@@ -69,7 +69,7 @@ public class Xpp3Dom
      */
     public static final String DEFAULT_SELF_COMBINATION_MODE = SELF_COMBINATION_MERGE;
 
-    private Xpp3Dom parent;
+    private ChildrenTracking childrenTracking;
     private Dom dom;
 
     public Xpp3Dom( String name )
@@ -114,7 +114,13 @@ public class Xpp3Dom
     public Xpp3Dom( Dom dom, Xpp3Dom parent )
     {
         this.dom = dom;
-        this.parent = parent;
+        this.childrenTracking = parent::replace;
+    }
+
+    public Xpp3Dom( Dom dom, ChildrenTracking childrenTracking )
+    {
+        this.dom = dom;
+        this.childrenTracking = childrenTracking;
     }
 
     public Dom getDom()
@@ -223,6 +229,7 @@ public class Xpp3Dom
     {
         List<Dom> children = new ArrayList<>( dom.getChildren() );
         children.add( xpp3Dom.dom );
+        xpp3Dom.childrenTracking = this::replace;
         update( new org.apache.maven.internal.xml.Xpp3Dom(
                 dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation() ) );
     }
@@ -452,18 +459,30 @@ public class Xpp3Dom
 
     private void update( Dom dom )
     {
-        if ( parent != null )
+        if ( childrenTracking != null )
         {
-            parent.replace( this.dom, dom );
+            childrenTracking.replace( this.dom, dom );
         }
         this.dom = dom;
     }
 
-    private void replace( Dom prevChild, Dom newChild )
+    private boolean replace( Object prevChild, Object newChild )
     {
         List<Dom> children = new ArrayList<>( dom.getChildren() );
-        children.replaceAll( d -> d == prevChild ? newChild : d );
+        children.replaceAll( d -> d == prevChild ? ( Dom ) newChild : d );
         update( new org.apache.maven.internal.xml.Xpp3Dom(
                 dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation() ) );
+        return true;
+    }
+
+    public void setChildrenTracking( ChildrenTracking childrenTracking )
+    {
+        this.childrenTracking = childrenTracking;
+    }
+
+    @FunctionalInterface
+    public interface ChildrenTracking
+    {
+        boolean replace( Object oldDelegate, Object newDelegate );
     }
 }

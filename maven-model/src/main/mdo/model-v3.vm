@@ -195,6 +195,7 @@ public class ${class.name}
         if ( ! Objects.equals( ( ( Xpp3Dom ) ${field.name} ).getDom(), getDelegate().${pfx}${cap}() ) )
         {
             update( getDelegate().with${cap}( ( ( Xpp3Dom ) ${field.name} ).getDom() ) );
+            ( ( Xpp3Dom ) ${field.name} ).setChildrenTracking( this::replace );
         }
       #else
         if ( !Objects.equals( ${field.name}, getDelegate().${pfx}${cap}() ) )
@@ -202,8 +203,10 @@ public class ${class.name}
         #if ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
             update( getDelegate().with${cap}(
                     ${field.name}.stream().map( c -> c.getDelegate() ).collect( Collectors.toList() ) ) );
+            ${field.name}.forEach( e -> e.childrenTracking = this::replace );
         #elseif ( $field.to && $field.to != "String" )
             update( getDelegate().with${cap}( ${field.name}.getDelegate() ) );
+            ${field.name}.childrenTracking = this::replace;
         #else
             update( getDelegate().with${cap}( ${field.name} ) );
         #end
@@ -224,6 +227,7 @@ public class ${class.name}
         update( getDelegate().with${cap}(
                 Stream.concat( getDelegate().get${cap}().stream(), Stream.of( ${v}.getDelegate() ) )
                         .collect( Collectors.toList() ) ) );
+        ${v}.childrenTracking = this::replace;
         #end
     }
 
@@ -263,6 +267,11 @@ public class ${class.name}
             list.replaceAll( d -> d == oldDelegate ? ( org.apache.maven.api.model.${field.to} ) newDelegate : d );
             update( getDelegate().with${cap}( list ) );
             return true;
+        }
+      #elseif ( $field.type == "DOM" )
+        if ( getDelegate().get${cap}() == oldDelegate )
+        {
+            update( getDelegate().with${cap}( ( org.apache.maven.api.xml.Dom ) newDelegate ) );
         }
       #end
     #end

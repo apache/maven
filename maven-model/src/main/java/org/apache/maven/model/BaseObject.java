@@ -24,7 +24,7 @@ import java.io.Serializable;
 public abstract class BaseObject
         implements Serializable, Cloneable, InputLocationTracker
 {
-    protected BaseObject parent;
+    protected ChildrenTracking childrenTracking;
     protected Object delegate;
 
     public BaseObject()
@@ -34,7 +34,13 @@ public abstract class BaseObject
     public BaseObject( Object delegate, BaseObject parent )
     {
         this.delegate = delegate;
-        this.parent = parent;
+        this.childrenTracking = parent != null ? parent::replace : null;
+    }
+
+    public BaseObject( Object delegate, ChildrenTracking parent )
+    {
+        this.delegate = delegate;
+        this.childrenTracking = parent;
     }
 
     public Object getDelegate()
@@ -42,23 +48,13 @@ public abstract class BaseObject
         return delegate;
     }
 
-    public BaseObject getParent()
-    {
-        return parent;
-    }
-
-    public void setParent( BaseObject parent )
-    {
-        this.parent = parent;
-    }
-
     public void update( Object newDelegate )
     {
         if ( delegate != newDelegate )
         {
-            if ( parent != null )
+            if ( childrenTracking != null )
             {
-                parent.replace( delegate, newDelegate );
+                childrenTracking.replace( delegate, newDelegate );
             }
             delegate = newDelegate;
         }
@@ -67,5 +63,11 @@ public abstract class BaseObject
     protected boolean replace( Object oldDelegate, Object newDelegate )
     {
         return false;
+    }
+
+    @FunctionalInterface
+    protected interface ChildrenTracking
+    {
+        boolean replace( Object oldDelegate, Object newDelegate );
     }
 }
