@@ -23,13 +23,46 @@ import org.apache.maven.api.xml.Dom;
 import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-public class XmlPlexusConfiguration
+public class XmlPlexusConfiguration extends DefaultPlexusConfiguration
 {
     public static PlexusConfiguration toPlexusConfiguration( Dom node )
     {
-        DefaultPlexusConfiguration dfc = new DefaultPlexusConfiguration( node.getName(), node.getValue() );
-        node.getAttributes().forEach( dfc::setAttribute );
-        node.getChildren().forEach( c -> dfc.addChild( toPlexusConfiguration( c ) ) );
-        return dfc;
+        return new XmlPlexusConfiguration( node );
     }
+
+    public XmlPlexusConfiguration( Dom node )
+    {
+        super( node.getName(), node.getValue() );
+        node.getAttributes().forEach( this::setAttribute );
+        node.getChildren().forEach( c -> this.addChild( new XmlPlexusConfiguration( c ) ) );
+    }
+
+    @Override
+    public String toString()
+    {
+        final StringBuilder buf = new StringBuilder().append( '<' ).append( getName() );
+        for ( final String a : getAttributeNames() )
+        {
+            buf.append( ' ' ).append( a ).append( "=\"" ).append( getAttribute( a ) ).append( '"' );
+        }
+        if ( getChildCount() > 0 )
+        {
+            buf.append( '>' );
+            for ( int i = 0, size = getChildCount(); i < size; i++ )
+            {
+                buf.append( getChild( i ) );
+            }
+            buf.append( "</" ).append( getName() ).append( '>' );
+        }
+        else if ( null != getValue() )
+        {
+            buf.append( '>' ).append( getValue() ).append( "</" ).append( getName() ).append( '>' );
+        }
+        else
+        {
+            buf.append( "/>" );
+        }
+        return buf.append( '\n' ).toString();
+    }
+
 }
