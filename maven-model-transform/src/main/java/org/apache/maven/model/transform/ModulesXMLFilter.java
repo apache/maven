@@ -19,7 +19,6 @@ package org.apache.maven.model.transform;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.model.transform.pull.NodeBufferingParser;
@@ -41,7 +40,7 @@ class ModulesXMLFilter
     }
 
     @Override
-    protected boolean shouldBuffer( ArrayList<String> stack )
+    protected boolean shouldBuffer( List<String> stack )
     {
         return stack.size() >= 2
                 && "project".equals( stack.get( 0 ) )

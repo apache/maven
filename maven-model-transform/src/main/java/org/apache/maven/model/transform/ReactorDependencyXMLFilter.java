@@ -19,7 +19,6 @@ package org.apache.maven.model.transform;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -45,7 +44,7 @@ public class ReactorDependencyXMLFilter extends NodeBufferingParser
     }
 
     @Override
-    protected boolean shouldBuffer( ArrayList<String> stack )
+    protected boolean shouldBuffer( List<String> stack )
     {
         return stack.contains( "dependency" );
     }

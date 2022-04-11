@@ -19,7 +19,6 @@ package org.apache.maven.model.transform;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -47,7 +46,7 @@ class CiFriendlyXMLFilter
     }
 
     @Override
-    protected boolean shouldBuffer( ArrayList<String> stack )
+    protected boolean shouldBuffer( List<String> stack )
     {
         return stack.contains( "version" );
     }

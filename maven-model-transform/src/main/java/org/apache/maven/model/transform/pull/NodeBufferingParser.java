@@ -83,7 +83,7 @@ public abstract class NodeBufferingParser extends BufferingParser
         return true;
     }
 
-    protected abstract boolean shouldBuffer( ArrayList<String> stack );
+    protected abstract boolean shouldBuffer( List<String> stack );
 
     protected abstract void process( List<Event> buffer );
 

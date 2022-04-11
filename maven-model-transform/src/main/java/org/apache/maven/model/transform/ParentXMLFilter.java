@@ -22,7 +22,6 @@ package org.apache.maven.model.transform;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -64,7 +63,7 @@ class ParentXMLFilter
     }
 
     @Override
-    protected boolean shouldBuffer( ArrayList<String> stack )
+    protected boolean shouldBuffer( List<String> stack )
     {
         return stack.size() >= 2
                 && "project".equals( stack.get( 0 ) )
