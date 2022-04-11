@@ -19,20 +19,19 @@ package org.apache.maven.model.plugin;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.api.xml.Dom;
-import org.apache.maven.api.model.Build;
-import org.apache.maven.api.model.Model;
-import org.apache.maven.api.model.Plugin;
-import org.apache.maven.api.model.PluginExecution;
-import org.apache.maven.api.model.PluginManagement;
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Handles expansion of general build plugin configuration into individual executions.
@@ -42,57 +41,46 @@ import org.apache.maven.model.building.ModelProblemCollector;
 @Named
 @Singleton
 public class DefaultPluginConfigurationExpander
-    implements PluginConfigurationExpander
+        implements PluginConfigurationExpander
 {
 
     @Override
-    public Model expandPluginConfiguration( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
+    public void expandPluginConfiguration( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         Build build = model.getBuild();
 
         if ( build != null )
         {
-            Build.Builder builder = Build.newBuilder( build );
-
-            builder.plugins( expand( build.getPlugins() ) );
+            expand( build.getPlugins() );
 
             PluginManagement pluginManagement = build.getPluginManagement();
 
             if ( pluginManagement != null )
             {
-                builder.pluginManagement( pluginManagement.withPlugins( expand( pluginManagement.getPlugins() ) ) );
+                expand( pluginManagement.getPlugins() );
             }
-
-            return model.withBuild( builder.build() );
         }
-
-        return model;
     }
 
-    private List<Plugin> expand( List<Plugin> plugins )
+    private void expand( List<Plugin> plugins )
     {
-        List<Plugin> newPlugins = new ArrayList<>( plugins.size() );
-
         for ( Plugin plugin : plugins )
         {
-            Dom parentDom = plugin.getConfiguration();
+            Xpp3Dom pluginConfiguration = (Xpp3Dom) plugin.getConfiguration();
 
-            if ( parentDom != null )
+            if ( pluginConfiguration != null )
             {
-                List<PluginExecution> executions = new ArrayList<>( plugin.getExecutions().size() );
                 for ( PluginExecution execution : plugin.getExecutions() )
                 {
-                    Dom childDom = execution.getConfiguration();
-                    executions.add( execution.withConfiguration(
-                            childDom != null ? childDom.merge( parentDom ) : parentDom ) );
+                    Xpp3Dom executionConfiguration = (Xpp3Dom) execution.getConfiguration();
+
+                    executionConfiguration =
+                            Xpp3Dom.mergeXpp3Dom( executionConfiguration, new Xpp3Dom( pluginConfiguration ) );
+
+                    execution.setConfiguration( executionConfiguration );
                 }
-                plugin = plugin.withExecutions( executions );
             }
-
-            newPlugins.add( plugin );
         }
-
-        return newPlugins;
     }
 
 }

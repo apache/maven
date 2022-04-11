@@ -35,7 +35,6 @@ import org.apache.maven.api.model.ModelBase;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.PluginContainer;
 import org.apache.maven.api.model.PluginExecution;
-import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.ReportPlugin;
 import org.apache.maven.api.model.ReportSet;
 import org.apache.maven.api.model.Reporting;
@@ -58,24 +57,26 @@ public class DefaultProfileInjector
     private ProfileModelMerger merger = new ProfileModelMerger();
 
     @Override
-    public Model injectProfile( Model model, Profile profile, ModelBuildingRequest request,
-                                ModelProblemCollector problems )
+    public void injectProfile( org.apache.maven.model.Model model,
+                               org.apache.maven.model.Profile profile,
+                               ModelBuildingRequest request,
+                               ModelProblemCollector problems )
     {
         if ( profile != null )
         {
-            Model.Builder builder = Model.newBuilder( model );
-            merger.mergeModelBase( builder, model, profile );
+            Model.Builder builder = Model.newBuilder( model.getDelegate() );
+            merger.mergeModelBase( builder, model.getDelegate(), profile.getDelegate() );
 
             if ( profile.getBuild() != null )
             {
-                Build build = model.getBuild() != null ? model.getBuild() : Build.newInstance();
+                Build build = model.getBuild() != null ? model.getBuild().getDelegate() : Build.newInstance();
                 Build.Builder bbuilder = Build.newBuilder( build );
-                merger.mergeBuildBase( bbuilder, build, profile.getBuild() );
+                merger.mergeBuildBase( bbuilder, build, profile.getBuild().getDelegate() );
                 builder.build( bbuilder.build() );
             }
-            return builder.build();
+
+            model.update( builder.build() );
         }
-        return model;
     }
 
     /**

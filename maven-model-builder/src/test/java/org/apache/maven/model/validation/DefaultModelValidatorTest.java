@@ -22,7 +22,7 @@ package org.apache.maven.model.validation;
 import java.io.InputStream;
 import java.util.List;
 
-import org.apache.maven.api.model.Model;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
@@ -50,7 +50,7 @@ public class DefaultModelValidatorTest
         String resource = "/poms/validation/" + pom;
         InputStream is = getClass().getResourceAsStream( resource );
         assertNotNull( is, "missing resource: " + resource );
-        return new MavenXpp3Reader().read( is );
+        return new Model( new MavenXpp3Reader().read( is ) );
     }
 
     private SimpleProblemCollector validate( String pom )

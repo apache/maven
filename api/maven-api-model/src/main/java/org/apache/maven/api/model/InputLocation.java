@@ -60,7 +60,7 @@ public class InputLocation
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
-        this.locations = selfLocationKey != null
+            this.locations = selfLocationKey != null
                 ?  Collections.singletonMap( selfLocationKey, this ) : Collections.emptyMap();
     }
 

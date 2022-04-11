@@ -49,7 +49,7 @@ public class DefaultModelValidator
 
         SimpleModelProblemCollector problems = new SimpleModelProblemCollector( result );
 
-        modelValidator.validateEffectiveModel( model.getDelegate(), request, problems );
+        modelValidator.validateEffectiveModel( model, request, problems );
 
         return result;
     }

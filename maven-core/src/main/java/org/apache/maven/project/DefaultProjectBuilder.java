@@ -21,7 +21,6 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -262,9 +261,9 @@ public class DefaultProjectBuilder
         return resolutionResult;
     }
 
-    private List<String> getProfileIds( List<org.apache.maven.api.model.Profile> profiles )
+    private List<String> getProfileIds( List<org.apache.maven.model.Profile> profiles )
     {
-        return profiles.stream().map( org.apache.maven.api.model.Profile::getId ).collect( Collectors.toList() );
+        return profiles.stream().map( org.apache.maven.model.Profile::getId ).collect( Collectors.toList() );
     }
 
     private ModelBuildingRequest getModelBuildingRequest( InternalConfig config )
@@ -281,9 +280,7 @@ public class DefaultProjectBuilder
 
         request.setValidationLevel( configuration.getValidationLevel() );
         request.setProcessPlugins( configuration.isProcessPlugins() );
-        request.setProfiles( configuration.getProfiles() != null
-                ? configuration.getProfiles().stream().map( Profile::getDelegate ).collect( Collectors.toList() )
-                : null );
+        request.setProfiles( configuration.getProfiles() );
         request.setActiveProfileIds( configuration.getActiveProfileIds() );
         request.setInactiveProfileIds( configuration.getInactiveProfileIds() );
         request.setSystemProperties( configuration.getSystemProperties() );
@@ -488,7 +485,7 @@ public class DefaultProjectBuilder
             noErrors = false;
         }
 
-        Model model = new Model( result.getFileModel() );
+        Model model = result.getFileModel();
 
         poolBuilder.put( model.getPomFile().toPath(),  model );
 
@@ -520,7 +517,7 @@ public class DefaultProjectBuilder
                     ModelProblem problem =
                         new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
                             + " does not exist", ModelProblem.Severity.ERROR, ModelProblem.Version.BASE,
-                                model.getDelegate(), -1, -1, null );
+                                model, -1, -1, null );
                     result.getProblems().add( problem );
 
                     noErrors = false;
@@ -557,7 +554,7 @@ public class DefaultProjectBuilder
                     ModelProblem problem =
                         new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
                             + " forms aggregation cycle " + buffer, ModelProblem.Severity.ERROR,
-                                ModelProblem.Version.BASE, model.getDelegate(), -1, -1, null );
+                                ModelProblem.Version.BASE, model, -1, -1, null );
                     result.getProblems().add( problem );
 
                     noErrors = false;
@@ -661,7 +658,7 @@ public class DefaultProjectBuilder
                 }
                 else
                 {
-                    project.setModel( new Model( interimResult.result.getEffectiveModel() ) );
+                    project.setModel( interimResult.result.getEffectiveModel() );
 
                     result = new DefaultProjectBuildingResult( project, e.getProblems(), null );
                 }
@@ -679,8 +676,8 @@ public class DefaultProjectBuilder
                               boolean buildParentIfNotExisting, ModelBuildingResult result,
                               Map<File, Boolean> profilesXmls, ProjectBuildingRequest projectBuildingRequest )
     {
-        project.setModel( new Model( result.getEffectiveModel() ) );
-        project.setOriginalModel( new Model( result.getFileModel() ) );
+        project.setModel( result.getEffectiveModel() );
+        project.setOriginalModel( result.getFileModel() );
 
         initParent( project, projects, buildParentIfNotExisting, result, projectBuildingRequest );
 
@@ -698,8 +695,8 @@ public class DefaultProjectBuilder
         }
 
         List<Profile> activeProfiles = new ArrayList<>();
-        activeProfiles.addAll( Profile.profileToApiV3( result.getActivePomProfiles( result.getModelIds().get( 0 ) ) ) );
-        activeProfiles.addAll( Profile.profileToApiV3( result.getActiveExternalProfiles() ) );
+        activeProfiles.addAll( result.getActivePomProfiles( result.getModelIds().get( 0 ) ) );
+        activeProfiles.addAll( result.getActiveExternalProfiles() );
         project.setActiveProfiles( activeProfiles );
 
         project.setInjectedProfileIds( "external", getProfileIds( result.getActiveExternalProfiles() ) );
@@ -901,7 +898,7 @@ public class DefaultProjectBuilder
                              ModelBuildingResult result, ProjectBuildingRequest projectBuildingRequest )
     {
         Model parentModel = result.getModelIds().size() > 1 && !result.getModelIds().get( 1 ).isEmpty()
-                                ? new Model( result.getRawModel( result.getModelIds().get( 1 ) ) )
+                                ? result.getRawModel( result.getModelIds().get( 1 ) )
                                 : null;
 
         if ( parentModel != null )
@@ -915,8 +912,7 @@ public class DefaultProjectBuilder
 
             // org.apache.maven.its.mng4834:parent:0.1
             String parentModelId = result.getModelIds().get( 1 );
-            Path parentPomPath = result.getRawModel( parentModelId ).getPomFile();
-            File parentPomFile = parentPomPath != null ? parentPomPath.toFile() : null;
+            File parentPomFile = result.getRawModel( parentModelId ).getPomFile();
             MavenProject parent = projects.get( parentPomFile );
             if ( parent == null && buildParentIfNotExisting )
             {
@@ -986,7 +982,7 @@ public class DefaultProjectBuilder
 
         if ( !modelId.isEmpty() )
         {
-            final Model model = new Model( result.getRawModel( modelId ) );
+            final Model model = result.getRawModel( modelId );
             groupId = model.getGroupId() != null
                           ? model.getGroupId()
                           : inheritedGroupId( result, modelIndex + 1 );

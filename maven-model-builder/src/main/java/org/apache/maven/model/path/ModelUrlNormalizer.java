@@ -19,7 +19,7 @@ package org.apache.maven.model.path;
  * under the License.
  */
 
-import org.apache.maven.api.model.Model;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 
 /**
@@ -37,6 +37,6 @@ public interface ModelUrlNormalizer
      * @param model The model whose URLs should be normalized, may be {@code null}.
      * @param request The model building request that holds further settings, must not be {@code null}.
      */
-    Model normalize( Model model, ModelBuildingRequest request );
+    void normalize( Model model, ModelBuildingRequest request );
 
 }

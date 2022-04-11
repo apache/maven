@@ -19,7 +19,7 @@ package org.apache.maven.model.management;
  * under the License.
  */
 
-import org.apache.maven.api.model.Model;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 
@@ -39,6 +39,6 @@ public interface DependencyManagementInjector
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    Model injectManagement( Model model, ModelBuildingRequest request, ModelProblemCollector problems );
+    void injectManagement( Model model, ModelBuildingRequest request, ModelProblemCollector problems );
 
 }

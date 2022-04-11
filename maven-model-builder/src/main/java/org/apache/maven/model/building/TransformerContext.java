@@ -21,7 +21,7 @@ package org.apache.maven.model.building;
 
 import java.nio.file.Path;
 
-import org.apache.maven.api.model.Model;
+import org.apache.maven.model.Model;
 
 /**
  * Context used to transform a pom file.

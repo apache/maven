@@ -19,9 +19,8 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import static org.apache.maven.model.building.Result.error;
+import static org.apache.maven.model.building.Result.newResult;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +32,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,26 +40,29 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.maven.api.model.Activation;
-import org.apache.maven.api.model.ActivationFile;
-import org.apache.maven.api.model.Build;
-import org.apache.maven.api.model.Dependency;
-import org.apache.maven.api.model.DependencyManagement;
-import org.apache.maven.api.model.InputLocation;
-import org.apache.maven.api.model.InputSource;
-import org.apache.maven.api.model.Model;
-import org.apache.maven.api.model.Parent;
-import org.apache.maven.api.model.Plugin;
-import org.apache.maven.api.model.PluginManagement;
-import org.apache.maven.api.model.Profile;
-import org.apache.maven.api.model.Repository;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.building.Source;
 import org.apache.maven.feature.Features;
+import org.apache.maven.model.Activation;
+import org.apache.maven.model.ActivationFile;
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.InputLocation;
+import org.apache.maven.api.model.InputSource;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
+import org.apache.maven.model.Profile;
+import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.composition.DependencyManagementImporter;
@@ -94,19 +97,15 @@ import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.eclipse.sisu.Nullable;
 
-import static org.apache.maven.model.building.Result.error;
-import static org.apache.maven.model.building.Result.newResult;
-
 /**
  * @author Benjamin Bentmann
  */
 @Named
 @Singleton
-@SuppressWarnings( {"checkstyle:JavaDocMethod", "checkstyle:HiddenField", "checkstyle:ParameterNumber" } )
 public class DefaultModelBuilder
-    implements ModelBuilder
+        implements ModelBuilder
 {
-    private final MavenMerger mavenMerger = new FileToRawModelMerger();
+    private final MavenMerger modelMerger = new FileToRawModelMerger();
 
     private final ModelProcessor modelProcessor;
     private final ModelValidator modelValidator;
@@ -128,6 +127,7 @@ public class DefaultModelBuilder
     private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private final ModelVersionProcessor versionProcessor;
 
+    @SuppressWarnings( "checkstyle:ParameterNumber" )
     @Inject
     public DefaultModelBuilder(
             ModelProcessor modelProcessor,
@@ -450,10 +450,10 @@ public class DefaultModelBuilder
         // read and validate raw model
         Model fileModel = readFileModel( request, problems );
 
-        fileModel = activateFileModel( request, result, fileModel, problems );
-
         request.setFileModel( fileModel );
         result.setFileModel( fileModel );
+
+        activateFileModel( request, result, problems );
 
         if ( !request.isTwoPhaseBuilding() )
         {
@@ -467,10 +467,11 @@ public class DefaultModelBuilder
         return result;
     }
 
-    private Model activateFileModel( final ModelBuildingRequest request, final DefaultModelBuildingResult result,
-                          Model inputModel, DefaultModelProblemCollector problems )
-        throws ModelBuildingException
+    private void activateFileModel( final ModelBuildingRequest request, final DefaultModelBuildingResult result,
+                                    DefaultModelProblemCollector problems )
+            throws ModelBuildingException
     {
+        Model inputModel = request.getFileModel();
         problems.setRootModel( inputModel );
 
         // profile activation
@@ -500,23 +501,21 @@ public class DefaultModelBuilder
 
         // model normalization
         problems.setSource( inputModel );
-        inputModel = modelNormalizer.mergeDuplicates( inputModel, request, problems );
+        inputModel.update( modelNormalizer.mergeDuplicates( inputModel.getDelegate(), request, problems ) );
 
-        Map<String, Activation> interpolatedActivations = getProfileActivations( inputModel );
-        inputModel = injectProfileActivations( inputModel, interpolatedActivations );
+        Map<String, Activation> interpolatedActivations = getProfileActivations( inputModel, false );
+        injectProfileActivations( inputModel, interpolatedActivations );
 
         // profile injection
         for ( Profile activeProfile : activePomProfiles )
         {
-            inputModel = profileInjector.injectProfile( inputModel, activeProfile, request, problems );
+            profileInjector.injectProfile( inputModel, activeProfile, request, problems );
         }
 
         for ( Profile activeProfile : activeExternalProfiles )
         {
-            inputModel = profileInjector.injectProfile( inputModel, activeProfile, request, problems );
+            profileInjector.injectProfile( inputModel, activeProfile, request, problems );
         }
-
-        return inputModel;
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
@@ -566,39 +565,39 @@ public class DefaultModelBuilder
                                                                                  profileActivationContext, problems );
             result.setActivePomProfiles( modelId, activePomProfiles );
 
-            Model tmpModel = rawModel;
+            Model tmpModel = rawModel.clone();
 
             problems.setSource( tmpModel );
 
             // model normalization
-            tmpModel = modelNormalizer.mergeDuplicates( tmpModel, request, problems );
+            tmpModel = new Model( modelNormalizer.mergeDuplicates( tmpModel.getDelegate(), request, problems ) );
 
             profileActivationContext.setProjectProperties( tmpModel.getProperties() );
 
             Map<String, Activation> interpolatedActivations = getInterpolatedActivations( rawModel,
                                                                                           profileActivationContext,
                                                                                           problems );
-            tmpModel = injectProfileActivations( tmpModel, interpolatedActivations );
+            injectProfileActivations( tmpModel, interpolatedActivations );
 
             // profile injection
             for ( Profile activeProfile : result.getActivePomProfiles( modelId ) )
             {
-                tmpModel = profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
+                profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
             }
 
             if ( currentData == resultData )
             {
                 for ( Profile activeProfile : activeExternalProfiles )
                 {
-                    tmpModel = profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
+                    profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
                 }
                 result.setEffectiveModel( tmpModel );
             }
 
+            lineage.add( tmpModel );
+
             if ( currentData == superData )
             {
-                lineage.add( tmpModel );
-
                 break;
             }
 
@@ -627,14 +626,8 @@ public class DefaultModelBuilder
             }
             else
             {
-                if ( !Objects.equals( tmpModel.getParent().getVersion(), parentData.getVersion() ) )
-                {
-//                    tmpModel = tmpModel.withParent( tmpModel.getParent().withVersion( parentData.getVersion() ) );
-                }
                 currentData = parentData;
             }
-
-            lineage.add( tmpModel );
         }
 
         problems.setSource( result.getRawModel() );
@@ -652,7 +645,7 @@ public class DefaultModelBuilder
         resultModel = interpolateModel( resultModel, request, problems );
 
         // url normalization
-        resultModel = modelUrlNormalizer.normalize( resultModel, request );
+        modelUrlNormalizer.normalize( resultModel, request );
 
         result.setEffectiveModel( resultModel );
 
@@ -666,23 +659,19 @@ public class DefaultModelBuilder
                                                                 DefaultProfileActivationContext context,
                                                                 DefaultModelProblemCollector problems )
     {
-        Map<String, Activation> interpolatedActivations = getProfileActivations( rawModel );
-        for ( Map.Entry<String, Activation> entry : interpolatedActivations.entrySet() )
+        Map<String, Activation> interpolatedActivations = getProfileActivations( rawModel, true );
+        for ( Activation activation : interpolatedActivations.values() )
         {
-            Activation activation = entry.getValue();
             if ( activation.getFile() != null )
             {
-                Activation value = activation.withFile(
-                        replaceWithInterpolatedValue( activation.getFile(), context, problems ) );
-                entry.setValue( value );
+                replaceWithInterpolatedValue( activation.getFile(), context, problems );
             }
         }
         return interpolatedActivations;
     }
 
-    private ActivationFile replaceWithInterpolatedValue( ActivationFile activationFile,
-                                                         ProfileActivationContext context,
-                                                         DefaultModelProblemCollector problems  )
+    private void replaceWithInterpolatedValue( ActivationFile activationFile, ProfileActivationContext context,
+                                               DefaultModelProblemCollector problems  )
     {
         try
         {
@@ -690,13 +679,13 @@ public class DefaultModelBuilder
             {
                 String path = activationFile.getExists();
                 String absolutePath = profileActivationFilePathInterpolator.interpolate( path, context );
-                return activationFile.withExists( absolutePath );
+                activationFile.setExists( absolutePath );
             }
             else if ( isNotEmpty( activationFile.getMissing() ) )
             {
                 String path = activationFile.getMissing();
                 String absolutePath = profileActivationFilePathInterpolator.interpolate( path, context );
-                return activationFile.withMissing( absolutePath );
+                activationFile.setMissing( absolutePath );
             }
         }
         catch ( InterpolationException e )
@@ -709,7 +698,6 @@ public class DefaultModelBuilder
                     activationFile.getLocation( isNotEmpty( activationFile.getExists() ) ? "exists" : "missing"  ) )
                     .setException( e ) );
         }
-        return activationFile;
     }
 
     private static boolean isNotEmpty( String string )
@@ -738,12 +726,10 @@ public class DefaultModelBuilder
         problems.setRootModel( resultModel );
 
         // model path translation
-        Path projectDirectory = resultModel.getProjectDirectory();
-        resultModel = modelPathTranslator.alignToBaseDirectory( resultModel,
-                projectDirectory != null ? projectDirectory.toFile() : null, request );
+        modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory(), request );
 
         // plugin management injection
-        resultModel = pluginManagementInjector.injectManagement( resultModel, request, problems );
+        pluginManagementInjector.injectManagement( resultModel, request, problems );
 
         fireEvent( resultModel, request, problems, ModelBuildingEventCatapult.BUILD_EXTENSIONS_ASSEMBLED );
 
@@ -755,33 +741,31 @@ public class DefaultModelBuilder
             }
 
             // lifecycle bindings injection
-            resultModel = lifecycleBindingsInjector.injectLifecycleBindings( resultModel, request, problems );
+            lifecycleBindingsInjector.injectLifecycleBindings( resultModel, request, problems );
         }
 
         // dependency management import
-        resultModel = importDependencyManagement( resultModel, request, problems, imports );
+        importDependencyManagement( resultModel, request, problems, imports );
 
         // dependency management injection
-        resultModel = dependencyManagementInjector.injectManagement( resultModel, request, problems );
+        dependencyManagementInjector.injectManagement( resultModel, request, problems );
 
-        resultModel = modelNormalizer.injectDefaultValues( resultModel, request, problems );
+        resultModel.update( modelNormalizer.injectDefaultValues( resultModel.getDelegate(), request, problems ) );
 
         if ( request.isProcessPlugins() )
         {
             // reports configuration
-            resultModel = reportConfigurationExpander.expandPluginConfiguration( resultModel, request, problems );
+            reportConfigurationExpander.expandPluginConfiguration( resultModel, request, problems );
 
             // reports conversion to decoupled site plugin
-            resultModel = reportingConverter.convertReporting( resultModel, request, problems );
+            reportingConverter.convertReporting( resultModel, request, problems );
 
             // plugins configuration
-            resultModel = pluginConfigurationExpander.expandPluginConfiguration( resultModel, request, problems );
+            pluginConfigurationExpander.expandPluginConfiguration( resultModel, request, problems );
         }
 
         // effective model validation
         modelValidator.validateEffectiveModel( resultModel, request, problems );
-
-        result.setEffectiveModel( resultModel );
 
         if ( hasModelErrors( problems ) )
         {
@@ -826,7 +810,7 @@ public class DefaultModelBuilder
         throws ModelBuildingException
     {
         ModelSource modelSource = request.getModelSource();
-        Model model = fromCache( request.getModelCache(), modelSource, ModelCacheTag.FILE );
+        org.apache.maven.api.model.Model model = fromCache( request.getModelCache(), modelSource, ModelCacheTag.FILE );
         if ( model == null )
         {
             model = doReadFileModel( modelSource, request, problems );
@@ -844,15 +828,15 @@ public class DefaultModelBuilder
             }
         }
 
-        return model;
+        return new Model( model );
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
-    private Model doReadFileModel( ModelSource modelSource, ModelBuildingRequest request,
-                                 DefaultModelProblemCollector problems )
+    private org.apache.maven.api.model.Model doReadFileModel( ModelSource modelSource, ModelBuildingRequest request,
+                                                              DefaultModelProblemCollector problems )
             throws ModelBuildingException
     {
-        Model model;
+        org.apache.maven.api.model.Model model;
         problems.setSource( modelSource.getLocation() );
         try
         {
@@ -865,8 +849,8 @@ public class DefaultModelBuilder
             InputSource source;
             if ( request.isLocationTracking() )
             {
-                source = (InputSource) options.computeIfAbsent( ModelProcessor.INPUT_SOURCE,
-                            k -> new InputSource( null, modelSource.getLocation() ) );
+                source = new InputSource( null, modelSource.getLocation() );
+                options.put( ModelProcessor.INPUT_SOURCE, source );
             }
             else
             {
@@ -946,11 +930,14 @@ public class DefaultModelBuilder
 
         if ( modelSource instanceof FileModelSource )
         {
-            model = Model.newBuilder( model ).pomFile( ( (FileModelSource) modelSource ).getFile().toPath() ).build();
+            model = model.withPomFile( ( (FileModelSource) modelSource ).getFile().toPath() );
         }
-        problems.setSource( model );
 
-        modelValidator.validateFileModel( model, request, problems );
+        Model retModel = new Model( model );
+
+        problems.setSource( retModel );
+
+        modelValidator.validateFileModel( retModel, request, problems );
 
         if ( hasFatalErrors( problems ) )
         {
@@ -987,13 +974,14 @@ public class DefaultModelBuilder
             try
             {
                 // must implement TransformContext, but should use request to access system properties/modelcache
-                Model transformedFileModel = modelProcessor.read( pomFile,
-                   Collections.singletonMap( ModelReader.TRANSFORMER_CONTEXT, context ) );
+                org.apache.maven.api.model.Model transformedFileModel = modelProcessor.read( pomFile,
+                        Collections.singletonMap( ModelReader.TRANSFORMER_CONTEXT, context ) );
 
                 // rawModel with locationTrackers, required for proper feedback during validations
 
                 // Apply enriched data
-                rawModel = mavenMerger.merge( rawModel, transformedFileModel, false, null );
+                rawModel = new Model( modelMerger.merge( rawModel.getDelegate(),
+                        transformedFileModel, false, null ) );
             }
             catch ( IOException e )
             {
@@ -1006,7 +994,7 @@ public class DefaultModelBuilder
         }
         else
         {
-            rawModel = request.getFileModel();
+            rawModel = request.getFileModel().clone();
         }
 
         modelValidator.validateRawModel( rawModel, request, problems );
@@ -1027,6 +1015,11 @@ public class DefaultModelBuilder
     }
 
     private String getGroupId( Model model )
+    {
+        return getGroupId( model.getDelegate() );
+    }
+
+    private String getGroupId( org.apache.maven.api.model.Model model )
     {
         String groupId = model.getGroupId();
         if ( groupId == null && model.getParent() != null )
@@ -1080,21 +1073,13 @@ public class DefaultModelBuilder
         {
             try
             {
-                try
-                {
-                    modelResolver.addRepository( repository, replaceRepositories );
-                }
-                catch ( AbstractMethodError e )
-                {
-                    modelResolver.addRepository( new org.apache.maven.model.Repository( repository ),
-                            replaceRepositories );
-                }
+                modelResolver.addRepository( repository, replaceRepositories );
             }
             catch ( InvalidRepositoryException e )
             {
                 problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Invalid repository " + repository.getId() + ": " + e.getMessage() )
-                    .setLocation( repository.getLocation( "" ) ).setException( e ) );
+                        .setMessage( "Invalid repository " + repository.getId() + ": " + e.getMessage() )
+                        .setLocation( repository.getLocation( "" ) ).setException( e ) );
             }
         }
     }
@@ -1154,16 +1139,16 @@ public class DefaultModelBuilder
     private Model assembleInheritance( List<Model> lineage, ModelBuildingRequest request,
                                       ModelProblemCollector problems )
     {
-        Model parent = lineage.get( lineage.size() - 1 );
+        org.apache.maven.api.model.Model parent = lineage.get( lineage.size() - 1 ).getDelegate();
         for ( int i = lineage.size() - 2; i >= 0; i-- )
         {
             Model child = lineage.get( i );
-            parent = inheritanceAssembler.assembleModelInheritance( child, parent, request, problems );
+            parent = inheritanceAssembler.assembleModelInheritance( child.getDelegate(), parent, request, problems );
         }
-        return parent;
+        return new Model( parent );
     }
 
-    private Map<String, Activation> getProfileActivations( Model model )
+    private Map<String, Activation> getProfileActivations( Model model, boolean clone )
     {
         Map<String, Activation> activations = new HashMap<>();
         for ( Profile profile : model.getProfiles() )
@@ -1175,15 +1160,19 @@ public class DefaultModelBuilder
                 continue;
             }
 
+            if ( clone )
+            {
+                activation = activation.clone();
+            }
+
             activations.put( profile.getId(), activation );
         }
 
         return activations;
     }
 
-    private Model injectProfileActivations( Model model, Map<String, Activation> activations )
+    private void injectProfileActivations( Model model, Map<String, Activation> activations )
     {
-        List<Profile> newProfiles = null;
         for ( Profile profile : model.getProfiles() )
         {
             Activation activation = profile.getActivation();
@@ -1194,66 +1183,44 @@ public class DefaultModelBuilder
             }
 
             // restore activation
-            if ( newProfiles == null )
-            {
-                newProfiles = new ArrayList<>( model.getProfiles() );
-            }
-            int idx = model.getProfiles().indexOf( profile );
-            Profile newProfile = Profile.newBuilder( profile ).
-                    activation( activations.get( profile.getId() ) ).build();
-            newProfiles.set( idx, newProfile );
+            profile.setActivation( activations.get( profile.getId() ) );
         }
-        return Model.newBuilder( model ).profiles( newProfiles ).build();
     }
 
     private Model interpolateModel( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         // save profile activations before interpolation, since they are evaluated with limited scope
-        Map<String, Activation> originalActivations = getProfileActivations( model );
+        Map<String, Activation> originalActivations = getProfileActivations( model, true );
 
-        // Overwrite existing values in model properties. Otherwise it's not possible
-        // to define the version via command line: mvn -Drevision=6.5.7 ...
-        Properties props = new Properties();
-        props.putAll( model.getProperties() );
-        versionProcessor.overwriteModelProperties( props, request );
-        if ( !props.equals( model.getProperties() ) )
-        {
-            model = model.withProperties( props );
-        }
-
-        Path projectDir = model.getProjectDirectory();
-        Model interpolatedModel = modelInterpolator.interpolateModel(
-                model, projectDir != null ? projectDir.toFile() : null, request, problems );
+        Model interpolatedModel = new Model( modelInterpolator.interpolateModel(
+                model.getDelegate(), model.getProjectDirectory(), request, problems ) );
         if ( interpolatedModel.getParent() != null )
         {
             StringSearchInterpolator ssi = new StringSearchInterpolator();
             ssi.addValueSource( new MapBasedValueSource( request.getUserProperties() ) );
+
             ssi.addValueSource( new MapBasedValueSource( model.getProperties() ) );
+
             ssi.addValueSource( new MapBasedValueSource( request.getSystemProperties() ) );
 
             try
             {
-                String parentVersion = interpolatedModel.getParent().getVersion();
-
-                String interpolated = ssi.interpolate( parentVersion );
-
-                if ( !parentVersion.equals( interpolated ) )
-                {
-                    interpolatedModel = interpolatedModel.withParent(
-                            interpolatedModel.getParent().withVersion( interpolated ) );
-                }
+                String interpolated = ssi.interpolate( interpolatedModel.getParent().getVersion() );
+                interpolatedModel.getParent().setVersion( interpolated );
             }
             catch ( Exception e )
             {
                 ModelProblemCollectorRequest mpcr =
-                    new ModelProblemCollectorRequest( Severity.ERROR,
-                                                      Version.BASE ).setMessage( "Failed to interpolate field: "
-                                                          + interpolatedModel.getParent().getVersion()
-                                                          + " on class: " ).setException( e );
+                        new ModelProblemCollectorRequest( Severity.ERROR,
+                                Version.BASE ).setMessage( "Failed to interpolate field: "
+                                + interpolatedModel.getParent().getVersion()
+                                + " on class: " ).setException( e );
                 problems.add( mpcr );
             }
+
+
         }
-        interpolatedModel = interpolatedModel.withPomFile( model.getPomFile() );
+        interpolatedModel.setPomFile( model.getPomFile() );
 
         // restore profiles with file activation to their value before full interpolation
         injectProfileActivations( model, originalActivations );
@@ -1328,7 +1295,7 @@ public class DefaultModelBuilder
             {
                 return null;
             }
-            candidateSource = new FileModelSource( candidateModel.getPomFile().toFile() );
+            candidateSource = new FileModelSource( candidateModel.getPomFile() );
         }
 
         //
@@ -1463,10 +1430,9 @@ public class DefaultModelBuilder
                                                ModelProblemUtils.toSourceHint( childModel ) ) );
 
         ModelSource modelSource;
-        AtomicReference<Parent> modified = new AtomicReference<>();
         try
         {
-            modelSource = modelResolver.resolveModel( parent, modified );
+            modelSource = modelResolver.resolveModel( parent );
         }
         catch ( UnresolvableModelException e )
         {
@@ -1497,12 +1463,6 @@ public class DefaultModelBuilder
             problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE )
                 .setMessage( buffer.toString() ).setLocation( parent.getLocation( "" ) ).setException( e ) );
             throw problems.newModelBuildingException();
-        }
-
-        if ( modified.get() != null )
-        {
-            parent = modified.get();
-            childModel = childModel.withParent( parent );
         }
 
         int validationLevel = Math.min( request.getValidationLevel(), ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 );
@@ -1545,51 +1505,38 @@ public class DefaultModelBuilder
 
     private Model getSuperModel()
     {
-        return superPomProvider.getSuperModel( "4.0.0" );
+        return new Model( superPomProvider.getSuperModel( "4.0.0" ) );
     }
 
-    private Model importDependencyManagement( Model model, ModelBuildingRequest request,
+    private void importDependencyManagement( Model model, ModelBuildingRequest request,
                                              DefaultModelProblemCollector problems, Collection<String> importIds )
     {
         DependencyManagement depMgmt = model.getDependencyManagement();
 
         if ( depMgmt == null )
         {
-            return model;
+            return;
         }
 
         String importing = model.getGroupId() + ':' + model.getArtifactId() + ':' + model.getVersion();
 
         importIds.add( importing );
 
-        List<DependencyManagement> importMgmts = null;
+        List<org.apache.maven.api.model.DependencyManagement> importMgmts = null;
 
-        List<Dependency> newDependencies = null;
-
-        for ( Dependency dependency : depMgmt.getDependencies() )
+        for ( Iterator<Dependency> it = depMgmt.getDependencies().iterator(); it.hasNext(); )
         {
+            Dependency dependency = it.next();
+
             if ( !"pom".equals( dependency.getType() ) || !"import".equals( dependency.getScope() ) )
             {
                 continue;
             }
 
-            if ( newDependencies == null )
-            {
-                newDependencies = new ArrayList<>( depMgmt.getDependencies() );
-            }
-            newDependencies.remove( dependency );
-
-            AtomicReference<Dependency> resolvedDependency = new AtomicReference<>();
+            it.remove();
 
             DependencyManagement importMgmt = loadDependencyManagement( model, request, problems,
-                    dependency, importIds, resolvedDependency );
-
-            if ( resolvedDependency.get() != null )
-            {
-                // TODO: The dependency for the BOM has been resolved, but we are actually getting rid of it...
-                //       Before the introduction of the immutable model, the dependency was updated.
-                Dependency resolvedDep = resolvedDependency.get();
-            }
+                    dependency, importIds );
 
             if ( importMgmt != null )
             {
@@ -1598,25 +1545,20 @@ public class DefaultModelBuilder
                     importMgmts = new ArrayList<>();
                 }
 
-                importMgmts.add( importMgmt );
+                importMgmts.add( importMgmt.getDelegate() );
             }
-        }
-
-        if ( newDependencies != null )
-        {
-            model = model.withDependencyManagement( depMgmt.withDependencies( newDependencies ) );
         }
 
         importIds.remove( importing );
 
-        return dependencyManagementImporter.importManagement( model, importMgmts, request, problems );
+        model.update( dependencyManagementImporter.importManagement(
+                model.getDelegate(), importMgmts, request, problems ) );
     }
 
     private DependencyManagement loadDependencyManagement( Model model, ModelBuildingRequest request,
                                                            DefaultModelProblemCollector problems,
                                                            Dependency dependency,
-                                                           Collection<String> importIds,
-                                                           AtomicReference<Dependency> resolvedDependency )
+                                                           Collection<String> importIds )
     {
         String groupId = dependency.getGroupId();
         String artifactId = dependency.getArtifactId();
@@ -1664,19 +1606,21 @@ public class DefaultModelBuilder
             return null;
         }
 
-        DependencyManagement importMgmt = fromCache( request.getModelCache(), groupId, artifactId, version,
-                                                    ModelCacheTag.IMPORT );
+        org.apache.maven.api.model.DependencyManagement importMgmt =
+                fromCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT );
         if ( importMgmt == null )
         {
-            importMgmt = doLoadDependencyManagement( model, request, problems, dependency,
-                                                     groupId, artifactId, version, importIds, resolvedDependency );
-            if ( importMgmt != null )
+            DependencyManagement importMgmtV3 = doLoadDependencyManagement( model, request, problems, dependency,
+                    groupId, artifactId, version, importIds );
+            if ( importMgmtV3 != null )
             {
-                intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, importMgmt );
+                importMgmt = importMgmtV3.getDelegate();
+                intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT,
+                        importMgmt );
             }
         }
 
-        return importMgmt;
+        return importMgmt != null ? new DependencyManagement( importMgmt ) : null;
     }
 
     @SuppressWarnings( "checkstyle:parameternumber" )
@@ -1686,8 +1630,7 @@ public class DefaultModelBuilder
                                                              String groupId,
                                                              String artifactId,
                                                              String version,
-                                                             Collection<String> importIds,
-                                                             AtomicReference<Dependency> resolvedDependency )
+                                                             Collection<String> importIds )
     {
         DependencyManagement importMgmt;
         final WorkspaceModelResolver workspaceResolver = request.getWorkspaceModelResolver();
@@ -1721,7 +1664,7 @@ public class DefaultModelBuilder
             final ModelSource importSource;
             try
             {
-                importSource = modelResolver.resolveModel( dependency, resolvedDependency );
+                importSource = modelResolver.resolveModel( dependency );
             }
             catch ( UnresolvableModelException e )
             {
@@ -1769,7 +1712,7 @@ public class DefaultModelBuilder
 
         if ( importMgmt == null )
         {
-            importMgmt = DependencyManagement.newInstance();
+            importMgmt = new DependencyManagement();
         }
         return importMgmt;
     }

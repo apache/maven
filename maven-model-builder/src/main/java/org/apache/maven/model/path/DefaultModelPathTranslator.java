@@ -55,13 +55,14 @@ public class DefaultModelPathTranslator
     }
 
     @Override
-    public Model alignToBaseDirectory( Model model, File basedir, ModelBuildingRequest request )
+    public void alignToBaseDirectory( org.apache.maven.model.Model modelV3, File basedir, ModelBuildingRequest request )
     {
-        if ( model == null || basedir == null )
+        if ( modelV3 == null || basedir == null )
         {
-            return model;
+            return;
         }
 
+        Model model = modelV3.getDelegate();
         Build build = model.getBuild();
         Build newBuild = null;
         if ( build != null )
@@ -89,12 +90,11 @@ public class DefaultModelPathTranslator
         }
         if ( newBuild != build || newReporting != reporting )
         {
-            return Model.newBuilder( model )
+            modelV3.update( Model.newBuilder( model )
                     .build( newBuild )
                     .reporting( newReporting )
-                    .build();
+                    .build() );
         }
-        return model;
     }
 
     private <T> List<T> map( List<T> resources, Function<T, T> mapper )

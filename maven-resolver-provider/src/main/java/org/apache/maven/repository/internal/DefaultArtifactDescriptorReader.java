@@ -239,7 +239,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                                                                           pomArtifact.getVersion() ) );
                 }
 
-                model = new Model( modelBuilder.build( modelRequest ).getEffectiveModel() );
+                model = modelBuilder.build( modelRequest ).getEffectiveModel();
             }
             catch ( ModelBuildingException e )
             {

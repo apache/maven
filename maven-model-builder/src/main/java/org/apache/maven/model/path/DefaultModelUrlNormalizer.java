@@ -23,12 +23,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.Objects;
-
-import org.apache.maven.api.model.DistributionManagement;
-import org.apache.maven.api.model.Model;
-import org.apache.maven.api.model.Scm;
-import org.apache.maven.api.model.Site;
+import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Scm;
+import org.apache.maven.model.Site;
 import org.apache.maven.model.building.ModelBuildingRequest;
 
 /**
@@ -40,7 +38,7 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 @Named
 @Singleton
 public class DefaultModelUrlNormalizer
-    implements ModelUrlNormalizer
+        implements ModelUrlNormalizer
 {
 
     private final UrlNormalizer urlNormalizer;
@@ -52,29 +50,21 @@ public class DefaultModelUrlNormalizer
     }
 
     @Override
-    public Model normalize( Model model, ModelBuildingRequest request )
+    public void normalize( Model model, ModelBuildingRequest request )
     {
         if ( model == null )
         {
-            return null;
+            return;
         }
 
-        Model.Builder builder = Model.newBuilder( model );
-
-        builder.url( normalize( model.getUrl() ) );
+        model.setUrl( normalize( model.getUrl() ) );
 
         Scm scm = model.getScm();
         if ( scm != null )
         {
-            scm = Scm.newBuilder( scm )
-                    .url( normalize( scm.getUrl() ) )
-                    .connection( normalize( scm.getConnection() ) )
-                    .developerConnection( normalize( scm.getDeveloperConnection() ) )
-                    .build();
-            if ( scm != model.getScm() )
-            {
-                builder.scm( scm );
-            }
+            scm.setUrl( normalize( scm.getUrl() ) );
+            scm.setConnection( normalize( scm.getConnection() ) );
+            scm.setDeveloperConnection( normalize( scm.getDeveloperConnection() ) );
         }
 
         DistributionManagement dist = model.getDistributionManagement();
@@ -83,23 +73,14 @@ public class DefaultModelUrlNormalizer
             Site site = dist.getSite();
             if ( site != null )
             {
-                site = Site.newBuilder( site )
-                        .url( normalize( site.getUrl() ) )
-                        .build();
-                if ( site != dist.getSite() )
-                {
-                    builder.distributionManagement( dist.withSite( site ) );
-                }
+                site.setUrl( normalize( site.getUrl() ) );
             }
         }
-
-        return builder.build();
     }
 
     private String normalize( String url )
     {
-        String newUrl = urlNormalizer.normalize( url );
-        return Objects.equals( url, newUrl ) ? null : newUrl;
+        return urlNormalizer.normalize( url );
     }
 
 }

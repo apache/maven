@@ -21,8 +21,8 @@ package org.apache.maven.model.building;
 
 import java.util.List;
 
-import org.apache.maven.api.model.Model;
-import org.apache.maven.api.model.Profile;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Profile;
 
 /**
  * Collects the output of the model builder.

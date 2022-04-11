@@ -109,6 +109,11 @@ public class DefaultModelReader
     private InputSource getSource( Map<String, ?> options )
     {
         Object value = ( options != null ) ? options.get( INPUT_SOURCE ) : null;
+        if ( value instanceof org.apache.maven.model.InputSource )
+        {
+            org.apache.maven.model.InputSource src = ( org.apache.maven.model.InputSource ) value;
+            return new InputSource( src.getModelId(), src.getLocation() );
+        }
         return (InputSource) value;
     }
 

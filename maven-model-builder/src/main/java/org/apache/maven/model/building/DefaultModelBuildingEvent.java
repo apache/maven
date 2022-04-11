@@ -19,7 +19,7 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import org.apache.maven.api.model.Model;
+import org.apache.maven.model.Model;
 
 /**
  * Holds data relevant for a model building event.
@@ -30,7 +30,7 @@ class DefaultModelBuildingEvent
     implements ModelBuildingEvent
 {
 
-    private final Model model;
+    private Model model;
 
     private final ModelBuildingRequest request;
 

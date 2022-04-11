@@ -1,12 +1,6 @@
 package org.apache.maven.model.building;
 
-  import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.io.File;
-  import java.util.concurrent.atomic.AtomicReference;
-
-  /*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -26,13 +20,18 @@ import java.io.File;
  */
 
 import org.apache.maven.api.model.Dependency;
-import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Repository;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.junit.jupiter.api.Test;
+import java.io.File;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Guillaume Nodet
@@ -99,7 +98,7 @@ public class DefaultModelBuilderTest
     static class CycleInImportsResolver extends BaseModelResolver
     {
         @Override
-        public ModelSource resolveModel(Dependency dependency, AtomicReference<Dependency> modified ) throws UnresolvableModelException
+        public ModelSource resolveModel( org.apache.maven.model.Dependency dependency ) throws UnresolvableModelException
         {
             switch ( dependency.getManagementKey() )
             {

@@ -19,7 +19,7 @@ package org.apache.maven.model.resolution;
  * under the License.
  */
 
-import org.apache.maven.api.model.Model;
+import org.apache.maven.model.Model;
 
 /**
  * WorkspaceModelResolver

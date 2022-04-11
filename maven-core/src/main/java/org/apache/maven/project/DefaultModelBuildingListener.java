@@ -77,7 +77,7 @@ public class DefaultModelBuildingListener
     @Override
     public void buildExtensionsAssembled( ModelBuildingEvent event )
     {
-        Model model = new Model( event.getModel() );
+        Model model = event.getModel();
 
         try
         {

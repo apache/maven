@@ -53,9 +53,10 @@ public class DefaultPluginManagementInjector
     private ManagementModelMerger merger = new ManagementModelMerger();
 
     @Override
-    public Model injectManagement( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
+    public void injectManagement( org.apache.maven.model.Model model, ModelBuildingRequest request,
+                                   ModelProblemCollector problems )
     {
-        return merger.mergeManagedBuildPlugins( model );
+        model.update( merger.mergeManagedBuildPlugins( model.getDelegate() ) );
     }
 
     /**

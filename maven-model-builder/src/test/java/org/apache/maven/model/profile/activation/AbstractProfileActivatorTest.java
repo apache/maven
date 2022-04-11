@@ -59,7 +59,7 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator>
     {
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
-        assertEquals( active, activator.isActive( profile, context, problems ) );
+        assertEquals( active, activator.isActive( new org.apache.maven.model.Profile( profile ), context, problems ) );
 
         assertEquals( 0, problems.getErrors().size(), problems.getErrors().toString() );
         assertEquals( 0, problems.getWarnings().size(), problems.getWarnings().toString() );

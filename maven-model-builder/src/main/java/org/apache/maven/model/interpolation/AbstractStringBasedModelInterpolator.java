@@ -86,6 +86,14 @@ public abstract class AbstractStringBasedModelInterpolator
         this.urlNormalizer = urlNormalizer;
     }
 
+    @Override
+    public org.apache.maven.model.Model interpolateModel( org.apache.maven.model.Model model, File projectDir,
+                                                          ModelBuildingRequest request, ModelProblemCollector problems )
+    {
+        return new org.apache.maven.model.Model( interpolateModel( model.getDelegate(), projectDir,
+                request, problems ) );
+    }
+
     protected List<ValueSource> createValueSources( final Model model, final File projectDir,
                                                     final ModelBuildingRequest config,
                                                     final ModelProblemCollector problems )

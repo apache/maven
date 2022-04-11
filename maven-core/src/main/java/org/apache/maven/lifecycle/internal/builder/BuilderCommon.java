@@ -179,7 +179,7 @@ public class BuilderCommon
                          .map( MojoExecution::getPlugin )
                          .filter( p -> p.getLocation( "version" ) != null
                                  && p.getLocation( "version" ).getSource() != null
-                                 && p.getLocation( "version" ).getSource().getModelId().equals( defaulModelId ) )
+                                 && defaulModelId.equals( p.getLocation( "version" ).getSource().getModelId() ) )
                          .distinct()
                          .map( Plugin::getArtifactId ) // managed by us, groupId is always o.a.m.plugins
                          .collect( Collectors.toList() );

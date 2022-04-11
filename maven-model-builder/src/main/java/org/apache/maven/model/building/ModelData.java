@@ -22,7 +22,7 @@ package org.apache.maven.model.building;
 import java.util.Objects;
 
 import org.apache.maven.building.Source;
-import org.apache.maven.api.model.Model;
+import org.apache.maven.model.Model;
 
 /**
  * Holds a model along with some auxiliary information. This internal utility class assists the model builder during POM

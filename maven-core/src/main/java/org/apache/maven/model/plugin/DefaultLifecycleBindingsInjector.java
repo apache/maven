@@ -66,7 +66,8 @@ public class DefaultLifecycleBindingsInjector
         this.lifecycle = lifecycle;
     }
 
-    public Model injectLifecycleBindings( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
+    public void injectLifecycleBindings( org.apache.maven.model.Model model, ModelBuildingRequest request,
+                                         ModelProblemCollector problems )
     {
         String packaging = model.getPackaging();
 
@@ -87,9 +88,8 @@ public class DefaultLifecycleBindingsInjector
             Model lifecycleModel = Model.newBuilder()
                             .build( Build.newBuilder().plugins( plugins ).build() )
                             .build();
-            model = merger.merge( model, lifecycleModel );
+            model.update( merger.merge( model.getDelegate(), lifecycleModel ) );
         }
-        return model;
     }
 
     /**
