@@ -19,10 +19,11 @@ package org.apache.maven.artifact.resolver.filter;
  * under the License.
  */
 
+import java.util.List;
+import java.util.function.Predicate;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Exclusion;
-
-import java.util.List;
 
 /**
  * Filter to exclude from a list of artifact patterns.
@@ -38,31 +39,33 @@ public class ExclusionArtifactFilter implements ArtifactFilter
         this.exclusions = exclusions;
     }
 
+    private Predicate<Exclusion> sameArtifactId( Artifact artifact )
+    {
+        return exclusion -> exclusion.getArtifactId().equals( artifact.getArtifactId() );
+    }
+
+    private Predicate<Exclusion> sameGroupId( Artifact artifact )
+    {
+        return exclusion -> exclusion.getGroupId().equals( artifact.getGroupId() );
+    }
+
+    private Predicate<Exclusion> groupIdIsWildcard = exclusion -> WILDCARD.equals( exclusion.getGroupId() );
+
+    private Predicate<Exclusion> artifactIdIsWildcard = exclusion -> WILDCARD.equals( exclusion.getArtifactId() );
+
+    private Predicate<Exclusion> groupIdAndArtifactIdIsWildcard = groupIdIsWildcard.and( artifactIdIsWildcard );
+
+    private Predicate<Exclusion> exclude( Artifact artifact )
+    {
+        return groupIdAndArtifactIdIsWildcard
+                .or( groupIdIsWildcard.and( sameArtifactId( artifact ) ) )
+                .or( artifactIdIsWildcard.and( sameGroupId( artifact ) ) )
+                .or( sameGroupId( artifact ).and( sameArtifactId( artifact ) ) );
+    }
+
     @Override
     public boolean include( Artifact artifact )
     {
-        for ( Exclusion exclusion : exclusions )
-        {
-            if ( WILDCARD.equals( exclusion.getGroupId() ) && WILDCARD.equals( exclusion.getArtifactId() ) )
-            {
-                return false;
-            }
-            if ( WILDCARD.equals( exclusion.getGroupId() )
-                && exclusion.getArtifactId().equals( artifact.getArtifactId() ) )
-            {
-                return false;
-            }
-            if ( WILDCARD.equals( exclusion.getArtifactId() )
-                && exclusion.getGroupId().equals( artifact.getGroupId() ) )
-            {
-                return false;
-            }
-            if ( exclusion.getGroupId().equals( artifact.getGroupId() )
-                && exclusion.getArtifactId().equals( artifact.getArtifactId() ) )
-            {
-                return false;
-            }
-        }
-        return true;
+        return !exclusions.stream().anyMatch( exclude( artifact ) );
     }
 }

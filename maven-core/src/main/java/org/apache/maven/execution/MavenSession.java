@@ -97,15 +97,9 @@ public class MavenSession
         if ( !projects.isEmpty() )
         {
             this.currentProject = projects.get( 0 );
-            this.topLevelProject = currentProject;
-            for ( MavenProject project : projects )
-            {
-                if ( project.isExecutionRoot() )
-                {
-                    topLevelProject = project;
-                    break;
-                }
-            }
+            this.topLevelProject =
+                    projects.stream().filter( project -> project.isExecutionRoot() ).findFirst()
+                            .orElse( currentProject );
         }
         else
         {

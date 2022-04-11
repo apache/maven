@@ -35,6 +35,7 @@ import org.apache.maven.graph.GraphBuilder;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.internal.aether.MavenChainedWorkspaceReader;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
 import org.apache.maven.api.model.Model;
@@ -53,7 +54,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.WorkspaceReader;
-import org.eclipse.aether.util.repository.ChainedWorkspaceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -386,9 +386,7 @@ public class DefaultMaven
             }
             workspaceReaders.add( workspaceReader );
         }
-        WorkspaceReader[] readers = workspaceReaders.toArray( new WorkspaceReader[0] );
-        repoSession.setWorkspaceReader( new ChainedWorkspaceReader( readers ) );
-
+        repoSession.setWorkspaceReader( MavenChainedWorkspaceReader.of( workspaceReaders ) );
     }
 
     private void afterSessionStart( MavenSession session )

@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 /**
@@ -57,7 +58,7 @@ public class DefaultLifecycleMapping
     public DefaultLifecycleMapping( final List<Lifecycle> lifecycles )
     {
         this.lifecycleMap = Collections.unmodifiableMap(
-                lifecycles.stream().collect( toMap( Lifecycle::getId, l -> l ) )
+                lifecycles.stream().collect( toMap( Lifecycle::getId, identity() ) )
         );
     }
 
