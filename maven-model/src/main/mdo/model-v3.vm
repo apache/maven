@@ -183,7 +183,7 @@ public class ${class.name}
       #elseif ( $field.to )
         return getDelegate().${pfx}${cap}() != null ? new ${field.to}( getDelegate().${pfx}${cap}(), this ) : null;
       #elseif ( $field.type == "DOM" )
-        return getDelegate().${pfx}${cap}() != null ? new Xpp3Dom( getDelegate().${pfx}${cap}() ) : null;
+        return getDelegate().${pfx}${cap}() != null ? new Xpp3Dom( getDelegate().${pfx}${cap}(), this::replace ) : null;
       #else
         return getDelegate().${pfx}${cap}();
       #end
