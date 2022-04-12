@@ -52,7 +52,7 @@ public class MavenSession
 
     private RepositorySystemSession repositorySession;
 
-    private Properties executionProperties;
+    private final Properties executionProperties;
 
     private InheritableThreadLocal<MavenProject> currentProject = new InheritableThreadLocal<>();
 
@@ -306,6 +306,9 @@ public class MavenSession
         this.result = result;
         this.settings = new SettingsAdapter( request );
         this.repositorySession = repositorySession;
+        this.executionProperties = new Properties();
+        this.executionProperties.putAll( request.getSystemProperties() );
+        this.executionProperties.putAll( request.getUserProperties() );
     }
     
     @Deprecated
@@ -351,6 +354,9 @@ public class MavenSession
         this.request = request;
         this.result = result;
         this.settings = new SettingsAdapter( request );
+        this.executionProperties = new Properties();
+        this.executionProperties.putAll( request.getSystemProperties() );
+        this.executionProperties.putAll( request.getUserProperties() );
         setProjects( projects );
     }
 
@@ -388,13 +394,6 @@ public class MavenSession
     @Deprecated
     public Properties getExecutionProperties()
     {
-        if ( executionProperties == null )
-        {
-            executionProperties = new Properties();
-            executionProperties.putAll( request.getSystemProperties() );
-            executionProperties.putAll( request.getUserProperties() );
-        }
-
         return executionProperties;
     }
     
