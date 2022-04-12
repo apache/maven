@@ -52,7 +52,7 @@ public class MavenSession
 
     private RepositorySystemSession repositorySession;
 
-    private Properties executionProperties;
+    private volatile Properties executionProperties;
 
     private InheritableThreadLocal<MavenProject> currentProject = new InheritableThreadLocal<>();
 
@@ -397,9 +397,15 @@ public class MavenSession
     {
         if ( executionProperties == null )
         {
-            executionProperties = new Properties();
-            executionProperties.putAll( request.getSystemProperties() );
-            executionProperties.putAll( request.getUserProperties() );
+            synchronized ( this )
+            {
+                if ( executionProperties == null )
+                {
+                    executionProperties = new Properties();
+                    executionProperties.putAll( request.getSystemProperties() );
+                    executionProperties.putAll( request.getUserProperties() );
+                }
+            }
         }
 
         return executionProperties;
