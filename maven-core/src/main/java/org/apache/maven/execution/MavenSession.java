@@ -54,7 +54,7 @@ public class MavenSession
 
     private Properties executionProperties;
 
-    private MavenProject currentProject;
+    private InheritableThreadLocal<MavenProject> currentProject = new InheritableThreadLocal<>();
 
     /**
      * These projects have already been topologically sorted in the {@link org.apache.maven.Maven} component before
@@ -83,8 +83,9 @@ public class MavenSession
     {
         if ( !projects.isEmpty() )
         {
-            this.currentProject = projects.get( 0 );
-            this.topLevelProject = currentProject;
+            MavenProject prj = projects.get( 0 );
+            this.currentProject.set( prj );
+            this.topLevelProject = prj;
             for ( MavenProject project : projects )
             {
                 if ( project.isExecutionRoot() )
@@ -96,7 +97,7 @@ public class MavenSession
         }
         else
         {
-            this.currentProject = null;
+            this.currentProject.set( null );
             this.topLevelProject = null;
         }
         this.projects = projects;
@@ -157,12 +158,12 @@ public class MavenSession
 
     public void setCurrentProject( MavenProject currentProject )
     {
-        this.currentProject = currentProject;
+        this.currentProject.set( currentProject );
     }
 
     public MavenProject getCurrentProject()
     {
-        return currentProject;
+        return currentProject.get();
     }
 
     public ProjectBuildingRequest getProjectBuildingRequest()

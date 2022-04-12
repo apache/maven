@@ -88,13 +88,10 @@ public class LifecycleModuleBuilder
 
         long buildStartTime = System.currentTimeMillis();
 
-        // session may be different from rootSession seeded in DefaultMaven
-        // explicitly seed the right session here to make sure it is used by Guice
-        final boolean scoped = session != rootSession;
-        if ( scoped )
+        if ( session != rootSession )
         {
-            sessionScope.enter();
-            sessionScope.seed( MavenSession.class, session );
+            // a single session is reused during the whole build
+            throw new UnsupportedOperationException();
         }
         try
         {
@@ -149,11 +146,6 @@ public class LifecycleModuleBuilder
         }
         finally
         {
-            if ( scoped )
-            {
-                sessionScope.exit();
-            }
-
             session.setCurrentProject( null );
 
             Thread.currentThread().setContextClassLoader( reactorContext.getOriginalContextClassLoader() );
