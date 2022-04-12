@@ -31,6 +31,11 @@ import com.google.inject.ScopeAnnotation;
  * Indicates that annotated component should be instantiated before session execution starts
  * and discarded after session execution completes.
  *
+ * Note that components will be cached in the session scope and be injected with the root session.
+ * Derived sessions will reuse the same components than their root sessions, thus components
+ * should not rely on {@link org.apache.maven.execution.MavenSession#getCurrentProject()} which
+ * will always return the root project.
+ *
  * @author Jason van Zyl
  * @since 3.2.0
  */
