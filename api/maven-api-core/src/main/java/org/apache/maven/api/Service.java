@@ -21,6 +21,14 @@ package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.ThreadSafe;
 
+/**
+ * Marker interface for all services provided by the {@link Session}.
+ *
+ * Services can be retrieved from the session using the
+ * {@link Session#getService(Class)} method.
+ * 
+ * @see Session#getService(Class) 
+ */
 @ThreadSafe
 public interface Service
 {
