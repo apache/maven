@@ -642,7 +642,7 @@ public class DefaultMavenPluginManager
             ConfigurationListener listener = new DebugConfigurationListener( logger );
 
             ValidatingConfigurationListener validator =
-                new ValidatingConfigurationListener( mojo, mojoDescriptor, listener );
+                new ValidatingConfigurationListener( mojo, mojoDescriptor, listener, expressionEvaluator );
 
             logger.debug(
                 "Configuring mojo '" + mojoDescriptor.getId() + "' with " + configuratorId + " configurator -->" );

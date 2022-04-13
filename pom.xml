@@ -64,9 +64,9 @@ under the License.
     <wagonVersion>3.5.1</wagonVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <cipherVersion>2.0</cipherVersion>
-    <modelloVersion>1.11</modelloVersion>
+    <modelloVersion>2.0.0</modelloVersion>
     <jxpathVersion>1.3</jxpathVersion>
-    <resolverVersion>1.7.2</resolverVersion>
+    <resolverVersion>1.7.3</resolverVersion>
     <slf4jVersion>1.7.32</slf4jVersion>
     <xmlunitVersion>2.2.1</xmlunitVersion>
     <powermockVersion>1.7.4</powermockVersion>
@@ -361,7 +361,7 @@ under the License.
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.2.1</version>
+        <version>1.2.11</version>
         <optional>true</optional>
       </dependency>
       <!--  Wagon -->
@@ -379,13 +379,6 @@ under the License.
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-http</artifactId>
         <version>${wagonVersion}</version>
-        <classifier>shaded</classifier>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <!--  Repository -->
       <dependency>
@@ -411,6 +404,16 @@ under the License.
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-connector-basic</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-transport-file</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-transport-http</artifactId>
         <version>${resolverVersion}</version>
       </dependency>
       <dependency>

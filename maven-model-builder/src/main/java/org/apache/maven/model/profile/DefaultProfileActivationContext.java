@@ -21,11 +21,12 @@ package org.apache.maven.model.profile;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Describes the environmental context used to determine the activation status of profiles.
@@ -230,8 +231,11 @@ public class DefaultProfileActivationContext
     {
         if ( projectProperties != null )
         {
-
-            this.projectProperties = Collections.unmodifiableMap( toMap( projectProperties ) );
+            this.projectProperties = projectProperties.entrySet().stream()
+                    .collect(
+                            collectingAndThen(
+                                    toMap( k -> String.valueOf( k.getKey() ), v -> String.valueOf( v ) ),
+                                    Collections::unmodifiableMap ) );
         }
         else
         {
@@ -241,19 +245,4 @@ public class DefaultProfileActivationContext
         return this;
     }
 
-    private Map<String, String> toMap( Properties properties )
-    {
-        if ( properties == null )
-        {
-            return Collections.emptyMap();
-        }
-        Map<String, String> map = new HashMap<>();
-        Enumeration keys = properties.keys();
-        while ( keys.hasMoreElements() )
-        {
-            String key = (String) keys.nextElement();
-            map.put( key, properties.getProperty( key ) );
-        }
-        return map;
-    }
 }
