@@ -19,56 +19,64 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
-import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
-
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.api.Listener;
-import org.apache.maven.api.SessionData;
-import org.apache.maven.api.services.ArtifactManager;
-import org.apache.maven.api.services.LocalRepositoryManager;
-import org.apache.maven.api.services.ProjectManager;
-import org.apache.maven.api.services.RepositoryFactory;
-import org.apache.maven.api.services.Service;
-import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.Metadata;
 import org.apache.maven.api.Dependency;
+import org.apache.maven.api.Listener;
+import org.apache.maven.api.LocalRepository;
+import org.apache.maven.api.Metadata;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
-import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.Service;
+import org.apache.maven.api.Session;
+import org.apache.maven.api.SessionData;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.services.ArtifactDeployer;
+import org.apache.maven.api.services.ArtifactDeployerException;
+import org.apache.maven.api.services.ArtifactFactory;
+import org.apache.maven.api.services.ArtifactInstaller;
+import org.apache.maven.api.services.ArtifactInstallerException;
+import org.apache.maven.api.services.ArtifactManager;
+import org.apache.maven.api.services.ArtifactResolver;
+import org.apache.maven.api.services.ArtifactResolverException;
+import org.apache.maven.api.services.DependencyCollector;
+import org.apache.maven.api.services.DependencyCollectorException;
+import org.apache.maven.api.services.DependencyFactory;
+import org.apache.maven.api.services.DependencyResolver;
+import org.apache.maven.api.services.DependencyResolverException;
+import org.apache.maven.api.services.LocalRepositoryManager;
+import org.apache.maven.api.services.ProjectBuilder;
+import org.apache.maven.api.services.ProjectManager;
+import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.ToolchainManager;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
 import org.apache.maven.api.services.xml.SettingsXmlFactory;
 import org.apache.maven.api.services.xml.ToolchainsXmlFactory;
+import org.apache.maven.api.settings.Settings;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.api.services.ArtifactResolver;
-import org.apache.maven.api.services.ArtifactDeployer;
-import org.apache.maven.api.services.ArtifactFactory;
-import org.apache.maven.api.services.ArtifactInstaller;
-import org.apache.maven.api.services.DependencyCollector;
-import org.apache.maven.api.services.DependencyFactory;
-import org.apache.maven.api.services.DependencyResolver;
-import org.apache.maven.api.services.ProjectBuilder;
-import org.apache.maven.api.settings.Settings;
 import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -114,7 +122,7 @@ public class DefaultSession implements Session
         this.repositories = repositories != null
                 ? repositories
                 : mavenSession.getRequest().getRemoteRepositories().stream()
-                    .map( RepositoryUtils::toRepo ).map( this::getRemoteRepository ).collect( Collectors.toList() );
+                .map( RepositoryUtils::toRepo ).map( this::getRemoteRepository ).collect( Collectors.toList() );
         this.projectBuilder = projectBuilder;
         this.mavenRepositorySystem = mavenRepositorySystem;
         this.toolchainManagerPrivate = toolchainManagerPrivate;
@@ -172,17 +180,20 @@ public class DefaultSession implements Session
             {
                 data.set( key, value );
             }
+
             @Override
             public boolean set( @Nonnull Object key, @Nullable Object oldValue, @Nullable Object newValue )
             {
                 return data.set( key, oldValue, newValue );
             }
+
             @Nullable
             @Override
             public Object get( @Nonnull Object key )
             {
                 return data.get( key );
             }
+
             @Nullable
             @Override
             public Object computeIfAbsent( @Nonnull Object key, @Nonnull Supplier<Object> supplier )
@@ -191,7 +202,7 @@ public class DefaultSession implements Session
                 Object value = data.get( key );
                 if ( value == null )
                 {
-                    if ( ! data.set( key, null, supplier.get() ) )
+                    if ( !data.set( key, null, supplier.get() ) )
                     {
                         value = data.get( key );
                     }
@@ -208,7 +219,7 @@ public class DefaultSession implements Session
         nonNull( localRepository, "localRepository" );
         if ( session.getLocalRepository() != null
                 && Objects.equals( session.getLocalRepository().getBasedir().toPath(),
-                             localRepository.getPath() ) )
+                localRepository.getPath() ) )
         {
             return this;
         }
@@ -219,9 +230,9 @@ public class DefaultSession implements Session
         RepositorySystemSession repoSession = new DefaultRepositorySystemSession( session )
                 .setLocalRepositoryManager( localRepositoryManager );
         MavenSession newSession = new MavenSession( mavenSession.getContainer(), repoSession,
-                                                    mavenSession.getRequest(), mavenSession.getResult() );
+                mavenSession.getRequest(), mavenSession.getResult() );
         return new DefaultSession( newSession, repositorySystem,
-                                   repositories, projectBuilder, mavenRepositorySystem, toolchainManagerPrivate );
+                repositories, projectBuilder, mavenRepositorySystem, toolchainManagerPrivate );
     }
 
     @Nonnull
@@ -229,7 +240,7 @@ public class DefaultSession implements Session
     public Session withRemoteRepositories( @Nonnull List<RemoteRepository> repositories )
     {
         return new DefaultSession( mavenSession, repositorySystem,
-                                   repositories, projectBuilder, mavenRepositorySystem, toolchainManagerPrivate );
+                repositories, projectBuilder, mavenRepositorySystem, toolchainManagerPrivate );
     }
 
     @Nonnull
@@ -374,7 +385,7 @@ public class DefaultSession implements Session
     {
         if ( repository instanceof DefaultLocalRepository )
         {
-            return ( ( DefaultLocalRepository ) repository ).getRepository();
+            return ( (DefaultLocalRepository) repository ).getRepository();
         }
         else
         {
@@ -433,7 +444,7 @@ public class DefaultSession implements Session
     {
         if ( dependency instanceof DefaultDependency )
         {
-            return ( ( DefaultDependency ) dependency ).getDependency();
+            return ( (DefaultDependency) dependency ).getDependency();
         }
         else
         {
@@ -526,6 +537,262 @@ public class DefaultSession implements Session
     public Collection<Listener> getListeners()
     {
         return Collections.unmodifiableCollection( listeners );
+    }
+
+    //
+    // Shortcut implementations
+    //
+
+    /**
+     * Shortcut for <code>getService(RepositoryFactory.class).createLocal(...)</code>
+     *
+     * @see RepositoryFactory#createLocal(Path)
+     */
+    @Override
+    public LocalRepository createLocalRepository( Path path )
+    {
+        return getService( RepositoryFactory.class ).createLocal( path );
+    }
+
+    /**
+     * Shortcut for <code>getService(RepositoryFactory.class).createRemote(...)</code>
+     *
+     * @see RepositoryFactory#createRemote(String, String)
+     */
+    @Nonnull
+    @Override
+    public RemoteRepository createRemoteRepository( @Nonnull String id, @Nonnull String url )
+    {
+        return getService( RepositoryFactory.class )
+                .createRemote( id, url );
+    }
+
+    /**
+     * Shortcut for <code>getService(RepositoryFactory.class).createRemote(...)</code>
+     *
+     * @see RepositoryFactory#createRemote(Repository)
+     */
+    @Nonnull
+    @Override
+    public RemoteRepository createRemoteRepository( @Nonnull Repository repository )
+    {
+        return getService( RepositoryFactory.class )
+                .createRemote( repository );
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
+     *
+     * @see ArtifactFactory#create(Session, String, String, String, String)
+     */
+    @Override
+    public Artifact createArtifact( String groupId, String artifactId, String version, String extension )
+    {
+        return getService( ArtifactFactory.class )
+                .create( this, groupId, artifactId, version, extension );
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
+     *
+     * @see ArtifactFactory#create(Session, String, String, String, String, String, String)
+     */
+    @Override
+    public Artifact createArtifact( String groupId, String artifactId, String version, String classifier,
+                                    String extension, String type )
+    {
+        return getService( ArtifactFactory.class )
+                .create( this, groupId, artifactId, version, classifier, extension, type );
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
+     *
+     * @throws ArtifactResolverException if the artifact resolution failed
+     * @see ArtifactResolver#resolve(Session, Artifact)
+     */
+    @Override
+    public Artifact resolveArtifact( Artifact artifact )
+    {
+        return getService( ArtifactResolver.class )
+                .resolve( this, artifact )
+                .getArtifact();
+    }
+
+    /**
+     * Shortcut for {@code getService(ArtifactInstaller.class).install(...)}
+     *
+     * @throws ArtifactInstallerException if the artifacts installation failed
+     * @see ArtifactInstaller#install(Session, Collection)
+     */
+    @Override
+    public void installArtifacts( Artifact... artifacts )
+    {
+        installArtifacts( Arrays.asList( artifacts ) );
+    }
+
+    /**
+     * Shortcut for {@code getService(ArtifactInstaller.class).install(...)}
+     *
+     * @throws ArtifactInstallerException if the artifacts installation failed
+     * @see ArtifactInstaller#install(Session, Collection)
+     */
+    @Override
+    public void installArtifacts( Collection<Artifact> artifacts )
+    {
+        getService( ArtifactInstaller.class )
+                .install( this, artifacts );
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactDeployer.class).deploy(...)</code>
+     *
+     * @throws ArtifactDeployerException if the artifacts deployment failed
+     * @see ArtifactDeployer#deploy(Session, RemoteRepository, Collection)
+     */
+    @Override
+    public void deployArtifact( RemoteRepository repository, Artifact... artifacts )
+    {
+        getService( ArtifactDeployer.class )
+                .deploy( this, repository, Arrays.asList( artifacts ) );
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactManager.class).setPath(...)</code>
+     *
+     * @see ArtifactManager#setPath(Artifact, Path)
+     */
+    @Override
+    public void setArtifactPath( @Nonnull Artifact artifact, @Nonnull Path path )
+    {
+        getService( ArtifactManager.class )
+                .setPath( artifact, path );
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactManager.class).getPath(...)</code>
+     *
+     * @see ArtifactManager#getPath(Artifact)
+     */
+    @Nonnull
+    @Override
+    public Optional<Path> getArtifactPath( @Nonnull Artifact artifact )
+    {
+        return getService( ArtifactManager.class )
+                .getPath( artifact );
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactManager.class).isSnapshot(...)</code>
+     *
+     * @see ArtifactManager#isSnapshot(String)
+     */
+    @Override
+    public boolean isVersionSnapshot( @Nonnull String version )
+    {
+        return getService( ArtifactManager.class )
+                .isSnapshot( version );
+    }
+
+    /**
+     * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
+     *
+     * @see DependencyFactory#create(Session, Artifact)
+     */
+    @Nonnull
+    @Override
+    public Dependency createDependency( @Nonnull Artifact artifact )
+    {
+        return getService( DependencyFactory.class )
+                .create( this, artifact );
+    }
+
+    /**
+     * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
+     *
+     * @throws DependencyCollectorException if the dependency collection failed
+     * @see DependencyCollector#collect(Session, Artifact)
+     */
+    @Nonnull
+    @Override
+    public Node collectDependencies( @Nonnull Artifact artifact )
+    {
+        return getService( DependencyCollector.class )
+                .collect( this, artifact )
+                .getRoot();
+    }
+
+    /**
+     * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
+     *
+     * @throws DependencyCollectorException if the dependency collection failed
+     * @see DependencyCollector#collect(Session, Project)
+     */
+    @Nonnull
+    @Override
+    public Node collectDependencies( @Nonnull Project project )
+    {
+        return getService( DependencyCollector.class )
+                .collect( this, project )
+                .getRoot();
+    }
+
+    /**
+     * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
+     *
+     * @throws DependencyCollectorException if the dependency collection failed
+     * @see DependencyCollector#collect(Session, Dependency)
+     */
+    @Nonnull
+    @Override
+    public Node collectDependencies( @Nonnull Dependency dependency )
+    {
+        return getService( DependencyCollector.class )
+                .collect( this, dependency )
+                .getRoot();
+    }
+
+    /**
+     * Shortcut for <code>getService(DependencyResolver.class).resolve(...)</code>
+     *
+     * @throws DependencyResolverException if the dependency resolution failed
+     * @see DependencyResolver#resolve(Session, Dependency, Predicate)
+     */
+    @Nonnull
+    @Override
+    public Node resolveDependencies( @Nonnull Dependency dependency )
+    {
+        return getService( DependencyResolver.class )
+                .resolve( this, dependency, null )
+                .getRoot();
+    }
+
+    @Override
+    public Path getPathForLocalArtifact( @Nonnull Artifact artifact )
+    {
+        return getService( LocalRepositoryManager.class )
+                .getPathForLocalArtifact( this, getLocalRepository(), artifact );
+    }
+
+    @Override
+    public Path getPathForLocalMetadata( Metadata metadata )
+    {
+        return getService( LocalRepositoryManager.class )
+                .getPathForLocalMetadata( this, getLocalRepository(), metadata );
+    }
+
+    @Override
+    public Path getPathForRemoteArtifact( RemoteRepository remote, Artifact artifact )
+    {
+        return getService( LocalRepositoryManager.class )
+                .getPathForRemoteArtifact( this, getLocalRepository(), remote, artifact );
+    }
+
+    @Override
+    public Path getPathForRemoteMetadata( RemoteRepository remote, Metadata metadata )
+    {
+        return getService( LocalRepositoryManager.class )
+                .getPathForRemoteMetadata( this, getLocalRepository(), remote, metadata );
     }
 
 }

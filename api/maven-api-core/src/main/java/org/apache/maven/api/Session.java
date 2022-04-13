@@ -23,7 +23,6 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.ThreadSafe;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -31,25 +30,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Predicate;
 
-import org.apache.maven.api.services.ArtifactDeployer;
-import org.apache.maven.api.services.ArtifactDeployerException;
-import org.apache.maven.api.services.ArtifactFactory;
-import org.apache.maven.api.services.ArtifactInstaller;
-import org.apache.maven.api.services.ArtifactInstallerException;
-import org.apache.maven.api.services.ArtifactManager;
-import org.apache.maven.api.services.ArtifactResolver;
-import org.apache.maven.api.services.ArtifactResolverException;
-import org.apache.maven.api.services.ArtifactResolverResult;
-import org.apache.maven.api.services.DependencyCollector;
-import org.apache.maven.api.services.DependencyCollectorException;
-import org.apache.maven.api.services.DependencyCollectorResult;
-import org.apache.maven.api.services.DependencyFactory;
-import org.apache.maven.api.services.DependencyResolver;
-import org.apache.maven.api.services.DependencyResolverException;
-import org.apache.maven.api.services.DependencyResolverResult;
-import org.apache.maven.api.services.LocalRepositoryManager;
-import org.apache.maven.api.services.RepositoryFactory;
-import org.apache.maven.api.services.Service;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.settings.Settings;
 
@@ -132,219 +112,137 @@ public interface Session
 
     /**
      * Shortcut for <code>getService(RepositoryFactory.class).createLocal(...)</code>
-     * @see RepositoryFactory#createLocal(Path)
+     * @see org.apache.maven.api.services.RepositoryFactory#createLocal(Path)
      */
-    default LocalRepository createLocalRepository( Path path )
-    {
-        return getService( RepositoryFactory.class ).createLocal( path );
-    }
+    LocalRepository createLocalRepository( Path path );
 
     /**
      * Shortcut for <code>getService(RepositoryFactory.class).createRemote(...)</code>
-     * @see RepositoryFactory#createRemote(String, String)
+     * @see org.apache.maven.api.services.RepositoryFactory#createRemote(String, String)
      */
     @Nonnull
-    default RemoteRepository createRemoteRepository( @Nonnull String id, @Nonnull String url )
-    {
-        return getService( RepositoryFactory.class )
-                .createRemote( id, url );
-    }
+    RemoteRepository createRemoteRepository( @Nonnull String id, @Nonnull String url );
 
     /**
      * Shortcut for <code>getService(RepositoryFactory.class).createRemote(...)</code>
-     * @see RepositoryFactory#createRemote(Repository)
+     * @see org.apache.maven.api.services.RepositoryFactory#createRemote(Repository)
      */
     @Nonnull
-    default RemoteRepository createRemoteRepository( @Nonnull Repository repository )
-    {
-        return getService( RepositoryFactory.class )
-                .createRemote( repository );
-    }
+    RemoteRepository createRemoteRepository( @Nonnull Repository repository );
 
     /**
      * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
-     * @see ArtifactFactory#create(Session, String, String, String, String)
+     * @see org.apache.maven.api.services.ArtifactFactory#create(Session, String, String, String, String)
      */
-    default Artifact createArtifact( String groupId, String artifactId, String version, String extension )
-    {
-        return getService( ArtifactFactory.class )
-                .create( this, groupId, artifactId, version, extension );
-    }
+    Artifact createArtifact( String groupId, String artifactId, String version, String extension );
 
     /**
      * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
-     * @see ArtifactFactory#create(Session, String, String, String, String, String, String)
+     * @see org.apache.maven.api.services.ArtifactFactory#create(Session, String, String, String, String, String, String)
      */
-    default Artifact createArtifact( String groupId, String artifactId, String version, String classifier,
-                                     String extension, String type )
-    {
-        return getService( ArtifactFactory.class )
-                .create( this, groupId, artifactId, version, classifier, extension, type );
-    }
+    Artifact createArtifact( String groupId, String artifactId, String version, String classifier,
+                             String extension, String type );
 
     /**
      * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
-     * @see ArtifactResolver#resolve(Session, Artifact)
+     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Artifact)
      *
-     * @throws ArtifactResolverException if the artifact resolution failed
+     * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
      */
-    default ArtifactResolverResult resolveArtifact( Artifact artifact )
-    {
-        return getService( ArtifactResolver.class )
-                .resolve( this, artifact );
-    }
+    Artifact resolveArtifact( Artifact artifact );
 
     /**
      * Shortcut for {@code getService(ArtifactInstaller.class).install(...)}
-     * @see ArtifactInstaller#install(Session, Collection)
+     * @see org.apache.maven.api.services.ArtifactInstaller#install(Session, Collection)
      *
-     * @throws ArtifactInstallerException if the artifacts installation failed
+     * @throws org.apache.maven.api.services.ArtifactInstallerException if the artifacts installation failed
      */
-    default void installArtifacts( Artifact... artifacts )
-    {
-        installArtifacts( Arrays.asList( artifacts ) );
-    }
+    void installArtifacts( Artifact... artifacts );
 
     /**
      * Shortcut for {@code getService(ArtifactInstaller.class).install(...)}
-     * @see ArtifactInstaller#install(Session, Collection)
+     * @see org.apache.maven.api.services.ArtifactInstaller#install(Session, Collection)
      *
-     * @throws ArtifactInstallerException if the artifacts installation failed
+     * @throws org.apache.maven.api.services.ArtifactInstallerException if the artifacts installation failed
      */
-    default void installArtifacts( Collection<Artifact> artifacts )
-    {
-        getService( ArtifactInstaller.class )
-                .install( this, artifacts );
-    }
+    void installArtifacts( Collection<Artifact> artifacts );
 
     /**
      * Shortcut for <code>getService(ArtifactDeployer.class).deploy(...)</code>
-     * @see ArtifactDeployer#deploy(Session, RemoteRepository, Collection)
+     * @see org.apache.maven.api.services.ArtifactDeployer#deploy(Session, RemoteRepository, Collection)
      *
-     * @throws ArtifactDeployerException if the artifacts deployment failed
+     * @throws org.apache.maven.api.services.ArtifactDeployerException if the artifacts deployment failed
      */
-    default void deployArtifact( RemoteRepository repository, Artifact... artifacts )
-    {
-        getService( ArtifactDeployer.class )
-                .deploy( this, repository, Arrays.asList( artifacts ) );
-    }
+    void deployArtifact( RemoteRepository repository, Artifact... artifacts );
 
     /**
      * Shortcut for <code>getService(ArtifactManager.class).setPath(...)</code>
-     * @see ArtifactManager#setPath(Artifact, Path)
+     * @see org.apache.maven.api.services.ArtifactManager#setPath(Artifact, Path)
      */
-    default void setArtifactPath( @Nonnull Artifact artifact, @Nonnull Path path )
-    {
-        getService( ArtifactManager.class )
-                .setPath( artifact, path );
-    }
+    void setArtifactPath( @Nonnull Artifact artifact, @Nonnull Path path );
 
     /**
      * Shortcut for <code>getService(ArtifactManager.class).getPath(...)</code>
-     * @see ArtifactManager#getPath(Artifact)
+     * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      */
     @Nonnull
-    default Optional<Path> getArtifactPath( @Nonnull Artifact artifact )
-    {
-        return getService( ArtifactManager.class )
-                .getPath( artifact );
-    }
+    Optional<Path> getArtifactPath( @Nonnull Artifact artifact );
 
     /**
      * Shortcut for <code>getService(ArtifactManager.class).isSnapshot(...)</code>
-     * @see ArtifactManager#isSnapshot(String)
+     * @see org.apache.maven.api.services.ArtifactManager#isSnapshot(String)
      */
-    default boolean isVersionSnapshot( @Nonnull String version )
-    {
-        return getService( ArtifactManager.class )
-                .isSnapshot( version );
-    }
+    boolean isVersionSnapshot( @Nonnull String version );
 
     /**
      * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
-     * @see DependencyFactory#create(Session, Artifact)
+     * @see org.apache.maven.api.services.DependencyFactory#create(Session, Artifact)
      */
     @Nonnull
-    default Dependency createDependency( @Nonnull Artifact artifact )
-    {
-        return getService( DependencyFactory.class )
-                .create( this, artifact );
-    }
+    Dependency createDependency( @Nonnull Artifact artifact );
 
     /**
      * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
-     * @see DependencyCollector#collect(Session, Artifact)
+     * @see org.apache.maven.api.services.DependencyCollector#collect(Session, Artifact)
      *
-     * @throws DependencyCollectorException if the dependency collection failed
+     * @throws org.apache.maven.api.services.DependencyCollectorException if the dependency collection failed
      */
     @Nonnull
-    default DependencyCollectorResult collectDependencies( @Nonnull Artifact artifact )
-    {
-        return getService( DependencyCollector.class )
-                .collect( this, artifact );
-    }
+    Node collectDependencies( @Nonnull Artifact artifact );
 
     /**
      * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
-     * @see DependencyCollector#collect(Session, Project)
+     * @see org.apache.maven.api.services.DependencyCollector#collect(Session, Project)
      *
-     * @throws DependencyCollectorException if the dependency collection failed
+     * @throws org.apache.maven.api.services.DependencyCollectorException if the dependency collection failed
      */
     @Nonnull
-    default DependencyCollectorResult collectDependencies( @Nonnull Project project )
-    {
-        return getService( DependencyCollector.class )
-                .collect( this, project );
-    }
+    Node collectDependencies( @Nonnull Project project );
 
     /**
      * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
-     * @see DependencyCollector#collect(Session, Dependency)
+     * @see org.apache.maven.api.services.DependencyCollector#collect(Session, Dependency)
      *
-     * @throws DependencyCollectorException if the dependency collection failed
+     * @throws org.apache.maven.api.services.DependencyCollectorException if the dependency collection failed
      */
     @Nonnull
-    default DependencyCollectorResult collectDependencies( @Nonnull Dependency dependency )
-    {
-        return getService( DependencyCollector.class )
-                .collect( this, dependency );
-    }
+    Node collectDependencies( @Nonnull Dependency dependency );
 
     /**
      * Shortcut for <code>getService(DependencyResolver.class).resolve(...)</code>
-     * @see DependencyResolver#resolve(Session, Dependency, Predicate)
+     * @see org.apache.maven.api.services.DependencyResolver#resolve(Session, Dependency, Predicate)
      *
-     * @throws DependencyResolverException if the dependency resolution failed
+     * @throws org.apache.maven.api.services.DependencyResolverException if the dependency resolution failed
      */
     @Nonnull
-    default DependencyResolverResult resolveDependencies( @Nonnull Dependency dependency )
-    {
-        return getService( DependencyResolver.class )
-                .resolve( this, dependency, null );
-    }
+    Node resolveDependencies( @Nonnull Dependency dependency );
 
-    default Path getPathForLocalArtifact( @Nonnull Artifact artifact )
-    {
-        return getService( LocalRepositoryManager.class )
-                .getPathForLocalArtifact( this, getLocalRepository(), artifact );
-    }
+    Path getPathForLocalArtifact( @Nonnull Artifact artifact );
 
-    default Path getPathForLocalMetadata( Metadata metadata )
-    {
-        return getService( LocalRepositoryManager.class )
-                .getPathForLocalMetadata( this, getLocalRepository(), metadata );
-    }
+    Path getPathForLocalMetadata( Metadata metadata );
 
-    default Path getPathForRemoteArtifact( RemoteRepository remote, Artifact artifact )
-    {
-        return getService( LocalRepositoryManager.class )
-                .getPathForRemoteArtifact( this, getLocalRepository(), remote, artifact );
-    }
+    Path getPathForRemoteArtifact( RemoteRepository remote, Artifact artifact );
 
-    default Path getPathForRemoteMetadata( RemoteRepository remote, Metadata metadata )
-    {
-        return getService( LocalRepositoryManager.class )
-                .getPathForRemoteMetadata( this, getLocalRepository(), remote, metadata );
-    }
+    Path getPathForRemoteMetadata( RemoteRepository remote, Metadata metadata );
 
 }

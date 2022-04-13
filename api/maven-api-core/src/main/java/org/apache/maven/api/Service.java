@@ -1,4 +1,4 @@
-package org.apache.maven.api.services;
+package org.apache.maven.api;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

@@ -93,7 +93,7 @@ public class TestApi
         Artifact artifact = session.createArtifact( "org.codehaus.plexus", "plexus-utils", "1.4.5", "pom" );
         assertFalse( artifact.getPath().isPresent() );
 
-        Artifact resolved =  session.resolveArtifact( artifact ).getArtifact();
+        Artifact resolved =  session.resolveArtifact( artifact );
         assertNotSame( resolved, artifact );
         assertTrue( resolved.getPath().isPresent() );
         assertNotNull( resolved.getPath().get() );
@@ -105,7 +105,7 @@ public class TestApi
         assertNotNull( project );
 
         artifact = session.createArtifact( "org.codehaus.plexus", "plexus-container-default", "1.0-alpha-32", "jar" );
-        Node root = session.collectDependencies( artifact ).getRoot();
+        Node root = session.collectDependencies( artifact );
         assertNotNull( root );
     }
 

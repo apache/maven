@@ -25,7 +25,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.services.Service;
+import org.apache.maven.api.Service;
 
 public interface XmlFactory<T> extends Service
 {
