@@ -25,9 +25,7 @@ import org.apache.maven.api.annotations.Consumer;
  * This interface forms the contract required for <code>Mojos</code> to interact with the <code>Maven</code>
  * infrastructure.<br>
  * It features an <code>execute()</code> method, which triggers the Mojo's build-process behavior, and can throw
- * a MojoExecutionException or MojoFailureException if error conditions occur.<br>
- * Also included is the <code>setLog(...)</code> method, which simply allows Maven to inject a logging mechanism which
- * will allow the Mojo to communicate to the outside world through standard Maven channels.
+ * a MojoException if error conditions occur.<br>
  */
 @FunctionalInterface @Consumer
 public interface Mojo

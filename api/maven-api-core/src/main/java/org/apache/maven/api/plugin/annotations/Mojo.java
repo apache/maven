@@ -63,6 +63,12 @@ public @interface Mojo
     ResolutionScope requiresDependencyCollection() default ResolutionScope.NONE;
 
     /**
+     * your Mojo instantiation strategy. (Only <code>per-lookup</code> and <code>singleton</code> are supported)
+     * @return the instantiation strategy
+     */
+    InstantiationStrategy instantiationStrategy() default InstantiationStrategy.PER_LOOKUP;
+
+    /**
      * does your mojo requires a project to be executed?
      * @return requires a project
      */
