@@ -78,7 +78,7 @@ import org.slf4j.LoggerFactory;
 @Named
 public class DefaultRepositorySystemSessionFactory
 {
-    private static final String MAVEN_TRANSPORT_KEY = "maven.transport";
+    private static final String MAVEN_TRANSPORT_KEY = "maven.resolver.transport";
 
     private static final String MAVEN_TRANSPORT_WAGON = "wagon";
 
