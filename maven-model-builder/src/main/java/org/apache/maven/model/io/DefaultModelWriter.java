@@ -90,4 +90,23 @@ public class DefaultModelWriter
         }
     }
 
+    @Override
+    public void write( File output, Map<String, Object> options, org.apache.maven.model.Model model ) throws IOException
+    {
+        write( output, options, model.getDelegate() );
+    }
+
+    @Override
+    public void write( Writer output, Map<String, Object> options, org.apache.maven.model.Model model )
+            throws IOException
+    {
+        write( output, options, model.getDelegate() );
+    }
+
+    @Override
+    public void write( OutputStream output, Map<String, Object> options, org.apache.maven.model.Model model )
+            throws IOException
+    {
+        write( output, options, model.getDelegate() );
+    }
 }
