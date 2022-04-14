@@ -78,19 +78,19 @@ import org.slf4j.LoggerFactory;
 @Named
 public class DefaultRepositorySystemSessionFactory
 {
-    private static final String MAVEN_TRANSPORT_KEY = "maven.resolver.transport";
+    private static final String MAVEN_RESOLVER_TRANSPORT_KEY = "maven.resolver.transport";
 
-    private static final String MAVEN_TRANSPORT_WAGON = "wagon";
+    private static final String MAVEN_RESOLVER_TRANSPORT_WAGON = "wagon";
 
-    private static final String MAVEN_TRANSPORT_RESOLVER = "resolver";
+    private static final String MAVEN_RESOLVER_TRANSPORT_NATIVE = "native";
 
-    private static final String MAVEN_TRANSPORT_AUTO = "auto";
+    private static final String MAVEN_RESOLVER_TRANSPORT_AUTO = "auto";
 
-    private static final String WAGON_TRANSPORTER_KEY_PRIORITY_KEY = "aether.priority.WagonTransporterFactory";
+    private static final String WAGON_TRANSPORTER_PRIORITY_KEY = "aether.priority.WagonTransporterFactory";
 
-    private static final String RESOLVER_HTTP_TRANSPORTER_PRIORITY_KEY = "aether.priority.HttpTransporterFactory";
+    private static final String NATIVE_HTTP_TRANSPORTER_PRIORITY_KEY = "aether.priority.HttpTransporterFactory";
 
-    private static final String RESOLVER_FILE_TRANSPORTER_PRIORITY_KEY = "aether.priority.FileTransporterFactory";
+    private static final String NATIVE_FILE_TRANSPORTER_PRIORITY_KEY = "aether.priority.FileTransporterFactory";
 
     private static final String RESOLVER_MAX_PRIORITY = String.valueOf( Float.MAX_VALUE );
 
@@ -261,23 +261,24 @@ public class DefaultRepositorySystemSessionFactory
         }
         session.setAuthenticationSelector( authSelector );
 
-        String transport = request.getUserProperties().getProperty( MAVEN_TRANSPORT_KEY, MAVEN_TRANSPORT_WAGON );
-        if ( MAVEN_TRANSPORT_RESOLVER.equals( transport ) )
+        String transport = request.getUserProperties()
+                .getProperty( MAVEN_RESOLVER_TRANSPORT_KEY, MAVEN_RESOLVER_TRANSPORT_WAGON );
+        if ( MAVEN_RESOLVER_TRANSPORT_NATIVE.equals( transport ) )
         {
             // Make sure (whatever extra priority is set) that resolver native is selected
-            configProps.put( RESOLVER_FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY );
-            configProps.put( RESOLVER_HTTP_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY );
+            configProps.put( NATIVE_FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY );
+            configProps.put( NATIVE_HTTP_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY );
         }
-        else if ( MAVEN_TRANSPORT_WAGON.equals( transport ) )
+        else if ( MAVEN_RESOLVER_TRANSPORT_WAGON.equals( transport ) )
         {
             // Make sure (whatever extra priority is set) that wagon is selected
-            configProps.put( WAGON_TRANSPORTER_KEY_PRIORITY_KEY, RESOLVER_MAX_PRIORITY );
+            configProps.put( WAGON_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY );
         }
-        else if ( !MAVEN_TRANSPORT_AUTO.equals( transport ) )
+        else if ( !MAVEN_RESOLVER_TRANSPORT_AUTO.equals( transport ) )
         {
             throw new IllegalArgumentException( "Unknown maven.transport=" + transport
-                    + ". Supported ones are: " + MAVEN_TRANSPORT_WAGON + ", "
-                    + MAVEN_TRANSPORT_RESOLVER + " and " + MAVEN_TRANSPORT_AUTO );
+                    + ". Supported ones are: " + MAVEN_RESOLVER_TRANSPORT_WAGON + ", "
+                    + MAVEN_RESOLVER_TRANSPORT_NATIVE + " and " + MAVEN_RESOLVER_TRANSPORT_AUTO );
         }
 
         session.setTransferListener( request.getTransferListener() );
