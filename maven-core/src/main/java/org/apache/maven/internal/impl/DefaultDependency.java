@@ -32,10 +32,11 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultDependency implements Dependency
 {
-    private final DefaultSession session;
+    private final AbstractSession session;
     private final org.eclipse.aether.graph.Dependency dependency;
 
-    public DefaultDependency( @Nonnull DefaultSession session, @Nonnull org.eclipse.aether.graph.Dependency dependency )
+    public DefaultDependency( @Nonnull AbstractSession session,
+                              @Nonnull org.eclipse.aether.graph.Dependency dependency )
     {
         this.session = nonNull( session, "session" );
         this.dependency = nonNull( dependency, "dependency" );

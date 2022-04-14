@@ -35,10 +35,10 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
  */
 public class DefaultArtifact implements Artifact
 {
-    private final @Nonnull DefaultSession session;
+    private final @Nonnull AbstractSession session;
     private final @Nonnull org.eclipse.aether.artifact.Artifact artifact;
 
-    public DefaultArtifact( @Nonnull DefaultSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact )
+    public DefaultArtifact( @Nonnull AbstractSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact )
     {
         this.session = nonNull( session, "session can not be null" );
         this.artifact = nonNull( artifact, "artifact can not be null" );

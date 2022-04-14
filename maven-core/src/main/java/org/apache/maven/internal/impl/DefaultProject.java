@@ -42,16 +42,16 @@ import org.apache.maven.project.MavenProject;
 public class DefaultProject implements Project
 {
 
-    private final DefaultSession session;
+    private final AbstractSession session;
     private final MavenProject project;
 
-    public DefaultProject( DefaultSession session, MavenProject project )
+    public DefaultProject( AbstractSession session, MavenProject project )
     {
         this.session = session;
         this.project = project;
     }
 
-    public DefaultSession getSession()
+    public AbstractSession getSession()
     {
         return session;
     }

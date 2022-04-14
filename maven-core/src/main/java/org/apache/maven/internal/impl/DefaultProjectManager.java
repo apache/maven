@@ -58,7 +58,7 @@ public class DefaultProjectManager implements ProjectManager
     @Override
     public Collection<Artifact> getAttachedArtifacts( Project project )
     {
-        DefaultSession session = ( (DefaultProject ) project ).getSession();
+        AbstractSession session = ( (DefaultProject ) project ).getSession();
         Collection<Artifact> attached = ( ( DefaultProject ) project ).getProject().getAttachedArtifacts().stream()
                 .map( RepositoryUtils::toArtifact )
                 .map( session::getArtifact )

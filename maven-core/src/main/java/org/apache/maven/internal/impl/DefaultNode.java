@@ -34,10 +34,10 @@ import org.apache.maven.api.annotations.Nonnull;
 public class DefaultNode implements Node
 {
 
-    private final @Nonnull DefaultSession session;
+    private final @Nonnull AbstractSession session;
     private final @Nonnull org.eclipse.aether.graph.DependencyNode node;
 
-    public DefaultNode( @Nonnull DefaultSession session,
+    public DefaultNode( @Nonnull AbstractSession session,
                         @Nonnull org.eclipse.aether.graph.DependencyNode node )
     {
         this.session = session;
