@@ -1154,6 +1154,25 @@
         return ( getOptional() != null ) ? Boolean.parseBoolean( getOptional() ) : false;
     }
 
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0/4.1.0</version>
+          <code>
+            <![CDATA[
+    public void setOptional( boolean optional )
+    {
+        setOptional( String.valueOf( optional ) );
+    }
+
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
     /**
      * @see java.lang.Object#toString()
      */
@@ -1836,7 +1855,24 @@
     {
         return ( getFiltering() != null ) ? Boolean.parseBoolean( getFiltering() ) : false;
     }
-
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0/4.1.0</version>
+          <code>
+            <![CDATA[
+    public void setFiltering( boolean filtering )
+    {
+        setFiltering( String.valueOf( filtering ) );
+    }
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
     /**
      * @see java.lang.Object#toString()
      */
@@ -2000,10 +2036,21 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
-
     public boolean isEnabled()
     {
         return ( getEnabled() != null ) ? Boolean.parseBoolean( getEnabled() ) : true;
+    }
+
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0/4.1.0</version>
+          <code>
+            <![CDATA[
+    public void setEnabled( boolean enabled )
+    {
+        setEnabled( String.valueOf( enabled ) );
     }
 
             ]]>
@@ -2205,8 +2252,26 @@
     {
         return ( getExtensions() != null ) ? Boolean.parseBoolean( getExtensions() ) : false;
     }
-
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0/4.1.0</version>
+          <code>
+            <![CDATA[
+    public void setExtensions( boolean extensions )
+    {
+        setExtensions( String.valueOf( extensions ) );
+    }
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
     private java.util.Map<String, PluginExecution> executionMap = null;
+
     /**
      * Reset the {@code executionMap} field to {@code null}
      */
@@ -2447,6 +2512,18 @@
     public boolean isExcludeDefaults()
     {
         return ( getExcludeDefaults() != null ) ? Boolean.parseBoolean( getExcludeDefaults() ) : false;
+    }
+
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0/4.1.0</version>
+          <code>
+            <![CDATA[
+    public void setExcludeDefaults( boolean excludeDefaults )
+    {
+        setExcludeDefaults( String.valueOf( excludeDefaults ) );
     }
 
             ]]>

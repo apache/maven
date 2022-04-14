@@ -195,7 +195,7 @@ public abstract class AbstractCoreMavenComponentTestCase
         File repoDir = new File( getBasedir(), "src/test/remote-repo" ).getAbsoluteFile();
 
         RepositoryPolicy policy = new RepositoryPolicy();
-        policy.setEnabled( Boolean.toString( true ) );
+        policy.setEnabled( true );
         policy.setChecksumPolicy( "ignore" );
         policy.setUpdatePolicy( "always" );
 

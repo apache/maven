@@ -350,7 +350,7 @@ public class MavenRepositorySystem
         org.apache.maven.model.RepositoryPolicy modelRepositoryPolicy = new org.apache.maven.model.RepositoryPolicy();
         if ( settingsRepositoryPolicy != null )
         {
-            modelRepositoryPolicy.setEnabled( Boolean.toString( settingsRepositoryPolicy.isEnabled() ) );
+            modelRepositoryPolicy.setEnabled( settingsRepositoryPolicy.isEnabled() );
             modelRepositoryPolicy.setUpdatePolicy( settingsRepositoryPolicy.getUpdatePolicy() );
             modelRepositoryPolicy.setChecksumPolicy( settingsRepositoryPolicy.getChecksumPolicy() );
         }
