@@ -231,6 +231,22 @@ public class ${class.name}
         #end
     }
 
+    public void remove${scap}( ${field.to} ${v} )
+    {
+        #if ( $field.to == "String" )
+        update( getDelegate().with${cap}(
+                getDelegate().get${cap}().stream()
+                        .filter( e -> !Objects.equals( e, ${v} ) )
+                        .collect( Collectors.toList() ) ) );
+        #else
+        update( getDelegate().with${cap}(
+                getDelegate().get${cap}().stream()
+                        .filter( e -> !Objects.equals( e, ${v} ) )
+                        .collect( Collectors.toList() ) ) );
+        ${v}.childrenTracking = null;
+        #end
+    }
+
       #end
     #end
     public InputLocation getLocation( Object key )
