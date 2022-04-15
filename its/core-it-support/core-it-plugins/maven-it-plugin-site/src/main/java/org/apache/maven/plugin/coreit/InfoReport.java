@@ -19,13 +19,12 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.reporting.MavenReportException;
-
-import org.codehaus.doxia.sink.Sink;
 
 import java.io.File;
 import java.io.FileOutputStream;
