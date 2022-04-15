@@ -143,6 +143,7 @@ public class DefaultMavenPluginManager
     private PluginVersionResolver pluginVersionResolver;
     private PluginArtifactsCache pluginArtifactsCache;
     private MavenPluginValidator pluginValidator;
+    private MavenPluginConfigurationValidator configurationValidator;
 
     private final ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
     private final PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
@@ -158,7 +159,8 @@ public class DefaultMavenPluginManager
             ExtensionRealmCache extensionRealmCache,
             PluginVersionResolver pluginVersionResolver,
             PluginArtifactsCache pluginArtifactsCache,
-            MavenPluginValidator pluginValidator )
+            MavenPluginValidator pluginValidator,
+            MavenPluginConfigurationValidator configurationValidator )
     {
         this.container = container;
         this.classRealmManager = classRealmManager;
@@ -170,6 +172,7 @@ public class DefaultMavenPluginManager
         this.pluginVersionResolver = pluginVersionResolver;
         this.pluginArtifactsCache = pluginArtifactsCache;
         this.pluginValidator = pluginValidator;
+        this.configurationValidator = configurationValidator;
     }
 
     public synchronized PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories,
@@ -603,6 +606,8 @@ public class DefaultMavenPluginManager
 
             ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
 
+            configurationValidator.validate( mojoDescriptor, pomConfiguration, expressionEvaluator );
+
             populateMojoExecutionFields( mojo, mojoExecution.getExecutionId(), mojoDescriptor, pluginRealm,
                                          pomConfiguration, expressionEvaluator );
 
@@ -638,7 +643,7 @@ public class DefaultMavenPluginManager
             ConfigurationListener listener = new DebugConfigurationListener( logger );
 
             ValidatingConfigurationListener validator =
-                new ValidatingConfigurationListener( mojo, mojoDescriptor, listener, expressionEvaluator );
+                new ValidatingConfigurationListener( mojo, mojoDescriptor, listener );
 
             logger.debug( "Configuring mojo execution '" + mojoDescriptor.getId() + ':' + executionId + "' with "
                 + configuratorId + " configurator -->" );
