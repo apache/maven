@@ -276,8 +276,8 @@ public class DefaultRepositorySystemSessionFactory
         }
         else if ( !MAVEN_RESOLVER_TRANSPORT_AUTO.equals( transport ) )
         {
-            throw new IllegalArgumentException( "Unknown " + MAVEN_RESOLVER_TRANSPORT_KEY + "=" + transport
-                    + ". Supported ones are: " + MAVEN_RESOLVER_TRANSPORT_WAGON + ", "
+            throw new IllegalArgumentException( "Unknown resolver transport '" + transport
+                    + "'. Supported transports are: " + MAVEN_RESOLVER_TRANSPORT_WAGON + ", "
                     + MAVEN_RESOLVER_TRANSPORT_NATIVE + ", " + MAVEN_RESOLVER_TRANSPORT_AUTO );
         }
 
