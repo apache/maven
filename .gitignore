@@ -3,12 +3,10 @@ target/
 .classpath
 .settings/
 .svn/
-bin/
 # Intellij
 *.ipr
 *.iml
 .idea
-out/
 .DS_Store
 /bootstrap
 /dependencies.xml
