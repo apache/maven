@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -46,6 +47,18 @@ public class DeprecatedConfigMojo
      */
     @Parameter( defaultValue = "${basedir}", readonly = true )
     private File basedir;
+
+    /**
+     * @deprecated bean read only
+     */
+    @Parameter(  defaultValue = "${project.artifact}", readonly = true )
+    private Artifact deprecatedBeanReadOnly;
+
+    /**
+     * @deprecated bean
+     */
+    @Parameter(  defaultValue = "${project.artifact}" )
+    private Artifact deprecatedBean;
 
     /**
      * The path to the properties file into which to save the mojo configuration.

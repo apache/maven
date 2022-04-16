@@ -35,7 +35,7 @@ public class MavenITmng5222MojoDeprecatedParamsTest
 {
     public MavenITmng5222MojoDeprecatedParamsTest()
     {
-        super( "[3.9.0,)" );
+        super( "[4.0.0-alpha-1,)" );
     }
 
     /**
@@ -107,13 +107,13 @@ public class MavenITmng5222MojoDeprecatedParamsTest
         List<String> warnLines = findDeprecationWarning( logLines );
 
         assertTrue( warnLines.remove(
-            "[WARNING]   Parameter 'deprecatedParam2' (user property 'config.deprecatedParam2') is deprecated: No reason given" ) );
+            "[WARNING] Parameter 'deprecatedParam2' (user property 'config.deprecatedParam2') is deprecated: No reason given" ) );
 
         assertTrue( warnLines.remove(
-            "[WARNING]   Parameter 'deprecatedArray' (user property 'config.deprecatedArray') is deprecated: deprecated array" ) );
+            "[WARNING] Parameter 'deprecatedArray' (user property 'config.deprecatedArray') is deprecated: deprecated array" ) );
 
         assertTrue( warnLines.remove(
-            "[WARNING]   Parameter 'deprecatedList' (user property 'config.deprecatedList') is deprecated: deprecated list" ) );
+            "[WARNING] Parameter 'deprecatedList' (user property 'config.deprecatedList') is deprecated: deprecated list" ) );
 
         assertTrue( "Not verified line: " + warnLines, warnLines.isEmpty() );
 
@@ -171,34 +171,34 @@ public class MavenITmng5222MojoDeprecatedParamsTest
         List<String> warnLines = findDeprecationWarning( logLines );
 
         assertTrue( warnLines.remove(
-            "[WARNING]   Parameter 'deprecatedParam' is deprecated: I'm deprecated param" ) );
+            "[WARNING] Parameter 'deprecatedParam' is deprecated: I'm deprecated param" ) );
 
         assertTrue( warnLines.remove(
-            "[WARNING]   Parameter 'deprecatedParam2' (user property 'config.deprecatedParam2') is deprecated: No reason given" ) );
+            "[WARNING] Parameter 'deprecatedParam2' (user property 'config.deprecatedParam2') is deprecated: No reason given" ) );
 
         assertTrue( warnLines.remove(
-            "[WARNING]   Parameter 'deprecatedParamWithDefaultConstant' is deprecated: deprecated with constant value" ) );
+            "[WARNING] Parameter 'deprecatedParamWithDefaultConstant' is deprecated: deprecated with constant value" ) );
 
         assertTrue( warnLines.remove(
-            "[WARNING]   Parameter 'deprecatedParamWithDefaultEvaluate' is deprecated: deprecated with evaluate value" ) );
+            "[WARNING] Parameter 'deprecatedParamWithDefaultEvaluate' is deprecated: deprecated with evaluate value" ) );
 
         assertTrue( warnLines.remove(
-            "[WARNING]   Parameter 'deprecatedArray' (user property 'config.deprecatedArray') is deprecated: deprecated array" ) );
+            "[WARNING] Parameter 'deprecatedArray' (user property 'config.deprecatedArray') is deprecated: deprecated array" ) );
 
         assertTrue( warnLines.remove(
-            "[WARNING]   Parameter 'deprecatedArrayWithDefaults' is deprecated: deprecated array" ) );
+            "[WARNING] Parameter 'deprecatedArrayWithDefaults' is deprecated: deprecated array" ) );
 
         assertTrue( warnLines.remove(
-            "[WARNING]   Parameter 'deprecatedList' (user property 'config.deprecatedList') is deprecated: deprecated list" ) );
+            "[WARNING] Parameter 'deprecatedList' (user property 'config.deprecatedList') is deprecated: deprecated list" ) );
 
         assertTrue( warnLines.remove(
-            "[WARNING]   Parameter 'deprecatedListWithDefaults' is deprecated: deprecated list" ) );
+            "[WARNING] Parameter 'deprecatedListWithDefaults' is deprecated: deprecated list" ) );
 
         assertTrue( warnLines.remove(
-            "[WARNING]   Parameter 'deprecatedProperties' is deprecated: deprecated properties" ) );
+            "[WARNING] Parameter 'deprecatedProperties' is deprecated: deprecated properties" ) );
 
         assertTrue( warnLines.remove(
-            "[WARNING]   Parameter 'deprecatedMap' is deprecated: deprecated map" ));
+            "[WARNING] Parameter 'deprecatedMap' is deprecated: deprecated map" ));
 
         assertTrue( "Not verified line: " + warnLines, warnLines.isEmpty() );
 
@@ -238,7 +238,7 @@ public class MavenITmng5222MojoDeprecatedParamsTest
 
     private List<String> findDeprecationWarning( List<String> logLines )
     {
-        Pattern pattern = Pattern.compile( "\\[WARNING] {3}Parameter .* is deprecated:.*" );
+        Pattern pattern = Pattern.compile( "\\[WARNING] Parameter .* is deprecated:.*" );
         List<String> result = new ArrayList<>();
         for ( String line : logLines )
         {
