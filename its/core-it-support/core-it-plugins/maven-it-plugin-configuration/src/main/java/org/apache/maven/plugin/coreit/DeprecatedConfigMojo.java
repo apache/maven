@@ -36,7 +36,9 @@ import org.apache.maven.plugins.annotations.Parameter;
  * Dumps this mojo's configuration into a properties file.
  *
  * @author Slawomir Jaranowski
+ * @deprecated This goal is deprecated
  */
+@Deprecated
 @Mojo( name = "deprecated-config", defaultPhase = LifecyclePhase.VALIDATE )
 public class DeprecatedConfigMojo
     extends AbstractMojo
