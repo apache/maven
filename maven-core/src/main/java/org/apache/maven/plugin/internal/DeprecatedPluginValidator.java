@@ -21,6 +21,7 @@ package org.apache.maven.plugin.internal;
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
+import org.apache.maven.shared.utils.logging.MessageBuilder;
 import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
@@ -30,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Print warnings if deprecated params of plugin are used in configuration.
+ * Print warnings if deprecated mojo or parameters of plugin are used in configuration.
  *
  * @author Slawomir Jaranowski
  */
@@ -48,6 +49,11 @@ class DeprecatedPluginValidator implements MavenPluginConfigurationValidator
         if ( !LOGGER.isWarnEnabled() )
         {
             return;
+        }
+
+        if ( mojoDescriptor.getDeprecated() != null )
+        {
+            logDeprecatedMojo( mojoDescriptor );
         }
 
         if ( mojoDescriptor.getParameters() == null )
@@ -69,7 +75,7 @@ class DeprecatedPluginValidator implements MavenPluginConfigurationValidator
 
         if ( isValueSet( config, expressionEvaluator ) )
         {
-            logDeprecateWarn( parameter );
+            logDeprecatedParameter( parameter );
         }
     }
 
@@ -110,22 +116,38 @@ class DeprecatedPluginValidator implements MavenPluginConfigurationValidator
         return false;
     }
 
-    private static void logDeprecateWarn( Parameter parameter )
+    private void logDeprecatedMojo( MojoDescriptor mojoDescriptor )
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append( "Parameter '" );
-        sb.append( parameter.getName() );
-        sb.append( '\'' );
+        String message = MessageUtils.buffer()
+            .warning( "Goal '" )
+            .warning( mojoDescriptor.getGoal() )
+            .warning( "' is deprecated: " )
+            .warning( mojoDescriptor.getDeprecated() )
+            .toString();
+
+        LOGGER.warn( message );
+    }
+
+    private static void logDeprecatedParameter( Parameter parameter )
+    {
+        MessageBuilder messageBuilder = MessageUtils.buffer()
+            .warning( "Parameter '" )
+            .warning( parameter.getName() )
+            .warning( '\'' );
+
         if ( parameter.getExpression() != null )
         {
             String userProperty = parameter.getExpression().replace( "${", "'" ).replace( '}', '\'' );
-            sb.append( " (user property " );
-            sb.append( userProperty );
-            sb.append( ")" );
+            messageBuilder
+                .warning( " (user property " )
+                .warning( userProperty )
+                .warning( ")" );
         }
-        sb.append( " is deprecated: " );
-        sb.append( parameter.getDeprecated() );
 
-        LOGGER.warn( MessageUtils.buffer().warning( sb.toString() ).toString() );
+        messageBuilder
+            .warning( " is deprecated: " )
+            .warning( parameter.getDeprecated() );
+
+        LOGGER.warn( messageBuilder.toString() );
     }
 }
