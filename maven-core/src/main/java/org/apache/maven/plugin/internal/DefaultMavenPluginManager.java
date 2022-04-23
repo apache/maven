@@ -164,6 +164,9 @@ public class DefaultMavenPluginManager
     @Requirement
     private PluginArtifactsCache pluginArtifactsCache;
 
+    @Requirement
+    private MavenPluginConfigurationValidator configurationValidator;
+
     private ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
 
     private PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
@@ -609,6 +612,8 @@ public class DefaultMavenPluginManager
 
             ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
 
+            configurationValidator.validate( mojoDescriptor, pomConfiguration, expressionEvaluator );
+
             populateMojoExecutionFields( mojo, mojoExecution.getExecutionId(), mojoDescriptor, pluginRealm,
                                          pomConfiguration, expressionEvaluator );
 
@@ -644,7 +649,7 @@ public class DefaultMavenPluginManager
             ConfigurationListener listener = new DebugConfigurationListener( logger );
 
             ValidatingConfigurationListener validator =
-                new ValidatingConfigurationListener( mojo, mojoDescriptor, listener, expressionEvaluator );
+                new ValidatingConfigurationListener( mojo, mojoDescriptor, listener );
 
             logger.debug( "Configuring mojo execution '" + mojoDescriptor.getId() + ':' + executionId + "' with "
                 + configuratorId + " configurator -->" );
