@@ -35,7 +35,7 @@ public class MavenITmng5222MojoDeprecatedParamsTest
 {
     public MavenITmng5222MojoDeprecatedParamsTest()
     {
-        super( "[4.0.0-alpha-1,)" );
+        super( "[3.9.0,)" );
     }
 
     /**

@@ -51,13 +51,13 @@ public class DeprecatedConfigMojo
     /**
      * @deprecated bean read only
      */
-    @Parameter(  defaultValue = "${project.artifact}", readonly = true )
+    @Parameter( defaultValue = "${project.artifact}", readonly = true )
     private Artifact deprecatedBeanReadOnly;
 
     /**
      * @deprecated bean
      */
-    @Parameter(  defaultValue = "${project.artifact}" )
+    @Parameter( defaultValue = "${project.artifact}" )
     private Artifact deprecatedBean;
 
     /**
