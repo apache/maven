@@ -229,13 +229,18 @@ public class MojoExecutor
             }
         }
 
-        if ( session.isParallel() && mojoDescriptor.isAggregator() )
-        {
-            LOGGER.warn( "Now what?" );
-        }
-
         try ( ProjectLock lock = new ProjectLock( session, mojoDescriptor, aggregatorLock ) )
         {
+            if ( session.isParallel() && mojoDescriptor.isAggregator() )
+            {
+                LOGGER.warn( "===" );
+                LOGGER.warn( "Executing aggregator Mojo in parallel build:" );
+                LOGGER.warn( "Aggregator Mojo requires exclusive access to reactor, " );
+                LOGGER.warn( "to prevent race conditions, an aggregating execution will block" );
+                LOGGER.warn( "all other executions until finished." );
+                LOGGER.warn( "===" );
+            }
+
             doExecute( session, mojoExecution, projectIndex, dependencyContext );
         }
     }
