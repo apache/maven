@@ -59,6 +59,8 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.SessionData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -75,10 +77,14 @@ import org.eclipse.aether.SessionData;
 @Singleton
 public class MojoExecutor
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( MojoExecutor.class );
 
     private final BuildPluginManager pluginManager;
+
     private final MavenPluginManager mavenPluginManager;
+
     private final LifecycleDependencyResolver lifeCycleDependencyResolver;
+
     private final ExecutionEventCatapult eventCatapult;
 
     private final ReadWriteLock aggregatorLock = new ReentrantReadWriteLock();
@@ -221,6 +227,11 @@ public class MojoExecutor
 
                 return;
             }
+        }
+
+        if ( session.isParallel() && mojoDescriptor.isAggregator() )
+        {
+            LOGGER.warn( "Now what?" );
         }
 
         try ( ProjectLock lock = new ProjectLock( session, mojoDescriptor, aggregatorLock ) )
