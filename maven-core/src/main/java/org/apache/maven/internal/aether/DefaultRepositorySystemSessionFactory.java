@@ -136,18 +136,9 @@ public class DefaultRepositorySystemSessionFactory
 
         session.setOffline( request.isOffline() );
         session.setChecksumPolicy( request.getGlobalChecksumPolicy() );
-        if ( request.isNoSnapshotUpdates() )
-        {
-            session.setUpdatePolicy( RepositoryPolicy.UPDATE_POLICY_NEVER );
-        }
-        else if ( request.isUpdateSnapshots() )
-        {
-            session.setUpdatePolicy( RepositoryPolicy.UPDATE_POLICY_ALWAYS );
-        }
-        else
-        {
-            session.setUpdatePolicy( null );
-        }
+        session.setUpdatePolicy( request.isNoSnapshotUpdates()
+                    ? RepositoryPolicy.UPDATE_POLICY_NEVER
+                    : request.isUpdateSnapshots() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null );
 
         int errorPolicy = 0;
         errorPolicy |= request.isCacheNotFound() ? ResolutionErrorPolicy.CACHE_NOT_FOUND
@@ -180,14 +171,8 @@ public class DefaultRepositorySystemSessionFactory
             session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( session, localRepo ) );
         }
 
-        if ( request.getWorkspaceReader() != null )
-        {
-            session.setWorkspaceReader( request.getWorkspaceReader() );
-        }
-        else
-        {
-            session.setWorkspaceReader( workspaceRepository );
-        }
+        session.setWorkspaceReader(
+                request.getWorkspaceReader() != null ? request.getWorkspaceReader() : workspaceRepository );
 
         DefaultSettingsDecryptionRequest decrypt = new DefaultSettingsDecryptionRequest();
         decrypt.setProxies( Proxy.proxyToApiV4( request.getProxies() ) );
