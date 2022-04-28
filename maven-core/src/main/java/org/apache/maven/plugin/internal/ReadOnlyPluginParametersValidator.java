@@ -19,25 +19,26 @@ package org.apache.maven.plugin.internal;
  * under the License.
  */
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
-import org.apache.maven.shared.utils.logging.MessageUtils;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Print warnings if deprecated mojo or parameters of plugin are used in configuration.
+ * Print warnings if read-only parameters of a plugin are used in configuration.
  *
  * @author Slawomir Jaranowski
  */
-
-@Component( role = MavenPluginConfigurationValidator.class )
-class DeprecatedPluginValidator extends AbstractMavenPluginParametersValidator
+@Named
+@Singleton
+public class ReadOnlyPluginParametersValidator extends AbstractMavenPluginParametersValidator
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger( DeprecatedPluginValidator.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( ReadOnlyPluginParametersValidator.class );
 
     @Override
     protected Logger getLogger()
@@ -48,22 +49,16 @@ class DeprecatedPluginValidator extends AbstractMavenPluginParametersValidator
     @Override
     protected String getParameterLogReason( Parameter parameter )
     {
-        return "is deprecated: " + parameter.getDeprecated();
+        return "is read-only, must not be used in configuration";
     }
 
     @Override
-    public void validate( MojoDescriptor mojoDescriptor,
-                          PlexusConfiguration pomConfiguration,
+    public void validate( MojoDescriptor mojoDescriptor, PlexusConfiguration pomConfiguration,
                           ExpressionEvaluator expressionEvaluator )
     {
         if ( !LOGGER.isWarnEnabled() )
         {
             return;
-        }
-
-        if ( mojoDescriptor.getDeprecated() != null )
-        {
-            logDeprecatedMojo( mojoDescriptor );
         }
 
         if ( mojoDescriptor.getParameters() == null )
@@ -72,14 +67,13 @@ class DeprecatedPluginValidator extends AbstractMavenPluginParametersValidator
         }
 
         mojoDescriptor.getParameters().stream()
-            .filter( parameter -> parameter.getDeprecated() != null )
-            .filter( Parameter::isEditable )
+            .filter( parameter -> !parameter.isEditable() )
             .forEach( parameter -> checkParameter( parameter, pomConfiguration, expressionEvaluator ) );
     }
 
-    private void checkParameter( Parameter parameter,
-                                 PlexusConfiguration pomConfiguration,
-                                 ExpressionEvaluator expressionEvaluator )
+    protected void checkParameter( Parameter parameter,
+                                   PlexusConfiguration pomConfiguration,
+                                   ExpressionEvaluator expressionEvaluator )
     {
         PlexusConfiguration config = pomConfiguration.getChild( parameter.getName(), false );
 
@@ -87,17 +81,5 @@ class DeprecatedPluginValidator extends AbstractMavenPluginParametersValidator
         {
             logParameter( parameter );
         }
-    }
-
-    private void logDeprecatedMojo( MojoDescriptor mojoDescriptor )
-    {
-        String message = MessageUtils.buffer()
-            .warning( "Goal '" )
-            .warning( mojoDescriptor.getGoal() )
-            .warning( "' is deprecated: " )
-            .warning( mojoDescriptor.getDeprecated() )
-            .toString();
-
-        LOGGER.warn( message );
     }
 }

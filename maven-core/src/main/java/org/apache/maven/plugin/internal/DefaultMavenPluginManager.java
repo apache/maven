@@ -126,7 +126,7 @@ public class DefaultMavenPluginManager
      * same class realm is used to load build extensions and load mojos for extensions=true plugins.
      * </p>
      * <strong>Note:</strong> This is part of internal implementation and may be changed or removed without notice
-     * 
+     *
      * @since 3.3.0
      */
     public static final String KEY_EXTENSIONS_REALMS = DefaultMavenPluginManager.class.getName() + "/extensionsRealms";
@@ -165,7 +165,7 @@ public class DefaultMavenPluginManager
     private PluginArtifactsCache pluginArtifactsCache;
 
     @Requirement
-    private MavenPluginConfigurationValidator configurationValidator;
+    private List<MavenPluginConfigurationValidator> configurationValidators;
 
     private ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
 
@@ -612,7 +612,10 @@ public class DefaultMavenPluginManager
 
             ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
 
-            configurationValidator.validate( mojoDescriptor, pomConfiguration, expressionEvaluator );
+            for ( MavenPluginConfigurationValidator validator: configurationValidators )
+            {
+                validator.validate( mojoDescriptor, pomConfiguration, expressionEvaluator );
+            }
 
             populateMojoExecutionFields( mojo, mojoExecution.getExecutionId(), mojoDescriptor, pluginRealm,
                                          pomConfiguration, expressionEvaluator );
