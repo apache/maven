@@ -36,7 +36,7 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
 {
     public MavenITmng7464ReadOnlyMojoParametersWarningTest()
     {
-        super( "4.0.0-alpha-1,)" );
+        super( "3.9.0,)" );
     }
 
     /**
@@ -63,7 +63,7 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
     /**
      * Test that ensures that warning is printed for read-only parameter set by property
      */
-    public void testDeprecatedProperty()
+    public void testReadOnlyProperty()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7464-mojo-read-only-params" );
