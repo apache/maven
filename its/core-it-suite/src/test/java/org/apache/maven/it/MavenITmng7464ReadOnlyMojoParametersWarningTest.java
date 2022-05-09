@@ -36,7 +36,7 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
 {
     public MavenITmng7464ReadOnlyMojoParametersWarningTest()
     {
-        super( "3.9.0,)" );
+        super( "[3.9.0,)" );
     }
 
     /**
