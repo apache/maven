@@ -19,6 +19,7 @@
 
 properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: env.BRANCH_NAME=='master'?'5':'1'))])
 
+
 def buildOs = 'linux'
 def buildJdk = '8'
 def buildMvn = '3.6.3'
