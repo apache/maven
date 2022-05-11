@@ -19,16 +19,16 @@ package org.apache.maven.session.scope.internal;
  * under the License.
  */
 
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 import com.google.inject.Key;
 import com.google.inject.OutOfScopeException;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
+import com.google.inject.util.Providers;
 
 /**
  * SessionScope
@@ -36,6 +36,18 @@ import com.google.inject.Scope;
 public class SessionScope
     implements Scope
 {
+    /**
+     * @since 3.3.0
+     */
+    public static class Memento
+    {
+        final Map<Key<?>, Provider<?>> seeded;
+
+        Memento( final Map<Key<?>, Provider<?>> seeded )
+        {
+            this.seeded = Collections.unmodifiableMap( new HashMap<>( seeded ) );
+        }
+    }
 
     private static final Provider<Object> SEEDED_KEY_PROVIDER = new Provider<Object>()
     {
@@ -48,127 +60,110 @@ public class SessionScope
     /**
      * ScopeState
      */
-    protected static final class ScopeState
+    private static final class ScopeState
     {
-        private final ConcurrentMap<Key<?>, CachingProvider<?>> provided = new ConcurrentHashMap<>();
+        private final Map<Key<?>, Provider<?>> seeded = new HashMap<>();
 
-        public <T> void seed( Class<T> clazz, Provider<T> value )
-        {
-            provided.put( Key.get( clazz ), new CachingProvider<>( value ) );
-        }
-
-        @SuppressWarnings( "unchecked" )
-        public <T> Provider<T> scope( Key<T> key, final Provider<T> unscoped )
-        {
-            Provider<?> provider = provided.get( key );
-            if ( provider == null )
-            {
-                CachingProvider<?> newValue = new CachingProvider<>( unscoped );
-                provider = provided.putIfAbsent( key, newValue );
-                if ( provider == null )
-                {
-                    provider = newValue;
-                }
-            }
-            return ( Provider<T> ) provider;
-        }
-
-        public Collection<CachingProvider<?>> providers()
-        {
-            return provided.values();
-        }
-
+        private final Map<Key<?>, Object> provided = new HashMap<>();
     }
 
-    private final List<ScopeState> values = new CopyOnWriteArrayList<>();
+    private final ThreadLocal<LinkedList<ScopeState>> values = new ThreadLocal<>();
 
     public void enter()
     {
-        values.add( 0, new ScopeState() );
+        LinkedList<ScopeState> stack = values.get();
+        if ( stack == null )
+        {
+            stack = new LinkedList<>();
+            values.set( stack );
+        }
+        stack.addFirst( new ScopeState() );
     }
 
-    protected ScopeState getScopeState()
+    /**
+     * @since 3.3.0
+     */
+    public void enter( Memento memento )
     {
-        if ( values.isEmpty() )
+        enter();
+        getScopeState().seeded.putAll( memento.seeded );
+    }
+
+    private ScopeState getScopeState()
+    {
+        LinkedList<ScopeState> stack = values.get();
+        if ( stack == null || stack.isEmpty() )
         {
-            throw new OutOfScopeException( "Cannot access session scope outside of a scoping block" );
+            throw new IllegalStateException();
         }
-        return values.get( 0 );
+        return stack.getFirst();
     }
 
     public void exit()
     {
-        if ( values.isEmpty() )
+        final LinkedList<ScopeState> stack = values.get();
+        if ( stack == null || stack.isEmpty() )
         {
             throw new IllegalStateException();
         }
-        values.remove( 0 );
+        stack.removeFirst();
+        if ( stack.isEmpty() )
+        {
+            values.remove();
+        }
+    }
+
+    /**
+     * @since 3.3.0
+     */
+    public Memento memento()
+    {
+        LinkedList<ScopeState> stack = values.get();
+        return new Memento( stack != null ? stack.getFirst().seeded : Collections.<Key<?>, Provider<?>>emptyMap() );
     }
 
     public <T> void seed( Class<T> clazz, Provider<T> value )
     {
-        getScopeState().seed( clazz, value );
+        getScopeState().seeded.put( Key.get( clazz ), value );
     }
 
     public <T> void seed( Class<T> clazz, final T value )
     {
-        seed( clazz, new Provider<T>()
-        {
-            @Override
-            public T get()
-            {
-                return value;
-            }
-        } );
+        getScopeState().seeded.put( Key.get( clazz ), Providers.of( value ) );
     }
 
     public <T> Provider<T> scope( final Key<T> key, final Provider<T> unscoped )
     {
-        // Lazy evaluating provider
         return new Provider<T>()
         {
-            @Override
+            @SuppressWarnings( "unchecked" )
             public T get()
             {
-                return getScopeState().scope( key, unscoped ).get();
+                LinkedList<ScopeState> stack = values.get();
+                if ( stack == null || stack.isEmpty() )
+                {
+                    throw new OutOfScopeException( "Cannot access " + key + " outside of a scoping block" );
+                }
+
+                ScopeState state = stack.getFirst();
+
+                Provider<?> seeded = state.seeded.get( key );
+
+                if ( seeded != null )
+                {
+                    return (T) seeded.get();
+                }
+
+                T provided = (T) state.provided.get( key );
+                if ( provided == null && unscoped != null )
+                {
+                    provided = unscoped.get();
+                    state.provided.put( key, provided );
+                }
+
+                return provided;
             }
         };
-    }
-
-    /**
-     * CachingProvider
-     * @param <T>
-     */
-    protected static class CachingProvider<T> implements Provider<T>
-    {
-        private final Provider<T> provider;
-        private volatile T value;
-
-        CachingProvider( Provider<T> provider )
-        {
-            this.provider = provider;
-        }
-
-        public T value()
-        {
-            return value;
-        }
-
-        @Override
-        public T get()
-        {
-            if ( value == null )
-            {
-                synchronized ( this )
-                {
-                    if ( value == null )
-                    {
-                        value = provider.get();
-                    }
-                }
-            }
-            return value;
-        }
     }
 
     @SuppressWarnings( { "unchecked" } )
