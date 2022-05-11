@@ -24,6 +24,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.MessageHelper;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.MissingProjectException;
 import org.apache.maven.plugin.BuildPluginManager;
@@ -238,12 +239,13 @@ public class MojoExecutor
                 acquiredProjectLock = getProjectLock( session );
                 if ( !acquiredAggregatorLock.tryLock() )
                 {
-                    LOGGER.warn( "================================================================" );
-                    LOGGER.warn( "An aggregator Mojo is already executing in parallel build, but" );
-                    LOGGER.warn( "aggregator Mojos require exclusive access to reactor to prevent" );
-                    LOGGER.warn( "race conditions. This mojo execution will be blocked until the" );
-                    LOGGER.warn( "aggregator work is done." );
-                    LOGGER.warn( "================================================================" );
+                    for ( String s : MessageHelper.formatWarning(
+                            "An aggregator Mojo is already executing in parallel build, but aggregator "
+                                    + "Mojos require exclusive access to reactor to prevent race conditions. This "
+                                    + "mojo execution will be blocked until the aggregator work is done." ) )
+                    {
+                        LOGGER.warn( s );
+                    }
                     acquiredAggregatorLock.lock();
                 }
                 acquiredProjectLock.lock();
