@@ -51,6 +51,7 @@ under the License.
     <module>group-12</module>
     <module>group-13</module>
     <module>group-14</module>
+    <module>group-15</module>
   </modules>
 
   <properties>

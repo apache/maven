@@ -60,10 +60,21 @@ public class HttpServer
         // server.join();
     }
 
+	public boolean isFailed()
+    {
+        return server.isFailed();
+    }
+
     public void stop()
         throws Exception
     {
         server.stop();
+    }
+
+    public void join()
+        throws Exception
+    {
+        server.join();
     }
 
     public int port()
