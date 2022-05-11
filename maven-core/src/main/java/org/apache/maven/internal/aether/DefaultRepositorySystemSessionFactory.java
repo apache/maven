@@ -261,8 +261,7 @@ public class DefaultRepositorySystemSessionFactory
         }
         session.setAuthenticationSelector( authSelector );
 
-        String transport = request.getUserProperties()
-                .getProperty( MAVEN_RESOLVER_TRANSPORT_KEY, MAVEN_RESOLVER_TRANSPORT_WAGON );
+        Object transport = configProps.getOrDefault( MAVEN_RESOLVER_TRANSPORT_KEY, MAVEN_RESOLVER_TRANSPORT_WAGON );
         if ( MAVEN_RESOLVER_TRANSPORT_NATIVE.equals( transport ) )
         {
             // Make sure (whatever extra priority is set) that resolver native is selected
