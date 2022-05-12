@@ -37,6 +37,7 @@ import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -239,7 +240,8 @@ public class MojoExecutor
                 acquiredProjectLock = getProjectLock( session );
                 if ( !acquiredAggregatorLock.tryLock() )
                 {
-                    for ( String s : MessageHelper.formatWarning(
+                    int size = Math.max( MessageUtils.getTerminalWidth() - 15, MessageHelper.DEFAULT_MAX_SIZE );
+                    for ( String s : MessageHelper.messageBox( size,
                             "An aggregator Mojo is already executing in parallel build, but aggregator "
                                     + "Mojos require exclusive access to reactor to prevent race conditions. This "
                                     + "mojo execution will be blocked until the aggregator work is done." ) )

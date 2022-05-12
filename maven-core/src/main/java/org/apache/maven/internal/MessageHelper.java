@@ -28,19 +28,29 @@ import java.util.List;
 public class MessageHelper
 {
 
-    private static final int DEFAULT_MAX_SIZE = 65;
+    public static final int DEFAULT_MAX_SIZE = 65;
+
     private static final char BOX_CHAR = '*';
 
     public static String separatorLine()
     {
-        StringBuilder sb = new StringBuilder( DEFAULT_MAX_SIZE );
-        repeat( sb, '*', DEFAULT_MAX_SIZE );
+        return separatorLine( DEFAULT_MAX_SIZE );
+    }
+
+    public static String separatorLine( int length )
+    {
+        StringBuilder sb = new StringBuilder( length );
+        repeat( sb, '*', length );
         return sb.toString();
     }
 
-    public static List<String> formatWarning( String... lines )
+    public static List<String> messageBox( String... lines )
     {
-        int size = DEFAULT_MAX_SIZE;
+        return messageBox( DEFAULT_MAX_SIZE, lines );
+    }
+
+    public static List<String> messageBox( int size, String... lines )
+    {
         int rem = size - 4;
         List<String> result = new ArrayList<>();
         StringBuilder sb = new StringBuilder( size );

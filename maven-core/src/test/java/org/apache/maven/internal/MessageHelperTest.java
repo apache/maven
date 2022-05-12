@@ -43,7 +43,7 @@ public class MessageHelperTest
         msgs.add( "* question, not against maven-core                              *" );
         msgs.add( "*****************************************************************" );
 
-        assertEquals( msgs, MessageHelper.formatWarning(
+        assertEquals( msgs, MessageHelper.messageBox(
                 "Your build is requesting parallel execution, but project contains the following "
                         + "plugin(s) that have goals not marked as @threadSafe to support parallel building.",
                 "While this /may/ work fine, please look for plugin updates and/or "
@@ -63,7 +63,7 @@ public class MessageHelperTest
         msgs.add( "* until the aggregator work is done.                            *" );
         msgs.add( "*****************************************************************" );
 
-        assertEquals( msgs, MessageHelper.formatWarning(
+        assertEquals( msgs, MessageHelper.messageBox(
                 "An aggregator Mojo is already executing in parallel build, but aggregator "
                         + "Mojos require exclusive access to reactor to prevent race conditions. This "
                         + "mojo execution will be blocked until the aggregator work is done." ) );
