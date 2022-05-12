@@ -183,7 +183,7 @@ public class ExecutionEventLogger
 
         List<MavenProject> projects = session.getProjects();
 
-        final int lineLength = MessageHelper.getConsoleLineLength();
+        final int lineLength = MessageHelper.getConsoleLineLength() - 8;
         int maxProjectNameLength = lineLength - ( LINE_LENGTH - MAX_PROJECT_NAME_LENGTH );
         for ( MavenProject project : projects )
         {
@@ -306,7 +306,7 @@ public class ExecutionEventLogger
             final String postHeader = " >--";
 
             final int headerLen = preHeader.length() + projectKey.length() + postHeader.length();
-            final int lineLength = MessageHelper.getConsoleLineLength();
+            final int lineLength = MessageHelper.getConsoleLineLength() - 8;
 
             String prefix = chars( '-', Math.max( 0, ( lineLength - headerLen ) / 2 ) ) + preHeader;
 

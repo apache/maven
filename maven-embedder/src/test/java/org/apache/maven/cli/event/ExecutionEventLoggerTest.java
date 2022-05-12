@@ -24,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.internal.MessageHelper;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.junit.AfterClass;
@@ -40,12 +41,14 @@ public class ExecutionEventLoggerTest
     public static void setUp() 
     {
         MessageUtils.setColorEnabled( false );
+        System.setProperty( MessageHelper.LINE_LENGTH_PROPERTY, "80" );
     }
 
     @AfterClass
     public static void tearDown()
     {
         MessageUtils.setColorEnabled( true );
+        System.clearProperty( MessageHelper.LINE_LENGTH_PROPERTY );
     }
 
     @Test
