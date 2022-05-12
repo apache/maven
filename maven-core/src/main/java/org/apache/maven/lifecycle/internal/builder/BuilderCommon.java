@@ -24,6 +24,7 @@ import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.MessageHelper;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
@@ -103,15 +104,15 @@ public class BuilderCommon
             final Set<Plugin> unsafePlugins = executionPlan.getNonThreadSafePlugins();
             if ( !unsafePlugins.isEmpty() )
             {
-                logger.warn( "*****************************************************************" );
-                logger.warn( "* Your build is requesting parallel execution, but project      *" );
-                logger.warn( "* contains the following plugin(s) that have goals not marked   *" );
-                logger.warn( "* as @threadSafe to support parallel building.                  *" );
-                logger.warn( "* While this /may/ work fine, please look for plugin updates    *" );
-                logger.warn( "* and/or request plugins be made thread-safe.                   *" );
-                logger.warn( "* If reporting an issue, report it against the plugin in        *" );
-                logger.warn( "* question, not against maven-core                              *" );
-                logger.warn( "*****************************************************************" );
+                for ( String s : MessageHelper.formatWarning(
+                        "Your build is requesting parallel execution, but project contains the following "
+                                + "plugin(s) that have goals not marked as @threadSafe to support parallel building.",
+                        "While this /may/ work fine, please look for plugin updates and/or "
+                                + "request plugins be made thread-safe.",
+                        "If reporting an issue, report it against the plugin in question, not against maven-core." ) )
+                {
+                    logger.warn( s );
+                }
                 if ( logger.isDebugEnabled() )
                 {
                     final Set<MojoDescriptor> unsafeGoals = executionPlan.getNonThreadSafeMojos();
@@ -130,7 +131,7 @@ public class BuilderCommon
                     }
                     logger.warn( "Enable debug to see more precisely which goals are not marked @threadSafe." );
                 }
-                logger.warn( "*****************************************************************" );
+                logger.warn( MessageHelper.separatorLine() );
             }
         }
 

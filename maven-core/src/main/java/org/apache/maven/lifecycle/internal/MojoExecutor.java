@@ -24,6 +24,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.MessageHelper;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.MissingProjectException;
 import org.apache.maven.plugin.BuildPluginManager;
@@ -44,6 +45,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.SessionData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,6 +77,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Component( role = MojoExecutor.class )
 public class MojoExecutor
 {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger( MojoExecutor.class );
 
     @Requirement
     private BuildPluginManager pluginManager;
@@ -254,7 +259,17 @@ public class MojoExecutor
                 boolean aggregator = mojoDescriptor.isAggregator();
                 acquiredAggregatorLock = aggregator ? aggregatorLock.writeLock() : aggregatorLock.readLock();
                 acquiredProjectLock = getProjectLock( session );
-                acquiredAggregatorLock.lock();
+                if ( !acquiredAggregatorLock.tryLock() )
+                {
+                    for ( String s : MessageHelper.formatWarning(
+                            "An aggregator Mojo is already executing in parallel build, but aggregator "
+                                    + "Mojos require exclusive access to reactor to prevent race conditions. This "
+                                    + "mojo execution will be blocked until the aggregator work is done." ) )
+                    {
+                        LOGGER.warn( s );
+                    }
+                    acquiredAggregatorLock.lock();
+                }
                 acquiredProjectLock.lock();
             }
             else
