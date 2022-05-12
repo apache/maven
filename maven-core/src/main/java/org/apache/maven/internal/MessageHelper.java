@@ -28,19 +28,58 @@ import java.util.List;
 public class MessageHelper
 {
 
-    private static final int DEFAULT_MAX_SIZE = 65;
+    public static final int DEFAULT_TERMINAL_WIDTH = 80;
+
+    public static final int DEFAULT_MAX_SIZE = 65;
+
+    public static final String LINE_LENGTH_PROPERTY = "maven.console.lineLength";
+
     private static final char BOX_CHAR = '*';
+
+    public static int getConsoleLineLength()
+    {
+        try
+        {
+            int length;
+            String prop = System.getProperty( LINE_LENGTH_PROPERTY );
+            if ( prop != null )
+            {
+                length = Integer.parseInt( prop );
+            }
+            else
+            {
+                Class<?> ansiConsoleClass = Class.forName( "org.fusesource.jansi.AnsiConsole" );
+                Object out = ansiConsoleClass.getMethod( "out" ).invoke( null );
+                length = (Integer) out.getClass().getMethod( "getTerminalWidth" ).invoke( out );
+            }
+            return Math.max( length, DEFAULT_TERMINAL_WIDTH );
+        }
+        catch ( Throwable t )
+        {
+            // ignore exceptions
+            return DEFAULT_TERMINAL_WIDTH;
+        }
+    }
 
     public static String separatorLine()
     {
-        StringBuilder sb = new StringBuilder( DEFAULT_MAX_SIZE );
-        repeat( sb, '*', DEFAULT_MAX_SIZE );
+        return separatorLine( DEFAULT_MAX_SIZE );
+    }
+
+    public static String separatorLine( int length )
+    {
+        StringBuilder sb = new StringBuilder( length );
+        repeat( sb, '*', length );
         return sb.toString();
     }
 
-    public static List<String> formatWarning( String... lines )
+    public static List<String> messageBox( String... lines )
     {
-        int size = DEFAULT_MAX_SIZE;
+        return messageBox( DEFAULT_MAX_SIZE, lines );
+    }
+
+    public static List<String> messageBox( int size, String... lines )
+    {
         int rem = size - 4;
         List<String> result = new ArrayList<>();
         StringBuilder sb = new StringBuilder( size );

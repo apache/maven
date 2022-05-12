@@ -33,6 +33,7 @@ import org.apache.maven.execution.BuildSummary;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.MessageHelper;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -60,11 +61,10 @@ public class ExecutionEventLogger
 
     public ExecutionEventLogger()
     {
-        logger = LoggerFactory.getLogger( ExecutionEventLogger.class );
+        this( LoggerFactory.getLogger( ExecutionEventLogger.class ) );
     }
 
-    // TODO should we deprecate?
-    public ExecutionEventLogger( Logger logger )
+    ExecutionEventLogger( Logger logger )
     {
         this.logger = Objects.requireNonNull( logger, "logger cannot be null" );
     }
@@ -83,7 +83,7 @@ public class ExecutionEventLogger
 
     private void infoLine( char c )
     {
-        infoMain( chars( c, LINE_LENGTH ) );
+        infoMain( chars( c, MessageHelper.getConsoleLineLength() ) );
     }
 
     private void infoMain( String msg )
@@ -112,9 +112,10 @@ public class ExecutionEventLogger
             logger.info( "" );
 
             final List<MavenProject> projects = event.getSession().getProjects();
+            final int lineLength = MessageHelper.getConsoleLineLength();
             for ( MavenProject project : projects )
             {
-                int len = LINE_LENGTH - project.getName().length() - project.getPackaging().length() - 2;
+                int len = lineLength - project.getName().length() - project.getPackaging().length() - 2;
                 logger.info( "{}{}[{}]",
                         project.getName(), chars( ' ', ( len > 0 ) ? len : 1 ), project.getPackaging() );
             }
@@ -182,6 +183,8 @@ public class ExecutionEventLogger
 
         List<MavenProject> projects = session.getProjects();
 
+        final int lineLength = MessageHelper.getConsoleLineLength();
+        int maxProjectNameLength = lineLength - ( LINE_LENGTH - MAX_PROJECT_NAME_LENGTH );
         for ( MavenProject project : projects )
         {
             StringBuilder buffer = new StringBuilder( 128 );
@@ -195,9 +198,9 @@ public class ExecutionEventLogger
                 buffer.append( ' ' );
             }
 
-            if ( buffer.length() <= MAX_PROJECT_NAME_LENGTH )
+            if ( buffer.length() <= maxProjectNameLength )
             {
-                while ( buffer.length() < MAX_PROJECT_NAME_LENGTH )
+                while ( buffer.length() < maxProjectNameLength )
                 {
                     buffer.append( '.' );
                 }
@@ -303,11 +306,12 @@ public class ExecutionEventLogger
             final String postHeader = " >--";
 
             final int headerLen = preHeader.length() + projectKey.length() + postHeader.length();
+            final int lineLength = MessageHelper.getConsoleLineLength();
 
-            String prefix = chars( '-', Math.max( 0, ( LINE_LENGTH - headerLen ) / 2 ) ) + preHeader;
+            String prefix = chars( '-', Math.max( 0, ( lineLength - headerLen ) / 2 ) ) + preHeader;
 
             String suffix = postHeader
-                + chars( '-', Math.max( 0, LINE_LENGTH - headerLen - prefix.length() + preHeader.length() ) );
+                + chars( '-', Math.max( 0, lineLength - headerLen - prefix.length() + preHeader.length() ) );
 
             logger.info( buffer().strong( prefix ).project( projectKey ).strong( suffix ).toString() );
 
@@ -328,14 +332,14 @@ public class ExecutionEventLogger
                 }
                 String progress = " [" + number + '/' + totalProjects + ']';
 
-                int pad = LINE_LENGTH - building.length() - progress.length();
+                int pad = lineLength - building.length() - progress.length();
 
                 infoMain( building + ( ( pad > 0 ) ? chars( ' ', pad ) : "" ) + progress );
             }
 
             // ----------[ packaging ]----------
-            prefix = chars( '-', Math.max( 0, ( LINE_LENGTH - project.getPackaging().length() - 4 ) / 2 ) );
-            suffix = chars( '-', Math.max( 0, LINE_LENGTH - project.getPackaging().length() - 4 - prefix.length() ) );
+            prefix = chars( '-', Math.max( 0, ( lineLength - project.getPackaging().length() - 4 ) / 2 ) );
+            suffix = chars( '-', Math.max( 0, lineLength - project.getPackaging().length() - 4 - prefix.length() ) );
             infoMain( prefix + "[ " + project.getPackaging() + " ]" + suffix );
         }
     }
@@ -360,12 +364,17 @@ public class ExecutionEventLogger
         {
             logger.info( "" );
 
-            MessageBuilder buffer = buffer().strong( "--- " );
-            append( buffer, event.getMojoExecution() );
-            append( buffer, event.getProject() );
-            buffer.strong( " ---" );
+            int len = 2;
+            MessageBuilder buffer = buffer().a( " " );
+            len += append( buffer, event.getMojoExecution() );
+            len += append( buffer, event.getProject() );
+            buffer.a( " " );
 
-            logger.info( buffer.toString() );
+            int rem = Math.max( MessageHelper.getConsoleLineLength() - len, 6 );
+
+            logger.info( buffer().strong( chars( '-', rem / 2 ) ).toString()
+                    + buffer.toString()
+                    + buffer().strong( chars( '-', rem - rem / 2 ) ).toString() );
         }
     }
 
@@ -419,13 +428,16 @@ public class ExecutionEventLogger
         }
     }
 
-    private void append( MessageBuilder buffer, MojoExecution me )
+    private int append( MessageBuilder buffer, MojoExecution me )
     {
+        int len = me.getArtifactId().length() + me.getVersion().length() + me.getGoal().length() + 2;
         buffer.mojo( me.getArtifactId() + ':' + me.getVersion() + ':' + me.getGoal() );
         if ( me.getExecutionId() != null )
         {
+            len += 3 + me.getExecutionId().length();
             buffer.a( ' ' ).strong( '(' + me.getExecutionId() + ')' );
         }
+        return len;
     }
 
     private void appendForkInfo( MessageBuilder buffer, MojoDescriptor md )
@@ -451,9 +463,10 @@ public class ExecutionEventLogger
         buffer.strong( buff.toString() );
     }
 
-    private void append( MessageBuilder buffer, MavenProject project )
+    private int append( MessageBuilder buffer, MavenProject project )
     {
         buffer.a( " @ " ).project( project.getArtifactId() );
+        return 3 + project.getArtifactId().length();
     }
 
     @Override

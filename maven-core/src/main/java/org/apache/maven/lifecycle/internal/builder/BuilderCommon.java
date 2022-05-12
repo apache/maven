@@ -104,7 +104,9 @@ public class BuilderCommon
             final Set<Plugin> unsafePlugins = executionPlan.getNonThreadSafePlugins();
             if ( !unsafePlugins.isEmpty() )
             {
-                for ( String s : MessageHelper.formatWarning(
+                int size = Math.max( MessageHelper.getConsoleLineLength() - "[WARNING] ".length() - 1,
+                                     MessageHelper.DEFAULT_MAX_SIZE );
+                for ( String s : MessageHelper.messageBox( size,
                         "Your build is requesting parallel execution, but project contains the following "
                                 + "plugin(s) that have goals not marked as @threadSafe to support parallel building.",
                         "While this /may/ work fine, please look for plugin updates and/or "
@@ -119,7 +121,7 @@ public class BuilderCommon
                     logger.warn( "The following goals are not marked @threadSafe in " + project.getName() + ":" );
                     for ( MojoDescriptor unsafeGoal : unsafeGoals )
                     {
-                        logger.warn( unsafeGoal.getId() );
+                        logger.warn( "  - " + unsafeGoal.getId() );
                     }
                 }
                 else
@@ -127,11 +129,11 @@ public class BuilderCommon
                     logger.warn( "The following plugins are not marked @threadSafe in " + project.getName() + ":" );
                     for ( Plugin unsafePlugin : unsafePlugins )
                     {
-                        logger.warn( unsafePlugin.getId() );
+                        logger.warn( "  - " + unsafePlugin.getId() );
                     }
                     logger.warn( "Enable debug to see more precisely which goals are not marked @threadSafe." );
                 }
-                logger.warn( MessageHelper.separatorLine() );
+                logger.warn( MessageHelper.separatorLine( size ) );
             }
         }
 

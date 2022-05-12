@@ -261,7 +261,9 @@ public class MojoExecutor
                 acquiredProjectLock = getProjectLock( session );
                 if ( !acquiredAggregatorLock.tryLock() )
                 {
-                    for ( String s : MessageHelper.formatWarning(
+                    int size = Math.max( MessageHelper.getConsoleLineLength() - "[WARNING] ".length() - 1,
+                                         MessageHelper.DEFAULT_MAX_SIZE );
+                    for ( String s : MessageHelper.messageBox( size,
                             "An aggregator Mojo is already executing in parallel build, but aggregator "
                                     + "Mojos require exclusive access to reactor to prevent race conditions. This "
                                     + "mojo execution will be blocked until the aggregator work is done." ) )
