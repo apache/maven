@@ -85,6 +85,8 @@ public class MojoExecutor
 
     private final ReadWriteLock aggregatorLock = new ReentrantReadWriteLock();
 
+    private final Map<Thread, MojoDescriptor> mojos = new ConcurrentHashMap<>();
+
     public MojoExecutor()
     {
     }
@@ -206,10 +208,7 @@ public class MojoExecutor
             }
         }
 
-        try ( ProjectLock lock = new ProjectLock( session, mojoDescriptor, aggregatorLock ) )
-        {
-            doExecute( session, mojoExecution, projectIndex, dependencyContext );
-        }
+        doExecute( session, mojoExecution, projectIndex, dependencyContext );
     }
 
     /**
@@ -220,13 +219,14 @@ public class MojoExecutor
      * TODO: ideally, the builder should take care of the ordering in a smarter way
      * TODO: and concurrency issues fixed with MNG-7157
      */
-    private static class ProjectLock implements AutoCloseable
+    private class ProjectLock implements AutoCloseable
     {
         final Lock acquiredAggregatorLock;
         final Lock acquiredProjectLock;
 
-        ProjectLock( MavenSession session, MojoDescriptor mojoDescriptor, ReadWriteLock aggregatorLock )
+        ProjectLock( MavenSession session, MojoDescriptor mojoDescriptor )
         {
+            mojos.put( Thread.currentThread(), mojoDescriptor );
             if ( session.getRequest().getDegreeOfConcurrency() > 1 )
             {
                 boolean aggregator = mojoDescriptor.isAggregator();
@@ -254,6 +254,7 @@ public class MojoExecutor
             {
                 acquiredAggregatorLock.unlock();
             }
+            mojos.remove( Thread.currentThread() );
         }
 
         @SuppressWarnings( { "unchecked", "rawtypes" } )
@@ -292,8 +293,23 @@ public class MojoExecutor
 
         ensureDependenciesAreResolved( mojoDescriptor, session, dependencyContext );
 
-        eventCatapult.fire( ExecutionEvent.Type.MojoStarted, session, mojoExecution );
+        try ( ProjectLock lock = new ProjectLock( session, mojoDescriptor ) )
+        {
+            doExecute2( session, mojoExecution );
+        }
+        finally
+        {
+            for ( MavenProject forkedProject : forkedProjects )
+            {
+                forkedProject.setExecutionProject( null );
+            }
+        }
+    }
 
+    private void doExecute2( MavenSession session, MojoExecution mojoExecution )
+            throws LifecycleExecutionException
+    {
+        eventCatapult.fire( ExecutionEvent.Type.MojoStarted, session, mojoExecution );
         try
         {
             try
@@ -313,13 +329,6 @@ public class MojoExecutor
             eventCatapult.fire( ExecutionEvent.Type.MojoFailed, session, mojoExecution, e );
 
             throw e;
-        }
-        finally
-        {
-            for ( MavenProject forkedProject : forkedProjects )
-            {
-                forkedProject.setExecutionProject( null );
-            }
         }
     }
 
