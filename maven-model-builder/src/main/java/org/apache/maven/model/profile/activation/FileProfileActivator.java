@@ -138,7 +138,7 @@ public class FileProfileActivator
                     {
                         /*
                          * NOTE: We intentionally only support ${basedir} and not ${project.basedir} as the latter form
-                         * would suggest that other project.* expressions can be used which is however beyond the design.
+                         * would suggest that other project.* expressions can be used which is however beyond the design
                          */
                         if ( "basedir".equals( expression ) )
                         {
