@@ -32,9 +32,13 @@ import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
+import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.profile.ProfileActivationContext;
+import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -58,10 +62,25 @@ public class FileProfileActivator
     @Inject
     private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
 
+    private PathTranslator pathTranslator;
+
     public FileProfileActivator setProfileActivationFilePathInterpolator(
             ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator )
     {
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
+        return this;
+    }
+
+    /**
+     * Sets {@link PathTranslator}. Used by legacy code that is NOT using container, but are instantiating this class
+     * manually (clearly, a misuse). Still, to
+     *
+     * @deprecated This setter is to be removed in next 3.9.x and later versions of Maven.
+     */
+    @Deprecated
+    public FileProfileActivator setPathTranslator( PathTranslator pathTranslator )
+    {
+        this.pathTranslator = pathTranslator;
         return this;
     }
 
@@ -100,35 +119,114 @@ public class FileProfileActivator
             return false;
         }
 
-        try
+        // MANUALLY CONSTRUCTED in legacy code:
+        // this is preserving "old" way of working, if for example class is instantiated manually
+        // instead using DI. This IF is ONLY here in 3.8.x line, and is NOT to be forward ported to later
+        // Maven versions.
+        if ( pathTranslator != null )
         {
-            path = profileActivationFilePathInterpolator.interpolate( path, context );
+            RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
+
+            final File basedir = context.getProjectDirectory();
+
+            if ( basedir != null )
+            {
+                interpolator.addValueSource( new AbstractValueSource( false )
+                {
+                    @Override
+                    public Object getValue( String expression )
+                    {
+                        /*
+                         * NOTE: We intentionally only support ${basedir} and not ${project.basedir} as the latter form
+                         * would suggest that other project.* expressions can be used which is however beyond the design.
+                         */
+                        if ( "basedir".equals( expression ) )
+                        {
+                            return basedir.getAbsolutePath();
+                        }
+                        return null;
+                    }
+                } );
+            }
+            else if ( path.contains( "${basedir}" ) )
+            {
+                return false;
+            }
+
+            interpolator.addValueSource( new MapBasedValueSource( context.getProjectProperties() ) );
+
+            interpolator.addValueSource( new MapBasedValueSource( context.getUserProperties() ) );
+
+            interpolator.addValueSource( new MapBasedValueSource( context.getSystemProperties() ) );
+
+            try
+            {
+                path = interpolator.interpolate( path, "" );
+            }
+            catch ( Exception e )
+            {
+                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                        .setMessage( "Failed to interpolate file location " + path + " for profile " + profile.getId()
+                                + ": " + e.getMessage() )
+                        .setLocation( file.getLocation( missing ? "missing" : "exists" ) )
+                        .setException( e ) );
+                return false;
+            }
+
+            path = pathTranslator.alignToBaseDirectory( path, basedir );
+
+            // replace activation value with interpolated value
+            if ( missing )
+            {
+                file.setMissing( path );
+            }
+            else
+            {
+                file.setExists( path );
+            }
+
+            File f = new File( path );
+
+            if ( !f.isAbsolute() )
+            {
+                return false;
+            }
+
+            boolean fileExists = f.exists();
+
+            return missing ? !fileExists : fileExists;
         }
-        catch ( InterpolationException e )
+        else // container constructed
         {
-            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Failed to interpolate file location " + path + " for profile " + profile.getId()
-                            + ": " + e.getMessage() )
-                    .setLocation( file.getLocation( missing ? "missing" : "exists" ) )
-                    .setException( e ) );
-            return false;
+
+            try
+            {
+                path = profileActivationFilePathInterpolator.interpolate( path, context );
+            }
+            catch ( InterpolationException e )
+            {
+                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                        .setMessage( "Failed to interpolate file location " + path + " for profile " + profile.getId()
+                                + ": " + e.getMessage() )
+                        .setLocation( file.getLocation( missing ? "missing" : "exists" ) )
+                        .setException( e ) );
+                return false;
+            }
+
+            if ( path == null )
+            {
+                return false;
+            }
+
+            File f = new File( path );
+
+            if ( !f.isAbsolute() )
+            {
+                return false;
+            }
+
+            return missing != f.exists();
         }
-
-        if ( path == null )
-        {
-            return false;
-        }
-
-        File f = new File( path );
-
-        if ( !f.isAbsolute() )
-        {
-            return false;
-        }
-
-        boolean fileExists = f.exists();
-
-        return missing ? !fileExists : fileExists;
     }
 
     @Override
@@ -143,11 +241,7 @@ public class FileProfileActivator
 
         ActivationFile file = activation.getFile();
 
-        if ( file == null )
-        {
-            return false;
-        }
-        return true;
+        return file != null;
     }
 
 }
