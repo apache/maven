@@ -13,8 +13,6 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng7470ResolverTransportTest
         extends AbstractMavenIntegrationTestCase
 {
-    private File testDir;
-
     private File projectDir;
 
     private HttpServer server;
@@ -30,7 +28,7 @@ public class MavenITmng7470ResolverTransportTest
     protected void setUp()
         throws Exception
     {
-        testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7470-resolver-transport" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7470-resolver-transport" );
         projectDir = new File( testDir, "project" );
 
         server = HttpServer.builder()
@@ -57,20 +55,31 @@ public class MavenITmng7470ResolverTransportTest
         }
     }
 
-    private void performTest( final String transport, final String logSnippet ) throws Exception
+    private void performTest( /* nullable */ final String transport, final String logSnippet ) throws Exception
     {
         Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
         Map<String, String> properties = new HashMap<>();
         properties.put( "@port@", Integer.toString( port ) );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", properties );
-        verifier.setLogFileName( transport + "-transport.log" );
+        if ( transport == null )
+        {
+            verifier.setLogFileName( "default-transport.log" );
+        }
+        else
+        {
+            verifier.setLogFileName( transport + "-transport.log" );
+        }
         verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.resolver.resolver-demo-maven-plugin" );
         verifier.deleteArtifacts( "org.apache.maven.its.resolver-transport" );
         verifier.addCliOption( "-X" );
         verifier.addCliOption( "-s" );
         verifier.addCliOption( new File( projectDir, "settings.xml" ).getAbsolutePath() );
         verifier.addCliOption( "-Pmaven-core-it-repo" );
-        verifier.addCliOption( "-Dmaven.resolver.transport=" + transport );
+        if ( transport != null )
+        {
+            verifier.addCliOption( "-Dmaven.resolver.transport=" + transport );
+        }
         // Maven will fail if project dependencies cannot be resolved.
         // As dependency exists ONLY in HTTP repo, it MUST be reached using selected transport and
         // successfully resolved from it.
@@ -79,6 +88,12 @@ public class MavenITmng7470ResolverTransportTest
         // verify maven console output contains "[DEBUG] Using transporter XXXTransporter"
         verifier.verifyTextInLog( logSnippet );
         verifier.resetStreams();
+    }
+
+    public void testResolverTransportDefault()
+            throws Exception
+    {
+        performTest( null, "[DEBUG] Using transporter WagonTransporter" );
     }
 
     public void testResolverTransportWagon()
