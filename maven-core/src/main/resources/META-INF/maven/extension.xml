@@ -26,6 +26,7 @@ under the License.
     <exportedPackage>org.apache.maven.artifact</exportedPackage>
     <exportedPackage>org.apache.maven.classrealm</exportedPackage>
     <exportedPackage>org.apache.maven.cli</exportedPackage>
+    <exportedPackage>org.apache.maven.eventspy</exportedPackage>
     <exportedPackage>org.apache.maven.configuration</exportedPackage>
     <exportedPackage>org.apache.maven.exception</exportedPackage>
     <exportedPackage>org.apache.maven.execution</exportedPackage>
