@@ -58,6 +58,8 @@ public class MavenITmng7470ResolverTransportTest
     private void performTest( /* nullable */ final String transport, final String logSnippet ) throws Exception
     {
         Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
+        verifier.setForkJvm( true );
+
         Map<String, String> properties = new HashMap<>();
         properties.put( "@port@", Integer.toString( port ) );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", properties );
