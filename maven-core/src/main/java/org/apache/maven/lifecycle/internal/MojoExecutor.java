@@ -24,6 +24,7 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.MultilineMessageHelper;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.MissingProjectException;
 import org.apache.maven.plugin.BuildPluginManager;
@@ -40,6 +41,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.SessionData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +55,6 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -71,6 +73,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class MojoExecutor
 {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger( MojoExecutor.class );
+
     @Requirement
     private BuildPluginManager pluginManager;
 
@@ -83,7 +87,7 @@ public class MojoExecutor
     @Requirement
     private ExecutionEventCatapult eventCatapult;
 
-    private final ReadWriteLock aggregatorLock = new ReentrantReadWriteLock();
+    private final OwnerReentrantReadWriteLock aggregatorLock = new OwnerReentrantReadWriteLock();
 
     private final Map<Thread, MojoDescriptor> mojos = new ConcurrentHashMap<>();
 
@@ -222,7 +226,7 @@ public class MojoExecutor
     private class ProjectLock implements AutoCloseable
     {
         final Lock acquiredAggregatorLock;
-        final Lock acquiredProjectLock;
+        final OwnerReentrantLock acquiredProjectLock;
 
         ProjectLock( MavenSession session, MojoDescriptor mojoDescriptor )
         {
@@ -232,8 +236,31 @@ public class MojoExecutor
                 boolean aggregator = mojoDescriptor.isAggregator();
                 acquiredAggregatorLock = aggregator ? aggregatorLock.writeLock() : aggregatorLock.readLock();
                 acquiredProjectLock = getProjectLock( session );
-                acquiredAggregatorLock.lock();
-                acquiredProjectLock.lock();
+                if ( !acquiredAggregatorLock.tryLock() )
+                {
+                    Thread owner = aggregatorLock.getOwner();
+                    MojoDescriptor ownerMojo = owner != null ? mojos.get( owner ) : null;
+                    String str = ownerMojo != null ? " The " + ownerMojo.getId() : "An";
+                    String msg = str + " aggregator mojo is already being executed "
+                            + "in this parallel build, those kind of mojos require exclusive access to "
+                            + "reactor to prevent race conditions. This mojo execution will be blocked "
+                            + "until the aggregator mojo is done.";
+                    warn( msg );
+                    acquiredAggregatorLock.lock();
+                }
+                if ( !acquiredProjectLock.tryLock() )
+                {
+                    Thread owner = acquiredProjectLock.getOwner();
+                    MojoDescriptor ownerMojo = owner != null ? mojos.get( owner ) : null;
+                    String str = ownerMojo != null ? " The " + ownerMojo.getId() : "A";
+                    String msg = str + " mojo is already being executed "
+                            + "on the project " + session.getCurrentProject().getGroupId()
+                            + ":" + session.getCurrentProject().getArtifactId() + ". "
+                            + "This mojo execution will be blocked "
+                            + "until the mojo is done.";
+                    warn( msg );
+                    acquiredProjectLock.lock();
+                }
             }
             else
             {
@@ -258,10 +285,10 @@ public class MojoExecutor
         }
 
         @SuppressWarnings( { "unchecked", "rawtypes" } )
-        private Lock getProjectLock( MavenSession session )
+        private OwnerReentrantLock getProjectLock( MavenSession session )
         {
             SessionData data = session.getRepositorySession().getData();
-            ConcurrentMap<MavenProject, Lock> locks = ( ConcurrentMap ) data.get( ProjectLock.class );
+            ConcurrentMap<MavenProject, OwnerReentrantLock> locks = ( ConcurrentMap ) data.get( ProjectLock.class );
             // initialize the value if not already done (in case of a concurrent access) to the method
             if ( locks == null )
             {
@@ -269,17 +296,43 @@ public class MojoExecutor
                 data.set( ProjectLock.class, null, new ConcurrentHashMap<>() );
                 locks = ( ConcurrentMap ) data.get( ProjectLock.class );
             }
-            Lock acquiredProjectLock = locks.get( session.getCurrentProject() );
+            OwnerReentrantLock acquiredProjectLock = locks.get( session.getCurrentProject() );
             if ( acquiredProjectLock == null )
             {
-                acquiredProjectLock = new ReentrantLock();
-                Lock prev = locks.putIfAbsent( session.getCurrentProject(), acquiredProjectLock );
+                acquiredProjectLock = new OwnerReentrantLock();
+                OwnerReentrantLock prev = locks.putIfAbsent( session.getCurrentProject(), acquiredProjectLock );
                 if ( prev != null )
                 {
                     acquiredProjectLock = prev;
                 }
             }
             return acquiredProjectLock;
+        }
+    }
+
+    static class OwnerReentrantLock extends ReentrantLock
+    {
+        @Override
+        public Thread getOwner()
+        {
+            return super.getOwner();
+        }
+    }
+
+    static class OwnerReentrantReadWriteLock extends ReentrantReadWriteLock
+    {
+        @Override
+        public Thread getOwner()
+        {
+            return super.getOwner();
+        }
+    }
+
+    private static void warn( String msg )
+    {
+        for ( String s : MultilineMessageHelper.format( msg ) )
+        {
+            LOGGER.warn( s );
         }
     }
 
