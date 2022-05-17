@@ -267,7 +267,7 @@ public class DefaultRepositorySystemSessionFactory
         if ( MAVEN_RESOLVER_TRANSPORT_DEFAULT.equals( transport ) )
         {
             // The "default" mode (user did not set anything) needs to tweak resolver default priorities
-            // that are coded like this:
+            // that are coded like this (default values):
             //
             // org.eclipse.aether.transport.http.HttpTransporterFactory.priority = 5.0f;
             // org.eclipse.aether.transport.wagon.WagonTransporterFactory.priority = -1.0f;
