@@ -430,7 +430,7 @@ public class BufferingParser implements XmlPullParser
                 throw new XmlPullParserException( "already reached end of XML input", this, null );
             }
             int currentEvent = xmlPullParser.nextToken();
-            if ( accept() )
+            if ( disabled || accept() )
             {
                 return currentEvent;
             }

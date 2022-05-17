@@ -70,7 +70,7 @@ class FastForwardFilter extends BufferingParser
             }
             else
             {
-                final String key = state.peek() + '/' + localName;
+                final String key = state.peekLast() + '/' + localName;
                 switch ( key )
                 {
                     case "execution/configuration":
