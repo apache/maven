@@ -11,6 +11,8 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.log.Log;
+import org.eclipse.jetty.util.log.StdErrLog;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Password;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -36,6 +38,10 @@ import java.util.Collections;
  */
 public class HttpServer
 {
+    static {
+        Log.initialized();
+        ((StdErrLog) Log.getRootLogger()).setLevel( StdErrLog.LEVEL_WARN );
+    }
 
     private final Server server;
 
