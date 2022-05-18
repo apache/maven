@@ -28,8 +28,9 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- * This filter will skip all following filters and write directly to the output.
- * Should be used in case of a DOM that should not be effected by other filters, even though the elements match.
+ * This filter will bypass all following filters and write directly to the output.
+ * Should be used in case of a DOM that should not be effected by other filters,
+ * even though the elements match.
  *
  * @author Robert Scholte
  * @author Guillaume Nodet
@@ -79,8 +80,11 @@ class FastForwardFilter extends BufferingParser
                     case "profile/reports":
                     case "project/reports":
                     case "reportSet/configuration":
+                        if ( domDepth == 0 )
+                        {
+                            bypass( true );
+                        }
                         domDepth++;
-                        disable();
                         break;
                     default:
                         break;
@@ -90,14 +94,24 @@ class FastForwardFilter extends BufferingParser
         }
         else if ( xmlPullParser.getEventType() == END_TAG )
         {
-            domDepth--;
-            if ( domDepth == 0 )
+            if ( domDepth > 0 )
             {
-                enable();
+                if ( --domDepth == 0 )
+                {
+                    bypass( false );
+                }
             }
             state.pop();
         }
         return true;
     }
 
+    @Override
+    public void bypass( boolean bypass )
+    {
+        if ( xmlPullParser instanceof BufferingParser )
+        {
+            ( ( BufferingParser ) xmlPullParser ).bypass( bypass );
+        }
+    }
 }

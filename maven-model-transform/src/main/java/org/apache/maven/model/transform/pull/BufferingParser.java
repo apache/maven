@@ -41,7 +41,7 @@ public class BufferingParser implements XmlPullParser
     protected XmlPullParser xmlPullParser;
     protected Deque<Event> events;
     protected Event current;
-    protected boolean disabled;
+    protected boolean bypass;
 
     @SuppressWarnings( "checkstyle:VisibilityModifier" )
     public static class Event
@@ -404,7 +404,7 @@ public class BufferingParser implements XmlPullParser
                 throw new XmlPullParserException( "already reached end of XML input", this, null );
             }
             int currentEvent = xmlPullParser.next();
-            if ( disabled || accept() )
+            if ( bypass || accept() )
             {
                 return currentEvent;
             }
@@ -430,7 +430,7 @@ public class BufferingParser implements XmlPullParser
                 throw new XmlPullParserException( "already reached end of XML input", this, null );
             }
             int currentEvent = xmlPullParser.nextToken();
-            if ( disabled || accept() )
+            if ( bypass || accept() )
             {
                 return currentEvent;
             }
@@ -531,22 +531,13 @@ public class BufferingParser implements XmlPullParser
         return true;
     }
 
-    protected void enable()
+    public void bypass( boolean bypass )
     {
-        disabled = false;
-    }
-
-    protected void disable()
-    {
-        if ( events != null && !events.isEmpty() )
+        if ( bypass && events != null && !events.isEmpty() )
         {
             throw new IllegalStateException( "Can not disable filter while processing" );
         }
-        disabled = true;
-        if ( xmlPullParser instanceof BufferingParser )
-        {
-            ( ( BufferingParser ) xmlPullParser ).disable();
-        }
+        this.bypass = bypass;
     }
 
     protected static String nullSafeAppend( String originalValue, String charSegment )

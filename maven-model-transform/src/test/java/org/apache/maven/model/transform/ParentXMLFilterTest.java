@@ -85,6 +85,53 @@ public class ParentXMLFilterTest
     }
 
     @Test
+    public void testWithFastForwardAfterByPass()
+            throws Exception
+    {
+        String input = "<project>"
+                        + "<build>"
+                            + "<plugins>"
+                                + "<plugin>"
+                                    + "<configuration>"
+                                        + "<parent>"
+                                            + "<groupId>GROUPID</groupId>"
+                                            + "<artifactId>ARTIFACTID</artifactId>"
+                                        + "</parent>"
+                                    + "</configuration>"
+                                + "</plugin>"
+                            + "</plugins>"
+                        + "</build>"
+                        + "<parent>"
+                            + "<groupId>GROUPID</groupId>"
+                            + "<artifactId>ARTIFACTID</artifactId>"
+                        + "</parent>"
+                    + "</project>";
+        String expected = "<project>"
+                            + "<build>"
+                                + "<plugins>"
+                                    + "<plugin>"
+                                        + "<configuration>"
+                                            + "<parent>"
+                                                + "<groupId>GROUPID</groupId>"
+                                                + "<artifactId>ARTIFACTID</artifactId>"
+                                            + "</parent>"
+                                        + "</configuration>"
+                                    + "</plugin>"
+                                + "</plugins>"
+                            + "</build>"
+                            + "<parent>"
+                                + "<groupId>GROUPID</groupId>"
+                                + "<artifactId>ARTIFACTID</artifactId>"
+                                + "<version>1.0.0</version>"
+                            + "</parent>"
+                        + "</project>";
+
+        String actual = transform( input );
+
+        assertEquals( expected, actual );
+    }
+
+    @Test
     public void testMinimum()
         throws Exception
     {
