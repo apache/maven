@@ -34,7 +34,9 @@ public class MojoLogWrapper implements Log {
     }
 
     public void debug(CharSequence content) {
-        logger.debug(toString(content));
+        if (isDebugEnabled()) {
+            logger.debug(toString(content));
+        }
     }
 
     private String toString(CharSequence content) {
@@ -47,7 +49,9 @@ public class MojoLogWrapper implements Log {
 
     @Override
     public void debug(CharSequence content, Throwable error) {
-        logger.debug(toString(content), error);
+        if (isDebugEnabled()) {
+            logger.debug(toString(content), error);
+        }
     }
 
     @Override
@@ -57,12 +61,16 @@ public class MojoLogWrapper implements Log {
 
     @Override
     public void info(CharSequence content) {
-        logger.info(toString(content));
+        if (isInfoEnabled()) {
+            logger.info(toString(content));
+        }
     }
 
     @Override
     public void info(CharSequence content, Throwable error) {
-        logger.info(toString(content), error);
+        if (isInfoEnabled()) {
+            logger.info(toString(content), error);
+        }
     }
 
     @Override
@@ -72,12 +80,16 @@ public class MojoLogWrapper implements Log {
 
     @Override
     public void warn(CharSequence content) {
-        logger.warn(toString(content));
+        if (isWarnEnabled()) {
+            logger.warn(toString(content));
+        }
     }
 
     @Override
     public void warn(CharSequence content, Throwable error) {
-        logger.warn(toString(content), error);
+        if (isWarnEnabled()) {
+            logger.warn(toString(content), error);
+        }
     }
 
     @Override
@@ -87,12 +99,16 @@ public class MojoLogWrapper implements Log {
 
     @Override
     public void error(CharSequence content) {
-        logger.error(toString(content));
+        if (isErrorEnabled()) {
+            logger.error(toString(content));
+        }
     }
 
     @Override
     public void error(CharSequence content, Throwable error) {
-        logger.error(toString(content), error);
+        if (isErrorEnabled()) {
+            logger.error(toString(content), error);
+        }
     }
 
     @Override

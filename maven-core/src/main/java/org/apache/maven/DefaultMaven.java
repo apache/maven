@@ -411,7 +411,7 @@ public class DefaultMaven implements Maven {
     private void validateLocalRepository(MavenExecutionRequest request) throws IOException {
         File localRepoDir = request.getLocalRepositoryPath();
 
-        logger.debug("Using local repository at " + localRepoDir);
+        logger.debug("Using local repository at {}", localRepoDir);
 
         localRepoDir.mkdirs();
 
@@ -427,7 +427,7 @@ public class DefaultMaven implements Maven {
             foundComponents.addAll(container.lookupList(role));
         } catch (ComponentLookupException e) {
             // this is just silly, lookupList should return an empty list!
-            logger.warn("Failed to lookup " + role + ": " + e.getMessage());
+            logger.warn("Failed to lookup {}: {}", role, e.getMessage());
         }
 
         foundComponents.addAll(getProjectScopedExtensionComponents(projects, role));
@@ -456,7 +456,7 @@ public class DefaultMaven implements Maven {
                         foundComponents.addAll(container.lookupList(role));
                     } catch (ComponentLookupException e) {
                         // this is just silly, lookupList should return an empty list!
-                        logger.warn("Failed to lookup " + role + ": " + e.getMessage());
+                        logger.warn("Failed to lookup {}: {}", role, e.getMessage());
                     }
                 }
             }
@@ -480,11 +480,13 @@ public class DefaultMaven implements Maven {
                 Prerequisites prerequisites =
                         mavenProject.getModel().getDelegate().getPrerequisites();
                 if (prerequisites != null && prerequisites.getMaven() != null) {
-                    logger.warn("The project " + mavenProject.getId() + " uses prerequisites"
-                            + " which is only intended for maven-plugin projects "
-                            + "but not for non maven-plugin projects. "
-                            + "For such purposes you should use the maven-enforcer-plugin. "
-                            + "See https://maven.apache.org/enforcer/enforcer-rules/requireMavenVersion.html");
+                    logger.warn(
+                            "The project {} uses prerequisites"
+                                    + " which is only intended for maven-plugin projects "
+                                    + "but not for non maven-plugin projects. "
+                                    + "For such purposes you should use the maven-enforcer-plugin. "
+                                    + "See https://maven.apache.org/enforcer/enforcer-rules/requireMavenVersion.html",
+                            mavenProject.getId());
                 }
             }
         }

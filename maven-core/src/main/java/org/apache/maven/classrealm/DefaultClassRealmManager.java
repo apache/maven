@@ -117,9 +117,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
                 try {
                     ClassRealm classRealm = world.newRealm(realmId, null);
 
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Created new class realm " + realmId);
-                    }
+                    logger.debug("Created new class realm {}", realmId);
 
                     return classRealm;
                 } catch (DuplicateRealmException e) {
@@ -152,14 +150,20 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             List<String> parentImports,
             Map<String, ClassLoader> foreignImports,
             List<Artifact> artifacts) {
-        Set<String> artifactIds = new LinkedHashSet<>();
+        Set<String> artifactIds = Collections.emptySet();
 
-        List<ClassRealmConstituent> constituents = new ArrayList<>();
+        List<ClassRealmConstituent> constituents = new ArrayList<>(artifacts == null ? 0 : artifacts.size());
 
-        if (artifacts != null) {
+        if (artifacts != null && !artifacts.isEmpty()) {
+            if (logger.isDebugEnabled()) {
+                artifactIds = new LinkedHashSet<>(artifacts.size());
+            }
+
             for (Artifact artifact : artifacts) {
                 if (!isProvidedArtifact(artifact)) {
-                    artifactIds.add(getId(artifact));
+                    if (logger.isDebugEnabled()) {
+                        artifactIds.add(getId(artifact));
+                    }
                     if (artifact.getFile() != null) {
                         constituents.add(new ArtifactClassRealmConstituent(artifact));
                     }
@@ -195,7 +199,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             artifactIds.removeAll(includedIds);
 
             for (String id : artifactIds) {
-                logger.debug("  Excluded: " + id);
+                logger.debug("  Excluded: {}", id);
             }
         }
 
@@ -301,20 +305,22 @@ public class DefaultClassRealmManager implements ClassRealmManager {
     }
 
     private Set<String> populateRealm(ClassRealm classRealm, List<ClassRealmConstituent> constituents) {
-        Set<String> includedIds = new LinkedHashSet<>();
+        Set<String> includedIds = Collections.emptySet();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Populating class realm " + classRealm.getId());
+            includedIds = new LinkedHashSet<>(constituents.size());
         }
+
+        logger.debug("Populating class realm {}", classRealm.getId());
 
         for (ClassRealmConstituent constituent : constituents) {
             File file = constituent.getFile();
 
-            String id = getId(constituent);
-            includedIds.add(id);
-
             if (logger.isDebugEnabled()) {
-                logger.debug("  Included: " + id);
+                String id = getId(constituent);
+                includedIds.add(id);
+
+                logger.debug("  Included: {}", id);
             }
 
             try {
@@ -330,41 +336,33 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
     private void wireRealm(ClassRealm classRealm, List<String> parentImports, Map<String, ClassLoader> foreignImports) {
         if (foreignImports != null && !foreignImports.isEmpty()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Importing foreign packages into class realm " + classRealm.getId());
-            }
+            logger.debug("Importing foreign packages into class realm {}", classRealm.getId());
 
             for (Map.Entry<String, ClassLoader> entry : foreignImports.entrySet()) {
                 ClassLoader importedRealm = entry.getValue();
                 String imp = entry.getKey();
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("  Imported: " + imp + " < " + getId(importedRealm));
-                }
+                logger.debug("  Imported: {} < {}", imp, getId(importedRealm));
 
                 classRealm.importFrom(importedRealm, imp);
             }
         }
 
         if (parentImports != null && !parentImports.isEmpty()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Importing parent packages into class realm " + classRealm.getId());
-            }
+            logger.debug("Importing parent packages into class realm {}", classRealm.getId());
 
             for (String imp : parentImports) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("  Imported: " + imp + " < " + getId(classRealm.getParentClassLoader()));
-                }
+                logger.debug("  Imported: {} < {}", imp, getId(classRealm.getParentClassLoader()));
 
                 classRealm.importFromParent(imp);
             }
         }
     }
 
-    private String getId(ClassLoader classLoader) {
+    private static Object getId(ClassLoader classLoader) {
         if (classLoader instanceof ClassRealm) {
             return ((ClassRealm) classLoader).getId();
         }
-        return String.valueOf(classLoader);
+        return classLoader;
     }
 }

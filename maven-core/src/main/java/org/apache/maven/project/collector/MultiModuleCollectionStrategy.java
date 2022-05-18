@@ -106,8 +106,9 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy 
                         "Maven detected that the requested POM file is part of a multi-module project, "
                                 + "but could not find a pom.xml file in the multi-module root directory '{}'.",
                         request.getMultiModuleProjectDirectory());
-                LOGGER.info("The reactor is limited to all projects under: "
-                        + request.getPom().getParent());
+                LOGGER.info(
+                        "The reactor is limited to all projects under: {}",
+                        request.getPom().getParent());
                 return request.getPom();
             }
 

@@ -139,7 +139,7 @@ public class MultiThreadedBuilder implements Builder {
         // schedule independent projects
         for (MavenProject mavenProject : analyzer.getRootSchedulableBuilds()) {
             ProjectSegment projectSegment = projectBuildList.get(mavenProject);
-            logger.debug("Scheduling: " + projectSegment.getProject());
+            logger.debug("Scheduling: {}", projectSegment.getProject());
             Callable<ProjectSegment> cb = createBuildCallable(
                     rootSession, projectSegment, reactorContext, taskSegment, muxer, duplicateArtifactIds);
             service.submit(cb);
@@ -159,7 +159,7 @@ public class MultiThreadedBuilder implements Builder {
                             analyzer.markAsFinished(projectBuild.getProject());
                     for (MavenProject mavenProject : newItemsThatCanBeBuilt) {
                         ProjectSegment scheduledDependent = projectBuildList.get(mavenProject);
-                        logger.debug("Scheduling: " + scheduledDependent);
+                        logger.debug("Scheduling: {}", scheduledDependent);
                         Callable<ProjectSegment> cb = createBuildCallable(
                                 rootSession,
                                 scheduledDependent,

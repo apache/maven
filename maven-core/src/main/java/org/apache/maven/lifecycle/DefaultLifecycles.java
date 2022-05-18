@@ -96,18 +96,19 @@ public class DefaultLifecycles {
         Map<String, Lifecycle> phaseToLifecycleMap = new HashMap<>();
 
         for (Lifecycle lifecycle : getLifeCycles()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Lifecycle " + lifecycle);
-            }
+            logger.debug("Lifecycle {}", lifecycle);
 
             for (String phase : lifecycle.getPhases()) {
                 // The first definition wins.
                 if (!phaseToLifecycleMap.containsKey(phase)) {
                     phaseToLifecycleMap.put(phase, lifecycle);
-                } else {
+                } else if (logger.isWarnEnabled()) {
                     Lifecycle original = phaseToLifecycleMap.get(phase);
-                    logger.warn("Duplicated lifecycle phase " + phase + ". Defined in " + original.getId()
-                            + " but also in " + lifecycle.getId());
+                    logger.warn(
+                            "Duplicated lifecycle phase {}. Defined in {} but also in {}",
+                            phase,
+                            original.getId(),
+                            lifecycle.getId());
                 }
             }
         }

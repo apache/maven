@@ -117,14 +117,15 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
 
             pluginArtifact = result.getArtifact();
 
-            if (logger.isWarnEnabled()) {
-                if (!result.getRelocations().isEmpty()) {
-                    String message = pluginArtifact instanceof org.apache.maven.repository.internal.RelocatedArtifact
-                            ? ((org.apache.maven.repository.internal.RelocatedArtifact) pluginArtifact).getMessage()
-                            : null;
-                    logger.warn("The artifact " + result.getRelocations().get(0) + " has been relocated to "
-                            + pluginArtifact + (message != null ? ": " + message : ""));
-                }
+            if (logger.isWarnEnabled() && !result.getRelocations().isEmpty()) {
+                String message = pluginArtifact instanceof org.apache.maven.repository.internal.RelocatedArtifact
+                        ? ": " + ((org.apache.maven.repository.internal.RelocatedArtifact) pluginArtifact).getMessage()
+                        : "";
+                logger.warn(
+                        "The artifact {} has been relocated to {}{}",
+                        result.getRelocations().get(0),
+                        pluginArtifact,
+                        message);
             }
 
             String requiredMavenVersion = (String) result.getProperties().get("prerequisites.maven");

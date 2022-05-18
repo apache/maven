@@ -79,7 +79,7 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
     }
 
     public PluginPrefixResult resolve(PluginPrefixRequest request) throws NoPluginFoundForPrefixException {
-        logger.debug("Resolving plugin prefix " + request.getPrefix() + " from " + request.getPluginGroups());
+        logger.debug("Resolving plugin prefix {} from {}", request.getPrefix(), request.getPluginGroups());
 
         PluginPrefixResult result = resolveFromProject(request);
 
@@ -92,16 +92,21 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
                         request.getPluginGroups(),
                         request.getRepositorySession().getLocalRepository(),
                         request.getRepositories());
-            } else if (logger.isDebugEnabled()) {
-                logger.debug("Resolved plugin prefix " + request.getPrefix() + " to " + result.getGroupId() + ":"
-                        + result.getArtifactId() + " from repository "
-                        + (result.getRepository() != null
-                                ? result.getRepository().getId()
-                                : "null"));
+            } else {
+                logger.debug(
+                        "Resolved plugin prefix {} to {}:{} from repository {}",
+                        request.getPrefix(),
+                        result.getGroupId(),
+                        result.getArtifactId(),
+                        (result.getRepository() != null ? result.getRepository().getId() : "null"));
             }
-        } else if (logger.isDebugEnabled()) {
-            logger.debug("Resolved plugin prefix " + request.getPrefix() + " to " + result.getGroupId() + ":"
-                    + result.getArtifactId() + " from POM " + request.getPom());
+        } else {
+            logger.debug(
+                    "Resolved plugin prefix {} to {}:{} from POM {}",
+                    request.getPrefix(),
+                    result.getGroupId(),
+                    result.getArtifactId(),
+                    request.getPom());
         }
 
         return result;
@@ -134,10 +139,9 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
                 }
             } catch (Exception e) {
                 if (logger.isDebugEnabled()) {
-                    logger.warn(
-                            "Failed to retrieve plugin descriptor for " + plugin.getId() + ": " + e.getMessage(), e);
+                    logger.warn("Failed to retrieve plugin descriptor for {}: {}", plugin.getId(), e.getMessage(), e);
                 } else {
-                    logger.warn("Failed to retrieve plugin descriptor for " + plugin.getId() + ": " + e.getMessage());
+                    logger.warn("Failed to retrieve plugin descriptor for {}: {}", plugin.getId(), e.getMessage());
                 }
             }
         }

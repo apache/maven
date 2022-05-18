@@ -89,11 +89,11 @@ implements Toolchain, ToolchainPrivate {
             RequirementMatcher matcher = provides.get(key);
 
             if (matcher == null) {
-                getLog().debug("Toolchain " + this + " is missing required property: " + key);
+                getLog().debug("Toolchain {} is missing required property: {}", this, key);
                 return false;
             }
             if (!matcher.matches(requirement.getValue())) {
-                getLog().debug("Toolchain " + this + " doesn't match required property: " + key);
+                getLog().debug("Toolchain {} doesn't match required property: {}", this, key);
                 return false;
             }
         }
