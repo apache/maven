@@ -52,9 +52,9 @@ public class MavenITmng5530MojoExecutionScopeTest
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
-        // verifier.assertFilePresent( "target/execution-failure.txt" );
-        verifier.assertFilePresent( "target/execution-success.txt" );
-        verifier.assertFilePresent( "target/execution-before.txt" );
+        // verifier.verifyFilePresent( "target/execution-failure.txt" );
+        verifier.verifyFilePresent( "target/execution-success.txt" );
+        verifier.verifyFilePresent( "target/execution-before.txt" );
     }
 
     public void test_copyfiles_multithreaded()
@@ -79,9 +79,9 @@ public class MavenITmng5530MojoExecutionScopeTest
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
-        // verifier.assertFilePresent( "target/execution-failure.txt" );
-        verifier.assertFilePresent( "target/execution-success.txt" );
-        verifier.assertFilePresent( "target/execution-before.txt" );
+        // verifier.verifyFilePresent( "target/execution-failure.txt" );
+        verifier.verifyFilePresent( "target/execution-success.txt" );
+        verifier.verifyFilePresent( "target/execution-before.txt" );
     }
 
     public void testExtension()

@@ -49,7 +49,7 @@ public class MavenIT0064MojoConfigViaSettersTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/fooValue" );
-        verifier.assertFilePresent( "target/barValue.baz" );
+        verifier.verifyFilePresent( "target/fooValue" );
+        verifier.verifyFilePresent( "target/barValue.baz" );
     }
 }

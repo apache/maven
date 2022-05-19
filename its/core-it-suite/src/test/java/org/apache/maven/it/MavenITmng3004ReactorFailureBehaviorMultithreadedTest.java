@@ -69,10 +69,10 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         }
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject1/target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject2/target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject3/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
+        verifier.verifyFileNotPresent( "subproject2/target/touch.txt" );
+        verifier.verifyFileNotPresent( "subproject3/target/touch.txt" );
     }
 
     /**
@@ -98,10 +98,10 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject1/target/touch.txt" );
-        verifier.assertFilePresent( "subproject2/target/touch.txt" );
-        verifier.assertFilePresent( "subproject3/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
+        verifier.verifyFilePresent( "subproject2/target/touch.txt" );
+        verifier.verifyFilePresent( "subproject3/target/touch.txt" );
     }
 
     /**
@@ -136,10 +136,10 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         }
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject1/target/touch.txt" );
-        verifier.assertFilePresent( "subproject2/target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject3/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
+        verifier.verifyFilePresent( "subproject2/target/touch.txt" );
+        verifier.verifyFileNotPresent( "subproject3/target/touch.txt" );
     }
 
     /**
@@ -165,10 +165,10 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject1/target/touch.txt" );
-        verifier.assertFilePresent( "subproject2/target/touch.txt" );
-        verifier.assertFilePresent( "subproject3/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
+        verifier.verifyFilePresent( "subproject2/target/touch.txt" );
+        verifier.verifyFilePresent( "subproject3/target/touch.txt" );
     }
 
     /**
@@ -203,10 +203,10 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         }
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject1/target/touch.txt" );
-        verifier.assertFilePresent( "subproject2/target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject3/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
+        verifier.verifyFilePresent( "subproject2/target/touch.txt" );
+        verifier.verifyFileNotPresent( "subproject3/target/touch.txt" );
     }
 
     // DGF not testing fail fast with multiple real threads since that's a "best effort" attempt to halt the build

@@ -56,8 +56,8 @@ public class MavenIT0038AlternatePomFileDifferentDirTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "project/target/passed.log" );
-        verifier.assertFileNotPresent( "target/failed.log" );
+        verifier.verifyFilePresent( "project/target/passed.log" );
+        verifier.verifyFileNotPresent( "target/failed.log" );
     }
 
 }

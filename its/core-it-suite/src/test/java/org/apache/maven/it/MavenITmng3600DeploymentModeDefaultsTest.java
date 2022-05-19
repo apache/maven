@@ -51,7 +51,7 @@ public class MavenITmng3600DeploymentModeDefaultsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "wagon.properties" );
+        verifier.verifyFilePresent( "wagon.properties" );
         Properties props = verifier.loadProperties( "wagon.properties" );
         assertNull( props.get( "directory.mode" ) );
         assertNull( props.get( "file.mode" ) );
@@ -72,7 +72,7 @@ public class MavenITmng3600DeploymentModeDefaultsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "wagon.properties" );
+        verifier.verifyFilePresent( "wagon.properties" );
         Properties props = verifier.loadProperties( "wagon.properties" );
         assertNull( props.get( "directory.mode" ) );
         assertNull( props.get( "file.mode" ) );
@@ -93,7 +93,7 @@ public class MavenITmng3600DeploymentModeDefaultsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "wagon.properties" );
+        verifier.verifyFilePresent( "wagon.properties" );
         Properties props = verifier.loadProperties( "wagon.properties" );
         assertEquals( "700", props.get( "directory.mode" ) );
         assertEquals( "600", props.get( "file.mode" ) );

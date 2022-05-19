@@ -53,7 +53,7 @@ public class MavenITmng5742BuildExtensionClassloaderTest
         verifier.executeGoal( "validate" );
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
-        verifier.assertFilePresent( "target/execution-success.txt" );
+        verifier.verifyFilePresent( "target/execution-success.txt" );
 
         String actual = FileUtils.fileRead( new File( projectDir, "target/execution-success.txt" ) );
         assertEquals( "executed", actual );

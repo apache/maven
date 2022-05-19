@@ -84,7 +84,7 @@ public class MavenITmng3938MergePluginExecutionsTest
         lines = verifier.loadLines( "target/non-default.log", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "child" } ), lines );
 
-        verifier.assertFileNotPresent( "target/parent.log" );
+        verifier.verifyFileNotPresent( "target/parent.log" );
     }
 
 }

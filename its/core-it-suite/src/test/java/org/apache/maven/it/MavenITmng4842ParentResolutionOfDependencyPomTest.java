@@ -64,7 +64,7 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest
         List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
 
         assertTrue( compile.toString(), compile.contains( "dep-0.1.jar" ) );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng4842", "parent", "0.1", "pom" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4842", "parent", "0.1", "pom" );
     }
 
     /**
@@ -90,7 +90,7 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng4842", "parent", "0.1", "pom" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4842", "parent", "0.1", "pom" );
     }
 
 }

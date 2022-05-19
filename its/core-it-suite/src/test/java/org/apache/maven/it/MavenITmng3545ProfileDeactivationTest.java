@@ -56,11 +56,11 @@ public class MavenITmng3545ProfileDeactivationTest
 
         verifier.verifyErrorFreeLog();
         // profile 1 and 2 are active by default
-        verifier.assertFilePresent( "target/profile1/touch.txt" );
-        verifier.assertFilePresent( "target/profile2/touch.txt" );
-        verifier.assertFileNotPresent( "target/profile3/touch.txt" );
-        verifier.assertFileNotPresent( "target/profile4/touch.txt" );
-        verifier.assertFileNotPresent( "target/profile5/touch.txt" );
+        verifier.verifyFilePresent( "target/profile1/touch.txt" );
+        verifier.verifyFilePresent( "target/profile2/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile3/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile4/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile5/touch.txt" );
         verifier.resetStreams();
     }
 
@@ -86,8 +86,8 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
-        verifier.assertFileNotPresent( "target/profile1/touch.txt" );
-        verifier.assertFileNotPresent( "target/profile2/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile1/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile2/touch.txt" );
         verifier.resetStreams();
     }
 
@@ -108,8 +108,8 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
-        verifier.assertFileNotPresent( "target/profile1/touch.txt" );
-        verifier.assertFileNotPresent( "target/profile2/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile1/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile2/touch.txt" );
         verifier.resetStreams();
     }
 
@@ -136,11 +136,11 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
-        verifier.assertFilePresent( "target/profile1/touch.txt" );
-        verifier.assertFilePresent( "target/profile2/touch.txt" );
-        verifier.assertFileNotPresent( "target/profile3/touch.txt" );
-        verifier.assertFileNotPresent( "target/profile4/touch.txt" );
-        verifier.assertFileNotPresent( "target/profile5/touch.txt" );
+        verifier.verifyFilePresent( "target/profile1/touch.txt" );
+        verifier.verifyFilePresent( "target/profile2/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile3/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile4/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile5/touch.txt" );
         verifier.resetStreams();
     }
 
@@ -167,11 +167,11 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
-        verifier.assertFilePresent( "target/profile1/touch.txt" );
-        verifier.assertFilePresent( "target/profile2/touch.txt" );
-        verifier.assertFileNotPresent( "target/profile3/touch.txt" );
-        verifier.assertFileNotPresent( "target/profile4/touch.txt" );
-        verifier.assertFileNotPresent( "target/profile5/touch.txt" );
+        verifier.verifyFilePresent( "target/profile1/touch.txt" );
+        verifier.verifyFilePresent( "target/profile2/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile3/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile4/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile5/touch.txt" );
         verifier.resetStreams();
     }
 
@@ -197,11 +197,11 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
-        verifier.assertFileNotPresent( "target/profile1/touch.txt" );
-        verifier.assertFileNotPresent( "target/profile2/touch.txt" );
-        verifier.assertFileNotPresent( "target/profile3/touch.txt" );
-        verifier.assertFilePresent( "target/profile4/touch.txt" );
-        verifier.assertFileNotPresent( "target/profile5/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile1/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile2/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile3/touch.txt" );
+        verifier.verifyFilePresent( "target/profile4/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile5/touch.txt" );
         verifier.resetStreams();
     }
 

@@ -49,9 +49,9 @@ public class MavenIT0009GoalConfigurationTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
-        verifier.assertFilePresent( supportSpaceInXml ? "target/  pluginItem  " : "target/pluginItem");
-        verifier.assertFilePresent( "target/goalItem" );
-        verifier.assertFileNotPresent( "target/bad-item" );
+        verifier.verifyFilePresent( supportSpaceInXml ? "target/  pluginItem  " : "target/pluginItem");
+        verifier.verifyFilePresent( "target/goalItem" );
+        verifier.verifyFileNotPresent( "target/bad-item" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

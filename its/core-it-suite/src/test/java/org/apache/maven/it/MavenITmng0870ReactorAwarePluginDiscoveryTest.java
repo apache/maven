@@ -60,7 +60,7 @@ public class MavenITmng0870ReactorAwarePluginDiscoveryTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "project/target/touch.txt" );
+        verifier.verifyFilePresent( "project/target/touch.txt" );
     }
 
 }

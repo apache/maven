@@ -59,7 +59,7 @@ public class MavenITmng4586PluginPrefixResolutionFromVersionlessPluginMngtTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
     }
 
 }

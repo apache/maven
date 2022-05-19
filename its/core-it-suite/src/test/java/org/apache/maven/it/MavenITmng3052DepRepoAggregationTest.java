@@ -66,8 +66,8 @@ public class MavenITmng3052DepRepoAggregationTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng3052", "direct", "0.1-SNAPSHOT", "jar" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng3052", "trans", "0.1-SNAPSHOT", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3052", "direct", "0.1-SNAPSHOT", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3052", "trans", "0.1-SNAPSHOT", "jar" );
     }
 
 }

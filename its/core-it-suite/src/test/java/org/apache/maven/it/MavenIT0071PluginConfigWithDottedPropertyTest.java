@@ -55,7 +55,7 @@ public class MavenIT0071PluginConfigWithDottedPropertyTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/foo2" );
+        verifier.verifyFilePresent( "target/foo2" );
     }
 
 }

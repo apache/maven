@@ -56,7 +56,7 @@ public class MavenITmng2135PluginBuildInReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "project/target/touch.txt" );
+        verifier.verifyFilePresent( "project/target/touch.txt" );
     }
 
 }

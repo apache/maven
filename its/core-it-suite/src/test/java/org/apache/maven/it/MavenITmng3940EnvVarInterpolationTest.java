@@ -74,7 +74,7 @@ public class MavenITmng3940EnvVarInterpolationTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/PASSED.properties" );
+        verifier.verifyFilePresent( "target/PASSED.properties" );
         Properties props = verifier.loadProperties( "target/PASSED.properties" );
         assertEquals( "PASSED", props.getProperty( "project.properties.envTest" ) );
     }

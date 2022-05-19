@@ -76,10 +76,10 @@ public class MavenITmng3284UsingCachedPluginsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "mod-a/target/version-0.1.txt" );
-        verifier.assertFileNotPresent( "mod-a/target/version-0.2.txt" );
-        verifier.assertFilePresent( "mod-b/target/version-0.2.txt" );
-        verifier.assertFileNotPresent( "mod-b/target/version-0.1.txt" );
+        verifier.verifyFilePresent( "mod-a/target/version-0.1.txt" );
+        verifier.verifyFileNotPresent( "mod-a/target/version-0.2.txt" );
+        verifier.verifyFilePresent( "mod-b/target/version-0.2.txt" );
+        verifier.verifyFileNotPresent( "mod-b/target/version-0.1.txt" );
     }
 
 }

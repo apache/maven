@@ -51,14 +51,14 @@ public class MavenIT0135EjbLifecycleTest
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
         verifier.executeGoal( "deploy" );
-        verifier.assertFilePresent( "target/resources-resources.txt" );
-        verifier.assertFilePresent( "target/compiler-compile.txt" );
-        verifier.assertFilePresent( "target/resources-test-resources.txt" );
-        verifier.assertFilePresent( "target/compiler-test-compile.txt" );
-        verifier.assertFilePresent( "target/surefire-test.txt" );
-        verifier.assertFilePresent( "target/ejb-ejb.txt" );
-        verifier.assertFilePresent( "target/install-install.txt" );
-        verifier.assertFilePresent( "target/deploy-deploy.txt" );
+        verifier.verifyFilePresent( "target/resources-resources.txt" );
+        verifier.verifyFilePresent( "target/compiler-compile.txt" );
+        verifier.verifyFilePresent( "target/resources-test-resources.txt" );
+        verifier.verifyFilePresent( "target/compiler-test-compile.txt" );
+        verifier.verifyFilePresent( "target/surefire-test.txt" );
+        verifier.verifyFilePresent( "target/ejb-ejb.txt" );
+        verifier.verifyFilePresent( "target/install-install.txt" );
+        verifier.verifyFilePresent( "target/deploy-deploy.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

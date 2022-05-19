@@ -66,7 +66,7 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng4367", "dep", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4367", "dep", "0.1", "jar" );
     }
 
     /**
@@ -96,7 +96,7 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng4367", "dep", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4367", "dep", "0.1", "jar" );
     }
 
     /**
@@ -126,7 +126,7 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng4367", "dep", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4367", "dep", "0.1", "jar" );
     }
 
 }

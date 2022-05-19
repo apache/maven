@@ -50,8 +50,8 @@ public class MavenIT0051ReleaseProfileTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/source-jar.txt" );
-        verifier.assertFilePresent( "target/javadoc-jar.txt" );
+        verifier.verifyFilePresent( "target/source-jar.txt" );
+        verifier.verifyFilePresent( "target/javadoc-jar.txt" );
     }
 
 }

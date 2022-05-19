@@ -57,8 +57,8 @@ public class MavenITmng4281PreferLocalSnapshotTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng4281", "dependency", "0.1-SNAPSHOT", "jar" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng4281", "dependency", "0.1-SNAPSHOT", "pom" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4281", "dependency", "0.1-SNAPSHOT", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4281", "dependency", "0.1-SNAPSHOT", "pom" );
 
         verifier = newVerifier( new File( testDir, "project" ).getAbsolutePath() );
         verifier.setAutoclean( false );

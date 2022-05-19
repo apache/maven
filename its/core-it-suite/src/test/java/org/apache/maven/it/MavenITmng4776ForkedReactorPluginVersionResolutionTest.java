@@ -58,7 +58,7 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "sub/target/log.txt" );
+        verifier.verifyFilePresent( "sub/target/log.txt" );
     }
 
     /**
@@ -82,7 +82,7 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "sub/target/log.txt" );
+        verifier.verifyFilePresent( "sub/target/log.txt" );
     }
 
 }

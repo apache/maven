@@ -67,7 +67,7 @@ public class MavenITmng3714ToolchainsCliOptionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/toolchains.properties" );
+        verifier.verifyFilePresent( "target/toolchains.properties" );
         Properties results = verifier.loadProperties( "target/toolchains.properties" );
         String tool = results.getProperty( "tool.1", "" );
         if ( tool.endsWith( ".exe" ) )
@@ -76,7 +76,7 @@ public class MavenITmng3714ToolchainsCliOptionTest
         }
         assertEquals( new File( javaHome, "bin/javac" ).getAbsolutePath(), tool );
 
-        verifier.assertFilePresent( "target/tool.properties" );
+        verifier.verifyFilePresent( "target/tool.properties" );
         Properties toolProps = verifier.loadProperties( "target/tool.properties" );
         String path = toolProps.getProperty( "tool.javac", "" );
         assertEquals( results.getProperty( "tool.1", "" ), path );

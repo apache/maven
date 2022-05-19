@@ -125,7 +125,7 @@ public class MavenITmng0768OfflineModeTest
                 verifier.addCliOption( "--settings" );
                 verifier.addCliOption( "settings.xml" );
                 verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
-                verifier.assertFilePresent( "target/compile.txt" );
+                verifier.verifyFilePresent( "target/compile.txt" );
                 verifier.verifyErrorFreeLog();
                 verifier.resetStreams();
             }
@@ -142,7 +142,7 @@ public class MavenITmng0768OfflineModeTest
                 verifier.addCliOption( "settings.xml" );
                 verifier.setLogFileName( "log2.txt" );
                 verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
-                verifier.assertFilePresent( "target/compile.txt" );
+                verifier.verifyFilePresent( "target/compile.txt" );
                 verifier.verifyErrorFreeLog();
                 verifier.resetStreams();
             }

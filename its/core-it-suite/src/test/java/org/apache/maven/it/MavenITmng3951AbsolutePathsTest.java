@@ -69,7 +69,7 @@ public class MavenITmng3951AbsolutePathsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/path.properties" );
+        verifier.verifyFilePresent( "target/path.properties" );
         Properties props = verifier.loadProperties( "target/path.properties" );
 
         assertCanonicalFileEquals( new File( testDir, "tmp" ).getAbsoluteFile(), new File( props.getProperty( "fileParams.0" ) ) );

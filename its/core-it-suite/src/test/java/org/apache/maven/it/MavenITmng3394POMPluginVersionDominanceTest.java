@@ -55,7 +55,7 @@ public class MavenITmng3394POMPluginVersionDominanceTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/resources-resources.txt" );
+        verifier.verifyFilePresent( "target/resources-resources.txt" );
     }
 
     public void testitMNG3394b()
@@ -72,7 +72,7 @@ public class MavenITmng3394POMPluginVersionDominanceTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/clean-clean.txt" );
+        verifier.verifyFilePresent( "target/clean-clean.txt" );
     }
 
 }

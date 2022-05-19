@@ -54,8 +54,8 @@ public class MavenITmng0522InheritedPluginMgmtConfigTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/plugin-mngt-config-1.txt" );
-        verifier.assertFilePresent( "target/plugin-mngt-config-2.txt" );
+        verifier.verifyFilePresent( "target/plugin-mngt-config-1.txt" );
+        verifier.verifyFilePresent( "target/plugin-mngt-config-2.txt" );
     }
 
 }

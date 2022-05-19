@@ -54,7 +54,7 @@ public class MavenITmng2831CustomArtifactHandlerAndCustomLifecycleTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/test-1.0-it.jar" );
+        verifier.verifyFilePresent( "target/test-1.0-it.jar" );
     }
 
 }

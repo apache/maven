@@ -51,8 +51,8 @@ public class MavenIT0131SiteLifecycleTest
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
         verifier.executeGoal( "site-deploy" );
-        verifier.assertFilePresent( "target/site-site.txt" );
-        verifier.assertFilePresent( "target/site-deploy.txt" );
+        verifier.verifyFilePresent( "target/site-site.txt" );
+        verifier.verifyFilePresent( "target/site-deploy.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

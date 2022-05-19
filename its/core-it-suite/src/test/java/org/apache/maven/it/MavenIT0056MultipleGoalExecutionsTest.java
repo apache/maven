@@ -49,8 +49,8 @@ public class MavenIT0056MultipleGoalExecutionsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/first-exec.txt" );
-        verifier.assertFilePresent( "target/second-exec.txt" );
+        verifier.verifyFilePresent( "target/first-exec.txt" );
+        verifier.verifyFilePresent( "target/second-exec.txt" );
     }
 
 }

@@ -66,15 +66,15 @@ public class MavenITmng6127PluginExecutionConfigurationInterferenceTest
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
-        verifier.assertFilePresent( modAconfigurationFile.getCanonicalPath() );
+        verifier.verifyFilePresent( modAconfigurationFile.getCanonicalPath() );
         String modAactual = FileUtils.fileRead( modAconfigurationFile );
         assertEquals( "name=mod-a, secondName=second from components.xml", modAactual );
 
-        verifier.assertFilePresent( modBconfigurationFile.getCanonicalPath() );
+        verifier.verifyFilePresent( modBconfigurationFile.getCanonicalPath() );
         String modBactual = FileUtils.fileRead( modBconfigurationFile );
         assertEquals( "name=mod-b, secondName=second from components.xml", modBactual );
 
-        verifier.assertFilePresent( modCconfigurationFile.getCanonicalPath() );
+        verifier.verifyFilePresent( modCconfigurationFile.getCanonicalPath() );
         String modCactual = FileUtils.fileRead( modCconfigurationFile );
         assertEquals( "secondName=second from components.xml", modCactual );
     }

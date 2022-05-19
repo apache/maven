@@ -119,7 +119,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             verifier.executeGoal( "a:touch" );
             verifier.verifyErrorFreeLog();
 
-            verifier.assertFilePresent( "target/touch.txt" );
+            verifier.verifyFilePresent( "target/touch.txt" );
             assertTrue( requestedUris.toString(), requestedUris.contains( metadataUri ) );
 
             requestedUris.clear();
@@ -206,7 +206,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             verifier.executeGoal( "a:touch" );
             verifier.verifyErrorFreeLog();
 
-            verifier.assertFilePresent( "target/touch.txt" );
+            verifier.verifyFilePresent( "target/touch.txt" );
             assertTrue( requestedUris.toString(), requestedUris.contains( metadataUri ) );
 
             requestedUris.clear();
@@ -296,7 +296,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             verifier.executeGoal( "a:touch" );
             verifier.verifyErrorFreeLog();
 
-            verifier.assertFilePresent( "target/touch.txt" );
+            verifier.verifyFilePresent( "target/touch.txt" );
             assertTrue( requestedUris.toString(), requestedUris.contains( metadataUri ) );
 
             requestedUris.clear();

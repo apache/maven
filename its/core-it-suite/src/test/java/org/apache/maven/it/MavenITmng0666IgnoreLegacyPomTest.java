@@ -60,7 +60,7 @@ public class MavenITmng0666IgnoreLegacyPomTest
         // don't verify error free log
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.it0059", "test", "3.8.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.it0059", "test", "3.8.1", "jar" );
 
         List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.it0059:test:jar:3.8.1" ) );

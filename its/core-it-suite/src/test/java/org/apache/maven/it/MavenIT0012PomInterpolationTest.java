@@ -45,8 +45,8 @@ public class MavenIT0012PomInterpolationTest
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "child-project/target" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
-        verifier.assertFilePresent( "target/touch-3.8.1.txt" );
-        verifier.assertFilePresent( "child-project/target/child-touch-3.0.3.txt" );
+        verifier.verifyFilePresent( "target/touch-3.8.1.txt" );
+        verifier.verifyFilePresent( "child-project/target/child-touch-3.0.3.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

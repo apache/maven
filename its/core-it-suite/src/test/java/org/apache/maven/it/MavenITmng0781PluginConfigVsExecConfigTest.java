@@ -55,8 +55,8 @@ public class MavenITmng0781PluginConfigVsExecConfigTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/exec-level.txt" );
-        verifier.assertFilePresent( "target/resources-resources.txt" );
+        verifier.verifyFilePresent( "target/exec-level.txt" );
+        verifier.verifyFilePresent( "target/resources-resources.txt" );
     }
 
 }

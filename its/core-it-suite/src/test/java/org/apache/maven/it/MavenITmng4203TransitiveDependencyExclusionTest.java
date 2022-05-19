@@ -70,8 +70,8 @@ public class MavenITmng4203TransitiveDependencyExclusionTest
 
         assertEquals( expected, artifacts );
 
-        verifier.assertArtifactNotPresent( "org.apache.maven.its.mng4203", "a", "0.1", "pom" );
-        verifier.assertArtifactNotPresent( "org.apache.maven.its.mng4203", "a", "0.1", "jar" );
+        verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng4203", "a", "0.1", "pom" );
+        verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng4203", "a", "0.1", "jar" );
     }
 
 }

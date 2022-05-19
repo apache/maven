@@ -60,7 +60,7 @@ public class MavenITmng2098VersionRangeSatisfiedFromWrongRepoTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng2098", "dep", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng2098", "dep", "0.1", "jar" );
     }
 
 }

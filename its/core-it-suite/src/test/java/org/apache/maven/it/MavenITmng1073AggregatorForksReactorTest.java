@@ -60,9 +60,9 @@ public class MavenITmng1073AggregatorForksReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/forked/touch.txt" );
-        verifier.assertFilePresent( "sub-1/target/forked/touch.txt" );
-        verifier.assertFilePresent( "sub-2/target/forked/touch.txt" );
+        verifier.verifyFilePresent( "target/forked/touch.txt" );
+        verifier.verifyFilePresent( "sub-1/target/forked/touch.txt" );
+        verifier.verifyFilePresent( "sub-2/target/forked/touch.txt" );
     }
 
     /**
@@ -85,9 +85,9 @@ public class MavenITmng1073AggregatorForksReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFilePresent( "sub-1/target/touch.txt" );
-        verifier.assertFilePresent( "sub-2/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "sub-1/target/touch.txt" );
+        verifier.verifyFilePresent( "sub-2/target/touch.txt" );
     }
 
 }

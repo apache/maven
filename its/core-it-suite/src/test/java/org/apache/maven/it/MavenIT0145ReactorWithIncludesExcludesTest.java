@@ -58,9 +58,9 @@ public class MavenIT0145ReactorWithIncludesExcludesTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch.txt" );
-        verifier.assertFilePresent( "mod-a/target/touch-a.txt" );
-        verifier.assertFilePresent( "mod-b/target/touch-b.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "mod-a/target/touch-a.txt" );
+        verifier.verifyFilePresent( "mod-b/target/touch-b.txt" );
     }
 
     /**
@@ -85,9 +85,9 @@ public class MavenIT0145ReactorWithIncludesExcludesTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch.txt" );
-        verifier.assertFilePresent( "mod-a/target/touch-a.txt" );
-        verifier.assertFileNotPresent( "mod-b/target/touch-b.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "mod-a/target/touch-a.txt" );
+        verifier.verifyFileNotPresent( "mod-b/target/touch-b.txt" );
     }
 
     /**
@@ -112,9 +112,9 @@ public class MavenIT0145ReactorWithIncludesExcludesTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-a/target/touch-a.txt" );
-        verifier.assertFilePresent( "mod-b/target/touch-b.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-a/target/touch-a.txt" );
+        verifier.verifyFilePresent( "mod-b/target/touch-b.txt" );
     }
 
 }

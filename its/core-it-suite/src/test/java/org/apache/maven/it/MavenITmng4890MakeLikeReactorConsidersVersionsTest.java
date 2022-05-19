@@ -61,9 +61,9 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "mod-b/target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-a/target/touch.txt" );
-        verifier.assertFileNotPresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "mod-b/target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-a/target/touch.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
     }
 
     /**
@@ -90,9 +90,9 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "mod-a/target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-b/target/touch.txt" );
-        verifier.assertFileNotPresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "mod-a/target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-b/target/touch.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
     }
 
 }

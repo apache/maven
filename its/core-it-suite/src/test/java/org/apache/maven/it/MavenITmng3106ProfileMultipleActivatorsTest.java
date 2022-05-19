@@ -58,8 +58,8 @@ public class MavenITmng3106ProfileMultipleActivatorsTest
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
-        verifier.assertFilePresent( "target/profile1/touch.txt" );
-        verifier.assertFilePresent( "target/profile2/touch.txt" );
+        verifier.verifyFilePresent( "target/profile1/touch.txt" );
+        verifier.verifyFilePresent( "target/profile2/touch.txt" );
         verifier.resetStreams();
     }
 

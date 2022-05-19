@@ -52,7 +52,7 @@ public class MavenITmng0985NonExecutedPluginMngtGoalsTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );
-        verifier.assertFileNotPresent( "target/unexpected.txt" );
+        verifier.verifyFileNotPresent( "target/unexpected.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

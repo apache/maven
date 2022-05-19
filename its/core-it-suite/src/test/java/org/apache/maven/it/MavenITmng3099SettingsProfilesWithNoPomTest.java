@@ -60,8 +60,8 @@ public class MavenITmng3099SettingsProfilesWithNoPomTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/PASSED.txt" );
-        verifier.assertFileNotPresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "target/PASSED.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
     }
 
 }

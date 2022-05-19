@@ -52,10 +52,10 @@ public class MavenITmng3268MultipleHyphenPCommandLineTest
         verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();
-        verifier.assertFilePresent( "target/profile1/touch.txt" );
-        verifier.assertFilePresent( "target/profile2/touch.txt" );
-        verifier.assertFilePresent( "target/profile3/touch.txt" );
-        verifier.assertFilePresent( "target/profile4/touch.txt" );
+        verifier.verifyFilePresent( "target/profile1/touch.txt" );
+        verifier.verifyFilePresent( "target/profile2/touch.txt" );
+        verifier.verifyFilePresent( "target/profile3/touch.txt" );
+        verifier.verifyFilePresent( "target/profile4/touch.txt" );
         verifier.resetStreams();
     }
 

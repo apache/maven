@@ -61,8 +61,8 @@ public class MavenITmng4086ExplicitPluginMetaversionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch-latest.txt" );
-        verifier.assertFilePresent( "target/touch-release.txt" );
+        verifier.verifyFileNotPresent( "target/touch-latest.txt" );
+        verifier.verifyFilePresent( "target/touch-release.txt" );
     }
 
     /**
@@ -88,8 +88,8 @@ public class MavenITmng4086ExplicitPluginMetaversionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch-release.txt" );
-        verifier.assertFilePresent( "target/touch-latest.txt" );
+        verifier.verifyFileNotPresent( "target/touch-release.txt" );
+        verifier.verifyFilePresent( "target/touch-latest.txt" );
     }
 
 }

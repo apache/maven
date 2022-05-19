@@ -59,8 +59,8 @@ public class MavenITmng4401RepositoryOrderForParentPomTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/passed.txt" );
-        verifier.assertFileNotPresent( "target/failed.txt" );
+        verifier.verifyFilePresent( "target/passed.txt" );
+        verifier.verifyFileNotPresent( "target/failed.txt" );
     }
 
 }

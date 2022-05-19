@@ -57,7 +57,7 @@ public class MavenITmng3766ToolchainsFromExtensionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/tool.properties" );
+        verifier.verifyFilePresent( "target/tool.properties" );
         Properties toolProps = verifier.loadProperties( "target/tool.properties" );
         assertEquals( "toolname", toolProps.getProperty( "tool.toolname", "" ) );
     }

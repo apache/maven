@@ -64,8 +64,8 @@ public class MavenITmng4262MakeLikeReactorDottedPath370Test
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFilePresent( "../sub-a/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "../sub-a/target/touch.txt" );
     }
 
     /**
@@ -88,8 +88,8 @@ public class MavenITmng4262MakeLikeReactorDottedPath370Test
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch.txt" );
-        verifier.assertFilePresent( "../sub-a/target/touch.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "../sub-a/target/touch.txt" );
     }
 
 }

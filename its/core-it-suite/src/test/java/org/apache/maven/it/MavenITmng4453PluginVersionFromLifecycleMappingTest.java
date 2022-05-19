@@ -55,7 +55,7 @@ public class MavenITmng4453PluginVersionFromLifecycleMappingTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/resources-resources.txt" );
+        verifier.verifyFilePresent( "target/resources-resources.txt" );
     }
 
 }

@@ -68,7 +68,7 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
 
         Path module1Jar = testDir.toPath().resolve( "module-a/target/module-a-1.0.jar" ).toAbsolutePath();
         verifier1.verifyErrorFreeLog();
-        verifier1.assertFilePresent( module1Jar.toString() );
+        verifier1.verifyFilePresent( module1Jar.toString() );
         verifier1.resetStreams();
 
         if ( System.getProperty( "java.version", "" ).startsWith( "1." ) )
@@ -93,14 +93,14 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         Path module1PropertiesFile = testDir.toPath().resolve( "module-a/target/classes/example.properties" )
                 .toAbsolutePath();
 
-        verifier2.assertFilePresent( module1PropertiesFile.toString() );
+        verifier2.verifyFilePresent( module1PropertiesFile.toString() );
         assertThat( Files.getLastModifiedTime( module1PropertiesFile ),
                 greaterThan ( Files.getLastModifiedTime( module1Jar ) ) );
 
         Path module1Class = testDir.toPath().resolve( "module-a/target/classes/org/apache/maven/it/Example.class" )
                         .toAbsolutePath();
         verifier2.verifyErrorFreeLog();
-        verifier2.assertFilePresent( module1Class.toString() );
+        verifier2.verifyFilePresent( module1Class.toString() );
         verifier2.resetStreams();
 
         // 3. Resume project build from module B, that depends on module A we just touched. Its packaged artifact

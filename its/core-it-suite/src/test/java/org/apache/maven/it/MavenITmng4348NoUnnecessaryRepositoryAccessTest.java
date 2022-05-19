@@ -114,7 +114,7 @@ public class MavenITmng4348NoUnnecessaryRepositoryAccessTest
             server.join();
         }
 
-        verifier.assertFilePresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
         assertEquals( new ArrayList<String>(), requestedUris );
     }
 }

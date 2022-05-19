@@ -61,8 +61,8 @@ public class MavenITmng2695OfflinePluginSnapshotsTest
             verifier.addCliOption( "--settings" );
             verifier.addCliOption( "settings.xml" );
             verifier.executeGoal( "validate" );
-            verifier.assertFilePresent( "target/a.txt" );
-            verifier.assertFilePresent( "target/b.txt" );
+            verifier.verifyFilePresent( "target/a.txt" );
+            verifier.verifyFilePresent( "target/b.txt" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
         }
@@ -77,8 +77,8 @@ public class MavenITmng2695OfflinePluginSnapshotsTest
             verifier.addCliOption( "settings.xml" );
             verifier.addCliOption( "--offline" );
             verifier.executeGoal( "validate" );
-            verifier.assertFilePresent( "target/a.txt" );
-            verifier.assertFilePresent( "target/b.txt" );
+            verifier.verifyFilePresent( "target/a.txt" );
+            verifier.verifyFilePresent( "target/b.txt" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
         }

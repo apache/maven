@@ -136,8 +136,8 @@ public class MavenITmng4068AuthenticatedMirrorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng4068", "a", "0.1", "jar" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng4068", "b", "0.1-SNAPSHOT", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4068", "a", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4068", "b", "0.1-SNAPSHOT", "jar" );
     }
 
 }

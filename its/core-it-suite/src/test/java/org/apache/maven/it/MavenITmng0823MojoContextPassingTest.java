@@ -55,7 +55,7 @@ public class MavenITmng0823MojoContextPassingTest
         List<String> goals = Arrays.asList( new String[]{"org.apache.maven.its.plugins:maven-it-plugin-context-passing:throw",
             "org.apache.maven.its.plugins:maven-it-plugin-context-passing:catch"} );
         verifier.executeGoals( goals );
-        verifier.assertFilePresent( "target/thrown-value" );
+        verifier.verifyFilePresent( "target/thrown-value" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

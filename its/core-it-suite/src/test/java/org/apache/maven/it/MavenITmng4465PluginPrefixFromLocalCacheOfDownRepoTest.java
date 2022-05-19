@@ -63,7 +63,7 @@ public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.properties" );
+        verifier.verifyFilePresent( "target/touch.properties" );
 
         // phase 2: re-try with the remote repo being inaccessible (due to bad URL)
 
@@ -79,7 +79,7 @@ public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.properties" );
+        verifier.verifyFilePresent( "target/touch.properties" );
     }
 
 }

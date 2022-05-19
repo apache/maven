@@ -99,7 +99,7 @@ public class MavenITmng2865MirrorWildcardTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng2865", "a", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng2865", "a", "0.1", "jar" );
     }
 
 }

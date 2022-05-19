@@ -57,7 +57,7 @@ public class MavenITmng4786AntBased21xMojoSupportTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/ant.txt" );
+        verifier.verifyFilePresent( "target/ant.txt" );
     }
 
 }

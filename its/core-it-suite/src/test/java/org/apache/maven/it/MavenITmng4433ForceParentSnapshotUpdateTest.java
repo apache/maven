@@ -63,8 +63,8 @@ public class MavenITmng4433ForceParentSnapshotUpdateTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
 
-        verifier.assertFilePresent( "target/old.txt" );
-        verifier.assertFileNotPresent( "target/new.txt" );
+        verifier.verifyFilePresent( "target/old.txt" );
+        verifier.verifyFileNotPresent( "target/new.txt" );
 
         filterProps.setProperty( "@repo@", "repo-2" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
@@ -76,8 +76,8 @@ public class MavenITmng4433ForceParentSnapshotUpdateTest
 
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/old.txt" );
-        verifier.assertFilePresent( "target/new.txt" );
+        verifier.verifyFileNotPresent( "target/old.txt" );
+        verifier.verifyFilePresent( "target/new.txt" );
     }
 
 }

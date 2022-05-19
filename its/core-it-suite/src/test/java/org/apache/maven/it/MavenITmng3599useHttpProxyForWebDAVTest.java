@@ -170,7 +170,7 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
         verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
                                          CONTENT );
     }
@@ -216,7 +216,7 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
         verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
                                          CONTENT );
     }

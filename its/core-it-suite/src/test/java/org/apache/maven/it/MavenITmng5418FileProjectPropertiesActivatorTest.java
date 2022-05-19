@@ -54,10 +54,10 @@ public class MavenITmng5418FileProjectPropertiesActivatorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/path1.txt" );
-        verifier.assertFilePresent( "target/file1.txt" );
-        verifier.assertFilePresent( "target/missing1.txt" );
-        verifier.assertFileNotPresent( "target/missing2.txt" );
+        verifier.verifyFilePresent( "target/path1.txt" );
+        verifier.verifyFilePresent( "target/file1.txt" );
+        verifier.verifyFilePresent( "target/missing1.txt" );
+        verifier.verifyFileNotPresent( "target/missing2.txt" );
 
     }
 

@@ -64,7 +64,7 @@ public class MavenITmng4269BadReactorResolutionFromOutDirTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
     }
 
 }

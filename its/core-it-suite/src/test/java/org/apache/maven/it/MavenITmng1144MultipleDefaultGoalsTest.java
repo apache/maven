@@ -55,8 +55,8 @@ public class MavenITmng1144MultipleDefaultGoalsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/clean-clean.txt" );
-        verifier.assertFilePresent( "target/resources-resources.txt" );
+        verifier.verifyFilePresent( "target/clean-clean.txt" );
+        verifier.verifyFilePresent( "target/resources-resources.txt" );
     }
 
 }

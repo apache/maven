@@ -65,7 +65,7 @@ public class MavenITmng5716ToolchainsTypeTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/toolchains.properties" );
+        verifier.verifyFilePresent( "target/toolchains.properties" );
         Properties results = verifier.loadProperties( "target/toolchains.properties" );
         assertNull( "javac tool should not be found for requested 'fake' toolchain", results.getProperty( "tool.1" ) );
     }

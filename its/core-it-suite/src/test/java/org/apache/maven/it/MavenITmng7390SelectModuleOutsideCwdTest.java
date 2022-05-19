@@ -59,9 +59,9 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
         verifier.addCliOption( ":module-b" );
         verifier.setLogFileName( "log-module-by-coordinate.txt" );
         verifier.executeGoal( "validate" );
-        verifier.assertFileNotPresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "../target/touch.txt" );
-        verifier.assertFilePresent( "../module-b/target/touch.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "../target/touch.txt" );
+        verifier.verifyFilePresent( "../module-b/target/touch.txt" );
     }
 
     public void testSelectMultipleModulesByCoordinate() throws Exception
@@ -72,9 +72,9 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
         verifier.addCliOption( ":module-b,:module-a" );
         verifier.setLogFileName( "log-modules-by-coordinate.txt" );
         verifier.executeGoal( "validate" );
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "../target/touch.txt" );
-        verifier.assertFilePresent( "../module-b/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "../target/touch.txt" );
+        verifier.verifyFilePresent( "../module-b/target/touch.txt" );
     }
 
     public void testSelectModuleByRelativePath() throws Exception
@@ -85,9 +85,9 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
         verifier.addCliOption( "../module-b" );
         verifier.setLogFileName( "log-module-by-relative-path.txt" );
         verifier.executeGoal( "validate" );
-        verifier.assertFileNotPresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "../target/touch.txt" );
-        verifier.assertFilePresent( "../module-b/target/touch.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "../target/touch.txt" );
+        verifier.verifyFilePresent( "../module-b/target/touch.txt" );
     }
 
     public void testSelectModulesByRelativePath() throws Exception
@@ -98,9 +98,9 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
         verifier.addCliOption( "../module-b,." );
         verifier.setLogFileName( "log-modules-by-relative-path.txt" );
         verifier.executeGoal( "validate" );
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "../target/touch.txt" );
-        verifier.assertFilePresent( "../module-b/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "../target/touch.txt" );
+        verifier.verifyFilePresent( "../module-b/target/touch.txt" );
     }
 
     /**
@@ -123,9 +123,9 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
         }
         catch ( VerificationException e )
         {
-            verifier.assertFileNotPresent( "target/touch.txt" );
-            verifier.assertFileNotPresent( "../target/touch.txt" );
-            verifier.assertFileNotPresent( "../module-b/target/touch.txt" );
+            verifier.verifyFileNotPresent( "target/touch.txt" );
+            verifier.verifyFileNotPresent( "../target/touch.txt" );
+            verifier.verifyFileNotPresent( "../module-b/target/touch.txt" );
         }
     }
 }

@@ -58,7 +58,7 @@ public class MavenITmng4279WagonProviderFailoverTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/wagon.properties" );
+        verifier.verifyFilePresent( "target/wagon.properties" );
     }
 
 }

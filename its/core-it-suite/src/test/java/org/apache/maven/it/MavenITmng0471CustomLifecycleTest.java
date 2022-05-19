@@ -58,8 +58,8 @@ public class MavenITmng0471CustomLifecycleTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/forked/touch.txt" );
-        verifier.assertFilePresent( "target/forked2/touch.txt" );
+        verifier.verifyFilePresent( "target/forked/touch.txt" );
+        verifier.verifyFilePresent( "target/forked2/touch.txt" );
     }
 
 }

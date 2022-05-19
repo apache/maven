@@ -67,11 +67,11 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFilePresent( "mod-a/target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-b/target/touch.txt" );
-        verifier.assertFilePresent( "mod-c/target/touch.txt" );
-        verifier.assertFilePresent( "mod-d/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "mod-a/target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-b/target/touch.txt" );
+        verifier.verifyFilePresent( "mod-c/target/touch.txt" );
+        verifier.verifyFilePresent( "mod-d/target/touch.txt" );
     }
 
     /**
@@ -95,11 +95,11 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-a/target/touch.txt" );
-        verifier.assertFilePresent( "mod-b/target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-c/target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-d/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-a/target/touch.txt" );
+        verifier.verifyFilePresent( "mod-b/target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-c/target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-d/target/touch.txt" );
     }
 
     /**
@@ -123,11 +123,11 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-a/target/touch.txt" );
-        verifier.assertFilePresent( "mod-b/target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-c/target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-d/target/touch.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-a/target/touch.txt" );
+        verifier.verifyFilePresent( "mod-b/target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-c/target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-d/target/touch.txt" );
     }
 
     /**
@@ -152,11 +152,11 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-a/target/touch.txt" );
-        verifier.assertFilePresent( "mod-b/target/touch.txt" );
-        verifier.assertFilePresent( "mod-c/target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-d/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-a/target/touch.txt" );
+        verifier.verifyFilePresent( "mod-b/target/touch.txt" );
+        verifier.verifyFilePresent( "mod-c/target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-d/target/touch.txt" );
     }
 
     /**
@@ -172,7 +172,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
-        verifier.assertFileNotPresent( "mod-d/pom.xml" );
+        verifier.verifyFileNotPresent( "mod-d/pom.xml" );
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "!mod-d" );
         verifier.setLogFileName( "log-basedir-exclamation.txt" );
@@ -180,11 +180,11 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFilePresent( "mod-a/target/touch.txt" );
-        verifier.assertFilePresent( "mod-b/target/touch.txt" );
-        verifier.assertFilePresent( "mod-c/target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-d/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "mod-a/target/touch.txt" );
+        verifier.verifyFilePresent( "mod-b/target/touch.txt" );
+        verifier.verifyFilePresent( "mod-c/target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-d/target/touch.txt" );
     }
 
     /**
@@ -200,7 +200,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
-        verifier.assertFileNotPresent( "mod-d/pom.xml" );
+        verifier.verifyFileNotPresent( "mod-d/pom.xml" );
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "-mod-d" );
         verifier.setLogFileName( "log-basedir-minus.txt" );
@@ -208,11 +208,11 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFilePresent( "mod-a/target/touch.txt" );
-        verifier.assertFilePresent( "mod-b/target/touch.txt" );
-        verifier.assertFilePresent( "mod-c/target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-d/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "mod-a/target/touch.txt" );
+        verifier.verifyFilePresent( "mod-b/target/touch.txt" );
+        verifier.verifyFilePresent( "mod-c/target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-d/target/touch.txt" );
     }
 
 
@@ -236,11 +236,11 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFilePresent( "mod-a/target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-b/target/touch.txt" );
-        verifier.assertFilePresent( "mod-c/target/touch.txt" );
-        verifier.assertFilePresent( "mod-d/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "mod-a/target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-b/target/touch.txt" );
+        verifier.verifyFilePresent( "mod-c/target/touch.txt" );
+        verifier.verifyFilePresent( "mod-d/target/touch.txt" );
     }
 
     /**
@@ -263,11 +263,11 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFilePresent( "mod-a/target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-b/target/touch.txt" );
-        verifier.assertFilePresent( "mod-c/target/touch.txt" );
-        verifier.assertFilePresent( "mod-d/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "mod-a/target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-b/target/touch.txt" );
+        verifier.verifyFilePresent( "mod-c/target/touch.txt" );
+        verifier.verifyFilePresent( "mod-d/target/touch.txt" );
     }
 
      /**
@@ -292,10 +292,10 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-a/target/touch.txt" );
-        verifier.assertFilePresent( "mod-b/target/touch.txt" );
-        verifier.assertFileNotPresent( "mod-c/target/touch.txt" );
-        verifier.assertFilePresent( "mod-d/target/touch.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-a/target/touch.txt" );
+        verifier.verifyFilePresent( "mod-b/target/touch.txt" );
+        verifier.verifyFileNotPresent( "mod-c/target/touch.txt" );
+        verifier.verifyFilePresent( "mod-d/target/touch.txt" );
     }
 }

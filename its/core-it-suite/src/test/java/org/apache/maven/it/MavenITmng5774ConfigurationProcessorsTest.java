@@ -31,7 +31,7 @@ public class MavenITmng5774ConfigurationProcessorsTest
         // Making sure our configuration processor executes
         verifier.verifyTextInLog( "[INFO] ConfigurationProcessorOne.process()" );
         // We have a property value injected by our configuration processor. Make sure it's correct
-        verifier.assertFilePresent( "target/classes/result.properties" );
+        verifier.verifyFilePresent( "target/classes/result.properties" );
         Properties result = verifier.loadProperties( "target/classes/result.properties" );
         assertEquals( "yes", result.getProperty( "configurationProcessorContributedValue" ) );
         verifier.resetStreams();

@@ -59,9 +59,9 @@ public class MavenITmng4314DirectInvocationOfAggregatorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "consumer/target/touch.txt" );
-        verifier.assertFileNotPresent( "dependency/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "consumer/target/touch.txt" );
+        verifier.verifyFileNotPresent( "dependency/target/touch.txt" );
     }
 
 }

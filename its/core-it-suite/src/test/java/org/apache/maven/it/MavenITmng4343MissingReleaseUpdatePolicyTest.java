@@ -185,8 +185,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
 
         assertTrue( requestedUris.toString(), requestedUris.contains( "/dep/0.1/dep-0.1.jar" ) );
         assertTrue( requestedUris.toString(), requestedUris.contains( "/dep/0.1/dep-0.1.pom" ) );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "jar" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "pom" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "pom" );
 
         verifier.resetStreams();
     }
@@ -247,8 +247,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
 
         //noinspection unchecked
         assertThat( requestedUris, CoreMatchers.<String>hasItems() );
-        verifier.assertArtifactNotPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "jar" );
-        verifier.assertArtifactNotPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "pom" );
+        verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "jar" );
+        verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "pom" );
 
         verifier.setLogFileName( "log-never-3.txt" );
         verifier.addCliOption( "-U" );
@@ -257,8 +257,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
 
         assertThat( requestedUris, hasItem( "/dep/0.1/dep-0.1.jar" ) );
         assertThat( requestedUris, hasItem( "/dep/0.1/dep-0.1.pom" ) );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "jar" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "pom" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "pom" );
 
         requestedUris.clear();
 

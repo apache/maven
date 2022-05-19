@@ -48,11 +48,11 @@ public class MavenITmng7112ProjectsWithNonRecursiveTest
         verifier.setLogFileName( "selected-non-recursive.txt" );
         verifier.executeGoal( "validate" );
 
-        verifier.assertFileNotPresent( "target/touch.txt" );
-        verifier.assertFilePresent( "aggregator-a/target/touch.txt" );
-        verifier.assertFileNotPresent( "aggregator-a/module-a/target/touch.txt" );
-        verifier.assertFilePresent( "aggregator-b/target/touch.txt" );
-        verifier.assertFileNotPresent( "aggregator-b/module-b/target/touch.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "aggregator-a/target/touch.txt" );
+        verifier.verifyFileNotPresent( "aggregator-a/module-a/target/touch.txt" );
+        verifier.verifyFilePresent( "aggregator-b/target/touch.txt" );
+        verifier.verifyFileNotPresent( "aggregator-b/module-b/target/touch.txt" );
     }
 
     public void testAggregatesCanBeDeselectedNonRecursively()
@@ -69,10 +69,10 @@ public class MavenITmng7112ProjectsWithNonRecursiveTest
         verifier.setLogFileName( "excluded-non-recursive.txt" );
         verifier.executeGoal( "validate" );
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "aggregator-a/target/touch.txt" );
-        verifier.assertFilePresent( "aggregator-a/module-a/target/touch.txt" );
-        verifier.assertFileNotPresent( "aggregator-b/target/touch.txt" );
-        verifier.assertFilePresent( "aggregator-b/module-b/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "aggregator-a/target/touch.txt" );
+        verifier.verifyFilePresent( "aggregator-a/module-a/target/touch.txt" );
+        verifier.verifyFileNotPresent( "aggregator-b/target/touch.txt" );
+        verifier.verifyFilePresent( "aggregator-b/module-b/target/touch.txt" );
     }
 }

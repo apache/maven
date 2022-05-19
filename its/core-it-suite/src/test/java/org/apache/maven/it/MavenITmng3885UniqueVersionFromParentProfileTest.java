@@ -60,7 +60,7 @@ public class MavenITmng3885UniqueVersionFromParentProfileTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "repo-f/org/apache/maven/its/mng3885/sub/0.2-SNAPSHOT/sub-0.2-SNAPSHOT.jar" );
+        verifier.verifyFilePresent( "repo-f/org/apache/maven/its/mng3885/sub/0.2-SNAPSHOT/sub-0.2-SNAPSHOT.jar" );
     }
 
     /**
@@ -84,7 +84,7 @@ public class MavenITmng3885UniqueVersionFromParentProfileTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "repo-f/org/apache/maven/its/mng3885/sub/0.2-SNAPSHOT/sub-0.2-SNAPSHOT.jar" );
+        verifier.verifyFilePresent( "repo-f/org/apache/maven/its/mng3885/sub/0.2-SNAPSHOT/sub-0.2-SNAPSHOT.jar" );
     }
 
     /**
@@ -108,8 +108,8 @@ public class MavenITmng3885UniqueVersionFromParentProfileTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "repo-t/org/apache/maven/its/mng3885/sub/0.2-SNAPSHOT/sub-0.2-SNAPSHOT.jar" );
-        verifier.assertFilePresent( "repo-t/org/apache/maven/its/mng3885/sub/0.2-SNAPSHOT/sub-0.2-*-1.jar" );
+        verifier.verifyFileNotPresent( "repo-t/org/apache/maven/its/mng3885/sub/0.2-SNAPSHOT/sub-0.2-SNAPSHOT.jar" );
+        verifier.verifyFilePresent( "repo-t/org/apache/maven/its/mng3885/sub/0.2-SNAPSHOT/sub-0.2-*-1.jar" );
     }
 
     /**
@@ -133,8 +133,8 @@ public class MavenITmng3885UniqueVersionFromParentProfileTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "repo-t/org/apache/maven/its/mng3885/sub/0.2-SNAPSHOT/sub-0.2-SNAPSHOT.jar" );
-        verifier.assertFilePresent( "repo-t/org/apache/maven/its/mng3885/sub/0.2-SNAPSHOT/sub-0.2-*-1.jar" );
+        verifier.verifyFileNotPresent( "repo-t/org/apache/maven/its/mng3885/sub/0.2-SNAPSHOT/sub-0.2-SNAPSHOT.jar" );
+        verifier.verifyFilePresent( "repo-t/org/apache/maven/its/mng3885/sub/0.2-SNAPSHOT/sub-0.2-*-1.jar" );
     }
 
 }

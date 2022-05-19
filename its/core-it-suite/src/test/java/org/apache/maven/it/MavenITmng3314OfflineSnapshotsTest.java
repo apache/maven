@@ -59,7 +59,7 @@ public class MavenITmng3314OfflineSnapshotsTest
             verifier.addCliOption( "--settings" );
             verifier.addCliOption( "settings.xml" );
             verifier.executeGoal( "validate" );
-            verifier.assertFilePresent( "target/compile.txt" );
+            verifier.verifyFilePresent( "target/compile.txt" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
         }
@@ -72,7 +72,7 @@ public class MavenITmng3314OfflineSnapshotsTest
             verifier.addCliOption( "--settings" );
             verifier.addCliOption( "settings.xml" );
             verifier.executeGoal( "validate" );
-            verifier.assertFilePresent( "target/compile.txt" );
+            verifier.verifyFilePresent( "target/compile.txt" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
         }

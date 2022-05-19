@@ -115,9 +115,9 @@ public class MavenITmng4561MirroringOfPluginRepoTest
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
 
-            verifier.assertArtifactPresent( "org.apache.maven.its.mng4561", "plugin-dep", "0.1", "jar" );
-            verifier.assertArtifactPresent( "org.apache.maven.its.mng4561", "plugin-dep", "0.1", "pom" );
-            verifier.assertFilePresent( "target/touch.txt" );
+            verifier.verifyArtifactPresent( "org.apache.maven.its.mng4561", "plugin-dep", "0.1", "jar" );
+            verifier.verifyArtifactPresent( "org.apache.maven.its.mng4561", "plugin-dep", "0.1", "pom" );
+            verifier.verifyFilePresent( "target/touch.txt" );
         }
         finally
         {

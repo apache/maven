@@ -53,6 +53,6 @@ public class MavenITmng5389LifecycleParticipantAfterSessionEnd
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
-        verifier.assertFilePresent( "target/afterSessionEnd.txt" );
+        verifier.verifyFilePresent( "target/afterSessionEnd.txt" );
     }
 }

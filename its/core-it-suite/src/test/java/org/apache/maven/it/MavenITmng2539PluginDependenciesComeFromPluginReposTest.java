@@ -59,7 +59,7 @@ public class MavenITmng2539PluginDependenciesComeFromPluginReposTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/log.txt" );
+        verifier.verifyFilePresent( "target/log.txt" );
     }
 
 }

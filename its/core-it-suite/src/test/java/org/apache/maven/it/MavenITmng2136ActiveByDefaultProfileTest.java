@@ -60,7 +60,7 @@ public class MavenITmng2136ActiveByDefaultProfileTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/expression.properties" );
+        verifier.verifyFilePresent( "target/expression.properties" );
         Properties props = verifier.loadProperties( "target/expression.properties" );
         assertNull( props.getProperty( "project.properties.it0102.testOutput" ) );
         assertEquals( "Success", props.getProperty( "project.properties.testOutput" ) );

@@ -49,8 +49,8 @@ public class MavenIT0008SimplePluginTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifact( "org.apache.maven.its.plugins", "maven-it-plugin-touch", "1.0", "maven-plugin" );
         verifier.executeGoal( "process-sources" );
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFilePresent( "target/test-basedir-alignment/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "target/test-basedir-alignment/touch.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

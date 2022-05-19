@@ -19,26 +19,21 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import junit.framework.TestCase;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.shared.utils.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Jason van Zyl
@@ -592,12 +587,6 @@ public abstract class AbstractMavenIntegrationTestCase
             }
         }
 
-        if ( matchesVersionRange( "(3.2.5,)" ) )
-        {
-            String multiModuleProjectDirectory = findMultiModuleProjectDirectory( basedir );
-            verifier.getSystemProperties().put( "maven.multiModuleProjectDirectory", multiModuleProjectDirectory );
-        }
-
         try
         {
             // Java7 TLS protocol
@@ -628,36 +617,6 @@ public abstract class AbstractMavenIntegrationTestCase
         }
 
         return verifier;
-    }
-
-    private boolean hasDotMvnSubDirectory( Path path )
-    {
-        final Path probablySubDirectory = path.resolve( ".mvn" );
-        return Files.exists( probablySubDirectory ) && Files.isDirectory( probablySubDirectory );
-    }
-
-    private String findMultiModuleProjectDirectory( String basedir )
-    {
-        Path path = Paths.get( basedir );
-        Path result = path;
-
-        Collection<Path> fileSystemRoots = new ArrayList<>();
-        for ( Path root : path.getFileSystem().getRootDirectories() )
-        {
-            fileSystemRoots.add( root );
-        }
-
-        while ( !fileSystemRoots.contains( path ) )
-        {
-            if ( hasDotMvnSubDirectory( path ) )
-            {
-                result = path;
-                break;
-            }
-            path = path.getParent();
-        }
-
-        return result.toString();
     }
 
     public static void assertCanonicalFileEquals( String message, File expected, File actual )

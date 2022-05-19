@@ -67,10 +67,10 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         }
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject1/target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject2/target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject3/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
+        verifier.verifyFileNotPresent( "subproject2/target/touch.txt" );
+        verifier.verifyFileNotPresent( "subproject3/target/touch.txt" );
     }
 
     /**
@@ -95,10 +95,10 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject1/target/touch.txt" );
-        verifier.assertFilePresent( "subproject2/target/touch.txt" );
-        verifier.assertFilePresent( "subproject3/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
+        verifier.verifyFilePresent( "subproject2/target/touch.txt" );
+        verifier.verifyFilePresent( "subproject3/target/touch.txt" );
     }
 
     /**
@@ -132,10 +132,10 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         }
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject1/target/touch.txt" );
-        verifier.assertFilePresent( "subproject2/target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject3/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
+        verifier.verifyFilePresent( "subproject2/target/touch.txt" );
+        verifier.verifyFileNotPresent( "subproject3/target/touch.txt" );
     }
 
 }

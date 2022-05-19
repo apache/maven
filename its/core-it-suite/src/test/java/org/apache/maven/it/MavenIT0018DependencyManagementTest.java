@@ -49,7 +49,7 @@ public class MavenIT0018DependencyManagementTest
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.it0018", "managed-dep", "1.0.3", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.it0018", "managed-dep", "1.0.3", "jar" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

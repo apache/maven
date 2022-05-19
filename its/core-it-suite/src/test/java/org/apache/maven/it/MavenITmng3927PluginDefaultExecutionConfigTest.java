@@ -56,8 +56,8 @@ public class MavenITmng3927PluginDefaultExecutionConfigTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/failed.txt" );
-        verifier.assertFilePresent( "target/resources-resources.txt" );
+        verifier.verifyFileNotPresent( "target/failed.txt" );
+        verifier.verifyFilePresent( "target/resources-resources.txt" );
     }
 
 }

@@ -59,7 +59,7 @@ public class MavenITmng4895PluginDepWithNonRelocatedMavenApiTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/classpath.txt" );
+        verifier.verifyFilePresent( "target/classpath.txt" );
     }
 
 }

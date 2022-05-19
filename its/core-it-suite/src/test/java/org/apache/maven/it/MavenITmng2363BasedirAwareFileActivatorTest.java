@@ -57,20 +57,20 @@ public class MavenITmng2363BasedirAwareFileActivatorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/parent1.txt" );
-        verifier.assertFilePresent( "target/parent2.txt" );
-        verifier.assertFileNotPresent( "target/file1.txt" );
-        verifier.assertFileNotPresent( "target/file2.txt" );
+        verifier.verifyFilePresent( "target/parent1.txt" );
+        verifier.verifyFilePresent( "target/parent2.txt" );
+        verifier.verifyFileNotPresent( "target/file1.txt" );
+        verifier.verifyFileNotPresent( "target/file2.txt" );
 
-        verifier.assertFileNotPresent( "sub-a/target/parent1.txt" );
-        verifier.assertFileNotPresent( "sub-a/target/parent2.txt" );
-        verifier.assertFilePresent( "sub-a/target/file1.txt" );
-        verifier.assertFileNotPresent( "sub-a/target/file2.txt" );
+        verifier.verifyFileNotPresent( "sub-a/target/parent1.txt" );
+        verifier.verifyFileNotPresent( "sub-a/target/parent2.txt" );
+        verifier.verifyFilePresent( "sub-a/target/file1.txt" );
+        verifier.verifyFileNotPresent( "sub-a/target/file2.txt" );
 
-        verifier.assertFileNotPresent( "sub-b/target/parent1.txt" );
-        verifier.assertFileNotPresent( "sub-b/target/parent2.txt" );
-        verifier.assertFileNotPresent( "sub-b/target/file1.txt" );
-        verifier.assertFilePresent( "sub-b/target/file2.txt" );
+        verifier.verifyFileNotPresent( "sub-b/target/parent1.txt" );
+        verifier.verifyFileNotPresent( "sub-b/target/parent2.txt" );
+        verifier.verifyFileNotPresent( "sub-b/target/file1.txt" );
+        verifier.verifyFilePresent( "sub-b/target/file2.txt" );
     }
 
 }

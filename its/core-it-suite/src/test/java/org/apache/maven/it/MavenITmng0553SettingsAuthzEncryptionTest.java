@@ -130,7 +130,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng0553" );
-        verifier.assertArtifactNotPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
+        verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         setUserHome( verifier, new File( testDir, "userhome" ) );
         verifier.addCliOption( "--settings" );
@@ -139,7 +139,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
     }
 
     /**
@@ -162,7 +162,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng0553" );
-        verifier.assertArtifactNotPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
+        verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
 
         // NOTE: The tilde ~ in the file name is essential part of the test
         verifier.filterFile( "security-template.xml", "settings~security.xml", "UTF-8", filterProps );
@@ -177,7 +177,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
     }
 
     /**

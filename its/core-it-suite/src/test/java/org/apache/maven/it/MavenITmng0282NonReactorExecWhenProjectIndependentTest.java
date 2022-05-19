@@ -52,8 +52,8 @@ public class MavenITmng0282NonReactorExecWhenProjectIndependentTest
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "subproject/target" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-no-project:light-touch" );
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "subproject/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "subproject/target/touch.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

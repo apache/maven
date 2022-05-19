@@ -56,7 +56,7 @@ public class MavenITmng4321CliUsesPluginMgmtConfigTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/passed.log" );
+        verifier.verifyFilePresent( "target/passed.log" );
     }
 
 }

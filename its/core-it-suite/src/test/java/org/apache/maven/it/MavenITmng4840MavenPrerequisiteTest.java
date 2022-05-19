@@ -92,8 +92,8 @@ public class MavenITmng4840MavenPrerequisiteTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch-1.txt" );
-        verifier.assertFileNotPresent( "target/touch-2.txt" );
+        verifier.verifyFilePresent( "target/touch-1.txt" );
+        verifier.verifyFileNotPresent( "target/touch-2.txt" );
     }
 
 }

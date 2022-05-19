@@ -57,7 +57,7 @@ public class MavenITmng4016PrefixedPropertyInterpolationTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/model.properties" );
+        verifier.verifyFilePresent( "target/model.properties" );
         Properties props = verifier.loadProperties( "target/model.properties" );
         assertEquals( "PASSED-1", props.getProperty( "project.properties.projectProperty" ) );
         assertEquals( "PASSED-2", props.getProperty( "project.properties.pomProperty" ) );

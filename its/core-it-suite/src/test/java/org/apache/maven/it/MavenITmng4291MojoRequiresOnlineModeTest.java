@@ -89,7 +89,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
     }
 
 }

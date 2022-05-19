@@ -104,7 +104,7 @@ public class MavenIT0146InstallerSnapshotNaming
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/appassembler/repo/dep-0.1-20110726.105319-1.jar" );
+        verifier.verifyFilePresent( "target/appassembler/repo/dep-0.1-20110726.105319-1.jar" );
     }
 
 
@@ -143,6 +143,6 @@ public class MavenIT0146InstallerSnapshotNaming
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/appassembler/repo/dep-0.1-SNAPSHOT.jar" );
+        verifier.verifyFilePresent( "target/appassembler/repo/dep-0.1-SNAPSHOT.jar" );
     }
 }

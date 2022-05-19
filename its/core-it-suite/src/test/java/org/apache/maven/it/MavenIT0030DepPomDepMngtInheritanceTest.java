@@ -47,7 +47,7 @@ public class MavenIT0030DepPomDepMngtInheritanceTest
         verifier.deleteArtifact( "org.apache.maven.it", "maven-it-it0030-child-project1", "1.0-SNAPSHOT", "jar" );
         verifier.deleteArtifact( "org.apache.maven.it", "maven-it-it0030-child-project2", "1.0-SNAPSHOT", "jar" );
         verifier.executeGoal( "install" );
-        verifier.assertFilePresent( "child-hierarchy/project2/target/classes/org/apache/maven/it0001/Person.class" );
+        verifier.verifyFilePresent( "child-hierarchy/project2/target/classes/org/apache/maven/it0001/Person.class" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 

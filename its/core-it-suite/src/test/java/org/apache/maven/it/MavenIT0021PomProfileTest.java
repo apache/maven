@@ -54,8 +54,8 @@ public class MavenIT0021PomProfileTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.it0021", "a", "0.1", "jar" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.it0021", "b", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.it0021", "a", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.it0021", "b", "0.1", "jar" );
     }
 
 }

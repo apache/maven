@@ -59,7 +59,7 @@ public class MavenITmng3970DepResolutionFromProfileReposTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng3970", "a", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3970", "a", "0.1", "jar" );
     }
 
     /**
@@ -82,7 +82,7 @@ public class MavenITmng3970DepResolutionFromProfileReposTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng3970", "a", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3970", "a", "0.1", "jar" );
     }
 
     /**
@@ -105,7 +105,7 @@ public class MavenITmng3970DepResolutionFromProfileReposTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng3970", "a", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3970", "a", "0.1", "jar" );
     }
 
 }

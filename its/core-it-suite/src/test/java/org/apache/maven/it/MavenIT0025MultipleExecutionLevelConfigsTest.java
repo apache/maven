@@ -54,8 +54,8 @@ public class MavenIT0025MultipleExecutionLevelConfigsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/test.txt" );
-        verifier.assertFilePresent( "target/test2.txt" );
+        verifier.verifyFilePresent( "target/test.txt" );
+        verifier.verifyFilePresent( "target/test2.txt" );
     }
 
 }

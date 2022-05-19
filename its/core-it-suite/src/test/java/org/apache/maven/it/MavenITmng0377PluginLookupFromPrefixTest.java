@@ -60,7 +60,7 @@ public class MavenITmng0377PluginLookupFromPrefixTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/file.txt" );
+        verifier.verifyFilePresent( "target/file.txt" );
     }
 
 }

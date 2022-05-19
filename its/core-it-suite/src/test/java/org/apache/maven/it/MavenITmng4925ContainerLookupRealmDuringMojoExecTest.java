@@ -59,7 +59,7 @@ public class MavenITmng4925ContainerLookupRealmDuringMojoExecTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
     }
 
 }

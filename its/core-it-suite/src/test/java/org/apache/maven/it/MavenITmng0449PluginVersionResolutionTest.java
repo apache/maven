@@ -71,15 +71,15 @@ public class MavenITmng0449PluginVersionResolutionTest
         // Maven 3.x prefers RELEASE over LATEST (see MNG-4206)
         if ( matchesVersionRange( "(,3.0-alpha-3)" ) )
         {
-            verifier.assertFileNotPresent( "target/touch-release.txt" );
-            verifier.assertFilePresent( "target/touch-snapshot.txt" );
+            verifier.verifyFileNotPresent( "target/touch-release.txt" );
+            verifier.verifyFilePresent( "target/touch-snapshot.txt" );
         }
         else
         {
-            verifier.assertFilePresent( "target/touch-release.txt" );
-            verifier.assertFileNotPresent( "target/touch-snapshot.txt" );
+            verifier.verifyFilePresent( "target/touch-release.txt" );
+            verifier.verifyFileNotPresent( "target/touch-snapshot.txt" );
         }
-        verifier.assertFilePresent( "target/package.txt" );
+        verifier.verifyFilePresent( "target/package.txt" );
     }
 
     /**
@@ -115,13 +115,13 @@ public class MavenITmng0449PluginVersionResolutionTest
         // Maven 3.x prefers RELEASE over LATEST (see MNG-4206)
         if ( matchesVersionRange( "(,3.0-alpha-3)" ) )
         {
-            verifier.assertFileNotPresent( "target/touch-release.txt" );
-            verifier.assertFilePresent( "target/touch-snapshot.txt" );
+            verifier.verifyFileNotPresent( "target/touch-release.txt" );
+            verifier.verifyFilePresent( "target/touch-snapshot.txt" );
         }
         else
         {
-            verifier.assertFilePresent( "target/touch-release.txt" );
-            verifier.assertFileNotPresent( "target/touch-snapshot.txt" );
+            verifier.verifyFilePresent( "target/touch-release.txt" );
+            verifier.verifyFileNotPresent( "target/touch-snapshot.txt" );
         }
     }
 

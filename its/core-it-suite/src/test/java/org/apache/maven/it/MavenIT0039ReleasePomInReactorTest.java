@@ -58,10 +58,10 @@ public class MavenIT0039ReleasePomInReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "project/target/passed.log" );
-        verifier.assertFileNotPresent( "project/target/failed.log" );
-        verifier.assertFilePresent( "project2/target/passed.log" );
-        verifier.assertFileNotPresent( "project2/target/failed.log" );
+        verifier.verifyFilePresent( "project/target/passed.log" );
+        verifier.verifyFileNotPresent( "project/target/failed.log" );
+        verifier.verifyFilePresent( "project2/target/passed.log" );
+        verifier.verifyFileNotPresent( "project2/target/failed.log" );
     }
 
 }

@@ -51,7 +51,7 @@ public class MavenITmng3679PluginExecIdInterpolationTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/check.txt" );
+        verifier.verifyFilePresent( "target/check.txt" );
     }
 
 }

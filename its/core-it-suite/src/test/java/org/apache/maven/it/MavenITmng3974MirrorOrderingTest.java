@@ -59,8 +59,8 @@ public class MavenITmng3974MirrorOrderingTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng3974", "a", "0.1", "jar" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng3974", "b", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3974", "a", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3974", "b", "0.1", "jar" );
     }
 
 }

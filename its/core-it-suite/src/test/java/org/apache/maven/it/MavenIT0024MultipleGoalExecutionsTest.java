@@ -55,7 +55,7 @@ public class MavenIT0024MultipleGoalExecutionsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/plugin-exec-configuration.txt" );
+        verifier.verifyFilePresent( "target/plugin-exec-configuration.txt" );
     }
 
 }

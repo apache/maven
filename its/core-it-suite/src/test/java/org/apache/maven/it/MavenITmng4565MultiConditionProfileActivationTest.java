@@ -62,8 +62,8 @@ public class MavenITmng4565MultiConditionProfileActivationTest
         // should not be activated. Only the profile1/touch.txt file should be generated.
         //
         verifier.verifyErrorFreeLog();
-        verifier.assertFilePresent( "target/profile1/touch.txt" );
-        verifier.assertFileNotPresent( "target/profile2/touch.txt" );
+        verifier.verifyFilePresent( "target/profile1/touch.txt" );
+        verifier.verifyFileNotPresent( "target/profile2/touch.txt" );
         verifier.resetStreams();
     }
 

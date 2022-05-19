@@ -51,7 +51,7 @@ public class MavenIT0023SettingsProfileTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/test.txt" );
+        verifier.verifyFilePresent( "target/test.txt" );
     }
 
 }

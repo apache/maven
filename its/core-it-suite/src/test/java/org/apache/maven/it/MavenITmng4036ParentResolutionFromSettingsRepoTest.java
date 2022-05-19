@@ -57,7 +57,7 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng4036", "parent", "0.2", "pom" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4036", "parent", "0.2", "pom" );
     }
 
     /**
@@ -83,7 +83,7 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng4036", "parent", "0.1", "pom" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4036", "parent", "0.1", "pom" );
     }
 
 }

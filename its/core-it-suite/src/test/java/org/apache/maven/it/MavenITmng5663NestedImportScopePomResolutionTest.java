@@ -58,7 +58,7 @@ public class MavenITmng5663NestedImportScopePomResolutionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng5663", "c", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng5663", "c", "0.1", "jar" );
 
     }
 

@@ -59,8 +59,8 @@ public class MavenITmng4654ArtifactHandlerForMainArtifactTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/repo/org/apache/maven/its/mng4654/test/1.0/test-1.0.mng4654" );
-        verifier.assertFilePresent( "target/repo/org/apache/maven/its/mng4654/test/1.0/test-1.0.jar" );
+        verifier.verifyFileNotPresent( "target/repo/org/apache/maven/its/mng4654/test/1.0/test-1.0.mng4654" );
+        verifier.verifyFilePresent( "target/repo/org/apache/maven/its/mng4654/test/1.0/test-1.0.jar" );
     }
 
 }

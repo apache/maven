@@ -57,7 +57,7 @@ public class MavenITmng4464PlatformIndependentFileSeparatorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "../sub/target/path.properties" );
+        verifier.verifyFilePresent( "../sub/target/path.properties" );
         Properties props = verifier.loadProperties( "../sub/target/path.properties" );
         assertPath( props, "project.build.resources.0.directory", "src/main/res" );
         assertPath( props, "project.build.testResources.0.directory", "src/test/res" );

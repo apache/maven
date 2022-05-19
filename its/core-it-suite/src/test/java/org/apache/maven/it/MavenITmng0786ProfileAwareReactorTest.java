@@ -55,8 +55,8 @@ public class MavenITmng0786ProfileAwareReactorTest
         verifier.setSystemProperty( "expression.outputFile", "target/expression.properties" );
         verifier.setSystemProperty( "activate", "anything" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
-        verifier.assertFilePresent( "sub1/target/expression.properties" );
-        verifier.assertFilePresent( "sub2/target/expression.properties" );
+        verifier.verifyFilePresent( "sub1/target/expression.properties" );
+        verifier.verifyFilePresent( "sub2/target/expression.properties" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

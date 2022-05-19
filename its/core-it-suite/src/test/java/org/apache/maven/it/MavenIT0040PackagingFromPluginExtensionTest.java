@@ -55,7 +55,7 @@ public class MavenIT0040PackagingFromPluginExtensionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/maven-it-it0040-1.0-it.jar" );
+        verifier.verifyFilePresent( "target/maven-it-it0040-1.0-it.jar" );
     }
 
 }

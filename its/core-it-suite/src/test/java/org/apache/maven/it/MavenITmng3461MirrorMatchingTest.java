@@ -69,7 +69,7 @@ public class MavenITmng3461MirrorMatchingTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng3461", "a", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3461", "a", "0.1", "jar" );
     }
 
     /**
@@ -149,9 +149,9 @@ public class MavenITmng3461MirrorMatchingTest
             server.join();
         }
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng3461", "a", "0.1", "jar" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng3461", "b", "0.1", "jar" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng3461", "c", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3461", "a", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3461", "b", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3461", "c", "0.1", "jar" );
     }
 
     /**
@@ -176,6 +176,6 @@ public class MavenITmng3461MirrorMatchingTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng3461", "a", "0.1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3461", "a", "0.1", "jar" );
     }
 }

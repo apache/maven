@@ -56,8 +56,8 @@ public class MavenIT0041ArtifactTypeFromPluginExtensionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.2", "coreit-artifact" );
-        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.2", "pom" );
+        verifier.verifyArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.2", "coreit-artifact" );
+        verifier.verifyArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.2", "pom" );
     }
 
 }

@@ -58,10 +58,10 @@ public class MavenITmng2744checksumVerificationTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng2744", "a", "1", "jar" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng2744", "a", "1", "pom" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng2744", "b", "1", "jar" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng2744", "b", "1", "pom" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng2744", "a", "1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng2744", "a", "1", "pom" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng2744", "b", "1", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng2744", "b", "1", "pom" );
     }
 
 }

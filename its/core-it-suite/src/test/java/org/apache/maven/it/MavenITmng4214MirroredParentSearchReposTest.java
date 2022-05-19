@@ -60,7 +60,7 @@ public class MavenITmng4214MirroredParentSearchReposTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng4214", "parent", "0.1", "pom" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4214", "parent", "0.1", "pom" );
     }
 
 }

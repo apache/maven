@@ -59,7 +59,7 @@ public class MavenITmng1908LegacySnapshotUpdateTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng1908", "artifact", "1.0-SNAPSHOT", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng1908", "artifact", "1.0-SNAPSHOT", "jar" );
     }
 
 }

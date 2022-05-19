@@ -57,7 +57,7 @@ public class MavenITmng5753CustomMojoExecutionConfiguratorTest
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
-        verifier.assertFilePresent( configurationFile.getCanonicalPath() );
+        verifier.verifyFilePresent( configurationFile.getCanonicalPath() );
         //
         // The <name/> element in the original configuration is "ORIGINAL". We want to assert that our
         // custom MojoExecutionConfigurator made the transformation of the element from "ORIGINAL" to "TRANSFORMED"

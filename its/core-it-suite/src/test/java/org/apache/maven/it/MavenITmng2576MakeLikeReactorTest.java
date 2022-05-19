@@ -67,11 +67,11 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.assertFilePresent( "sub-b/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-c/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-d/target/touch.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
+        verifier.verifyFilePresent( "sub-b/target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-c/target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-d/target/touch.txt" );
     }
 
     /**
@@ -95,11 +95,11 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFilePresent( "sub-a/target/touch.txt" );
-        verifier.assertFilePresent( "sub-b/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-c/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-d/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "sub-a/target/touch.txt" );
+        verifier.verifyFilePresent( "sub-b/target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-c/target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-d/target/touch.txt" );
     }
 
     /**
@@ -123,11 +123,11 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.assertFilePresent( "sub-b/target/touch.txt" );
-        verifier.assertFilePresent( "sub-c/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-d/target/touch.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
+        verifier.verifyFilePresent( "sub-b/target/touch.txt" );
+        verifier.verifyFilePresent( "sub-c/target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-d/target/touch.txt" );
     }
 
     /**
@@ -152,11 +152,11 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFilePresent( "sub-a/target/touch.txt" );
-        verifier.assertFilePresent( "sub-b/target/touch.txt" );
-        verifier.assertFilePresent( "sub-c/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-d/target/touch.txt" );
+        verifier.verifyFilePresent( "target/touch.txt" );
+        verifier.verifyFilePresent( "sub-a/target/touch.txt" );
+        verifier.verifyFilePresent( "sub-b/target/touch.txt" );
+        verifier.verifyFilePresent( "sub-c/target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-d/target/touch.txt" );
     }
 
     /**
@@ -172,7 +172,7 @@ public class MavenITmng2576MakeLikeReactorTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
-        verifier.assertFileNotPresent( "sub-d/pom.xml" );
+        verifier.verifyFileNotPresent( "sub-d/pom.xml" );
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "sub-d" );
         verifier.setLogFileName( "log-basedir.txt" );
@@ -180,11 +180,11 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-b/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-c/target/touch.txt" );
-        verifier.assertFilePresent( "sub-d/target/touch.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-b/target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-c/target/touch.txt" );
+        verifier.verifyFilePresent( "sub-d/target/touch.txt" );
     }
 
     /**
@@ -203,7 +203,7 @@ public class MavenITmng2576MakeLikeReactorTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
-        verifier.assertFileNotPresent( "sub-d/pom.xml" );
+        verifier.verifyFileNotPresent( "sub-d/pom.xml" );
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "+sub-d" );
         verifier.setLogFileName( "log-basedir-plus.txt" );
@@ -211,11 +211,11 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-b/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-c/target/touch.txt" );
-        verifier.assertFilePresent( "sub-d/target/touch.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-b/target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-c/target/touch.txt" );
+        verifier.verifyFilePresent( "sub-d/target/touch.txt" );
     }
     /**
      * Verify that the project list can also specify project ids.
@@ -237,11 +237,11 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.assertFilePresent( "sub-b/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-c/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-d/target/touch.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
+        verifier.verifyFilePresent( "sub-b/target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-c/target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-d/target/touch.txt" );
     }
 
     /**
@@ -267,11 +267,11 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.assertFilePresent( "sub-b/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-c/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-d/target/touch.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
+        verifier.verifyFilePresent( "sub-b/target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-c/target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-d/target/touch.txt" );
     }
 
     /**
@@ -294,10 +294,10 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.assertFilePresent( "sub-b/target/touch.txt" );
-        verifier.assertFilePresent( "sub-c/target/touch.txt" );
+        verifier.verifyFileNotPresent( "target/touch.txt" );
+        verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
+        verifier.verifyFilePresent( "sub-b/target/touch.txt" );
+        verifier.verifyFilePresent( "sub-c/target/touch.txt" );
     }
 
 }

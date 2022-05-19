@@ -61,8 +61,8 @@ public class MavenITmng2432PluginPrefixOrderTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/touch-settings.txt" );
-        verifier.assertFilePresent( "target/touch-pom.txt" );
+        verifier.verifyFileNotPresent( "target/touch-settings.txt" );
+        verifier.verifyFilePresent( "target/touch-pom.txt" );
     }
 
 }

@@ -61,8 +61,8 @@ public class MavenITmng3217InterPluginDependencyTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "sub-1/target/touch-1.txt" );
-        verifier.assertFilePresent( "sub-2/target/touch-2.txt" );
+        verifier.verifyFilePresent( "sub-1/target/touch-1.txt" );
+        verifier.verifyFilePresent( "sub-2/target/touch-2.txt" );
     }
 
 }

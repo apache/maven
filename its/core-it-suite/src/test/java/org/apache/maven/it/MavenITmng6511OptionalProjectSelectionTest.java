@@ -51,7 +51,7 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
         verifier.addCliOption( "-pl ?existing-module" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.assertFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
+        verifier.verifyFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
     }
 
     public void testSelectExistingOptionalProfileByArtifactId() throws VerificationException
@@ -63,7 +63,7 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
         verifier.addCliOption( "-pl ?:existing-module" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.assertFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
+        verifier.verifyFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
     }
 
     public void testSelectNonExistingOptionalProfile() throws VerificationException
@@ -75,7 +75,7 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
         verifier.addCliOption( "-pl ?non-existing-module" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.assertFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
+        verifier.verifyFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
     }
 
     public void testDeselectExistingOptionalProfile() throws VerificationException
@@ -87,7 +87,7 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
         verifier.addCliOption( "-pl !?existing-module" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.assertFileNotPresent( "existing-module/target/touch.txt" ); // existing-module should not have been built.
+        verifier.verifyFileNotPresent( "existing-module/target/touch.txt" ); // existing-module should not have been built.
     }
 
     public void testDeselectNonExistingOptionalProfile() throws VerificationException
@@ -99,6 +99,6 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
         verifier.addCliOption( "-pl !?non-existing-module" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.assertFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
+        verifier.verifyFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
     }
 }

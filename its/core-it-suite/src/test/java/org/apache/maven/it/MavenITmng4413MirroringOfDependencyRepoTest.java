@@ -115,7 +115,7 @@ public class MavenITmng4413MirroringOfDependencyRepoTest
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
 
-            verifier.assertArtifactPresent( "org.apache.maven.its.mng4413", "a", "0.1", "jar" );
+            verifier.verifyArtifactPresent( "org.apache.maven.its.mng4413", "a", "0.1", "jar" );
         }
         finally
         {

@@ -70,7 +70,7 @@ public class MavenIT0108SnapshotUpdateTest
         artifact.getParentFile().mkdirs();
         FileUtils.fileWrite( artifact.getAbsolutePath(), "originalArtifact" );
 
-        verifier.assertArtifactNotPresent( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
+        verifier.verifyArtifactNotPresent( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
     }
 
     public void testSnapshotUpdated()
@@ -211,9 +211,9 @@ public class MavenIT0108SnapshotUpdateTest
     }
 
     private void assertArtifactContents( String s )
-        throws IOException
+        throws IOException, VerificationException
     {
-        verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
         verifier.assertArtifactContents( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar", s );
     }
 

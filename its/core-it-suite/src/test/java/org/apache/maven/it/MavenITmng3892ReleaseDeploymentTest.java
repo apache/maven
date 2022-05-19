@@ -59,22 +59,22 @@ public class MavenITmng3892ReleaseDeploymentTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng3892", "test", "1.0", "pom" );
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng3892", "test", "1.0", "jar" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3892", "test", "1.0", "pom" );
+        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3892", "test", "1.0", "jar" );
 
         String groupDir = "repo/org/apache/maven/its/mng3892/test/";
-        verifier.assertFilePresent( groupDir + "maven-metadata.xml" );
-        verifier.assertFilePresent( groupDir + "maven-metadata.xml.md5" );
-        verifier.assertFilePresent( groupDir + "maven-metadata.xml.sha1" );
-        verifier.assertFilePresent( groupDir + "1.0/test-1.0.pom" );
-        verifier.assertFilePresent( groupDir + "1.0/test-1.0.pom.md5" );
-        verifier.assertFilePresent( groupDir + "1.0/test-1.0.pom.sha1" );
-        verifier.assertFilePresent( groupDir + "1.0/test-1.0.jar" );
-        verifier.assertFilePresent( groupDir + "1.0/test-1.0.jar.md5" );
-        verifier.assertFilePresent( groupDir + "1.0/test-1.0.jar.sha1" );
-        verifier.assertFilePresent( groupDir + "1.0/test-1.0-it.jar" );
-        verifier.assertFilePresent( groupDir + "1.0/test-1.0-it.jar.md5" );
-        verifier.assertFilePresent( groupDir + "1.0/test-1.0-it.jar.sha1" );
+        verifier.verifyFilePresent( groupDir + "maven-metadata.xml" );
+        verifier.verifyFilePresent( groupDir + "maven-metadata.xml.md5" );
+        verifier.verifyFilePresent( groupDir + "maven-metadata.xml.sha1" );
+        verifier.verifyFilePresent( groupDir + "1.0/test-1.0.pom" );
+        verifier.verifyFilePresent( groupDir + "1.0/test-1.0.pom.md5" );
+        verifier.verifyFilePresent( groupDir + "1.0/test-1.0.pom.sha1" );
+        verifier.verifyFilePresent( groupDir + "1.0/test-1.0.jar" );
+        verifier.verifyFilePresent( groupDir + "1.0/test-1.0.jar.md5" );
+        verifier.verifyFilePresent( groupDir + "1.0/test-1.0.jar.sha1" );
+        verifier.verifyFilePresent( groupDir + "1.0/test-1.0-it.jar" );
+        verifier.verifyFilePresent( groupDir + "1.0/test-1.0-it.jar.md5" );
+        verifier.verifyFilePresent( groupDir + "1.0/test-1.0-it.jar.sha1" );
 
         verify( testDir, groupDir + "1.0/test-1.0.jar.md5", "dd89c30cc71c3cd8a729622243c76770" );
         verify( testDir, groupDir + "1.0/test-1.0.jar.sha1", "0b0717ff89d3cbadc3564270bf8930163753bf71" );

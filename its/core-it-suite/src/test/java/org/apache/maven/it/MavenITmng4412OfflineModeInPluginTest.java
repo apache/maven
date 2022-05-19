@@ -99,7 +99,7 @@ public class MavenITmng4412OfflineModeInPluginTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactNotPresent( "org.apache.maven.its.mng4412", "dep", "0.1", "pom" );
+        verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng4412", "dep", "0.1", "pom" );
     }
 
 }

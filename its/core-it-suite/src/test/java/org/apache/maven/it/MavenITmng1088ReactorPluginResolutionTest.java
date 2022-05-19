@@ -62,7 +62,7 @@ public class MavenITmng1088ReactorPluginResolutionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "client/target/touch.txt" );
+        verifier.verifyFilePresent( "client/target/touch.txt" );
     }
 
 }

@@ -52,7 +52,7 @@ public class MavenITmng0496IgnoreUnknownPluginParametersTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-log-file:2.1-SNAPSHOT:reset" );
-        verifier.assertFilePresent( "target/file.txt" );
+        verifier.verifyFilePresent( "target/file.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

@@ -63,11 +63,11 @@ public class MavenITmng4357LifecycleMappingDiscoveryInReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "mod-a/target/old.txt" );
-        verifier.assertFileNotPresent( "mod-a/target/new.txt" );
+        verifier.verifyFilePresent( "mod-a/target/old.txt" );
+        verifier.verifyFileNotPresent( "mod-a/target/new.txt" );
 
-        verifier.assertFileNotPresent( "mod-b/target/old.txt" );
-        verifier.assertFilePresent( "mod-b/target/new.txt" );
+        verifier.verifyFileNotPresent( "mod-b/target/old.txt" );
+        verifier.verifyFilePresent( "mod-b/target/new.txt" );
     }
 
 }

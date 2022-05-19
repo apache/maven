@@ -56,8 +56,8 @@ public class MavenITmng4087PercentEncodedFileUrlTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFileNotPresent( "target/%72%65%70%6F" );
-        verifier.assertFilePresent( "target/repo" );
+        verifier.verifyFileNotPresent( "target/%72%65%70%6F" );
+        verifier.verifyFilePresent( "target/repo" );
     }
 
 }

@@ -58,7 +58,7 @@ public class MavenITmng3944BasedirInterpolationTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/basedir.properties" );
+        verifier.verifyFilePresent( "target/basedir.properties" );
         Properties props = verifier.loadProperties( "target/basedir.properties" );
         assertCanonicalFileEquals( testDir, new File( props.getProperty( "project.properties.prop0" ) ) );
         assertCanonicalFileEquals( testDir, new File( props.getProperty( "project.properties.prop1" ) ) );
