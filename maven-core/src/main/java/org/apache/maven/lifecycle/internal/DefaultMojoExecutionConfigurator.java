@@ -20,15 +20,29 @@ package org.apache.maven.lifecycle.internal;
  */
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.Parameter;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
+import org.apache.maven.shared.utils.logging.MessageBuilder;
+import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static java.util.Arrays.stream;
 
 /**
  * @since 3.3.1, MNG-5753
@@ -37,6 +51,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public class DefaultMojoExecutionConfigurator
     implements MojoExecutionConfigurator
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Override
     public void configure( MavenProject project, MojoExecution mojoExecution, boolean allowPluginLevelConfig )
@@ -73,6 +88,8 @@ public class DefaultMojoExecutionConfigurator
             mojoConfiguration = Xpp3Dom.mergeXpp3Dom( mojoExecution.getConfiguration(), mojoConfiguration );
 
             mojoExecution.setConfiguration( mojoConfiguration );
+
+            checkUnknownMojoConfigurationParameters( mojoExecution );
         }
     }
 
@@ -103,6 +120,84 @@ public class DefaultMojoExecutionConfigurator
         }
 
         return null;
+    }
+
+    private void checkUnknownMojoConfigurationParameters( MojoExecution mojoExecution )
+    {
+        if ( mojoExecution.getMojoDescriptor() == null
+            || mojoExecution.getConfiguration() == null || mojoExecution.getConfiguration().getChildCount() == 0 )
+        {
+            return;
+        }
+
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+
+        // in first step get parameter names of current goal
+        Set<String> parametersNamesGoal = Optional.ofNullable( mojoDescriptor.getParameters() )
+            .orElseGet( Collections::emptyList ).stream()
+            .flatMap( this::getParameterNames )
+            .collect( Collectors.toSet() );
+
+        Set<String> unknownParameters = getUnknownParameters( mojoExecution, parametersNamesGoal );
+
+        if ( unknownParameters.isEmpty() )
+        {
+            return;
+        }
+
+        // second step get parameter names of all plugin goals
+        Set<String> parametersNamesAll = Optional.ofNullable( mojoDescriptor.getPluginDescriptor() )
+            .map( PluginDescriptor::getMojos )
+            .orElseGet( Collections::emptyList ).stream()
+            .filter( m -> m.getParameters() != null )
+            .flatMap( m -> m.getParameters().stream() )
+            .flatMap( this::getParameterNames )
+            .collect( Collectors.toSet() );
+
+        unknownParameters = getUnknownParameters( mojoExecution, parametersNamesAll );
+
+        unknownParameters.forEach(
+            name ->
+            {
+                MessageBuilder messageBuilder = MessageUtils.buffer()
+                    .warning( "Parameter '" )
+                    .warning( name )
+                    .warning( "' is unknown for plugin '" )
+                    .warning( mojoExecution.getArtifactId() ).warning( ":" )
+                    .warning( mojoExecution.getVersion() ).warning( ":" )
+                    .warning( mojoExecution.getGoal() );
+
+                if ( mojoExecution.getExecutionId() != null )
+                {
+                    messageBuilder.warning( " (" );
+                    messageBuilder.warning( mojoExecution.getExecutionId() );
+                    messageBuilder.warning( ")" );
+                }
+
+                messageBuilder.warning( "'" );
+
+                logger.warn( messageBuilder.toString() );
+            } );
+    }
+
+    private Stream<String> getParameterNames( Parameter parameter )
+    {
+        if ( parameter.getAlias() != null )
+        {
+            return Stream.of( parameter.getName(), parameter.getAlias() );
+        }
+        else
+        {
+            return Stream.of( parameter.getName() );
+        }
+    }
+
+    private Set<String> getUnknownParameters( MojoExecution mojoExecution, Set<String> parameters )
+    {
+        return stream( mojoExecution.getConfiguration().getChildren() )
+            .map( Xpp3Dom::getName )
+            .filter( name -> !parameters.contains( name ) )
+            .collect( Collectors.toSet() );
     }
 
 }
