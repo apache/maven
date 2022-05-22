@@ -19,6 +19,9 @@ name: Can Maven build itself
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     strategy:
