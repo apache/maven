@@ -39,12 +39,11 @@ public class RawToConsumerPomXMLFilterFactory
 
     public final XmlPullParser get( XmlPullParser orgParser, Path projectPath )
     {
-        XmlPullParser parser = orgParser;
+        // Ensure that xs:any elements aren't touched by next filters
+        XmlPullParser parser = orgParser instanceof FastForwardFilter
+                ? orgParser : new FastForwardFilter( orgParser );
 
         parser = buildPomXMLFilterFactory.get( parser, projectPath );
-
-        // Ensure that xs:any elements aren't touched by next filters
-        parser = new FastForwardFilter( parser );
 
         // Strip modules
         parser = new ModulesXMLFilter( parser );

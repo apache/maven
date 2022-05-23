@@ -55,8 +55,7 @@ public class ParentXMLFilterTest
     }
 
     protected XmlPullParser createFilter( XmlPullParser parser, Function<Path, Optional<RelativeProject>> pathMapper, Path projectPath ) {
-        ParentXMLFilter filter = new ParentXMLFilter( parser, pathMapper, projectPath );
-        return new FastForwardFilter( filter );
+        return new ParentXMLFilter( new FastForwardFilter( parser ), pathMapper, projectPath );
     }
 
     @Test
