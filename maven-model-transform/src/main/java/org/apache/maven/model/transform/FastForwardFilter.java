@@ -60,6 +60,42 @@ class FastForwardFilter extends BufferingParser
     }
 
     @Override
+    public int next() throws XmlPullParserException, IOException
+    {
+        int event = super.next();
+        if ( bypass && event == END_TAG )
+        {
+            if ( domDepth > 0 )
+            {
+                if ( --domDepth == 0 )
+                {
+                    bypass( false );
+                }
+            }
+            state.removeLast();
+        }
+        return event;
+    }
+
+    @Override
+    public int nextToken() throws XmlPullParserException, IOException
+    {
+        int event = super.nextToken();
+        if ( bypass && event == END_TAG )
+        {
+            if ( domDepth > 0 )
+            {
+                if ( --domDepth == 0 )
+                {
+                    bypass( false );
+                }
+            }
+            state.removeLast();
+        }
+        return event;
+    }
+
+    @Override
     protected boolean accept() throws XmlPullParserException, IOException
     {
         if ( xmlPullParser.getEventType() == START_TAG )
@@ -92,26 +128,12 @@ class FastForwardFilter extends BufferingParser
             }
             state.add( localName );
         }
-        else if ( xmlPullParser.getEventType() == END_TAG )
-        {
-            if ( domDepth > 0 )
-            {
-                if ( --domDepth == 0 )
-                {
-                    bypass( false );
-                }
-            }
-            state.pop();
-        }
         return true;
     }
 
     @Override
     public void bypass( boolean bypass )
     {
-        if ( xmlPullParser instanceof BufferingParser )
-        {
-            ( ( BufferingParser ) xmlPullParser ).bypass( bypass );
-        }
+        this.bypass = bypass;
     }
 }

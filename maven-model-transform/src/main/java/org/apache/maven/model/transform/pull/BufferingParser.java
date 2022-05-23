@@ -404,7 +404,7 @@ public class BufferingParser implements XmlPullParser
                 throw new XmlPullParserException( "already reached end of XML input", this, null );
             }
             int currentEvent = xmlPullParser.next();
-            if ( bypass || accept() )
+            if ( bypass() || accept() )
             {
                 return currentEvent;
             }
@@ -430,7 +430,7 @@ public class BufferingParser implements XmlPullParser
                 throw new XmlPullParserException( "already reached end of XML input", this, null );
             }
             int currentEvent = xmlPullParser.nextToken();
-            if ( bypass || accept() )
+            if ( bypass() || accept() )
             {
                 return currentEvent;
             }
@@ -538,6 +538,13 @@ public class BufferingParser implements XmlPullParser
             throw new IllegalStateException( "Can not disable filter while processing" );
         }
         this.bypass = bypass;
+    }
+
+    public boolean bypass()
+    {
+        return bypass
+                || ( xmlPullParser instanceof BufferingParser
+                        && ( (BufferingParser) xmlPullParser ).bypass() );
     }
 
     protected static String nullSafeAppend( String originalValue, String charSegment )
