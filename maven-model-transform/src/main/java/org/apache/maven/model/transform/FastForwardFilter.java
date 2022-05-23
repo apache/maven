@@ -63,17 +63,7 @@ class FastForwardFilter extends BufferingParser
     public int next() throws XmlPullParserException, IOException
     {
         int event = super.next();
-        if ( bypass && event == END_TAG )
-        {
-            if ( domDepth > 0 )
-            {
-                if ( --domDepth == 0 )
-                {
-                    bypass( false );
-                }
-            }
-            state.removeLast();
-        }
+        filter();
         return event;
     }
 
@@ -81,22 +71,11 @@ class FastForwardFilter extends BufferingParser
     public int nextToken() throws XmlPullParserException, IOException
     {
         int event = super.nextToken();
-        if ( bypass && event == END_TAG )
-        {
-            if ( domDepth > 0 )
-            {
-                if ( --domDepth == 0 )
-                {
-                    bypass( false );
-                }
-            }
-            state.removeLast();
-        }
+        filter();
         return event;
     }
 
-    @Override
-    protected boolean accept() throws XmlPullParserException, IOException
+    protected void filter() throws XmlPullParserException, IOException
     {
         if ( xmlPullParser.getEventType() == START_TAG )
         {
@@ -128,7 +107,17 @@ class FastForwardFilter extends BufferingParser
             }
             state.add( localName );
         }
-        return true;
+        else if ( xmlPullParser.getEventType() == END_TAG )
+        {
+            if ( domDepth > 0 )
+            {
+                if ( --domDepth == 0 )
+                {
+                    bypass( false );
+                }
+            }
+            state.removeLast();
+        }
     }
 
     @Override
