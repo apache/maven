@@ -56,7 +56,7 @@ under the License.
     <mockitoVersion>2.21.0</mockitoVersion>
     <plexusVersion>2.1.0</plexusVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
-    <plexusUtilsVersion>3.3.0</plexusUtilsVersion>
+    <plexusUtilsVersion>3.3.1</plexusUtilsVersion>
     <guiceVersion>4.2.2</guiceVersion>
     <sisuVersion>0.3.5</sisuVersion>
     <wagonVersion>3.5.1</wagonVersion>
