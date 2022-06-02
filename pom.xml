@@ -25,7 +25,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>35</version>
+    <version>36</version>
     <relativePath />
   </parent>
 
@@ -46,8 +46,7 @@ under the License.
   <inceptionYear>2001</inceptionYear>
 
   <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <javaVersion>8</javaVersion>
     <classWorldsVersion>2.6.0</classWorldsVersion>
     <commonsCliVersion>1.5.0</commonsCliVersion>
     <commonsLangVersion>3.12.0</commonsLangVersion>
@@ -55,11 +54,10 @@ under the License.
     <mockitoVersion>3.2.0</mockitoVersion>
     <plexusVersion>2.1.0</plexusVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
-    <plexusUtilsVersion>3.3.0</plexusUtilsVersion>
+    <plexusUtilsVersion>3.4.2</plexusUtilsVersion>
     <guiceVersion>4.2.3</guiceVersion>
     <guavaVersion>30.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
-    <sisuVersion>0.3.5</sisuVersion>
     <wagonVersion>3.5.1</wagonVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <cipherVersion>2.0</cipherVersion>
@@ -505,19 +503,6 @@ under the License.
               <goals>
                 <goal>generate-metadata</goal>
                 <goal>generate-test-metadata</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
-          <groupId>org.eclipse.sisu</groupId>
-          <artifactId>sisu-maven-plugin</artifactId>
-          <version>${sisuVersion}</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>main-index</goal>
-                <goal>test-index</goal>
               </goals>
             </execution>
           </executions>
