@@ -36,7 +36,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
 {
     public MavenITmng7468UnsupportedPluginsParametersTest()
     {
-        super( "[4.0.0-alpha-1,)" );
+        super( "[3.9.0,)" );
     }
 
     /**
