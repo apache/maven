@@ -70,6 +70,8 @@ import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.StringModelSource;
 import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.resolution.ModelResolver;
+import org.apache.maven.model.resolution.UnresolvableModelException;
+import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.apache.maven.repository.internal.ModelCacheFactory;
 import org.codehaus.plexus.util.Os;
@@ -604,6 +606,39 @@ public class DefaultProjectBuilder
         }
 
     }
+    
+    private static class WorkspaceModelResolverImpl implements WorkspaceModelResolver 
+    {
+        private final Map<File, MavenProject> projectIndex;
+
+        WorkspaceModelResolverImpl( Map<File, MavenProject> projectIndex )
+        {
+            this.projectIndex = projectIndex;
+        }
+
+        @Override
+        public Model resolveRawModel( String groupId, String artifactId, String versionConstraint )
+            throws UnresolvableModelException 
+        {
+            for ( Map.Entry<File, MavenProject> e : projectIndex.entrySet() )
+            {
+                MavenProject prj = e.getValue();
+                if ( groupId.equals( prj.getGroupId() ) && artifactId.equals( prj.getArtifactId() )
+                        && versionConstraint.equals( prj.getVersion() ) )
+                {
+                    return prj.getModel();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public Model resolveEffectiveModel( String groupId, String artifactId, String versionConstraint )
+                throws UnresolvableModelException
+        {
+            return resolveRawModel( groupId, artifactId, versionConstraint );
+        }
+    }
 
     private boolean build( List<ProjectBuildingResult> results, List<MavenProject> projects,
                            Map<File, MavenProject> projectIndex, List<InterimResult> interimResults,
@@ -617,6 +652,7 @@ public class DefaultProjectBuilder
             MavenProject project = interimResult.listener.getProject();
             try
             {
+                interimResult.request.setWorkspaceModelResolver( new WorkspaceModelResolverImpl( projectIndex ) );
                 ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
 
                 // 2nd pass of initialization: resolve and build parent if necessary
