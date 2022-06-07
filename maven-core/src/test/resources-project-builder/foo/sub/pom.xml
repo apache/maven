@@ -102,7 +102,7 @@
     <dependency>
       <groupId>org.mortbay.jetty</groupId>
       <artifactId>jetty</artifactId>
-      <version>6.1.4</version>
+      <version>6.1.17</version>
       <scope>test</scope>
     </dependency>
     <dependency>
