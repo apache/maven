@@ -558,6 +558,7 @@ under the License.
           <configuration>
             <excludes>
               <exclude>.asf.yaml</exclude>
+              <exclude>.mvn/**</exclude>
               <exclude>src/test/resources*/**</exclude>
               <exclude>src/test/projects/**</exclude>
               <exclude>src/test/remote-repo/**</exclude>

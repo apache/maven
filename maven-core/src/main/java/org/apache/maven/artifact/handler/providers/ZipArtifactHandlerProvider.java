@@ -26,6 +26,8 @@ import javax.inject.Singleton;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@code zip} artifact handler provider.
@@ -35,11 +37,12 @@ import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 public class ZipArtifactHandlerProvider
     implements Provider<ArtifactHandler>
 {
+    private static final boolean ADDED_TO_CLASSPATH = Boolean.parseBoolean( System.getProperty(
+            "maven.artifactHandler.zip.addedToClasspath", Boolean.TRUE.toString() ) );
     private final ArtifactHandler artifactHandler;
 
     @Inject
-    public ZipArtifactHandlerProvider( @Named( "${maven.artifactHandler.zip.addedToClasspath:-true}" )
-                                           boolean addedToClasspath )
+    public ZipArtifactHandlerProvider()
     {
         this.artifactHandler = new DefaultArtifactHandler(
             "zip",
@@ -49,8 +52,12 @@ public class ZipArtifactHandlerProvider
             null,
             false,
             "java",
-            addedToClasspath
+                ADDED_TO_CLASSPATH
         );
+
+        // TODO: here only to verify proper set up
+        Logger logger = LoggerFactory.getLogger( getClass() );
+        logger.info( "addedToClasspath={}", ADDED_TO_CLASSPATH );
     }
 
     @Override
