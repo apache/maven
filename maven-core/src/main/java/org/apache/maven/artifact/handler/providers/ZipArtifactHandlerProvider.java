@@ -45,13 +45,13 @@ public class ZipArtifactHandlerProvider
     public ZipArtifactHandlerProvider()
     {
         this.artifactHandler = new DefaultArtifactHandler(
-            "zip",
-            null,
-            null,
-            null,
-            null,
-            false,
-            "java",
+                "zip",
+                null,
+                null,
+                null,
+                null,
+                false,
+                "java",
                 ADDED_TO_CLASSPATH
         );
 
