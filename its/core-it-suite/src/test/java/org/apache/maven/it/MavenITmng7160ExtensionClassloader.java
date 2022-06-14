@@ -38,7 +38,7 @@ public class MavenITmng7160ExtensionClassloader
     public void testVerify() throws IOException, VerificationException
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7160-extensionclassloader" );
-        
+
         final Verifier extensionVerifier = newVerifier( new File( projectDir, "extension" ).getAbsolutePath() );
         extensionVerifier.executeGoal( "install" );
         extensionVerifier.verifyErrorFreeLog();
