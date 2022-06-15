@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -31,6 +32,7 @@ import javax.inject.Named;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.model.Plugin;
@@ -59,11 +61,17 @@ import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 @Named
 public class BootstrapCoreExtensionManager
 {
+    public static final String STRATEGY_PARENT_FIRST = "parent-first";
+    public static final String STRATEGY_PLUGIN = "plugin";
+    public static final String STRATEGY_SELF_FIRST = "self-first";
+
     private final Logger log;
 
     private final DefaultPluginDependenciesResolver pluginDependenciesResolver;
 
     private final DefaultRepositorySystemSessionFactory repositorySystemSessionFactory;
+
+    private final CoreExports coreExports;
 
     private final ClassWorld classWorld;
 
@@ -72,11 +80,13 @@ public class BootstrapCoreExtensionManager
     @Inject
     public BootstrapCoreExtensionManager( Logger log, DefaultPluginDependenciesResolver pluginDependenciesResolver,
                                           DefaultRepositorySystemSessionFactory repositorySystemSessionFactory,
+                                          CoreExports coreExports,
                                           PlexusContainer container )
     {
         this.log = log;
         this.pluginDependenciesResolver = pluginDependenciesResolver;
         this.repositorySystemSessionFactory = repositorySystemSessionFactory;
+        this.coreExports = coreExports;
         this.classWorld = ( (DefaultPlexusContainer) container ).getClassWorld();
         this.parentRealm = container.getContainerRealm();
     }
@@ -121,14 +131,45 @@ public class BootstrapCoreExtensionManager
     {
         String realmId =
             "coreExtension>" + extension.getGroupId() + ":" + extension.getArtifactId() + ":" + extension.getVersion();
-        ClassRealm realm = classWorld.newRealm( realmId, null );
+        final ClassRealm realm = classWorld.newRealm( realmId, null );
+        Set<String> providedArtifacts = Collections.emptySet();
+        String classLoadingStrategy = extension.getClassLoadingStrategy();
+        if ( STRATEGY_PARENT_FIRST.equals( classLoadingStrategy ) )
+        {
+            realm.importFrom( parentRealm, "" );
+        }
+        else if ( STRATEGY_PLUGIN.equals( classLoadingStrategy ) )
+        {
+            for ( Entry<String, ClassLoader> entry : coreExports.getExportedPackages().entrySet() )
+            {
+                realm.importFrom( entry.getValue(), entry.getKey() );
+            }
+            providedArtifacts = coreExports.getExportedArtifacts();
+        }
+        else if ( STRATEGY_SELF_FIRST.equals( classLoadingStrategy ) )
+        {
+            realm.setParentRealm( parentRealm );
+        }
+        else
+        {
+            throw new IllegalArgumentException( "Unsupported class-loading strategy '"
+                    + classLoadingStrategy + "'. Supported values are: " + STRATEGY_PARENT_FIRST
+                    + ", " + STRATEGY_PLUGIN + " and " + STRATEGY_SELF_FIRST );
+        }
         log.debug( "Populating class realm " + realm.getId() );
-        realm.setParentRealm( parentRealm );
         for ( Artifact artifact : artifacts )
         {
-            File file = artifact.getFile();
-            log.debug( "  Included " + file );
-            realm.addURL( file.toURI().toURL() );
+            String id = artifact.getGroupId() + ":" + artifact.getArtifactId();
+            if ( providedArtifacts.contains( id ) )
+            {
+                log.debug( "  Excluded " + id );
+            }
+            else
+            {
+                File file = artifact.getFile();
+                log.debug( "  Included " + id + " located at " + file );
+                realm.addURL( file.toURI().toURL() );
+            }
         }
         return CoreExtensionEntry.discoverFrom( realm, Collections.singleton( artifacts.get( 0 ).getFile() ) );
     }

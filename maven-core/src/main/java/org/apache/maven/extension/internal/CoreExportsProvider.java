@@ -19,34 +19,34 @@ package org.apache.maven.extension.internal;
  * under the License.
  */
 
+import java.util.Objects;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.codehaus.plexus.PlexusContainer;
-import org.eclipse.sisu.Nullable;
 
 /**
  * CoreExportsProvider
  */
 @Named
 @Singleton
-public class CoreExportsProvider
+public class CoreExportsProvider implements Provider<CoreExports>
 {
 
     private final CoreExports exports;
 
     @Inject
-    public CoreExportsProvider( PlexusContainer container, @Nullable CoreExports exports )
+    public CoreExportsProvider( PlexusContainer container )
     {
-        if ( exports == null )
-        {
-            this.exports = new CoreExports( CoreExtensionEntry.discoverFrom( container.getContainerRealm() ) );
-        }
-        else
-        {
-            this.exports = exports;
-        }
+        this( new CoreExports( CoreExtensionEntry.discoverFrom( container.getContainerRealm() ) ) );
+    }
+
+    public CoreExportsProvider( CoreExports exports )
+    {
+        this.exports = Objects.requireNonNull( exports );
     }
 
     public CoreExports get()

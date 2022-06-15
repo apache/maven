@@ -29,7 +29,7 @@ import javax.inject.Singleton;
 
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
-import org.apache.maven.extension.internal.CoreExportsProvider;
+import org.apache.maven.extension.internal.CoreExports;
 
 /**
  * @author Jason van Zyl
@@ -50,10 +50,10 @@ public class DefaultArtifactFilterManager
 
     @Inject
     public DefaultArtifactFilterManager( List<ArtifactFilterManagerDelegate> delegates,
-                                         CoreExportsProvider coreExports )
+                                         CoreExports coreExports )
     {
         this.delegates = delegates;
-        this.coreArtifacts = coreExports.get().getExportedArtifacts();
+        this.coreArtifacts = coreExports.getExportedArtifacts();
     }
 
     private synchronized Set<String> getExcludedArtifacts()
