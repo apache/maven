@@ -32,7 +32,7 @@ public class MavenITmng7160ExtensionClassloader
 {
     public MavenITmng7160ExtensionClassloader()
     {
-        super( "[4.0.0-alpha-1,)" );
+        super( "[3.9.0,)" );
     }
 
     public void testVerify() throws IOException, VerificationException
