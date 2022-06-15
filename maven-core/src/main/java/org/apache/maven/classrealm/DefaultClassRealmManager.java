@@ -37,7 +37,7 @@ import javax.inject.Singleton;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
-import org.apache.maven.extension.internal.CoreExportsProvider;
+import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.MutablePlexusContainer;
@@ -92,20 +92,20 @@ public class DefaultClassRealmManager
 
     @Inject
     public DefaultClassRealmManager( Logger logger, PlexusContainer container,
-                                     List<ClassRealmManagerDelegate> delegates, CoreExportsProvider exports )
+                                     List<ClassRealmManagerDelegate> delegates, CoreExports exports )
     {
         this.logger = logger;
         this.world = ( (MutablePlexusContainer) container ).getClassWorld();
         this.containerRealm = container.getContainerRealm();
         this.delegates = delegates;
 
-        Map<String, ClassLoader> foreignImports = exports.get().getExportedPackages();
+        Map<String, ClassLoader> foreignImports = exports.getExportedPackages();
 
         this.mavenApiRealm =
             createRealm( API_REALMID, RealmType.Core, null /* parent */, null /* parentImports */,
                          foreignImports, null /* artifacts */ );
 
-        this.providedArtifacts = exports.get().getExportedArtifacts();
+        this.providedArtifacts = exports.getExportedArtifacts();
     }
 
     private ClassRealm newRealm( String id )
