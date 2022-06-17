@@ -47,6 +47,12 @@ under the License.
       <version>${maven-version}</version>
       <scope>provided</scope>
     </dependency>
+    <!-- this might help github actions to not fail... -->
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-classworlds</artifactId>
+      <version>2.5.2</version>
+    </dependency>
   </dependencies>
 
   <build>
