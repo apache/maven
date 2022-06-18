@@ -21,10 +21,11 @@ package org.apache.maven.plugin.testing;
 
 import java.io.File;
 
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 
 /**
@@ -101,9 +102,11 @@ public class ResolverExpressionEvaluatorStub
         }
         else if ( "localRepository".equals( expression ) )
         {
-            File localRepo = new File( PlexusTestCase.getBasedir(), "target/local-repo" );
-            return new DefaultArtifactRepository( "localRepository", "file://" + localRepo.getAbsolutePath(),
-                                                  new DefaultRepositoryLayout() );
+            return new MavenArtifactRepository( "localRepository",
+            "file://" + new File( PlexusTestCase.getBasedir(), "target/local-repo" ).getAbsolutePath(),
+            new DefaultRepositoryLayout(),
+            new ArtifactRepositoryPolicy( true, "release", "always" ),
+            new ArtifactRepositoryPolicy( true, "snapshot", "never" ) );
         }
         else
         {
