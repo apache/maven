@@ -23,6 +23,7 @@ import static org.apache.maven.cli.CLIReportingUtils.formatDuration;
 import static org.apache.maven.cli.CLIReportingUtils.formatTimestamp;
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
+import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
@@ -331,6 +332,15 @@ public class ExecutionEventLogger
                 int pad = LINE_LENGTH - building.length() - progress.length();
 
                 infoMain( building + ( ( pad > 0 ) ? chars( ' ', pad ) : "" ) + progress );
+            }
+
+            // path to pom.xml
+            File currentPom = project.getFile();
+            if ( currentPom != null )
+            {
+                MavenSession session = event.getSession();
+                File rootBasedir = session.getTopLevelProject().getBasedir();
+                logger.info( "  from " + rootBasedir.toPath().relativize( currentPom.toPath() ) );
             }
 
             // ----------[ packaging ]----------
