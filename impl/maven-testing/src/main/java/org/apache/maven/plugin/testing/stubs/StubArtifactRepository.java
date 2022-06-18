@@ -37,7 +37,7 @@ import java.util.List;
 public class StubArtifactRepository
     implements ArtifactRepository
 {
-    private String baseDir = null;
+    private final String baseDir;
 
     /**
      * Default constructor

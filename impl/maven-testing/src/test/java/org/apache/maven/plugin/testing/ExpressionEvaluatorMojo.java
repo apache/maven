@@ -22,7 +22,6 @@ package org.apache.maven.plugin.testing;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -40,7 +39,7 @@ public class ExpressionEvaluatorMojo
     /** {@inheritDoc} */
     @Override
     public void execute()
-        throws MojoExecutionException, MojoFailureException
+        throws MojoExecutionException
     {
         if ( StringUtils.isEmpty( basedir ) )
         {

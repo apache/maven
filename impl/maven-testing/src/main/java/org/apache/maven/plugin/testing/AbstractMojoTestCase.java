@@ -21,7 +21,6 @@ package org.apache.maven.plugin.testing;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -29,6 +28,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -162,6 +162,7 @@ public abstract class AbstractMojoTestCase
     
             artifact.setFile( getPluginArtifactFile() );
             pluginDescriptor.setPluginArtifact( artifact );
+            //noinspection ArraysAsListWithZeroOrOneArgument
             pluginDescriptor.setArtifacts( Arrays.asList( artifact ) );
     
             for ( ComponentDescriptor<?> desc : pluginDescriptor.getComponents() )
@@ -237,7 +238,7 @@ public abstract class AbstractMojoTestCase
     protected InputStream getPublicDescriptorStream()
         throws Exception
     {
-        return new FileInputStream( new File( getPluginDescriptorPath() ) );
+        return Files.newInputStream( new File( getPluginDescriptorPath() ).toPath() );
     }
 
     protected String getPluginDescriptorPath()
@@ -258,7 +259,7 @@ public abstract class AbstractMojoTestCase
         {
             List<Module> modules = new ArrayList<>();
             addGuiceModules( modules );
-            container = new DefaultPlexusContainer( cc, modules.toArray( new Module[modules.size()] ) );
+            container = new DefaultPlexusContainer( cc, modules.toArray( new Module[0] ) );
         }
         catch ( PlexusContainerException e )
         {
@@ -270,6 +271,7 @@ public abstract class AbstractMojoTestCase
     /**
      * @since 3.0.0
      */
+    @SuppressWarnings( "EmptyMethod" )
     protected void addGuiceModules( List<Module> modules )
     {
         // no custom guice modules by default
@@ -277,15 +279,11 @@ public abstract class AbstractMojoTestCase
 
     protected ContainerConfiguration setupContainerConfiguration()
     {
-        ClassWorld classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
-
-        ContainerConfiguration cc = new DefaultContainerConfiguration()
-          .setClassWorld( classWorld )
+        return new DefaultContainerConfiguration()
+          .setClassWorld( new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() ) )
           .setClassPathScanning( PlexusConstants.SCANNING_INDEX )
           .setAutoWiring( true )
-          .setName( "maven" );      
-
-        return cc;
+          .setName( "maven" );
     }
     
     @Override
@@ -498,6 +496,7 @@ public abstract class AbstractMojoTestCase
 
         MavenSession session = new MavenSession( container, MavenRepositorySystemUtils.newSession(), request, result );
         session.setCurrentProject( project );
+        //noinspection ArraysAsListWithZeroOrOneArgument
         session.setProjects( Arrays.asList( project ) );
         return session;
     }

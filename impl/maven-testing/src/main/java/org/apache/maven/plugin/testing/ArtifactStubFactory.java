@@ -316,7 +316,7 @@ public class ArtifactStubFactory
             WarArchiver war = (WarArchiver) archiver;
             // the use of this is counter-intuitive:
             // http://jira.codehaus.org/browse/PLX-286
-            war.setIgnoreWebxml( false );
+            war.setExpectWebXml( false );
         }
         archiver.createArchive();
     }
@@ -549,7 +549,7 @@ public class ArtifactStubFactory
      */
     public static String getFormattedFileName( Artifact artifact, boolean removeVersion )
     {
-        String destFileName = null;
+        String destFileName;
 
         // if there is a file and we aren't stripping the version, just get the
         // name directly
@@ -560,7 +560,7 @@ public class ArtifactStubFactory
         else
         // if offline
         {
-            String versionString = null;
+            String versionString;
             if ( !removeVersion )
             {
                 versionString = "-" + artifact.getVersion();

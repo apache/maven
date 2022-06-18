@@ -45,11 +45,11 @@ import org.apache.maven.wagon.events.TransferListener;
 public class StubArtifactResolver
     implements ArtifactResolver
 {
-    private boolean throwArtifactResolutionException;
+    private final boolean throwArtifactResolutionException;
 
-    private boolean throwArtifactNotFoundException;
+    private final boolean throwArtifactNotFoundException;
 
-    private ArtifactStubFactory factory;
+    private final ArtifactStubFactory factory;
 
     /**
      * Default constructor

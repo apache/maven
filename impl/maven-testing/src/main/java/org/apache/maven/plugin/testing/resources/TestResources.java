@@ -21,6 +21,7 @@ package org.apache.maven.plugin.testing.resources;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
@@ -116,11 +117,7 @@ public class TestResources
         scanner.addDefaultExcludes();
         scanner.scan();
 
-        Set<String> actual = new TreeSet<>();
-        for ( String path : scanner.getIncludedFiles() )
-        {
-            actual.add( path );
-        }
+        Set<String> actual = new TreeSet<>( Arrays.asList( scanner.getIncludedFiles() ) );
         for ( String path : scanner.getIncludedDirectories() )
         {
             if ( path.length() > 0 )
@@ -132,10 +129,7 @@ public class TestResources
         Set<String> expected = new TreeSet<>();
         if ( expectedPaths != null )
         {
-            for ( String path : expectedPaths )
-            {
-                expected.add( path );
-            }
+            expected.addAll( Arrays.asList( expectedPaths ) );
         }
 
         // compare textual representation to make diff easier to understand

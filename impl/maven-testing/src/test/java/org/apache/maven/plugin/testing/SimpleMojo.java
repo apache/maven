@@ -20,7 +20,6 @@ package org.apache.maven.plugin.testing;
  */
 
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * @author Jason van Zyl
@@ -44,7 +43,6 @@ public class SimpleMojo
 
     @Override
     public void execute()
-        throws MojoExecutionException
     {
     }
 }

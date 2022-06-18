@@ -35,7 +35,7 @@ public class ArtifactStubFactoryTest
         assertFalse(factory.getSnapshotArtifact().isRelease());
     }
 
-    public void testCreateFiles() throws IOException
+    public void testCreateFiles()
     {
         ArtifactStubFactory factory = new ArtifactStubFactory();
         assertFalse(factory.isCreateFiles());

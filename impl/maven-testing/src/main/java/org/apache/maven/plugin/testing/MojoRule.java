@@ -87,7 +87,8 @@ public class MojoRule
     /**
      * May be overridden in the implementation to do stuff after the current test was run.
      */
-    protected void after() 
+    @SuppressWarnings( "EmptyMethod" )
+    protected void after()
     {
         
     }

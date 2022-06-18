@@ -75,7 +75,7 @@ public class ResolverExpressionEvaluatorStub
             }
 
             // Was not an expression
-            if ( expression.indexOf( "$$" ) > -1 )
+            if ( expression.contains( "$$" ) )
             {
                 return expression.replaceAll( "\\$\\$", "\\$" );
             }

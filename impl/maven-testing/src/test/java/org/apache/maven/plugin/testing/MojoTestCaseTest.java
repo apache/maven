@@ -32,9 +32,6 @@ import java.util.Map;
 public class MojoTestCaseTest
     extends AbstractMojoTestCase
 {
-    private String pom;
-
-    private Xpp3Dom pomDom;
 
     private PlexusConfiguration pluginConfiguration;
 
@@ -45,8 +42,7 @@ public class MojoTestCaseTest
     {
         super.setUp();
 
-        pom =
-            "<project>" +
+        String pom = "<project>" +
                 "<build>" +
                 "<plugins>" +
                 "<plugin>" +
@@ -60,16 +56,14 @@ public class MojoTestCaseTest
                 "</build>" +
                 "</project>";
 
-        pomDom = Xpp3DomBuilder.build( new StringReader( pom ) );
+        Xpp3Dom pomDom = Xpp3DomBuilder.build( new StringReader( pom ) );
 
         pluginConfiguration = extractPluginConfiguration( "maven-simple-plugin", pomDom );
     }
 
     /**
-     * @throws Exception if any
      */
     public void testPluginConfigurationExtraction()
-        throws Exception
     {
         assertEquals( "valueOne", pluginConfiguration.getChild( "keyOne" ).getValue() );
 

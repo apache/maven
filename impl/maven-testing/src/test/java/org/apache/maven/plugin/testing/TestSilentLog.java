@@ -31,7 +31,7 @@ public class TestSilentLog
     public void testLog()
     {
         Log log = new SilentLog();
-        String text = new String( "Text" );
+        String text = "Text";
         Throwable e = new RuntimeException();
         log.debug( text );
         log.debug( text, e );
@@ -54,7 +54,7 @@ public class TestSilentLog
     public void testLogger()
     {
         Logger log = new SilentLog();
-        String text = new String( "Text" );
+        String text = "Text";
         Throwable e = new RuntimeException();
 
         log.debug( text );

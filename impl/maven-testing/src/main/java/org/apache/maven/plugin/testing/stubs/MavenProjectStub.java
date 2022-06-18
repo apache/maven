@@ -69,6 +69,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  *
  * @author jesse
  */
+@SuppressWarnings( "FieldCanBeLocal" )
 public class MavenProjectStub
     extends MavenProject
 {
@@ -282,19 +283,14 @@ public class MavenProjectStub
     @Override
     public List<ArtifactRepository> getRemoteArtifactRepositories()
     {
-        return Collections.<ArtifactRepository>emptyList();
+        return Collections.emptyList();
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean hasParent()
     {
-        if ( parent != null )
-        {
-            return true;
-        }
-
-        return false;
+        return parent != null;
     }
 
     /** {@inheritDoc} */
@@ -337,7 +333,7 @@ public class MavenProjectStub
     @Override
     public List<Dependency> getDependencies()
     {
-        return Collections.<Dependency>emptyList();
+        return Collections.emptyList();
     }
 
     /**
@@ -960,7 +956,7 @@ public class MavenProjectStub
     @Override
     public List<MailingList> getMailingLists()
     {
-        return Collections.<MailingList>emptyList();
+        return Collections.emptyList();
     }
 
     /**
@@ -993,7 +989,7 @@ public class MavenProjectStub
     @Override
     public List<Developer> getDevelopers()
     {
-        return Collections.<Developer>emptyList();
+        return Collections.emptyList();
     }
 
     /**
@@ -1026,7 +1022,7 @@ public class MavenProjectStub
     @Override
     public List<Contributor> getContributors()
     {
-        return Collections.<Contributor>emptyList();
+        return Collections.emptyList();
     }
 
     /**
@@ -1062,7 +1058,7 @@ public class MavenProjectStub
     @Override
     public List<Resource> getResources()
     {
-        return Collections.<Resource>emptyList();
+        return Collections.emptyList();
     }
 
     /**
@@ -1073,7 +1069,7 @@ public class MavenProjectStub
     @Override
     public List<Resource> getTestResources()
     {
-        return Collections.<Resource>emptyList();
+        return Collections.emptyList();
     }
 
     /**
@@ -1164,7 +1160,7 @@ public class MavenProjectStub
     @Override
     public Set<Artifact> getArtifacts()
     {
-        return Collections.<Artifact>emptySet();
+        return Collections.emptySet();
     }
 
     /**
@@ -1175,7 +1171,7 @@ public class MavenProjectStub
     @Override
     public Map<String, Artifact> getArtifactMap()
     {
-        return Collections.<String, Artifact>emptyMap();
+        return Collections.emptyMap();
     }
 
     /**
@@ -1197,7 +1193,7 @@ public class MavenProjectStub
     @Override
     public Set<Artifact> getPluginArtifacts()
     {
-        return Collections.<Artifact>emptySet();
+        return Collections.emptySet();
     }
 
     /**
@@ -1208,7 +1204,7 @@ public class MavenProjectStub
     @Override
     public Map<String, Artifact> getPluginArtifactMap()
     {
-        return Collections.<String, Artifact>emptyMap();
+        return Collections.emptyMap();
     }
 
     /**
@@ -1230,7 +1226,7 @@ public class MavenProjectStub
     @Override
     public Set<Artifact> getReportArtifacts()
     {
-        return Collections.<Artifact>emptySet();
+        return Collections.emptySet();
     }
 
     /**
@@ -1241,7 +1237,7 @@ public class MavenProjectStub
     @Override
     public Map<String, Artifact> getReportArtifactMap()
     {
-        return Collections.<String, Artifact>emptyMap();
+        return Collections.emptyMap();
     }
 
     /**
@@ -1263,7 +1259,7 @@ public class MavenProjectStub
     @Override
     public Set<Artifact> getExtensionArtifacts()
     {
-        return Collections.<Artifact>emptySet();
+        return Collections.emptySet();
     }
 
     /**
@@ -1274,7 +1270,7 @@ public class MavenProjectStub
     @Override
     public Map<String, Artifact> getExtensionArtifactMap()
     {
-        return Collections.<String, Artifact>emptyMap();
+        return Collections.emptyMap();
     }
 
     /**
@@ -1307,7 +1303,7 @@ public class MavenProjectStub
     @Override
     public List<Repository> getRepositories()
     {
-        return Collections.<Repository>emptyList();
+        return Collections.emptyList();
     }
 
     /**
@@ -1318,7 +1314,7 @@ public class MavenProjectStub
     @Override
     public List<ReportPlugin> getReportPlugins()
     {
-        return Collections.<ReportPlugin>emptyList();
+        return Collections.emptyList();
     }
 
     /**
@@ -1329,7 +1325,7 @@ public class MavenProjectStub
     @Override
     public List<Plugin> getBuildPlugins()
     {
-        return Collections.<Plugin>emptyList();
+        return Collections.emptyList();
     }
 
     /**
@@ -1340,7 +1336,7 @@ public class MavenProjectStub
     @Override
     public List<String> getModules()
     {
-        return Collections.<String>emptyList();
+        return Collections.emptyList();
     }
 
     /**
@@ -1357,6 +1353,7 @@ public class MavenProjectStub
     /**
      * By default, do nothing.
      */
+    @SuppressWarnings( "EmptyMethod" )
     public void addPlugin( Plugin plugin )
     {
         // nop
@@ -1367,6 +1364,7 @@ public class MavenProjectStub
      *
      * @param plugin
      */
+    @SuppressWarnings( "EmptyMethod" )
     public void injectPluginManagementInfo( Plugin plugin )
     {
         // nop
@@ -1419,7 +1417,7 @@ public class MavenProjectStub
     @Override
     public List<Repository> getPluginRepositories()
     {
-        return Collections.<Repository>emptyList();
+        return Collections.emptyList();
     }
 
     /** {@inheritDoc} */
@@ -1575,7 +1573,7 @@ public class MavenProjectStub
     @Override
     public List<Extension> getBuildExtensions()
     {
-        return Collections.<Extension>emptyList();
+        return Collections.emptyList();
     }
 
     /**
@@ -1587,7 +1585,7 @@ public class MavenProjectStub
     public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String string,
                                           ArtifactFilter artifactFilter )
     {
-        return Collections.<Artifact>emptySet();
+        return Collections.emptySet();
     }
 
     /**
@@ -1631,7 +1629,7 @@ public class MavenProjectStub
     @Override
     public List<String> getFilters()
     {
-        return Collections.<String>emptyList();
+        return Collections.emptyList();
     }
 
     /**
@@ -1642,7 +1640,7 @@ public class MavenProjectStub
     @Override
     public Map<String, MavenProject> getProjectReferences()
     {
-        return Collections.<String, MavenProject>emptyMap();
+        return Collections.emptyMap();
     }
 
     /** {@inheritDoc} */

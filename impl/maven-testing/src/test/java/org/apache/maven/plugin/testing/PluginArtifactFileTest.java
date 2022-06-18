@@ -30,7 +30,6 @@ public class PluginArtifactFileTest
     private static final String FS = System.getProperty( "file.separator" );
     
     public void testArtifact()
-        throws Exception
     {
         MojoExecution execution = newMojoExecution( "parameters" ); // TODO dedicated test mojo
 
