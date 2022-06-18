@@ -96,7 +96,7 @@ public class DefaultLifecycleTaskSegmentCalculator
         {
             if ( isGoalSpecification( task ) )
             {
-                // "pluginPrefix:goal" or "groupId:artifactId[:version]:goal"
+                // "pluginPrefix[:version]:goal" or "groupId:artifactId[:version]:goal"
 
                 lifecyclePluginResolver.resolveMissingPluginVersions( session.getTopLevelProject(), session );
 
