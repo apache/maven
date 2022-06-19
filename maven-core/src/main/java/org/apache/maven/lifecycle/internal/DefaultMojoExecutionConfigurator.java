@@ -156,28 +156,37 @@ public class DefaultMojoExecutionConfigurator
 
         unknownParameters = getUnknownParameters( mojoExecution, parametersNamesAll );
 
-        unknownParameters.forEach(
-            name ->
-            {
-                MessageBuilder messageBuilder = MessageUtils.buffer()
-                    .warning( "Parameter '" )
-                    .warning( name )
-                    .warning( "' is unknown for plugin '" )
-                    .warning( mojoExecution.getArtifactId() ).warning( ":" )
-                    .warning( mojoExecution.getVersion() ).warning( ":" )
-                    .warning( mojoExecution.getGoal() );
-
-                if ( mojoExecution.getExecutionId() != null )
+        unknownParameters.stream()
+            .filter( parameterName -> isNotReportPluginsForMavenSite( parameterName, mojoExecution ) )
+            .forEach(
+                name ->
                 {
-                    messageBuilder.warning( " (" );
-                    messageBuilder.warning( mojoExecution.getExecutionId() );
-                    messageBuilder.warning( ")" );
-                }
+                    MessageBuilder messageBuilder = MessageUtils.buffer()
+                        .warning( "Parameter '" )
+                        .warning( name )
+                        .warning( "' is unknown for plugin '" )
+                        .warning( mojoExecution.getArtifactId() ).warning( ":" )
+                        .warning( mojoExecution.getVersion() ).warning( ":" )
+                        .warning( mojoExecution.getGoal() );
 
-                messageBuilder.warning( "'" );
+                    if ( mojoExecution.getExecutionId() != null )
+                    {
+                        messageBuilder.warning( " (" );
+                        messageBuilder.warning( mojoExecution.getExecutionId() );
+                        messageBuilder.warning( ")" );
+                    }
 
-                logger.warn( messageBuilder.toString() );
-            } );
+                    messageBuilder.warning( "'" );
+
+                    logger.warn( messageBuilder.toString() );
+                } );
+    }
+
+    private boolean isNotReportPluginsForMavenSite( String parameterName,
+                                                    MojoExecution mojoExecution )
+    {
+        return !( "reportPlugins".equals( parameterName )
+            && "maven-site-plugin".equals( mojoExecution.getArtifactId() ) );
     }
 
     private Stream<String> getParameterNames( Parameter parameter )
