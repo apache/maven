@@ -159,7 +159,7 @@ public class MojoExecution
 
     public void setConfiguration( Dom configuration )
     {
-        this.configuration = new org.codehaus.plexus.util.xml.Xpp3Dom( configuration );
+        this.configuration = configuration != null ? new org.codehaus.plexus.util.xml.Xpp3Dom( configuration ) : null;
     }
 
     public String identify()
