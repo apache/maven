@@ -20,11 +20,13 @@ package org.apache.maven.api;
  */
 
 import org.apache.maven.api.annotations.Consumer;
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * A listener for session events.
  */
+@Experimental
 @FunctionalInterface @Consumer
 public interface Listener
 {

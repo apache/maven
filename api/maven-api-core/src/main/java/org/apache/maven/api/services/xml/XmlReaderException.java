@@ -19,11 +19,13 @@ package org.apache.maven.api.services.xml;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.services.MavenException;
 
 /**
  * 
  */
+@Experimental
 public class XmlReaderException
         extends MavenException
 {

@@ -24,9 +24,11 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.Service;
 
+@Experimental
 public interface XmlFactory<T> extends Service
 {
 

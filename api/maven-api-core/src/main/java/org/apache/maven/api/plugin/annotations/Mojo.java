@@ -26,12 +26,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.apache.maven.api.annotations.Experimental;
+
 /**
  * This annotation will mark your class as a Mojo (ie. goal in a Maven plugin).
  *
  * @author Olivier Lamy
  * @since 3.0
  */
+@Experimental
 @Documented
 @Retention( RetentionPolicy.CLASS )
 @Target( ElementType.TYPE )

@@ -19,6 +19,7 @@ package org.apache.maven.api;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.stream.Stream;
 /**
  * Represents a dependency node within a Maven project's dependency collector.
  */
+@Experimental
 @Immutable
 public interface Node
 {

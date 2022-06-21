@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
  */
 
 import org.apache.maven.api.Service;
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 import java.nio.file.Path;
@@ -27,6 +28,7 @@ import java.nio.file.Path;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
 
+@Experimental
 public interface ProjectBuilder extends Service
 {
 

@@ -19,6 +19,7 @@ package org.apache.maven.api;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 import java.util.Optional;
@@ -28,6 +29,7 @@ import java.util.Optional;
  * Such events can be listened to using {@link Listener}s objects
  * registered in the {@link Session}.
  */
+@Experimental
 public interface Event
 {
 

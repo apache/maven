@@ -19,10 +19,13 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
+
 /**
  * An artifact could not correctly being deployed.
  * 
  */
+@Experimental
 public class ArtifactDeployerException
     extends MavenException
 {

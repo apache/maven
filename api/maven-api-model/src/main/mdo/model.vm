@@ -39,6 +39,7 @@
     #set ( $dummy = $imports.add( "java.util.Collections" ) )
     #set ( $dummy = $imports.add( "java.util.HashMap" ) )
     #set ( $dummy = $imports.add( "java.util.Map" ) )
+    #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Experimental" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Generated" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Immutable" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Nonnull" ) )
@@ -94,6 +95,7 @@ import $imp;
  * ${line.trim()}
     #end
  */
+@Experimental
 @Generated @ThreadSafe @Immutable
 public class ${class.name}
     #if ( $class.superClass )

@@ -19,8 +19,10 @@ package org.apache.maven.api;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nullable;
 
+@Experimental
 public interface Exclusion
 {
     @Nullable

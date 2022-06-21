@@ -24,9 +24,11 @@ import java.nio.file.Path;
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Service;
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Repository;
 
+@Experimental
 public interface RepositoryFactory extends Service
 {
 

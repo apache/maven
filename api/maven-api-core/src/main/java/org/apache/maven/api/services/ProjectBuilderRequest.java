@@ -19,6 +19,7 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
@@ -32,6 +33,7 @@ import org.apache.maven.api.Artifact;
 
 import static org.apache.maven.api.services.BaseRequest.nonNull;
 
+@Experimental
 @Immutable
 public interface ProjectBuilderRequest
 {

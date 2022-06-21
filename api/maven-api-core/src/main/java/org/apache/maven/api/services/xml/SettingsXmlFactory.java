@@ -19,8 +19,10 @@ package org.apache.maven.api.services.xml;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.settings.Settings;
 
+@Experimental
 public interface SettingsXmlFactory extends XmlFactory<Settings>
 {
 

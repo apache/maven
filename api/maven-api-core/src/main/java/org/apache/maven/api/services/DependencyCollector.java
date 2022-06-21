@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
  */
 
 import org.apache.maven.api.Service;
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 import org.apache.maven.api.Session;
@@ -36,6 +37,7 @@ import org.apache.maven.api.Project;
  * @author Robert Scholte
  * @author Guillaume Nodet
  */
+@Experimental
 public interface DependencyCollector extends Service
 {
 

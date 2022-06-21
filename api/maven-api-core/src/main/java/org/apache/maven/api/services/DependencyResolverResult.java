@@ -22,12 +22,14 @@ package org.apache.maven.api.services;
 import java.util.List;
 
 import org.apache.maven.api.Node;
+import org.apache.maven.api.annotations.Experimental;
 
 /**
  * 
  * @author Robert Scholte
  *
  */
+@Experimental
 public interface DependencyResolverResult
 {
     /**

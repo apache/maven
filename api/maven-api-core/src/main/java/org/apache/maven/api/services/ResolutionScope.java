@@ -19,11 +19,14 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
+
 /**
  * Resolution scope
  * TODO: merge this with {@link org.apache.maven.api.plugin.annotations.ResolutionScope}
  * TODO: should this simply be an EnumSet<Scope> instead ?
  */
+@Experimental
 public enum ResolutionScope
 {
     Compile,

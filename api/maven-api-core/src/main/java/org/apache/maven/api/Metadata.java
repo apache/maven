@@ -19,9 +19,12 @@ package org.apache.maven.api;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
+
 /**
  * TODO: investigate removing the Metadata api completely
  */
+@Experimental
 public interface Metadata
 {
 

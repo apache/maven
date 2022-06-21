@@ -19,6 +19,8 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
+
 /**
  * Describes a problem that was encountered during settings building. A problem can either be an exception that was
  * thrown or a simple string message. In addition, a problem carries a hint about its source, e.g. the settings file
@@ -27,6 +29,7 @@ package org.apache.maven.api.services;
  * @author Benjamin Bentmann
  * @author Robert Scholte
  */
+@Experimental
 public interface ProjectBuilderProblem
 {
 

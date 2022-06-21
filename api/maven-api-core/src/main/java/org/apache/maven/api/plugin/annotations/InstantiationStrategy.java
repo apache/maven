@@ -19,12 +19,15 @@ package org.apache.maven.api.plugin.annotations;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
+
 /**
  * Component instantiation strategy.
  *
  * @author Hervé Boutemy
  * @since 3.0
  */
+@Experimental
 public enum InstantiationStrategy
 {
     PER_LOOKUP( "per-lookup" ),

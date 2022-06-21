@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
  */
 
 import org.apache.maven.api.Service;
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 import java.nio.file.Path;
@@ -29,6 +30,7 @@ import java.util.Optional;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Metadata;
 
+@Experimental
 public interface ArtifactManager extends Service
 {
 

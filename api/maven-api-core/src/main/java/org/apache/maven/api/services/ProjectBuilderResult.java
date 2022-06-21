@@ -19,6 +19,7 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 import java.nio.file.Path;
@@ -27,6 +28,7 @@ import java.util.Optional;
 
 import org.apache.maven.api.Project;
 
+@Experimental
 public interface ProjectBuilderResult
 {
 

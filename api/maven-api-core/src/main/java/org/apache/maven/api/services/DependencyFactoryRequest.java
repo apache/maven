@@ -19,6 +19,7 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
@@ -31,6 +32,7 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.annotations.NotThreadSafe;
 
+@Experimental
 @Immutable
 public interface DependencyFactoryRequest
 {

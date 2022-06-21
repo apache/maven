@@ -19,6 +19,7 @@ package org.apache.maven.api;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.ThreadSafe;
 
 /**
@@ -29,6 +30,7 @@ import org.apache.maven.api.annotations.ThreadSafe;
  * 
  * @see Session#getService(Class) 
  */
+@Experimental
 @ThreadSafe
 public interface Service
 {

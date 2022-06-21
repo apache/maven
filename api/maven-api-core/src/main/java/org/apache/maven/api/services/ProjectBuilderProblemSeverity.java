@@ -19,9 +19,12 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
+
 /**
  * The different severity levels for a problem, in decreasing order.
  */
+@Experimental
 public enum ProjectBuilderProblemSeverity
 {
 

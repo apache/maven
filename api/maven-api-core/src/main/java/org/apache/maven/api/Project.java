@@ -19,6 +19,7 @@ package org.apache.maven.api;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 import java.nio.file.Path;
@@ -30,6 +31,7 @@ import org.apache.maven.api.model.Model;
 /**
  * Interface representing a Maven project.
  */
+@Experimental
 public interface Project
 {
 

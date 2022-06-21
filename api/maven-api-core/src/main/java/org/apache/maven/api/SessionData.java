@@ -19,6 +19,7 @@ package org.apache.maven.api;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.annotations.Provider;
@@ -37,6 +38,7 @@ import java.util.function.Supplier;
  * 
  * @see Session#getData()
  */
+@Experimental
 @ThreadSafe @Provider
 public interface SessionData
 {

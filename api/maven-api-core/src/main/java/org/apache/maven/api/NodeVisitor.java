@@ -21,6 +21,7 @@ package org.apache.maven.api;
 
 
 import org.apache.maven.api.annotations.Consumer;
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
@@ -29,6 +30,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * @author Pim Moerenhout
  * @since 0.12
  */
+@Experimental
 @Consumer
 public interface NodeVisitor
 {

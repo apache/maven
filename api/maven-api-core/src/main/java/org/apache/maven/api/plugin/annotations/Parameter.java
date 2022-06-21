@@ -26,6 +26,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.apache.maven.api.annotations.Experimental;
+
 /**
  * Used to configure your Mojo parameters to be injected by
  * <a href="/ref/current/maven-core/apidocs/org/apache/maven/plugin/MavenPluginManager.html">
@@ -38,6 +40,7 @@ import java.lang.annotation.Target;
  * @author Olivier Lamy
  * @since 3.0
  */
+@Experimental
 @Documented
 @Retention( RetentionPolicy.CLASS )
 @Target( { ElementType.FIELD } )

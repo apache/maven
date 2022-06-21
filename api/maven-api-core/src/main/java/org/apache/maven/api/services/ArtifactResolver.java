@@ -22,10 +22,12 @@ package org.apache.maven.api.services;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.annotations.Experimental;
 
 /**
  * Resolves the artifact, i.e download the file when required and attach it to the artifact
  */
+@Experimental
 public interface ArtifactResolver extends Service
 {
 

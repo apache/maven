@@ -20,6 +20,7 @@ package org.apache.maven.api.plugin;
  */
 
 import org.apache.maven.api.annotations.Consumer;
+import org.apache.maven.api.annotations.Experimental;
 
 /**
  * This interface forms the contract required for <code>Mojos</code> to interact with the <code>Maven</code>
@@ -27,6 +28,7 @@ import org.apache.maven.api.annotations.Consumer;
  * It features an <code>execute()</code> method, which triggers the Mojo's build-process behavior, and can throw
  * a MojoException if error conditions occur.<br>
  */
+@Experimental
 @FunctionalInterface @Consumer
 public interface Mojo
 {

@@ -19,6 +19,9 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
+
+@Experimental
 public class MavenException extends RuntimeException
 {
     public MavenException()

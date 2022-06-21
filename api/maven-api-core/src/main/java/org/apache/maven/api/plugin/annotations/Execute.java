@@ -26,12 +26,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.apache.maven.api.annotations.Experimental;
+
 /**
  * Used if your Mojo needs to fork a <a href="/ref/3.0.4/maven-core/lifecycles.html">lifecycle</a>.
  *
  * @author Olivier Lamy
  * @since 3.0
  */
+@Experimental
 @Documented
 @Retention( RetentionPolicy.CLASS )
 @Target( ElementType.TYPE )

@@ -19,11 +19,13 @@ package org.apache.maven.api.plugin;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.services.MavenException;
 
 /**
  * An exception occurring during the execution of a plugin.<br>
  */
+@Experimental
 public class MojoException
     extends MavenException
 {

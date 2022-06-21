@@ -1,4 +1,4 @@
-package org.apache.maven.api;
+package org.apache.maven.api.annotations;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,20 +19,16 @@ package org.apache.maven.api;
  * under the License.
  */
 
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-import org.apache.maven.api.model.Plugin;
-
-@Experimental
-public interface MojoExecution
+/**
+ * This annotation tags types that are part of an experimental API.
+ * Classes or methods annotated with this annotation may be changed / removed without notice.
+ */
+@Documented
+@Retention( RetentionPolicy.CLASS )
+public @interface Experimental
 {
-    @Nonnull
-    Plugin getPlugin();
-
-    @Nonnull
-    String getExecutionId();
-
-    @Nonnull
-    String getGoal();
 }

@@ -19,6 +19,9 @@ package org.apache.maven.api;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
+
+@Experimental
 public interface JavaToolchain extends Toolchain
 {
 

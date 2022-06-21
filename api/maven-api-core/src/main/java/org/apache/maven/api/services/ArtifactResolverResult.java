@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
  */
 
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.annotations.Experimental;
 
 /**
  * The Artifact Result
@@ -27,6 +28,7 @@ import org.apache.maven.api.Artifact;
  * @author Robert Scholte
  * @since 3.0
  */
+@Experimental
 public interface ArtifactResolverResult
 {
     /**

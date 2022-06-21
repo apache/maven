@@ -19,10 +19,13 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
+
 /**
  * Thrown in case of bad artifact descriptors, version ranges or other issues encountered during calculation of the
  * dependency graph.
  */
+@Experimental
 public class DependencyCollectorException
     extends MavenException
 {

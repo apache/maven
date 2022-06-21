@@ -21,8 +21,10 @@ package org.apache.maven.api;
 
 import java.nio.file.Path;
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
+@Experimental
 public interface LocalRepository extends Repository
 {
 

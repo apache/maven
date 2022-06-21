@@ -19,9 +19,12 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
+
 /**
  * The Exception class in case a resolving does not work.
  */
+@Experimental
 public class ProjectBuilderException
     extends MavenException
 {

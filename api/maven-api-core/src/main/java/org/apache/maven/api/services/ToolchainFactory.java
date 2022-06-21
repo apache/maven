@@ -20,7 +20,9 @@ package org.apache.maven.api.services;
  */
 
 import org.apache.maven.api.annotations.Consumer;
+import org.apache.maven.api.annotations.Experimental;
 
+@Experimental
 @Consumer
 public interface ToolchainFactory
 {

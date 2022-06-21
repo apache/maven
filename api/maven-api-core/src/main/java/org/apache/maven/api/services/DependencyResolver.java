@@ -26,6 +26,7 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
@@ -36,6 +37,7 @@ import org.apache.maven.api.annotations.Nullable;
  * @author Robert Scholte
  * @author Guillaume Nodet
  */
+@Experimental
 public interface DependencyResolver extends Service
 {
     /**

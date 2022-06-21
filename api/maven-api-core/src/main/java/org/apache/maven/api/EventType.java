@@ -19,6 +19,8 @@ package org.apache.maven.api;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
+
 /**
  * The possible types of execution events.
  *
@@ -26,6 +28,7 @@ package org.apache.maven.api;
  *       we need to align on one strategy
  *       see also {@link MetadataStorage} and {@link org.apache.maven.api.services.ResolutionScope}
  */
+@Experimental
 public enum EventType
 {
     ProjectDiscoveryStarted,

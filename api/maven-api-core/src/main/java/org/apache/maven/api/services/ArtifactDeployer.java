@@ -25,11 +25,13 @@ import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * 
  */
+@Experimental
 public interface ArtifactDeployer extends Service
 {
 

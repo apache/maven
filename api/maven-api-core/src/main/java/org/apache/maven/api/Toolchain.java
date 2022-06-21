@@ -21,9 +21,12 @@ package org.apache.maven.api;
 
 import java.util.Map;
 
+import org.apache.maven.api.annotations.Experimental;
+
 /**
  * Toolchain interface.
  */
+@Experimental
 public interface Toolchain
 {
     /**

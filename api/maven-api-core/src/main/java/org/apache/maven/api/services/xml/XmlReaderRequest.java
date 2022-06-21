@@ -24,10 +24,12 @@ import java.io.Reader;
 import java.net.URL;
 import java.nio.file.Path;
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 
+@Experimental
 @Immutable
 public interface XmlReaderRequest
 {

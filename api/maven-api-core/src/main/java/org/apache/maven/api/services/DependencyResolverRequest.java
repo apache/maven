@@ -19,6 +19,7 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
@@ -42,6 +43,7 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
 /**
  * A request to collect and resolve a dependency graph.
  */
+@Experimental
 @Immutable
 public interface DependencyResolverRequest extends DependencyCollectorRequest
 {

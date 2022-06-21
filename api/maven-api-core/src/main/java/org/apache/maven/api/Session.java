@@ -19,6 +19,7 @@ package org.apache.maven.api;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.ThreadSafe;
 
@@ -36,6 +37,7 @@ import org.apache.maven.api.settings.Settings;
 /**
  * The session to install / deploy / resolve artifacts and dependencies.
  */
+@Experimental
 @ThreadSafe
 public interface Session
 {

@@ -25,7 +25,9 @@ import java.util.Map;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Toolchain;
+import org.apache.maven.api.annotations.Experimental;
 
+@Experimental
 public interface ToolchainManager extends Service
 {
 

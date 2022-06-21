@@ -19,6 +19,7 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import org.apache.maven.api.Session;
 /**
  * Base class for requests.
  */
+@Experimental
 abstract class BaseRequest
 {
 

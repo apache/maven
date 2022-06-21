@@ -19,6 +19,7 @@ package org.apache.maven.api;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Immutable;
 
@@ -28,6 +29,7 @@ import java.util.Optional;
 /**
  * TODO: split between Coordinates / AttachedArtifact / ResolvedArtifact ?
  */
+@Experimental
 @Immutable
 public interface Artifact
 {

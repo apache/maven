@@ -19,6 +19,7 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
@@ -33,6 +34,7 @@ import org.apache.maven.api.Artifact;
 /**
  * A request for installing one or more artifacts in the local repository.
  */
+@Experimental
 @Immutable
 public interface ArtifactInstallerRequest
 {

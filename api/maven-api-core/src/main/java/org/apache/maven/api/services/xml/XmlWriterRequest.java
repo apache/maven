@@ -22,6 +22,9 @@ package org.apache.maven.api.services.xml;
 import java.io.OutputStream;
 import java.io.Writer;
 
+import org.apache.maven.api.annotations.Experimental;
+
+@Experimental
 public interface XmlWriterRequest<T>
 {
 

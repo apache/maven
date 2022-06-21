@@ -25,10 +25,12 @@ import java.util.Collections;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.annotations.Experimental;
 
 /**
  * @author Robert Scholte
  */
+@Experimental
 public interface ArtifactInstaller extends Service
 {
     /**

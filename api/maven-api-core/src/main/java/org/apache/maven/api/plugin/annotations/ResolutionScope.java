@@ -19,6 +19,8 @@ package org.apache.maven.api.plugin.annotations;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
+
 /**
  * Dependencies resolution scopes available before
  * <a href="/ref/current/maven-core/apidocs/org/apache/maven/lifecycle/internal/MojoExecutor.html">mojo execution</a>.
@@ -29,6 +31,7 @@ package org.apache.maven.api.plugin.annotations;
  * @author Hervé Boutemy
  * @since 3.0
  */
+@Experimental
 public enum ResolutionScope
 {
     /**

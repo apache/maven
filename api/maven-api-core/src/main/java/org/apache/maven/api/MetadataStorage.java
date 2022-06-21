@@ -19,9 +19,12 @@ package org.apache.maven.api;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
+
 /**
  * Storage location for metadata
  */
+@Experimental
 public enum MetadataStorage
 {
     GROUP,

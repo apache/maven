@@ -27,7 +27,9 @@ import org.apache.maven.api.Metadata;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Experimental;
 
+@Experimental
 public interface LocalRepositoryManager extends Service
 {
 

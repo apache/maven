@@ -19,6 +19,7 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
@@ -29,6 +30,7 @@ import org.apache.maven.api.annotations.NotThreadSafe;
 /**
  * A request for resolving an artifact.
  */
+@Experimental
 @Immutable
 public interface ArtifactResolverRequest
 {

@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
  */
 
 import org.apache.maven.api.Service;
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 import java.nio.file.Path;
@@ -36,6 +37,7 @@ import org.apache.maven.api.Session;
 /**
  * Interface to manage the project during its lifecycle
  */
+@Experimental
 public interface ProjectManager extends Service
 {
     /**
