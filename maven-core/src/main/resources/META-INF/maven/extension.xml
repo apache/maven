@@ -74,6 +74,7 @@ under the License.
     <exportedPackage>org.eclipse.aether.transfer</exportedPackage>
     <exportedPackage>org.eclipse.aether.transform</exportedPackage>
     <exportedPackage>org.eclipse.aether.version</exportedPackage>
+    <exportedPackage>org.eclipse.aether.util</exportedPackage>
 
     <!-- plexus-classworlds -->
     <exportedPackage>org.codehaus.plexus.classworlds</exportedPackage>
@@ -171,6 +172,8 @@ under the License.
     <exportedArtifact>org.apache.maven.resolver:maven-resolver-api</exportedArtifact>
     <exportedArtifact>org.apache.maven.resolver:maven-resolver-spi</exportedArtifact>
     <exportedArtifact>org.apache.maven.resolver:maven-resolver-impl</exportedArtifact>
+    <exportedArtifact>org.apache.maven.resolver:maven-resolver-util</exportedArtifact>
+    <exportedArtifact>org.apache.maven.resolver:maven-resolver-connector-basic</exportedArtifact>
 
     <exportedArtifact>javax.inject:javax.inject</exportedArtifact>
     <exportedArtifact>javax.annotation:javax.annotation-api</exportedArtifact>
@@ -186,6 +189,8 @@ under the License.
     <exportedArtifact>org.eclipse.aether:aether-api</exportedArtifact>
     <exportedArtifact>org.eclipse.aether:aether-spi</exportedArtifact>
     <exportedArtifact>org.eclipse.aether:aether-impl</exportedArtifact>
+    <exportedArtifact>org.eclipse.aether:aether-util</exportedArtifact>
+    <exportedArtifact>org.eclipse.aether:aether-connector-basic</exportedArtifact>
 
     <!--
       | NOTE: Don't exclude the wagons or any of their dependencies (apart from the wagon API). This would otherwise

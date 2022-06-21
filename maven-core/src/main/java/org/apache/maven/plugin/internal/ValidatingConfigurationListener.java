@@ -36,7 +36,6 @@ import org.codehaus.plexus.component.configurator.ConfigurationListener;
 class ValidatingConfigurationListener
     implements ConfigurationListener
 {
-
     private final Object mojo;
 
     private final ConfigurationListener delegate;
@@ -93,5 +92,4 @@ class ValidatingConfigurationListener
             missingParameters.remove( fieldName );
         }
     }
-
 }

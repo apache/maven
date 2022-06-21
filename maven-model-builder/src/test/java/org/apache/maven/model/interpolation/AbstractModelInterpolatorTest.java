@@ -213,7 +213,7 @@ public abstract class AbstractModelInterpolatorTest
     public void shouldInterpolateDependencyVersionToSetSameAsProjectVersion() throws Exception
     {
         Model model = Model.newBuilder().version(  "3.8.1" )
-                .dependencies( Collections.singletonList( Dependency.newBuilder().version( "${version}" ).build() ) )
+                .dependencies( Collections.singletonList( Dependency.newBuilder().version( "${project.version}" ).build() ) )
                 .build();
 
         ModelInterpolator interpolator = createInterpolator();
@@ -221,7 +221,7 @@ public abstract class AbstractModelInterpolatorTest
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out = interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ),
                 collector );
-        assertCollectorState( 0, 0, 1, collector );
+        assertCollectorState( 0, 0, 0, collector );
 
         assertEquals( "3.8.1", ( out.getDependencies().get( 0 ) ).getVersion() );
     }
@@ -263,7 +263,7 @@ public abstract class AbstractModelInterpolatorTest
     {
         Model model = Model.newBuilder().version(  "3.8.1" ).artifactId( "foo" )
                 .dependencies( Collections.singletonList(
-                        Dependency.newBuilder().version( "${artifactId}-${version}" ).build() ) )
+                        Dependency.newBuilder().version( "${project.artifactId}-${project.version}" ).build() ) )
                 .build();
 
         ModelInterpolator interpolator = createInterpolator();
@@ -271,7 +271,7 @@ public abstract class AbstractModelInterpolatorTest
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out = interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ),
                 collector );
-        assertCollectorState( 0, 0, 2, collector );
+        assertCollectorState( 0, 0, 0, collector );
 
         assertEquals( "foo-3.8.1", ( out.getDependencies().get( 0 ) ).getVersion() );
     }
@@ -375,8 +375,7 @@ public abstract class AbstractModelInterpolatorTest
                 .build( Build.newBuilder()
                         .sourceDirectory( "correct" )
                         .resources( Arrays.asList(
-                                Resource.newBuilder().directory( "${project.build.sourceDirectory}" ).build(),
-                                Resource.newBuilder().directory( "${build.sourceDirectory}" ).build()
+                                Resource.newBuilder().directory( "${project.build.sourceDirectory}" ).build()
                         ) )
                         .build() )
                 .build();
@@ -385,13 +384,12 @@ public abstract class AbstractModelInterpolatorTest
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out = interpolator.interpolateModel( model, null, createModelBuildingRequest( context ), collector );
-        assertCollectorState( 0, 0, 1, collector );
+        assertCollectorState( 0, 0, 0, collector );
 
 
         List<Resource> outResources = out.getBuild().getResources();
         Iterator<Resource> resIt = outResources.iterator();
 
-        assertEquals( model.getBuild().getSourceDirectory(), resIt.next().getDirectory() );
         assertEquals( model.getBuild().getSourceDirectory(), resIt.next().getDirectory() );
     }
 

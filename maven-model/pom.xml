@@ -44,11 +44,6 @@ under the License.
       <artifactId>maven-xml-impl</artifactId>
       <version>4.0.0-alpha-1-SNAPSHOT</version>
     </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>

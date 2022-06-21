@@ -144,6 +144,7 @@ public class DefaultMavenPluginManager
     private PluginVersionResolver pluginVersionResolver;
     private PluginArtifactsCache pluginArtifactsCache;
     private MavenPluginValidator pluginValidator;
+    private List<MavenPluginConfigurationValidator> configurationValidators;
 
     private final ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
     private final PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
@@ -160,7 +161,8 @@ public class DefaultMavenPluginManager
             ExtensionRealmCache extensionRealmCache,
             PluginVersionResolver pluginVersionResolver,
             PluginArtifactsCache pluginArtifactsCache,
-            MavenPluginValidator pluginValidator )
+            MavenPluginValidator pluginValidator,
+            List<MavenPluginConfigurationValidator> configurationValidators )
     {
         this.container = container;
         this.classRealmManager = classRealmManager;
@@ -172,6 +174,7 @@ public class DefaultMavenPluginManager
         this.pluginVersionResolver = pluginVersionResolver;
         this.pluginArtifactsCache = pluginArtifactsCache;
         this.pluginValidator = pluginValidator;
+        this.configurationValidators = configurationValidators;
     }
 
     public synchronized PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories,
@@ -511,7 +514,7 @@ public class DefaultMavenPluginManager
 
         if ( logger.isDebugEnabled() )
         {
-            logger.debug( "Configuring mojo " + mojoDescriptor.getId() + " from plugin realm " + pluginRealm );
+            logger.debug( "Loading mojo " + mojoDescriptor.getId() + " from plugin realm " + pluginRealm );
         }
 
         // We are forcing the use of the plugin realm for all lookups that might occur during
@@ -606,7 +609,13 @@ public class DefaultMavenPluginManager
 
             ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
 
-            populatePluginFields( mojo, mojoDescriptor, pluginRealm, pomConfiguration, expressionEvaluator );
+            for ( MavenPluginConfigurationValidator validator: configurationValidators )
+            {
+                validator.validate( mojoDescriptor, pomConfiguration, expressionEvaluator );
+            }
+
+            populateMojoExecutionFields( mojo, mojoExecution.getExecutionId(), mojoDescriptor, pluginRealm,
+                                         pomConfiguration, expressionEvaluator );
 
             return mojo;
         }
@@ -617,8 +626,9 @@ public class DefaultMavenPluginManager
         }
     }
 
-    private void populatePluginFields( Object mojo, MojoDescriptor mojoDescriptor, ClassRealm pluginRealm,
-                                       PlexusConfiguration configuration, ExpressionEvaluator expressionEvaluator )
+    private void populateMojoExecutionFields( Object mojo, String executionId, MojoDescriptor mojoDescriptor,
+                                              ClassRealm pluginRealm, PlexusConfiguration configuration,
+                                              ExpressionEvaluator expressionEvaluator )
         throws PluginConfigurationException
     {
         ComponentConfigurator configurator = null;
@@ -641,8 +651,8 @@ public class DefaultMavenPluginManager
             ValidatingConfigurationListener validator =
                 new ValidatingConfigurationListener( mojo, mojoDescriptor, listener );
 
-            logger.debug(
-                "Configuring mojo '" + mojoDescriptor.getId() + "' with " + configuratorId + " configurator -->" );
+            logger.debug( "Configuring mojo execution '" + mojoDescriptor.getId() + ':' + executionId + "' with "
+                + configuratorId + " configurator -->" );
 
             configurator.configureComponent( mojo, configuration, expressionEvaluator, pluginRealm, validator );
 

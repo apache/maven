@@ -69,7 +69,7 @@ public class StringVisitorModelInterpolator
     public Model interpolateModel( Model model, File projectDir, ModelBuildingRequest config,
                                    ModelProblemCollector problems )
     {
-        List<? extends ValueSource> valueSources = createValueSources( model, projectDir, config, problems );
+        List<? extends ValueSource> valueSources = createValueSources( model, projectDir, config );
         List<? extends InterpolationPostProcessor> postProcessors =
             createPostProcessors( model, projectDir, config );
 

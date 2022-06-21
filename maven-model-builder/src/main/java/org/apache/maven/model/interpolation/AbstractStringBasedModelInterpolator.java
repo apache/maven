@@ -37,7 +37,6 @@ import org.apache.maven.model.path.UrlNormalizer;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
-import org.codehaus.plexus.interpolation.ObjectBasedValueSource;
 import org.codehaus.plexus.interpolation.PrefixAwareRecursionInterceptor;
 import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
 import org.codehaus.plexus.interpolation.PrefixedValueSourceWrapper;
@@ -95,21 +94,14 @@ public abstract class AbstractStringBasedModelInterpolator
     }
 
     protected List<ValueSource> createValueSources( final Model model, final File projectDir,
-                                                    final ModelBuildingRequest config,
-                                                    final ModelProblemCollector problems )
+                                                    final ModelBuildingRequest config )
     {
         Properties modelProperties = model.getProperties();
 
         ValueSource projectPrefixValueSource = new PrefixedObjectValueSource( PROJECT_PREFIXES, model, false );
-        ValueSource prefixlessObjectBasedValueSource = new ObjectBasedValueSource( model );
-        if ( config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
-        {
-            prefixlessObjectBasedValueSource =
-                    new ProblemDetectingValueSource( prefixlessObjectBasedValueSource, "", "project.", problems );
-        }
 
         // NOTE: Order counts here!
-        List<ValueSource> valueSources = new ArrayList<>( 9 );
+        List<ValueSource> valueSources = new ArrayList<>( 8 );
 
         if ( projectDir != null )
         {
@@ -159,8 +151,6 @@ public abstract class AbstractStringBasedModelInterpolator
                 return config.getSystemProperties().getProperty( "env." + expression );
             }
         } );
-
-        valueSources.add( prefixlessObjectBasedValueSource );
 
         return valueSources;
     }

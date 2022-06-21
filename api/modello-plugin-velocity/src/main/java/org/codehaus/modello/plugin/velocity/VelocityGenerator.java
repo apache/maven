@@ -39,6 +39,7 @@ import org.codehaus.modello.model.Version;
 import org.codehaus.modello.plugin.AbstractModelloGenerator;
 import org.codehaus.modello.plugin.ModelloGenerator;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.io.CachingWriter;
 
 @Component( role = ModelloGenerator.class, hint = "velocity" )
 public class VelocityGenerator

@@ -82,6 +82,24 @@ import org.slf4j.LoggerFactory;
 @Named
 public class DefaultRepositorySystemSessionFactory
 {
+    private static final String MAVEN_RESOLVER_TRANSPORT_KEY = "maven.resolver.transport";
+
+    private static final String MAVEN_RESOLVER_TRANSPORT_DEFAULT = "default";
+
+    private static final String MAVEN_RESOLVER_TRANSPORT_WAGON = "wagon";
+
+    private static final String MAVEN_RESOLVER_TRANSPORT_NATIVE = "native";
+
+    private static final String MAVEN_RESOLVER_TRANSPORT_AUTO = "auto";
+
+    private static final String WAGON_TRANSPORTER_PRIORITY_KEY = "aether.priority.WagonTransporterFactory";
+
+    private static final String NATIVE_HTTP_TRANSPORTER_PRIORITY_KEY = "aether.priority.HttpTransporterFactory";
+
+    private static final String NATIVE_FILE_TRANSPORTER_PRIORITY_KEY = "aether.priority.FileTransporterFactory";
+
+    private static final String RESOLVER_MAX_PRIORITY = String.valueOf( Float.MAX_VALUE );
+
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private final ArtifactHandlerManager artifactHandlerManager;
@@ -122,6 +140,7 @@ public class DefaultRepositorySystemSessionFactory
         this.runtimeInformation = runtimeInformation;
     }
 
+    @SuppressWarnings( "checkstyle:methodLength" )
     public DefaultRepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
@@ -229,6 +248,45 @@ public class DefaultRepositorySystemSessionFactory
             configProps.put( "aether.connector.perms.dirMode." + server.getId(), server.getDirectoryPermissions() );
         }
         session.setAuthenticationSelector( authSelector );
+
+        Object transport = configProps.getOrDefault( MAVEN_RESOLVER_TRANSPORT_KEY, MAVEN_RESOLVER_TRANSPORT_DEFAULT );
+        if ( MAVEN_RESOLVER_TRANSPORT_DEFAULT.equals( transport ) )
+        {
+            // The "default" mode (user did not set anything) needs to tweak resolver default priorities
+            // that are coded like this (default values):
+            //
+            // org.eclipse.aether.transport.http.HttpTransporterFactory.priority = 5.0f;
+            // org.eclipse.aether.transport.wagon.WagonTransporterFactory.priority = -1.0f;
+            //
+            // Hence, as both are present on classpath, HttpTransport would be selected, while
+            // we want to retain "default" behaviour of Maven and use Wagon. To achieve that,
+            // we set explicitly priority of WagonTransport to 6.0f (just above of HttpTransport),
+            // to make it "win" over HttpTransport. We do this to NOT interfere with possibly
+            // installed OTHER transports and their priorities, as unlike "wagon" or "native"
+            // transport setting, that sets priorities to MAX, hence prevents any 3rd party
+            // transport to get into play (inhibits them), in default mode we want to retain
+            // old behavior. Also, this "default" mode is different from "auto" setting,
+            // as it does not alter resolver priorities at all, and uses priorities as is.
+
+            configProps.put( WAGON_TRANSPORTER_PRIORITY_KEY, "6" );
+        }
+        else if ( MAVEN_RESOLVER_TRANSPORT_NATIVE.equals( transport ) )
+        {
+            // Make sure (whatever extra priority is set) that resolver native is selected
+            configProps.put( NATIVE_FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY );
+            configProps.put( NATIVE_HTTP_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY );
+        }
+        else if ( MAVEN_RESOLVER_TRANSPORT_WAGON.equals( transport ) )
+        {
+            // Make sure (whatever extra priority is set) that wagon is selected
+            configProps.put( WAGON_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY );
+        }
+        else if ( !MAVEN_RESOLVER_TRANSPORT_AUTO.equals( transport ) )
+        {
+            throw new IllegalArgumentException( "Unknown resolver transport '" + transport
+                    + "'. Supported transports are: " + MAVEN_RESOLVER_TRANSPORT_WAGON + ", "
+                    + MAVEN_RESOLVER_TRANSPORT_NATIVE + ", " + MAVEN_RESOLVER_TRANSPORT_AUTO );
+        }
 
         session.setTransferListener( request.getTransferListener() );
 
