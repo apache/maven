@@ -54,7 +54,7 @@ under the License.
     <mockitoVersion>3.2.0</mockitoVersion>
     <plexusVersion>2.1.0</plexusVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
-    <plexusUtilsVersion>3.4.2</plexusUtilsVersion>
+    <plexusUtilsVersion>4.0.0-alpha-1-SNAPSHOT</plexusUtilsVersion>
     <guiceVersion>4.2.3</guiceVersion>
     <guavaVersion>30.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
@@ -84,6 +84,7 @@ under the License.
     <module>maven-model-transform</module>
     <module>api</module>
     <module>maven-xml-impl</module>
+    <module>plexus-utils</module>
     <module>maven-core</module>
     <module>maven-settings</module>
     <module>maven-settings-builder</module>
@@ -570,6 +571,7 @@ under the License.
               <exclude>src/main/appended-resources/licenses/MIT-slf4j-api-1.7.30.txt</exclude>
               <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
               <exclude>src/main/appended-resources/licenses/unrecognized-javax.annotation-api-1.3.2.txt</exclude>
+              <exclude>plexus-utils/target/**</exclude>
             </excludes>
           </configuration>
         </plugin>
