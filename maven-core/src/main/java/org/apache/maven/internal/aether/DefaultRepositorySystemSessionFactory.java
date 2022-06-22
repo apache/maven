@@ -81,6 +81,20 @@ public class DefaultRepositorySystemSessionFactory
 
     private static final String RESOLVER_MAX_PRIORITY = String.valueOf( Float.MAX_VALUE );
 
+    private static final String MAVEN_RESOLVER_LOCKING_KEY = "maven.resolver.locking";
+
+    private static final String MAVEN_RESOLVER_LOCKING_DEFAULT = "default";
+
+    private static final String MAVEN_RESOLVER_LOCKING_LOCAL = "local";
+
+    private static final String MAVEN_RESOLVER_LOCKING_FILE = "file";
+
+    private static final String MAVEN_RESOLVER_LOCKING_AUTO = "auto";
+
+    private static final String MAVEN_RESOLVER_LOCKING_LOCK_FACTORY_KEY = "aether.syncContext.named.factory";
+
+    private static final String MAVEN_RESOLVER_LOCKING_NAME_MAPPER_KEY = "aether.syncContext.named.nameMapper";
+
     @Inject
     private Logger logger;
 
@@ -280,6 +294,25 @@ public class DefaultRepositorySystemSessionFactory
             throw new IllegalArgumentException( "Unknown resolver transport '" + transport
                     + "'. Supported transports are: " + MAVEN_RESOLVER_TRANSPORT_WAGON + ", "
                     + MAVEN_RESOLVER_TRANSPORT_NATIVE + ", " + MAVEN_RESOLVER_TRANSPORT_AUTO );
+        }
+
+        Object locking = configProps.getOrDefault( MAVEN_RESOLVER_LOCKING_KEY, MAVEN_RESOLVER_LOCKING_DEFAULT );
+        if ( MAVEN_RESOLVER_LOCKING_DEFAULT.equals( locking ) || MAVEN_RESOLVER_LOCKING_FILE.equals( locking ) )
+        {
+            // The "default" mode (user did not set anything) is same as "file" mode
+            configProps.put( MAVEN_RESOLVER_LOCKING_LOCK_FACTORY_KEY, "file-lock" );
+            configProps.put( MAVEN_RESOLVER_LOCKING_NAME_MAPPER_KEY, "file-gav" );
+        }
+        else if ( MAVEN_RESOLVER_LOCKING_LOCAL.equals( locking ) )
+        {
+            configProps.put( MAVEN_RESOLVER_LOCKING_LOCK_FACTORY_KEY, "rwlock-local" );
+            configProps.put( MAVEN_RESOLVER_LOCKING_NAME_MAPPER_KEY, "gav" );
+        }
+        else if ( !MAVEN_RESOLVER_LOCKING_AUTO.equals( locking ) )
+        {
+            throw new IllegalArgumentException( "Unknown resolver locking mode '" + transport
+                    + "'. Supported locking modes are: " + MAVEN_RESOLVER_LOCKING_FILE + ", "
+                    + MAVEN_RESOLVER_LOCKING_LOCAL + ", " + MAVEN_RESOLVER_LOCKING_AUTO );
         }
 
         session.setTransferListener( request.getTransferListener() );
