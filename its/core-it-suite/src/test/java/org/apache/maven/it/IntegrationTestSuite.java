@@ -706,6 +706,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng0249ResolveDepsFromReactorTest.class );
         suite.addTestSuite( MavenITmng0187CollectedProjectsTest.class );
         suite.addTestSuite( MavenITmng0095ReactorFailureBehaviorTest.class );
+        suite.addTestSuite( MavenIT0199CyclicImportScopeTest.class );
         suite.addTestSuite( MavenIT0146InstallerSnapshotNaming.class );
         suite.addTestSuite( MavenIT0145ReactorWithIncludesExcludesTest.class );
         suite.addTestSuite( MavenIT0144LifecycleExecutionOrderTest.class );
