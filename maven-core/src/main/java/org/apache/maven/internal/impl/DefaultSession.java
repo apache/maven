@@ -45,6 +45,7 @@ import org.apache.maven.api.services.DependencyCollector;
 import org.apache.maven.api.services.DependencyFactory;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.LocalRepositoryManager;
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.api.services.ProjectBuilder;
 import org.apache.maven.api.services.ProjectManager;
 import org.apache.maven.api.services.Prompter;
@@ -287,6 +288,10 @@ public class DefaultSession extends AbstractSession
         else if ( clazz == Prompter.class )
         {
             return (T) new DefaultPrompter( container );
+        }
+        else if ( clazz == MessageBuilderFactory.class )
+        {
+            return (T) new DefaultMessageBuilderFactory();
         }
         throw new NoSuchElementException( clazz.getName() );
     }
