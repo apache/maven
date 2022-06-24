@@ -301,16 +301,16 @@ public class DefaultRepositorySystemSessionFactory
         }
 
         Object locking = configProps.getOrDefault( MAVEN_RESOLVER_LOCKING_KEY, MAVEN_RESOLVER_LOCKING_DEFAULT );
-        if ( MAVEN_RESOLVER_LOCKING_DEFAULT.equals( locking ) || MAVEN_RESOLVER_LOCKING_FILE.equals( locking ) )
+        if ( MAVEN_RESOLVER_LOCKING_DEFAULT.equals( locking ) || MAVEN_RESOLVER_LOCKING_LOCAL.equals( locking ) )
         {
-            // The "default" mode (user did not set anything) is same as "file" mode
-            configProps.put( MAVEN_RESOLVER_LOCKING_LOCK_FACTORY_KEY, "file-lock" );
-            configProps.put( MAVEN_RESOLVER_LOCKING_NAME_MAPPER_KEY, "file-gav" );
-        }
-        else if ( MAVEN_RESOLVER_LOCKING_LOCAL.equals( locking ) )
-        {
+            // The "default" mode (user did not set anything) is same as "local" mode
             configProps.put( MAVEN_RESOLVER_LOCKING_LOCK_FACTORY_KEY, "rwlock-local" );
             configProps.put( MAVEN_RESOLVER_LOCKING_NAME_MAPPER_KEY, "gav" );
+        }
+        else if ( MAVEN_RESOLVER_LOCKING_FILE.equals( locking ) )
+        {
+            configProps.put( MAVEN_RESOLVER_LOCKING_LOCK_FACTORY_KEY, "file-lock" );
+            configProps.put( MAVEN_RESOLVER_LOCKING_NAME_MAPPER_KEY, "file-gav" );
         }
         else if ( MAVEN_RESOLVER_LOCKING_HAZELCAST.equals( locking ) )
         {
