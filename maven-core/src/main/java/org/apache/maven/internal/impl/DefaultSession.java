@@ -47,6 +47,7 @@ import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.LocalRepositoryManager;
 import org.apache.maven.api.services.ProjectBuilder;
 import org.apache.maven.api.services.ProjectManager;
+import org.apache.maven.api.services.Prompter;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.ToolchainManager;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
@@ -57,6 +58,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
+import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -75,13 +77,15 @@ public class DefaultSession extends AbstractSession
     private final DefaultToolchainManagerPrivate toolchainManagerPrivate;
     private final ArtifactManager artifactManager = new DefaultArtifactManager();
     private final ProjectManager projectManager = new DefaultProjectManager( artifactManager );
+    private final PlexusContainer container;
 
     public DefaultSession( @Nonnull MavenSession session,
                            @Nonnull RepositorySystem repositorySystem,
                            @Nullable List<RemoteRepository> repositories,
                            @Nonnull org.apache.maven.project.ProjectBuilder projectBuilder,
                            @Nonnull MavenRepositorySystem mavenRepositorySystem,
-                           @Nonnull DefaultToolchainManagerPrivate toolchainManagerPrivate )
+                           @Nonnull DefaultToolchainManagerPrivate toolchainManagerPrivate,
+                           @Nonnull PlexusContainer container )
     {
         this.mavenSession = nonNull( session );
         this.session = mavenSession.getRepositorySession();
@@ -93,6 +97,7 @@ public class DefaultSession extends AbstractSession
         this.projectBuilder = projectBuilder;
         this.mavenRepositorySystem = mavenRepositorySystem;
         this.toolchainManagerPrivate = toolchainManagerPrivate;
+        this.container = container;
     }
 
     MavenSession getMavenSession()
@@ -199,7 +204,7 @@ public class DefaultSession extends AbstractSession
         MavenSession newSession = new MavenSession( mavenSession.getContainer(), repoSession,
                 mavenSession.getRequest(), mavenSession.getResult() );
         return new DefaultSession( newSession, repositorySystem,
-                repositories, projectBuilder, mavenRepositorySystem, toolchainManagerPrivate );
+                repositories, projectBuilder, mavenRepositorySystem, toolchainManagerPrivate, container );
     }
 
     @Nonnull
@@ -207,7 +212,7 @@ public class DefaultSession extends AbstractSession
     public Session withRemoteRepositories( @Nonnull List<RemoteRepository> repositories )
     {
         return new DefaultSession( mavenSession, repositorySystem,
-                repositories, projectBuilder, mavenRepositorySystem, toolchainManagerPrivate );
+                repositories, projectBuilder, mavenRepositorySystem, toolchainManagerPrivate, container );
     }
 
     @Nonnull
@@ -278,6 +283,10 @@ public class DefaultSession extends AbstractSession
         else if ( clazz == ToolchainsXmlFactory.class )
         {
             return (T) new DefaultToolchainsXmlFactory();
+        }
+        else if ( clazz == Prompter.class )
+        {
+            return (T) new DefaultPrompter( container );
         }
         throw new NoSuchElementException( clazz.getName() );
     }

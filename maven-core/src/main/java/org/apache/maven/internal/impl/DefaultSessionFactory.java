@@ -28,6 +28,7 @@ import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
+import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.SessionData;
 
@@ -39,17 +40,20 @@ public class DefaultSessionFactory
     private final org.apache.maven.project.ProjectBuilder projectBuilder;
     private final MavenRepositorySystem mavenRepositorySystem;
     private final DefaultToolchainManagerPrivate toolchainManagerPrivate;
+    private final PlexusContainer plexusContainer;
 
     @Inject
     public DefaultSessionFactory( RepositorySystem repositorySystem,
                                   ProjectBuilder projectBuilder,
                                   MavenRepositorySystem mavenRepositorySystem,
-                                  DefaultToolchainManagerPrivate toolchainManagerPrivate )
+                                  DefaultToolchainManagerPrivate toolchainManagerPrivate,
+                                  PlexusContainer plexusContainer )
     {
         this.repositorySystem = repositorySystem;
         this.projectBuilder = projectBuilder;
         this.mavenRepositorySystem = mavenRepositorySystem;
         this.toolchainManagerPrivate = toolchainManagerPrivate;
+        this.plexusContainer = plexusContainer;
     }
 
     public Session getSession( MavenSession mavenSession )
@@ -70,6 +74,6 @@ public class DefaultSessionFactory
     {
         return new DefaultSession(
                 mavenSession, repositorySystem, null,
-                projectBuilder, mavenRepositorySystem, toolchainManagerPrivate );
+                projectBuilder, mavenRepositorySystem, toolchainManagerPrivate, plexusContainer );
     }
 }
