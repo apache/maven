@@ -136,4 +136,11 @@ public class DefaultMessageBuilder implements MessageBuilder
         delegate.format( s, objects );
         return this;
     }
+
+    @Override
+    @Nonnull
+    public String build()
+    {
+        return delegate.toString();
+    }
 }

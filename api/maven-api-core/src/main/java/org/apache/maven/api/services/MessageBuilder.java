@@ -144,4 +144,12 @@ public interface MessageBuilder
      */
     @Nonnull
     MessageBuilder format( String pattern, Object... args );
+
+    /**
+     * Return the built message.
+     * @return the message
+     */
+    @Nonnull
+    String build();
+
 }
