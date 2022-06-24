@@ -89,6 +89,10 @@ public class DefaultRepositorySystemSessionFactory
 
     private static final String MAVEN_RESOLVER_LOCKING_FILE = "file";
 
+    private static final String MAVEN_RESOLVER_LOCKING_HAZELCAST = "hazelcast";
+
+    private static final String MAVEN_RESOLVER_LOCKING_REDISSON = "redisson";
+
     private static final String MAVEN_RESOLVER_LOCKING_AUTO = "auto";
 
     private static final String MAVEN_RESOLVER_LOCKING_LOCK_FACTORY_KEY = "aether.syncContext.named.factory";
@@ -307,6 +311,16 @@ public class DefaultRepositorySystemSessionFactory
         {
             configProps.put( MAVEN_RESOLVER_LOCKING_LOCK_FACTORY_KEY, "rwlock-local" );
             configProps.put( MAVEN_RESOLVER_LOCKING_NAME_MAPPER_KEY, "gav" );
+        }
+        else if ( MAVEN_RESOLVER_LOCKING_HAZELCAST.equals( locking ) )
+        {
+            configProps.put( MAVEN_RESOLVER_LOCKING_LOCK_FACTORY_KEY, "semaphore-hazelcast-client" );
+            configProps.put( MAVEN_RESOLVER_LOCKING_NAME_MAPPER_KEY, "discriminating" );
+        }
+        else if ( MAVEN_RESOLVER_LOCKING_REDISSON.equals( locking ) )
+        {
+            configProps.put( MAVEN_RESOLVER_LOCKING_LOCK_FACTORY_KEY, "rwlock-redisson" );
+            configProps.put( MAVEN_RESOLVER_LOCKING_NAME_MAPPER_KEY, "discriminating" );
         }
         else if ( !MAVEN_RESOLVER_LOCKING_AUTO.equals( locking ) )
         {
