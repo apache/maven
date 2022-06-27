@@ -59,7 +59,7 @@ under the License.
     <guiceVersion>4.2.3</guiceVersion>
     <guavaVersion>30.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
-    <wagonVersion>3.5.1</wagonVersion>
+    <wagonVersion>3.5.2</wagonVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <cipherVersion>2.0</cipherVersion>
     <modelloVersion>2.0.0</modelloVersion>
