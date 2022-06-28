@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ParentXMLFilterTest
     extends AbstractXMLFilterTests
 {
-    private Function<XmlPullParser, ParentXMLFilter> filterCreator;
+    private Function<XmlPullParser, XmlPullParser> filterCreator;
 
     @BeforeEach
     void reset() {
@@ -41,22 +41,93 @@ public class ParentXMLFilterTest
     }
 
     @Override
-    protected ParentXMLFilter getFilter( XmlPullParser parser )
+    protected XmlPullParser getFilter( XmlPullParser parser )
     {
-        Function<XmlPullParser, ParentXMLFilter> filterCreator =
+        Function<XmlPullParser, XmlPullParser> filterCreator =
             (this.filterCreator != null ? this.filterCreator : this::createFilter);
         return filterCreator.apply(parser);
     }
 
-    protected ParentXMLFilter createFilter( XmlPullParser parser ) {
+    protected XmlPullParser createFilter( XmlPullParser parser ) {
         return createFilter( parser,
                 x -> Optional.of(new RelativeProject("GROUPID", "ARTIFACTID", "1.0.0")),
                 Paths.get( "pom.xml").toAbsolutePath() );
     }
 
-    protected ParentXMLFilter createFilter( XmlPullParser parser, Function<Path, Optional<RelativeProject>> pathMapper, Path projectPath ) {
-        ParentXMLFilter filter = new ParentXMLFilter( parser, pathMapper, projectPath );
-        return filter;
+    protected XmlPullParser createFilter( XmlPullParser parser, Function<Path, Optional<RelativeProject>> pathMapper, Path projectPath ) {
+        return new ParentXMLFilter( new FastForwardFilter( parser ), pathMapper, projectPath );
+    }
+
+    @Test
+    public void testWithFastForward()
+        throws Exception
+    {
+        String input = "<project>"
+                        + "<build>"
+                            + "<plugins>"
+                                + "<plugin>"
+                                    + "<configuration>"
+                                        + "<parent>"
+                                            + "<groupId>GROUPID</groupId>"
+                                            + "<artifactId>ARTIFACTID</artifactId>"
+                                        + "</parent>"
+                                    + "</configuration>"
+                                + "</plugin>"
+                            + "</plugins>"
+                        + "</build>"
+                    + "</project>";
+        String expected = input;
+
+        String actual = transform( input );
+
+        assertEquals( expected, actual );
+    }
+
+    @Test
+    public void testWithFastForwardAfterByPass()
+            throws Exception
+    {
+        String input = "<project>"
+                        + "<build>"
+                            + "<plugins>"
+                                + "<plugin>"
+                                    + "<configuration>"
+                                        + "<parent>"
+                                            + "<groupId>GROUPID</groupId>"
+                                            + "<artifactId>ARTIFACTID</artifactId>"
+                                        + "</parent>"
+                                    + "</configuration>"
+                                + "</plugin>"
+                            + "</plugins>"
+                        + "</build>"
+                        + "<parent>"
+                            + "<groupId>GROUPID</groupId>"
+                            + "<artifactId>ARTIFACTID</artifactId>"
+                        + "</parent>"
+                    + "</project>";
+        String expected = "<project>"
+                            + "<build>"
+                                + "<plugins>"
+                                    + "<plugin>"
+                                        + "<configuration>"
+                                            + "<parent>"
+                                                + "<groupId>GROUPID</groupId>"
+                                                + "<artifactId>ARTIFACTID</artifactId>"
+                                            + "</parent>"
+                                        + "</configuration>"
+                                    + "</plugin>"
+                                + "</plugins>"
+                            + "</build>"
+                            + "<parent>"
+                                + "<groupId>GROUPID</groupId>"
+                                + "<artifactId>ARTIFACTID</artifactId>"
+                                + "<version>1.0.0</version>"
+                            + "</parent>"
+                        + "</project>";
+
+        String actual = transform( input );
+
+        assertEquals( expected, actual );
     }
 
     @Test

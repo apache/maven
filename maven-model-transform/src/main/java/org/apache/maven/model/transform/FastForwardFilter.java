@@ -28,8 +28,9 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- * This filter will skip all following filters and write directly to the output.
- * Should be used in case of a DOM that should not be effected by other filters, even though the elements match.
+ * This filter will bypass all following filters and write directly to the output.
+ * Should be used in case of a DOM that should not be effected by other filters,
+ * even though the elements match.
  *
  * @author Robert Scholte
  * @author Guillaume Nodet
@@ -59,7 +60,22 @@ class FastForwardFilter extends BufferingParser
     }
 
     @Override
-    protected boolean accept() throws XmlPullParserException, IOException
+    public int next() throws XmlPullParserException, IOException
+    {
+        int event = super.next();
+        filter();
+        return event;
+    }
+
+    @Override
+    public int nextToken() throws XmlPullParserException, IOException
+    {
+        int event = super.nextToken();
+        filter();
+        return event;
+    }
+
+    protected void filter() throws XmlPullParserException, IOException
     {
         if ( xmlPullParser.getEventType() == START_TAG )
         {
@@ -70,7 +86,7 @@ class FastForwardFilter extends BufferingParser
             }
             else
             {
-                final String key = state.peek() + '/' + localName;
+                final String key = state.peekLast() + '/' + localName;
                 switch ( key )
                 {
                     case "execution/configuration":
@@ -79,8 +95,11 @@ class FastForwardFilter extends BufferingParser
                     case "profile/reports":
                     case "project/reports":
                     case "reportSet/configuration":
+                        if ( domDepth == 0 )
+                        {
+                            bypass( true );
+                        }
                         domDepth++;
-                        disable();
                         break;
                     default:
                         break;
@@ -90,14 +109,20 @@ class FastForwardFilter extends BufferingParser
         }
         else if ( xmlPullParser.getEventType() == END_TAG )
         {
-            domDepth--;
-            if ( domDepth == 0 )
+            if ( domDepth > 0 )
             {
-                enable();
+                if ( --domDepth == 0 )
+                {
+                    bypass( false );
+                }
             }
-            state.pop();
+            state.removeLast();
         }
-        return true;
     }
 
+    @Override
+    public void bypass( boolean bypass )
+    {
+        this.bypass = bypass;
+    }
 }
