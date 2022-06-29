@@ -55,7 +55,6 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Comparator.comparing;
 
 /**
@@ -215,8 +214,7 @@ public class DefaultGraphBuilder
 
         if ( StringUtils.isNotEmpty( request.getResumeFrom() ) )
         {
-            File reactorDirectory = !isNullOrEmpty( request.getBaseDirectory() )
-                    ? new File( request.getBaseDirectory() ) : null;
+            File reactorDirectory = projectSelector.getBaseDirectoryFromRequest( request );
 
             String selector = request.getResumeFrom();
 

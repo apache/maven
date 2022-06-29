@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-
 public final class ProjectSelector
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( ProjectSelector.class );
@@ -43,8 +41,7 @@ public final class ProjectSelector
             throws MavenExecutionException
     {
         Set<MavenProject> selectedProjects = new LinkedHashSet<>();
-        File baseDirectory = !isNullOrEmpty( request.getBaseDirectory() )
-                ? new File( request.getBaseDirectory() ) : null;
+        File baseDirectory = getBaseDirectoryFromRequest( request );
         for ( String selector : projectSelectors )
         {
             Optional<MavenProject> optSelectedProject = findOptionalProject( projects, baseDirectory, selector );
@@ -73,8 +70,7 @@ public final class ProjectSelector
     {
         Set<MavenProject> resolvedOptionalProjects = new LinkedHashSet<>();
         Set<String> unresolvedOptionalSelectors = new HashSet<>();
-        File baseDirectory = !isNullOrEmpty( request.getBaseDirectory() )
-                ? new File( request.getBaseDirectory() ) : null;
+        File baseDirectory = getBaseDirectoryFromRequest( request );
         for ( String selector : projectSelectors )
         {
             Optional<MavenProject> optSelectedProject = findOptionalProject( projects, baseDirectory, selector );
@@ -104,6 +100,11 @@ public final class ProjectSelector
         return projects.stream()
                 .filter( project -> isMatchingProject( project, selector, reactorDirectory ) )
                 .findFirst();
+    }
+
+    File getBaseDirectoryFromRequest( MavenExecutionRequest request )
+    {
+        return request.getBaseDirectory() != null ? new File( request.getBaseDirectory() ) : null;
     }
 
     boolean isMatchingProject( MavenProject project, String selector, File reactorDirectory )

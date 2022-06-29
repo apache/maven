@@ -649,7 +649,7 @@ public class DefaultMaven
         final Set<String> allOptionalSelectors = Sets.union( projectActivation.getOptionalActiveProjectSelectors(),
                 projectActivation.getOptionalInactiveProjectSelectors() );
         // We intentionally ignore the results of this method.
-        // As a side effect it will log the optional projects that could not be resolve.
+        // As a side effect it will log the optional projects that could not be resolved.
         projectSelector.getOptionalProjectsBySelectors( request, session.getAllProjects(), allOptionalSelectors );
     }
 
