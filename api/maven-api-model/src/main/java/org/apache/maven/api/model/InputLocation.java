@@ -22,7 +22,6 @@ package org.apache.maven.api.model;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -69,8 +68,7 @@ public class InputLocation
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
-        this.locations = locations != null
-                ? Collections.unmodifiableMap( new HashMap<>( locations ) ) : Collections.emptyMap();
+        this.locations = ImmutableCollections.copy( locations );
     }
 
     public int getLineNumber()

@@ -482,11 +482,19 @@ public class ${class.name}
                 return base;
             }
     #if ( $locationTracking )
-            Map<Object, InputLocation> locations = new HashMap<>( this.locations != null ? this.locations : ( base != null ? base.locations : Collections.emptyMap() ) );
-            InputLocation location = locations.remove( "" );
+            Map<Object, InputLocation> locations = null;
+            InputLocation location = null;
       #foreach ( $field in $allFields )
-            InputLocation ${field.name}Location = locations.remove( "${field.name}" );
+            InputLocation ${field.name}Location = null;
       #end
+            if ( this.locations != null )
+            {
+                locations = this.locations;
+                location = locations.remove( "" );
+      #foreach ( $field in $allFields )
+                ${field.name}Location = locations.remove( "${field.name}" );
+      #end
+            }
     #end
             return new ${class.name}(
     #if ( $class == $root )
@@ -501,7 +509,7 @@ public class ${class.name}
       #end
     #end
     #if ( $locationTracking )
-                locations,
+                locations != null ? locations : ( base != null ? base.locations : null ),
       #set ( $sep = "#if(${allFields.size()}>0),#end" )
                 location != null ? location : ( base != null ? base.location : null )${sep}
       #foreach ( $field in $allFields )
