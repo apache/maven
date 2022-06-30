@@ -53,7 +53,9 @@ public class BuildToRawPomXMLFilterFactory
     public final XmlPullParser get( XmlPullParser orgParser, Path projectFile )
 
     {
-        XmlPullParser parser = orgParser;
+        // Ensure that xs:any elements aren't touched by next filters
+        XmlPullParser parser = orgParser instanceof FastForwardFilter
+                ? orgParser : new FastForwardFilter( orgParser );
 
         if ( getDependencyKeyToVersionMapper() != null )
         {
