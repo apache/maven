@@ -19,50 +19,44 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.apache.maven.its.bootstrap</groupId>
-    <artifactId>maven-it-boostrap</artifactId>
-    <version>1.0</version>
+    <groupId>org.apache.maven.its</groupId>
+    <artifactId>core-it-support</artifactId>
+    <version>2.1-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.apache.maven.its.bootstrap</groupId>
-  <artifactId>group-2</artifactId>
-  <version>1.0</version>
-  <packaging>jar</packaging>
-
-  <name>Maven Integration Test :: Boostrap :: Group-2</name>
+  <artifactId>maven-it-plugin-bootstrap</artifactId>
+  <packaging>maven-plugin</packaging>
+  <name>Bootstrap plugin</name>
 
   <properties>
-    <itPluginVersion>2.1-SNAPSHOT</itPluginVersion>
+    <mavenVersion>3.8.6</mavenVersion>
+    <mavenResolverVersion>1.8.1</mavenResolverVersion>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.maven.its</groupId>
-      <artifactId>core-it-extension</artifactId>
-      <version>${itPluginVersion}</version>
-      <scope>runtime</scope>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>${mavenVersion}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.its</groupId>
-      <artifactId>core-it-wagon</artifactId>
-      <version>${itPluginVersion}</version>
-      <scope>runtime</scope>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>${mavenVersion}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.its</groupId>
-      <artifactId>core-it-toolchain</artifactId>
-      <version>${itPluginVersion}</version>
-      <scope>runtime</scope>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-      <version>1.5.5</version>
-      <scope>runtime</scope>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-impl</artifactId>
+      <version>${mavenResolverVersion}</version>
     </dependency>
   </dependencies>
+
 </project>

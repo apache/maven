@@ -20,37 +20,37 @@ under the License.
 -->
 
 <settings>
-  <profiles>
-    <profile>
-      <id>it-bootstrap</id>
-      <!-- NOTE: We want everything to be fetched from the repo configured in the global settings -->
-      <repositories>
-        <repository>
-          <id>apache.snapshots</id>
-          <url>file:target/null</url>
-          <releases>
-            <enabled>false</enabled>
-          </releases>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-        </repository>
-      </repositories>
-      <pluginRepositories>
-        <pluginRepository>
-          <id>apache.snapshots</id>
-          <url>file:target/null</url>
-          <releases>
-            <enabled>false</enabled>
-          </releases>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-        </pluginRepository>
-      </pluginRepositories>
-    </profile>
-  </profiles>
-  <activeProfiles>
-    <activeProfile>it-bootstrap</activeProfile>
-  </activeProfiles>
+    <profiles>
+        <profile>
+            <id>it-bootstrap</id>
+            <!-- NOTE: We want everything to be fetched from the repo configured in the global settings -->
+            <repositories>
+                <repository>
+                    <id>apache.snapshots</id>
+                    <url>file:target/null</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>apache.snapshots</id>
+                    <url>file:target/null</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
+    <activeProfiles>
+        <activeProfile>it-bootstrap</activeProfile>
+    </activeProfiles>
 </settings>

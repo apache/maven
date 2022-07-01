@@ -68,8 +68,8 @@ under the License.
     <maven.site.path>core-its</maven.site.path>
     <maven.site.cache>${user.home}/maven-sites</maven.site.cache>
     <rat.ignoreErrors>true</rat.ignoreErrors>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
   <modules>

@@ -33,6 +33,7 @@ under the License.
   <description>Maven Core Integration Tests support tools.</description>
 
   <modules>
+    <module>maven-it-plugin-bootstrap</module>
     <module>core-it-plugins</module>
     <module>core-it-component</module>
     <module>core-it-toolchain</module>

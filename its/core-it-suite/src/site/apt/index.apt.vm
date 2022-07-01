@@ -52,11 +52,9 @@ mvn -Preporting site
  which obviously can't resolve anything. This setup using a file-based dummy repo also helps execution time,
  because this repo produces (expected) <<<404>>>s much faster than a HTTP-based repo.
 
- The one place where access to Central is desired is in the <<<MavenITBootstrapTest>>>
- ({{{./xref-test/org/apache/maven/it/MavenITBootstrapTest.html}src}},
- {{{./testapidocs/org/apache/maven/it/MavenITBootstrapTest.html}javadoc}}),
- which doesn't really test anything but just primes the local repo with any artifacts the ITs will need:
- you can see {{{./bootstrap.html}here}} the list of plugins and artifacts that are fetched during bootstrap.
+ The one place where access to Central is desired is by adding artifacts to the
+ {{{https://github.com/apache/maven-integration-testing/blob/master/core-it-suite/src/test/resources/bootstrap.txt}bootstrap.txt}} file,
+ which is used to prime the local repo with any artifacts the ITs will need.  This file should be kept sorted alphabetically for ease of use.
 
  So some care needs to be taken when introducing new dependencies into the ITs themselves or {{{../core-it-support/}the support plugins}}.
  Many times the failures that we encounter are discrepancies between actual artifact consumption required and

@@ -82,6 +82,8 @@ under the License.
     <proxy.nonProxyHosts>localhost</proxy.nonProxyHosts>
     <slf4jVersion>1.6.1</slf4jVersion>
     <jetty9Version>9.0.4.v20130625</jetty9Version>
+
+    <stubPluginVersion>0.1-stub-SNAPSHOT</stubPluginVersion>
   </properties>
 
   <dependencies>
@@ -207,7 +209,7 @@ under the License.
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <parallel>classes</parallel>
+              <parallel>suitesAndClasses</parallel>
               <threadCount>6</threadCount>
             </configuration>
           </plugin>

@@ -52,6 +52,7 @@ public class MavenITBootstrapTest
         verifier.setAutoclean( false );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
+        verifier.addCliOption( "-Dbootstrap=" + getClass().getResource( "/bootstrap.txt" ).toURI().getPath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

@@ -20,131 +20,44 @@ under the License.
 -->
 
 <project>
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.apache.maven.its.bootstrap</groupId>
-  <artifactId>maven-it-boostrap</artifactId>
-  <version>1.0</version>
-  <packaging>pom</packaging>
+    <groupId>org.apache.maven.its.bootstrap</groupId>
+    <artifactId>maven-it-boostrap</artifactId>
+    <version>1.0</version>
+    <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: Boostrap</name>
-  <description>
-    This project pulls down all the artifacts/plugins required for the IT suite. Due to MNG-2974, snapshot versions of
-    plugins cannot be downloaded by Maven from non-default repositories configured in the POM if the plugin is invoked
-    directly from the command line. Also, having this in a central place spares us from copying the snapshot repo
-    config all around in the IT POMs.
-  </description>
+    <name>Maven Integration Test :: Boostrap</name>
+    <description>
+        This project pulls down all the artifacts/plugins required for the IT suite. Due to MNG-2974, snapshot versions of
+        plugins cannot be downloaded by Maven from non-default repositories configured in the POM if the plugin is invoked
+        directly from the command line. Also, having this in a central place spares us from copying the snapshot repo
+        config all around in the IT POMs.
+    </description>
 
-  <modules>
-    <!-- Dependencies are split into groups when conflict resolution would otherwise prevent downloads -->
-    <module>group-1</module>
-    <module>group-2</module>
-    <module>group-3</module>
-    <module>group-4</module>
-    <module>group-5</module>
-    <module>group-6</module>
-    <module>group-7</module>
-    <module>group-8</module>
-    <module>group-9</module>
-    <module>group-10</module>
-    <module>group-11</module>
-    <module>group-12</module>
-    <module>group-13</module>
-    <module>group-14</module>
-    <module>group-15</module>
-  </modules>
+    <properties>
+        <maven.test.skip>true</maven.test.skip>
+    </properties>
 
-  <properties>
-    <maven.test.skip>true</maven.test.skip>
-  </properties>
-
-  <build>
-    <!-- This merely locks the plugin versions to disable auto-update -->
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.0.2</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.2</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-ejb-plugin</artifactId>
-        <version>2.5.1</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>2.7</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-ear-plugin</artifactId>
-        <version>2.8</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>2.6</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.12.4</version>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>flatten-maven-plugin</artifactId>
-        <version>1.0.0</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.1.0</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-wrapper-plugin</artifactId>
-        <version>3.1.0</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.1.1</version>
-        <configuration>
-          <includeScope>runtime</includeScope>
-          <prependGroupId>true</prependGroupId>
-        </configuration>
-        <executions>
-          <execution>
-            <id>get-all-plugins-deps</id>
-            <phase>pre-integration-test</phase>
-            <inherited>false</inherited><!-- only parent pom selects plugins -->
-            <goals>
-              <goal>resolve-plugins</goal>
-            </goals>
-            <configuration>
-              <outputFile>${project.build.directory}/resolve-plugins.txt</outputFile>
-            </configuration>
-          </execution>
-          <execution>
-            <id>get-all-deps</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>resolve</goal>
-            </goals>
-            <configuration>
-              <sort>true</sort>
-              <outputScope>false</outputScope>
-              <outputFile>${project.build.directory}/resolve.txt</outputFile>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+    <build>
+        <!-- This merely locks the plugin versions to disable auto-update -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.its</groupId>
+                <artifactId>maven-it-plugin-bootstrap</artifactId>
+                <version>2.1-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>download</goal>
+                        </goals>
+                        <configuration>
+                            <file>${bootstrap}</file>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
