@@ -173,7 +173,7 @@ public class ${class.name}
     public ${type} ${pfx}${cap}()
     {
       #if ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
-        return new WrapperList<${field.to}, org.apache.maven.api.model.${field.to}>(
+        return new WrapperList<${field.to}, ${packageModelV4}.${field.to}>(
                     () -> getDelegate().get${cap}(), l -> update( getDelegate().with${cap}( l ) ),
                     d -> new ${field.to}( d, this ), ${field.to}::getDelegate );
       #elseif ( $field.to == "String" && $field.type == "java.util.Properties" && $field.multiplicity == "*" )
@@ -251,13 +251,13 @@ public class ${class.name}
     #end
     public InputLocation getLocation( Object key )
     {
-        org.apache.maven.api.model.InputLocation loc = getDelegate().getLocation( key );
+        ${packageModelV4}.InputLocation loc = getDelegate().getLocation( key );
         return loc != null ? new InputLocation( loc ) : null;
     }
 
     public void setLocation( Object key, InputLocation location )
     {
-        update( org.apache.maven.api.model.${class.name}.newBuilder( getDelegate(), true )
+        update( ${packageModelV4}.${class.name}.newBuilder( getDelegate(), true )
                         .location( key, location.toApiLocation() ).build() );
     }
 
@@ -273,14 +273,14 @@ public class ${class.name}
       #if ( $field.to && $field.multiplicity != "*" )
         if ( oldDelegate == getDelegate().get${cap}() )
         {
-            update( getDelegate().with${cap}( ( org.apache.maven.api.model.${field.to} ) newDelegate ) );
+            update( getDelegate().with${cap}( ( ${packageModelV4}.${field.to} ) newDelegate ) );
             return true;
         }
       #elseif ( $field.type == "java.util.List" && $field.to != "String" )
         if ( getDelegate().get${cap}().contains( oldDelegate ) )
         {
-            List<org.apache.maven.api.model.${field.to}> list = new ArrayList<>( getDelegate().get${cap}() );
-            list.replaceAll( d -> d == oldDelegate ? ( org.apache.maven.api.model.${field.to} ) newDelegate : d );
+            List<${packageModelV4}.${field.to}> list = new ArrayList<>( getDelegate().get${cap}() );
+            list.replaceAll( d -> d == oldDelegate ? ( ${packageModelV4}.${field.to} ) newDelegate : d );
             update( getDelegate().with${cap}( list ) );
             return true;
         }
@@ -294,14 +294,14 @@ public class ${class.name}
         return false;
     }
 
-    public static List<org.apache.maven.api.model.${class.name}> ${Helper.uncapitalise(${class.name})}ToApiV4( List<${class.name}> list )
+    public static List<${packageModelV4}.${class.name}> ${Helper.uncapitalise(${class.name})}ToApiV4( List<${class.name}> list )
     {
-        return list != null ? new MappingList<>( list, ${class.name}::getDelegate, ${class.name}::new ) : null;
+        return list != null ? new WrapperList<>( list, ${class.name}::getDelegate, ${class.name}::new ) : null;
     }
 
-    public static List<${class.name}> ${Helper.uncapitalise(${class.name})}ToApiV3( List<org.apache.maven.api.model.${class.name}> list )
+    public static List<${class.name}> ${Helper.uncapitalise(${class.name})}ToApiV3( List<${packageModelV4}.${class.name}> list )
     {
-        return list != null ? new MappingList<>( list, ${class.name}::new, ${class.name}::getDelegate ) : null;
+        return list != null ? new WrapperList<>( list, ${class.name}::new, ${class.name}::getDelegate ) : null;
     }
 
     #foreach ( $cs in $class.getCodeSegments($version) )
