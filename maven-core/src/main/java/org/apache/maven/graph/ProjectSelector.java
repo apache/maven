@@ -110,7 +110,7 @@ public final class ProjectSelector
     boolean isMatchingProject( MavenProject project, String selector, File reactorDirectory )
     {
         // [groupId]:artifactId
-        if ( selector.indexOf( ':' ) >= 0 )
+        if ( selector.contains( ":" ) )
         {
             String id = ':' + project.getArtifactId();
 

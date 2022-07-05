@@ -83,7 +83,7 @@ public class DefaultGraphBuilder
         this.pomlessCollectionStrategy = pomlessCollectionStrategy;
         this.multiModuleCollectionStrategy = multiModuleCollectionStrategy;
         this.requestPomCollectionStrategy = requestPomCollectionStrategy;
-        this.projectSelector = new ProjectSelector();
+        this.projectSelector = new ProjectSelector(); // if necessary switch to DI
     }
 
     @Override

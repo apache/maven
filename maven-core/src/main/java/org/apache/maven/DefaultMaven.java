@@ -137,7 +137,7 @@ public class DefaultMaven
         this.buildResumptionAnalyzer = buildResumptionAnalyzer;
         this.buildResumptionDataRepository = buildResumptionDataRepository;
         this.superPomProvider = superPomProvider;
-        this.projectSelector = new ProjectSelector();
+        this.projectSelector = new ProjectSelector(); // if necessary switch to DI
     }
 
     @Override
