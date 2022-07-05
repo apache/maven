@@ -26,12 +26,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Utility class to extract {@link MavenProject} from the project graph during the execution phase based on optional or
+ * required selectors.
+ */
 public final class ProjectSelector
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( ProjectSelector.class );
@@ -44,7 +49,8 @@ public final class ProjectSelector
         File baseDirectory = getBaseDirectoryFromRequest( request );
         for ( String selector : projectSelectors )
         {
-            Optional<MavenProject> optSelectedProject = findOptionalProject( projects, baseDirectory, selector );
+            Optional<MavenProject> optSelectedProject =
+                    findOptionalProjectBySelector( projects, baseDirectory, selector );
             if ( !optSelectedProject.isPresent() )
             {
                 String message = "Could not find the selected project in the reactor: " + selector;
@@ -54,12 +60,7 @@ public final class ProjectSelector
             MavenProject selectedProject = optSelectedProject.get();
 
             selectedProjects.add( selectedProject );
-
-            List<MavenProject> children = selectedProject.getCollectedProjects();
-            if ( children != null && request.isRecursive() )
-            {
-                selectedProjects.addAll( children );
-            }
+            selectedProjects.addAll( getChildProjects( selectedProject, request ) );
         }
 
         return selectedProjects;
@@ -73,10 +74,12 @@ public final class ProjectSelector
         File baseDirectory = getBaseDirectoryFromRequest( request );
         for ( String selector : projectSelectors )
         {
-            Optional<MavenProject> optSelectedProject = findOptionalProject( projects, baseDirectory, selector );
+            Optional<MavenProject> optSelectedProject =
+                    findOptionalProjectBySelector( projects, baseDirectory, selector );
             if ( optSelectedProject.isPresent() )
             {
                 resolvedOptionalProjects.add( optSelectedProject.get() );
+                resolvedOptionalProjects.addAll( getChildProjects( optSelectedProject.get(), request ) );
             }
             else
             {
@@ -94,8 +97,21 @@ public final class ProjectSelector
         return resolvedOptionalProjects;
     }
 
-    private Optional<MavenProject> findOptionalProject( List<MavenProject> projects, File reactorDirectory,
-                                                        String selector )
+    private List<MavenProject> getChildProjects( MavenProject parent, MavenExecutionRequest request )
+    {
+        final List<MavenProject> children = parent.getCollectedProjects();
+        if ( children != null && request.isRecursive() )
+        {
+            return children;
+        }
+        else
+        {
+            return new ArrayList<>();
+        }
+    }
+
+    private Optional<MavenProject> findOptionalProjectBySelector( List<MavenProject> projects, File reactorDirectory,
+                                                                  String selector )
     {
         return projects.stream()
                 .filter( project -> isMatchingProject( project, selector, reactorDirectory ) )
