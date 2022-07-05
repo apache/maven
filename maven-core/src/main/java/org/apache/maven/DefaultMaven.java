@@ -19,7 +19,6 @@ package org.apache.maven;
  * under the License.
  */
 
-import com.google.common.collect.Sets;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.BuildResumptionAnalyzer;
 import org.apache.maven.execution.BuildResumptionDataRepository;
@@ -646,8 +645,9 @@ public class DefaultMaven
     private void validateOptionalProjects( MavenExecutionRequest request, MavenSession session )
     {
         final ProjectActivation projectActivation = request.getProjectActivation();
-        final Set<String> allOptionalSelectors = Sets.union( projectActivation.getOptionalActiveProjectSelectors(),
-                projectActivation.getOptionalInactiveProjectSelectors() );
+        final Set<String> allOptionalSelectors = new HashSet<>();
+        allOptionalSelectors.addAll( projectActivation.getOptionalActiveProjectSelectors() );
+        allOptionalSelectors.addAll( projectActivation.getRequiredActiveProjectSelectors() );
         // We intentionally ignore the results of this method.
         // As a side effect it will log the optional projects that could not be resolved.
         projectSelector.getOptionalProjectsBySelectors( request, session.getAllProjects(), allOptionalSelectors );
