@@ -425,16 +425,20 @@ public class DefaultMavenPluginManager
         try
         {
             GenericVersionScheme versionScheme = new GenericVersionScheme();
-            Version version = versionScheme.parseVersion( "3.1.0" );
+            Version minimumVersion = versionScheme.parseVersion( "3.1.0" );
             for ( Artifact artifact : pluginArtifacts )
             {
                 if ( "org.apache.maven".equals( artifact.getGroupId() ) && "maven-plugin-api".equals(
                         artifact.getArtifactId() ) )
                 {
-                    logger.warn( "" );
-                    logger.warn( "Plugin " + plugin.getId()
-                            + " is old, please update to plugin supporting Maven 3.1+" );
-                    logger.warn( "" );
+                    Version mavenPluginApiVersion = versionScheme.parseVersion( artifact.getVersion() );
+                    if ( minimumVersion.compareTo( mavenPluginApiVersion ) > 0 )
+                    {
+                        logger.warn( "" );
+                        logger.warn( "Plugin " + plugin.getId()
+                                + " is old, please update to plugin supporting Maven 3.1+" );
+                        logger.warn( "" );
+                    }
                 }
             }
         }
