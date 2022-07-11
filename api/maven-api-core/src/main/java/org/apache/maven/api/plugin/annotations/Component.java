@@ -39,7 +39,7 @@ import org.apache.maven.api.annotations.Experimental;
 @Experimental
 @Documented
 @Retention( RetentionPolicy.CLASS )
-@Target( { ElementType.FIELD } )
+@Target( { ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER } )
 @Inherited
 public @interface Component
 {

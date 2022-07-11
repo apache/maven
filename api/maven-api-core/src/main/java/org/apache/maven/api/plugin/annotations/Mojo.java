@@ -90,8 +90,8 @@ public @interface Mojo
     boolean requiresOnline() default false;
 
     /**
-     * own configurator class.
-     * @return own configurator class
+     * configurator bean name.
+     * @return the configurator bean name
      */
     String configurator() default "";
 
