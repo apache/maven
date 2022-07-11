@@ -169,6 +169,9 @@ public class DefaultMavenPluginManager
     @Requirement
     private List<MavenPluginConfigurationValidator> configurationValidators;
 
+    @Requirement
+    private SessionUsedPluginCollector sessionUsedPluginCollector;
+
     private ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
 
     private PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
@@ -422,6 +425,8 @@ public class DefaultMavenPluginManager
         pluginDescriptor.setClassRealm( pluginRealm );
         pluginDescriptor.setArtifacts( pluginArtifacts );
 
+        sessionUsedPluginCollector.usedPlugin( session, plugin.getId() );
+
         try
         {
             GenericVersionScheme versionScheme = new GenericVersionScheme();
@@ -434,10 +439,7 @@ public class DefaultMavenPluginManager
                     Version mavenPluginApiVersion = versionScheme.parseVersion( artifact.getVersion() );
                     if ( minimumVersion.compareTo( mavenPluginApiVersion ) > 0 )
                     {
-                        logger.warn( "" );
-                        logger.warn( "Plugin " + plugin.getId()
-                                + " is old, please update to plugin supporting Maven 3.1+" );
-                        logger.warn( "" );
+                        sessionUsedPluginCollector.deprecatedPlugin( session, plugin.getId() );
                     }
                 }
             }
