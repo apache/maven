@@ -31,8 +31,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * Used if your Mojo needs to fork a <a href="/ref/3.0.4/maven-core/lifecycles.html">lifecycle</a>.
  *
- * @author Olivier Lamy
- * @since 3.0
+ * @since 4.0
  */
 @Experimental
 @Documented

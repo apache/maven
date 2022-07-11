@@ -24,8 +24,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * Component instantiation strategy.
  *
- * @author Hervé Boutemy
- * @since 3.0
+ * @since 4.0
  */
 @Experimental
 public enum InstantiationStrategy

@@ -31,8 +31,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * This annotation will mark your class as a Mojo (ie. goal in a Maven plugin).
  *
- * @author Olivier Lamy
- * @since 3.0
+ * @since 4.0
  */
 @Experimental
 @Documented

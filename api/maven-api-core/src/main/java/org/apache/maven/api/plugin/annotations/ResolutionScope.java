@@ -28,8 +28,7 @@ import org.apache.maven.api.annotations.Experimental;
  * Important note: The {@code id} values of this enum correspond to constants of
  * {@code org.apache.maven.artifact.Artifact} class and MUST BE KEPT IN SYNC.
  *
- * @author Hervé Boutemy
- * @since 3.0
+ * @since 4.0
  */
 @Experimental
 public enum ResolutionScope

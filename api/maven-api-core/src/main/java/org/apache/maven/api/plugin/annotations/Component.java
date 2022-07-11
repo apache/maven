@@ -33,8 +33,7 @@ import org.apache.maven.api.annotations.Experimental;
  * <a href="/ref/current/maven-core/apidocs/org/apache/maven/plugin/MavenPluginManager.html">
  * <code>MavenPluginManager.getConfiguredMojo(...)</code></a>.
  *
- * @author Olivier Lamy
- * @since 3.0
+ * @since 4.0
  */
 @Experimental
 @Documented
