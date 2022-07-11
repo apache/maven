@@ -76,7 +76,7 @@ class ProjectSelectorTest
     @EmptySource
     void isMatchingProjectNoMatchOnSelectorReturnsFalse( String selector )
     {
-        final boolean result = sut.isMatchingProject( getMavenProject( "maven-core" ), selector, null );
+        final boolean result = sut.isMatchingProject( createMavenProject("maven-core" ), selector, null );
         assertThat( result, is( false ) );
     }
 
@@ -84,7 +84,7 @@ class ProjectSelectorTest
     @ValueSource( strings = {":maven-core", "org.apache.maven:maven-core"} )
     void isMatchingProjectMatchOnSelectorReturnsTrue( String selector )
     {
-        final boolean result = sut.isMatchingProject( getMavenProject( "maven-core" ), selector, null );
+        final boolean result = sut.isMatchingProject( createMavenProject("maven-core" ), selector, null );
         assertThat( result, is( true ) );
     }
 
@@ -93,7 +93,7 @@ class ProjectSelectorTest
     {
         final File tempFile = File.createTempFile( "maven-core-unit-test-pom", ".xml" );
         final String selector = tempFile.getName();
-        final MavenProject mavenProject = getMavenProject( "maven-core" );
+        final MavenProject mavenProject = createMavenProject("maven-core" );
         mavenProject.setFile( tempFile );
 
         final boolean result = sut.isMatchingProject( mavenProject, selector, tempFile.getParentFile() );
@@ -109,7 +109,7 @@ class ProjectSelectorTest
         final File tempDir = new File( System.getProperty( "java.io.tmpdir" ) );
         final File tempProjectDir = new File( tempDir, "maven-core" );
         tempProjectDir.mkdir();
-        final MavenProject mavenProject = getMavenProject( "maven-core" );
+        final MavenProject mavenProject = createMavenProject("maven-core" );
         mavenProject.setFile( new File( tempProjectDir, "some-file.xml" ) );
 
         final boolean result = sut.isMatchingProject( mavenProject, selector, tempDir );
@@ -125,7 +125,7 @@ class ProjectSelectorTest
         selectors.add( ":maven-core" );
         selectors.add( ":optional" );
 
-        final MavenProject mavenProject = getMavenProject( "maven-core" );
+        final MavenProject mavenProject = createMavenProject("maven-core" );
         final List<MavenProject> listOfProjects = Collections.singletonList( mavenProject );
 
         final Set<MavenProject> optionalProjectsBySelectors =
@@ -142,7 +142,7 @@ class ProjectSelectorTest
         selectors.add( ":maven-core" );
         selectors.add( ":required" );
 
-        final MavenProject mavenProject = getMavenProject( "maven-core" );
+        final MavenProject mavenProject = createMavenProject("maven-core" );
         final List<MavenProject> listOfProjects = Collections.singletonList( mavenProject );
 
         final MavenExecutionException exception = assertThrows( MavenExecutionException.class,
@@ -157,7 +157,7 @@ class ProjectSelectorTest
         final HashSet<String> selectors = new HashSet<>();
         selectors.add( ":maven-core" );
 
-        final MavenProject mavenProject = getMavenProject( "maven-core" );
+        final MavenProject mavenProject = createMavenProject("maven-core" );
         final List<MavenProject> listOfProjects = Collections.singletonList( mavenProject );
 
         final Set<MavenProject> requiredProjectsBySelectors =
@@ -175,8 +175,8 @@ class ProjectSelectorTest
         final HashSet<String> selectors = new HashSet<>();
         selectors.add( ":maven-core" );
 
-        final MavenProject mavenProject = getMavenProject( "maven-core" );
-        final MavenProject child = getMavenProject( "maven-core-child" );
+        final MavenProject mavenProject = createMavenProject("maven-core" );
+        final MavenProject child = createMavenProject("maven-core-child" );
         mavenProject.setCollectedProjects( Collections.singletonList( child ) );
         final List<MavenProject> listOfProjects = Collections.singletonList( mavenProject );
 
@@ -195,8 +195,8 @@ class ProjectSelectorTest
         final HashSet<String> selectors = new HashSet<>();
         selectors.add( ":maven-core" );
 
-        final MavenProject mavenProject = getMavenProject( "maven-core" );
-        final MavenProject child = getMavenProject( "maven-core-child" );
+        final MavenProject mavenProject = createMavenProject("maven-core" );
+        final MavenProject child = createMavenProject("maven-core-child" );
         mavenProject.setCollectedProjects( Collections.singletonList( child ) );
         final List<MavenProject> listOfProjects = Collections.singletonList( mavenProject );
 
@@ -207,7 +207,7 @@ class ProjectSelectorTest
         assertThat( optionalProjectsBySelectors, contains( mavenProject, child ) );
     }
 
-    private MavenProject getMavenProject( String artifactId )
+    private MavenProject createMavenProject(String artifactId )
     {
         MavenProject mavenProject = new MavenProject();
         mavenProject.setGroupId( "org.apache.maven" );
