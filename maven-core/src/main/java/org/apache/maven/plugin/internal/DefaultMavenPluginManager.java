@@ -87,6 +87,8 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
+import org.eclipse.aether.util.version.GenericVersionScheme;
+import org.eclipse.aether.version.Version;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -419,6 +421,28 @@ public class DefaultMavenPluginManager
 
         pluginDescriptor.setClassRealm( pluginRealm );
         pluginDescriptor.setArtifacts( pluginArtifacts );
+
+        try
+        {
+            GenericVersionScheme versionScheme = new GenericVersionScheme();
+            Version version = versionScheme.parseVersion( "3.1.0" );
+            for ( Artifact artifact : pluginArtifacts )
+            {
+                if ( "org.apache.maven".equals( artifact.getGroupId() ) && "maven-plugin-api".equals(
+                        artifact.getArtifactId() ) )
+                {
+                    logger.warn( "" );
+                    logger.warn( "Plugin " + plugin.getId()
+                            + " is old, please update to plugin supporting Maven 3.1+" );
+                    logger.warn( "" );
+                }
+            }
+        }
+        catch ( org.eclipse.aether.version.InvalidVersionSpecificationException e )
+        {
+            // nope
+            logger.warn( "never thrown", e );
+        }
     }
 
     private void discoverPluginComponents( final ClassRealm pluginRealm, Plugin plugin,
