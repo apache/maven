@@ -31,17 +31,20 @@ import javax.inject.Singleton;
 public final class WarLifecycleMappingProvider
     extends AbstractLifecycleMappingProvider
 {
+    private static final String WAR_PLUGIN_VERSION = "3.3.1";
+
     // START SNIPPET: war
+    @SuppressWarnings( "checkstyle:linelength" )
     private static final String[] BINDINGS =
     {
-        "process-resources",      "org.apache.maven.plugins:maven-resources-plugin:3.2.0:resources",
-        "compile",                "org.apache.maven.plugins:maven-compiler-plugin:3.8.1:compile",
-        "process-test-resources", "org.apache.maven.plugins:maven-resources-plugin:3.2.0:testResources",
-        "test-compile",           "org.apache.maven.plugins:maven-compiler-plugin:3.8.1:testCompile",
-        "test",                   "org.apache.maven.plugins:maven-surefire-plugin:3.0.0-M5:test",
-        "package",                "org.apache.maven.plugins:maven-war-plugin:3.3.1:war",
-        "install",                "org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install",
-        "deploy",                 "org.apache.maven.plugins:maven-deploy-plugin:3.0.0-M1:deploy"
+        "process-resources",      "org.apache.maven.plugins:maven-resources-plugin:" + RESOURCES_PLUGIN_VERSION + ":resources",
+        "compile",                "org.apache.maven.plugins:maven-compiler-plugin:" + COMPILER_PLUGIN_VERSION + ":compile",
+        "process-test-resources", "org.apache.maven.plugins:maven-resources-plugin:" + RESOURCES_PLUGIN_VERSION + ":testResources",
+        "test-compile",           "org.apache.maven.plugins:maven-compiler-plugin:" + COMPILER_PLUGIN_VERSION + ":testCompile",
+        "test",                   "org.apache.maven.plugins:maven-surefire-plugin:" + SUREFIRE_PLUGIN_VERSION + ":test",
+        "package",                "org.apache.maven.plugins:maven-war-plugin:" + WAR_PLUGIN_VERSION + ":war",
+        "install",                "org.apache.maven.plugins:maven-install-plugin:" + INSTALL_PLUGIN_VERSION + ":install",
+        "deploy",                 "org.apache.maven.plugins:maven-deploy-plugin:" + DEPLOY_PLUGIN_VERSION + ":deploy"
     };
     // END SNIPPET: war
     

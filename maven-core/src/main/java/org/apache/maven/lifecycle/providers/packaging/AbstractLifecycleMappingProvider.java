@@ -37,6 +37,18 @@ import static java.util.Objects.requireNonNull;
 public abstract class AbstractLifecycleMappingProvider
     implements Provider<LifecycleMapping>
 {
+    protected static final String RESOURCES_PLUGIN_VERSION = "3.2.0";
+
+    protected static final String COMPILER_PLUGIN_VERSION = "3.8.1";
+
+    protected static final String SUREFIRE_PLUGIN_VERSION = "3.0.0-M5";
+
+    protected static final String JAR_PLUGIN_VERSION = "3.2.0";
+
+    protected static final String INSTALL_PLUGIN_VERSION = "3.0.0-M1";
+
+    protected static final String DEPLOY_PLUGIN_VERSION = "3.0.0-M2";
+
     private final LifecycleMapping lifecycleMapping;
 
     protected AbstractLifecycleMappingProvider( String[] pluginBindings )
