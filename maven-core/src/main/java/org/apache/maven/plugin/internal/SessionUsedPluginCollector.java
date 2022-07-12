@@ -43,15 +43,12 @@ public final class SessionUsedPluginCollector
 {
     private final Logger logger = LoggerFactory.getLogger( SessionUsedPluginCollector.class );
 
-    private static final String PLUGIN_IDS_KEY = SessionUsedPluginCollector.class.getSimpleName() + ".used";
-
-    private static final String DEPRECATED_PLUGIN_IDS_KEY = SessionUsedPluginCollector.class.getSimpleName()
-            + ".deprecated";
+    private static final String DEPRECATED_PLUGIN_IDS_KEY =
+            SessionUsedPluginCollector.class.getSimpleName() + ".deprecated";
 
     @Override
     public void afterSessionStart( MavenSession session )
     {
-        session.getRepositorySession().getData().set( PLUGIN_IDS_KEY, new CopyOnWriteArraySet<>() );
         session.getRepositorySession().getData().set( DEPRECATED_PLUGIN_IDS_KEY, new CopyOnWriteArraySet<>() );
     }
 
@@ -59,41 +56,19 @@ public final class SessionUsedPluginCollector
     @Override
     public void afterSessionEnd( MavenSession session )
     {
-        Set<String> usedPlugins = (Set<String>) session
-                .getRepositorySession().getData().get( PLUGIN_IDS_KEY );
-        if ( usedPlugins != null && !usedPlugins.isEmpty() )
-        {
-            logger.debug( "Used plugins in session:" );
-            for ( String pluginId : new TreeSet<>( usedPlugins ) )
-            {
-                logger.debug( " * {}", pluginId );
-            }
-            logger.debug( "" );
-            logger.debug( "Total of {}", usedPlugins.size() );
-        }
-
         Set<String> deprecatedPlugins = (Set<String>) session
                 .getRepositorySession().getData().get( DEPRECATED_PLUGIN_IDS_KEY );
         if ( deprecatedPlugins != null && !deprecatedPlugins.isEmpty() )
         {
-            logger.warn( "Used DEPRECATED plugins in session:" );
+            logger.warn( "Used pre-3.1 Maven plugins in session:" );
             for ( String pluginId : new TreeSet<>( deprecatedPlugins ) )
             {
                 logger.warn( " * {}", pluginId );
             }
             logger.warn( "" );
             logger.warn( "Total of {}", deprecatedPlugins.size() );
-        }
-    }
-
-    @SuppressWarnings( "unchecked" )
-    public void usedPlugin( MavenSession session, String pluginId )
-    {
-        Set<String> usedPlugins = (Set<String>) session
-                .getRepositorySession().getData().get( PLUGIN_IDS_KEY );
-        if ( usedPlugins != null )
-        {
-            usedPlugins.add( pluginId );
+            logger.warn( "Please update to newer versions of these plugins." );
+            logger.warn( "" );
         }
     }
 

@@ -425,8 +425,6 @@ public class DefaultMavenPluginManager
         pluginDescriptor.setClassRealm( pluginRealm );
         pluginDescriptor.setArtifacts( pluginArtifacts );
 
-        sessionUsedPluginCollector.usedPlugin( session, plugin.getId() );
-
         try
         {
             GenericVersionScheme versionScheme = new GenericVersionScheme();
