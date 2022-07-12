@@ -31,8 +31,6 @@ import javax.inject.Singleton;
 public final class EarLifecycleMappingProvider
     extends AbstractLifecycleMappingProvider
 {
-    private static final String EAR_PLUGIN_VERSION = "3.1.2";
-
     // START SNIPPET: ear
     @SuppressWarnings( "checkstyle:linelength" )
     private static final String[] BINDINGS =

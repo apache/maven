@@ -31,8 +31,6 @@ import javax.inject.Singleton;
 public final class MavenPluginLifecycleMappingProvider
     extends AbstractLifecycleMappingProvider
 {
-    private static final String PLUGIN_PLUGIN_VERSION = "3.6.0";
-
     // START SNIPPET: maven-plugin
     @SuppressWarnings( "checkstyle:linelength" )
     private static final String[] BINDINGS =

@@ -43,11 +43,23 @@ public abstract class AbstractLifecycleMappingProvider
 
     protected static final String SUREFIRE_PLUGIN_VERSION = "3.0.0-M5";
 
-    protected static final String JAR_PLUGIN_VERSION = "3.2.0";
-
     protected static final String INSTALL_PLUGIN_VERSION = "3.0.0-M1";
 
     protected static final String DEPLOY_PLUGIN_VERSION = "3.0.0-M2";
+
+    // packaging
+
+    protected static final String JAR_PLUGIN_VERSION = "3.2.0";
+
+    protected static final String EAR_PLUGIN_VERSION = "3.1.2";
+
+    protected static final String EJB_PLUGIN_VERSION = "3.1.0";
+
+    protected static final String PLUGIN_PLUGIN_VERSION = "3.6.0";
+
+    protected static final String RAR_PLUGIN_VERSION = "2.4"; // TODO: Update!!!
+
+    protected static final String WAR_PLUGIN_VERSION = "3.3.1";
 
     private final LifecycleMapping lifecycleMapping;
 

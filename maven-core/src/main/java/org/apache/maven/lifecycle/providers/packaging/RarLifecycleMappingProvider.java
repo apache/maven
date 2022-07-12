@@ -31,8 +31,6 @@ import javax.inject.Singleton;
 public final class RarLifecycleMappingProvider
     extends AbstractLifecycleMappingProvider
 {
-    private static final String RAR_PLUGIN_VERSION = "2.4";
-
     // START SNIPPET: rar
     @SuppressWarnings( "checkstyle:linelength" )
     private static final String[] BINDINGS =

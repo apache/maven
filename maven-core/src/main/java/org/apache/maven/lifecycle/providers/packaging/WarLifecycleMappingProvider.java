@@ -31,8 +31,6 @@ import javax.inject.Singleton;
 public final class WarLifecycleMappingProvider
     extends AbstractLifecycleMappingProvider
 {
-    private static final String WAR_PLUGIN_VERSION = "3.3.1";
-
     // START SNIPPET: war
     @SuppressWarnings( "checkstyle:linelength" )
     private static final String[] BINDINGS =

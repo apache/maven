@@ -31,8 +31,6 @@ import javax.inject.Singleton;
 public final class EjbLifecycleMappingProvider
     extends AbstractLifecycleMappingProvider
 {
-    private static final String EJB_PLUGIN_VERSION = "3.1.0";
-
     // START SNIPPET: ejb
     @SuppressWarnings( "checkstyle:linelength" )
     private static final String[] BINDINGS =
