@@ -21,6 +21,7 @@ package org.apache.maven.cli;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
@@ -33,8 +34,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.List;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
@@ -46,11 +45,12 @@ import org.codehaus.plexus.PlexusContainer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
 import org.mockito.InOrder;
 
 public class MavenCliTest
 {
-    private MavenCli cli;
+    MavenCli cli;
 
     private String origBasedir;
 
@@ -76,23 +76,27 @@ public class MavenCliTest
     }
 
     @Test
-    public void testCalculateDegreeOfConcurrencyWithCoreMultiplier()
+    public void testCalculateDegreeOfConcurrency()
     {
-        int cores = Runtime.getRuntime().availableProcessors();
-        // -T2.2C
-        assertEquals( (int) ( cores * 2.2 ), cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "C2.2" ) );
-        // -TC2.2
-        assertEquals( (int) ( cores * 2.2 ), cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "2.2C" ) );
+        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "0" ) );
+        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "-1" ) );
+        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "0x4" ) );
+        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "1.0" ) );
+        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "1." ) );
+        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "AA" ) );
+        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "C" ) );
+        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "C2.2C" ) );
+        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "C2.2" ) );
+        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "2C2" ) );
+        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "CXXX" ) );
+        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "XXXC" ) );
 
-        try
-        {
-            cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "CXXX" );
-            fail( "Should have failed with a NumberFormatException" );
-        }
-        catch ( NumberFormatException e )
-        {
-            // carry on
-        }
+        int cpus = Runtime.getRuntime().availableProcessors();
+        assertEquals( (int) ( cpus * 2.2 ), cli.calculateDegreeOfConcurrency( "2.2C" ) );
+        assertEquals( 1, cli.calculateDegreeOfConcurrency( "0.0001C" ) );
+        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "2.C" ) );
+        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "-2.2C" ) );
+        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "0C" ) );
     }
 
     @Test
@@ -371,4 +375,20 @@ public class MavenCliTest
         assertEquals( MessageUtils.stripAnsiCodes( versionOut ), versionOut );
     }
 
+    class ConcurrencyCalculator implements ThrowingRunnable
+    {
+
+        private final String value;
+
+        public ConcurrencyCalculator( String value )
+        {
+            this.value = value;
+        }
+
+        @Override
+        public void run() throws Throwable
+        {
+            cli.calculateDegreeOfConcurrency( value );
+        }
+    }
 }

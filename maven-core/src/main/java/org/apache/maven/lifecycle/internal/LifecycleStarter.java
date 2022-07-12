@@ -119,7 +119,7 @@ public class LifecycleStarter
             }
 
             int degreeOfConcurrency = session.getRequest().getDegreeOfConcurrency();
-            if ( degreeOfConcurrency >= 2 )
+            if ( degreeOfConcurrency > 1 )
             {
                 logger.info( "" );
                 logger.info( String.format( "Using the %s implementation with a thread count of %d",
