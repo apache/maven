@@ -146,18 +146,43 @@ public class MavenCliTest
     }
 
     @Test
-    public void testCalculateDegreeOfConcurrencyWithCoreMultiplier()
+    public void testCalculateDegreeOfConcurrency()
     {
-        int cores = Runtime.getRuntime().availableProcessors();
-        // -T2.2C
-        assertEquals( (int) ( cores * 2.2 ), cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "C2.2" ) );
-        // -TC2.2
-        assertEquals( (int) ( cores * 2.2 ), cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "2.2C" ) );
+        assertThrows( IllegalArgumentException.class,
+                () -> cli.calculateDegreeOfConcurrency( "0" ) );
+        assertThrows( IllegalArgumentException.class,
+                () -> cli.calculateDegreeOfConcurrency( "-1" ) );
+        assertThrows( IllegalArgumentException.class,
+                () -> cli.calculateDegreeOfConcurrency( "0x4" ) );
+        assertThrows( IllegalArgumentException.class,
+                () -> cli.calculateDegreeOfConcurrency( "1.0" ) );
+        assertThrows( IllegalArgumentException.class,
+                () -> cli.calculateDegreeOfConcurrency( "1." ) );
+        assertThrows( IllegalArgumentException.class,
+                () -> cli.calculateDegreeOfConcurrency( "AA" ) );
+        assertThrows( IllegalArgumentException.class,
+                () -> cli.calculateDegreeOfConcurrency( "C" ) );
+        assertThrows( IllegalArgumentException.class,
+                () -> cli.calculateDegreeOfConcurrency( "C2.2C" ) );
+        assertThrows( IllegalArgumentException.class,
+                () -> cli.calculateDegreeOfConcurrency( "C2.2" ) );
+        assertThrows( IllegalArgumentException.class,
+                () -> cli.calculateDegreeOfConcurrency( "2C2" ) );
+        assertThrows( IllegalArgumentException.class,
+                () -> cli.calculateDegreeOfConcurrency( "CXXX" ) );
+        assertThrows( IllegalArgumentException.class,
+                () -> cli.calculateDegreeOfConcurrency( "XXXC" ) );
 
-        assertThrows(
-                NumberFormatException.class,
-                () -> cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "CXXX" ),
-                "Should have failed with a NumberFormatException" );
+        int cpus = Runtime.getRuntime().availableProcessors();
+        assertEquals( (int) ( cpus * 2.2 ), cli.calculateDegreeOfConcurrency( "2.2C" ) );
+        assertEquals( 1, cli.calculateDegreeOfConcurrency( "0.0001C" ) );
+        assertThrows( IllegalArgumentException.class,
+                () -> cli.calculateDegreeOfConcurrency( "2.C" ) );
+        assertThrows( IllegalArgumentException.class,
+                () -> cli.calculateDegreeOfConcurrency( "-2.2C" ) );
+        assertThrows( IllegalArgumentException.class,
+                () -> cli.calculateDegreeOfConcurrency( "0C" ) );
+
     }
 
     @Test
