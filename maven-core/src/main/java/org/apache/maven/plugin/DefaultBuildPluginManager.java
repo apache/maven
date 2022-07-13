@@ -143,14 +143,7 @@ public class DefaultBuildPluginManager
             {
                 MojoExecutionEvent mojoExecutionEvent = new MojoExecutionEvent( session, project, mojoExecution, mojo );
                 mojoExecutionListener.beforeMojoExecution( mojoExecutionEvent );
-                if ( mojoDescriptor.isV4Api() )
-                {
-                    ( ( org.apache.maven.api.plugin.Mojo ) mojo ).execute();
-                }
-                else
-                {
-                    ( ( Mojo ) mojo ).execute();
-                }
+                mojo.execute();
                 mojoExecutionListener.afterMojoExecutionSuccess( mojoExecutionEvent );
             }
             catch ( ClassCastException e )

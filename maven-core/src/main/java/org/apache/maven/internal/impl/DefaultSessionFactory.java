@@ -63,15 +63,7 @@ public class DefaultSessionFactory
     public Session getSession( MavenSession mavenSession )
     {
         SessionData data = mavenSession.getRepositorySession().getData();
-        Session session = ( Session ) data.get( DefaultSession.class );
-        if ( session == null )
-        {
-            if ( ! data.set( DefaultSession.class, null, newSession( mavenSession ) ) )
-            {
-                session = ( Session ) data.get( DefaultSession.class );
-            }
-        }
-        return session;
+        return ( Session ) data.computeIfAbsent( DefaultSession.class, () -> newSession( mavenSession ) );
     }
 
     private Session newSession( MavenSession mavenSession )

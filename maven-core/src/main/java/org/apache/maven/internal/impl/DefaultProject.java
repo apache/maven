@@ -37,6 +37,7 @@ import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.project.MavenProject;
 
 public class DefaultProject implements Project
@@ -86,7 +87,11 @@ public class DefaultProject implements Project
     @Override
     public Artifact getArtifact()
     {
-        return session.getArtifact( RepositoryUtils.toArtifact( project.getArtifact() ) );
+        org.eclipse.aether.artifact.Artifact resolverArtifact = RepositoryUtils.toArtifact( project.getArtifact() );
+        Artifact artifact = session.getArtifact( resolverArtifact );
+        Path path = resolverArtifact.getFile() != null ? resolverArtifact.getFile().toPath() : null;
+        session.getService( ArtifactManager.class ).setPath( artifact, path );
+        return artifact;
     }
 
     @Nonnull
