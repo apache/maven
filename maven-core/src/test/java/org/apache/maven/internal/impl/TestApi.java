@@ -35,6 +35,7 @@ import org.apache.maven.api.services.ProjectBuilder;
 import org.apache.maven.api.services.ProjectBuilderRequest;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.bridge.MavenRepositorySystem;
+import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
 import org.codehaus.plexus.PlexusContainer;
@@ -72,6 +73,9 @@ public class TestApi
     @Inject
     PlexusContainer plexusContainer;
 
+    @Inject
+    MojoExecutionScope mojoExecutionScope;
+
     @BeforeEach
     void setup()
     {
@@ -81,7 +85,7 @@ public class TestApi
         DefaultSession session = new DefaultSession( ms, repositorySystem,
                                                      Collections.emptyList(), projectBuilder,
                                                      mavenRepositorySystem, toolchainManagerPrivate,
-                                                     plexusContainer );
+                                                     plexusContainer, mojoExecutionScope );
         DefaultLocalRepository localRepository = new DefaultLocalRepository(
                 new LocalRepository( "target/test-classes/apiv4-repo" ) );
         org.apache.maven.api.RemoteRepository remoteRepository = session.getRemoteRepository(

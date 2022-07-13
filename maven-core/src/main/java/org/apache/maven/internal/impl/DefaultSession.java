@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Properties;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.LocalRepository;
+import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
@@ -45,6 +47,7 @@ import org.apache.maven.api.services.DependencyCollector;
 import org.apache.maven.api.services.DependencyFactory;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.LocalRepositoryManager;
+import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.api.services.ProjectBuilder;
 import org.apache.maven.api.services.ProjectManager;
@@ -58,8 +61,13 @@ import org.apache.maven.api.settings.Settings;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.scope.internal.MojoExecutionScope;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -79,14 +87,17 @@ public class DefaultSession extends AbstractSession
     private final ArtifactManager artifactManager = new DefaultArtifactManager();
     private final ProjectManager projectManager = new DefaultProjectManager( artifactManager );
     private final PlexusContainer container;
+    private final MojoExecutionScope mojoExecutionScope;
 
+    @SuppressWarnings( "checkstyle:ParameterNumber" )
     public DefaultSession( @Nonnull MavenSession session,
                            @Nonnull RepositorySystem repositorySystem,
                            @Nullable List<RemoteRepository> repositories,
                            @Nonnull org.apache.maven.project.ProjectBuilder projectBuilder,
                            @Nonnull MavenRepositorySystem mavenRepositorySystem,
                            @Nonnull DefaultToolchainManagerPrivate toolchainManagerPrivate,
-                           @Nonnull PlexusContainer container )
+                           @Nonnull PlexusContainer container,
+                           @Nonnull MojoExecutionScope mojoExecutionScope )
     {
         this.mavenSession = nonNull( session );
         this.session = mavenSession.getRepositorySession();
@@ -99,6 +110,7 @@ public class DefaultSession extends AbstractSession
         this.mavenRepositorySystem = mavenRepositorySystem;
         this.toolchainManagerPrivate = toolchainManagerPrivate;
         this.container = container;
+        this.mojoExecutionScope = mojoExecutionScope;
     }
 
     MavenSession getMavenSession()
@@ -139,6 +151,22 @@ public class DefaultSession extends AbstractSession
     public Properties getSystemProperties()
     {
         return mavenSession.getSystemProperties();
+    }
+
+    @Override
+    public Map<String, Object> getPluginContext( Project project )
+    {
+        try
+        {
+            MojoExecution mojoExecution = container.lookup( MojoExecution.class );
+            MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+            PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+            return mavenSession.getPluginContext( pluginDescriptor, ( ( DefaultProject ) project ).getProject() );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new MavenException( "The PluginContext is only available during a mojo execution", e );
+        }
     }
 
     @Nonnull
@@ -204,16 +232,16 @@ public class DefaultSession extends AbstractSession
                 .setLocalRepositoryManager( localRepositoryManager );
         MavenSession newSession = new MavenSession( mavenSession.getContainer(), repoSession,
                 mavenSession.getRequest(), mavenSession.getResult() );
-        return new DefaultSession( newSession, repositorySystem,
-                repositories, projectBuilder, mavenRepositorySystem, toolchainManagerPrivate, container );
+        return new DefaultSession( newSession, repositorySystem, repositories,
+                projectBuilder, mavenRepositorySystem, toolchainManagerPrivate, container, mojoExecutionScope );
     }
 
     @Nonnull
     @Override
     public Session withRemoteRepositories( @Nonnull List<RemoteRepository> repositories )
     {
-        return new DefaultSession( mavenSession, repositorySystem,
-                repositories, projectBuilder, mavenRepositorySystem, toolchainManagerPrivate, container );
+        return new DefaultSession( mavenSession, repositorySystem, repositories,
+                projectBuilder, mavenRepositorySystem, toolchainManagerPrivate, container, mojoExecutionScope );
     }
 
     @Nonnull

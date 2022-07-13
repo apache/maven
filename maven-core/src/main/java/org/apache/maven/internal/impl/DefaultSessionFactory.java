@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 import org.apache.maven.api.Session;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
 import org.codehaus.plexus.PlexusContainer;
@@ -41,19 +42,22 @@ public class DefaultSessionFactory
     private final MavenRepositorySystem mavenRepositorySystem;
     private final DefaultToolchainManagerPrivate toolchainManagerPrivate;
     private final PlexusContainer plexusContainer;
+    private final MojoExecutionScope mojoExecutionScope;
 
     @Inject
     public DefaultSessionFactory( RepositorySystem repositorySystem,
                                   ProjectBuilder projectBuilder,
                                   MavenRepositorySystem mavenRepositorySystem,
                                   DefaultToolchainManagerPrivate toolchainManagerPrivate,
-                                  PlexusContainer plexusContainer )
+                                  PlexusContainer plexusContainer,
+                                  MojoExecutionScope mojoExecutionScope )
     {
         this.repositorySystem = repositorySystem;
         this.projectBuilder = projectBuilder;
         this.mavenRepositorySystem = mavenRepositorySystem;
         this.toolchainManagerPrivate = toolchainManagerPrivate;
         this.plexusContainer = plexusContainer;
+        this.mojoExecutionScope = mojoExecutionScope;
     }
 
     public Session getSession( MavenSession mavenSession )
@@ -73,7 +77,7 @@ public class DefaultSessionFactory
     private Session newSession( MavenSession mavenSession )
     {
         return new DefaultSession(
-                mavenSession, repositorySystem, null,
-                projectBuilder, mavenRepositorySystem, toolchainManagerPrivate, plexusContainer );
+                mavenSession, repositorySystem, null, projectBuilder, mavenRepositorySystem,
+                toolchainManagerPrivate, plexusContainer, mojoExecutionScope );
     }
 }

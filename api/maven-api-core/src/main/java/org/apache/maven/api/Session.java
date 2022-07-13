@@ -26,6 +26,7 @@ import org.apache.maven.api.annotations.ThreadSafe;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Properties;
@@ -61,12 +62,24 @@ public interface Session
     Properties getSystemProperties();
 
     /**
+     * Returns the plugin context for mojo being executed and the specified
+     * {@link Project}, never returns {@code null} as if context not present, creates it.
+     *
+     * <strong>Implementation note:</strong> while this method return type is {@link Map}, the returned map instance
+     * implements {@link java.util.concurrent.ConcurrentMap} as well.
+     *
+     * @throws org.apache.maven.api.services.MavenException if not called from the within a mojo execution
+     */
+    @Nonnull
+    Map<String, Object> getPluginContext( @Nonnull Project project );
+
+    /**
      * Retrieves the service for the interface
      *
      * @throws NoSuchElementException if the service could not be found
      */
     @Nonnull
-    <T extends Service> T getService( Class<T> clazz );
+    <T extends Service> T getService( @Nonnull Class<T> clazz );
 
     /**
      * Creates a derived session using the given local repository.
