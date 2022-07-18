@@ -295,6 +295,13 @@ under the License.
         <groupId>org.apache.maven.shared</groupId>
         <artifactId>maven-shared-utils</artifactId>
         <version>3.3.4</version>
+        <exclusions>
+          <!-- We use org.apache.maven.shared.utils.logging only in Maven Core -->
+          <exclusion>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.fusesource.jansi</groupId>
