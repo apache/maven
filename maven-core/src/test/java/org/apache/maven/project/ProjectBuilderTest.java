@@ -20,7 +20,6 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +27,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
@@ -35,8 +35,8 @@ import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelSource;
-import org.apache.maven.shared.utils.io.FileUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.apache.maven.project.ProjectBuildingResultWithLocationMatcher.projectBuildingResultWithLocation;
 import static org.apache.maven.project.ProjectBuildingResultWithProblemMessageMatcher.projectBuildingResultWithProblemMessage;
@@ -166,35 +166,27 @@ public class ProjectBuilderTest
     }
 
     @Test
-    public void testReadModifiedPoms() throws Exception {
+    public void testReadModifiedPoms( @TempDir Path tempDir ) throws Exception {
         // TODO a similar test should be created to test the dependency management (basically all usages
         // of DefaultModelBuilder.getCache() are affected by MNG-6530
 
-        Path tempDir = Files.createTempDirectory( null );
-        FileUtils.copyDirectoryStructure ( new File( "src/test/resources/projects/grandchild-check" ), tempDir.toFile() );
-        try
-        {
-            MavenSession mavenSession = createMavenSession( null );
-            ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
-            configuration.setRepositorySession( mavenSession.getRepositorySession() );
-            org.apache.maven.project.ProjectBuilder projectBuilder = getContainer().lookup( org.apache.maven.project.ProjectBuilder.class );
-            File child = new File( tempDir.toFile(), "child/pom.xml" );
-            // build project once
-            projectBuilder.build( child, configuration );
-            // modify parent
-            File parent = new File( tempDir.toFile(), "pom.xml" );
-            String parentContent = FileUtils.fileRead( parent );
-            parentContent = parentContent.replaceAll( "<packaging>pom</packaging>",
-                     "<packaging>pom</packaging><properties><addedProperty>addedValue</addedProperty></properties>" );
-            FileUtils.fileWrite( parent, "UTF-8", parentContent );
-            // re-build pom with modified parent
-            ProjectBuildingResult result = projectBuilder.build( child, configuration );
-            assertThat( result.getProject().getProperties(), hasKey( (Object) "addedProperty" ) );
-        }
-        finally
-        {
-            FileUtils.deleteDirectory( tempDir.toFile() );
-        }
+        FileUtils.copyDirectory( new File( "src/test/resources/projects/grandchild-check" ), tempDir.toFile() );
+        MavenSession mavenSession = createMavenSession( null );
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setRepositorySession( mavenSession.getRepositorySession() );
+        org.apache.maven.project.ProjectBuilder projectBuilder = getContainer().lookup( org.apache.maven.project.ProjectBuilder.class );
+        File child = new File( tempDir.toFile(), "child/pom.xml" );
+        // build project once
+        projectBuilder.build( child, configuration );
+        // modify parent
+        File parent = new File( tempDir.toFile(), "pom.xml" );
+        String parentContent = FileUtils.readFileToString( parent, "UTF-8" );
+        parentContent = parentContent.replaceAll( "<packaging>pom</packaging>",
+                 "<packaging>pom</packaging><properties><addedProperty>addedValue</addedProperty></properties>" );
+        FileUtils.write( parent, parentContent, "UTF-8" );
+        // re-build pom with modified parent
+        ProjectBuildingResult result = projectBuilder.build( child, configuration );
+        assertThat( result.getProject().getProperties(), hasKey( (Object) "addedProperty" ) );
     }
 
     @Test
