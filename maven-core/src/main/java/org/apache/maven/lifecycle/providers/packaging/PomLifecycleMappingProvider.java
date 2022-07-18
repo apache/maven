@@ -32,10 +32,11 @@ public final class PomLifecycleMappingProvider
     extends AbstractLifecycleMappingProvider
 {
     // START SNIPPET: pom
+    @SuppressWarnings( "checkstyle:linelength" )
     private static final String[] BINDINGS =
     {
-        "install", "org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install",
-        "deploy",  "org.apache.maven.plugins:maven-deploy-plugin:3.0.0-M1:deploy"
+        "install", "org.apache.maven.plugins:maven-install-plugin:" + INSTALL_PLUGIN_VERSION + ":install",
+        "deploy",  "org.apache.maven.plugins:maven-deploy-plugin:" + DEPLOY_PLUGIN_VERSION + ":deploy"
     };
     // END SNIPPET: pom
     
