@@ -29,6 +29,6 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 interface MavenPluginValidator
 {
 
-    void validate( Artifact pluginArtfiact, PluginDescriptor pluginDescriptor, List<String> errors );
+    void validate( Artifact pluginArtifact, PluginDescriptor pluginDescriptor, List<String> errors );
 
 }

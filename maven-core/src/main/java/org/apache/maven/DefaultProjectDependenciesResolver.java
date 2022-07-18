@@ -93,11 +93,11 @@ public class DefaultProjectDependenciesResolver
 
     public Set<Artifact> resolve( MavenProject project, Collection<String> scopesToCollect,
                                   Collection<String> scopesToResolve, MavenSession session,
-                                  Set<Artifact> ignoreableArtifacts )
+                                  Set<Artifact> ignorableArtifacts )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         return resolveImpl( Collections.singleton( project ), scopesToCollect, scopesToResolve, session,
-                            getIgnorableArtifacts( ignoreableArtifacts ) );
+                            getIgnorableArtifacts( ignorableArtifacts ) );
     }
 
 
