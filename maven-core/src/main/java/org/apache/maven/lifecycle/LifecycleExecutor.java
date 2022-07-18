@@ -53,7 +53,7 @@ public interface LifecycleExecutor
     // by the POM builder because they will have to be defined in plugin management. Once this is setComplete then it
     // can be passed back so that the default configuration information can be populated.
     //
-    // We need to know the specific version so that we can lookup the right version of the plugin descriptor
+    // We need to know the specific version so that we can look up the right version of the plugin descriptor
     // which tells us what the default configuration is.
     //
 

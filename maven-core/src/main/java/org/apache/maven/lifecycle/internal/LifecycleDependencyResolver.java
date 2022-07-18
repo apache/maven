@@ -165,7 +165,7 @@ public class LifecycleDependencyResolver
             for ( Artifact artifact : resolvedArtifacts )
             {
                 /**
-                 * MNG-6300: resolvedArtifacts can be cache result; this ensures reactor files are always up to date
+                 * MNG-6300: resolvedArtifacts can be cache result; this ensures reactor files are always up-to-date
                  * During lifecycle the Artifact.getFile() can change from target/classes to the actual jar.
                  * This clearly shows that target/classes should not be abused as artifactFile just for the classpath
                  */

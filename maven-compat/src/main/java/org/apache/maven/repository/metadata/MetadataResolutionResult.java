@@ -34,7 +34,7 @@ public class MetadataResolutionResult
     MetadataTreeNode treeRoot;
 
     /**
-     * these components are are initialized on demand by
+     * these components are initialized on demand by
      * explicit call of the initTreeProcessing()
      */
     ClasspathTransformation classpathTransformation;

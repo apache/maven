@@ -22,7 +22,7 @@ package org.apache.maven.settings;
 import java.io.File;
 
 /**
- * To handle runtime informations like local repository or profiles.
+ * To handle runtime information like local repository or profiles.
  *
  */
 @Deprecated

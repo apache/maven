@@ -44,7 +44,7 @@ Maven Repository Metadata Model
        gives data about available versions (<<<latest>>>, <<<release>>>, <<<versions>>> list and <<<lastUpdated>>>),
 
  [[3]] in a "groupId/artifactId/version" snapshot artifact directory: metadata describes <<<groupId>>>, <<<artifactId>>>, <<<version>>> (base version, i.e. ending in <<<-SNAPSHOT>>>) and
-       <<<versioning>>> element that gives data about snaphot (<<<snapshot>>>, <<<lastUpdated>>> and <<<snapshotVersions>>> list). Notice that a
+       <<<versioning>>> element that gives data about snapshot (<<<snapshot>>>, <<<lastUpdated>>> and <<<snapshotVersions>>> list). Notice that a
        release artifact directory is not expected to provide metadata.
 
  []
@@ -61,4 +61,3 @@ Maven Repository Metadata Model
 ~~ 2. this will remove the code that updates plugins data: see MNG-7375/MPLUGIN-384 https://maven.apache.org/ref/3.8.4/maven-compat/apidocs/org/apache/maven/artifact/repository/metadata/GroupRepositoryMetadata.html
 ~~ 3. this will lead to inconsistent data: removing it will be safer/more clear
 ~~ but this logic still remains to be confirmed by clear consensus of the whole team
- 

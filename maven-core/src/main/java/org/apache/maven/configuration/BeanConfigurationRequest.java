@@ -63,7 +63,7 @@ public interface BeanConfigurationRequest
      * Sets the configuration to unmarshal into the bean. The configuration should be taken from
      * {@link org.apache.maven.model.ConfigurationContainer#getConfiguration()} or a similar source.
      * If {@code element} is not {@code null}, child configuration element with the specified name will
-     * be unmarshaled.
+     * be unmarshalled.
      *
      * @param configuration The configuration to unmarshal, may be {@code null}.
      * @param element Configuration element name to unmarshal or {@code null} to unmarshal entire configuration.

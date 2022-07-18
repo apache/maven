@@ -22,7 +22,7 @@ package org.apache.maven.artifact.repository.metadata.io;
 import java.io.IOException;
 
 /**
- * Signals a failure to parse the metadata due to invalid syntax (e.g. non-wellformed XML or unknown elements).
+ * Signals a failure to parse the metadata due to invalid syntax (e.g. non well formed XML or unknown elements).
  *
  * @author Benjamin Bentmann
  */

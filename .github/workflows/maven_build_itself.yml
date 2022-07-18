@@ -49,7 +49,7 @@ jobs:
             tar -xzf ${{ env.TAR_BALL }} -C "$temp_dir" --strip 1
             maven_bin_dir=$temp_dir/bin
             if [ -d $maven_bin_dir ]; then
-              echo "tar.gz file \"${{ env.TAR_BALL }}\" succesfully extracted in temporarily directory \"$temp_dir.\""
+              echo "tar.gz file \"${{ env.TAR_BALL }}\" successfully extracted in temporarily directory \"$temp_dir.\""
               echo "TEMP_MAVEN_BIN_DIR=$maven_bin_dir" >> $GITHUB_ENV
             else
               echo "$maven_bin_dir does not exist."

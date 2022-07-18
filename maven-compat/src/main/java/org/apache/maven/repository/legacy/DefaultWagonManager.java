@@ -633,7 +633,7 @@ public class DefaultWagonManager
             // We do this in here so we can checksum the artifact metadata too, otherwise it could be metadata itself
             for ( String extension : checksums.keySet() )
             {
-                // TODO shouldn't need a file intermediatary - improve wagon to take a stream
+                // TODO shouldn't need a file intermediary - improve wagon to take a stream
                 File temp = File.createTempFile( "maven-artifact", null );
                 temp.deleteOnExit();
                 FileUtils.fileWrite( temp.getAbsolutePath(), "UTF-8", sums.get( extension ) );

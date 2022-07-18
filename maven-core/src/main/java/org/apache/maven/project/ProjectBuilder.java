@@ -70,7 +70,7 @@ public interface ProjectBuilder
     /**
      * Builds a project descriptor for the specified model source.
      *
-     * @param modelSource The source of the model to built the project descriptor from, must not be {@code null}.
+     * @param modelSource The source of the model to build the project descriptor from, must not be {@code null}.
      * @param request The project building request that holds further parameters, must not be {@code null}.
      * @return The result of the project building, never {@code null}.
      * @throws ProjectBuildingException If the project descriptor could not be successfully built.
@@ -84,7 +84,7 @@ public interface ProjectBuilder
      * Builds the projects for the specified POM files and optionally their children.
      *
      * @param pomFiles The POM files to build, must not be {@code null}.
-     * @param recursive {@code true} to recursively build sub modules referenced by the POM files, {@code false} to
+     * @param recursive {@code true} to recursively build submodules referenced by the POM files, {@code false} to
      *            build only the specified POM files.
      * @param request The project builder configuration that provides further parameters, must not be {@code null}.
      * @return The results of the project builder where each result corresponds to one project that was built, never

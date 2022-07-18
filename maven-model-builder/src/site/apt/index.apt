@@ -53,7 +53,7 @@ Maven Model Builder
 
    ** Build up a raw model by re-reading the file and enrich it based on information available in the reactor. Some features:
 
-      *** Resolve version of versionless parents based on realtivePath (including ci-friendly versions)
+      *** Resolve version of versionless parents based on relativePath (including ci-friendly versions)
 
       *** Resolve version of versionless dependencies that are part of the reactor
 
@@ -141,7 +141,7 @@ Maven Model Builder
 
   ** since Maven 3.5.0, if <<<project.directory>>> POM property value is defined, it is used instead of artifact id:
   this permits default inheritance calculations when module directory name is not equal to artifact id. Notice that this
-  property is not inherited from a POM to its child: childs POM will use child artifact id if property is not
+  property is not inherited from a POM to its child: child's POM will use child artifact id if property is not
   set.
 
   ** since Maven 3.6.1, inheritance can avoid appending any path to parent value by setting model attribute value to

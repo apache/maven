@@ -1220,7 +1220,7 @@ public class MavenCli
         // is always available in the core and likely always will be, but we may have another ConfigurationProcessor
         // present supplied by the user. The rule is that we only allow the execution of one ConfigurationProcessor.
         // If there is more than one then we execute the one supplied by the user, otherwise we execute the
-        // the default SettingsXmlConfigurationProcessor.
+        // default SettingsXmlConfigurationProcessor.
         //
         int userSuppliedConfigurationProcessorCount = configurationProcessors.size() - 1;
 

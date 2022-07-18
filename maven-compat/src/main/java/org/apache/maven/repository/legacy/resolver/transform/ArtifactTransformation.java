@@ -37,7 +37,7 @@ public interface ArtifactTransformation
     String ROLE = ArtifactTransformation.class.getName();
 
     /**
-     * Take in a artifact and return the transformed artifact for locating in the remote repository. If no
+     * Take in an artifact and return the transformed artifact for locating in the remote repository. If no
      * transformation has occurred the original artifact is returned.
      *
      * @param artifact           Artifact to be transformed.
@@ -47,7 +47,7 @@ public interface ArtifactTransformation
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
-     * Take in a artifact and return the transformed artifact for locating in the remote repository. If no
+     * Take in an artifact and return the transformed artifact for locating in the remote repository. If no
      * transformation has occurred the original artifact is returned.
      *
      * @param artifact           Artifact to be transformed.
@@ -60,7 +60,7 @@ public interface ArtifactTransformation
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
-     * Take in a artifact and return the transformed artifact for locating in the local repository. If no
+     * Take in an artifact and return the transformed artifact for locating in the local repository. If no
      * transformation has occurred the original artifact is returned.
      *
      * @param artifact        Artifact to be transformed.
@@ -71,7 +71,7 @@ public interface ArtifactTransformation
         throws ArtifactInstallationException;
 
     /**
-     * Take in a artifact and return the transformed artifact for distributing to remote repository. If no
+     * Take in an artifact and return the transformed artifact for distributing to remote repository. If no
      * transformation has occurred the original artifact is returned.
      *
      * @param artifact         Artifact to be transformed.

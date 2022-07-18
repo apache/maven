@@ -1291,7 +1291,7 @@
             <![CDATA[
             Gives the status of this artifact in the remote repository.
             This must not be set in your local project, as it is updated by
-            tools placing it in the reposiory. Valid values are: <code>none</code> (default),
+            tools placing it in the repository. Valid values are: <code>none</code> (default),
             <code>converted</code> (repository manager converted this from an Maven 1 POM),
             <code>partner</code>
             (directly synced from a partner Maven 2 repository), <code>deployed</code> (was deployed from a Maven 2
@@ -2836,7 +2836,7 @@
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            The version of the reporting plugin to be used. Starting with Maven 3, if no version is defined explicitely,
+            The version of the reporting plugin to be used. Starting with Maven 3, if no version is defined explicitly,
             version is searched in <code>build/plugins</code> then in <code>build/pluginManagement</code>.
             ]]>
           </description>

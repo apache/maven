@@ -28,7 +28,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
  * The ModelSourceTransformer is a way to transform the local pom while streaming the input.
  *
  * The {@link #transform(XmlPullParser, Path, TransformerContext)} method uses a Path on purpose, to ensure the
- * local pom is the the original source.
+ * local pom is the original source.
  *
  * @author Robert Scholte
  * @author Guillaume Nodet

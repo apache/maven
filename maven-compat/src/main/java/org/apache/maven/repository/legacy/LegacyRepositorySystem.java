@@ -299,7 +299,7 @@ public class LegacyRepositorySystem
         // So now we have an url of the form file://<path>
 
         // We want to eliminate any relative path nonsense and lock down the path so we
-        // need to fully resolve it before any sub-modules use the path. This can happen
+        // need to fully resolve it before any submodules use the path. This can happen
         // when you are using a custom settings.xml that contains a relative path entry
         // for the local repository setting.
 

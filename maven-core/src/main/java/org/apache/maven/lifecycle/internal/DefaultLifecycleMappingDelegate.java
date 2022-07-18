@@ -115,7 +115,7 @@ public class DefaultLifecycleMappingDelegate
                         }
                     }
                 }
-                // if not then i need to grab the mojo descriptor and look at the phase that is specified
+                // if not then I need to grab the mojo descriptor and look at the phase that is specified
                 else
                 {
                     for ( String goal : execution.getGoals() )

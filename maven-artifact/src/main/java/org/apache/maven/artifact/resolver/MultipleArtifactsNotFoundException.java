@@ -52,7 +52,7 @@ public class MultipleArtifactsNotFoundException
     }
 
     /**
-     * Create an instance of the exception with allrequired information.
+     * Create an instance of the exception with all required information.
      *
      * @param originatingArtifact the artifact that was being resolved
      * @param resolvedArtifacts   artifacts that could be resolved

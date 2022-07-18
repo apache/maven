@@ -92,7 +92,7 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
             if ( fallThrough )
             {
                 LOGGER.debug( "Multi module project collection failed:{}"
-                        + "Detected that one of the modules of this multi module project uses another module as "
+                        + "Detected that one of the modules of this multi-module project uses another module as "
                         + "plugin extension which still needed to be built. This is not possible within the same "
                         + "reactor build. Another project collection strategy will be executed as result.",
                         System.lineSeparator() );
@@ -114,8 +114,8 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
             File multiModuleProjectPom = modelLocator.locatePom( request.getMultiModuleProjectDirectory() );
             if ( !multiModuleProjectPom.exists() )
             {
-                LOGGER.info( "Maven detected that the requested POM file is part of a multi module project, "
-                        + "but could not find a pom.xml file in the multi module root directory '{}'.",
+                LOGGER.info( "Maven detected that the requested POM file is part of a multi-module project, "
+                        + "but could not find a pom.xml file in the multi-module root directory '{}'.",
                         request.getMultiModuleProjectDirectory() );
                 LOGGER.info( "The reactor is limited to all projects under: " + request.getPom().getParent() );
                 return request.getPom();
@@ -141,7 +141,7 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
 
     /**
      * This method finds out whether collecting projects failed because of the following scenario:
-     * - A multi module project containing a module which is a plugin and another module which depends on it.
+     * - A multi-module project containing a module which is a plugin and another module which depends on it.
      * - Just the plugin is being built with the -f <pom> flag.
      * - Because of inter-module dependency collection, all projects in the multi-module project are collected.
      * - The plugin is not yet installed in a repository.

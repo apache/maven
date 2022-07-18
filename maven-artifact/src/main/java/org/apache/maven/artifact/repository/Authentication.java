@@ -36,7 +36,7 @@ public class Authentication
     }
 
     /**
-     * Username used to login to the host
+     * Username used to log in to the host
      */
     private String username;
 

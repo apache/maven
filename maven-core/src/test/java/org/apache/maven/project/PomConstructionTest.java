@@ -111,7 +111,7 @@ public class PomConstructionTest
     }
 
     /**
-     * Will throw exception if doesn't find parent(s) in build
+     * Will throw an exception if it doesn't find parent(s) in build
      *
      * @throws Exception in case of issue
      */

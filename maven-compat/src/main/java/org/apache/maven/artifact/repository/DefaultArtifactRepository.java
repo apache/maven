@@ -31,7 +31,7 @@ import org.apache.maven.wagon.repository.Repository;
 
 /**
  * This class is an abstraction of the location from/to resources can be
- * transfered.
+ * transferred.
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
  */

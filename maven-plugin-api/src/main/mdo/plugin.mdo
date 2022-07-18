@@ -240,7 +240,7 @@ under the License.
           <version>1.0.0</version>
           <type>boolean</type>
           <description>
-            Flags this Mojo to run it in a multi module way, i.e. aggregate the build with the set of projects
+            Flags this Mojo to run it in a multi-module way, i.e. aggregate the build with the set of projects
             listed as modules.
           </description>
           <defaultValue>false</defaultValue>
