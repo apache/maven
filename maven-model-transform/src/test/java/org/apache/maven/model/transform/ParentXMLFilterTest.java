@@ -180,7 +180,7 @@ public class ParentXMLFilterTest
     }
 
     /**
-     * An empty relative path means it must downloaded from a repository.
+     * An empty relative path means it must be downloaded from a repository.
      * That implies that the version cannot be solved (if missing, Maven should complain)
      *
      * @throws Exception

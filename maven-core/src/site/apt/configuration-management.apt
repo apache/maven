@@ -106,7 +106,7 @@ Plugin configuration
 
 Unified source directory
 
- Unified source directory structure that is analagous to the repository
+ Unified source directory structure that is analogous to the repository
  itself. This way locations of intermediary artifacts of a build would be
  in a known location. This would also help with developer setup i.e. getting
  new developers up and running. They could run a maven command and have all

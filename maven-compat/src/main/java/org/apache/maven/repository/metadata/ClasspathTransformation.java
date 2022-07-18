@@ -22,7 +22,7 @@ package org.apache.maven.repository.metadata;
 import org.apache.maven.artifact.ArtifactScopeEnum;
 
 /**
- * Helper class to conver an Md Graph into some form of a classpath
+ * Helper class to convert a metadata Graph into some form of a classpath
  *
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *

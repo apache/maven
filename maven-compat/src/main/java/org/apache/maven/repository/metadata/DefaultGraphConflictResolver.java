@@ -100,7 +100,7 @@ public class DefaultGraphConflictResolver
                 final MetadataGraphEdge edge = cleanEdges( v, ins, requestedScope );
 
                 if ( edge == null )
-                { // no edges - don't need this vertex any more
+                { // no edges - don't need this vertex anymore
                     if ( entry.equals( v ) )
                     { // unless it's an entry point.
                         // currently processing the entry point - it should not have any entry incident edges

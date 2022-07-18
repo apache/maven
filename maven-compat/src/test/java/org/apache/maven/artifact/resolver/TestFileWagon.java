@@ -30,7 +30,7 @@ import org.apache.maven.wagon.providers.file.FileWagon;
 import org.apache.maven.wagon.resource.Resource;
 
 /**
- * Wagon used for test cases that annotates some methods. Note that this is not a thread-safe implementation.
+ * Wagon used for test cases that annotate some methods. Note that this is not a thread-safe implementation.
  */
 public class TestFileWagon
     extends FileWagon

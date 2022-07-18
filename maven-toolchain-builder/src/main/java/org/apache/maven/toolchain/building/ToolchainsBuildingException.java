@@ -39,7 +39,7 @@ public class ToolchainsBuildingException
     /**
      * Creates a new exception with the specified problems.
      *
-     * @param problems The problems that causes this exception, must not be {@code null}.
+     * @param problems The problems that cause this exception, must not be {@code null}.
      */
     public ToolchainsBuildingException( List<Problem> problems )
     {

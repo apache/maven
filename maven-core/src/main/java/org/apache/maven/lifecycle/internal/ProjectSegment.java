@@ -26,7 +26,7 @@ import org.apache.maven.project.MavenProject;
 import java.util.List;
 
 /**
- * A build context that matches a mavenproject to a given tasksegment, and the session to be used.
+ * A build context that matches a Maven project to a given task segment, and the session to be used.
  * <p>
  * A note to the reader;
  * </p>

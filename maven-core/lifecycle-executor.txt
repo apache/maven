@@ -18,7 +18,7 @@ We have a lifecycle mapping for the packaging of *jar* below. You see that for t
   </lifecycles>
 </configuration>
 
-We need to turn this list of phases into a set of plugin objects that have an xml representation like the following:
+We need to turn this list of phases into a set of plugin objects that have an XML representation like the following:
 
 <plugins>
   <plugin>

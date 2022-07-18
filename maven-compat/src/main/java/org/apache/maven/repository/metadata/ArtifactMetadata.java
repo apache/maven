@@ -42,7 +42,7 @@ public class ArtifactMetadata
     protected String classifier;
 
     /**
-     * explanation: why this MD was chosen over it's siblings
+     * explanation: why this MD was chosen over its siblings
      * in the resulting structure (classpath for now)
      */
     protected String why;

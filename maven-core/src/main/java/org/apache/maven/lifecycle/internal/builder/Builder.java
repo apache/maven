@@ -39,7 +39,7 @@ import org.apache.maven.lifecycle.internal.TaskSegment;
 public interface Builder
 {
     //
-    // Be nice to whittle this down to Session, maybe add task segments to the session. The session really is the
+    // Be nice to whittle this down to Session, maybe add task segments to the session. The session really is
     // the place to store reactor related information.
     //
     void build( MavenSession session, ReactorContext reactorContext, ProjectBuildList projectBuilds,

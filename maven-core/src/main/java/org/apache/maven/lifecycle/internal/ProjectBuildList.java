@@ -55,7 +55,7 @@ public class ProjectBuildList
     // TODO Optimize; or maybe just rewrite the whole way aggregating mojos are being run.
     /**
      * Returns aProjectBuildList that contains only items for the specified taskSegment
-     * @param taskSegment the requested tasksegment
+     * @param taskSegment the requested task segment
      * @return a project build list for the supplied task segment
      */
     public ProjectBuildList getByTaskSegment( TaskSegment taskSegment )

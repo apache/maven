@@ -85,7 +85,7 @@ public class DefaultMavenExecutionRequest
 
     // ----------------------------------------------------------------------------
     // We need to allow per execution user and global settings as the embedder
-    // might be running in a mode where its executing many threads with totally
+    // might be running in a mode where it's executing many threads with totally
     // different settings.
     // ----------------------------------------------------------------------------
 
