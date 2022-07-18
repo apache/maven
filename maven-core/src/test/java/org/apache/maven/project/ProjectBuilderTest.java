@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.execution.MavenSession;
@@ -41,8 +42,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelSource;
-import org.apache.maven.shared.utils.io.FileUtils;
-
 
 public class ProjectBuilderTest
     extends AbstractCoreMavenComponentTestCase
@@ -159,7 +158,7 @@ public class ProjectBuilderTest
         // of DefaultModelBuilder.getCache() are affected by MNG-6530
 
         Path tempDir = Files.createTempDirectory( null );
-        FileUtils.copyDirectoryStructure ( new File( "src/test/resources/projects/grandchild-check" ), tempDir.toFile() );
+        FileUtils.copyDirectory( new File( "src/test/resources/projects/grandchild-check" ), tempDir.toFile() );
         try
         {
             MavenSession mavenSession = createMavenSession( null );
@@ -171,10 +170,10 @@ public class ProjectBuilderTest
             projectBuilder.build( child, configuration );
             // modify parent
             File parent = new File( tempDir.toFile(), "pom.xml" );
-            String parentContent = FileUtils.fileRead( parent );
+            String parentContent = FileUtils.readFileToString( parent, "UTF-8" );
             parentContent = parentContent.replaceAll( "<packaging>pom</packaging>",
                     "<packaging>pom</packaging><properties><addedProperty>addedValue</addedProperty></properties>" );
-            FileUtils.fileWrite( parent, "UTF-8", parentContent );
+            FileUtils.write( parent, parentContent, "UTF-8" );
             // re-build pom with modified parent
             ProjectBuildingResult result = projectBuilder.build( child, configuration );
             assertThat( result.getProject().getProperties(), hasKey( (Object) "addedProperty" ) );

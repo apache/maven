@@ -50,6 +50,7 @@ under the License.
     <javaVersion>8</javaVersion>
     <classWorldsVersion>2.6.0</classWorldsVersion>
     <commonsCliVersion>1.4</commonsCliVersion>
+    <commonsIoVersion>2.11.0</commonsIoVersion>
     <commonsLangVersion>3.8.1</commonsLangVersion>
     <junitVersion>4.13.2</junitVersion>
     <mockitoVersion>2.21.0</mockitoVersion>
@@ -339,6 +340,13 @@ under the License.
         <groupId>org.apache.maven.shared</groupId>
         <artifactId>maven-shared-utils</artifactId>
         <version>3.3.4</version>
+        <exclusions>
+          <!-- We use org.apache.maven.shared.utils.logging only in Maven Core -->
+          <exclusion>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.fusesource.jansi</groupId>
@@ -377,6 +385,13 @@ under the License.
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-http</artifactId>
         <version>${wagonVersion}</version>
+        <exclusions>
+          <!-- Not used at all -->
+          <exclusion>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!--  Repository -->
       <dependency>
@@ -434,6 +449,11 @@ under the License.
             <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>${commonsIoVersion}</version>
       </dependency>
       <dependency>
         <groupId>commons-jxpath</groupId>
