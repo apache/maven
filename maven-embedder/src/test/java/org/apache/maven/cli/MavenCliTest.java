@@ -424,9 +424,9 @@ public class MavenCliTest
         customizedMavenCli.container(cliRequest);
         customizedMavenCli.toolchains(cliRequest);
 
-        InOrder orderdEventSpyDispatcherMock = inOrder(eventSpyDispatcherMock);
-        orderdEventSpyDispatcherMock.verify(eventSpyDispatcherMock, times(1)).onEvent(any(ToolchainsBuildingRequest.class));
-        orderdEventSpyDispatcherMock.verify(eventSpyDispatcherMock, times(1)).onEvent(any(ToolchainsBuildingResult.class));
+        InOrder orderedEventSpyDispatcherMock = inOrder(eventSpyDispatcherMock);
+        orderedEventSpyDispatcherMock.verify(eventSpyDispatcherMock, times(1)).onEvent(any(ToolchainsBuildingRequest.class));
+        orderedEventSpyDispatcherMock.verify(eventSpyDispatcherMock, times(1)).onEvent(any(ToolchainsBuildingResult.class));
     }
 
     @Test

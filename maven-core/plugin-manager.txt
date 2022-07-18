@@ -11,7 +11,7 @@ h3. Plugins
 * Maven test harness for plugin execution model
 * Eclipse IDE tooling for plugin execution model and metadata model
 
-- we also seem to have information like the plugin lifecycle model that's burried inside the maven execution model
+- we also seem to have information like the plugin lifecycle model that's buried inside the maven execution model
 - we also seem to have artifact information tangled inside the plugin model
 - we have to deal with scripting implementations (groovy, beanshell, ruby)
 - we need to deal with a shared context for plugins, like the guarded mojos

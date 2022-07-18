@@ -41,7 +41,7 @@ public class ProjectDependencyGraphStubTest
     }
 
     @Test
-    public void testBDepenencies()
+    public void testBDependencies()
     {
         final List<MavenProject> bProjects = stub.getUpstreamProjects( ProjectDependencyGraphStub.B, false );
         assertEquals( 1, bProjects.size() );
@@ -49,7 +49,7 @@ public class ProjectDependencyGraphStubTest
     }
 
     @Test
-    public void testCDepenencies()
+    public void testCDependencies()
     {
         final List<MavenProject> cProjects = stub.getUpstreamProjects( ProjectDependencyGraphStub.C, false );
         assertEquals( 1, cProjects.size() );
@@ -57,7 +57,7 @@ public class ProjectDependencyGraphStubTest
     }
 
     @Test
-    public void testXDepenencies()
+    public void testXDependencies()
     {
         final List<MavenProject> cProjects = stub.getUpstreamProjects( ProjectDependencyGraphStub.X, false );
         assertEquals( 2, cProjects.size() );

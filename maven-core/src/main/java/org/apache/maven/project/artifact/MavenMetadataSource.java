@@ -592,7 +592,7 @@ public class MavenMetadataSource
                     {
                         message = "Missing POM for " + artifact.getId();
                     }
-                    else if ( isNonTransferrablePom( e ) )
+                    else if ( isNonTransferablePom( e ) )
                     {
                         throw new ArtifactMetadataRetrievalException( "Failed to retrieve POM for "
                             + artifact.getId() + ": " + e.getCause().getMessage(), e.getCause(),
@@ -736,7 +736,7 @@ public class MavenMetadataSource
             && e.getCause().getCause() instanceof ArtifactNotFoundException;
     }
 
-    private boolean isNonTransferrablePom( Exception e )
+    private boolean isNonTransferablePom( Exception e )
     {
         if ( e.getCause() instanceof ArtifactResolutionException )
         {
