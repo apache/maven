@@ -119,16 +119,16 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <configuration>
-          <includeArtifactIds>jansi</includeArtifactIds>
-          <includes>org/fusesource/jansi/internal/native/Windows/**</includes>
-        </configuration>
         <executions>
           <execution>
             <id>unpack-jansi-native</id>
             <goals>
               <goal>unpack-dependencies</goal>
             </goals>
+            <configuration>
+              <includeArtifactIds>jansi</includeArtifactIds>
+              <includes>org/fusesource/jansi/internal/native/Windows/**</includes>
+            </configuration>
           </execution>
         </executions>
       </plugin>
