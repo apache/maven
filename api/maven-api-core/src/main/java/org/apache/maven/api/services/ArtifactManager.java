@@ -57,9 +57,4 @@ public interface ArtifactManager extends Service
      */
     void attachMetadata( @Nonnull Artifact artifact, @Nonnull Metadata metadata );
 
-    /**
-     * Checks whether a given artifact version is considered a {@code SNAPSHOT} or not.
-     */
-    boolean isSnapshot( String version );
-
 }

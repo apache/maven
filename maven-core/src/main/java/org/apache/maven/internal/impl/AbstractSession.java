@@ -42,6 +42,8 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.Version;
+import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.ArtifactDeployer;
@@ -59,6 +61,7 @@ import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverException;
 import org.apache.maven.api.services.LocalRepositoryManager;
 import org.apache.maven.api.services.RepositoryFactory;
+import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
 
@@ -390,7 +393,7 @@ public abstract class AbstractSession implements Session
     @Override
     public boolean isVersionSnapshot( @Nonnull String version )
     {
-        return getService( ArtifactManager.class )
+        return getService( VersionParser.class )
                 .isSnapshot( version );
     }
 
@@ -495,4 +498,17 @@ public abstract class AbstractSession implements Session
                 .getPathForRemoteMetadata( this, getLocalRepository(), remote, metadata );
     }
 
+    @Override
+    public Version parseVersion( String version )
+    {
+        return getService( VersionParser.class )
+                .parseVersion( version );
+    }
+
+    @Override
+    public VersionRange parseVersionRange( String versionRange )
+    {
+        return getService( VersionParser.class )
+                .parseVersionRange( versionRange );
+    }
 }

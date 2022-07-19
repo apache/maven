@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.regex.Pattern;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Metadata;
@@ -36,9 +35,6 @@ import org.apache.maven.api.services.ArtifactManager;
 
 public class DefaultArtifactManager implements ArtifactManager
 {
-    private static final String SNAPSHOT = "SNAPSHOT";
-    private static final Pattern SNAPSHOT_TIMESTAMP = Pattern.compile( "^(.*-)?([0-9]{8}\\.[0-9]{6}-[0-9]+)$" );
-
 
     private final Map<Artifact, Path> paths = new ConcurrentHashMap<>();
     private final Map<Artifact, Collection<Metadata>> metadatas = new ConcurrentHashMap<>();
@@ -78,9 +74,4 @@ public class DefaultArtifactManager implements ArtifactManager
         metadatas.computeIfAbsent( artifact, a -> new CopyOnWriteArrayList<>() ).add( metadata );
     }
 
-    @Override
-    public boolean isSnapshot( String version )
-    {
-        return version.endsWith( SNAPSHOT ) || SNAPSHOT_TIMESTAMP.matcher( version ).matches();
-    }
 }

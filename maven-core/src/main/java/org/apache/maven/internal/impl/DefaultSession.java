@@ -54,6 +54,7 @@ import org.apache.maven.api.services.ProjectManager;
 import org.apache.maven.api.services.Prompter;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.ToolchainManager;
+import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
 import org.apache.maven.api.services.xml.SettingsXmlFactory;
 import org.apache.maven.api.services.xml.ToolchainsXmlFactory;
@@ -65,6 +66,7 @@ import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -88,6 +90,7 @@ public class DefaultSession extends AbstractSession
     private final ProjectManager projectManager = new DefaultProjectManager( artifactManager );
     private final PlexusContainer container;
     private final MojoExecutionScope mojoExecutionScope;
+    private final RuntimeInformation runtimeInformation;
 
     @SuppressWarnings( "checkstyle:ParameterNumber" )
     public DefaultSession( @Nonnull MavenSession session,
@@ -97,7 +100,8 @@ public class DefaultSession extends AbstractSession
                            @Nonnull MavenRepositorySystem mavenRepositorySystem,
                            @Nonnull DefaultToolchainManagerPrivate toolchainManagerPrivate,
                            @Nonnull PlexusContainer container,
-                           @Nonnull MojoExecutionScope mojoExecutionScope )
+                           @Nonnull MojoExecutionScope mojoExecutionScope,
+                           @Nonnull RuntimeInformation runtimeInformation )
     {
         this.mavenSession = nonNull( session );
         this.session = mavenSession.getRepositorySession();
@@ -111,6 +115,7 @@ public class DefaultSession extends AbstractSession
         this.toolchainManagerPrivate = toolchainManagerPrivate;
         this.container = container;
         this.mojoExecutionScope = mojoExecutionScope;
+        this.runtimeInformation = runtimeInformation;
     }
 
     MavenSession getMavenSession()
@@ -153,9 +158,17 @@ public class DefaultSession extends AbstractSession
         return mavenSession.getSystemProperties();
     }
 
+    @Nonnull
+    @Override
+    public String getMavenVersion()
+    {
+        return runtimeInformation.getMavenVersion();
+    }
+
     @Override
     public Map<String, Object> getPluginContext( Project project )
     {
+        nonNull( project, "project" );
         try
         {
             MojoExecution mojoExecution = container.lookup( MojoExecution.class );
@@ -232,16 +245,16 @@ public class DefaultSession extends AbstractSession
                 .setLocalRepositoryManager( localRepositoryManager );
         MavenSession newSession = new MavenSession( mavenSession.getContainer(), repoSession,
                 mavenSession.getRequest(), mavenSession.getResult() );
-        return new DefaultSession( newSession, repositorySystem, repositories,
-                projectBuilder, mavenRepositorySystem, toolchainManagerPrivate, container, mojoExecutionScope );
+        return new DefaultSession( newSession, repositorySystem, repositories, projectBuilder, mavenRepositorySystem,
+                toolchainManagerPrivate, container, mojoExecutionScope, runtimeInformation );
     }
 
     @Nonnull
     @Override
     public Session withRemoteRepositories( @Nonnull List<RemoteRepository> repositories )
     {
-        return new DefaultSession( mavenSession, repositorySystem, repositories,
-                projectBuilder, mavenRepositorySystem, toolchainManagerPrivate, container, mojoExecutionScope );
+        return new DefaultSession( mavenSession, repositorySystem, repositories, projectBuilder, mavenRepositorySystem,
+                toolchainManagerPrivate, container, mojoExecutionScope, runtimeInformation );
     }
 
     @Nonnull
@@ -320,6 +333,10 @@ public class DefaultSession extends AbstractSession
         else if ( clazz == MessageBuilderFactory.class )
         {
             return (T) new DefaultMessageBuilderFactory();
+        }
+        else if ( clazz == VersionParser.class )
+        {
+            return (T) new DefaultVersionParser();
         }
         throw new NoSuchElementException( clazz.getName() );
     }

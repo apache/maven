@@ -62,6 +62,13 @@ public interface Session
     Properties getSystemProperties();
 
     /**
+     * Returns the current maven version
+     * @return the maven version, never {@code null}.
+     */
+    @Nonnull
+    String getMavenVersion();
+
+    /**
      * Returns the plugin context for mojo being executed and the specified
      * {@link Project}, never returns {@code null} as if context not present, creates it.
      *
@@ -205,7 +212,7 @@ public interface Session
 
     /**
      * Shortcut for <code>getService(ArtifactManager.class).isSnapshot(...)</code>
-     * @see org.apache.maven.api.services.ArtifactManager#isSnapshot(String)
+     * @see org.apache.maven.api.services.VersionParser#isSnapshot(String)
      */
     boolean isVersionSnapshot( @Nonnull String version );
 
@@ -260,4 +267,21 @@ public interface Session
 
     Path getPathForRemoteMetadata( RemoteRepository remote, Metadata metadata );
 
+    /**
+     * Shortcut for <code>getService(VersionParser.class).parseVersion(...)</code>
+     * @see org.apache.maven.api.services.VersionParser#parseVersion(String)
+     *
+     * @throws org.apache.maven.api.services.VersionParserException if the parsing failed
+     */
+    @Nonnull
+    Version parseVersion( @Nonnull String version );
+
+    /**
+     * Shortcut for <code>getService(VersionParser.class).parseVersionRange(...)</code>
+     * @see org.apache.maven.api.services.VersionParser#parseVersionRange(String)
+     *
+     * @throws org.apache.maven.api.services.VersionParserException if the parsing failed
+     */
+    @Nonnull
+    VersionRange parseVersionRange( @Nonnull String versionRange );
 }

@@ -28,6 +28,7 @@ import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
 import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.RepositorySystem;
@@ -43,6 +44,7 @@ public class DefaultSessionFactory
     private final DefaultToolchainManagerPrivate toolchainManagerPrivate;
     private final PlexusContainer plexusContainer;
     private final MojoExecutionScope mojoExecutionScope;
+    private final RuntimeInformation runtimeInformation;
 
     @Inject
     public DefaultSessionFactory( RepositorySystem repositorySystem,
@@ -50,7 +52,8 @@ public class DefaultSessionFactory
                                   MavenRepositorySystem mavenRepositorySystem,
                                   DefaultToolchainManagerPrivate toolchainManagerPrivate,
                                   PlexusContainer plexusContainer,
-                                  MojoExecutionScope mojoExecutionScope )
+                                  MojoExecutionScope mojoExecutionScope,
+                                  RuntimeInformation runtimeInformation )
     {
         this.repositorySystem = repositorySystem;
         this.projectBuilder = projectBuilder;
@@ -58,6 +61,7 @@ public class DefaultSessionFactory
         this.toolchainManagerPrivate = toolchainManagerPrivate;
         this.plexusContainer = plexusContainer;
         this.mojoExecutionScope = mojoExecutionScope;
+        this.runtimeInformation = runtimeInformation;
     }
 
     public Session getSession( MavenSession mavenSession )
@@ -70,6 +74,6 @@ public class DefaultSessionFactory
     {
         return new DefaultSession(
                 mavenSession, repositorySystem, null, projectBuilder, mavenRepositorySystem,
-                toolchainManagerPrivate, plexusContainer, mojoExecutionScope );
+                toolchainManagerPrivate, plexusContainer, mojoExecutionScope, runtimeInformation );
     }
 }
