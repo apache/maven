@@ -160,7 +160,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest
     }
 
     /**
-     * Verify that using the basedir for exclusion with an exclemation in the project list matches projects with non-default POM files.
+     * Verify that using the basedir for exclusion with an exclamation in the project list matches projects with non-default POM files.
      *
      * @throws Exception in case of failure
      */

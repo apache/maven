@@ -37,7 +37,7 @@ under the License.
         </repository>
       </repositories>
       <activation>
-        <!-- This explicit disactivation is only here to workaround MNG-2605 -->
+        <!-- This explicit inactivation is only here to workaround MNG-2605 -->
         <activeByDefault>false</activeByDefault>
       </activation>
     </profile>

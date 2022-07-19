@@ -29,7 +29,7 @@ under the License.
 
   <name>Maven Integration Test :: MNG-4207</name>
   <description>
-    Test that a plugin that depends on log4j and employes the artifact resolver does not die when using
+    Test that a plugin that depends on log4j and employs the artifact resolver does not die when using
     commons-http to resolve an artifact.
   </description>
 

@@ -52,7 +52,7 @@ public class Premain
                     ClassReader r = new ClassReader( classfileBuffer );
                     final ClassWriter w = new ClassWriter( Opcodes.ASM6 );
 
-                    ClassVisitor v = new DefaultModelReaderVisitior( Opcodes.ASM6, w );
+                    ClassVisitor v = new DefaultModelReaderVisitor( Opcodes.ASM6, w );
 
                     r.accept( v, ClassReader.EXPAND_FRAMES );
                     return w.toByteArray();
@@ -65,10 +65,10 @@ public class Premain
         } );
     }
 
-    private static class DefaultModelReaderVisitior
+    private static class DefaultModelReaderVisitor
         extends ClassVisitor
     {
-        DefaultModelReaderVisitior( int api, org.objectweb.asm.ClassVisitor cv )
+        DefaultModelReaderVisitor( int api, org.objectweb.asm.ClassVisitor cv )
         {
             super( api, cv );
         }

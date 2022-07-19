@@ -27,7 +27,7 @@ under the License.
   <version>1.0-SNAPSHOT</version>
 
   <name>Maven Integration Test :: it0043</name>
-  <description>Test for repository inheritence - ensure using the same id overrides the defaults</description>
+  <description>Test for repository inheritance - ensure using the same id overrides the defaults</description>
 
   <repositories>
     <repository>

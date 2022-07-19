@@ -77,7 +77,7 @@ public class MavenITmng1803PomValidationErrorIncludesLineNumberTest
             }
         }
 
-        assertTrue( "Build output did not mention validaton error!", foundError );
+        assertTrue( "Build output did not mention validation error!", foundError );
     }
 
 }

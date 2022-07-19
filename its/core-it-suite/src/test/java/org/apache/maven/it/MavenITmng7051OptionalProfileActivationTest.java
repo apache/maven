@@ -79,7 +79,7 @@ public class MavenITmng7051OptionalProfileActivationTest
     }
 
     /**
-     * This test verifies that activating both an existing and a non-existing profile does not break the build when it the latter is prefixed with <strong>?</strong>.
+     * This test verifies that activating both an existing and a non-existing profile does not break the build when the latter is prefixed with <strong>?</strong>.
      *
      * @throws Exception in case of failure
      */
@@ -117,7 +117,7 @@ public class MavenITmng7051OptionalProfileActivationTest
     }
 
     /**
-     * This test verifies that deactivating both an existing and a non-existing profile does not break the build when it the latter is prefixed with <strong>?</strong>.
+     * This test verifies that deactivating both an existing and a non-existing profile does not break the build when the latter is prefixed with <strong>?</strong>.
      *
      * @throws Exception in case of failure
      */

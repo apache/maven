@@ -63,7 +63,7 @@ public class MavenITmng4600DependencyOptionalFlagManagementTest
     }
 
     /**
-     * Verify that a transitive dependency's optional flag is not subject to dependency management of the root artifat.
+     * Verify that a transitive dependency's optional flag is not subject to dependency management of the root artifact.
      * This part of the test checks the artifact collector.
      *
      * @throws Exception in case of failure

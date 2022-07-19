@@ -51,7 +51,7 @@ under the License.
     </dependency>
     <dependency>
       <!--
-      NOTE: It's a essential part of the test to have a dependency that is not part of the core to check the plugin
+      NOTE: It's an essential part of the test to have a dependency that is not part of the core to check the plugin
       POM is resolved, too.
       -->
       <groupId>org.apache.maven.its.mng0870</groupId>

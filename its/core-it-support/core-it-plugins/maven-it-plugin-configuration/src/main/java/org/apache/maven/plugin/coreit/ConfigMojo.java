@@ -118,7 +118,7 @@ public class ConfigMojo
     /**
      * A simple parameter of type {@link java.lang.Integer}.
      *
-     * @parameter property="config.intergerParam"
+     * @parameter property="config.integerParam"
      */
     private Integer integerParam;
 

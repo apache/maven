@@ -51,7 +51,7 @@ public class MavenITmng2199ParentVersionRangeTest
             // building a parent fails. The build succeeds without any parent. If that warning message appears in the
             // log, parent resolution failed.
             final List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
-            assertFalse( "Unxpected error message found.",
+            assertFalse( "Unexpected error message found.",
                          indexOf( lines, ".*Failed to build parent project.*" ) >= 0 );
 
         }
@@ -85,7 +85,7 @@ public class MavenITmng2199ParentVersionRangeTest
             // building a parent fails. The build succeeds without any parent. If that warning message appears in the
             // log, parent resolution failed.
             final List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
-            assertFalse( "Unxpected error message found.",
+            assertFalse( "Unexpected error message found.",
                          indexOf( lines, ".*Failed to build parent project.*" ) >= 0 );
 
         }
@@ -211,7 +211,7 @@ public class MavenITmng2199ParentVersionRangeTest
             // is not corrupt. It's expected to find the local parent and not fall back to remote resolution. If it
             // falls back to remote resolution, this just catches the test project to be broken.
             final List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
-            assertFalse( "Unxpected error message found.",
+            assertFalse( "Unexpected error message found.",
                          indexOf( lines, ".*Failed to build parent project.*" ) >= 0 );
 
         }
@@ -276,7 +276,7 @@ public class MavenITmng2199ParentVersionRangeTest
             // resolution with a version range in use. If the warning message is in the logs, that remote parent
             // resolution failed unexpectedly.
             final List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
-            assertFalse( "Unxpected error message found.",
+            assertFalse( "Unexpected error message found.",
                          indexOf( lines, ".*Failed to build parent project.*" ) >= 0 );
 
         }

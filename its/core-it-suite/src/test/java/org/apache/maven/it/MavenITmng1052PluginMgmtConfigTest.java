@@ -24,35 +24,36 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 /**
- * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-985">MNG-985</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1052">MNG-1052</a>.
  *
  * @author John Casey
  *
  */
-public class MavenITmng0985NonExecutedPluginMngtGoalsTest
+public class MavenITmng1052PluginMgmtConfigTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng0985NonExecutedPluginMngtGoalsTest()
+    public MavenITmng1052PluginMgmtConfigTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }
 
     /**
-     * Test that plugins in pluginManagement aren't included in the build
-     * unless they are referenced by groupId/artifactId within the plugins
-     * section of a pom.
+     * Test that configuration for a lifecycle-bound plugin is injected from
+     * PluginManagement section even when it's not explicitly defined in the
+     * plugins section.
      *
      * @throws Exception in case of failure
      */
-    public void testitMNG0985()
+    public void testitMNG1052()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0985" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1052" );
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "initialize" );
-        verifier.verifyFileNotPresent( "target/unexpected.txt" );
+        verifier.executeGoal( "process-resources" );
+        verifier.verifyFilePresent( "target/plugin-management.txt" );
+        verifier.verifyFileNotPresent( "target/resources-resources.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

@@ -22,7 +22,7 @@ under the License.
 <settings>
   <mirrors>
     <mirror>
-      <!-- NOTE: The id of the mirror should be used to lookup the credentials, not the id of the original repository. -->
+      <!-- NOTE: The id of the mirror should be used to look up the credentials, not the id of the original repository. -->
       <id>maven-core-it-mng-4068</id>
       <name>Test Mirror</name>
       <mirrorOf>mng-4068</mirrorOf>

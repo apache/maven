@@ -30,7 +30,7 @@ under the License.
 
   <name>Maven Integration Test :: MNG-7390</name>
   <description>
-    This test suite verifies that other modules in the same multi module project cannot be selected when invoking Maven
+    This test suite verifies that other modules in the same multi-module project cannot be selected when invoking Maven
     from a submodule, when the .mvn directory in the root is missing.
   </description>
 

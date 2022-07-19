@@ -23,10 +23,10 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
-public class MavenIT0030DepPomDepMngtInheritanceTest
+public class MavenIT0030DepPomDepMgmtInheritanceTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenIT0030DepPomDepMngtInheritanceTest()
+    public MavenIT0030DepPomDepMgmtInheritanceTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }

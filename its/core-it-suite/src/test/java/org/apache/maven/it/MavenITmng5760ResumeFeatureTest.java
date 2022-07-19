@@ -188,7 +188,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         // Let's do a first pass with a and c failing.  The build is parallel,
         // so we have a first thread with a and d, and the second one with b and c
         // The result should be:
-        //   a : failure (slow, so b and c will be built in the mean time)
+        //   a : failure (slow, so b and c will be built in the meantime)
         //   b : success
         //   c : failure
         //   d : skipped

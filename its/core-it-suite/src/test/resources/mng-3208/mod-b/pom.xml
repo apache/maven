@@ -29,7 +29,7 @@ under the License.
 
   <name>Maven Integration Test :: MNG-3208 :: Mod-B</name>
   <description>
-    Verify that project sorting consideres dependencies injected by profiles.
+    Verify that project sorting considers dependencies injected by profiles.
   </description>
 
   <build>

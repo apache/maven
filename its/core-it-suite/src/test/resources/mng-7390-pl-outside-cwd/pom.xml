@@ -30,7 +30,7 @@ under the License.
 
   <name>Maven Integration Test :: MNG-7390</name>
   <description>
-    This test suite tests whether other modules in the same multi module project can be selected when invoking Maven
+    This test suite tests whether other modules in the same multi-module project can be selected when invoking Maven
     from a submodule.
   </description>
 

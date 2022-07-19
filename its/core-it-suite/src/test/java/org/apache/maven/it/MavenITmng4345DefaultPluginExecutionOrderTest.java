@@ -40,7 +40,7 @@ public class MavenITmng4345DefaultPluginExecutionOrderTest
     }
 
     /**
-     * Test that plugin executions contributed by default lifecycle mappings always execute first in the targetted
+     * Test that plugin executions contributed by default lifecycle mappings always execute first in the targeted
      * lifecycle phase regardless of other plugin executions bound to the same phase and regardless of the POM
      * order of plugin declarations.
      *

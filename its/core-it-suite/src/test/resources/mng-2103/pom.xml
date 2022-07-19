@@ -29,7 +29,7 @@ under the License.
 
   <name>Maven Integration Test :: MNG-2103 :: Parent</name>
   <description>
-    Verify that the plugin-level inherited flag can be overriden by the execution-level flag.
+    Verify that the plugin-level inherited flag can be overridden by the execution-level flag.
   </description>
 
   <modules>

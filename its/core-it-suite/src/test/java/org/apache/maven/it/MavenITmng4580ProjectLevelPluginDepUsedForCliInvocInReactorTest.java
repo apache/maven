@@ -39,7 +39,7 @@ public class MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest
     }
 
     /**
-     * Verify that project-level plugin dependencies of sub modules are still considered when a plugin is invoked
+     * Verify that project-level plugin dependencies of submodules are still considered when a plugin is invoked
      * directly from command line at the reactor root. In other words, the plugin realm used for a mojo execution
      * should match the plugin dependencies as given by the current project.
      *

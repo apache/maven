@@ -108,7 +108,7 @@ under the License.
             <artifactId>maven-project-info-reports-plugin</artifactId>
             <configuration>
               <dependencyLocationsEnabled>false</dependencyLocationsEnabled><!-- waiting for MPIR-267 -->
-              <!-- pin down urls to to avoid interpolated values from the modules, waiting for  MPIR-290 -->
+              <!-- pin down urls to avoid interpolated values from the modules, waiting for  MPIR-290 -->
               <anonymousConnection>${project.scm.connection}</anonymousConnection>
               <developerConnection>${project.scm.developerConnection}</developerConnection>
             </configuration>

@@ -110,7 +110,7 @@ under the License.
       <property name="max" value="132"/>
     </module> -->
 
-    <!-- the following exist in sufficent abundance that enforcing and even warning on these is impractical -->
+    <!-- the following exist in sufficient abundance that enforcing and even warning on these is impractical -->
     <!--
     <module name="ParameterName">
       <property name="format" value="^[a-z][a-zA-Z0-9]*" />

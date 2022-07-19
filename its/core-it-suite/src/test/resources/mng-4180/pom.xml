@@ -41,7 +41,7 @@ under the License.
         <exclusion>
           <!--
           This exclusion should have no effect on the transitive dependencies of say org.apache.maven.its.mng4180:c, i.e.
-          an exclusion defined for a dependency should be limited to the sub tree below this dependency.
+          an exclusion defined for a dependency should be limited to the subtree below this dependency.
           -->
           <groupId>org.apache.maven.its.mng4180</groupId>
           <artifactId>b</artifactId>

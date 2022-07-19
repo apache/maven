@@ -36,7 +36,7 @@ public class MavenITmng2130ParentLookupFromReactorCacheTest
 
     /**
      * Test that parent-POMs cached during a build are available as parents
-     * to other POMs in the multimodule build.
+     * to other POMs in the multi-module build.
      *
      * @throws Exception in case of failure
      */

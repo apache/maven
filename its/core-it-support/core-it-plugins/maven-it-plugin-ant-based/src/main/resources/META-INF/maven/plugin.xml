@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- NOTE: Using hand-written descriptor to decouple from MPLUGIN-136/MNG-3741 -->
+<!-- NOTE: Using handwritten descriptor to decouple from MPLUGIN-136/MNG-3741 -->
 <plugin>
   <description>A test plugin whose mojos are implemented via Ant scripts.</description>
   <groupId>org.apache.maven.its.plugins</groupId>

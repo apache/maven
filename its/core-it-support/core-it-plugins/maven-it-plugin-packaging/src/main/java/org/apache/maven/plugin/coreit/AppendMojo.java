@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 /**
- * Appends a message to an UTF-8 encoded plain text file.
+ * Appends a message to a UTF-8 encoded plain text file.
  *
  * @author Benjamin Bentmann
  * @goal append

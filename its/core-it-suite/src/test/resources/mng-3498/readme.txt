@@ -10,4 +10,4 @@ To run, execute the following steps:
 2. Build the test project:
 
     cd project
-    mvn validte
+    mvn validate

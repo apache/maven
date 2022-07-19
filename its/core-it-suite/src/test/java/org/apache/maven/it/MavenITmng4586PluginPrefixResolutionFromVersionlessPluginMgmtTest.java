@@ -23,30 +23,43 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
-public class MavenIT0019PluginVersionMngtBySuperPomTest
+/**
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4586">MNG-4586</a>.
+ *
+ * @author Benjamin Bentmann
+ */
+public class MavenITmng4586PluginPrefixResolutionFromVersionlessPluginMgmtTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenIT0019PluginVersionMngtBySuperPomTest()
+
+    public MavenITmng4586PluginPrefixResolutionFromVersionlessPluginMgmtTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[3.0-beta-1,)" );
     }
 
     /**
-     * Test that a version is managed by pluginManagement in the super POM
+     * Verify that plugin prefixes can be resolved from the POM's plugin management even if the POM
+     * does not specify the plugin version.
      *
      * @throws Exception in case of failure
      */
-    public void testit0019()
+    public void testit()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0019" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4586" );
+
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "process-resources" );
-        verifier.verifyFilePresent( "target/classes/test.txt" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng4586" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
+        verifier.executeGoal( "mng4586:touch" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        verifier.verifyFilePresent( "target/touch.txt" );
     }
 
 }

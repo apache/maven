@@ -31,7 +31,7 @@ under the License.
 
   <dependencies>
     <dependency>
-      <!-- In order to resolve the transitive dependency on dep-a:0.1-SNAPHOT, project.version needs to be resolved properly... -->
+      <!-- In order to resolve the transitive dependency on dep-a:0.1-SNAPSHOT, project.version needs to be resolved properly... -->
       <groupId>org.apache.maven.its.mng2486</groupId>
       <artifactId>dep-b</artifactId>
       <version>0.1-SNAPSHOT</version>

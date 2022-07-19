@@ -103,7 +103,7 @@ under the License.
           </dependency>
         </dependencies>
         <configuration>
-          <!-- NOTE: We use a hand-written descriptor to decouple from MPLUGIN-136/MNG-3741 so dump the generated one -->
+          <!-- NOTE: We use a handwritten descriptor to decouple from MPLUGIN-136/MNG-3741 so dump the generated one -->
           <outputDirectory>${project.build.directory}</outputDirectory>
         </configuration>
       </plugin>

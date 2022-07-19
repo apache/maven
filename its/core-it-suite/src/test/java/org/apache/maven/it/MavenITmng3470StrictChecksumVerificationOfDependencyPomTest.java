@@ -28,11 +28,11 @@ import java.io.File;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng3470StrictCheckumVerificationOfDependencyPomTest
+public class MavenITmng3470StrictChecksumVerificationOfDependencyPomTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng3470StrictCheckumVerificationOfDependencyPomTest()
+    public MavenITmng3470StrictChecksumVerificationOfDependencyPomTest()
     {
         super( "[2.0.3,2.0.4],[3.0-beta-1,)" );
     }

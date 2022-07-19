@@ -69,7 +69,7 @@ public class MavenITmng6352PrintVersionTest
         List<String> loadedLines = verifier.loadLines( "version-log.txt", "UTF-8" );
         List<String> resultingLines = extractReactorBuildOrder( loadedLines );
 
-        // We expecting exactly four lines as result.
+        // We're expecting exactly four lines as result.
         assertEquals( 4, resultingLines.size() );
 
         // We expect those lines in the following exact order.
@@ -104,7 +104,7 @@ public class MavenITmng6352PrintVersionTest
         List<String> loadedLines = verifier.loadLines( "version-log.txt", "UTF-8" );
         List<String> resultingLines = extractReactorBuildOrder( loadedLines );
 
-        // We expecting exactly four lines as result.
+        // We're expecting exactly four lines as result.
         assertEquals( 4, resultingLines.size() );
 
         // We expect those lines in the following exact order.

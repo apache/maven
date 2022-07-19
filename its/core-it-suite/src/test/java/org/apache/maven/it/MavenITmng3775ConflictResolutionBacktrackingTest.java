@@ -76,7 +76,7 @@ public class MavenITmng3775ConflictResolutionBacktrackingTest
 
     /**
      * Verify that conflict resolution doesn't select nodes which are children of eventually disabled nodes.
-     * In other words, when a sub tree gets disabled, all previously selected winners among the children need to
+     * In other words, when a subtree gets disabled, all previously selected winners among the children need to
      * be revised.
      */
     private void testit( String project )

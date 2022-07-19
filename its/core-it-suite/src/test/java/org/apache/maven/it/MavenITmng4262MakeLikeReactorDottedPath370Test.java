@@ -69,7 +69,7 @@ public class MavenITmng4262MakeLikeReactorDottedPath370Test
     }
 
     /**
-     * Verify that the project list can select a sub module by a relative path like {@code "../<something>"}.
+     * Verify that the project list can select a submodule by a relative path like {@code "../<something>"}.
      *
      * @throws Exception in case of failure
      */

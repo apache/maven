@@ -54,7 +54,7 @@ under the License.
     </dependency>
     <dependency>
       <!--
-      NOTE: This is a dummy dependency whose contents doesn't matter. All that matters is that the plugin has at least
+      NOTE: This is a dummy dependency whose content doesn't matter. All that matters is that the plugin has at least
       one dependency that is not excluded by the artifact filter of the core. This makes our IT plugin more closely
       resemble a real-world plugin and in particular makes sure the extension manager does not consider the plugin
       artifact as a standalone resource package. This subtle difference is crucial to reproduce MNG-2831.

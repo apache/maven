@@ -27,7 +27,7 @@ under the License.
   <version>1.0-SNAPSHOT</version>
 
   <name>Maven Integration Test :: it0043 setup</name>
-  <description>Preparation project with non-overriden URL to central for plugin download.</description>
+  <description>Preparation project with non-overridden URL to central for plugin download.</description>
 
   <build>
     <plugins>

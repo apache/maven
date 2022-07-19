@@ -41,7 +41,7 @@ under the License.
         <version>0.1-stub-SNAPSHOT</version>
         <executions>
           <execution>
-            <!-- NOTE: <id> element deliberatly omitted to trigger issue. -->
+            <!-- NOTE: <id> element deliberately omitted to trigger issue. -->
             <phase>verify</phase>
             <goals>
               <goal>resources</goal>

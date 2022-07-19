@@ -38,8 +38,8 @@ under the License.
 
   <build>
     <!--
-    NOTE: Unlike the sub module, this POM does not have any extensions, in particular, this project does not know about
-    the artifact handler for "it-artifact" used in the sub module.
+    NOTE: Unlike the submodule, this POM does not have any extensions, in particular, this project does not know about
+    the artifact handler for "it-artifact" used in the submodule.
     -->
     <plugins>
       <plugin>

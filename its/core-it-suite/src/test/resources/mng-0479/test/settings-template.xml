@@ -23,7 +23,7 @@ under the License.
   <profiles>
     <profile>
       <!--
-      Make sure we also override the repo definition in case a repo manager is setup.
+      Make sure we also override the repo definition in case a repo manager is set up.
       -->
       <id>it-defaults</id>
       <activation>

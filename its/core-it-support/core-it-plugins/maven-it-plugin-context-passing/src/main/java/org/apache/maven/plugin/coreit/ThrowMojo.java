@@ -24,7 +24,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * "Throw" a parameter into the plugin context, for the "catch" mojo to
- * pickup and process.
+ * pick up and process.
  *
  * @goal throw
  */

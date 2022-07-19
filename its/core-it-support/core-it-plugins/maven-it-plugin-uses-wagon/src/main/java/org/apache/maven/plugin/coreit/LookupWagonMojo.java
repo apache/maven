@@ -95,7 +95,7 @@ public class LookupWagonMojo
                 }
                 catch ( Exception e )
                 {
-                    getLog().warn( "[MAVEN-CORE-IT-LOG] Failed to lookp up wagon for URL " + url, e );
+                    getLog().warn( "[MAVEN-CORE-IT-LOG] Failed to look up wagon for URL " + url, e );
                 }
             }
         }

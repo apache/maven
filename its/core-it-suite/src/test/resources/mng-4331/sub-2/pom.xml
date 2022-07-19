@@ -34,7 +34,7 @@ under the License.
   </description>
 
   <dependencies>
-    <!-- This dependency or more precisly its POM is part of the reactor but the actual artifact file is not (yet build) -->
+    <!-- This dependency or more precisely its POM is part of the reactor but the actual artifact file is not (yet build) -->
     <dependency>
       <groupId>org.apache.maven.its.mng4331</groupId>
       <artifactId>sub-1</artifactId>

@@ -66,7 +66,7 @@ public class MavenITmng6057CheckReactorOrderTest
         List<String> loadedLines = verifier.loadLines( "log-only.txt", "UTF-8" );
         List<String> resultingLines = extractReactorBuildOrder( loadedLines );
 
-        // We expecting exactly three lines as result.
+        // We're expecting exactly three lines as result.
         assertEquals( 3, resultingLines.size() );
 
         // We expect those lines in the following exact order.

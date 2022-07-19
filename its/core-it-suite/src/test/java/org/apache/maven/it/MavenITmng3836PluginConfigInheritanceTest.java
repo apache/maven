@@ -40,7 +40,7 @@ public class MavenITmng3836PluginConfigInheritanceTest
     }
 
     /**
-     * Verify that sub modules can *override* inherited plugin configuration.
+     * Verify that submodules can *override* inherited plugin configuration.
      *
      * @throws Exception in case of failure
      */

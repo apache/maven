@@ -28,7 +28,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * <p>
  * Complicated use case, but say
  * you have an aggregator plugin that forks a lifecycle, and this aggregator is bound to the main lifecycle in a
- * multimodule build. Further, say you call another plugin directly from the command line for this multimodule build,
+ * multi-module build. Further, say you call another plugin directly from the command line for this multi-module build,
  * which forks a new lifecycle (like assembly:assembly).
  * </p>
  * When the directly invoked aggregator forks, it will force the

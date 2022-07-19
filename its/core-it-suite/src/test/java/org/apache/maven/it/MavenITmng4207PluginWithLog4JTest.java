@@ -38,7 +38,7 @@ public class MavenITmng4207PluginWithLog4JTest
     }
 
     /**
-     * Test that a plugin that depends on log4j and employes the artifact resolver does not die when using
+     * Test that a plugin that depends on log4j and employs the artifact resolver does not die when using
      * commons-http to resolve an artifact.
      *
      * @throws Exception in case of failure

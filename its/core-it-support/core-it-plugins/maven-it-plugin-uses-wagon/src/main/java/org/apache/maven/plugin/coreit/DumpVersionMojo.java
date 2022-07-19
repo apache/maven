@@ -51,7 +51,7 @@ public class DumpVersionMojo
     private File basedir;
 
     /**
-     * The Wagon manager used to lookup the wagon of interest.
+     * The Wagon manager used to look up the wagon of interest.
      *
      * @component
      */

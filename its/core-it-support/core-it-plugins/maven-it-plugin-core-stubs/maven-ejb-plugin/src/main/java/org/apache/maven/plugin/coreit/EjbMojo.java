@@ -50,7 +50,7 @@ public class EjbMojo
     private MavenProject project;
 
     /**
-     * The path to the output file, relative to the project base directory directory.
+     * The path to the output file, relative to the project base directory.
      *
      * @parameter
      */

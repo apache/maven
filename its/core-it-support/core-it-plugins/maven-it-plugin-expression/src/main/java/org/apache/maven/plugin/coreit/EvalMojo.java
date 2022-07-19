@@ -72,7 +72,7 @@ public class EvalMojo
 
     /**
      * The path to the output file for the properties with the expression values. For each expression given by the
-     * parameter {@link #expressions} an similar named properties key will be used to save the expression value. If an
+     * parameter {@link #expressions}, a similar named properties key will be used to save the expression value. If an
      * expression evaluated to <code>null</code>, there will be no corresponding key in the properties file.
      *
      * @parameter property="expression.outputFile"

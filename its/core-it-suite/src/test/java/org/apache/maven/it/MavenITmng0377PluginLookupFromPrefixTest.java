@@ -38,7 +38,7 @@ public class MavenITmng0377PluginLookupFromPrefixTest
     }
 
     /**
-     * Test usage of plugins.xml mapping file on the repository to resolve plugin artifactId from it's prefix using the
+     * Test usage of plugins.xml mapping file on the repository to resolve plugin artifactId from its prefix using the
      * pluginGroups in the provided settings.xml.
      *
      * @throws Exception in case of failure

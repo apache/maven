@@ -53,7 +53,7 @@ public class MavenITmng4800NearestWinsVsScopeWideningTest
     /**
      * Verify that nearest-wins conflict resolution doesn't get confused when a farther conflicting dependency has
      * a wider scope than the nearer dependency, i.e. one should still end up with the nearer dependency (s:1) and
-     * its sub tree (x) but in the wider scope (compile).
+     * its subtree (x) but in the wider scope (compile).
      */
     private void testit( String test )
         throws Exception

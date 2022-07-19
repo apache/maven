@@ -40,7 +40,7 @@ public class MavenITmng3208ProfileAwareReactorSortingTest
     }
 
     /**
-     * Verify that project sorting consideres dependencies injected by profiles.
+     * Verify that project sorting considers dependencies injected by profiles.
      *
      * @throws Exception in case of failure
      */

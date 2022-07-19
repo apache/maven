@@ -299,7 +299,7 @@ public class MavenITmng3652UserAgentHeaderTest
         assertEquals( "My wonderful header", customHeader );
     }
 
-    public void testmng3652_AdditionnalHttpHeaderConfiguredInSettings()
+    public void testmng3652_AdditionalHttpHeaderConfiguredInSettings()
         throws Exception
     {
         // customizing version not supported in Maven 3

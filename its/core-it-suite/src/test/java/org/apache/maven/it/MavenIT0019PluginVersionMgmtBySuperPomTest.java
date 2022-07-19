@@ -23,37 +23,28 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
-/**
- * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1052">MNG-1052</a>.
- *
- * @author John Casey
- *
- */
-public class MavenITmng1052PluginMngtConfigTest
+public class MavenIT0019PluginVersionMgmtBySuperPomTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng1052PluginMngtConfigTest()
+    public MavenIT0019PluginVersionMgmtBySuperPomTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }
 
     /**
-     * Test that configuration for a lifecycle-bound plugin is injected from
-     * PluginManagement section even when it's not explicitly defined in the
-     * plugins section.
+     * Test that a version is managed by pluginManagement in the super POM
      *
      * @throws Exception in case of failure
      */
-    public void testitMNG1052()
+    public void testit0019()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1052" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0019" );
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "process-resources" );
-        verifier.verifyFilePresent( "target/plugin-management.txt" );
-        verifier.verifyFileNotPresent( "target/resources-resources.txt" );
+        verifier.verifyFilePresent( "target/classes/test.txt" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

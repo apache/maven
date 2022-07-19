@@ -24,7 +24,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 /**
- * This test suite tests whether other modules in the same multi module project can be selected when invoking Maven from a submodule.
+ * This test suite tests whether other modules in the same multi-module project can be selected when invoking Maven from a submodule.
  * Related JIRA issue: <a href="https://issues.apache.org/jira/browse/MNG-7390">MNG-7390</a>.
  *
  * @author Martin Kanters
@@ -104,7 +104,7 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
     }
 
     /**
-     Maven determines whether the target module is in a multi module project based on the presence of a .mvn directory in root.
+     Maven determines whether the target module is in a multi-module project based on the presence of a .mvn directory in root.
      This test verifies that when that directory is missing, the module cannot be found.
      */
     public void testSelectModulesOutsideCwdDoesNotWorkWhenDotMvnIsNotPresent() throws Exception

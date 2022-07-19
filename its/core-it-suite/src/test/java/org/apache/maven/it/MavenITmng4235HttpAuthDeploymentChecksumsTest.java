@@ -165,7 +165,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
             if ( StringUtils.equalsIgnoreCase( "chunked", deployedResource.transferEncoding ) )
             {
                 fail( "deployedResource " + deployedResource
-                          + " use chuncked transfert encoding some http server doesn't support that" );
+                          + " use chunked transfert encoding some http server doesn't support that" );
             }
         }
     }

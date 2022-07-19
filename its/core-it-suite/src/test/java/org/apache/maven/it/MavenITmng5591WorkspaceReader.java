@@ -37,9 +37,9 @@ public class MavenITmng5591WorkspaceReader
         /*
          * The point of this test is to validate that ide WorkspaceReader, like one used by m2e, does not interfere with
          * reactor dependency resolution. The test comes in two parts. mng-5591-workspace-reader/extension is noop
-         * WorkspaceReader implementation and mng-5591-workspace-reader/basic is a multimodule project with inter-module
+         * WorkspaceReader implementation and mng-5591-workspace-reader/basic is a multi-module project with inter-module
          * dependencies. The workspace reader extension is injected in maven runtime with -Dmaven.ext.class.path command
-         * line argument. The multimodule build fails unless reactor resolution works properly.
+         * line argument. The multi-module build fails unless reactor resolution works properly.
          */
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5591-workspace-reader" );

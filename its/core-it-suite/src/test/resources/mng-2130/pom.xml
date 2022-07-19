@@ -9,7 +9,7 @@
   <name>Maven Integration Test :: MNG-2130</name>
   <description>
     Test that parent-POMs cached during a build are available as parents
-    to other POMs in the multimodule build.
+    to other POMs in the multi-module build.
   </description>
 
   <modules>

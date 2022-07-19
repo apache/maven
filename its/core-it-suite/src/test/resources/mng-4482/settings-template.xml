@@ -33,7 +33,7 @@ under the License.
           <snapshots>
             <enabled>true</enabled>
             <checksumPolicy>ignore</checksumPolicy>
-            <!-- NOTE: This should be overriden by -U from the CLI -->
+            <!-- NOTE: This should be overridden by -U from the CLI -->
             <updatePolicy>never</updatePolicy>
           </snapshots>
         </repository>

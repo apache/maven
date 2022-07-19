@@ -80,7 +80,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest
     /**
      * Test that reactor projects are included in dependency resolution.
      *
-     * I this pass, the dependency artifact should have the file $(basedir)/dependency/dependency-classes
+     * If this passes, the dependency artifact should have the file $(basedir)/dependency/dependency-classes
      * (a directory) associated with it, since the 'compile' phase has run. This location should be
      * present in the compile classpath output from the maven-it-plugin-dependency-resolution:compile
      * mojo execution.
@@ -112,7 +112,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest
     /**
      * Test that reactor projects are included in dependency resolution.
      *
-     * I this pass, the dependency should have been installed, so the dependency artifact should have
+     * If this passes, the dependency should have been installed, so the dependency artifact should have
      * a file of .../dependency-1.jar associated with it, since the 'install' phase has run. This
      * location should be present in the compile classpath output from the
      * maven-it-plugin-dependency-resolution:compile mojo execution.

@@ -39,7 +39,7 @@ public class MavenITmng3979ElementJoinTest
     }
 
     /**
-     * Test that during inheritance the merging/joining of sub trees with equal identifier doesn't crash if the parent
+     * Test that during inheritance the merging/joining of subtrees with equal identifier doesn't crash if the parent
      * POM has a non-empty element and the child POM has an empty element to join.
      *
      * @throws Exception in case of failure

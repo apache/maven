@@ -40,7 +40,7 @@ public class MavenITmng3845LimitedPomInheritanceTest
     }
 
     /**
-     * Test that inheritance is all-or-nothing for certain sub-trees of the POM.
+     * Test that inheritance is all-or-nothing for certain subtrees of the POM.
      *
      * @throws Exception in case of failure
      */

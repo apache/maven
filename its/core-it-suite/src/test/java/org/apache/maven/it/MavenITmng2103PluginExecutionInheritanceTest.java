@@ -40,7 +40,7 @@ public class MavenITmng2103PluginExecutionInheritanceTest
     }
 
     /**
-     * Verify that the plugin-level inherited flag can be overriden by the execution-level flag.
+     * Verify that the plugin-level inherited flag can be overridden by the execution-level flag.
      *
      * @throws Exception in case of failure
      */

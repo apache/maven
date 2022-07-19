@@ -63,7 +63,7 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        // phase 2: trigger blacklisting of repo (by invalid URL) and check previously downloaded metadata is stil used
+        // phase 2: trigger blacklisting of repo (by invalid URL) and check previously downloaded metadata is still used
 
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );

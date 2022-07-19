@@ -18,7 +18,7 @@ rm -rf $repo/commons-logging
 read
 
 ( cd parent ; $mvn -f pom2.xml deploy )
-# Move the original commons-loggings deps out of the way
+# Move the original commons-logging deps out of the way
 mv $repo/commons-logging $repo/commons-logging-1.0.1
 # Run the child project again and the new version of commons-logging should come down
 ( cd issue; $mvn compile )

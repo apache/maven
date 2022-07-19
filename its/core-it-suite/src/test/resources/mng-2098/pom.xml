@@ -38,7 +38,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.its.mng2098</groupId>
       <artifactId>dep</artifactId>
-      <!-- NOTE: The version range is the center piece of this test -->
+      <!-- NOTE: The version range is the centerpiece of this test -->
       <version>[0.1,0.1.99]</version>
     </dependency>
   </dependencies>
