@@ -43,10 +43,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.inject.Inject;
 
-// It would be cool if there was a hook that i could use to setup a test environment.
-// I want to setup a local/remote repositories for testing but i don't want to have
-// to change them when i change the layout of the repositories. So i want to generate
-// the structure i want to test by using the artifact handler manager which dictates
+// It would be cool if there was a hook that I could use to set up a test environment.
+// I want to set up a local/remote repositories for testing but I don't want to have
+// to change them when I change the layout of the repositories. So I want to generate
+// the structure I want to test by using the artifact handler manager which dictates
 // the layout used for a particular artifact type.
 
 /**

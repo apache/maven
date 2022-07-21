@@ -122,7 +122,7 @@ class ModelData
      */
     public String getId()
     {
-        // if source is null, it is the supermodel, which can be accessed via empty string
+        // if source is null, it is the super model, which can be accessed via empty string
         return Objects.toString( source, "" );
     }
 

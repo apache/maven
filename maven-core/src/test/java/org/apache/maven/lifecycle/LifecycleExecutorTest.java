@@ -346,7 +346,7 @@ public class LifecycleExecutorTest
     // Prefixes
 
     @Test
-    public void testFindingPluginPrefixforCleanClean()
+    public void testFindingPluginPrefixForCleanClean()
         throws Exception
     {
         File pom = getProject( "project-basic" );

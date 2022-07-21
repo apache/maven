@@ -34,7 +34,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
 
-// This class needs to stick around because it was exposed the the remote resources plugin started using it instead of
+// This class needs to stick around because it was exposed the remote resources plugin started using it instead of
 // getting the repositories from the project.
 
 /**

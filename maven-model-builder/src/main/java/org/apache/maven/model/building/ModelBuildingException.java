@@ -44,7 +44,7 @@ public class ModelBuildingException
      *
      * @param model The model that could not be built, may be {@code null}.
      * @param modelId The identifier of the model that could not be built, may be {@code null}.
-     * @param problems The problems that causes this exception, may be {@code null}.
+     * @param problems The problems that cause this exception, may be {@code null}.
      * @deprecated Use {@link #ModelBuildingException(ModelBuildingResult)} instead.
      */
     @Deprecated

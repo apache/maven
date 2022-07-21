@@ -94,7 +94,7 @@ public class MojoDescriptor
     private String deprecated;
 
     /**
-     * Flags this Mojo to run it in a multi module way, i.e. aggregate the build with the set of projects listed as
+     * Flags this Mojo to run it in a multi-module way, i.e. aggregate the build with the set of projects listed as
      * modules. By default, no need to aggregate the Maven project and its child modules
      */
     private boolean aggregator = false;
@@ -347,7 +347,7 @@ public class MojoDescriptor
     }
 
     /**
-     * @return the binded phase name of the Mojo
+     * @return the bound phase name of the Mojo
      */
     public String getPhase()
     {
@@ -355,7 +355,7 @@ public class MojoDescriptor
     }
 
     /**
-     * @param phase the new binded phase name of the Mojo
+     * @param phase the new bound phase name of the Mojo
      */
     public void setPhase( String phase )
     {

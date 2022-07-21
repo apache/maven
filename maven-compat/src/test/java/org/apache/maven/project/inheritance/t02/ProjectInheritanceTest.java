@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * A test which demonstrates maven's recursive inheritance where
- * a distinct value is taken from each parent contributing to the
+ * a distinct value is taken from each parent contributing to
  * the final model of the project being assembled. There is no
  * overriding going on amongst the models being used in this test:
  * each model in the lineage is providing a value that is not present

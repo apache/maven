@@ -84,7 +84,7 @@ public class MultiThreadedBuilder
         throws ExecutionException, InterruptedException
     {
         int nThreads = Math.min( session.getRequest().getDegreeOfConcurrency(), session.getProjects().size() );
-        boolean parallel = nThreads >= 2;
+        boolean parallel = nThreads > 1;
         // Propagate the parallel flag to the root session and all of the cloned sessions in each project segment
         session.setParallel( parallel );
         for ( ProjectSegment segment : projectBuilds )

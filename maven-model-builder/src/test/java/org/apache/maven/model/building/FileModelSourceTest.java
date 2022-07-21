@@ -63,10 +63,10 @@ public class FileModelSourceTest
         String absolutePath = upperCaseFile.getAbsolutePath();
         File lowerCaseFile = new File( absolutePath.toLowerCase() );
 
-        FileModelSource upperCaseFileSouce = new FileModelSource( upperCaseFile );
-        FileModelSource lowerCaseFileSouce = new FileModelSource( lowerCaseFile );
+        FileModelSource upperCaseFileSource = new FileModelSource( upperCaseFile );
+        FileModelSource lowerCaseFileSource = new FileModelSource( lowerCaseFile );
 
-        assertTrue( upperCaseFileSouce.equals( lowerCaseFileSouce ) );
+        assertTrue( upperCaseFileSource.equals( lowerCaseFileSource ) );
     }
 
     private File createTempFile( String name ) throws IOException

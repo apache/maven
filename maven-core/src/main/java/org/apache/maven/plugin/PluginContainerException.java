@@ -31,7 +31,7 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
  * to some deeper problem with Plexus. Context information includes the groupId,
  * artifactId, and version for the plugin; at times, the goal name for which
  * execution failed; a message detailing the problem; the ClassRealm used to
- * lookup the plugin; and the Plexus exception that caused this error.
+ * look up the plugin; and the Plexus exception that caused this error.
  *
  * @author jdcasey
  *

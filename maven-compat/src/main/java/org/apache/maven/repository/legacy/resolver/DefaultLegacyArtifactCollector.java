@@ -301,7 +301,7 @@ public class DefaultLegacyArtifactCollector
                                 Artifact resetArtifact = resetNodes[j].getArtifact();
 
                                 // MNG-2123: if the previous node was not a range, then it wouldn't have any available
-                                // versions. We just clobbered the selected version above. (why? i have no idea.)
+                                // versions. We just clobbered the selected version above. (why? I have no idea.)
                                 // So since we are here and this is ranges we must go figure out the version (for a
                                 // third time...)
                                 if ( resetArtifact.getVersion() == null && resetArtifact.getVersionRange() != null )

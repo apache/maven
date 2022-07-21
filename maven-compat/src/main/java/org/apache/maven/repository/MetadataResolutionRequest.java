@@ -126,9 +126,9 @@ public class MetadataResolutionRequest
      * @deprecated instead use {@link #setRemoteRepositories(List)}
      */
     @Deprecated
-    public MetadataResolutionRequest setRemoteRepostories( List<ArtifactRepository> remoteRepostories )
+    public MetadataResolutionRequest setRemoteRepostories( List<ArtifactRepository> remoteRepositories )
     {
-        this.remoteRepositories = remoteRepostories;
+        this.remoteRepositories = remoteRepositories;
 
         return this;
     }

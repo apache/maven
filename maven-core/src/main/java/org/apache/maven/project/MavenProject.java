@@ -300,7 +300,7 @@ public class MavenProject
     }
 
     // ----------------------------------------------------------------------
-    // Test and compile sourceroots.
+    // Test and compile source roots.
     // ----------------------------------------------------------------------
 
     private void addPath( List<String> paths, String path )
@@ -708,7 +708,7 @@ public class MavenProject
 
     /**
      * All dependencies that this project has, including transitive ones. Contents are lazily populated, so depending on
-     * what phases have run dependencies in some scopes won't be included. eg. if only compile phase has run,
+     * what phases have run dependencies in some scopes won't be included. e.g. if only compile phase has run,
      * dependencies with scope test won't be included.
      *
      * @return {@link Set} &lt; {@link Artifact} &gt;
@@ -1281,7 +1281,7 @@ public class MavenProject
 
         if ( project.getAttachedArtifacts() != null )
         {
-            // clone properties modifyable by plugins in a forked lifecycle
+            // clone properties modifiable by plugins in a forked lifecycle
             setAttachedArtifacts( new ArrayList<>( project.getAttachedArtifacts() ) );
         }
 
@@ -1893,7 +1893,7 @@ public class MavenProject
         Xpp3Dom dom = null;
 
         // ----------------------------------------------------------------------
-        // I would like to be able to lookup the Mojo object using a key but
+        // I would like to be able to look up the Mojo object using a key but
         // we have a limitation in modello that will be remedied shortly. So
         // for now I have to iterate through and see what we have.
         // ----------------------------------------------------------------------
@@ -1971,7 +1971,7 @@ public class MavenProject
 
     /**
      * Gets the project building request from which this project instance was created. <strong>Warning:</strong> This is
-     * an utility method that is meant to assist integrators of Maven, it must not be used by Maven plugins.
+     * a utility method that is meant to assist integrators of Maven, it must not be used by Maven plugins.
      *
      * @return The project building request or {@code null}.
      * @since 2.1
@@ -1984,7 +1984,7 @@ public class MavenProject
 
     /**
      * Sets the project building request from which this project instance was created. <strong>Warning:</strong> This is
-     * an utility method that is meant to assist integrators of Maven, it must not be used by Maven plugins.
+     * a utility method that is meant to assist integrators of Maven, it must not be used by Maven plugins.
      *
      * @param projectBuildingRequest The project building request, may be {@code null}.
      * @since 2.1

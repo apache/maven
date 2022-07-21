@@ -40,7 +40,7 @@ public class SettingsBuildingException
     /**
      * Creates a new exception with the specified problems.
      *
-     * @param problems The problems that causes this exception, may be {@code null}.
+     * @param problems The problems that cause this exception, may be {@code null}.
      */
     public SettingsBuildingException( List<SettingsProblem> problems )
     {

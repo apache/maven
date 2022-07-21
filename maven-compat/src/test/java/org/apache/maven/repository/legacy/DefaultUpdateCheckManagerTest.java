@@ -240,14 +240,14 @@ public class DefaultUpdateCheckManagerTest
     {
         ArtifactRepository localRepository = localRepository();
 
-        Artifact a = artifactFactory.createArtifactWithClassifier( "groupdId", "a", "0.0.1-SNAPSHOT", "jar", null );
+        Artifact a = artifactFactory.createArtifactWithClassifier( "groupId", "a", "0.0.1-SNAPSHOT", "jar", null );
         File file = new File( localRepository.getBasedir(),
                               localRepository.pathOf( a ) );
         a.setFile( file );
 
         assertEquals( "a-0.0.1-SNAPSHOT.jar.lastUpdated", updateCheckManager.getTouchfile( a ).getName() );
 
-        a = artifactFactory.createArtifactWithClassifier( "groupdId", "a", "0.0.1-SNAPSHOT", "jar", "classifier" );
+        a = artifactFactory.createArtifactWithClassifier( "groupId", "a", "0.0.1-SNAPSHOT", "jar", "classifier" );
         file = new File( localRepository.getBasedir(),
                               localRepository.pathOf( a ) );
         a.setFile( file );

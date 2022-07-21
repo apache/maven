@@ -91,7 +91,7 @@ public class Proxy
     }
 
     /**
-     * Get user's password used to login to proxy server.
+     * Get user's password used to log in to proxy server.
      *
      * @return user's password at proxy host
      */
@@ -103,7 +103,7 @@ public class Proxy
     /**
      * Set the user's password for the proxy server.
      *
-     * @param password password to use to login to a proxy server
+     * @param password password to use to log in to a proxy server
      */
     public void setPassword( String password )
     {

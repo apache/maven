@@ -24,7 +24,7 @@ import java.util.List;
 import org.apache.maven.project.MavenProject;
 
 /**
- * Describes the inter-dependencies between projects in the reactor.
+ * Describes the interdependencies between projects in the reactor.
  *
  * @author Benjamin Bentmann
  * @since 3.0-alpha
@@ -43,7 +43,7 @@ public interface ProjectDependencyGraph
 
     /**
      * Gets all projects in their intended build order, i.e. after topologically sorting the projects according to their
-     * inter-dependencies.
+     * interdependencies.
      *
      * @return The projects in the build order, never {@code null}.
      */

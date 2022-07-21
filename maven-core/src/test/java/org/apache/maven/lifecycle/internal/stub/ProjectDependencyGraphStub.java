@@ -41,7 +41,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * A stub dependency graph that is custom made for testing concurrent build graph evaluations.
+ * A stub dependency graph that is custom-made for testing concurrent build graph evaluations.
  * <p>
  * Implements a graph as follows:
  * A has no dependencies

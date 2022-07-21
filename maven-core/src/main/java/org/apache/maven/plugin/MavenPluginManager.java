@@ -105,7 +105,7 @@ public interface MavenPluginManager
     /**
      * Looks up the mojo for the specified mojo execution and populates its parameters from the configuration given by
      * the mojo execution. The mojo/plugin descriptor associated with the mojo execution provides the class realm to
-     * lookup the mojo from. <strong>Warning:</strong> The returned mojo instance must be released via
+     * look up the mojo from. <strong>Warning:</strong> The returned mojo instance must be released via
      * {@link #releaseMojo(Object, MojoExecution)} when the mojo is no longer needed to free any resources allocated for
      * it.
      *

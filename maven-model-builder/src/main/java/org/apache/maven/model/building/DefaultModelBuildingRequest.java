@@ -290,7 +290,7 @@ public class DefaultModelBuildingRequest
         {
             this.systemProperties = new Properties();
             synchronized ( systemProperties )
-            { // avoid concurrentmodification if someone else sets/removes an unrelated system property
+            { // avoid concurrent modification if someone else sets/removes an unrelated system property
                 this.systemProperties.putAll( systemProperties );
             }
         }

@@ -52,7 +52,7 @@ public class BuilderCommonTest
         final MavenExecutionPlan plan =
             builderCommon.resolveBuildPlan( session1, ProjectDependencyGraphStub.A, taskSegment1,
                     new HashSet<>() );
-        assertEquals( LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan().size(), plan.size() );
+        assertEquals( LifecycleExecutionPlanCalculatorStub.getProjectAExecutionPlan().size(), plan.size() );
     }
 
     @Test

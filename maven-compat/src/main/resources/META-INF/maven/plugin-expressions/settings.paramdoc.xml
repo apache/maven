@@ -46,7 +46,7 @@ under the License.
       If false, flags the system to skip prompting the user for any information, or holding up the build
       waiting for any input.
 
-      NOTE: It's also possible to switch to batch (ie. non-interactive) mode using the '-B' command-line option.
+      NOTE: It's also possible to switch to batch (i.e. non-interactive) mode using the '-B' command-line option.
     ]]></description>
     </expression>
   </expressions>

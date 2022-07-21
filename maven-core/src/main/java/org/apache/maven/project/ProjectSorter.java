@@ -64,13 +64,13 @@ public class ProjectSorter
     // MAVENAPI FIXME: the DAG used is NOT only used to represent the dependency relation,
     // but also for <parent>, <build><plugin>, <reports>. We need multiple DAG's
     // since a DAG can only handle 1 type of relationship properly.
-    // Usecase:  This is detected as a cycle:
+    // Use case:  This is detected as a cycle:
     // org.apache.maven:maven-plugin-api                -(PARENT)->
     // org.apache.maven:maven                           -(inherited REPORTING)->
     // org.apache.maven.plugins:maven-checkstyle-plugin -(DEPENDENCY)->
     // org.apache.maven:maven-plugin-api
     // In this case, both the verify and the report goals are called
-    // in a different lifecycle. Though the compiler-plugin has a valid usecase, although
+    // in a different lifecycle. Though the compiler-plugin has a valid use case, although
     // that seems to work fine. We need to take versions and lifecycle into account.
     public ProjectSorter( Collection<MavenProject> projects )
         throws CycleDetectedException, DuplicateProjectException

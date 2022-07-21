@@ -24,7 +24,7 @@ import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryListener;
 
 /**
- * Forwards repository events to eventspies.
+ * Forwards repository events to EventSpies.
  * @since 3.0.2
  */
 class EventSpyRepositoryListener

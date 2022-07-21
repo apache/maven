@@ -11,7 +11,7 @@ h3. Plugins
 * Maven test harness for plugin execution model
 * Eclipse IDE tooling for plugin execution model and metadata model
 
-- we also seem to have information like the plugin lifecycle model that's burried inside the maven execution model
+- we also seem to have information like the plugin lifecycle model that's buried inside the maven execution model
 - we also seem to have artifact information tangled inside the plugin model
 - we have to deal with scripting implementations (groovy, beanshell, ruby)
 - we need to deal with a shared context for plugins, like the guarded mojos
@@ -32,8 +32,8 @@ TODO
 - jar
 - hooks for loading
 
-- i could make an annotation that marked another class as its plugin discoverer, i could just add it to the
-  the component descriptor and when it's loaded we can add the discoverer, that would be simpler. i could
+- I could make an annotation that marked another class as its plugin discoverer, I could just add it to
+  the component descriptor and when it's loaded we can add the discoverer, that would be simpler. I could
   also do this with the lister as well
 i'l
 // 1 the metadata -> model plugin/mojo descriptor
@@ -51,8 +51,8 @@ i'l
  * h2. Concerns for the plugin manager
  *
  * h3. resolving the dependencies of a plugin - these could be resolved remotely at runtime or, -
- * they could be resolved from a local repository - i think we need a simple dependency model here
- * that is more mercury related and not Maven related i.e no POMs - workspace resolver - we need
+ * they could be resolved from a local repository - I think we need a simple dependency model here
+ * that is more mercury related and not Maven related i.e. no POMs - workspace resolver - we need
  * tools to pre-populate this repository
  *
  * h3. create an isolated classloader
@@ -71,7 +71,7 @@ i'l
  *
  * - nexus - the plugin class - UI to contribute - what JS to hook into the UI - what resources to
  * load into the UI - having packed or unpacked plugins, and positioning resources if necessary -
- * maven can work out of the classloader, nexus plugins probably couldn't given the js and image
+ * maven can work out of the classloader, nexus plugins probably couldn't give the js and image
  * resources
  *
  * We need to look at Maven, and Nexus as use cases and figure out what each of them needs to be
@@ -103,7 +103,7 @@ h4. Working with POMs during development
 
 During the development of a plugin we would want to make it easy for a developer to create a plugin which means we would allow the direct use of a POM to state the dependencies of a given plugin and any tooling we created would be responsible for turning the dependency information in the POM into plugin metadata which described the dependencies of the plugin.
 
-We are looking at using Mercury for the resolution and retrieval of the plugin dependencies so during development we would translate the POMs into dependency information that Mercury can understand, and in production we would have the pre-digested format that Mercury could utilize to resolve and retrieve dependencies. We need to be careful that we are using Mercury during development and production so that we don’t get in the situation where Maven 2.x is resolving different then Mercury is. We can still leverage POMs during development but we need to make sure Mercury is doing the work.
+We are looking at using Mercury for the resolution and retrieval of the plugin dependencies so during development we would translate the POMs into dependency information that Mercury can understand, and in production we would have the pre-digested format that Mercury could utilize to resolve and retrieve dependencies. We need to be careful that we are using Mercury during development and production so that we don’t get in the situation where Maven 2.x is resolving differently than Mercury is. We can still leverage POMs during development but we need to make sure Mercury is doing the work.
 
 With respect to development inside an IDE the workspace from which we would like to resolve and retrieve dependencies is a read-only local repository to Mercury which is put at the front-end of the search order of any repository that Mercury will consult for artifacts.
 
@@ -133,7 +133,7 @@ I still need to do some work here to figure out how a dispatching to a particula
 
 In the short term we are working with the model where the URI maps to a resource, and the resource itself is a Plexus component which can itself have a reference to the host application in order to perform its work. This may not occur in the first versions of the plugin API but a resource needs to simply become the mapping mechanism by which parameters are taken from the REST side of the application and mapped into a method call within a given Plexus component. Whether that be the core Nexus application or a component provided by a plugin.
 
-At the very least in the short term the resource needs to know how to lookup the component that is required to perform the work. This needs to be made simple, for the time being we can write and test plugins working in the same realm until we get complete isolation working.
+At the very least in the short term the resource needs to know how to look up the component that is required to perform the work. This needs to be made simple, for the time being we can write and test plugins working in the same realm until we get complete isolation working.
 
 h3. Plugins need a specific metadata model
 
@@ -168,7 +168,7 @@ The plugin metadata:
 * what JS to hook into the UI
 * what resources to load into the UI
 * having packed or unpacked plugins, and positioning resources if necessary
-* maven can work out of the classloader, nexus plugins probably couldn't given the js and image resources
+* maven can work out of the classloader, nexus plugins probably couldn't give the js and image resources
 
 h3. Other issues
 

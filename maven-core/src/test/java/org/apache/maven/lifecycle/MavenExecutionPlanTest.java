@@ -36,7 +36,7 @@ public class MavenExecutionPlanTest
     public void testFindLastInPhase()
         throws Exception
     {
-        MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan();
+        MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExecutionPlan();
 
         ExecutionPlanItem expected = plan.findLastInPhase( "package" );
         ExecutionPlanItem beerPhase = plan.findLastInPhase( "BEER" );  // Beer comes straight after package in stub
@@ -48,7 +48,7 @@ public class MavenExecutionPlanTest
     public void testThreadSafeMojos()
         throws Exception
     {
-        MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan();
+        MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExecutionPlan();
         final Set<Plugin> unSafePlugins = plan.getNonThreadSafePlugins();
         // There is only a single threadsafe plugin here...
         assertEquals( plan.size() - 1, unSafePlugins.size() );
@@ -60,7 +60,7 @@ public class MavenExecutionPlanTest
     public void testFindLastWhenFirst()
         throws Exception
     {
-        MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan();
+        MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExecutionPlan();
 
         ExecutionPlanItem beerPhase = plan.findLastInPhase(
             LifecycleExecutionPlanCalculatorStub.VALIDATE.getPhase() );  // Beer comes straight after package in stub
@@ -71,7 +71,7 @@ public class MavenExecutionPlanTest
     public void testFindLastInPhaseMisc()
         throws Exception
     {
-        MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan();
+        MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExecutionPlan();
 
         assertNull( plan.findLastInPhase( "pacXkage" ) );
         // Beer comes straight after package in stub, much like real life.

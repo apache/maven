@@ -83,7 +83,7 @@ public final class CLIReportingUtils
     }
 
     /**
-     * Create a human readable string containing the Maven version, buildnumber, and time of build
+     * Create a human-readable string containing the Maven version, buildnumber, and time of build
      *
      * @param buildProperties The build properties
      * @return Readable build info

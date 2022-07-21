@@ -43,7 +43,7 @@ Maven super model
  the top of that lineage to provide default values.
 
  The super model is where we place all the values which we believe to be standard, values that can be shared and
- utilized across all your maven projects.
+ utilized across all your Maven projects.
 
 +-----+
  m0 <- m1 <- m2

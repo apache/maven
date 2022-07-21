@@ -137,7 +137,7 @@ public class LifecycleExecutionPlanCalculatorStub
     {
         if ( project.equals( ProjectDependencyGraphStub.A ) )
         {
-            return getProjectAExceutionPlan();
+            return getProjectAExecutionPlan();
         }
         if ( project.equals( ProjectDependencyGraphStub.B ) )
         {
@@ -165,7 +165,7 @@ public class LifecycleExecutionPlanCalculatorStub
     {
     }
 
-    public static MavenExecutionPlan getProjectAExceutionPlan()
+    public static MavenExecutionPlan getProjectAExecutionPlan()
         throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
         PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
         NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException

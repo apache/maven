@@ -21,7 +21,7 @@ package org.apache.maven.artifact;
 
 /**
  * Exception thrown when the identity of an artifact can not be established,
- * eg. one of groupId, artifactId, version or type is null.
+ * e.g. one of groupId, artifactId, version or type is null.
  */
 public class InvalidArtifactRTException
     extends RuntimeException

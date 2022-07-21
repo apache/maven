@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Dispatches callbacks to all registered eventspies.
+ * Dispatches callbacks to all registered EventSpies.
  * @since 3.0.2
  */
 @Named

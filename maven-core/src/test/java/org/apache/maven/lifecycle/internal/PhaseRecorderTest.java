@@ -34,7 +34,7 @@ public class PhaseRecorderTest
     @Test
     public void testObserveExecution() throws Exception {
         PhaseRecorder phaseRecorder = new PhaseRecorder( ProjectDependencyGraphStub.A);
-        MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan();
+        MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExecutionPlan();
         final List<MojoExecution> executions = plan.getMojoExecutions();
 
         final MojoExecution mojoExecution1 = executions.get( 0 );

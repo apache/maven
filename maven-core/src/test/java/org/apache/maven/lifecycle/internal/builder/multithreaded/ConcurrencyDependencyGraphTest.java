@@ -42,7 +42,7 @@ public class ConcurrencyDependencyGraphTest {
         assertEquals( 6, graph.getNumberOfBuilds() );
 
         List<MavenProject> rootSchedulableBuilds = graph.getRootSchedulableBuilds();
-        // only Project.A has no dependences
+        // only Project.A has no dependencies
         assertEquals( 1, rootSchedulableBuilds.size() );
         assertEquals( ProjectDependencyGraphStub.A, rootSchedulableBuilds.iterator().next() );
         // double check A deps
