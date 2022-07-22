@@ -40,11 +40,6 @@ under the License.
             <version>4.0.0-alpha-1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-api-model</artifactId>
-            <version>4.0.0-alpha-1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>org.eclipse.sisu</groupId>
             <artifactId>org.eclipse.sisu.plexus</artifactId>
         </dependency>
@@ -52,6 +47,7 @@ under the License.
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
             <version>3.4.1</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

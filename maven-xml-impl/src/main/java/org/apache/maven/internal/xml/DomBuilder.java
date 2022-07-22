@@ -21,7 +21,7 @@ package org.apache.maven.internal.xml;
 
 import java.io.Reader;
 
-import org.apache.maven.api.model.InputLocation;
+//import org.apache.maven.api.model.InputLocation;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -77,14 +77,14 @@ public class DomBuilder
     public static class LocationBuilder
     {
 
-        private final InputLocation location;
+        private final Object location;
 
-        public LocationBuilder( InputLocation location )
+        public LocationBuilder( Object location )
         {
             this.location = location;
         }
 
-        public InputLocation getLocation()
+        public Object getLocation()
         {
             return location;
         }

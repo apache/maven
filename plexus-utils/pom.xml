@@ -33,6 +33,20 @@ under the License.
     <artifactId>plexus-utils</artifactId>
     <version>4.0.0-alpha-1-SNAPSHOT</version>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>3.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-xml-impl</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -60,6 +74,22 @@ under the License.
                                         org/codehaus/plexus/util/xml/Xpp3Dom.class,
                                         org/codehaus/plexus/util/xml/Xpp3DomBuilder.class
                                     </excludes>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.maven</groupId>
+                                    <artifactId>maven-api-xml</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <includes>**/*</includes>
+                                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.maven</groupId>
+                                    <artifactId>maven-xml-impl</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <includes>**/*</includes>
+                                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                             <includes>**/*.java</includes>
