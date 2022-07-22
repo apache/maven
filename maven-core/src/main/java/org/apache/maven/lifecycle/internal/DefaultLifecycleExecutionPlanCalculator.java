@@ -562,11 +562,16 @@ public class DefaultLifecycleExecutionPlanCalculator
                 {
                     for ( MojoExecution forkedExecution : forkedExecutions )
                     {
-                        Dom forkedConfiguration = forkedExecution.getConfiguration().getDom();
+                        org.codehaus.plexus.util.xml.Xpp3Dom config = forkedExecution.getConfiguration();
 
-                        forkedConfiguration = phaseConfiguration.merge( forkedConfiguration );
+                        if ( config != null )
+                        {
+                            Dom forkedConfiguration = config.getDom();
 
-                        forkedExecution.setConfiguration( forkedConfiguration );
+                            forkedConfiguration = phaseConfiguration.merge( forkedConfiguration );
+
+                            forkedExecution.setConfiguration( forkedConfiguration );
+                        }
                     }
                 }
             }
