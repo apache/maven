@@ -463,6 +463,11 @@ under the License.
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.10.1</version>
+        </plugin>
+        <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
           <version>${plexusVersion}</version>
