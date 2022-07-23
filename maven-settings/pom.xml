@@ -25,7 +25,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>3.8.8</version>
+    <version>3.8.8-resolver-1.8.1</version>
   </parent>
 
   <artifactId>maven-settings</artifactId>
