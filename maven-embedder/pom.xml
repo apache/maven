@@ -140,6 +140,10 @@ under the License.
       <artifactId>plexus-cipher</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-interpolation</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
