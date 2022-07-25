@@ -386,9 +386,9 @@ public abstract class AbstractSession implements Session
     }
 
     /**
-     * Shortcut for <code>getService(ArtifactManager.class).isSnapshot(...)</code>
+     * Shortcut for <code>getService(VersionParser.class).isSnapshot(...)</code>
      *
-     * @see ArtifactManager#isSnapshot(String)
+     * @see VersionParser#isSnapshot(String)
      */
     @Override
     public boolean isVersionSnapshot( @Nonnull String version )
