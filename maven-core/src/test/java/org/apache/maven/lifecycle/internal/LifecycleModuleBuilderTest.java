@@ -75,7 +75,6 @@ public class LifecycleModuleBuilderTest extends PlexusTestCase
         MavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
         mavenExecutionRequest.setExecutionListener( new AbstractExecutionListener() );
         mavenExecutionRequest.setGoals( Arrays.asList( "clean" ) );
-        mavenExecutionRequest.setDegreeOfConcurrency( 1 );
         final MavenSession session = new MavenSession( null, null, mavenExecutionRequest, defaultMavenExecutionResult );
         final ProjectDependencyGraphStub dependencyGraphStub = new ProjectDependencyGraphStub();
         session.setProjectDependencyGraph( dependencyGraphStub );
