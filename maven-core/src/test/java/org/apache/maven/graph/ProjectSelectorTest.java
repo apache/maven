@@ -23,6 +23,7 @@ import org.apache.maven.MavenExecutionException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -103,10 +104,9 @@ class ProjectSelectorTest
     }
 
     @Test
-    void isMatchingProjectMatchOnDirectoryReturnsTrue()
+    void isMatchingProjectMatchOnDirectoryReturnsTrue(@TempDir File tempDir)
     {
         String selector = "maven-core";
-        final File tempDir = new File( System.getProperty( "java.io.tmpdir" ) );
         final File tempProjectDir = new File( tempDir, "maven-core" );
         tempProjectDir.mkdir();
         final MavenProject mavenProject = createMavenProject("maven-core" );

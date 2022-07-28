@@ -89,9 +89,7 @@ public final class ProjectSelector
 
         if ( !unresolvedOptionalSelectors.isEmpty() )
         {
-            String message = String.format( "The requested optional projects [%s] do not exist.",
-                    String.join( ",", unresolvedOptionalSelectors ) );
-            LOGGER.info( message );
+            LOGGER.info( "The requested optional projects {} do not exist.", unresolvedOptionalSelectors );
         }
 
         return resolvedOptionalProjects;

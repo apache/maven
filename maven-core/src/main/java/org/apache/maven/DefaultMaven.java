@@ -56,6 +56,7 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.MessageFormatter;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -629,10 +630,10 @@ public class DefaultMaven
 
         if ( !notFoundRequiredProfiles.isEmpty() )
         {
-            final String message = String.format(
-                    "The requested profiles [%s] could not be activated or deactivated because they do not exist.",
-                    String.join( ", ", notFoundRequiredProfiles )
-            );
+            // Use SLF4J formatter for consistency with warnings reported by logger
+            final String message = MessageFormatter.format(
+                    "The requested profiles {} could not be activated or deactivated because they do not"
+                            + " exist.", notFoundRequiredProfiles ).getMessage();
             addExceptionToResult( session.getResult(), new MissingProfilesException( message ) );
         }
     }
@@ -672,11 +673,8 @@ public class DefaultMaven
 
         if ( !notFoundOptionalProfiles.isEmpty() )
         {
-            final String message = String.format(
-                    "The requested optional profiles [%s] could not be activated or deactivated because they "
-                            + "do not exist.", String.join( ", ", notFoundOptionalProfiles )
-            );
-            logger.info( message );
+            logger.info( "The requested optional profiles {} could not be activated or deactivated because they do not"
+                            + " exist.", notFoundOptionalProfiles );
         }
     }
 
