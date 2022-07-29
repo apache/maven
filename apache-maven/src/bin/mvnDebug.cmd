@@ -21,6 +21,7 @@
 @REM Environment Variable Prerequisites
 @REM
 @REM   JAVA_HOME           Must point at your Java Development Kit installation.
+@REM   MAVEN_ARGS          (Optional) Arguments passed to Maven before CLI arguments.
 @REM   MAVEN_BATCH_ECHO    (Optional) Set to 'on' to enable the echoing of the batch commands.
 @REM   MAVEN_BATCH_PAUSE   (Optional) set to 'on' to wait for a key stroke before ending.
 @REM   MAVEN_OPTS          (Optional) Java runtime options used when Maven is executed.
