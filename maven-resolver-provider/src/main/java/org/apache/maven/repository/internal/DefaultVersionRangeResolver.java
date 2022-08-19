@@ -72,6 +72,8 @@ public class DefaultVersionRangeResolver
 
     private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
 
+    private static final String SNAPSHOT = "SNAPSHOT";
+
     private MetadataResolver metadataResolver;
 
     private SyncContextFactory syncContextFactory;
@@ -218,9 +220,11 @@ public class DefaultVersionRangeResolver
             }
 
             Versioning versioning = readVersions( session, trace, metadataResult.getMetadata(), repository, result );
+            RemoteRepository remoteRepository = metadataResult.getRequest().getRepository();
+
             for ( String version : versioning.getVersions() )
             {
-                if ( !versionIndex.containsKey( version ) )
+                if ( isEnabled( remoteRepository, version ) && !versionIndex.containsKey( version ) )
                 {
                     versionIndex.put( version, repository );
                 }
@@ -229,6 +233,19 @@ public class DefaultVersionRangeResolver
 
         return versionIndex;
     }
+
+    private boolean isEnabled( RemoteRepository remoteRepository, String version )
+    {
+        if ( remoteRepository == null )
+        {
+            return true;
+        }
+
+        boolean snapshot = version != null && version.endsWith( SNAPSHOT );
+
+        return remoteRepository.getPolicy( snapshot ).isEnabled();
+    }
+
 
     private Versioning readVersions( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
                                      ArtifactRepository repository, VersionRangeResult result )
