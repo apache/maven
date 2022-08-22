@@ -49,13 +49,13 @@ public class MavenITmng7353CliGoalInvocationTest
     public void testPrefixGoal()
         throws Exception
     {
-        run( "pluginPrefix-goal", "dependency:list", "maven-dependency-plugin:3.3.0:list (default-cli)" );
+        run( "pluginPrefix-goal", "dependency:list", "maven-dependency-plugin:2.7:list (default-cli)" );
     }
 
     public void testPrefixGoalAtId()
         throws Exception
     {
-        run( "pluginPrefix-goal@id", "dependency:list@id", "maven-dependency-plugin:3.3.0:list (id)" );
+        run( "pluginPrefix-goal@id", "dependency:list@id", "maven-dependency-plugin:2.7:list (id)" );
     }
 
     /**
@@ -64,7 +64,7 @@ public class MavenITmng7353CliGoalInvocationTest
     public void testPrefixVersionGoal()
         throws Exception
     {
-        run( "pluginPrefix-version-goal", "dependency:3.1.1:list", "maven-dependency-plugin:3.1.1:list (default-cli)" );
+        run( "pluginPrefix-version-goal", "dependency:2.8:list", "maven-dependency-plugin:2.8:list (default-cli)" );
     }
 
     /**
@@ -73,30 +73,30 @@ public class MavenITmng7353CliGoalInvocationTest
     public void testPrefixVersionGoalAtId()
         throws Exception
     {
-        run( "pluginPrefix-goal@id", "dependency:3.1.1:list@id", "maven-dependency-plugin:3.1.1:list (id)" );
+        run( "pluginPrefix-goal@id", "dependency:2.8:list@id", "maven-dependency-plugin:2.8:list (id)" );
     }
 
     public void testGroupIdArtifactIdGoal()
         throws Exception
     {
-        run( "groupId-artifactId-goal", "org.apache.maven.plugins:maven-dependency-plugin:list", "maven-dependency-plugin:3.3.0:list (default-cli)" );
+        run( "groupId-artifactId-goal", "org.apache.maven.plugins:maven-dependency-plugin:list", "maven-dependency-plugin:2.7:list (default-cli)" );
     }
 
     public void testGroupIdArtifactIdGoalAtId()
         throws Exception
     {
-        run( "groupId-artifactId-goal@id", "org.apache.maven.plugins:maven-dependency-plugin:list@id", "maven-dependency-plugin:3.3.0:list (id)" );
+        run( "groupId-artifactId-goal@id", "org.apache.maven.plugins:maven-dependency-plugin:list@id", "maven-dependency-plugin:2.7:list (id)" );
     }
 
     public void testGroupIdArtifactIdVersionGoal()
         throws Exception
     {
-        run( "groupId-artifactId-version-goal", "org.apache.maven.plugins:maven-dependency-plugin:3.1.1:list", "maven-dependency-plugin:3.1.1:list (default-cli)" );
+        run( "groupId-artifactId-version-goal", "org.apache.maven.plugins:maven-dependency-plugin:2.8:list", "maven-dependency-plugin:2.8:list (default-cli)" );
     }
 
     public void testGroupIdArtifactIdVersionGoalAtId()
         throws Exception
     {
-        run( "groupId-artifactId-version-goal@id", "org.apache.maven.plugins:maven-dependency-plugin:3.1.1:list@id", "maven-dependency-plugin:3.1.1:list (id)" );
+        run( "groupId-artifactId-version-goal@id", "org.apache.maven.plugins:maven-dependency-plugin:2.8:list@id", "maven-dependency-plugin:2.8:list (id)" );
     }
 }
