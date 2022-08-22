@@ -38,7 +38,7 @@ jobs:
           cache: 'maven'
 
       - name: Build with Maven
-        run: mvn verify -e -B -V -DdistributionFileName=apache-maven
+        run: mvn clean verify -e -B -V -DdistributionFileName=apache-maven
 
       - name: Extract tarball
         shell: bash
