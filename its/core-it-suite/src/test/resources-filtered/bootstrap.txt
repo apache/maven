@@ -66,6 +66,7 @@ org.apache.maven.plugins:maven-assembly-plugin:2.2-beta-5
 org.apache.maven.plugins:maven-assembly-plugin:3.1.0
 org.apache.maven.plugins:maven-clean-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-clean-plugin:2.5
+org.apache.maven.plugins:maven-clean-plugin:3.1.0
 org.apache.maven.plugins:maven-compiler-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-compiler-plugin:2.0.2
 org.apache.maven.plugins:maven-compiler-plugin:3.1
@@ -73,6 +74,8 @@ org.apache.maven.plugins:maven-compiler-plugin:3.8.1
 org.apache.maven.plugins:maven-compiler-plugin:3.10.1
 org.apache.maven.plugins:maven-dependency-plugin:2.7
 org.apache.maven.plugins:maven-dependency-plugin:2.8
+org.apache.maven.plugins:maven-dependency-plugin:3.1.1
+org.apache.maven.plugins:maven-dependency-plugin:3.3.0
 org.apache.maven.plugins:maven-deploy-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-deploy-plugin:2.7
 org.apache.maven.plugins:maven-deploy-plugin:3.0.0-M1
