@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class BuildListCalculatorTest
 {
@@ -42,6 +43,11 @@ public class BuildListCalculatorTest
         assertEquals( 6, segments.size(), "Stub data contains 6 items" );
         final ProjectSegment build = segments.get( 0 );
         assertNotNull( build );
+
+        for ( ProjectSegment segment : segments )
+        {
+            assertSame( session, segment.getSession() );
+        }
     }
 
     private static LifecycleTaskSegmentCalculator getTaskSegmentCalculator()

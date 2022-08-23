@@ -87,10 +87,6 @@ public class LifecycleModuleBuilder
 
         long buildStartTime = System.currentTimeMillis();
 
-        // session may be different from rootSession seeded in DefaultMaven
-        // explicitly seed the right session here to make sure it is used by Guice
-        sessionScope.enter( reactorContext.getSessionScopeMemento() );
-        sessionScope.seed( MavenSession.class, session );
         try
         {
 
@@ -144,8 +140,6 @@ public class LifecycleModuleBuilder
         }
         finally
         {
-            sessionScope.exit();
-
             session.setCurrentProject( null );
 
             Thread.currentThread().setContextClassLoader( reactorContext.getOriginalContextClassLoader() );
