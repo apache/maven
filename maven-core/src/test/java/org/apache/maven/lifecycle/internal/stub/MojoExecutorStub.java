@@ -46,6 +46,11 @@ public class MojoExecutorStub
 
     public final List<MojoExecution> executions = Collections.synchronizedList(new ArrayList<>() );
 
+    public MojoExecutorStub()
+    {
+        super( null, null, null, null, null );
+    }
+
     public MojoExecutorStub(
             BuildPluginManager pluginManager,
             MavenPluginManager mavenPluginManager,

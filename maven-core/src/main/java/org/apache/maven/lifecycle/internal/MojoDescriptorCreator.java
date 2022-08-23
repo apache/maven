@@ -168,18 +168,31 @@ public class MojoDescriptorCreator
         }
         else if ( numTokens == 3 )
         {
-            // We have everything that we need except the version
-            //
-            // org.apache.maven.plugins:maven-remote-resources-plugin:???:process
-            //
-            // groupId
-            // artifactId
-            // ???
-            // goal
-            //
-            plugin = new Plugin();
-            plugin.setGroupId( tok.nextToken() );
-            plugin.setArtifactId( tok.nextToken() );
+            // groupId:artifactId:goal or pluginPrefix:version:goal (since Maven 3.9.0)
+
+            String firstToken = tok.nextToken();
+            // groupId or pluginPrefix? heuristics: groupId contains dot (.) but not pluginPrefix
+            if ( firstToken.contains( "." ) )
+            {
+                // We have everything that we need except the version
+                //
+                // org.apache.maven.plugins:maven-remote-resources-plugin:???:process
+                //
+                // groupId
+                // artifactId
+                // ???
+                // goal
+                //
+                plugin = new Plugin();
+                plugin.setGroupId( firstToken );
+                plugin.setArtifactId( tok.nextToken() );
+            }
+            else
+            {
+                // pluginPrefix:version:goal, like remote-resources:3.5.0:process
+                plugin = findPluginForPrefix( firstToken, session );
+                plugin.setVersion( tok.nextToken() );
+            }
             goal = tok.nextToken();
         }
         else

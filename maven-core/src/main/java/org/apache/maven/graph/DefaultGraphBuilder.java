@@ -25,10 +25,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -73,6 +71,7 @@ public class DefaultGraphBuilder
     private final PomlessCollectionStrategy pomlessCollectionStrategy;
     private final MultiModuleCollectionStrategy multiModuleCollectionStrategy;
     private final RequestPomCollectionStrategy requestPomCollectionStrategy;
+    private final ProjectSelector projectSelector;
 
     @Inject
     public DefaultGraphBuilder( BuildResumptionDataRepository buildResumptionDataRepository,
@@ -84,6 +83,7 @@ public class DefaultGraphBuilder
         this.pomlessCollectionStrategy = pomlessCollectionStrategy;
         this.multiModuleCollectionStrategy = multiModuleCollectionStrategy;
         this.requestPomCollectionStrategy = requestPomCollectionStrategy;
+        this.projectSelector = new ProjectSelector(); // if necessary switch to DI
     }
 
     @Override
@@ -186,9 +186,9 @@ public class DefaultGraphBuilder
         {
             Set<MavenProject> selectedProjects = new HashSet<>( requiredSelectors.size() + optionalSelectors.size() );
             selectedProjects.addAll(
-                    getProjectsBySelectors( request, allSortedProjects, requiredSelectors, true ) );
+                    projectSelector.getRequiredProjectsBySelectors( request, allSortedProjects, requiredSelectors ) );
             selectedProjects.addAll(
-                    getProjectsBySelectors( request, allSortedProjects, optionalSelectors, false ) );
+                    projectSelector.getOptionalProjectsBySelectors( request, allSortedProjects, optionalSelectors ) );
 
             // it can be empty when an optional project is missing from the reactor, fallback to returning all projects
             if ( !selectedProjects.isEmpty() )
@@ -206,46 +206,6 @@ public class DefaultGraphBuilder
         return result;
     }
 
-    private Set<MavenProject> getProjectsBySelectors( MavenExecutionRequest request, List<MavenProject> projects,
-                                                      Set<String> projectSelectors, boolean required )
-            throws MavenExecutionException
-    {
-        Set<MavenProject> selectedProjects = new LinkedHashSet<>();
-        File reactorDirectory = getReactorDirectory( request );
-
-        for ( String selector : projectSelectors )
-        {
-            Optional<MavenProject> optSelectedProject = projects.stream()
-                    .filter( project -> isMatchingProject( project, selector, reactorDirectory ) )
-                    .findFirst();
-            if ( !optSelectedProject.isPresent() )
-            {
-                String message = "Could not find the selected project in the reactor: " + selector;
-                if ( required )
-                {
-                    throw new MavenExecutionException( message, request.getPom() );
-                }
-                else
-                {
-                    LOGGER.info( message );
-                    break;
-                }
-            }
-
-            MavenProject selectedProject = optSelectedProject.get();
-
-            selectedProjects.add( selectedProject );
-
-            List<MavenProject> children = selectedProject.getCollectedProjects();
-            if ( children != null && request.isRecursive() )
-            {
-                selectedProjects.addAll( children );
-            }
-        }
-
-        return selectedProjects;
-    }
-
     private List<MavenProject> trimResumedProjects( List<MavenProject> projects, ProjectDependencyGraph graph,
                                                     MavenExecutionRequest request )
             throws MavenExecutionException
@@ -254,12 +214,12 @@ public class DefaultGraphBuilder
 
         if ( StringUtils.isNotEmpty( request.getResumeFrom() ) )
         {
-            File reactorDirectory = getReactorDirectory( request );
+            File reactorDirectory = projectSelector.getBaseDirectoryFromRequest( request );
 
             String selector = request.getResumeFrom();
 
             MavenProject resumingFromProject = projects.stream()
-                    .filter( project -> isMatchingProject( project, selector, reactorDirectory ) )
+                    .filter( project -> projectSelector.isMatchingProject( project, selector, reactorDirectory ) )
                     .findFirst()
                     .orElseThrow( () -> new MavenExecutionException(
                             "Could not find project to resume reactor build from: " + selector + " vs "
@@ -286,8 +246,10 @@ public class DefaultGraphBuilder
         {
             Set<MavenProject> excludedProjects = new HashSet<>( requiredSelectors.size() + optionalSelectors.size() );
             List<MavenProject> allProjects = graph.getAllProjects();
-            excludedProjects.addAll( getProjectsBySelectors( request, allProjects, requiredSelectors, true ) );
-            excludedProjects.addAll( getProjectsBySelectors( request, allProjects, optionalSelectors, false ) );
+            excludedProjects.addAll(
+                    projectSelector.getRequiredProjectsBySelectors( request, allProjects, requiredSelectors ) );
+            excludedProjects.addAll(
+                    projectSelector.getOptionalProjectsBySelectors( request, allProjects, optionalSelectors ) );
 
             result = new ArrayList<>( projects );
             result.removeAll( excludedProjects );
@@ -396,51 +358,6 @@ public class DefaultGraphBuilder
             }
         }
         return projectNames.toString();
-    }
-
-    private boolean isMatchingProject( MavenProject project, String selector, File reactorDirectory )
-    {
-        // [groupId]:artifactId
-        if ( selector.indexOf( ':' ) >= 0 )
-        {
-            String id = ':' + project.getArtifactId();
-
-            if ( id.equals( selector ) )
-            {
-                return true;
-            }
-
-            id = project.getGroupId() + id;
-
-            return id.equals( selector );
-        }
-
-        // relative path, e.g. "sub", "../sub" or "."
-        else if ( reactorDirectory != null )
-        {
-            File selectedProject = new File( new File( reactorDirectory, selector ).toURI().normalize() );
-
-            if ( selectedProject.isFile() )
-            {
-                return selectedProject.equals( project.getFile() );
-            }
-            else if ( selectedProject.isDirectory() )
-            {
-                return selectedProject.equals( project.getBasedir() );
-            }
-        }
-
-        return false;
-    }
-
-    private File getReactorDirectory( MavenExecutionRequest request )
-    {
-        if ( request.getBaseDirectory() != null )
-        {
-            return new File( request.getBaseDirectory() );
-        }
-
-        return null;
     }
 
     // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

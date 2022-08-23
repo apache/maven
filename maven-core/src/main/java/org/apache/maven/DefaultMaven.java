@@ -30,8 +30,10 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProfileActivation;
+import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.graph.GraphBuilder;
+import org.apache.maven.graph.ProjectSelector;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -56,6 +58,7 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.MessageFormatter;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -111,6 +114,8 @@ public class DefaultMaven
 
     private final DefaultSessionFactory defaultSessionFactory;
 
+    private final ProjectSelector projectSelector;
+
     @Inject
     @SuppressWarnings( "checkstyle:ParameterNumber" )
     public DefaultMaven(
@@ -139,6 +144,7 @@ public class DefaultMaven
         this.buildResumptionDataRepository = buildResumptionDataRepository;
         this.superPomProvider = superPomProvider;
         this.defaultSessionFactory = defaultSessionFactory;
+        this.projectSelector = new ProjectSelector(); // if necessary switch to DI
     }
 
     @Override
@@ -332,6 +338,7 @@ public class DefaultMaven
 
             lifecycleStarter.execute( session );
 
+            validateOptionalProjects( request, session );
             validateOptionalProfiles( session, request.getProfileActivation() );
 
             if ( session.getResult().hasExceptions() )
@@ -630,12 +637,28 @@ public class DefaultMaven
 
         if ( !notFoundRequiredProfiles.isEmpty() )
         {
-            final String message = String.format(
-                    "The requested profiles [%s] could not be activated or deactivated because they do not exist.",
-                    String.join( ", ", notFoundRequiredProfiles )
-            );
+            // Use SLF4J formatter for consistency with warnings reported by logger
+            final String message = MessageFormatter.format(
+                    "The requested profiles {} could not be activated or deactivated because they do not"
+                            + " exist.", notFoundRequiredProfiles ).getMessage();
             addExceptionToResult( session.getResult(), new MissingProfilesException( message ) );
         }
+    }
+
+    /**
+     * Check whether any of the requested optional projects were not activated or deactivated.
+     * @param request the {@link MavenExecutionRequest}.
+     * @param session the {@link MavenSession}.
+     */
+    private void validateOptionalProjects( MavenExecutionRequest request, MavenSession session )
+    {
+        final ProjectActivation projectActivation = request.getProjectActivation();
+        final Set<String> allOptionalSelectors = new HashSet<>();
+        allOptionalSelectors.addAll( projectActivation.getOptionalActiveProjectSelectors() );
+        allOptionalSelectors.addAll( projectActivation.getRequiredActiveProjectSelectors() );
+        // We intentionally ignore the results of this method.
+        // As a side effect it will log the optional projects that could not be resolved.
+        projectSelector.getOptionalProjectsBySelectors( request, session.getAllProjects(), allOptionalSelectors );
     }
 
     /**
@@ -657,11 +680,8 @@ public class DefaultMaven
 
         if ( !notFoundOptionalProfiles.isEmpty() )
         {
-            final String message = String.format(
-                    "The requested optional profiles [%s] could not be activated or deactivated because they "
-                            + "do not exist.", String.join( ", ", notFoundOptionalProfiles )
-            );
-            logger.info( message );
+            logger.info( "The requested optional profiles {} could not be activated or deactivated because they do not"
+                            + " exist.", notFoundOptionalProfiles );
         }
     }
 
