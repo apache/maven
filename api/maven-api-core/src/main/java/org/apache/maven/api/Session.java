@@ -24,6 +24,7 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.ThreadSafe;
 
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,20 @@ public interface Session
      */
     @Nonnull
     String getMavenVersion();
+
+    int getDegreeOfConcurrency();
+
+    @Nonnull
+    Instant getStartTime();
+
+    @Nonnull
+    Path getMultiModuleProjectDirectory();
+
+    @Nonnull
+    Path getExecutionRootDirectory();
+
+    @Nonnull
+    List<Project> getProjects();
 
     /**
      * Returns the plugin context for mojo being executed and the specified

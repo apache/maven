@@ -1863,7 +1863,14 @@ public class DefaultModelBuilder
                         {
                             ModelBuildingRequest gaBuildingRequest = new DefaultModelBuildingRequest( request )
                                 .setModelSource( (ModelSource) source );
-                            return readRawModel( gaBuildingRequest, problems );
+                            Model model = readRawModel( gaBuildingRequest, problems );
+                            if ( source instanceof FileModelSource )
+                            {
+                                Path path = ( ( FileModelSource ) source ).getFile().toPath();
+                                context.modelByPath.computeIfAbsent( path, k -> new DefaultTransformerContext.Holder() )
+                                        .computeIfAbsent( () -> model );
+                            }
+                            return model;
                         }
                         catch ( ModelBuildingException e )
                         {
@@ -1886,7 +1893,12 @@ public class DefaultModelBuilder
 
                     try
                     {
-                        return readRawModel( req, problems );
+                        Model model = readRawModel( req, problems );
+                        DefaultTransformerContext.GAKey key =
+                                new DefaultTransformerContext.GAKey( model.getGroupId(), model.getArtifactId() );
+                        context.modelByGA.computeIfAbsent( key, k -> new DefaultTransformerContext.Holder() )
+                                .computeIfAbsent( () -> model );
+                        return model;
                     }
                     catch ( ModelBuildingException e )
                     {

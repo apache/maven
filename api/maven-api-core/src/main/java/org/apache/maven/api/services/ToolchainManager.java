@@ -21,11 +21,13 @@ package org.apache.maven.api.services;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Toolchain;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 @Experimental
 public interface ToolchainManager extends Service
@@ -37,18 +39,20 @@ public interface ToolchainManager extends Service
      * @param type
      * @param requirements
      * @return the selected {@link Toolchain}s
-     * @throws ToolchainManagerException if an exceptino occurs
+     * @throws ToolchainManagerException if an exception occurs
      */
-    List<Toolchain> getToolchains( Session session, String type, Map<String, String> requirements );
+    @Nonnull
+    List<Toolchain> getToolchains( @Nonnull Session session, String type, Map<String, String> requirements );
 
     /**
      *
      * @param session
      * @param type
      * @return the selected {@link Toolchain}
-     * @throws ToolchainManagerException if an exceptino occurs
+     * @throws ToolchainManagerException if an exception occurs
      */
-    Toolchain getToolchainFromBuildContext( Session session, String type )
+    @Nonnull
+    Optional<Toolchain> getToolchainFromBuildContext( @Nonnull Session session, String type )
             throws ToolchainManagerException;
 
     /**
@@ -56,17 +60,18 @@ public interface ToolchainManager extends Service
      * @param session
      * @param type
      * @return the selected {@link Toolchain}s
-     * @throws ToolchainManagerException if an exceptino occurs
+     * @throws ToolchainManagerException if an exception occurs
      */
-    List<Toolchain> getToolchainsForType( Session session, String type )
+    @Nonnull
+    List<Toolchain> getToolchainsForType( @Nonnull Session session, String type )
             throws ToolchainManagerException;
 
     /**
      *
      * @param session
      * @param toolchain
-     * @throws ToolchainManagerException if an exceptino occurs
+     * @throws ToolchainManagerException if an exception occurs
      */
-    void storeToolchainToBuildContext( Session session, Toolchain toolchain )
+    void storeToolchainToBuildContext( @Nonnull Session session, Toolchain toolchain )
             throws ToolchainManagerException;
 }

@@ -20,12 +20,17 @@ package org.apache.maven.plugin;
  */
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.Properties;
 
-import org.apache.maven.execution.MavenSession;
+import org.apache.maven.api.Project;
+import org.apache.maven.api.Session;
+import org.apache.maven.internal.impl.DefaultMojoExecution;
+import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
 import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
@@ -36,23 +41,21 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
  * <table border="1">
  * <caption>Expression matrix</caption>
  * <tr><th>expression</th>                     <th></th>               <th>evaluation result</th></tr>
- * <tr><td><code>session</code></td>           <td></td>               <td>the actual {@link MavenSession}</td></tr>
+ * <tr><td><code>session</code></td>           <td></td>               <td>the actual {@link Session}</td></tr>
  * <tr><td><code>session.*</code></td>         <td>(since Maven 3)</td><td></td></tr>
  * <tr><td><code>localRepository</code></td>   <td></td>
- *                                             <td>{@link MavenSession#getLocalRepository()}</td></tr>
+ *                                             <td>{@link Session#getLocalRepository()}</td></tr>
  * <tr><td><code>reactorProjects</code></td>   <td></td>               <td>{@link MavenSession#getProjects()}</td></tr>
- * <tr><td><code>repositorySystemSession</code></td><td> (since Maven 3)</td>
- *                                             <td>{@link MavenSession#getRepositorySession()}</td></tr>
  * <tr><td><code>project</code></td>           <td></td>
- *                                             <td>{@link MavenSession#getCurrentProject()}</td></tr>
+ *                                             <td>{@link Session#getCurrentProject()}</td></tr>
  * <tr><td><code>project.*</code></td>         <td></td>               <td></td></tr>
  * <tr><td><code>pom.*</code></td>             <td>(since Maven 3)</td><td>same as <code>project.*</code></td></tr>
  * <tr><td><code>executedProject</code></td>   <td></td>
  *                                             <td>{@link MavenProject#getExecutionProject()}</td></tr>
- * <tr><td><code>settings</code></td>          <td></td>               <td>{@link MavenSession#getSettings()}</td></tr>
+ * <tr><td><code>settings</code></td>          <td></td>               <td>{@link Session#getSettings()}</td></tr>
  * <tr><td><code>settings.*</code></td>        <td></td>               <td></td></tr>
  * <tr><td><code>basedir</code></td>           <td></td>
- *                                             <td>{@link MavenSession#getExecutionRootDirectory()} or
+ *                                             <td>{@link Session#getExecutionRootDirectory()} or
  *                                                 <code>System.getProperty( "user.dir" )</code> if null</td></tr>
  * <tr><td><code>mojoExecution</code></td>     <td></td>               <td>the actual {@link MojoExecution}</td></tr>
  * <tr><td><code>mojo</code></td>              <td>(since Maven 3)</td><td>same as <code>mojoExecution</code></td></tr>
@@ -67,33 +70,33 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
  * <i>Notice:</i> <code>reports</code> was supported in Maven 2.x but was removed in Maven 3
  *
  * @author Jason van Zyl
- * @see MavenSession
+ * @see Session
  * @see MojoExecution
  */
-public class PluginParameterExpressionEvaluator
+public class PluginParameterExpressionEvaluatorV4
     implements TypeAwareExpressionEvaluator
 {
-    private MavenSession session;
+    private Session session;
 
     private MojoExecution mojoExecution;
 
-    private MavenProject project;
+    private Project project;
 
-    private String basedir;
+    private Path basedir;
 
     private Properties properties;
 
-    public PluginParameterExpressionEvaluator( MavenSession session )
+    public PluginParameterExpressionEvaluatorV4( Session session, Project project )
     {
-        this( session, null );
+        this( session, project, null );
     }
 
-    public PluginParameterExpressionEvaluator( MavenSession session, MojoExecution mojoExecution )
+    public PluginParameterExpressionEvaluatorV4( Session session, Project project, MojoExecution mojoExecution )
     {
         this.session = session;
         this.mojoExecution = mojoExecution;
         this.properties = new Properties();
-        this.project = session.getCurrentProject();
+        this.project = project;
 
         //
         // Maven4: We may want to evaluate how this is used but we add these separate as the
@@ -102,16 +105,16 @@ public class PluginParameterExpressionEvaluator
         this.properties.putAll( session.getUserProperties() );
         this.properties.putAll( session.getSystemProperties() );
 
-        String basedir = null;
+        Path basedir = null;
 
         if ( project != null )
         {
-            File projectFile = project.getBasedir();
+            Optional<Path> projectFile = project.getBasedir();
 
             // this should always be the case for non-super POM instances...
-            if ( projectFile != null )
+            if ( projectFile.isPresent() )
             {
-                basedir = projectFile.getAbsolutePath();
+                basedir = projectFile.get().toAbsolutePath();
             }
         }
 
@@ -122,7 +125,7 @@ public class PluginParameterExpressionEvaluator
 
         if ( basedir == null )
         {
-            basedir = System.getProperty( "user.dir" );
+            basedir = Paths.get( System.getProperty( "user.dir" ) );
         }
 
         this.basedir = basedir;
@@ -192,10 +195,9 @@ public class PluginParameterExpressionEvaluator
             }
         }
 
-        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-
         if ( "localRepository".equals( expression ) )
         {
+            // TODO: v4
             value = session.getLocalRepository();
         }
         else if ( "session".equals( expression ) )
@@ -204,6 +206,7 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( expression.startsWith( "session" ) )
         {
+            // TODO: v4
             try
             {
                 int pathSeparator = expression.indexOf( '/' );
@@ -236,10 +239,12 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( "executedProject".equals( expression ) )
         {
-            value = project.getExecutionProject();
+            value = ( (DefaultSession) session ).getProject(
+                    ( (DefaultSession) session ).getMavenSession().getCurrentProject().getExecutionProject() );
         }
         else if ( expression.startsWith( "project" ) || expression.startsWith( "pom" ) )
         {
+            // TODO: v4
             try
             {
                 int pathSeparator = expression.indexOf( '/' );
@@ -264,14 +269,15 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( expression.equals( "repositorySystemSession" ) )
         {
-            value = session.getRepositorySession();
+            // TODO: v4
         }
         else if ( expression.equals( "mojo" ) || expression.equals( "mojoExecution" ) )
         {
-            value = mojoExecution;
+            value = new DefaultMojoExecution( mojoExecution );
         }
         else if ( expression.startsWith( "mojo" ) )
         {
+            // TODO: v4
             try
             {
                 int pathSeparator = expression.indexOf( '/' );
@@ -296,15 +302,17 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( expression.equals( "plugin" ) )
         {
-            value = mojoDescriptor.getPluginDescriptor();
+            // TODO: v4
+            value = mojoExecution.getMojoDescriptor().getPluginDescriptor();
         }
         else if ( expression.startsWith( "plugin" ) )
         {
+            // TODO: v4
             try
             {
                 int pathSeparator = expression.indexOf( '/' );
 
-                PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+                PluginDescriptor pluginDescriptor = mojoExecution.getMojoDescriptor().getPluginDescriptor();
 
                 if ( pathSeparator > 0 )
                 {
@@ -353,7 +361,7 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( "basedir".equals( expression ) )
         {
-            value = basedir;
+            value = basedir.toString();
         }
         else if ( expression.startsWith( "basedir" ) )
         {
@@ -361,7 +369,7 @@ public class PluginParameterExpressionEvaluator
 
             if ( pathSeparator > 0 )
             {
-                value = basedir + expression.substring( pathSeparator );
+                value = basedir.toString() + expression.substring( pathSeparator );
             }
         }
 
@@ -392,9 +400,9 @@ public class PluginParameterExpressionEvaluator
                 value = properties.getProperty( expression );
             }
 
-            if ( ( value == null ) && ( ( project != null ) && ( project.getProperties() != null ) ) )
+            if ( ( value == null ) && ( ( project != null ) && ( project.getModel().getProperties() != null ) ) )
             {
-                value = project.getProperties().getProperty( expression );
+                value = project.getModel().getProperties().getProperty( expression );
             }
 
         }
@@ -462,7 +470,7 @@ public class PluginParameterExpressionEvaluator
             else
             {
                 // an ordinary relative path, align with project directory
-                file = new File( new File( basedir, file.getPath() ).toURI().normalize() ).getAbsoluteFile();
+                file = basedir.resolve( file.getPath() ).normalize().toAbsolutePath().toFile();
             }
         }
         return file;

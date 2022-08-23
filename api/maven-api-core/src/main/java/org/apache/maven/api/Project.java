@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Model;
 
 /**
@@ -52,6 +53,13 @@ public interface Project
 
     @Nonnull
     Model getModel();
+
+    @Nonnull
+    default Build getBuild()
+    {
+        Build build = getModel().getBuild();
+        return build != null ? build : Build.newInstance();
+    }
 
     /**
      * Returns the path to the pom file for this project.

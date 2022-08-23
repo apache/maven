@@ -20,6 +20,8 @@ package org.apache.maven.configuration.internal;
  */
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 import javax.inject.Named;
@@ -31,10 +33,12 @@ import org.apache.maven.configuration.BeanConfigurationRequest;
 import org.apache.maven.configuration.BeanConfigurationValuePreprocessor;
 import org.apache.maven.configuration.BeanConfigurator;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
+import org.codehaus.plexus.component.configurator.ConfigurationListener;
+import org.codehaus.plexus.component.configurator.converters.basic.AbstractBasicConverter;
 import org.codehaus.plexus.component.configurator.converters.composite.ObjectWithFieldsConverter;
 import org.codehaus.plexus.component.configurator.converters.lookup.ConverterLookup;
-import org.codehaus.plexus.component.configurator.converters.lookup.DefaultConverterLookup;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
@@ -52,7 +56,12 @@ public class DefaultBeanConfigurator
     implements BeanConfigurator
 {
 
-    private final ConverterLookup converterLookup = new DefaultConverterLookup();
+    private final ConverterLookup converterLookup;
+
+    public DefaultBeanConfigurator()
+    {
+        converterLookup = new EnhancedConverterLookup();
+    }
 
     public void configureBean( BeanConfigurationRequest request )
         throws BeanConfigurationException
@@ -94,11 +103,12 @@ public class DefaultBeanConfigurator
 
         BeanExpressionEvaluator evaluator = new BeanExpressionEvaluator( request );
 
-        ObjectWithFieldsConverter converter = new ObjectWithFieldsConverter();
+        ObjectWithFieldsConverter converter = new EnhancedConfigurationConverter();
 
         try
         {
-            converter.processConfiguration( converterLookup, request.getBean(), classLoader, plexusConfig, evaluator );
+            converter.processConfiguration( converterLookup, request.getBean(), classLoader,
+                                            plexusConfig, evaluator, null );
         }
         catch ( ComponentConfigurationException e )
         {
@@ -150,6 +160,35 @@ public class DefaultBeanConfigurator
                 return translator.translatePath( file );
             }
             return file;
+        }
+
+    }
+
+    static class PathConverter extends AbstractBasicConverter
+    {
+        @Override
+        public boolean canConvert( Class<?> type )
+        {
+            return Path.class.equals( type );
+        }
+
+        @Override
+        protected Object fromString( String value ) throws ComponentConfigurationException
+        {
+            return Paths.get( value.replace( '/' == File.separatorChar ? '\\' : '/', File.separatorChar ) );
+        }
+
+        @Override
+        public Object fromConfiguration( final ConverterLookup lookup, final PlexusConfiguration configuration,
+                                         final Class<?> type, final Class<?> enclosingType, final ClassLoader loader,
+                                         final ExpressionEvaluator evaluator, final ConfigurationListener listener )
+                throws ComponentConfigurationException
+        {
+            final Object result =
+                    super.fromConfiguration( lookup, configuration, type, enclosingType, loader, evaluator, listener );
+
+            return result instanceof Path
+                    ? evaluator.alignToBaseDirectory( ( (Path) result ).toFile() ).toPath() : result;
         }
 
     }

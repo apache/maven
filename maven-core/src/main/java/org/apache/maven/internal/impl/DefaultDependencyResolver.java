@@ -89,7 +89,8 @@ public class DefaultDependencyResolver implements DependencyResolver
                 @Override
                 public List<ArtifactResolverResult> getArtifactResults()
                 {
-                    return null;
+                    return new MappedList<>( result.getArtifactResults(),
+                            ar -> () -> session.getArtifact( ar.getArtifact() ) );
                 }
             };
         }

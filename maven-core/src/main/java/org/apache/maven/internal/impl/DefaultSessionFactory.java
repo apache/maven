@@ -47,6 +47,7 @@ public class DefaultSessionFactory
     private final RuntimeInformation runtimeInformation;
 
     @Inject
+    @SuppressWarnings( "checkstyle:ParameterNumber" )
     public DefaultSessionFactory( RepositorySystem repositorySystem,
                                   ProjectBuilder projectBuilder,
                                   MavenRepositorySystem mavenRepositorySystem,

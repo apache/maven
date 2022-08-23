@@ -257,7 +257,7 @@ public class DefaultBuildPluginManager
             }
             catch ( MojoException e )
             {
-                throw new MojoExecutionException( e );
+                throw new MojoExecutionException( e.getMessage(), e );
             }
         }
 

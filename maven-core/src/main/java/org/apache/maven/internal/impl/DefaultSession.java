@@ -19,6 +19,9 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -86,8 +89,8 @@ public class DefaultSession extends AbstractSession
     private final org.apache.maven.project.ProjectBuilder projectBuilder;
     private final MavenRepositorySystem mavenRepositorySystem;
     private final DefaultToolchainManagerPrivate toolchainManagerPrivate;
-    private final ArtifactManager artifactManager = new DefaultArtifactManager();
-    private final ProjectManager projectManager = new DefaultProjectManager( artifactManager );
+    private final ArtifactManager artifactManager;
+    private final ProjectManager projectManager;
     private final PlexusContainer container;
     private final MojoExecutionScope mojoExecutionScope;
     private final RuntimeInformation runtimeInformation;
@@ -116,9 +119,11 @@ public class DefaultSession extends AbstractSession
         this.container = container;
         this.mojoExecutionScope = mojoExecutionScope;
         this.runtimeInformation = runtimeInformation;
+        this.artifactManager = new DefaultArtifactManager( this );
+        this.projectManager = new DefaultProjectManager( this, artifactManager, container );
     }
 
-    MavenSession getMavenSession()
+    public MavenSession getMavenSession()
     {
         return mavenSession;
     }
@@ -165,6 +170,41 @@ public class DefaultSession extends AbstractSession
         return runtimeInformation.getMavenVersion();
     }
 
+    @Override
+    public int getDegreeOfConcurrency()
+    {
+        return mavenSession.getRequest().getDegreeOfConcurrency();
+    }
+
+    @Nonnull
+    @Override
+    public Instant getStartTime()
+    {
+        return mavenSession.getStartTime().toInstant();
+    }
+
+    @Nonnull
+    @Override
+    public Path getMultiModuleProjectDirectory()
+    {
+        return mavenSession.getRequest().getMultiModuleProjectDirectory().toPath();
+    }
+
+    @Nonnull
+    @Override
+    public Path getExecutionRootDirectory()
+    {
+        return Paths.get( mavenSession.getRequest().getBaseDirectory() );
+    }
+
+    @Nonnull
+    @Override
+    public List<Project> getProjects()
+    {
+        return getProjects( mavenSession.getProjects() );
+    }
+
+    @Nonnull
     @Override
     public Map<String, Object> getPluginContext( Project project )
     {

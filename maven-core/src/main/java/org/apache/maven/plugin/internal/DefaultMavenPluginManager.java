@@ -25,6 +25,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
+import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.ContextEnabled;
 import org.apache.maven.plugin.DebugConfigurationListener;
@@ -43,6 +44,7 @@ import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
+import org.apache.maven.plugin.PluginParameterExpressionEvaluatorV4;
 import org.apache.maven.plugin.PluginRealmCache;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -607,7 +609,18 @@ public class DefaultMavenPluginManager
                 pomConfiguration = XmlPlexusConfiguration.toPlexusConfiguration( dom );
             }
 
-            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
+            ExpressionEvaluator expressionEvaluator;
+            if ( mojoDescriptor.isV4Api() )
+            {
+                expressionEvaluator = new PluginParameterExpressionEvaluatorV4(
+                        session.getSession(),
+                        ( ( DefaultSession ) session.getSession() ).getProject( session.getCurrentProject() ),
+                        mojoExecution );
+            }
+            else
+            {
+                expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
+            }
 
             for ( MavenPluginConfigurationValidator validator: configurationValidators )
             {
@@ -637,7 +650,7 @@ public class DefaultMavenPluginManager
 
         if ( StringUtils.isEmpty( configuratorId ) )
         {
-            configuratorId = "basic";
+            configuratorId = "enhanced";
         }
 
         try

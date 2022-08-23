@@ -28,6 +28,10 @@ import java.util.Optional;
 
 /**
  * TODO: split between Coordinates / AttachedArtifact / ResolvedArtifact ?
+ * Coordinate: version range
+ * <resolver-version-artifact> : version
+ * ResolvedArtifact: version + file
+ * AttachedArtifact:
  */
 @Experimental
 @Immutable

@@ -32,17 +32,36 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Metadata;
 import org.apache.maven.api.services.ArtifactManager;
+import org.apache.maven.project.MavenProject;
 
 public class DefaultArtifactManager implements ArtifactManager
 {
 
+    @Nonnull
+    private final DefaultSession session;
     private final Map<Artifact, Path> paths = new ConcurrentHashMap<>();
     private final Map<Artifact, Collection<Metadata>> metadatas = new ConcurrentHashMap<>();
+
+    public DefaultArtifactManager( @Nonnull DefaultSession session )
+    {
+        this.session = session;
+    }
 
     @Nonnull
     @Override
     public Optional<Path> getPath( @Nonnull Artifact artifact )
     {
+        if ( session.getMavenSession().getAllProjects() != null )
+        {
+            String id = artifact.getId();
+            for ( MavenProject project : session.getMavenSession().getAllProjects() )
+            {
+                if ( id.equals( project.getArtifact().getId() ) && project.getArtifact().getFile() != null )
+                {
+                    return Optional.of( project.getArtifact().getFile().toPath() );
+                }
+            }
+        }
         Path path = paths.get( artifact );
         return path != null ? Optional.of( path ) : artifact.getPath();
     }
@@ -50,6 +69,18 @@ public class DefaultArtifactManager implements ArtifactManager
     @Override
     public void setPath( @Nonnull Artifact artifact, Path path )
     {
+        if ( session.getMavenSession().getAllProjects() != null )
+        {
+            String id = artifact.getId();
+            for ( MavenProject project : session.getMavenSession().getAllProjects() )
+            {
+                if ( id.equals( project.getArtifact().getId() ) )
+                {
+                    project.getArtifact().setFile( path != null ? path.toFile() : null );
+                    break;
+                }
+            }
+        }
         if ( path == null )
         {
             paths.remove( artifact );

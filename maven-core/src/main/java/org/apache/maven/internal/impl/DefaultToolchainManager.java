@@ -22,6 +22,7 @@ package org.apache.maven.internal.impl;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Toolchain;
@@ -52,11 +53,12 @@ public class DefaultToolchainManager implements ToolchainManager
     }
 
     @Override
-    public Toolchain getToolchainFromBuildContext( Session session, String type )
+    public Optional<Toolchain> getToolchainFromBuildContext( Session session, String type )
             throws ToolchainManagerException
     {
         MavenSession s = ( ( DefaultSession ) session ).getMavenSession();
-        return toToolchain( toolchainManagerPrivate.getToolchainFromBuildContext( type, s ) );
+        return Optional.ofNullable( toolchainManagerPrivate.getToolchainFromBuildContext( type, s ) )
+                .map( this::toToolchain );
     }
 
     @Override
