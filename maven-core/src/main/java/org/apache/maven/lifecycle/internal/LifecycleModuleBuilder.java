@@ -32,7 +32,6 @@ import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
@@ -66,9 +65,6 @@ public class LifecycleModuleBuilder
     @Requirement
     private List<ProjectExecutionListener> projectExecutionListeners;
 
-    @Requirement
-    private SessionScope sessionScope;
-
     public void setProjectExecutionListeners( final List<ProjectExecutionListener> listeners )
     {
         this.projectExecutionListeners = listeners;
@@ -88,10 +84,6 @@ public class LifecycleModuleBuilder
 
         long buildStartTime = System.currentTimeMillis();
 
-        // session may be different from rootSession seeded in DefaultMaven
-        // explicitly seed the right session here to make sure it is used by Guice
-        sessionScope.enter( reactorContext.getSessionScopeMemento() );
-        sessionScope.seed( MavenSession.class, session );
         try
         {
 
@@ -145,8 +137,6 @@ public class LifecycleModuleBuilder
         }
         finally
         {
-            sessionScope.exit();
-
             session.setCurrentProject( null );
 
             Thread.currentThread().setContextClassLoader( reactorContext.getOriginalContextClassLoader() );

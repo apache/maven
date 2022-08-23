@@ -54,7 +54,7 @@ public class MavenSession
 
     private Properties executionProperties;
 
-    private MavenProject currentProject;
+    private ThreadLocal<MavenProject> currentProject = new ThreadLocal<>();
 
     /**
      * These projects have already been topologically sorted in the {@link org.apache.maven.Maven} component before
@@ -83,14 +83,15 @@ public class MavenSession
     {
         if ( !projects.isEmpty() )
         {
-            this.currentProject = projects.get( 0 );
+            MavenProject first = projects.get( 0 );
+            this.currentProject = ThreadLocal.withInitial( () -> first );
             this.topLevelProject =
                     projects.stream().filter( project -> project.isExecutionRoot() ).findFirst()
-                            .orElse( currentProject );
+                            .orElse( first );
         }
         else
         {
-            this.currentProject = null;
+            this.currentProject = new ThreadLocal<>();
             this.topLevelProject = null;
         }
         this.projects = projects;
@@ -151,12 +152,12 @@ public class MavenSession
 
     public void setCurrentProject( MavenProject currentProject )
     {
-        this.currentProject = currentProject;
+        this.currentProject.set( currentProject );
     }
 
     public MavenProject getCurrentProject()
     {
-        return currentProject;
+        return currentProject.get();
     }
 
     public ProjectBuildingRequest getProjectBuildingRequest()
@@ -233,7 +234,12 @@ public class MavenSession
     {
         try
         {
-            return (MavenSession) super.clone();
+            MavenSession clone = (MavenSession) super.clone();
+            // the default must become the current project of the thread that clones this
+            MavenProject current = getCurrentProject();
+            // we replace the thread local of the clone to prevent write through and enforce the new default value
+            clone.currentProject = ThreadLocal.withInitial( () -> current );
+            return clone;
         }
         catch ( CloneNotSupportedException e )
         {
