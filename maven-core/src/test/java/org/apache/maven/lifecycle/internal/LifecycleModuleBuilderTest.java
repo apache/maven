@@ -44,13 +44,6 @@ public class LifecycleModuleBuilderTest
 {
     @Inject
     PlexusContainer container;
-//    @Override
-//    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-//    {
-//        configuration.setAutoWiring( true );
-//        configuration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-//
-//    }
 
     @Test
     public void testCurrentProject() throws Exception
