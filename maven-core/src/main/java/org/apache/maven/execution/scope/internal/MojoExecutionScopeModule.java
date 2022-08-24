@@ -19,6 +19,7 @@ package org.apache.maven.execution.scope.internal;
  * under the License.
  */
 
+import org.apache.maven.api.plugin.Log;
 import org.apache.maven.execution.scope.MojoExecutionScoped;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
@@ -54,6 +55,7 @@ public class MojoExecutionScopeModule
 
         bind( MavenProject.class ).toProvider( MojoExecutionScope.seededKeyProvider() ).in( scope );
         bind( MojoExecution.class ).toProvider( MojoExecutionScope.seededKeyProvider() ).in( scope );
+        bind( Log.class ).toProvider( MojoExecutionScope.seededKeyProvider() ).in( scope );
     }
 
 }

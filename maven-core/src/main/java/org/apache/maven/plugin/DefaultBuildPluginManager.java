@@ -32,6 +32,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
+import org.apache.maven.internal.impl.DefaultLog;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -40,6 +41,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.slf4j.LoggerFactory;
 
 // TODO the antrun plugin has its own configurator, the only plugin that does. might need to think about how that works
 // TODO remove the coreArtifactFilterManager
@@ -122,6 +124,8 @@ public class DefaultBuildPluginManager
         {
             scope.seed( MavenProject.class, project );
             scope.seed( MojoExecution.class, mojoExecution );
+            scope.seed( org.apache.maven.api.plugin.Log.class, new DefaultLog(
+                    LoggerFactory.getLogger( mojoExecution.getMojoDescriptor().getFullGoalName() ) ) );
 
             if ( mojoDescriptor.isV4Api() )
             {
