@@ -149,10 +149,6 @@ public abstract class AbstractMojo
     /** Plugin container context */
     private Map pluginContext;
 
-    /**
-     * @deprecated Use SLF4J directly
-     */
-    @Deprecated
     @Override
     public void setLog( Log log )
     {
@@ -171,9 +167,7 @@ public abstract class AbstractMojo
      * method directly whenever you need the logger, it is fast enough and needs no caching.
      *
      * @see org.apache.maven.plugin.Mojo#getLog()
-     * @deprecated Use SLF4J directly
      */
-    @Deprecated
     @Override
     public Log getLog()
     {

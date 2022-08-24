@@ -29,9 +29,7 @@ package org.apache.maven.plugin.logging;
  *
  * @author jdcasey
  *
- * @deprecated Use SLF4J directly
  */
-@Deprecated
 public interface Log
 {
     /**

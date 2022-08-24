@@ -27,9 +27,7 @@ import java.io.StringWriter;
  *
  * @author jdcasey
  *
- * @deprecated Use SLF4J directly
  */
-@Deprecated
 public class SystemStreamLog
     implements Log
 {
