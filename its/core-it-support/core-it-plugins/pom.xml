@@ -84,6 +84,7 @@ under the License.
     <module>mng5805-plugin-dep</module>
     <module>mng5958-extension</module>
     <module>mng6759-plugin-resolves-project-dependencies</module>
+    <module>mng7529-plugin</module>
   </modules>
 
   <distributionManagement>
