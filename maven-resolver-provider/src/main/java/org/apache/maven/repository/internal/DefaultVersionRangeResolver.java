@@ -69,6 +69,8 @@ public class DefaultVersionRangeResolver
 
     private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
 
+    private static final String SNAPSHOT = "SNAPSHOT";
+
     private final MetadataResolver metadataResolver;
     private final SyncContextFactory syncContextFactory;
     private final RepositoryEventDispatcher repositoryEventDispatcher;
@@ -183,6 +185,9 @@ public class DefaultVersionRangeResolver
             }
 
             Versioning versioning = readVersions( session, trace, metadataResult.getMetadata(), repository, result );
+
+            versioning = filterVersionsByRepositoryType( versioning, metadataResult.getRequest().getRepository() );
+
             for ( String version : versioning.getVersions() )
             {
                 if ( !versionIndex.containsKey( version ) )
@@ -224,6 +229,28 @@ public class DefaultVersionRangeResolver
         }
 
         return ( versioning != null ) ? versioning : new Versioning();
+    }
+
+    private Versioning filterVersionsByRepositoryType( Versioning versioning, RemoteRepository remoteRepository )
+    {
+        if ( remoteRepository == null )
+        {
+            return versioning;
+        }
+
+        Versioning filteredVersions = versioning.clone();
+
+        for ( String version : versioning.getVersions() )
+        {
+            boolean snapshotVersion = version != null && version.endsWith( SNAPSHOT );
+
+            if ( !remoteRepository.getPolicy( snapshotVersion ).isEnabled() )
+            {
+                filteredVersions.removeVersion( version );
+            }
+        }
+
+        return filteredVersions;
     }
 
     private void invalidMetadata( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
