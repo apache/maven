@@ -19,6 +19,7 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.eclipse.aether.RepositoryEvent;
@@ -68,8 +69,6 @@ public class DefaultVersionRangeResolver
 {
 
     private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
-
-    private static final String SNAPSHOT = "SNAPSHOT";
 
     private final MetadataResolver metadataResolver;
     private final SyncContextFactory syncContextFactory;
@@ -242,9 +241,7 @@ public class DefaultVersionRangeResolver
 
         for ( String version : versioning.getVersions() )
         {
-            boolean snapshotVersion = version != null && version.endsWith( SNAPSHOT );
-
-            if ( !remoteRepository.getPolicy( snapshotVersion ).isEnabled() )
+            if ( !remoteRepository.getPolicy( ArtifactUtils.isSnapshot( version ) ).isEnabled() )
             {
                 filteredVersions.removeVersion( version );
             }
