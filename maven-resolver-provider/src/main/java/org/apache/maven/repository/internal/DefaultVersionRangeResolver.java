@@ -19,6 +19,7 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.eclipse.aether.RepositoryEvent;
@@ -68,8 +69,6 @@ public class DefaultVersionRangeResolver
 {
 
     private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
-
-    private static final String SNAPSHOT = "SNAPSHOT";
 
     private final MetadataResolver metadataResolver;
     private final SyncContextFactory syncContextFactory;
@@ -185,11 +184,12 @@ public class DefaultVersionRangeResolver
             }
 
             Versioning versioning = readVersions( session, trace, metadataResult.getMetadata(), repository, result );
-            RemoteRepository remoteRepository = metadataResult.getRequest().getRepository();
+
+            versioning = filterVersionsByRepositoryType( versioning, metadataResult.getRequest().getRepository() );
 
             for ( String version : versioning.getVersions() )
             {
-                if ( isEnabled( remoteRepository, version ) && !versionIndex.containsKey( version ) )
+                if ( !versionIndex.containsKey( version ) )
                 {
                     versionIndex.put( version, repository );
                 }
@@ -197,18 +197,6 @@ public class DefaultVersionRangeResolver
         }
 
         return versionIndex;
-    }
-
-    private boolean isEnabled( RemoteRepository remoteRepository, String version )
-    {
-        if ( remoteRepository == null )
-        {
-            return true;
-        }
-
-        boolean snapshot = version != null && version.endsWith( SNAPSHOT );
-
-        return remoteRepository.getPolicy( snapshot ).isEnabled();
     }
 
     private Versioning readVersions( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
@@ -240,6 +228,26 @@ public class DefaultVersionRangeResolver
         }
 
         return ( versioning != null ) ? versioning : new Versioning();
+    }
+
+    private Versioning filterVersionsByRepositoryType( Versioning versioning, RemoteRepository remoteRepository )
+    {
+        if ( remoteRepository == null )
+        {
+            return versioning;
+        }
+
+        Versioning filteredVersions = versioning.clone();
+
+        for ( String version : versioning.getVersions() )
+        {
+            if ( !remoteRepository.getPolicy( ArtifactUtils.isSnapshot( version ) ).isEnabled() )
+            {
+                filteredVersions.removeVersion( version );
+            }
+        }
+
+        return filteredVersions;
     }
 
     private void invalidMetadata( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
