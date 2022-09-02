@@ -19,11 +19,12 @@ package org.apache.maven.its.mng7474;
  * under the License.
  */
 
-import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.apache.maven.SessionScoped;
 
 @SessionScoped
 @Named

@@ -7,7 +7,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>plugin</module>
         <module>project-a</module>
         <module>project-b</module>
     </modules>
