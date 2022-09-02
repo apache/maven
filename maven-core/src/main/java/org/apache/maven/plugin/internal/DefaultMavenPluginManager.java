@@ -650,7 +650,7 @@ public class DefaultMavenPluginManager
 
         if ( StringUtils.isEmpty( configuratorId ) )
         {
-            configuratorId = "enhanced";
+            configuratorId = "basic";
         }
 
         try

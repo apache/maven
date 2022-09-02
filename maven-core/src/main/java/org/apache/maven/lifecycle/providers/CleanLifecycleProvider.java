@@ -40,7 +40,7 @@ public final class CleanLifecycleProvider
         "post-clean"
     };
 
-    private static final String MAVEN_CLEAN_PLUGIN_VERSION = "4.0.0-SNAPSHOT";
+    private static final String MAVEN_CLEAN_PLUGIN_VERSION = "3.1.0";
 
     private static final String[] BINDINGS = {
         "clean", "org.apache.maven.plugins:maven-clean-plugin:" + MAVEN_CLEAN_PLUGIN_VERSION + ":clean"
