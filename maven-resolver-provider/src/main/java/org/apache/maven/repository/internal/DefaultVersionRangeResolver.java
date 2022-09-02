@@ -19,6 +19,7 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.eclipse.aether.RepositoryEvent;
@@ -183,6 +184,9 @@ public class DefaultVersionRangeResolver
             }
 
             Versioning versioning = readVersions( session, trace, metadataResult.getMetadata(), repository, result );
+
+            versioning = filterVersionsByRepositoryType( versioning, metadataResult.getRequest().getRepository() );
+
             for ( String version : versioning.getVersions() )
             {
                 if ( !versionIndex.containsKey( version ) )
@@ -224,6 +228,26 @@ public class DefaultVersionRangeResolver
         }
 
         return ( versioning != null ) ? versioning : new Versioning();
+    }
+
+    private Versioning filterVersionsByRepositoryType( Versioning versioning, RemoteRepository remoteRepository )
+    {
+        if ( remoteRepository == null )
+        {
+            return versioning;
+        }
+
+        Versioning filteredVersions = versioning.clone();
+
+        for ( String version : versioning.getVersions() )
+        {
+            if ( !remoteRepository.getPolicy( ArtifactUtils.isSnapshot( version ) ).isEnabled() )
+            {
+                filteredVersions.removeVersion( version );
+            }
+        }
+
+        return filteredVersions;
     }
 
     private void invalidMetadata( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
