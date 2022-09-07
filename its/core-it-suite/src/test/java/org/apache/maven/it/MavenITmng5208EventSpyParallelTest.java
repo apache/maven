@@ -50,7 +50,8 @@ public class MavenITmng5208EventSpyParallelTest
         verifier.deleteDirectory( "target" );
         verifier.setSystemProperty( "maven.ext.class.path", "../spy/target/event-spy-0.0.1-SNAPSHOT.jar" );
         verifier.addCliOption( "-X" );
-        verifier.addCliOption( "-T 2" );
+        verifier.addCliOption( "-T" );
+        verifier.addCliOption( "2" );
         verifier.addCliOption( "-fn" );
         verifier.executeGoal( "compile" );
         verifier.verifyTextInLog( "ProjectFailed/org.apache.maven.its.mng5208:sub-2" );

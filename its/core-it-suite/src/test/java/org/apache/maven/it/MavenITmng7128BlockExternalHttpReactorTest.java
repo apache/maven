@@ -42,7 +42,9 @@ public class MavenITmng7128BlockExternalHttpReactorTest
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
-        verifier.addCliOption( "-s settings.xml" ); // ITs override global settings that provide blocked mirror: need to define the mirror in dedicated settings
+        // ITs override global settings that provide blocked mirror: need to define the mirror in dedicated settings
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
 
         try
         {

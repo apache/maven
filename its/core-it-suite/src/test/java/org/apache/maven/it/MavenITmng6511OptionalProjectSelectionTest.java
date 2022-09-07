@@ -48,7 +48,8 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log-select-existing.txt" );
-        verifier.addCliOption( "-pl ?existing-module" );
+        verifier.addCliOption( "-pl" );
+        verifier.addCliOption( "?existing-module" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
@@ -60,7 +61,8 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log-select-existing-artifact-id.txt" );
-        verifier.addCliOption( "-pl ?:existing-module" );
+        verifier.addCliOption( "-pl" );
+        verifier.addCliOption( "?:existing-module" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
@@ -72,7 +74,8 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log-select-non-existing.txt" );
-        verifier.addCliOption( "-pl ?non-existing-module" );
+        verifier.addCliOption( "-pl" );
+        verifier.addCliOption( "?non-existing-module" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
@@ -84,7 +87,8 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log-deselect-existing.txt" );
-        verifier.addCliOption( "-pl !?existing-module" );
+        verifier.addCliOption( "-pl" );
+        verifier.addCliOption( "!?existing-module" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.verifyFileNotPresent( "existing-module/target/touch.txt" ); // existing-module should not have been built.
@@ -96,7 +100,8 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log-deselect-non-existing.txt" );
-        verifier.addCliOption( "-pl !?non-existing-module" );
+        verifier.addCliOption( "-pl" );
+        verifier.addCliOption( "!?non-existing-module" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.

@@ -70,7 +70,8 @@ public class MavenITmng3057VersionExprTransformationsTest
 
         verifier.addCliOption( "-V" );
         verifier.addCliOption( "-DtestVersion=1" );
-        verifier.addCliOption( "-f pom-filtered.xml" );
+        verifier.addCliOption( "-f" );
+        verifier.addCliOption( "pom-filtered.xml" );
 
         verifier.executeGoal( "generate-sources" );
         verifier.verifyErrorFreeLog();

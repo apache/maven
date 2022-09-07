@@ -48,7 +48,8 @@ public class MavenITmng3268MultipleHyphenPCommandLineTest
 
         verifier.addCliOption( "-Pprofile1,profile2" );
         verifier.addCliOption( "-Pprofile3" );
-        verifier.addCliOption( "-P profile4" );
+        verifier.addCliOption( "-P" );
+        verifier.addCliOption( "profile4" );
         verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();

@@ -72,7 +72,10 @@ public class MavenITmng5578SessionScopeTest
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         verifier.addCliOption( "-Dit-build-extensions=false" );
-        verifier.addCliOption( "--builder multithreaded -T 1" );
+        verifier.addCliOption( "--builder" );
+        verifier.addCliOption( "multithreaded" );
+        verifier.addCliOption( "-T" );
+        verifier.addCliOption( "1" );
         verifier.executeGoal( "package" );
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();

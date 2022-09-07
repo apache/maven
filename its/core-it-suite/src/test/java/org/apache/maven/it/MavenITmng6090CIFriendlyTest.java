@@ -72,7 +72,8 @@ public class MavenITmng6090CIFriendlyTest
         verifier.setAutoclean( false );
 
         verifier.addCliOption( "-Drevision=1.2" );
-        verifier.addCliOption( "-pl module-3" );
+        verifier.addCliOption( "-pl" );
+        verifier.addCliOption( "module-3" );
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -101,7 +102,8 @@ public class MavenITmng6090CIFriendlyTest
         verifier.setForkJvm(true);
 
         verifier.addCliOption( "-Drevision=1.2" );
-        verifier.addCliOption( "-pl module-3" );
+        verifier.addCliOption( "-pl" );
+        verifier.addCliOption( "module-3" );
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

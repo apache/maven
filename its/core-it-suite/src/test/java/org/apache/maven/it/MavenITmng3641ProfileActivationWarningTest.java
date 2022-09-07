@@ -51,7 +51,8 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.deleteArtifact( "org.apache.maven.its.mng3641", "parent", "1.0", "pom" );
 
         // (1) make sure the profile is found. Must not contain a warning.
-        verifier.addCliOption( "-P mng-3641-it-provided-profile" );
+        verifier.addCliOption( "-P" );
+        verifier.addCliOption( "mng-3641-it-provided-profile" );
         verifier.setLogFileName( "log-1.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
@@ -62,7 +63,8 @@ public class MavenITmng3641ProfileActivationWarningTest
 
         // (2) make sure the profile was not found and a warning was printed.
         verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliOption( "-P mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p" );
+        verifier.addCliOption( "-P" );
+        verifier.addCliOption( "mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p" );
         verifier.setLogFileName( "log-2.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
@@ -74,7 +76,8 @@ public class MavenITmng3641ProfileActivationWarningTest
         // (3) make sure the first profile is found while the other is not and a warning was printed
         // accordingly.
         verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliOption( "-P mng-3641-it-provided-profile,mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p" );
+        verifier.addCliOption( "-P" );
+        verifier.addCliOption( "mng-3641-it-provided-profile,mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p" );
         verifier.setLogFileName( "log-3.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
@@ -86,7 +89,8 @@ public class MavenITmng3641ProfileActivationWarningTest
 
         // (4) make sure the warning is only printed when the profile is missing in all projects
         verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliOption( "-P mng-3641-it-provided-profile-child" );
+        verifier.addCliOption( "-P" );
+        verifier.addCliOption( "mng-3641-it-provided-profile-child" );
         verifier.setLogFileName( "log-4.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
@@ -97,7 +101,8 @@ public class MavenITmng3641ProfileActivationWarningTest
 
         // (5) make sure the profile is found in subproject. Must not contain a warning.
         verifier = newVerifier( new File( testDir, "child1" ).getAbsolutePath() );
-        verifier.addCliOption( "-P mng-3641-it-provided-profile-child" );
+        verifier.addCliOption( "-P" );
+        verifier.addCliOption( "mng-3641-it-provided-profile-child" );
         verifier.setLogFileName( "log-5.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
@@ -108,7 +113,8 @@ public class MavenITmng3641ProfileActivationWarningTest
 
         // (6) make sure the profile is found from parent in subproject. Must not contain a warning.
         verifier = newVerifier( new File( testDir, "child1" ).getAbsolutePath() );
-        verifier.addCliOption( "-P mng-3641-it-provided-profile" );
+        verifier.addCliOption( "-P" );
+        verifier.addCliOption( "mng-3641-it-provided-profile" );
         verifier.setLogFileName( "log-6.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

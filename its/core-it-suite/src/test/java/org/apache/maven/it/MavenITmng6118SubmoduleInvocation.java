@@ -19,12 +19,10 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.util.ResourceExtractor;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a collection of test cases for <a href="https://issues.apache.org/jira/browse/MNG-6118">MNG-6118</a>,
@@ -43,7 +41,6 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
 {
     private static final String RESOURCE_PATH = "/mng-6118-submodule-invocation-full-reactor";
     private final File testDir;
-    private final Map<String, String> envVars = new HashMap<>();
 
     public MavenITmng6118SubmoduleInvocation() throws IOException
     {
@@ -60,13 +57,13 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     {
         // Compile the whole project first.
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "compile", envVars );
+        verifier.executeGoal( "compile" );
 
         final File submoduleDirectory = new File( testDir, "app" );
         verifier = newVerifier( submoduleDirectory.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setLogFileName( "log-insubmodule.txt" );
-        verifier.executeGoal( "compile", envVars );
+        verifier.executeGoal( "compile" );
     }
 
     /**
@@ -83,8 +80,9 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setLogFileName( "log-withfile.txt" );
-        verifier.addCliOption( "-f app/pom.xml" );
-        verifier.executeGoal( "compile", envVars );
+        verifier.addCliOption( "-f" );
+        verifier.addCliOption( "app/pom.xml" );
+        verifier.executeGoal( "compile" );
     }
 
     /**
@@ -96,9 +94,10 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     {
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.addCliOption( "-am" );
-        verifier.addCliOption( "-f app/pom.xml" );
+        verifier.addCliOption( "-f" );
+        verifier.addCliOption( "app/pom.xml" );
         verifier.setLogFileName( "log-withfilealsomake.txt" );
-        verifier.executeGoal( "compile", envVars );
+        verifier.executeGoal( "compile" );
         verifier.verifyTextInLog( "Building Maven Integration Test :: MNG-6118 :: Library 1.0" );
     }
 
@@ -113,7 +112,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
         Verifier verifier = newVerifier( submoduleDirectory.getAbsolutePath() );
         verifier.addCliOption( "-am" );
         verifier.setLogFileName( "log-insubmodulealsomake.txt" );
-        verifier.executeGoal( "compile", envVars );
+        verifier.executeGoal( "compile" );
         verifier.verifyTextInLog( "Building Maven Integration Test :: MNG-6118 :: Library 1.0" );
     }
 }

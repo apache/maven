@@ -60,7 +60,8 @@ public class MavenITmng5716ToolchainsTypeTest
 
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "--toolchains toolchains.xml" );
+        verifier.addCliOption( "--toolchains" );
+        verifier.addCliOption( "toolchains.xml" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

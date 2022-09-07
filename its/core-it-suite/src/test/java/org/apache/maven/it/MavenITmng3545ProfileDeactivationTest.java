@@ -81,7 +81,8 @@ public class MavenITmng3545ProfileDeactivationTest
 
         // Deactivate active by default profiles
         verifier.addCliOption( "-P-profile1" );
-        verifier.addCliOption( "-P -profile2" );
+        verifier.addCliOption( "-P" );
+        verifier.addCliOption( "-profile2" );
 
         verifier.executeGoal( "validate" );
 
@@ -103,7 +104,8 @@ public class MavenITmng3545ProfileDeactivationTest
 
         // Deactivate active by default profiles
         verifier.addCliOption( "-P!profile1" );
-        verifier.addCliOption( "-P !profile2" );
+        verifier.addCliOption( "-P" );
+        verifier.addCliOption( "!profile2" );
 
         verifier.executeGoal( "validate" );
 
