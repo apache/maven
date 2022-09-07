@@ -129,6 +129,7 @@ org.apache.maven:maven-core:3.1.0
 org.apache.maven:maven-core:3.3.1
 org.apache.maven:maven-model:2.1.0
 org.apache.maven:maven-plugin-api:3.1.0
+org.apache.maven:maven-plugin-api:3.2.5
 org.apache.maven:maven-plugin-registry:2.1.0
 org.apache.maven:maven-profile:2.1.0
 org.apache.maven:maven-project:2.1.0
@@ -159,6 +160,7 @@ org.eclipse.aether:aether-impl:0.9.0.M2
 org.eclipse.aether:aether-spi:0.9.0.M2
 org.eclipse.sisu:org.eclipse.sisu.inject:0.0.0.M5
 org.eclipse.sisu:org.eclipse.sisu.plexus:0.0.0.M5
+org.eclipse.sisu:sisu-maven-plugin:0.3.5
 org.ow2.asm:asm:4.1
 org.ow2.asm:asm:6.2
 org.ow2.asm:asm:7.2
