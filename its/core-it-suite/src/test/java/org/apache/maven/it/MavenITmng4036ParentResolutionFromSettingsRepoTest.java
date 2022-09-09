@@ -60,30 +60,4 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng4036", "parent", "0.2", "pom" );
     }
 
-    /**
-     * Verify that a parent POM is downloaded from a legacy-style remote repo defined in the settings.
-     *
-     * @throws Exception in case of failure
-     */
-    public void testitLegacyLayout()
-        throws Exception
-    {
-        // legacy layout no longer supported in Maven 3.x (see MNG-4204)
-        requiresMavenVersion( "[2.0,3.0-alpha-3)" );
-
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4036/legacy" );
-
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.filterFile( "settings.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4036" );
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng4036", "parent", "0.1", "pom" );
-    }
-
 }

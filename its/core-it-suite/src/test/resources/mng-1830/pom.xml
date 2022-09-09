@@ -1,9 +1,0 @@
-<project>
-  <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: MNG-1830</name>
-  <groupId>org.apache.maven.its.mng1830</groupId>
-  <artifactId>maven-it-mng-1830</artifactId>
-  <description>Test -v</description>
-  <version>1.0</version>
-  <packaging>pom</packaging>
-</project>

@@ -80,32 +80,6 @@ public class MavenITmng4428FollowHttpRedirectTest
     }
 
     /**
-     * Verify that redirects from HTTP to HTTPS are getting followed.
-     *
-     * @throws Exception in case of failure
-     */
-    public void testitHttpToHttps()
-        throws Exception
-    {
-        requiresMavenVersion( "[2.2.0]" );
-
-        testit( true, false );
-    }
-
-    /**
-     * Verify that redirects from HTTPS to HTTP are getting followed.
-     *
-     * @throws Exception in case of failure
-     */
-    public void testitHttpsToHttp()
-        throws Exception
-    {
-        requiresMavenVersion( "[2.2.0]" );
-
-        testit( false, true );
-    }
-
-    /**
      * Verify that redirects using a relative location URL are getting followed. While a relative URL violates the
      * HTTP spec, popular HTTP clients do support them so we better do, too.
      *

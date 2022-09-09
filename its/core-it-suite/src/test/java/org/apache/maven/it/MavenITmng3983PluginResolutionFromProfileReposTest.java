@@ -64,32 +64,6 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest
     }
 
     /**
-     * Test that plugins can be resolved from remote plugin repositories defined by (active) profiles in profiles.xml.
-     *
-     * @throws Exception in case of failure
-     */
-    public void testitFromProfilesXml()
-        throws Exception
-    {
-        // support for profiles.xml removed from 3.x (see MNG-4060)
-        requiresMavenVersion( "[2.0,3.0-alpha-1)" );
-
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3983/test-2" );
-
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.setForkJvm( true ); // Don't lock up plugin files in class loader within current JVM
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3983" );
-        verifier.filterFile( "profiles.xml", "profiles.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.executeGoal( "validate" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        verifier.verifyArtifactPresent( "org.apache.maven.its.mng3983", "p", "0.1", "jar" );
-    }
-
-    /**
      * Test that plugins can be resolved from remote plugin repositories defined by (active) profiles in settings.xml.
      *
      * @throws Exception in case of failure

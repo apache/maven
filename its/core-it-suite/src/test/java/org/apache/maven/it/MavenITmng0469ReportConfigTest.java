@@ -42,29 +42,6 @@ public class MavenITmng0469ReportConfigTest
     }
 
     /**
-     * Test that {@code <reporting>} configuration also affects build plugins unless {@code <build>} configuration is also given.
-     *
-     * @throws Exception in case of failure
-     */
-    public void testitReportConfigOverridesBuildDefaults()
-        throws Exception
-    {
-        requiresMavenVersion( "[2.0.0,3.0-alpha-1)" );
-
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0469/test0" );
-
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.deleteDirectory( "target" );
-        verifier.setAutoclean( false );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-configuration:2.1-SNAPSHOT:config" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        Properties props = verifier.loadProperties( "target/config.properties" );
-        assertEquals( "not-the-default-value", props.getProperty( "defaultParam" ) );
-    }
-
-    /**
      * Test that {@code <build>} configuration dominates {@code <reporting>} configuration for build goals.
      *
      * @throws Exception in case of failure
