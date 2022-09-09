@@ -29,8 +29,8 @@ public class MavenITmng5771CoreExtensionsTest
         verifier = newVerifier( new File( testDir, "client" ).getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it-core-extensions" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( new File( testDir, "settings.xml" ).getAbsolutePath() );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -47,8 +47,8 @@ public class MavenITmng5771CoreExtensionsTest
         verifier = newVerifier( new File( testDir, "client-no-descriptor" ).getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it-core-extensions" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( new File( testDir, "settings.xml" ).getAbsolutePath() );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -90,8 +90,8 @@ public class MavenITmng5771CoreExtensionsTest
         verifier = newVerifier( new File( testDir, "client" ).getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it-core-extensions" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( new File( testDir, "settings.xml" ).getAbsolutePath() );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -115,9 +115,9 @@ public class MavenITmng5771CoreExtensionsTest
         verifier = newVerifier( new File( testDir, "client-properties" ).getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it-core-extensions" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( new File( testDir, "settings.xml" ).getAbsolutePath() );
-        verifier.getCliOptions().add( "-Dtest-extension-version=0.1" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
+        verifier.addCliOption( "-Dtest-extension-version=0.1" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -139,8 +139,8 @@ public class MavenITmng5771CoreExtensionsTest
         verifier = newVerifier( new File( testDir, "client-config" ).getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it-core-extensions" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( new File( testDir, "settings.xml" ).getAbsolutePath() );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
         verifier.setForkJvm( true ); // force forked JVM since we need the shell script to detect .mvn/
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

@@ -91,7 +91,7 @@ public class MavenITmng6255FixConcatLines
         createJvmConfigFile( jvmConfig, lineEndings, "-Djvm.config=ok", "-Xms256m", "-Xmx512m" );
 
         Verifier verifier = newVerifier( baseDir.getAbsolutePath() );
-        verifier.getCliOptions().add( "-Dexpression.outputFile=" + new File( baseDir, "expression.properties" ).getAbsolutePath() );
+        verifier.addCliOption( "-Dexpression.outputFile=" + new File( baseDir, "expression.properties" ).getAbsolutePath() );
         verifier.setForkJvm( true );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

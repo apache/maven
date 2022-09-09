@@ -74,7 +74,10 @@ public class MavenITmng5530MojoExecutionScopeTest
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
-        verifier.getCliOptions().add( "--builder multithreaded -T 1" );
+        verifier.addCliOption( "--builder" );
+        verifier.addCliOption( "multithreaded" );
+        verifier.addCliOption( "-T" );
+        verifier.addCliOption( "1" );
         verifier.executeGoal( "package" );
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();

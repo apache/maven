@@ -48,8 +48,8 @@ public class MavenITmng6210CoreExtensionsCustomScopesTest
         verifier = newVerifier( new File( testDir, "client" ).getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it-core-extensions-custom-scopes" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( new File( testDir, "settings.xml" ).getAbsolutePath() );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
