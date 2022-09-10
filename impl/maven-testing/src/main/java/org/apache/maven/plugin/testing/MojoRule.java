@@ -132,7 +132,7 @@ public class MojoRule
      * @return a Mojo instance
      * @throws Exception
      */
-    public Mojo lookupMojo( String goal, String pluginPom )
+    public <T extends Mojo> T lookupMojo( String goal, String pluginPom )
         throws Exception
     {
         return testCase.lookupMojo( goal, pluginPom );
@@ -146,7 +146,7 @@ public class MojoRule
      * @return a Mojo instance
      * @throws Exception
      */
-    public Mojo lookupEmptyMojo( String goal, String pluginPom )
+    public <T extends Mojo> T lookupEmptyMojo( String goal, String pluginPom )
         throws Exception
     {
         return testCase.lookupEmptyMojo( goal, new File( pluginPom ) );
@@ -160,7 +160,7 @@ public class MojoRule
      * @return a Mojo instance
      * @throws Exception
      */
-    public Mojo lookupMojo( String goal, File pom )
+    public <T extends Mojo> T lookupMojo( String goal, File pom )
         throws Exception
     {
         return testCase.lookupMojo( goal, pom );
@@ -174,26 +174,26 @@ public class MojoRule
      * @return a Mojo instance
      * @throws Exception
      */
-    public Mojo lookupEmptyMojo( String goal, File pom )
+    public <T extends Mojo> T lookupEmptyMojo( String goal, File pom )
         throws Exception
     {
         return testCase.lookupEmptyMojo( goal, pom );
     }
 
-    public Mojo lookupMojo( String groupId, String artifactId, String version, String goal,
+    public <T extends Mojo> T lookupMojo( String groupId, String artifactId, String version, String goal,
                                PlexusConfiguration pluginConfiguration )
         throws Exception
     {
         return testCase.lookupMojo( groupId, artifactId, version, goal, pluginConfiguration );
     }
 
-    public Mojo lookupConfiguredMojo( MavenProject project, String goal )
+    public <T extends Mojo> T lookupConfiguredMojo( MavenProject project, String goal )
         throws Exception
     {
         return testCase.lookupConfiguredMojo( project, goal );
     }
 
-    public Mojo lookupConfiguredMojo( MavenSession session, MojoExecution execution )
+    public <T extends Mojo> T lookupConfiguredMojo( MavenSession session, MojoExecution execution )
         throws Exception, ComponentConfigurationException
     {
         return testCase.lookupConfiguredMojo( session, execution );
@@ -221,13 +221,13 @@ public class MojoRule
         return testCase.extractPluginConfiguration( artifactId, pomDom );
     }
 
-    public Mojo configureMojo( Mojo mojo, String artifactId, File pom )
+    public <T extends Mojo> T configureMojo( T mojo, String artifactId, File pom )
         throws Exception
     {
         return testCase.configureMojo( mojo, artifactId, pom );
     }
 
-    public Mojo configureMojo( Mojo mojo, PlexusConfiguration pluginConfiguration )
+    public <T extends Mojo> T configureMojo( T mojo, PlexusConfiguration pluginConfiguration )
         throws Exception
     {
         return testCase.configureMojo( mojo, pluginConfiguration );
@@ -243,7 +243,7 @@ public class MojoRule
      * @return object value of variable
      * @throws IllegalArgumentException
      */
-    public Object getVariableValueFromObject( Object object, String variable )
+    public <T> T getVariableValueFromObject( Object object, String variable )
         throws IllegalAccessException
     {
         return testCase.getVariableValueFromObject( object, variable );
@@ -286,7 +286,7 @@ public class MojoRule
      * @param value
      * @throws IllegalAccessException
      */
-    public void setVariableValueToObject( Object object, String variable, Object value )
+    public <T> void setVariableValueToObject( Object object, String variable, T value )
         throws IllegalAccessException
     {
         testCase.setVariableValueToObject( object, variable, value );
@@ -350,7 +350,7 @@ public class MojoRule
     /**
      * @since 3.1.0
      */
-    public Mojo lookupConfiguredMojo( File basedir, String goal )
+    public <T extends Mojo> T lookupConfiguredMojo( File basedir, String goal )
         throws Exception, ComponentConfigurationException
     {
         MavenProject project = readMavenProject( basedir );

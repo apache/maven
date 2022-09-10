@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import com.google.inject.Module;
 import org.apache.commons.io.input.XmlStreamReader;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -80,8 +81,6 @@ import org.codehaus.plexus.util.ReflectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-
-import com.google.inject.Module;
 
 /**
  * TODO: add a way to use the plugin POM for the lookup so that the user doesn't have to provide the a:g:v:goal
@@ -304,7 +303,7 @@ public abstract class AbstractMojoTestCase
      * @return a Mojo instance
      * @throws Exception
      */
-    protected Mojo lookupMojo( String goal, String pluginPom )
+    protected <T extends Mojo> T lookupMojo( String goal, String pluginPom )
         throws Exception
     {
         return lookupMojo( goal, new File( pluginPom ) );
@@ -318,7 +317,7 @@ public abstract class AbstractMojoTestCase
      * @return a Mojo instance
      * @throws Exception
      */
-    protected Mojo lookupEmptyMojo( String goal, String pluginPom )
+    protected <T extends Mojo> T lookupEmptyMojo( String goal, String pluginPom )
         throws Exception
     {
         return lookupEmptyMojo( goal, new File( pluginPom ) );
@@ -332,7 +331,7 @@ public abstract class AbstractMojoTestCase
      * @return a Mojo instance
      * @throws Exception
      */
-    protected Mojo lookupMojo( String goal, File pom )
+    protected <T extends Mojo> T lookupMojo( String goal, File pom )
         throws Exception
     {
         File pluginPom = new File( getBasedir(), "pom.xml" );
@@ -358,7 +357,7 @@ public abstract class AbstractMojoTestCase
      * @return a Mojo instance
      * @throws Exception
      */
-    protected Mojo lookupEmptyMojo( String goal, File pom )
+    protected <T extends Mojo> T lookupEmptyMojo( String goal, File pom )
         throws Exception
     {
         File pluginPom = new File( getBasedir(), "pom.xml" );
@@ -394,7 +393,7 @@ public abstract class AbstractMojoTestCase
      * @return a Mojo instance
      * @throws Exception
      */
-    protected Mojo lookupMojo( String groupId, String artifactId, String version, String goal,
+    protected <T extends Mojo> T lookupMojo( String groupId, String artifactId, String version, String goal,
                                PlexusConfiguration pluginConfiguration )
         throws Exception
     {
@@ -402,7 +401,7 @@ public abstract class AbstractMojoTestCase
 
         // pluginkey = groupId : artifactId : version : goal
 
-        Mojo mojo = lookup( Mojo.class, groupId + ":" + artifactId + ":" + version + ":" + goal );
+        T mojo = (T) lookup( Mojo.class, groupId + ":" + artifactId + ":" + version + ":" + goal );
 
         LoggerManager loggerManager = getContainer().lookup( LoggerManager.class );
         
@@ -425,21 +424,21 @@ public abstract class AbstractMojoTestCase
     }
 
     /**
-     * 
+     *
      * @param project
      * @param goal
      * @return
      * @throws Exception
      * @since 2.0
      */
-    protected Mojo lookupConfiguredMojo( MavenProject project, String goal )
+    protected <T extends Mojo> T lookupConfiguredMojo( MavenProject project, String goal )
         throws Exception
     {
         return lookupConfiguredMojo( newMavenSession( project ), newMojoExecution( goal ) );
     }
 
     /**
-     * 
+     *
      * @param session
      * @param execution
      * @return
@@ -447,13 +446,13 @@ public abstract class AbstractMojoTestCase
      * @throws ComponentConfigurationException
      * @since 2.0
      */
-    protected Mojo lookupConfiguredMojo( MavenSession session, MojoExecution execution )
+    protected <T extends Mojo> T lookupConfiguredMojo( MavenSession session, MojoExecution execution )
         throws Exception, ComponentConfigurationException
     {
         MavenProject project = session.getCurrentProject();
         MojoDescriptor mojoDescriptor = execution.getMojoDescriptor();
 
-        Mojo mojo = (Mojo) lookup( mojoDescriptor.getRole(), mojoDescriptor.getRoleHint() );
+        T mojo = (T) lookup( mojoDescriptor.getRole(), mojoDescriptor.getRoleHint() );
 
         ExpressionEvaluator evaluator = new PluginParameterExpressionEvaluator( session, execution );
 
@@ -639,7 +638,7 @@ public abstract class AbstractMojoTestCase
      * @return a Mojo instance
      * @throws Exception
      */
-    protected Mojo configureMojo( Mojo mojo, String artifactId, File pom )
+    protected <T extends Mojo> T configureMojo( T mojo, String artifactId, File pom )
         throws Exception
     {
         validateContainerStatus();
@@ -661,7 +660,7 @@ public abstract class AbstractMojoTestCase
      * @return a Mojo instance
      * @throws Exception
      */
-    protected Mojo configureMojo( Mojo mojo, PlexusConfiguration pluginConfiguration )
+    protected <T extends Mojo> T configureMojo( T mojo, PlexusConfiguration pluginConfiguration )
         throws Exception
     {
         validateContainerStatus();
@@ -683,14 +682,14 @@ public abstract class AbstractMojoTestCase
      * @return object value of variable
      * @throws IllegalArgumentException
      */
-    protected Object getVariableValueFromObject( Object object, String variable )
+    protected <T> T getVariableValueFromObject( Object object, String variable )
         throws IllegalAccessException
     {
         Field field = ReflectionUtils.getFieldByNameIncludingSuperclasses( variable, object.getClass() );
 
         field.setAccessible( true );
 
-        return field.get( object );
+        return (T) field.get( object );
     }
 
     /**
@@ -748,7 +747,7 @@ public abstract class AbstractMojoTestCase
      * @param value
      * @throws IllegalAccessException
      */
-    protected void setVariableValueToObject( Object object, String variable, Object value )
+    protected <T> void setVariableValueToObject( Object object, String variable, T value )
         throws IllegalAccessException
     {
         Field field = ReflectionUtils.getFieldByNameIncludingSuperclasses( variable, object.getClass() );

@@ -19,17 +19,20 @@ package org.apache.maven.plugin.testing;
  * under the License.
  */
 
+import java.io.File;
+import java.io.StringReader;
+import java.util.Map;
+
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-
-import java.io.StringReader;
-import java.util.Map;
-import org.junit.Rule;
-
-import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Mirko Friedenhagen
@@ -95,7 +98,7 @@ public class MojoRuleTest
     {
         SimpleMojo mojo = new SimpleMojo();
 
-        mojo = (SimpleMojo) rule.configureMojo( mojo, pluginConfiguration );
+        mojo = rule.configureMojo( mojo, pluginConfiguration );
 
         assertEquals( "valueOne", mojo.getKeyOne() );
 
@@ -111,7 +114,7 @@ public class MojoRuleTest
     {
         SimpleMojo mojo = new SimpleMojo();
 
-        mojo = (SimpleMojo) rule.configureMojo( mojo, pluginConfiguration );
+        mojo = rule.configureMojo( mojo, pluginConfiguration );
 
         assertEquals( "valueOne", rule.getVariableValueFromObject( mojo, "keyOne" ) );
 
@@ -127,7 +130,7 @@ public class MojoRuleTest
      {
         SimpleMojo mojo = new SimpleMojo();
 
-        mojo = (SimpleMojo) rule.configureMojo( mojo, pluginConfiguration );
+        mojo = rule.configureMojo( mojo, pluginConfiguration );
 
         Map<String, Object> map = rule.getVariablesAndValuesFromObject( mojo );
 
@@ -145,7 +148,7 @@ public class MojoRuleTest
     {
         SimpleMojo mojo = new SimpleMojo();
 
-        mojo = (SimpleMojo) rule.configureMojo( mojo, pluginConfiguration );
+        mojo = rule.configureMojo( mojo, pluginConfiguration );
 
         rule.setVariableValueToObject( mojo, "keyOne", "myValueOne" );
 
@@ -165,4 +168,19 @@ public class MojoRuleTest
     {
         assertTrue( "before executed because WithMojo annotation was not added", beforeWasCalled );
     }
+
+    /**
+     * @throws Exception if any
+     */
+    @Test
+    public void testLookupInitializedMojo()
+            throws Exception
+    {
+        File pomBaseDir = new File( "src/test/projects/property" );
+        ParametersMojo mojo = rule.lookupConfiguredMojo( pomBaseDir, "parameters" );
+        assertEquals( "default", rule.getVariableValueFromObject( mojo, "withDefault" ) );
+        assertEquals( "propertyValue", rule.getVariableValueFromObject( mojo, "withProperty" ) );
+        assertEquals( "propertyValue", rule.getVariableValueFromObject( mojo, "withPropertyAndDefault" ) );
+    }
+
 }
