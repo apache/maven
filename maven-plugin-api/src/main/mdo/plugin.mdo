@@ -289,10 +289,10 @@ under the License.
           <name>deprecated</name>
           <version>1.0.0</version>
           <type>String</type>
-          <description>
-            Specify the version when the Mojo was deprecated to the API. Similar to Javadoc deprecated. This will
-            trigger a warning when a user tries to configure a parameter marked as deprecated.
-          </description>
+          <description><![CDATA[
+            Description with the reason of Mojo deprecation. Similar to Javadoc <code>@deprecated</code>
+            This will trigger a warning when a user tries to use a Mojo marked as deprecated.
+          ]]></description>
         </field>
         <field>
           <name>configurator</name>
@@ -422,10 +422,10 @@ under the License.
           <name>deprecated</name>
           <version>1.0.0</version>
           <type>String</type>
-          <description>
-            Specify the version when the parameter was deprecated to the API. Similar to Javadoc deprecated.
+          <description><![CDATA[
+            Description with the reason of parameter deprecation. Similar to Javadoc <code>@deprecated</code>
             This will trigger a warning when a user tries to configure a parameter marked as deprecated.
-          </description>
+          ]]></description>
         </field>
       </fields>
     </class>
