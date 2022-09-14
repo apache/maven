@@ -38,13 +38,13 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests
         final BuildToRawPomXMLFilterFactory buildPomXMLFilterFactory = new BuildToRawPomXMLFilterFactory( true )
         {
             @Override
-            protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
+            protected RelativePathMapper getRelativePathMapper()
             {
                 return null;
             }
 
             @Override
-            protected BiFunction<String, String, String> getDependencyKeyToVersionMapper()
+            protected DependencyKeyToVersionMapper getDependencyKeyToVersionMapper()
             {
                 return null;
             }

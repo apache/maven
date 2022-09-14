@@ -102,13 +102,13 @@ class DefaultTransformerContext implements TransformerContext
     }
 
     @Override
-    public Model getRawModel( Path p )
+    public Model getRawModel( Path from, Path p )
     {
         return Holder.deref( modelByPath.get( p ) );
     }
 
     @Override
-    public Model getRawModel( String groupId, String artifactId )
+    public Model getRawModel( Path from, String groupId, String artifactId )
     {
         return Holder.deref( modelByGA.get( new GAKey( groupId, artifactId ) ) );
     }

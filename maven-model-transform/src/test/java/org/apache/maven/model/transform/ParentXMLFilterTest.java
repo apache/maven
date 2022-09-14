@@ -50,11 +50,11 @@ public class ParentXMLFilterTest
 
     protected XmlPullParser createFilter( XmlPullParser parser ) {
         return createFilter( parser,
-                x -> Optional.of(new RelativeProject("GROUPID", "ARTIFACTID", "1.0.0")),
+                (from, x) -> Optional.of(new RelativeProject("GROUPID", "ARTIFACTID", "1.0.0")),
                 Paths.get( "pom.xml").toAbsolutePath() );
     }
 
-    protected XmlPullParser createFilter( XmlPullParser parser, Function<Path, Optional<RelativeProject>> pathMapper, Path projectPath ) {
+    protected XmlPullParser createFilter( XmlPullParser parser, BuildToRawPomXMLFilterFactory.RelativePathMapper pathMapper, Path projectPath ) {
         return new ParentXMLFilter( new FastForwardFilter( parser ), pathMapper, projectPath );
     }
 
@@ -230,7 +230,7 @@ public class ParentXMLFilterTest
     public void testInvalidRelativePath()
         throws Exception
     {
-        filterCreator = parser -> createFilter(parser, x -> Optional.ofNullable( null ), Paths.get( "pom.xml").toAbsolutePath() );
+        filterCreator = parser -> createFilter(parser, (from, x) -> Optional.ofNullable( null ), Paths.get( "pom.xml").toAbsolutePath() );
 
         String input = "<project><parent>"
             + "<groupId>GROUPID</groupId>"

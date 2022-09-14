@@ -41,6 +41,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.Collectors;
 
+import org.apache.maven.ProjectCycleException;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidArtifactRTException;
@@ -77,6 +78,7 @@ import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.apache.maven.repository.internal.ModelCacheFactory;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
@@ -361,30 +363,36 @@ public class DefaultProjectBuilder
         List<ProjectBuildingResult> build( List<File> pomFiles, boolean recursive )
                 throws ProjectBuildingException
         {
-            try
-            {
-                List<ProjectBuildingResult> results =
-                        forkJoinPool.submit( () -> doBuild( pomFiles, recursive ) ).join();
+            ForkJoinTask<List<ProjectBuildingResult>> task = forkJoinPool.submit(
+                    () -> doBuild( pomFiles, recursive ) );
 
-                if ( results.stream().flatMap( r -> r.getProblems().stream() )
-                        .anyMatch( p -> p.getSeverity() != ModelProblem.Severity.WARNING ) )
-                {
-                    throw new ProjectBuildingException( results );
-                }
-
-                return results;
-            }
-            catch ( Exception e )
+            // ForkJoinTask.getException rewraps the exception in a weird way
+            // which cause an additional layer of exception, so try to unwrap it
+            task.quietlyJoin();
+            if ( task.isCompletedAbnormally() )
             {
-                for ( Throwable t = e; t != null; t = t.getCause() )
-                {
-                    if ( t instanceof ProjectBuildingException )
-                    {
-                        throw ( ProjectBuildingException ) t;
-                    }
-                }
-                throw new RuntimeException( e );
+                Throwable e = task.getException();
+                Throwable c = e.getCause();
+                uncheckedThrow( c != null && c.getClass() == e.getClass() ? c : e );
             }
+
+            List<ProjectBuildingResult> results = task.getRawResult();
+            if ( results.stream().flatMap( r -> r.getProblems().stream() )
+                    .anyMatch( p -> p.getSeverity() != ModelProblem.Severity.WARNING ) )
+            {
+                ModelProblem cycle = results.stream().flatMap( r -> r.getProblems().stream() )
+                        .filter( p -> p.getException() instanceof CycleDetectedException )
+                        .findAny().orElse( null );
+                if ( cycle != null )
+                {
+                    throw new RuntimeException( new ProjectCycleException(
+                            "The projects in the reactor contain a cyclic reference: " + cycle.getMessage(),
+                            ( CycleDetectedException ) cycle.getException() ) );
+                }
+                throw new ProjectBuildingException( results );
+            }
+
+            return results;
         }
 
         List<ProjectBuildingResult> doBuild( List<File> pomFiles, boolean recursive )
@@ -1050,6 +1058,11 @@ public class DefaultProjectBuilder
         }
 
         return version;
+    }
+
+    static <T extends Throwable> void uncheckedThrow( Throwable t ) throws T
+    {
+        throw (T) t; // rely on vacuous cast
     }
 
 }

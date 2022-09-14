@@ -21,8 +21,6 @@ package org.apache.maven.model.transform;
 
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
@@ -35,6 +33,16 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 public class BuildToRawPomXMLFilterFactory
 {
     private final boolean consume;
+
+    public interface RelativePathMapper
+    {
+        Optional<RelativeProject> apply( Path from, Path path );
+    }
+
+    public interface DependencyKeyToVersionMapper
+    {
+        String apply( Path from, String g, String a );
+    }
 
     public BuildToRawPomXMLFilterFactory()
     {
@@ -59,12 +67,12 @@ public class BuildToRawPomXMLFilterFactory
 
         if ( getDependencyKeyToVersionMapper() != null )
         {
-            parser = new ReactorDependencyXMLFilter( parser, getDependencyKeyToVersionMapper() );
+            parser = new ReactorDependencyXMLFilter( parser, getDependencyKeyToVersionMapper(), projectFile );
         }
 
         if ( getRelativePathMapper() != null )
         {
-            parser = new ParentXMLFilter( parser, getRelativePathMapper(), projectFile.getParent() );
+            parser = new ParentXMLFilter( parser, getRelativePathMapper(), projectFile );
         }
 
         CiFriendlyXMLFilter ciFriendlyFilter = new CiFriendlyXMLFilter( parser, consume );
@@ -79,12 +87,12 @@ public class BuildToRawPomXMLFilterFactory
     /**
      * @return the mapper or {@code null} if relativePaths don't need to be mapped
      */
-    protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
+    protected RelativePathMapper getRelativePathMapper()
     {
         return null;
     }
 
-    protected BiFunction<String, String, String> getDependencyKeyToVersionMapper()
+    protected DependencyKeyToVersionMapper getDependencyKeyToVersionMapper()
     {
         return null;
     }

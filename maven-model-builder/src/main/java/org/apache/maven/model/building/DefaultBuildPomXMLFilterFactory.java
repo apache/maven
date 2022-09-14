@@ -20,10 +20,7 @@ package org.apache.maven.model.building;
  */
 
 
-import java.nio.file.Path;
 import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.transform.BuildToRawPomXMLFilterFactory;
@@ -52,16 +49,16 @@ public class DefaultBuildPomXMLFilterFactory extends BuildToRawPomXMLFilterFacto
     }
 
     @Override
-    protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
+    protected RelativePathMapper getRelativePathMapper()
     {
-        return p -> Optional.ofNullable( context.getRawModel( p ) )
+        return ( from, p ) -> Optional.ofNullable( context.getRawModel( from, p ) )
                 .map( DefaultBuildPomXMLFilterFactory::toRelativeProject );
     }
 
     @Override
-    protected BiFunction<String, String, String> getDependencyKeyToVersionMapper()
+    protected DependencyKeyToVersionMapper getDependencyKeyToVersionMapper()
     {
-        return ( g, a ) -> Optional.ofNullable( context.getRawModel( g, a ) )
+        return ( from, g, a ) -> Optional.ofNullable( context.getRawModel( from, g, a ) )
                             .map( DefaultBuildPomXMLFilterFactory::toVersion )
                             .orElse( null );
     }

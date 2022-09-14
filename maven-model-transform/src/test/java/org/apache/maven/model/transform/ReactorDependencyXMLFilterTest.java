@@ -19,6 +19,7 @@ package org.apache.maven.model.transform;
  * under the License.
  */
 
+import java.nio.file.Paths;
 import java.util.function.BiFunction;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
@@ -30,7 +31,7 @@ import static org.xmlunit.assertj.XmlAssert.assertThat;
 public class ReactorDependencyXMLFilterTest
     extends AbstractXMLFilterTests
 {
-    private BiFunction<String, String, String> reactorVersionMapper;
+    private BuildToRawPomXMLFilterFactory.DependencyKeyToVersionMapper reactorVersionMapper;
 
     @BeforeEach
     protected void reset() {
@@ -41,7 +42,8 @@ public class ReactorDependencyXMLFilterTest
     protected ReactorDependencyXMLFilter getFilter(XmlPullParser parser)
     {
         return new ReactorDependencyXMLFilter( parser,
-                reactorVersionMapper != null ? reactorVersionMapper : (g, a) -> "1.0.0" );
+                reactorVersionMapper != null ? reactorVersionMapper : (from, g, a) -> "1.0.0",
+                Paths.get( "theproject/pom.xml" ) );
     }
 
     @Test
@@ -64,7 +66,7 @@ public class ReactorDependencyXMLFilterTest
     public void testManagedDependency()
         throws Exception
     {
-        reactorVersionMapper = (g, a) -> null;
+        reactorVersionMapper = (from, g, a) -> null;
 
         String input = "<dependency>"
             + "<groupId>GROUPID</groupId>"

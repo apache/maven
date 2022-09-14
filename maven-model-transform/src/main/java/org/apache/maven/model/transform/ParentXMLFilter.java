@@ -25,10 +25,10 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 
 import org.apache.maven.model.transform.pull.NodeBufferingParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.apache.maven.model.transform.BuildToRawPomXMLFilterFactory.RelativePathMapper;
 
 /**
  * <p>
@@ -46,19 +46,20 @@ class ParentXMLFilter
     extends NodeBufferingParser
 {
 
-    private final Function<Path, Optional<RelativeProject>> relativePathMapper;
+    private final RelativePathMapper relativePathMapper;
 
-    private final Path projectPath;
+    private final Path projectFile;
 
     /**
      * @param relativePathMapper
      */
     ParentXMLFilter( XmlPullParser parser,
-                     Function<Path, Optional<RelativeProject>> relativePathMapper, Path projectPath )
+                     RelativePathMapper relativePathMapper,
+                     Path projectFile )
     {
         super( parser, "parent" );
         this.relativePathMapper = relativePathMapper;
-        this.projectPath = projectPath;
+        this.projectFile = projectFile;
     }
 
     protected void process( List<Event> buffer )
@@ -108,39 +109,34 @@ class ParentXMLFilter
             }
             else if ( event.event == END_TAG && "parent".equals( event.name ) )
             {
-                Optional<RelativeProject> resolvedParent;
                 if ( !hasVersion && ( !hasRelativePath || relativePath != null ) )
                 {
                     Path relPath = Paths.get( Objects.toString( relativePath, "../pom.xml" ) );
-                    resolvedParent = resolveRelativePath( relPath, groupId, artifactId );
-                }
-                else
-                {
-                    resolvedParent = Optional.empty();
-                }
-                if ( !hasVersion && resolvedParent.isPresent() )
-                {
-                    int pos = buffer.get( i - 1 ).event == TEXT ? i - 1  : i;
-                    Event e = new Event();
-                    e.event = TEXT;
-                    e.text = whitespaceAfterParentStart;
-                    buffer.add( pos++, e );
-                    e = new Event();
-                    e.event = START_TAG;
-                    e.namespace = buffer.get( 0 ).namespace;
-                    e.prefix = buffer.get( 0 ).prefix;
-                    e.name = "version";
-                    buffer.add( pos++, e );
-                    e = new Event();
-                    e.event = TEXT;
-                    e.text = resolvedParent.get().getVersion();
-                    buffer.add( pos++, e );
-                    e = new Event();
-                    e.event = END_TAG;
-                    e.name = "version";
-                    e.namespace = buffer.get( 0 ).namespace;
-                    e.prefix = buffer.get( 0 ).prefix;
-                    buffer.add( pos++, e );
+                    Optional<RelativeProject> resolvedParent = resolveRelativePath( relPath, groupId, artifactId );
+                    if ( resolvedParent.isPresent() )
+                    {
+                        int pos = buffer.get( i - 1 ).event == TEXT ? i - 1 : i;
+                        Event e = new Event();
+                        e.event = TEXT;
+                        e.text = whitespaceAfterParentStart;
+                        buffer.add( pos++, e );
+                        e = new Event();
+                        e.event = START_TAG;
+                        e.namespace = buffer.get( 0 ).namespace;
+                        e.prefix = buffer.get( 0 ).prefix;
+                        e.name = "version";
+                        buffer.add( pos++, e );
+                        e = new Event();
+                        e.event = TEXT;
+                        e.text = resolvedParent.get().getVersion();
+                        buffer.add( pos++, e );
+                        e = new Event();
+                        e.event = END_TAG;
+                        e.name = "version";
+                        e.namespace = buffer.get( 0 ).namespace;
+                        e.prefix = buffer.get( 0 ).prefix;
+                        buffer.add( pos++, e );
+                    }
                 }
                 break;
             }
@@ -151,13 +147,13 @@ class ParentXMLFilter
 
     protected Optional<RelativeProject> resolveRelativePath( Path relativePath, String groupId, String artifactId )
     {
-        Path pomPath = projectPath.resolve( relativePath );
+        Path pomPath = projectFile.resolveSibling( relativePath );
         if ( Files.isDirectory( pomPath ) )
         {
             pomPath = pomPath.resolve( "pom.xml" );
         }
 
-        Optional<RelativeProject> mappedProject = relativePathMapper.apply( pomPath.normalize() );
+        Optional<RelativeProject> mappedProject = relativePathMapper.apply( projectFile, pomPath.normalize() );
 
         if ( mappedProject.isPresent() )
         {

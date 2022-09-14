@@ -19,11 +19,12 @@ package org.apache.maven.model.transform;
  * under the License.
  */
 
+import java.nio.file.Path;
 import java.util.List;
-import java.util.function.BiFunction;
 
 import org.apache.maven.model.transform.pull.NodeBufferingParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.apache.maven.model.transform.BuildToRawPomXMLFilterFactory.DependencyKeyToVersionMapper;
 
 /**
  * Will apply the version if the dependency is part of the reactor
@@ -34,13 +35,16 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
  */
 public class ReactorDependencyXMLFilter extends NodeBufferingParser
 {
-    private final BiFunction<String, String, String> reactorVersionMapper;
+    private final DependencyKeyToVersionMapper reactorVersionMapper;
+    private final Path projectFile;
 
     public ReactorDependencyXMLFilter( XmlPullParser xmlPullParser,
-                                       BiFunction<String, String, String> reactorVersionMapper )
+                                       DependencyKeyToVersionMapper reactorVersionMapper,
+                                       Path projectFile )
     {
         super( xmlPullParser, "dependency" );
         this.reactorVersionMapper = reactorVersionMapper;
+        this.projectFile = projectFile;
     }
 
     protected void process( List<Event> buffer )
@@ -79,30 +83,33 @@ public class ReactorDependencyXMLFilter extends NodeBufferingParser
             }
             else if ( event.event == END_TAG && "dependency".equals( event.name ) )
             {
-                String version = reactorVersionMapper.apply( groupId, artifactId  );
-                if ( !hasVersion && version != null )
+                if ( !hasVersion )
                 {
-                    int pos = buffer.get( i - 1 ).event == TEXT ? i - 1  : i;
-                    Event e = new Event();
-                    e.event = TEXT;
-                    e.text = dependencyWhitespace;
-                    buffer.add( pos++, e );
-                    e = new Event();
-                    e.event = START_TAG;
-                    e.namespace = buffer.get( 0 ).namespace;
-                    e.prefix = buffer.get( 0 ).prefix;
-                    e.name = "version";
-                    buffer.add( pos++, e );
-                    e = new Event();
-                    e.event = TEXT;
-                    e.text = version;
-                    buffer.add( pos++, e );
-                    e = new Event();
-                    e.event = END_TAG;
-                    e.name = "version";
-                    e.namespace = buffer.get( 0 ).namespace;
-                    e.prefix = buffer.get( 0 ).prefix;
-                    buffer.add( pos++, e );
+                    String version = reactorVersionMapper.apply( projectFile, groupId, artifactId  );
+                    if ( version != null )
+                    {
+                        int pos = buffer.get( i - 1 ).event == TEXT ? i - 1 : i;
+                        Event e = new Event();
+                        e.event = TEXT;
+                        e.text = dependencyWhitespace;
+                        buffer.add( pos++, e );
+                        e = new Event();
+                        e.event = START_TAG;
+                        e.namespace = buffer.get( 0 ).namespace;
+                        e.prefix = buffer.get( 0 ).prefix;
+                        e.name = "version";
+                        buffer.add( pos++, e );
+                        e = new Event();
+                        e.event = TEXT;
+                        e.text = version;
+                        buffer.add( pos++, e );
+                        e = new Event();
+                        e.event = END_TAG;
+                        e.name = "version";
+                        e.namespace = buffer.get( 0 ).namespace;
+                        e.prefix = buffer.get( 0 ).prefix;
+                        buffer.add( pos++, e );
+                    }
                 }
                 break;
             }
