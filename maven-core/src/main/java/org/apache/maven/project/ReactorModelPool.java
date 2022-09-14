@@ -22,11 +22,11 @@ package org.apache.maven.project;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.model.Model;
 
@@ -39,9 +39,9 @@ import org.apache.maven.model.Model;
  */
 class ReactorModelPool
 {
-    private final Map<GAKey, Set<Model>> modelsByGa = new HashMap<>();
+    private final Map<GAKey, Set<Model>> modelsByGa = new ConcurrentHashMap<>();
 
-    private final Map<Path, Model> modelsByPath = new HashMap<>();
+    private final Map<Path, Model> modelsByPath = new ConcurrentHashMap<>();
 
     /**
      * Get the model by its GAV or (since 4.0.0) by its GA if there is only one.

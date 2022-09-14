@@ -72,6 +72,22 @@ public class ProjectBuildingException
         this.results = results;
     }
 
+    public ProjectBuildingException( Throwable cause )
+    {
+        super( cause );
+        if ( cause instanceof ProjectBuildingException )
+        {
+            ProjectBuildingException pbe = (ProjectBuildingException) cause;
+            this.projectId = pbe.projectId;
+            this.pomFile = pbe.pomFile;
+            this.results = pbe.results;
+        }
+        else
+        {
+            throw new IllegalArgumentException();
+        }
+    }
+
     public File getPomFile()
     {
         return pomFile;
