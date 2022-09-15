@@ -569,17 +569,15 @@ public class DefaultModelBuilder
             // profile activation
             profileActivationContext.setProjectProperties( modelv4.getProperties() );
 
-            modelv4 = interpolateActivations( modelv4, profileActivationContext, problems );
+            List<org.apache.maven.api.model.Profile> interpolatedProfiles =
+                    interpolateActivations( modelv4.getProfiles(), profileActivationContext, problems );
 
             // profile injection
             List<org.apache.maven.api.model.Profile> activePomProfiles = profileSelector.getActiveProfilesV4(
-                    modelv4.getProfiles(), profileActivationContext, problems );
+                    interpolatedProfiles, profileActivationContext, problems );
             result.setActivePomProfiles( modelId,
                     activePomProfiles.stream().map( Profile::new ).collect( Collectors.toList() ) );
-            for ( org.apache.maven.api.model.Profile activeProfile : activePomProfiles )
-            {
-                modelv4 = profileInjector.injectProfile( modelv4, activeProfile, request, problems );
-            }
+            modelv4 = profileInjector.injectProfiles( modelv4, activePomProfiles, request, problems );
 
             lineage.add( new Model( modelv4 ) );
 
@@ -619,13 +617,20 @@ public class DefaultModelBuilder
             }
         }
 
-        // inject external profile into current model
         Model tmpModel = lineage.get( 0 );
-        for ( Profile activeProfile : activeExternalProfiles )
+
+        // inject interpolated activations
+        List<org.apache.maven.api.model.Profile> interpolated = interpolateActivations(
+                tmpModel.getDelegate().getProfiles(), profileActivationContext, problems );
+        if ( interpolated != tmpModel.getDelegate().getProfiles() )
         {
-            tmpModel.update( profileInjector.injectProfile(
-                    tmpModel.getDelegate(), activeProfile.getDelegate(), request, problems ) );
+            tmpModel.update( tmpModel.getDelegate().withProfiles( interpolated ) );
         }
+
+        // inject external profile into current model
+        tmpModel.update( profileInjector.injectProfiles( tmpModel.getDelegate(),
+                activeExternalProfiles.stream().map( Profile::getDelegate ).collect( Collectors.toList() ),
+                request, problems ) );
 
         checkPluginVersions( lineage, request, problems );
 
@@ -651,14 +656,15 @@ public class DefaultModelBuilder
         return resultModel;
     }
 
-    private org.apache.maven.api.model.Model interpolateActivations( org.apache.maven.api.model.Model model,
-                                                                     DefaultProfileActivationContext context,
-                                                                     DefaultModelProblemCollector problems )
+    private List<org.apache.maven.api.model.Profile> interpolateActivations(
+                    List<org.apache.maven.api.model.Profile> profiles,
+                    DefaultProfileActivationContext context,
+                    DefaultModelProblemCollector problems )
     {
-        boolean modified = false;
-        List<org.apache.maven.api.model.Profile> profiles = new ArrayList<>();
-        for ( org.apache.maven.api.model.Profile profile : model.getProfiles() )
+        List<org.apache.maven.api.model.Profile> newProfiles = null;
+        for ( int index = 0; index < profiles.size(); index++ )
         {
+            org.apache.maven.api.model.Profile profile = profiles.get( index );
             org.apache.maven.api.model.Activation activation = profile.getActivation();
             if ( activation != null )
             {
@@ -673,8 +679,12 @@ public class DefaultModelBuilder
                             String newExists = interpolate( oldExists, context );
                             if ( !Objects.equals( oldExists, newExists ) )
                             {
-                                profile = profile.withActivation( activation.withFile( file.withExists( newExists ) ) );
-                                modified = true;
+                                if ( newProfiles == null )
+                                {
+                                    newProfiles = new ArrayList<>( profiles );
+                                }
+                                newProfiles.set( index, profile.withActivation(
+                                        activation.withFile( file.withExists( newExists ) ) ) );
                             }
                         }
                         catch ( InterpolationException e )
@@ -692,9 +702,12 @@ public class DefaultModelBuilder
                                 String newMissing = interpolate( oldMissing, context );
                                 if ( !Objects.equals( oldMissing, newMissing ) )
                                 {
-                                    profile = profile.withActivation(
-                                                    activation.withFile( file.withMissing( newMissing ) ) );
-                                    modified = true;
+                                    if ( newProfiles == null )
+                                    {
+                                        newProfiles = new ArrayList<>( profiles );
+                                    }
+                                    newProfiles.set( index, profile.withActivation(
+                                            activation.withFile( file.withMissing( newMissing ) ) ) );
                                 }
                             }
                             catch ( InterpolationException e )
@@ -704,10 +717,9 @@ public class DefaultModelBuilder
                         }
                     }
                 }
-                profiles.add( profile );
             }
         }
-        return modified ? model.withProfiles( profiles ) : model;
+        return newProfiles != null ? newProfiles : profiles;
     }
 
     private static void addInterpolationProblem( DefaultModelProblemCollector problems,

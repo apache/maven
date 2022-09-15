@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -48,7 +49,7 @@ public class DefaultSuperPomProvider
     /**
      * The cached super POM, lazily created.
      */
-    private Model superModel;
+    private static final Map<String, Model> SUPER_MODELS = new ConcurrentHashMap<>();
 
     @Inject
     public DefaultSuperPomProvider( ModelProcessor modelProcessor )
@@ -59,9 +60,9 @@ public class DefaultSuperPomProvider
     @Override
     public Model getSuperModel( String version )
     {
-        if ( superModel == null )
+        return SUPER_MODELS.computeIfAbsent( version, v ->
         {
-            String resource = "/org/apache/maven/model/pom-" + version + ".xml";
+            String resource = "/org/apache/maven/model/pom-" + v + ".xml";
 
             InputStream is = getClass().getResourceAsStream( resource );
 
@@ -82,16 +83,14 @@ public class DefaultSuperPomProvider
                         modelId, getClass().getResource( resource ).toExternalForm() );
                 options.put( ModelProcessor.INPUT_SOURCE, inputSource );
 
-                superModel = modelProcessor.read( is, options );
+                return modelProcessor.read( is, options );
             }
             catch ( IOException e )
             {
                 throw new IllegalStateException( "The super POM " + resource + " is damaged"
                     + ", please verify the integrity of your Maven installation", e );
             }
-        }
-
-        return superModel;
+        } );
     }
 
 }

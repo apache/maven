@@ -19,6 +19,8 @@ package org.apache.maven.model.profile;
  * under the License.
  */
 
+import java.util.List;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -47,4 +49,9 @@ public interface ProfileInjector
                         org.apache.maven.api.model.Model model,
                         org.apache.maven.api.model.Profile profile,
                         ModelBuildingRequest request, ModelProblemCollector problems );
+
+    org.apache.maven.api.model.Model injectProfiles(
+            org.apache.maven.api.model.Model model,
+            List<org.apache.maven.api.model.Profile> profiles,
+            ModelBuildingRequest request, ModelProblemCollector problems );
 }

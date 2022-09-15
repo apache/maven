@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.BuildBase;
@@ -55,6 +57,9 @@ public class DefaultProfileInjector
     implements ProfileInjector
 {
 
+    private static final Map<Model, Map<List<Profile>, Model>> CACHE
+            = Collections.synchronizedMap( new WeakHashMap<>() );
+
     private ProfileModelMerger merger = new ProfileModelMerger();
 
     @Override
@@ -71,20 +76,36 @@ public class DefaultProfileInjector
     public Model injectProfile( Model model, Profile profile, ModelBuildingRequest request,
                                 ModelProblemCollector problems )
     {
-        if ( profile != null )
+        return injectProfiles( model, Collections.singletonList( profile ), request, problems );
+    }
+
+    @Override
+    public Model injectProfiles( Model model, List<Profile> profiles, ModelBuildingRequest request,
+                                 ModelProblemCollector problems )
+    {
+        return CACHE.computeIfAbsent( model, k -> new ConcurrentHashMap<>() )
+                .computeIfAbsent( profiles, l -> doInjectProfiles( model, profiles ) );
+    }
+
+    private Model doInjectProfiles( Model model, List<Profile> profiles )
+    {
+        for ( Profile profile : profiles )
         {
-            Model.Builder builder = Model.newBuilder( model );
-            merger.mergeModelBase( builder, model, profile );
-
-            if ( profile.getBuild() != null )
+            if ( profile != null )
             {
-                Build build = model.getBuild() != null ? model.getBuild() : Build.newInstance();
-                Build.Builder bbuilder = Build.newBuilder( build );
-                merger.mergeBuildBase( bbuilder, build, profile.getBuild() );
-                builder.build( bbuilder.build() );
-            }
+                Model.Builder builder = Model.newBuilder( model );
+                merger.mergeModelBase( builder, model, profile );
 
-            return builder.build();
+                if ( profile.getBuild() != null )
+                {
+                    Build build = model.getBuild() != null ? model.getBuild() : Build.newInstance();
+                    Build.Builder bbuilder = Build.newBuilder( build );
+                    merger.mergeBuildBase( bbuilder, build, profile.getBuild() );
+                    builder.build( bbuilder.build() );
+                }
+
+                model = builder.build();
+            }
         }
         return model;
     }
