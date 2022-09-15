@@ -46,4 +46,8 @@ public interface ProfileSelector
     List<Profile> getActiveProfiles( Collection<Profile> profiles, ProfileActivationContext context,
                                      ModelProblemCollector problems );
 
+    List<org.apache.maven.api.model.Profile> getActiveProfilesV4(
+            Collection<org.apache.maven.api.model.Profile> profiles,
+            ProfileActivationContext context,
+            ModelProblemCollector problems );
 }

@@ -39,6 +39,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ForkJoinTask;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -50,7 +51,6 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.building.Source;
 import org.apache.maven.feature.Features;
 import org.apache.maven.model.Activation;
-import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -61,7 +61,6 @@ import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.composition.DependencyManagementImporter;
@@ -559,55 +558,42 @@ public class DefaultModelBuilder
             String modelId = currentData.getId();
             result.addModelId( modelId );
 
-            Model rawModel = currentData.getModel();
-            result.setRawModel( modelId, rawModel );
-
-            profileActivationContext.setProjectProperties( rawModel.getProperties() );
-            problems.setSource( rawModel );
-            List<Profile> activePomProfiles = profileSelector.getActiveProfiles( rawModel.getProfiles(),
-                                                                                 profileActivationContext, problems );
-            result.setActivePomProfiles( modelId, activePomProfiles );
-
-            Model tmpModel = rawModel.clone();
-
-            problems.setSource( tmpModel );
+            Model model = currentData.getModel();
+            result.setRawModel( modelId, model );
+            problems.setSource( model );
+            org.apache.maven.api.model.Model modelv4 = model.getDelegate();
 
             // model normalization
-            tmpModel = new Model( modelNormalizer.mergeDuplicates( tmpModel.getDelegate(), request, problems ) );
+            modelv4 = modelNormalizer.mergeDuplicates( modelv4, request, problems );
 
-            profileActivationContext.setProjectProperties( tmpModel.getProperties() );
+            // profile activation
+            profileActivationContext.setProjectProperties( modelv4.getProperties() );
 
-            Map<String, Activation> interpolatedActivations = getInterpolatedActivations( rawModel,
-                                                                                          profileActivationContext,
-                                                                                          problems );
-            injectProfileActivations( tmpModel, interpolatedActivations );
+            modelv4 = interpolateActivations( modelv4, profileActivationContext, problems );
 
             // profile injection
-            for ( Profile activeProfile : result.getActivePomProfiles( modelId ) )
+            List<org.apache.maven.api.model.Profile> activePomProfiles = profileSelector.getActiveProfilesV4(
+                    modelv4.getProfiles(), profileActivationContext, problems );
+            result.setActivePomProfiles( modelId,
+                    activePomProfiles.stream().map( Profile::new ).collect( Collectors.toList() ) );
+            for ( org.apache.maven.api.model.Profile activeProfile : activePomProfiles )
             {
-                profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
+                modelv4 = profileInjector.injectProfile( modelv4, activeProfile, request, problems );
             }
 
-            if ( currentData == resultData )
-            {
-                for ( Profile activeProfile : activeExternalProfiles )
-                {
-                    profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
-                }
-                result.setEffectiveModel( tmpModel );
-            }
-
-            lineage.add( tmpModel );
+            lineage.add( new Model( modelv4 ) );
 
             if ( currentData == superData )
             {
                 break;
             }
 
-            configureResolver( request.getModelResolver(), tmpModel, problems );
+            // add repositories specified by the current model so that we can resolve the parent
+            configureResolver( request.getModelResolver(), modelv4, problems, false );
 
+            // we pass a cloned model, so that resolving the parent version does not affect the returned model
             ModelData parentData =
-                readParent( currentData.getModel(), currentData.getSource(), request, result, problems );
+                readParent( new Model( modelv4 ), currentData.getSource(), request, problems );
 
             if ( parentData == null )
             {
@@ -633,7 +619,14 @@ public class DefaultModelBuilder
             }
         }
 
-        problems.setSource( result.getRawModel() );
+        // inject external profile into current model
+        Model tmpModel = lineage.get( 0 );
+        for ( Profile activeProfile : activeExternalProfiles )
+        {
+            tmpModel.update( profileInjector.injectProfile(
+                    tmpModel.getDelegate(), activeProfile.getDelegate(), request, problems ) );
+        }
+
         checkPluginVersions( lineage, request, problems );
 
         // inheritance assembly
@@ -653,54 +646,87 @@ public class DefaultModelBuilder
         result.setEffectiveModel( resultModel );
 
         // Now the fully interpolated model is available: reconfigure the resolver
-        configureResolver( request.getModelResolver(), resultModel, problems, true );
+        configureResolver( request.getModelResolver(), resultModel.getDelegate(), problems, true );
 
         return resultModel;
     }
 
-    private Map<String, Activation> getInterpolatedActivations( Model rawModel,
-                                                                DefaultProfileActivationContext context,
-                                                                DefaultModelProblemCollector problems )
+    private org.apache.maven.api.model.Model interpolateActivations( org.apache.maven.api.model.Model model,
+                                                                     DefaultProfileActivationContext context,
+                                                                     DefaultModelProblemCollector problems )
     {
-        Map<String, Activation> interpolatedActivations = getProfileActivations( rawModel, true );
-        for ( Activation activation : interpolatedActivations.values() )
+        boolean modified = false;
+        List<org.apache.maven.api.model.Profile> profiles = new ArrayList<>();
+        for ( org.apache.maven.api.model.Profile profile : model.getProfiles() )
         {
-            if ( activation.getFile() != null )
+            org.apache.maven.api.model.Activation activation = profile.getActivation();
+            if ( activation != null )
             {
-                replaceWithInterpolatedValue( activation.getFile(), context, problems );
+                org.apache.maven.api.model.ActivationFile file = activation.getFile();
+                if ( file != null )
+                {
+                    String oldExists = file.getExists();
+                    if ( isNotEmpty( oldExists ) )
+                    {
+                        try
+                        {
+                            String newExists = interpolate( oldExists, context );
+                            if ( !Objects.equals( oldExists, newExists ) )
+                            {
+                                profile = profile.withActivation( activation.withFile( file.withExists( newExists ) ) );
+                                modified = true;
+                            }
+                        }
+                        catch ( InterpolationException e )
+                        {
+                            addInterpolationProblem( problems, file, oldExists, e, "exists" );
+                        }
+                    }
+                    else
+                    {
+                        String oldMissing = file.getMissing();
+                        if ( isNotEmpty( oldMissing ) )
+                        {
+                            try
+                            {
+                                String newMissing = interpolate( oldMissing, context );
+                                if ( !Objects.equals( oldMissing, newMissing ) )
+                                {
+                                    profile = profile.withActivation(
+                                                    activation.withFile( file.withMissing( newMissing ) ) );
+                                    modified = true;
+                                }
+                            }
+                            catch ( InterpolationException e )
+                            {
+                                addInterpolationProblem( problems, file, oldMissing, e, "missing" );
+                            }
+                        }
+                    }
+                }
+                profiles.add( profile );
             }
         }
-        return interpolatedActivations;
+        return modified ? model.withProfiles( profiles ) : model;
     }
 
-    private void replaceWithInterpolatedValue( ActivationFile activationFile, ProfileActivationContext context,
-                                               DefaultModelProblemCollector problems  )
+    private static void addInterpolationProblem( DefaultModelProblemCollector problems,
+                                   org.apache.maven.api.model.ActivationFile file, String path,
+                                   InterpolationException e, String locationKey )
     {
-        try
-        {
-            if ( isNotEmpty( activationFile.getExists() ) )
-            {
-                String path = activationFile.getExists();
-                String absolutePath = profileActivationFilePathInterpolator.interpolate( path, context );
-                activationFile.setExists( absolutePath );
-            }
-            else if ( isNotEmpty( activationFile.getMissing() ) )
-            {
-                String path = activationFile.getMissing();
-                String absolutePath = profileActivationFilePathInterpolator.interpolate( path, context );
-                activationFile.setMissing( absolutePath );
-            }
-        }
-        catch ( InterpolationException e )
-        {
-            String path = isNotEmpty(
-                    activationFile.getExists() ) ? activationFile.getExists() : activationFile.getMissing();
+        problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                .setMessage( "Failed to interpolate file location " + path + ": "
+                        + e.getMessage() )
+                .setLocation( Optional.ofNullable( file.getLocation( locationKey  ) )
+                        .map( InputLocation::new ).orElse( null ) )
+                .setException( e ) );
+    }
 
-            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage(
-                    "Failed to interpolate file location " + path + ": " + e.getMessage() ).setLocation(
-                    activationFile.getLocation( isNotEmpty( activationFile.getExists() ) ? "exists" : "missing"  ) )
-                    .setException( e ) );
-        }
+    private String interpolate( String path, ProfileActivationContext context ) throws InterpolationException
+    {
+        return isNotEmpty( path )
+                ? profileActivationFilePathInterpolator.interpolate( path, context )
+                : path;
     }
 
     private static boolean isNotEmpty( String string )
@@ -1053,34 +1079,23 @@ public class DefaultModelBuilder
         return context;
     }
 
-    private void configureResolver( ModelResolver modelResolver, Model model, DefaultModelProblemCollector problems )
+    private void configureResolver( ModelResolver modelResolver, org.apache.maven.api.model.Model model,
+                                    DefaultModelProblemCollector problems, boolean replaceRepositories )
     {
-        configureResolver( modelResolver, model, problems, false );
-    }
-
-    private void configureResolver( ModelResolver modelResolver, Model model, DefaultModelProblemCollector problems,
-                                    boolean replaceRepositories )
-    {
-        if ( modelResolver == null )
+        if ( modelResolver != null )
         {
-            return;
-        }
-
-        problems.setSource( model );
-
-        List<Repository> repositories = model.getRepositories();
-
-        for ( Repository repository : repositories )
-        {
-            try
+            for ( org.apache.maven.api.model.Repository repository : model.getRepositories() )
             {
-                modelResolver.addRepository( repository, replaceRepositories );
-            }
-            catch ( InvalidRepositoryException e )
-            {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                        .setMessage( "Invalid repository " + repository.getId() + ": " + e.getMessage() )
-                        .setLocation( repository.getLocation( "" ) ).setException( e ) );
+                try
+                {
+                    modelResolver.addRepository( repository, replaceRepositories );
+                }
+                catch ( InvalidRepositoryException e )
+                {
+                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                            .setMessage( "Invalid repository " + repository.getId() + ": " + e.getMessage() )
+                            .setLocation( new InputLocation( repository.getLocation( "" ) ) ).setException( e ) );
+                }
             }
         }
     }
@@ -1609,22 +1624,16 @@ public class DefaultModelBuilder
 
         org.apache.maven.api.model.DependencyManagement importMgmt =
                 cache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT,
-                        () -> Optional.ofNullable( doLoadDependencyManagement(
-                                model, request, problems, dependency, groupId, artifactId, version, importIds ) )
-                            .map( DependencyManagement::getDelegate )
-                            .orElse( null ) );
+                        () -> doLoadDependencyManagement(
+                                model, request, problems, dependency, groupId, artifactId, version, importIds ) );
 
         return importMgmt != null ? new DependencyManagement( importMgmt ) : null;
     }
 
     @SuppressWarnings( "checkstyle:parameternumber" )
-    private DependencyManagement doLoadDependencyManagement( Model model, ModelBuildingRequest request,
-                                                             DefaultModelProblemCollector problems,
-                                                             Dependency dependency,
-                                                             String groupId,
-                                                             String artifactId,
-                                                             String version,
-                                                             Collection<String> importIds )
+    private org.apache.maven.api.model.DependencyManagement doLoadDependencyManagement(
+                Model model, ModelBuildingRequest request, DefaultModelProblemCollector problems, Dependency dependency,
+                String groupId, String artifactId, String version, Collection<String> importIds )
     {
         DependencyManagement importMgmt;
         final WorkspaceModelResolver workspaceResolver = request.getWorkspaceModelResolver();
@@ -1708,7 +1717,7 @@ public class DefaultModelBuilder
         {
             importMgmt = new DependencyManagement();
         }
-        return importMgmt;
+        return importMgmt.getDelegate();
     }
 
     private static <T> T cache( ModelCache cache, String groupId, String artifactId, String version,

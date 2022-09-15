@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -62,6 +63,15 @@ public class DefaultProfileSelector
             activators.add( profileActivator );
         }
         return this;
+    }
+
+    @Override
+    public List<org.apache.maven.api.model.Profile> getActiveProfilesV4(
+            Collection<org.apache.maven.api.model.Profile> profiles, ProfileActivationContext context,
+            ModelProblemCollector problems )
+    {
+        return getActiveProfiles( profiles.stream().map( Profile::new ).collect( Collectors.toList() ),
+                context, problems ).stream().map( Profile::getDelegate ).collect( Collectors.toList() );
     }
 
     @Override

@@ -43,4 +43,8 @@ public interface ProfileInjector
      */
     void injectProfile( Model model, Profile profile, ModelBuildingRequest request, ModelProblemCollector problems );
 
+    org.apache.maven.api.model.Model injectProfile(
+                        org.apache.maven.api.model.Model model,
+                        org.apache.maven.api.model.Profile profile,
+                        ModelBuildingRequest request, ModelProblemCollector problems );
 }
