@@ -35,4 +35,18 @@ public interface ProjectBuilderSource
     InputStream getInputStream() throws IOException;
 
     String getLocation();
+
+    /**
+     * Returns a new source identified by a relative path. Implementation <strong>MUST</strong>
+     * be able to accept <code>relPath</code> parameter values that
+     * <ul>
+     * <li>use either / or \ file path separator</li>
+     * <li>have .. parent directory references</li>
+     * <li>point either at file or directory.</li>
+     * </ul>
+     *
+     * @param relative is the path of the requested source relative to this source.
+     * @return related source or <code>null</code> if no such source.
+     */
+    ProjectBuilderSource resolve( String relative );
 }

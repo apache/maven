@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -46,7 +47,7 @@ import org.apache.maven.api.services.ProjectBuilderSource;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.building.ModelProblem;
-import org.apache.maven.model.building.ModelSource;
+import org.apache.maven.model.building.ModelSource2;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -88,20 +89,7 @@ public class DefaultProjectBuilder implements ProjectBuilder
             else if ( request.getSource().isPresent() )
             {
                 ProjectBuilderSource source = request.getSource().get();
-                ModelSource modelSource = new ModelSource()
-                {
-                    @Override
-                    public InputStream getInputStream() throws IOException
-                    {
-                        return source.getInputStream();
-                    }
-
-                    @Override
-                    public String getLocation()
-                    {
-                        return source.getLocation();
-                    }
-                };
+                ModelSource2 modelSource = new ProjectBuilderSourceWrapper( source );
                 res = builder.build( modelSource, req );
             }
             else if ( request.getArtifact().isPresent() )
@@ -262,6 +250,41 @@ public class DefaultProjectBuilder implements ProjectBuilder
         catch ( ProjectBuildingException e )
         {
             throw new ProjectBuilderException( "Unable to build project", e );
+        }
+    }
+
+    private static class ProjectBuilderSourceWrapper implements ModelSource2
+    {
+        private final ProjectBuilderSource source;
+
+        ProjectBuilderSourceWrapper( ProjectBuilderSource source )
+        {
+            this.source = source;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException
+        {
+            return source.getInputStream();
+        }
+
+        @Override
+        public String getLocation()
+        {
+            return source.getLocation();
+        }
+
+        @Override
+        public ModelSource2 getRelatedSource( String relPath )
+        {
+            ProjectBuilderSource rel = source.resolve( relPath );
+            return rel != null ? new ProjectBuilderSourceWrapper( rel ) : null;
+        }
+
+        @Override
+        public URI getLocationURI()
+        {
+            return null;
         }
     }
 }
