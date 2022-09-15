@@ -1230,7 +1230,7 @@ public class DefaultModelBuilder
     }
 
     private ModelData readParent( Model childModel, Source childSource, ModelBuildingRequest request,
-                                  ModelBuildingResult result, DefaultModelProblemCollector problems )
+                                  DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
         ModelData parentData = null;
@@ -1238,10 +1238,10 @@ public class DefaultModelBuilder
         Parent parent = childModel.getParent();
         if ( parent != null )
         {
-            parentData = readParentLocally( childModel, childSource, request, result, problems );
+            parentData = readParentLocally( childModel, childSource, request, problems );
             if ( parentData == null )
             {
-                parentData = readParentExternally( childModel, request, result, problems );
+                parentData = readParentExternally( childModel, request, problems );
             }
 
             Model parentModel = parentData.getModel();
@@ -1258,7 +1258,7 @@ public class DefaultModelBuilder
     }
 
     private ModelData readParentLocally( Model childModel, Source childSource, ModelBuildingRequest request,
-                                         ModelBuildingResult result, DefaultModelProblemCollector problems )
+                                         DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
         final Parent parent = childModel.getParent();
@@ -1413,7 +1413,7 @@ public class DefaultModelBuilder
     }
 
     private ModelData readParentExternally( Model childModel, ModelBuildingRequest request,
-                                            ModelBuildingResult result, DefaultModelProblemCollector problems )
+                                            DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
         problems.setSource( childModel );
