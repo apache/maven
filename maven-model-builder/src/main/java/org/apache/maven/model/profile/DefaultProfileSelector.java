@@ -46,7 +46,7 @@ public class DefaultProfileSelector implements ProfileSelector {
 
     @Inject
     public DefaultProfileSelector(List<ProfileActivator> activators) {
-        this.activators = activators;
+        this.activators = new ArrayList<>(activators);
     }
 
     public DefaultProfileSelector addProfileActivator(ProfileActivator profileActivator) {
