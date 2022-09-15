@@ -56,7 +56,7 @@ under the License.
     <plexusVersion>2.1.0</plexusVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusUtilsVersion>4.0.0-alpha-1-SNAPSHOT</plexusUtilsVersion>
-    <guiceVersion>4.2.3</guiceVersion>
+    <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>30.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
     <wagonVersion>3.5.2</wagonVersion>
@@ -212,7 +212,6 @@ under the License.
         <groupId>com.google.inject</groupId>
         <artifactId>guice</artifactId>
         <version>${guiceVersion}</version>
-        <classifier>no_aop</classifier>
         <exclusions>
           <exclusion>
             <groupId>com.google.guava</groupId>
@@ -588,6 +587,7 @@ under the License.
               -->
               <exclude>src/main/appended-resources/licenses/MIT-slf4j-api-1.7.30.txt</exclude>
               <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
+              <exclude>src/main/appended-resources/licenses/unrecognized-aopalliance-1.0.txt</exclude>
               <exclude>src/main/appended-resources/licenses/unrecognized-javax.annotation-api-1.3.2.txt</exclude>
               <exclude>plexus-utils/target/**</exclude>
             </excludes>

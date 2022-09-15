@@ -88,8 +88,8 @@ public class MojoDescriptor
     private String executeLifecycle;
 
     /**
-     * Specify the version when the Mojo was deprecated to the API. Similar to Javadoc deprecated. This will trigger a
-     * warning when a user tries to configure a parameter marked as deprecated.
+     * Description with reason of Mojo deprecation. Similar to Javadoc {@code @deprecated}.
+     * This will trigger a warning when a user tries to use a Mojo marked as deprecated.
      */
     private String deprecated;
 
@@ -172,7 +172,7 @@ public class MojoDescriptor
     }
 
     /**
-     * @return <code>true</code> if the Mojo is deprecated, <code>false</code> otherwise.
+     * @return Description with reason of a Mojo deprecation.
      */
     public String getDeprecated()
     {
@@ -180,7 +180,7 @@ public class MojoDescriptor
     }
 
     /**
-     * @param deprecated <code>true</code> to deprecate the Mojo, <code>false</code> otherwise.
+     * @param deprecated Description with reason of a Mojo deprecation.
      */
     public void setDeprecated( String deprecated )
     {
