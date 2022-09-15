@@ -94,6 +94,7 @@ org.apache.maven.plugins:maven-jar-plugin:2.4
 org.apache.maven.plugins:maven-jar-plugin:3.2.0
 org.apache.maven.plugins:maven-javadoc-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-plugin-plugin:${stubPluginVersion}
+org.apache.maven.plugins:maven-plugin-plugin:3.2
 org.apache.maven.plugins:maven-plugin-plugin:3.6.0
 org.apache.maven.plugins:maven-rar-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-release-plugin:2.5.3
