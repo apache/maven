@@ -42,8 +42,7 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder
 {
     private final DefaultTransformerContext context = new DefaultTransformerContext();
 
-    private final Map<DefaultTransformerContext.GAKey, Set<FileModelSource>> mappedSources
-            = new ConcurrentHashMap<>( 64 );
+    private final Map<String, Set<FileModelSource>> mappedSources = new ConcurrentHashMap<>( 64 );
 
     private final DAG dag = new DAG();
     private final DefaultModelBuilder defaultModelBuilder;
@@ -73,17 +72,26 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder
             @Override
             public Model getRawModel( Path from, String gId, String aId )
             {
-                return context.modelByGA.computeIfAbsent( new DefaultTransformerContext.GAKey( gId, aId ),
-                                k -> new DefaultTransformerContext.Holder() )
-                        .computeIfAbsent( () -> findRawModel( from, gId, aId ) );
+                Model model = findRawModel( from, gId, aId );
+                if ( model != null )
+                {
+                    context.modelByGA.put( gId + ":" + aId, model );
+                    context.modelByPath.put( model.getPomFile().toPath(), model );
+                }
+                return model;
             }
 
             @Override
             public Model getRawModel( Path from, Path path )
             {
-                return context.modelByPath.computeIfAbsent( path,
-                                k -> new DefaultTransformerContext.Holder() )
-                        .computeIfAbsent( () -> findRawModel( from, path ) );
+                Model model = findRawModel( from, path );
+                if ( model != null )
+                {
+                    String groupId = defaultModelBuilder.getGroupId( model );
+                    context.modelByGA.put( groupId + ":" + model.getArtifactId(), model );
+                    context.modelByPath.put( path, model );
+                }
+                return model;
             }
 
             private Model findRawModel( Path from, String groupId, String artifactId )
@@ -99,11 +107,7 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder
                     {
                         ModelBuildingRequest gaBuildingRequest = new DefaultModelBuildingRequest( request )
                                 .setModelSource( source );
-                        Model model = defaultModelBuilder.readRawModel( gaBuildingRequest, problems );
-                        Path path = source.getFile().toPath();
-                        context.modelByPath.computeIfAbsent( path, k -> new DefaultTransformerContext.Holder() )
-                                .computeIfAbsent( () -> model );
-                        return model;
+                        return defaultModelBuilder.readRawModel( gaBuildingRequest, problems );
                     }
                     catch ( ModelBuildingException e )
                     {
@@ -131,12 +135,7 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder
 
                 try
                 {
-                    Model model = defaultModelBuilder.readRawModel( req, problems );
-                    DefaultTransformerContext.GAKey key =
-                            new DefaultTransformerContext.GAKey( defaultModelBuilder.getGroupId( model ), model.getArtifactId() );
-                    context.modelByGA.computeIfAbsent( key, k -> new DefaultTransformerContext.Holder() )
-                            .computeIfAbsent( () -> model );
-                    return model;
+                    return defaultModelBuilder.readRawModel( req, problems );
                 }
                 catch ( ModelBuildingException e )
                 {
@@ -177,8 +176,7 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder
 
     public FileModelSource getSource( String groupId, String artifactId )
     {
-        Set<FileModelSource> sources = mappedSources.get(
-                new DefaultTransformerContext.GAKey( groupId, artifactId ) );
+        Set<FileModelSource> sources = mappedSources.get( groupId + ":" + artifactId );
         if ( sources == null )
         {
             return null;
@@ -193,7 +191,7 @@ class DefaultTransformerContextBuilder implements TransformerContextBuilder
 
     public void putSource( String groupId, String artifactId, FileModelSource source )
     {
-        mappedSources.computeIfAbsent( new DefaultTransformerContext.GAKey( groupId, artifactId ),
-                k -> new HashSet<>() ).add( source );
+        mappedSources.computeIfAbsent( groupId + ":" + artifactId, k -> new HashSet<>() )
+                .add( source );
     }
 }

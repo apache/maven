@@ -21,9 +21,7 @@ package org.apache.maven.model.building;
 
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 
 import org.apache.maven.model.Model;
 
@@ -36,64 +34,9 @@ class DefaultTransformerContext implements TransformerContext
 {
     final Map<String, String> userProperties = new ConcurrentHashMap<>();
 
-    final Map<Path, Holder> modelByPath = new ConcurrentHashMap<>();
+    final Map<Path, Model> modelByPath = new ConcurrentHashMap<>();
 
-    final Map<GAKey, Holder> modelByGA = new ConcurrentHashMap<>();
-
-    public static class Holder
-    {
-        private volatile boolean set;
-        private volatile Model model;
-
-        Holder()
-        {
-        }
-
-        public static Model deref( Holder holder )
-        {
-            return holder != null ? holder.get() : null;
-        }
-
-        public Model get()
-        {
-            if ( !set )
-            {
-                synchronized ( this )
-                {
-                    if ( !set )
-                    {
-                        try
-                        {
-                            this.wait();
-                        }
-                        catch ( InterruptedException e )
-                        {
-                            // Ignore
-                        }
-                    }
-                }
-            }
-            return model;
-        }
-
-        public Model computeIfAbsent( Supplier<Model> supplier )
-        {
-            if ( !set )
-            {
-                synchronized ( this )
-                {
-                    if ( !set )
-                    {
-                        this.set = true;
-                        this.model = supplier.get();
-                        this.notifyAll();
-                    }
-                }
-            }
-            return model;
-        }
-
-    }
+    final Map<String, Model> modelByGA = new ConcurrentHashMap<>();
 
     @Override
     public String getUserProperty( String key )
@@ -104,48 +47,13 @@ class DefaultTransformerContext implements TransformerContext
     @Override
     public Model getRawModel( Path from, Path p )
     {
-        return Holder.deref( modelByPath.get( p ) );
+        return modelByPath.get( p );
     }
 
     @Override
     public Model getRawModel( Path from, String groupId, String artifactId )
     {
-        return Holder.deref( modelByGA.get( new GAKey( groupId, artifactId ) ) );
+        return modelByGA.get( groupId + ":" + artifactId );
     }
 
-    static class GAKey
-    {
-        private final String groupId;
-        private final String artifactId;
-        private final int hashCode;
-
-        GAKey( String groupId, String artifactId )
-        {
-            this.groupId = groupId;
-            this.artifactId = artifactId;
-            this.hashCode = Objects.hash( groupId, artifactId );
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return hashCode;
-        }
-
-        @Override
-        public boolean equals( Object obj )
-        {
-            if ( this == obj )
-            {
-                return true;
-            }
-            if ( !( obj instanceof GAKey ) )
-            {
-                return false;
-            }
-
-            GAKey other = (GAKey) obj;
-            return Objects.equals( artifactId, other.artifactId ) && Objects.equals( groupId, other.groupId );
-        }
-    }
 }
