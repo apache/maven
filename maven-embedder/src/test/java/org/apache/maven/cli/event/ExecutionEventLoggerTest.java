@@ -19,16 +19,12 @@ package org.apache.maven.cli.event;
  * under the License.
  */
 
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
 
-import com.google.common.collect.ImmutableList;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
@@ -36,7 +32,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
@@ -44,10 +39,6 @@ import org.slf4j.Logger;
 
 class ExecutionEventLoggerTest
 {
-
-    private Logger logger;
-    private ExecutionEventLogger executionEventLogger;
-
     @BeforeAll
     public static void setUp()
     {
@@ -60,17 +51,14 @@ class ExecutionEventLoggerTest
         MessageUtils.setColorEnabled( true );
     }
 
-    @BeforeEach
-    void beforeEach() {
-        logger = mock( Logger.class );
-        when( logger.isInfoEnabled() ).thenReturn( true );
-        executionEventLogger = new ExecutionEventLogger( logger );
-    }
-
     @Test
     void testProjectStarted()
     {
         // prepare
+        Logger logger = mock( Logger.class );
+        when( logger.isInfoEnabled() ).thenReturn( true );
+        ExecutionEventLogger executionEventLogger = new ExecutionEventLogger( logger );
+
         File basedir = new File( "" ).getAbsoluteFile();
         ExecutionEvent event = mock( ExecutionEvent.class );
         MavenProject project = mock( MavenProject.class );
@@ -104,6 +92,10 @@ class ExecutionEventLoggerTest
     void testProjectStartedOverflow()
     {
         // prepare
+        Logger logger = mock( Logger.class );
+        when( logger.isInfoEnabled() ).thenReturn( true );
+        ExecutionEventLogger executionEventLogger = new ExecutionEventLogger( logger );
+
         File basedir = new File( "" ).getAbsoluteFile();
         ExecutionEvent event = mock( ExecutionEvent.class );
         MavenProject project = mock( MavenProject.class );
@@ -169,10 +161,13 @@ class ExecutionEventLoggerTest
         Mockito.verify( logger ).info( "-----------------------------------------------------[ maven-plugin ]-----------------------------------------------------" );
     }
 
-    @Test
     public void testProjectStartedNoPom()
     {
         // prepare
+        Logger logger = mock( Logger.class );
+        when( logger.isInfoEnabled() ).thenReturn( true );
+        ExecutionEventLogger executionEventLogger = new ExecutionEventLogger( logger );
+
         File basedir = new File( "" ).getAbsoluteFile();
         ExecutionEvent event = mock( ExecutionEvent.class );
         MavenProject project = mock( MavenProject.class );
@@ -194,80 +189,6 @@ class ExecutionEventLoggerTest
         inOrder.verify( logger ).info( "------------------< org.apache.maven:standalone-pom >-------------------" );
         inOrder.verify( logger ).info( "Building Maven Stub Project (No POM) 1" );
         inOrder.verify( logger ).info( "--------------------------------[ pom ]---------------------------------" );
-    }
-
-    @Test
-    void testMultiModuleProjectProgress()
-    {
-        // prepare
-        MavenProject project1 = generateMavenProject("Apache Maven Embedder 1");
-        MavenProject project2 = generateMavenProject("Apache Maven Embedder 2");
-        MavenProject project3 = generateMavenProject("Apache Maven Embedder 3");
-
-        MavenSession session = mock( MavenSession.class );
-        when( session.getProjects() ).thenReturn( ImmutableList.of( project1, project2, project3 ) );
-        when( session.getAllProjects() ).thenReturn( ImmutableList.of( project1, project2, project3 ) );
-
-        ExecutionEvent sessionStartedEvent = mock( ExecutionEvent.class );
-        when( sessionStartedEvent.getSession() ).thenReturn( session );
-        ExecutionEvent projectStartedEvent1 = mock( ExecutionEvent.class );
-        when( projectStartedEvent1.getProject() ).thenReturn( project1 );
-        ExecutionEvent projectStartedEvent2 = mock( ExecutionEvent.class );
-        when( projectStartedEvent2.getProject() ).thenReturn( project2 );
-        ExecutionEvent projectStartedEvent3 = mock( ExecutionEvent.class );
-        when( projectStartedEvent3.getProject() ).thenReturn( project3 );
-
-        // execute
-        executionEventLogger.sessionStarted( sessionStartedEvent );
-        executionEventLogger.projectStarted( projectStartedEvent1 );
-        executionEventLogger.projectStarted( projectStartedEvent2 );
-        executionEventLogger.projectStarted( projectStartedEvent3 );
-
-        // verify
-        InOrder inOrder = inOrder( logger );
-        inOrder.verify( logger ).info( matches(".*Apache Maven Embedder 1.*\\[1\\/3\\]") );
-        inOrder.verify( logger ).info( matches(".*Apache Maven Embedder 2.*\\[2\\/3\\]") );
-        inOrder.verify( logger ).info( matches(".*Apache Maven Embedder 3.*\\[3\\/3\\]") );
-    }
-
-    @Test
-    void testMultiModuleProjectResumeFromProgress()
-    {
-        // prepare
-        MavenProject project1 = generateMavenProject("Apache Maven Embedder 1");
-        MavenProject project2 = generateMavenProject("Apache Maven Embedder 2");
-        MavenProject project3 = generateMavenProject("Apache Maven Embedder 3");
-
-        MavenSession session = mock( MavenSession.class );
-        when( session.getProjects() ).thenReturn( ImmutableList.of( project2, project3 ) );
-        when( session.getAllProjects() ).thenReturn( ImmutableList.of( project1, project2, project3 ) );
-
-        ExecutionEvent sessionStartedEvent = mock( ExecutionEvent.class );
-        when( sessionStartedEvent.getSession() ).thenReturn( session );
-        ExecutionEvent projectStartedEvent2 = mock( ExecutionEvent.class );
-        when( projectStartedEvent2.getProject() ).thenReturn( project2 );
-        ExecutionEvent projectStartedEvent3 = mock( ExecutionEvent.class );
-        when( projectStartedEvent3.getProject() ).thenReturn( project3 );
-
-        // execute
-        executionEventLogger.sessionStarted( sessionStartedEvent );
-        executionEventLogger.projectStarted( projectStartedEvent2 );
-        executionEventLogger.projectStarted( projectStartedEvent3 );
-
-        // verify
-        InOrder inOrder = inOrder( logger );
-        inOrder.verify( logger, never() ).info( matches(".*Apache Maven Embedder 1.*\\[1\\/3\\]") );
-        inOrder.verify( logger ).info( matches(".*Apache Maven Embedder 2.*\\[2\\/3\\]") );
-        inOrder.verify( logger ).info( matches(".*Apache Maven Embedder 3.*\\[3\\/3\\]") );
-    }
-
-    private static MavenProject generateMavenProject( String projectName )
-    {
-        MavenProject project = mock( MavenProject.class );
-        when( project.getPackaging() ).thenReturn( "jar" );
-        when( project.getVersion() ).thenReturn( "3.5.4-SNAPSHOT" );
-        when( project.getName() ).thenReturn( projectName );
-        return project;
     }
 
     private static String adaptDirSeparator( String path )

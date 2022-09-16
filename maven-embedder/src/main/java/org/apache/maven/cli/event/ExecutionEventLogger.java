@@ -143,11 +143,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener
                         project.getName(), chars( ' ', ( len > 0 ) ? len : 1 ), project.getPackaging() );
             }
 
-            final List<MavenProject> allProjects = event.getSession().getAllProjects();
-            final int projectsSkipped = allProjects.size() - projects.size();
-
-            currentVisitedProjectCount = projectsSkipped;
-            totalProjects = allProjects.size();
+            totalProjects = projects.size();
         }
     }
 
