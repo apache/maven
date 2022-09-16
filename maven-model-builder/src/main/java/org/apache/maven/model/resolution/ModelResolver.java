@@ -124,15 +124,39 @@ public interface ModelResolver
      */
     ModelResolver newCopy();
 
-    ModelSource resolveModel( Parent parent, AtomicReference<Parent> modified )
-            throws UnresolvableModelException;
+    default ModelSource resolveModel( Parent parent, AtomicReference<Parent> modified )
+            throws UnresolvableModelException
+    {
+        org.apache.maven.model.Parent p = new org.apache.maven.model.Parent( parent );
+        ModelSource result = resolveModel( p );
+        if ( p.getDelegate() != parent )
+        {
+            modified.set( p.getDelegate() );
+        }
+        return result;
+    }
 
-    ModelSource resolveModel( Dependency dependency, AtomicReference<Dependency> modified )
-            throws UnresolvableModelException;
+    default ModelSource resolveModel( Dependency dependency, AtomicReference<Dependency> modified )
+            throws UnresolvableModelException
+    {
+        org.apache.maven.model.Dependency d = new org.apache.maven.model.Dependency( dependency );
+        ModelSource result = resolveModel( d );
+        if ( d.getDelegate() != dependency )
+        {
+            modified.set( d.getDelegate() );
+        }
+        return result;
+    }
 
-    void addRepository( Repository repository )
-            throws InvalidRepositoryException;
+    default void addRepository( Repository repository )
+            throws InvalidRepositoryException
+    {
+        addRepository( new org.apache.maven.model.Repository( repository ) );
+    }
 
-    void addRepository( Repository repository, boolean replace )
-            throws InvalidRepositoryException;
+    default void addRepository( Repository repository, boolean replace )
+            throws InvalidRepositoryException
+    {
+        addRepository( new org.apache.maven.model.Repository( repository ), replace );
+    }
 }
