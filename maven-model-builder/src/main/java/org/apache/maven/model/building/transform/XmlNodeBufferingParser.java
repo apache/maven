@@ -1,4 +1,4 @@
-package org.apache.maven.model.transform.pull;
+package org.apache.maven.model.building.transform;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -33,7 +33,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * @author Guillaume Nodet
  * @since 4.0.0
  */
-public abstract class NodeBufferingParser extends BufferingParser
+public abstract class XmlNodeBufferingParser extends XmlBufferingParser
 {
 
     private final List<Event> buffer = new ArrayList<>();
@@ -42,7 +42,7 @@ public abstract class NodeBufferingParser extends BufferingParser
 
     private boolean buffering;
 
-    public NodeBufferingParser( XmlPullParser xmlPullParser, String nodeName )
+    public XmlNodeBufferingParser( XmlPullParser xmlPullParser, String nodeName )
     {
         super( xmlPullParser );
         this.nodeName = Objects.requireNonNull( nodeName );

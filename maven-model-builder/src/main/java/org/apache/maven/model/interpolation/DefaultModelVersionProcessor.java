@@ -19,7 +19,7 @@ package org.apache.maven.model.interpolation;
  * under the License.
  */
 
-import java.util.Properties;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -50,7 +50,7 @@ public class DefaultModelVersionProcessor
     }
 
     @Override
-    public void overwriteModelProperties( Properties modelProperties, ModelBuildingRequest request )
+    public void overwriteModelProperties( Map<Object, Object> modelProperties, ModelBuildingRequest request )
     {
         if ( request.getSystemProperties().containsKey( REVISION_PROPERTY ) )
         {

@@ -19,7 +19,7 @@ package org.apache.maven.model.interpolation;
  * under the License.
  */
 
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.maven.model.building.ModelBuildingRequest;
 
@@ -42,6 +42,6 @@ public interface ModelVersionProcessor
      * @param modelProperties
      * @param request
      */
-    void overwriteModelProperties( Properties modelProperties, ModelBuildingRequest request );
+    void overwriteModelProperties( Map<Object, Object> modelProperties, ModelBuildingRequest request );
 
 }

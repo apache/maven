@@ -235,7 +235,7 @@ public class DefaultModelBuilderFactory
 
     protected ModelReader newModelReader()
     {
-        return new DefaultModelReader( newModelSourceTransformer() );
+        return new DefaultModelReader();
     }
 
     protected ProfileSelector newProfileSelector()
@@ -268,7 +268,7 @@ public class DefaultModelBuilderFactory
     {
         UrlNormalizer normalizer = newUrlNormalizer();
         PathTranslator pathTranslator = newPathTranslator();
-        return new StringVisitorModelInterpolator( pathTranslator, normalizer );
+        return new StringVisitorModelInterpolator( pathTranslator, normalizer, newModelVersionPropertiesProcessor() );
     }
 
     protected ModelVersionProcessor newModelVersionPropertiesProcessor()
@@ -345,11 +345,6 @@ public class DefaultModelBuilderFactory
     protected ReportingConverter newReportingConverter()
     {
         return new DefaultReportingConverter();
-    }
-
-    private ModelSourceTransformer newModelSourceTransformer()
-    {
-        return new DefaultModelSourceTransformer();
     }
 
     /**

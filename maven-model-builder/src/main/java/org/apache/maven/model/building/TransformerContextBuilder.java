@@ -28,19 +28,5 @@ package org.apache.maven.model.building;
  */
 public interface TransformerContextBuilder
 {
-    /**
-     * This method is used to initialize the TransformerContext
-     *
-     * @param request the modelBuildingRequest
-     * @param problems the problemCollector
-     * @return the mutable transformerContext
-     */
-    TransformerContext initialize( ModelBuildingRequest request, ModelProblemCollector problems );
 
-    /**
-     * The immutable transformerContext, can be used after the buildplan is finished.
-     *
-     * @return the immutable transformerContext
-     */
-    TransformerContext build();
 }

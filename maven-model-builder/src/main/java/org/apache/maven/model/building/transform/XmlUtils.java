@@ -1,4 +1,4 @@
-package org.apache.maven.model.transform.pull;
+package org.apache.maven.model.building.transform;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

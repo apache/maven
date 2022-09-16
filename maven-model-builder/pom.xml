@@ -63,10 +63,6 @@ under the License.
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-builder-support</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model-transform</artifactId>
-    </dependency>
     <!-- Testing -->
     <dependency>
       <groupId>org.eclipse.sisu</groupId>

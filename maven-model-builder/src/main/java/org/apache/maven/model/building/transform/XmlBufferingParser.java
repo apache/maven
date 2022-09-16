@@ -1,4 +1,4 @@
-package org.apache.maven.model.transform.pull;
+package org.apache.maven.model.building.transform;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -36,7 +36,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * @author Guillaume Nodet
  * @since 4.0.0
  */
-public class BufferingParser implements XmlPullParser
+public class XmlBufferingParser implements XmlPullParser
 {
 
     private static final Pattern WHITESPACE_REGEX = Pattern.compile( "[ \r\t\n]+" );
@@ -78,7 +78,7 @@ public class BufferingParser implements XmlPullParser
     }
 
 
-    public BufferingParser( XmlPullParser xmlPullParser )
+    public XmlBufferingParser( XmlPullParser xmlPullParser )
     {
         this.xmlPullParser = xmlPullParser;
     }
@@ -546,8 +546,8 @@ public class BufferingParser implements XmlPullParser
     public boolean bypass()
     {
         return bypass
-                || ( xmlPullParser instanceof BufferingParser
-                        && ( (BufferingParser) xmlPullParser ).bypass() );
+                || ( xmlPullParser instanceof XmlBufferingParser
+                        && ( (XmlBufferingParser) xmlPullParser ).bypass() );
     }
 
     protected static String nullSafeAppend( String originalValue, String charSegment )

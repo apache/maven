@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
+import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.FileModelSource;
@@ -236,8 +237,8 @@ public class ProjectBuilderTest
                 getContainer().lookup( org.apache.maven.project.ProjectBuilder.class );
 
         // single project build entry point
-        Exception ex = assertThrows( Exception.class, () -> projectBuilder.build( pomFile, configuration ) );
-        assertThat( ex.getMessage(), containsString( "expected START_TAG or END_TAG not TEXT" ) );
+        InvalidArtifactRTException ex = assertThrows( InvalidArtifactRTException.class, () -> projectBuilder.build( pomFile, configuration ) );
+        assertThat( ex.getMessage(), containsString( "The groupId cannot be empty." ) );
 
         // multi projects build entry point
         ProjectBuildingException pex =
@@ -245,8 +246,9 @@ public class ProjectBuilderTest
                           () -> projectBuilder.build( Collections.singletonList( pomFile ), false, configuration ) );
         assertEquals( 1, pex.getResults().size() );
         assertNotNull( pex.getResults().get( 0 ).getPomFile() );
+        assertNotNull( pex.getResults().get( 0 ).getProject() );
         assertThat( pex.getResults().get( 0 ).getProblems().size(), greaterThan( 0 ) );
-        assertThat( pex.getResults(), contains( projectBuildingResultWithProblemMessage( "expected START_TAG or END_TAG not TEXT" ) ) );
+        assertThat( pex.getResults(), contains( projectBuildingResultWithProblemMessage( "'groupId' is missing." ) ) );
     }
 
     @Test

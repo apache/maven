@@ -22,6 +22,7 @@ package org.apache.maven.internal.aether;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,7 +43,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.feature.Features;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.internal.xml.Xpp3Dom;
-import org.apache.maven.model.building.TransformerContext;
+import org.apache.maven.model.building.transform.RawToConsumerTransformer;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
@@ -53,7 +54,6 @@ import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -323,11 +323,10 @@ public class DefaultRepositorySystemSessionFactory
     private Collection<FileTransformer> getTransformersForArtifact( final Artifact artifact,
                                                                     final SessionData sessionData )
     {
-        TransformerContext context = (TransformerContext) sessionData.get( TransformerContext.KEY );
         Collection<FileTransformer> transformers = new ArrayList<>();
 
         // In case of install:install-file there's no transformer context, as the goal is unrelated to the lifecycle.
-        if ( "pom".equals( artifact.getExtension() ) && context != null )
+        if ( "pom".equals( artifact.getExtension() ) )
         {
             transformers.add( new FileTransformer()
             {
@@ -335,11 +334,11 @@ public class DefaultRepositorySystemSessionFactory
                 public InputStream transformData( File pomFile )
                     throws IOException, TransformException
                 {
-                    try
+                    try ( InputStream is = Files.newInputStream( pomFile.toPath() ) )
                     {
-                        return new ConsumerModelSourceTransformer().transform( pomFile.toPath(), context );
+                        return new RawToConsumerTransformer().transform( is );
                     }
-                    catch ( XmlPullParserException e )
+                    catch ( Exception e )
                     {
                         throw new TransformException( e );
                     }

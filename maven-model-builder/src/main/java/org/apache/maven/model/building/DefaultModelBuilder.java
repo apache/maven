@@ -25,21 +25,15 @@ import static org.apache.maven.model.building.Result.newResult;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -65,12 +59,12 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.building.transform.BuildToRawTransformer;
 import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.interpolation.ModelVersionProcessor;
 import org.apache.maven.model.io.ModelParseException;
-import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.management.DependencyManagementInjector;
 import org.apache.maven.model.management.PluginManagementInjector;
 import org.apache.maven.model.normalization.ModelNormalizer;
@@ -90,7 +84,6 @@ import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
-import org.apache.maven.model.v4.MavenMerger;
 import org.apache.maven.model.validation.ModelValidator;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
@@ -105,7 +98,6 @@ import org.eclipse.sisu.Nullable;
 public class DefaultModelBuilder
         implements ModelBuilder
 {
-    private final MavenMerger modelMerger = new FileToRawModelMerger();
 
     private final ModelProcessor modelProcessor;
     private final ModelValidator modelValidator;
@@ -824,7 +816,7 @@ public class DefaultModelBuilder
             {
                 DefaultTransformerContextBuilder contextBuilder =
                         (DefaultTransformerContextBuilder) request.getTransformerContextBuilder();
-                contextBuilder.putSource( getGroupId( model ), model.getArtifactId(), modelSource );
+                contextBuilder.putSource( getGroupId( model ), model.getArtifactId(), (FileModelSource) modelSource );
             }
         }
 
@@ -960,30 +952,51 @@ public class DefaultModelBuilder
 
         Model rawModel;
         if ( Features.buildConsumer( request.getUserProperties() ).isActive()
-            && modelSource instanceof FileModelSource )
+            && modelSource instanceof FileModelSource
+            && request.getTransformerContextBuilder() != null )
         {
             rawModel = readFileModel( request, problems );
-            File pomFile = ( (FileModelSource) modelSource ).getFile();
-
-            TransformerContext context = null;
-            if ( request.getTransformerContextBuilder() != null )
-            {
-                context = request.getTransformerContextBuilder().initialize( request, problems );
-            }
 
             try
             {
-                // must implement TransformContext, but should use request to access system properties/modelcache
-                org.apache.maven.api.model.Model transformedFileModel = modelProcessor.read( pomFile,
-                        Collections.singletonMap( ModelReader.TRANSFORMER_CONTEXT, context ) );
-
-                // rawModel with locationTrackers, required for proper feedback during validations
-
-                // Apply enriched data
-                rawModel = new Model( modelMerger.merge( rawModel.getDelegate(),
-                        transformedFileModel, false, null ) );
+                // Enrich model
+                rawModel = new Model( new BuildToRawTransformer().transform( rawModel.getDelegate(),
+                        ( from, p ) ->
+                        {
+                            try
+                            {
+                                DefaultModelBuildingRequest req = new DefaultModelBuildingRequest( request )
+                                        .setModelSource( new FileModelSource( p.toFile() ) );
+                                return getVersion( readRawModel( req, problems ) );
+                            }
+                            catch ( ModelBuildingException e )
+                            {
+                                return null; // gathered in problem collector
+                            }
+                        },
+                        ( from, g, a ) ->
+                        {
+                            DefaultTransformerContextBuilder contextBuilder =
+                                    (DefaultTransformerContextBuilder) request.getTransformerContextBuilder();
+                            FileModelSource source = contextBuilder.getSource( g, a );
+                            if ( source != null
+                                    && contextBuilder.addEdge( from, source.getFile().toPath(), problems ) )
+                            {
+                                try
+                                {
+                                    ModelBuildingRequest req = new DefaultModelBuildingRequest( request )
+                                            .setModelSource( source );
+                                    return getVersion( readRawModel( req, problems ) );
+                                }
+                                catch ( ModelBuildingException e )
+                                {
+                                    // gathered with problem collector
+                                }
+                            }
+                            return null;
+                        } ) );
             }
-            catch ( IOException e )
+            catch ( Exception e )
             {
                 problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V40 ).setException( e ) );
             }
@@ -1802,139 +1815,4 @@ public class DefaultModelBuilder
         }
     }
 
-    /**
-     * Builds up the transformer context.
-     * After the buildplan is ready, the build()-method returns the immutable context useful during distribution.
-     * This is an inner class, as it must be able to call readRawModel()
-     *
-     * @author Robert Scholte
-     * @since 4.0.0
-     */
-    private class DefaultTransformerContextBuilder implements TransformerContextBuilder
-    {
-        private final DefaultTransformerContext context = new DefaultTransformerContext();
-
-        private final Map<DefaultTransformerContext.GAKey, Set<Source>> mappedSources
-                = new ConcurrentHashMap<>( 64 );
-
-        /**
-         * If an interface could be extracted, DefaultModelProblemCollector should be ModelProblemCollectorExt
-         *
-         * @param request
-         * @param collector
-         * @return
-         */
-        @Override
-        public TransformerContext initialize( ModelBuildingRequest request, ModelProblemCollector collector )
-        {
-            // We must assume the TransformerContext was created using this.newTransformerContextBuilder()
-            DefaultModelProblemCollector problems = (DefaultModelProblemCollector) collector;
-            return new TransformerContext()
-            {
-                @Override
-                public String getUserProperty( String key )
-                {
-                    return context.userProperties.computeIfAbsent( key,
-                                                           k -> request.getUserProperties().getProperty( key ) );
-                }
-
-                @Override
-                public Model getRawModel( String gId, String aId )
-                {
-                    return context.modelByGA.computeIfAbsent( new DefaultTransformerContext.GAKey( gId, aId ),
-                                                              k -> new DefaultTransformerContext.Holder() )
-                            .computeIfAbsent( () -> findRawModel( gId, aId ) );
-                }
-
-                @Override
-                public Model getRawModel( Path path )
-                {
-                    return context.modelByPath.computeIfAbsent( path,
-                                                                k -> new DefaultTransformerContext.Holder() )
-                            .computeIfAbsent( () -> findRawModel( path ) );
-                }
-
-                private Model findRawModel( String groupId, String artifactId )
-                {
-                    Source source = getSource( groupId, artifactId );
-                    if ( source != null )
-                    {
-                        try
-                        {
-                            ModelBuildingRequest gaBuildingRequest = new DefaultModelBuildingRequest( request )
-                                .setModelSource( (ModelSource) source );
-                            Model model = readRawModel( gaBuildingRequest, problems );
-                            if ( source instanceof FileModelSource )
-                            {
-                                Path path = ( ( FileModelSource ) source ).getFile().toPath();
-                                context.modelByPath.computeIfAbsent( path, k -> new DefaultTransformerContext.Holder() )
-                                        .computeIfAbsent( () -> model );
-                            }
-                            return model;
-                        }
-                        catch ( ModelBuildingException e )
-                        {
-                            // gathered with problem collector
-                        }
-                    }
-                    return null;
-                }
-
-                private Model findRawModel( Path p )
-                {
-                    if ( !Files.isRegularFile( p ) )
-                    {
-                        throw new IllegalArgumentException( "Not a regular file: " + p );
-                    }
-
-                    DefaultModelBuildingRequest req = new DefaultModelBuildingRequest( request )
-                                    .setPomFile( p.toFile() )
-                                    .setModelSource( new FileModelSource( p.toFile() ) );
-
-                    try
-                    {
-                        Model model = readRawModel( req, problems );
-                        DefaultTransformerContext.GAKey key =
-                                new DefaultTransformerContext.GAKey( getGroupId( model ), model.getArtifactId() );
-                        context.modelByGA.computeIfAbsent( key, k -> new DefaultTransformerContext.Holder() )
-                                .computeIfAbsent( () -> model );
-                        return model;
-                    }
-                    catch ( ModelBuildingException e )
-                    {
-                        // gathered with problem collector
-                    }
-                    return null;
-                }
-            };
-        }
-
-        @Override
-        public TransformerContext build()
-        {
-            return context;
-        }
-
-        public Source getSource( String groupId, String artifactId )
-        {
-            Set<Source> sources = mappedSources.get( new DefaultTransformerContext.GAKey( groupId, artifactId ) );
-            if ( sources == null )
-            {
-                return null;
-            }
-            return sources.stream().reduce( ( a, b ) ->
-            {
-                throw new IllegalStateException( String.format( "No unique Source for %s:%s: %s and %s",
-                                                                groupId, artifactId,
-                                                                a.getLocation(), b.getLocation() ) );
-            } ).orElse( null );
-        }
-
-        public void putSource( String groupId, String artifactId, Source source )
-        {
-            mappedSources.computeIfAbsent( new DefaultTransformerContext.GAKey( groupId, artifactId ),
-                    k -> new HashSet<>() ).add( source );
-        }
-
-    }
 }

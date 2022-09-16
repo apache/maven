@@ -27,14 +27,11 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
-import org.apache.maven.model.building.ModelSourceTransformer;
-import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.v4.MavenXpp3Reader;
 import org.apache.maven.model.v4.MavenXpp3ReaderEx;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -54,14 +51,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 public class DefaultModelReader
     implements ModelReader
 {
-    private final ModelSourceTransformer transformer;
-
-    @Inject
-    public DefaultModelReader( ModelSourceTransformer transformer )
-    {
-        this.transformer = transformer;
-    }
-
     @Override
     public Model read( File input, Map<String, ?> options )
         throws IOException
@@ -117,12 +106,6 @@ public class DefaultModelReader
         return (InputSource) value;
     }
 
-    private TransformerContext getTransformerContext( Map<String, ?> options )
-    {
-        Object value = ( options != null ) ? options.get( TRANSFORMER_CONTEXT ) : null;
-        return (TransformerContext) value;
-    }
-
     private Model read( Reader reader, Path pomFile, Map<String, ?> options )
         throws IOException
     {
@@ -131,19 +114,15 @@ public class DefaultModelReader
             XmlPullParser parser = new MXParser( EntityReplacementMap.defaultEntityReplacementMap );
             parser.setInput( reader );
 
-            TransformerContext context = getTransformerContext( options );
-            XmlPullParser transformingParser = context != null
-                    ? transformer.transform( parser, pomFile, context ) : parser;
-
             InputSource source = getSource( options );
             boolean strict = isStrict( options );
             if ( source != null )
             {
-                return readModelEx( transformingParser, source, strict );
+                return readModelEx( parser, source, strict );
             }
             else
             {
-                return readModel( transformingParser, strict );
+                return readModel( parser, strict );
             }
         }
         catch ( XmlPullParserException e )

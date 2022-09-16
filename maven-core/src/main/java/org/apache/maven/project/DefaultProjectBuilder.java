@@ -45,7 +45,6 @@ import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.LegacyLocalRepositoryManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
-import org.apache.maven.feature.Features;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -68,7 +67,6 @@ import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.StringModelSource;
-import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.apache.maven.repository.internal.ModelCacheFactory;
@@ -125,7 +123,8 @@ public class DefaultProjectBuilder
         this.dependencyResolver = dependencyResolver;
         this.modelCacheFactory = modelCacheFactory;
     }
-// ----------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
 
@@ -406,12 +405,6 @@ public class DefaultProjectBuilder
         finally
         {
             Thread.currentThread().setContextClassLoader( oldContextClassLoader );
-        }
-
-        if ( Features.buildConsumer( request.getUserProperties() ).isActive() )
-        {
-            request.getRepositorySession().getData().set( TransformerContext.KEY,
-                                                          config.transformerContextBuilder.build() );
         }
 
         if ( !noErrors )
