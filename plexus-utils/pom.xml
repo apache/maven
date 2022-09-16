@@ -37,7 +37,7 @@ under the License.
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <version>3.4.2</version>
+            <version>${plexusUtilsVersionEmbedded}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
@@ -55,8 +55,8 @@ under the License.
                 <version>3.1.1</version>
                 <executions>
                     <execution>
-                        <id>unpack</id>
-                        <phase>compile</phase>
+                        <id>unpack-sourcs</id>
+                        <phase>generate-sources</phase>
                         <goals>
                             <goal>unpack</goal>
                         </goals>
@@ -65,7 +65,32 @@ under the License.
                                 <artifactItem>
                                     <groupId>org.codehaus.plexus</groupId>
                                     <artifactId>plexus-utils</artifactId>
-                                    <version>3.4.2</version>
+                                    <version>${plexusUtilsVersionEmbedded}</version>
+                                    <classifier>sources</classifier>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                                    <includes>**/*.java</includes>
+                                    <excludes>
+                                        org/codehaus/plexus/util/xml/Xpp3Dom.java,
+                                        org/codehaus/plexus/util/xml/Xpp3DomBuilder.java
+                                    </excludes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>unpack-classes</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.codehaus.plexus</groupId>
+                                    <artifactId>plexus-utils</artifactId>
+                                    <version>${plexusUtilsVersionEmbedded}</version>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/classes</outputDirectory>
@@ -95,6 +120,38 @@ under the License.
                             <includes>**/*.java</includes>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>target/generated-sources</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <configuration>
+                            <skipMain>true</skipMain>
                         </configuration>
                     </execution>
                 </executions>
