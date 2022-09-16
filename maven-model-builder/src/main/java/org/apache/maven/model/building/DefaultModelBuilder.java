@@ -1895,7 +1895,7 @@ public class DefaultModelBuilder
                     {
                         Model model = readRawModel( req, problems );
                         DefaultTransformerContext.GAKey key =
-                                new DefaultTransformerContext.GAKey( model.getGroupId(), model.getArtifactId() );
+                                new DefaultTransformerContext.GAKey( getGroupId( model ), model.getArtifactId() );
                         context.modelByGA.computeIfAbsent( key, k -> new DefaultTransformerContext.Holder() )
                                 .computeIfAbsent( () -> model );
                         return model;
