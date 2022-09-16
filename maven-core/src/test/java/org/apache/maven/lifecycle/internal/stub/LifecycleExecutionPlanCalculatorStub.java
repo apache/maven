@@ -16,6 +16,7 @@
 package org.apache.maven.lifecycle.internal.stub;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
@@ -38,6 +39,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.ArrayList;
@@ -205,7 +207,20 @@ public class LifecycleExecutionPlanCalculatorStub
     {
         final List<ExecutionPlanItem> planItemList =
             ExecutionPlanItem.createExecutionPlanItems( project, mojoExecutions );
-        return new MavenExecutionPlan( planItemList, DefaultLifecyclesStub.createDefaultLifecycles() );
+        return new MavenExecutionPlan( planItemList, getDefaultLifecycles());
+    }
+
+    private static DefaultLifecycles getDefaultLifecycles()
+    {
+        try
+        {
+            return DefaultLifecyclesStub.createDefaultLifecycles();
+        }
+        catch ( ComponentLookupException e )
+        {
+            // ignore
+            return null;
+        }
     }
 
     private static MojoExecution createMojoExecution( String goal, String executionId, MojoDescriptor mojoDescriptor )

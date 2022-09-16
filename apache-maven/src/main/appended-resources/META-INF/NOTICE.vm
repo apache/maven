@@ -18,9 +18,9 @@
 ##
 This software bundles the following NOTICE files from third party library providers:
 
-META-INF/NOTICE in archive lib/guice-4.2.1-no_aop.jar
+META-INF/NOTICE in archive lib/guice-5.1.0.jar
 Google Guice - Core Library
-Copyright 2006-2018 Google, Inc.
+Copyright 2006-2022 Google, Inc.
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 
