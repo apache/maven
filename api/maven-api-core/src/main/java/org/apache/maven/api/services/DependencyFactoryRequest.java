@@ -32,6 +32,10 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.annotations.NotThreadSafe;
 
+/**
+ *
+ * @since 4.0
+ */
 @Experimental
 @Immutable
 public interface DependencyFactoryRequest

@@ -20,11 +20,23 @@ package org.apache.maven.api.annotations;
  */
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
+/**
+ * The {@code ThreadSafe} annotation can be used to indicate a given type
+ * is thread safe.  {@link Immutable} objects are automatically thread safe.
+ *
+ * @see Immutable
+ * @see NotThreadSafe
+ * @since 4.0
+ */
+@Experimental
 @Documented
 @Retention( RetentionPolicy.CLASS )
+@Target( ElementType.TYPE )
 public @interface ThreadSafe
 {
 }

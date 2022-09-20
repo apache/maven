@@ -30,6 +30,8 @@ import org.apache.maven.api.Session;
 
 /**
  * Base class for requests.
+ *
+ * @since 4.0
  */
 @Experimental
 abstract class BaseRequest

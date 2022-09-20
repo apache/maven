@@ -28,6 +28,11 @@ import java.util.Optional;
 
 import org.apache.maven.api.Project;
 
+/**
+ * Result of a project build call.
+ *
+ * @since 4.0
+ */
 @Experimental
 public interface ProjectBuilderResult
 {

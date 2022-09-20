@@ -27,6 +27,8 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Service used to create {@link Artifact} objects.
+ *
+ * @since 4.0
  */
 @Experimental
 public interface ArtifactFactory extends Service

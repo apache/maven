@@ -28,6 +28,8 @@ import java.util.Optional;
  * Event sent by maven during various phases of the build process.
  * Such events can be listened to using {@link Listener}s objects
  * registered in the {@link Session}.
+ *
+ * @since 4.0
  */
 @Experimental
 public interface Event

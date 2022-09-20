@@ -23,6 +23,8 @@ import org.apache.maven.api.annotations.Experimental;
 
 /**
  * The different severity levels for a problem, in decreasing order.
+ *
+ * @since 4.0
  */
 @Experimental
 public enum ProjectBuilderProblemSeverity

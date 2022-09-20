@@ -20,11 +20,20 @@ package org.apache.maven.api.annotations;
  */
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
+/**
+ * This annotation indicates that a type is automatically generated.
+ *
+ * @since 4.0
+ */
+@Experimental
 @Documented
 @Retention( RetentionPolicy.CLASS )
+@Target( ElementType.TYPE )
 public @interface Generated
 {
 }

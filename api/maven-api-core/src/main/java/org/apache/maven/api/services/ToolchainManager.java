@@ -29,6 +29,11 @@ import org.apache.maven.api.Toolchain;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
+/**
+ * Service to manage {@link Toolchain}s.
+ *
+ * @since 4.0
+ */
 @Experimental
 public interface ToolchainManager extends Service
 {

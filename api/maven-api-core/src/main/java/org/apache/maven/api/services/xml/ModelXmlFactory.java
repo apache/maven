@@ -22,6 +22,11 @@ package org.apache.maven.api.services.xml;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.model.Model;
 
+/**
+ * Reads or writes a {@link Model} using XML.
+ *
+ * @since 4.0
+ */
 @Experimental
 public interface ModelXmlFactory extends XmlFactory<Model>
 {

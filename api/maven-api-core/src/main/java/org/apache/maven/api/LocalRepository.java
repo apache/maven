@@ -22,9 +22,17 @@ package org.apache.maven.api;
 import java.nio.file.Path;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
+/**
+ * The local repository is used to cache artifacts downloaded from {@link RemoteRepository}
+ * and to hold artifacts that have been build locally.
+ *
+ * @since 4.0
+ */
 @Experimental
+@Immutable
 public interface LocalRepository extends Repository
 {
 

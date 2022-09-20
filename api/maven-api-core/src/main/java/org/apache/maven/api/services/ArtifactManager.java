@@ -30,6 +30,10 @@ import java.util.Optional;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Metadata;
 
+/**
+ *
+ * @since 4.0
+ */
 @Experimental
 public interface ArtifactManager extends Service
 {

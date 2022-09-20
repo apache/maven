@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.maven.api.annotations.Nonnull;
@@ -89,11 +90,12 @@ public class DefaultModelXmlFactory
     {
         nonNull( request, "request can not be null" );
         Model content = nonNull( request.getContent(), "content can not be null" );
+        Path path = request.getPath();
         OutputStream outputStream = request.getOutputStream();
         Writer writer = request.getWriter();
-        if ( writer == null && outputStream == null )
+        if ( writer == null && outputStream == null && path == null )
         {
-            throw new IllegalArgumentException( "writer or outputStream must be non null" );
+            throw new IllegalArgumentException( "writer, outputStream or path must be non null" );
         }
         try
         {
@@ -101,9 +103,16 @@ public class DefaultModelXmlFactory
             {
                 new MavenXpp3WriterEx().write( writer, content );
             }
-            else
+            else if ( outputStream != null )
             {
                 new MavenXpp3WriterEx().write( outputStream, content );
+            }
+            else
+            {
+                try ( OutputStream os = Files.newOutputStream( path ) )
+                {
+                    new MavenXpp3WriterEx().write( outputStream, content );
+                }
             }
         }
         catch ( Exception e )

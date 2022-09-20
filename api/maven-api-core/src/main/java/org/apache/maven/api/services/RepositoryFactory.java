@@ -28,6 +28,11 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Repository;
 
+/**
+ * Factory service to create {@link LocalRepository} or {@link RemoteRepository} objects.
+ *
+ * @since 4.0
+ */
 @Experimental
 public interface RepositoryFactory extends Service
 {

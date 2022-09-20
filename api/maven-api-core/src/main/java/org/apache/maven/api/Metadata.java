@@ -23,6 +23,8 @@ import org.apache.maven.api.annotations.Experimental;
 
 /**
  * TODO: investigate removing the Metadata api completely
+ *
+ * @since 4.0
  */
 @Experimental
 public interface Metadata

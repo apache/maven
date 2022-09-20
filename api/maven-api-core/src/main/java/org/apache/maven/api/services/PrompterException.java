@@ -22,7 +22,9 @@ package org.apache.maven.api.services;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * The Exception class in case a the prompter can not perform a call.
+ * The Exception class throw by the {@link Prompter} service.
+ *
+ * @since 4.0
  */
 @Experimental
 public class PrompterException

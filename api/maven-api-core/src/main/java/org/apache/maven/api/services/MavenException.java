@@ -21,6 +21,11 @@ package org.apache.maven.api.services;
 
 import org.apache.maven.api.annotations.Experimental;
 
+/**
+ * Base class for all maven exceptions.
+ *
+ * @since 4.0
+ */
 @Experimental
 public class MavenException extends RuntimeException
 {
@@ -43,8 +48,4 @@ public class MavenException extends RuntimeException
         super( cause );
     }
 
-    public MavenException( String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace )
-    {
-        super( message, cause, enableSuppression, writableStackTrace );
-    }
 }

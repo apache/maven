@@ -24,6 +24,9 @@ import org.apache.maven.api.annotations.Nonnull;
 
 import org.apache.maven.api.model.Plugin;
 
+/**
+ * A {@code MojoExecution}
+ */
 @Experimental
 public interface MojoExecution
 {

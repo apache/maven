@@ -26,6 +26,10 @@ import org.apache.maven.api.annotations.Immutable;
 
 import java.util.Collection;
 
+/**
+ *
+ * @since 4.0
+ */
 @Experimental
 @Immutable
 public interface Dependency

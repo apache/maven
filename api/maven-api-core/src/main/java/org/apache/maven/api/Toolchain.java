@@ -25,6 +25,8 @@ import org.apache.maven.api.annotations.Experimental;
 
 /**
  * Toolchain interface.
+ *
+ * @since 4.0
  */
 @Experimental
 public interface Toolchain

@@ -23,6 +23,13 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+/**
+ * The annotated element can be {@code null}.
+ *
+ * @see Nonnull
+ * @since 4.0
+ */
+@Experimental
 @Documented
 @Retention( RetentionPolicy.CLASS )
 public @interface Nullable

@@ -22,6 +22,11 @@ package org.apache.maven.api.services.xml;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.settings.Settings;
 
+/**
+ * Reads and writes a {@link Settings} object to/from XML.
+ *
+ * @since 4.0
+ */
 @Experimental
 public interface SettingsXmlFactory extends XmlFactory<Settings>
 {

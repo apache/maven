@@ -25,8 +25,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * The Artifact Result
  * 
- * @author Robert Scholte
- * @since 3.0
+ * @since 4.0
  */
 @Experimental
 public interface ArtifactResolverResult

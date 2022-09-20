@@ -27,8 +27,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Defines a hierarchical visitor for collecting dependency node trees.
  * 
- * @author Pim Moerenhout
- * @since 0.12
+ * @since 4.0
  */
 @Experimental
 @Consumer

@@ -42,6 +42,8 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
  * A request to collect and resolve a dependency graph.
+ *
+ * @since 4.0
  */
 @Experimental
 @Immutable

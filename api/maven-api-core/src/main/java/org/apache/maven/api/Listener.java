@@ -25,6 +25,8 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * A listener for session events.
+ *
+ * @since 4.0
  */
 @Experimental
 @FunctionalInterface @Consumer

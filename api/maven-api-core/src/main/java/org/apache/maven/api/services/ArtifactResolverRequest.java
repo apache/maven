@@ -29,6 +29,8 @@ import org.apache.maven.api.annotations.NotThreadSafe;
 
 /**
  * A request for resolving an artifact.
+ *
+ * @since 4.0
  */
 @Experimental
 @Immutable

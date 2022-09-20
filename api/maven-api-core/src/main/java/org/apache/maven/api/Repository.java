@@ -20,9 +20,18 @@ package org.apache.maven.api;
  */
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
+/**
+ * A repository holds artifacts.
+ *
+ * @since 4.0
+ * @see RemoteRepository
+ * @see LocalRepository
+ */
 @Experimental
+@Immutable
 public interface Repository
 {
 

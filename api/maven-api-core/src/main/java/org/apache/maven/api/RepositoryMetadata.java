@@ -21,6 +21,10 @@ package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
 
+/**
+ *
+ * @since 4.0
+ */
 @Experimental
 public interface RepositoryMetadata extends Metadata
 {

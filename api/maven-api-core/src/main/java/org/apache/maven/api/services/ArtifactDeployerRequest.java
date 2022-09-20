@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
  */
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 import java.util.Collection;
@@ -32,8 +33,11 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
  * A request for deploying one or more artifacts to a remote repository.
+ *
+ * @since 4.0
  */
 @Experimental
+@Immutable
 public interface ArtifactDeployerRequest
 {
 

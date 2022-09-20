@@ -29,6 +29,10 @@ import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 
+/**
+ *
+ * @since 4.0
+ */
 @Experimental
 public interface LocalRepositoryManager extends Service
 {

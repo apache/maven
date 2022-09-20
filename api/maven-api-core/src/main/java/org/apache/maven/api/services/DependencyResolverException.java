@@ -23,6 +23,8 @@ import org.apache.maven.api.annotations.Experimental;
 
 /**
  * The Exception class in case a resolving does not work.
+ *
+ * @since 4.0
  */
 @Experimental
 public class DependencyResolverException

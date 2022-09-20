@@ -24,6 +24,8 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * A range of versions.
+ *
+ * @since 4.0
  */
 @Experimental
 public interface VersionRange

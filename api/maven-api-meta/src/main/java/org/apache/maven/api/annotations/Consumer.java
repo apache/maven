@@ -20,23 +20,28 @@ package org.apache.maven.api.annotations;
  */
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * A type implemented by, or extended by maven plugins or extensions.
  * Maven plugins or extensions may provide implementations of those types which will be used by maven.
- *
+ * <p>
  * A type can be marked {@link Consumer} or {@link Provider} but not both. A type is assumed to be
  * {@link Consumer} if it is not marked either {@link Consumer} or {@link Provider}.
- *
+ * <p>
  * A package can be marked {@link Provider}. In this case, all types in the package are considered
  * to be a provider type regardless of whether they are marked {@link Consumer} or {@link Provider}.
  *
  * @see Provider
+ * @since 4.0
  */
+@Experimental
 @Documented
 @Retention( RetentionPolicy.CLASS )
+@Target( { ElementType.TYPE, ElementType.PACKAGE } )
 public @interface Consumer
 {
 }

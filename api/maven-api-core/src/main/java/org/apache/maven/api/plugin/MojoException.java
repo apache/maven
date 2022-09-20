@@ -23,7 +23,8 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.services.MavenException;
 
 /**
- * An exception occurring during the execution of a plugin.<br>
+ * An exception occurring during the execution of a plugin.
+ *
  * @since 4.0
  */
 @Experimental

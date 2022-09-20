@@ -33,6 +33,8 @@ import org.apache.maven.api.Artifact;
 
 /**
  * A request for installing one or more artifacts in the local repository.
+ *
+ * @since 4.0
  */
 @Experimental
 @Immutable

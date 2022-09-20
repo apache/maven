@@ -27,6 +27,8 @@ import org.apache.maven.api.annotations.Experimental;
  * TODO: those values are lower cased, while other events are upper-case
  *       we need to align on one strategy
  *       see also {@link MetadataStorage} and {@link org.apache.maven.api.services.ResolutionScope}
+ *
+ * @since 4.0
  */
 @Experimental
 public enum EventType

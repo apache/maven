@@ -29,7 +29,10 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * 
+ * Deploys {@link Artifact}s to a {@link RemoteRepository}.
+ *
+ * @since 4.0
+ * @see Session#deployArtifact(RemoteRepository, Artifact...)
  */
 @Experimental
 public interface ArtifactDeployer extends Service

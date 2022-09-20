@@ -23,14 +23,33 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Path;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.Service;
 
+/**
+ * Generic interface to read/write objects to/from XML.
+ *
+ * @param <T> the object type to read/write
+ * @since 4.0
+ */
 @Experimental
 public interface XmlFactory<T> extends Service
 {
+
+    @Nonnull
+    default T read( @Nonnull Path path ) throws XmlReaderException
+    {
+        return read( path, true );
+    }
+
+    @Nonnull
+    default T read( @Nonnull Path path, boolean strict ) throws XmlReaderException
+    {
+        return read( XmlReaderRequest.builder().path( path ).strict( strict ).build() );
+    }
 
     @Nonnull
     default T read( @Nonnull InputStream input ) throws XmlReaderException
@@ -58,6 +77,11 @@ public interface XmlFactory<T> extends Service
 
     @Nonnull
     T read( @Nonnull XmlReaderRequest request ) throws XmlReaderException;
+
+    default void write( @Nonnull T content, @Nonnull Path path ) throws XmlWriterException
+    {
+        write( XmlWriterRequest.<T>builder().content( content ).path( path ).build() );
+    }
 
     default void write( @Nonnull T content, @Nonnull OutputStream outputStream ) throws XmlWriterException
     {

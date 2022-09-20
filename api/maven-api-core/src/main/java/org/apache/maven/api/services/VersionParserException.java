@@ -22,7 +22,9 @@ package org.apache.maven.api.services;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * The Exception class in case a resolving does not work.
+ * The Exception class thrown by {@link VersionParser}.
+ *
+ * @since 4.0
  */
 @Experimental
 public class VersionParserException

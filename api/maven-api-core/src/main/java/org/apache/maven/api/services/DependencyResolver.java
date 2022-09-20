@@ -34,8 +34,7 @@ import org.apache.maven.api.annotations.Nullable;
  * The DependencyResolver service can be used to collect the dependencies
  * and download the artifacts.
  *
- * @author Robert Scholte
- * @author Guillaume Nodet
+ * @since 4.0
  */
 @Experimental
 public interface DependencyResolver extends Service

@@ -32,6 +32,8 @@ import java.util.Optional;
  * <resolver-version-artifact> : version
  * ResolvedArtifact: version + file
  * AttachedArtifact:
+ *
+ * @since 4.0
  */
 @Experimental
 @Immutable

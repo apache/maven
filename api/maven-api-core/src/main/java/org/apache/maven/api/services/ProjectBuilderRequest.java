@@ -33,6 +33,12 @@ import org.apache.maven.api.Artifact;
 
 import static org.apache.maven.api.services.BaseRequest.nonNull;
 
+/**
+ * Request used to build a {@link org.apache.maven.api.Project} using
+ * the {@link ProjectBuilder} service.
+ *
+ * @since 4.0
+ */
 @Experimental
 @Immutable
 public interface ProjectBuilderRequest

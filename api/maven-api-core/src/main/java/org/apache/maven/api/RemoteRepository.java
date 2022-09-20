@@ -20,9 +20,14 @@ package org.apache.maven.api;
  */
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
+/**
+ * A remote repository that can be used to download or upload artifacts.
+ */
 @Experimental
+@Immutable
 public interface RemoteRepository extends Repository
 {
 

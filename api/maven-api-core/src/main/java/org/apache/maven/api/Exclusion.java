@@ -22,6 +22,12 @@ package org.apache.maven.api;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nullable;
 
+/**
+ * A dependency exlusion.
+ *
+ * @since 4.0
+ * @see Dependency#getExclusions()
+ */
 @Experimental
 public interface Exclusion
 {

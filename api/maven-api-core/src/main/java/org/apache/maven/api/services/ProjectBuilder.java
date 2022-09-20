@@ -28,6 +28,9 @@ import java.nio.file.Path;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
 
+/**
+ * @since 4.0
+ */
 @Experimental
 public interface ProjectBuilder extends Service
 {

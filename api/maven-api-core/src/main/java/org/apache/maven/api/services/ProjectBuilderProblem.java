@@ -22,12 +22,10 @@ package org.apache.maven.api.services;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * Describes a problem that was encountered during settings building. A problem can either be an exception that was
- * thrown or a simple string message. In addition, a problem carries a hint about its source, e.g. the settings file
- * that exhibits the problem.
+ * Describes a problem that was encountered during project building. A problem can either be an exception that was
+ * thrown or a simple string message. In addition, a problem carries a hint about its source.
  *
- * @author Benjamin Bentmann
- * @author Robert Scholte
+ * @since 4.0
  */
 @Experimental
 public interface ProjectBuilderProblem

@@ -25,6 +25,8 @@ import org.apache.maven.api.annotations.Experimental;
  * Resolution scope
  * TODO: merge this with {@link org.apache.maven.api.plugin.annotations.ResolutionScope}
  * TODO: should this simply be an EnumSet<Scope> instead ?
+ *
+ * @since 4.0
  */
 @Experimental
 public enum ResolutionScope

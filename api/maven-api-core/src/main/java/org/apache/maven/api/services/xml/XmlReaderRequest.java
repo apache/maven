@@ -29,6 +29,11 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 
+/**
+ * An XML reader request.
+ *
+ * @since 4.0
+ */
 @Experimental
 @Immutable
 public interface XmlReaderRequest

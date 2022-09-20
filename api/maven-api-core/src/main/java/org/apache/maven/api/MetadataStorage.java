@@ -23,6 +23,8 @@ import org.apache.maven.api.annotations.Experimental;
 
 /**
  * Storage location for metadata
+ *
+ * @since 4.0
  */
 @Experimental
 public enum MetadataStorage

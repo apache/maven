@@ -24,6 +24,11 @@ import java.io.InputStream;
 
 import org.apache.maven.api.annotations.Experimental;
 
+/**
+ * The source for a project's XML model.
+ *
+ * @since 4.0
+ */
 @Experimental
 public interface ProjectBuilderSource
 {

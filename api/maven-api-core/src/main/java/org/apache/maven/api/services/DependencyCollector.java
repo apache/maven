@@ -34,8 +34,7 @@ import org.apache.maven.api.Project;
  * The dependencies collection mechanism will not download any artifacts,
  * and only the pom files will be downloaded.
  *
- * @author Robert Scholte
- * @author Guillaume Nodet
+ * @since 4.0
  */
 @Experimental
 public interface DependencyCollector extends Service

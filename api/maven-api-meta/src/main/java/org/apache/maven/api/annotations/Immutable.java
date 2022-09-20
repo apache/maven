@@ -20,12 +20,24 @@ package org.apache.maven.api.annotations;
  */
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
+/**
+ * The {@code Immutable} annotation indicates that the object is immutable, i.e.
+ * none of its field can be changed.  This also ensures that the type is
+ * {@link ThreadSafe}.
+ *
+ * @see ThreadSafe
+ * @since 4.0
+ */
+@Experimental
 @Documented
 @Retention( RetentionPolicy.CLASS )
 @ThreadSafe
+@Target( ElementType.TYPE )
 public @interface Immutable
 {
 }

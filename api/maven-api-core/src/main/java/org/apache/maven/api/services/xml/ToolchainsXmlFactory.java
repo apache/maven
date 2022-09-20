@@ -22,6 +22,11 @@ package org.apache.maven.api.services.xml;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.toolchain.PersistedToolchains;
 
+/**
+ * Reads and writes a {@link PersistedToolchains} object to/from XML.
+ *
+ * @since 4.0
+ */
 @Experimental
 public interface ToolchainsXmlFactory extends XmlFactory<PersistedToolchains>
 {

@@ -26,7 +26,9 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Service interface to parse version and version ranges
+ * Service interface to parse {@link Version} and {@link VersionRange}.
+ * 
+ * @since 4.0
  */
 @Experimental
 public interface VersionParser extends Service
@@ -37,6 +39,7 @@ public interface VersionParser extends Service
      * @param version The version string to parse, must not be {@code null}.
      * @return The parsed version, never {@code null}.
      * @throws VersionParserException If the string violates the syntax rules of this scheme.
+     * @see org.apache.maven.api.Session#parseVersion(String) 
      */
     @Nonnull
     Version parseVersion( @Nonnull String version );

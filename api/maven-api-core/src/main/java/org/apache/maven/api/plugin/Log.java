@@ -28,6 +28,8 @@ import java.util.function.Supplier;
  * <code>java.lang.CharSequence</code> rather than <code>java.lang.String</code>. This is provided mainly as a
  * convenience, to enable developers to pass things like <code>java.lang.StringBuffer</code> directly into the logger,
  * rather than formatting first by calling <code>toString()</code>.
+ *
+ * @since 4.0
  */
 public interface Log
 {

@@ -21,6 +21,7 @@ package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,9 @@ import java.util.stream.Stream;
 
 /**
  * Represents a dependency node within a Maven project's dependency collector.
+ *
+ * @since 4.0
+ * @see org.apache.maven.api.services.DependencyCollectorResult#getRoot()
  */
 @Experimental
 @Immutable
@@ -49,16 +53,19 @@ public interface Node
      *
      * @return the child nodes of this node, never {@code null}
      */
+    @Nonnull
     List<Node> getChildren();
 
     /**
      * @return repositories of this node
      */
+    @Nonnull
     List<Repository> getRemoteRepositories();
 
     /**
      * The repository where this artifact has been downloaded from.
      */
+    @Nonnull
     Optional<RemoteRepository> getRepository();
 
     /**
@@ -67,7 +74,7 @@ public interface Node
      * @param visitor The visitor to call back, must not be {@code null}.
      * @return {@code true} to visit siblings nodes of this node as well, {@code false} to skip siblings.
      */
-    boolean accept( NodeVisitor visitor );
+    boolean accept( @Nonnull NodeVisitor visitor );
 
     /**
      * Returns a new tree starting at this node, filtering the children.
@@ -84,6 +91,7 @@ public interface Node
      *
      * @return a stream containing this node and its descendant
      */
+    @Nonnull
     default Stream<Node> stream()
     {
         return Stream.concat( Stream.of( this ), getChildren().stream().flatMap( Node::stream ) );

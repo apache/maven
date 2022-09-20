@@ -28,8 +28,13 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.annotations.ThreadSafe;
 
+/**
+ * An immutable xml node.
+ *
+ * @since 4.0
+ */
 @Experimental
-@ThreadSafe  @Immutable
+@ThreadSafe @Immutable
 public interface Dom
 {
 

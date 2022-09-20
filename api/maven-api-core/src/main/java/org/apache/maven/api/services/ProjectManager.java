@@ -35,7 +35,9 @@ import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 
 /**
- * Interface to manage the project during its lifecycle
+ * Interface to manage the project during its lifecycle.
+ *
+ * @since 4.0
  */
 @Experimental
 public interface ProjectManager extends Service

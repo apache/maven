@@ -23,7 +23,8 @@ import org.apache.maven.api.annotations.Experimental;
 
 /**
  * An artifact could not correctly being deployed.
- * 
+ *
+ * @since 4.0
  */
 @Experimental
 public class ArtifactDeployerException

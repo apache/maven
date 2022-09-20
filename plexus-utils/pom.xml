@@ -69,7 +69,7 @@ under the License.
                                     <classifier>sources</classifier>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/generated-sources/plexus-utils</outputDirectory>
                                     <includes>**/*.java</includes>
                                     <excludes>
                                         org/codehaus/plexus/util/xml/Xpp3Dom.java,
@@ -137,7 +137,7 @@ under the License.
                         </goals>
                         <configuration>
                             <sources>
-                                <source>target/generated-sources</source>
+                                <source>target/generated-sources/plexus-utils</source>
                             </sources>
                         </configuration>
                     </execution>

@@ -37,6 +37,7 @@ import java.util.function.Supplier;
  * <strong>Note:</strong> Actual implementations must be thread-safe.
  * 
  * @see Session#getData()
+ * @since 4.0
  */
 @Experimental
 @ThreadSafe @Provider

@@ -26,6 +26,11 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.NotThreadSafe;
 
+/**
+ *
+ *
+ * @since 4.0
+ */
 @Experimental
 @Immutable
 public interface ArtifactFactoryRequest

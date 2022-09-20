@@ -25,9 +25,8 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * 
- * @author Robert Scholte
  *
+ * @since 4.0
  */
 @Experimental
 public interface DependencyResolverResult

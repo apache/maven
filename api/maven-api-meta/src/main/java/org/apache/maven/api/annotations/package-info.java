@@ -1,4 +1,13 @@
-package org.apache.maven.api.services;
+// CHECKSTYLE_OFF: RegexpHeader
+/**
+ * This package contains non-functional annotations which are
+ * used to tag various elements and help users understanding
+ * how those types should be used.
+ *
+ * @since 4.0
+ */
+@Experimental
+package org.apache.maven.api.annotations;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,29 +28,3 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
-import org.apache.maven.api.annotations.Experimental;
-
-/**
- * Thrown in case of bad artifact descriptors, version ranges or other
- * issues encountered during calculation of the dependency graph.
- *
- * @since 4.0
- */
-@Experimental
-public class DependencyCollectorException
-    extends MavenException
-{
-    /**
-     *
-     */
-    private static final long serialVersionUID = -3134726259840210686L;
-
-    /**
-     * @param message The message you would give for the exception.
-     * @param cause The cause which is related to the message.
-     */
-    public DependencyCollectorException( String message, Throwable cause )
-    {
-        super( message, cause );
-    }
-}

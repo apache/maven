@@ -28,7 +28,10 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * @author Robert Scholte
+ * Installs {@link Artifact}s to the local repository.
+ *
+ * @since 4.0
+ * @see Session#withLocalRepository(org.apache.maven.api.LocalRepository)
  */
 @Experimental
 public interface ArtifactInstaller extends Service
