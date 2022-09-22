@@ -19,6 +19,8 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import org.apache.maven.api.Type;
+import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
@@ -38,6 +40,7 @@ import org.apache.maven.api.Project;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ArtifactManager;
+import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.project.MavenProject;
 
 public class DefaultProject implements Project
@@ -146,12 +149,41 @@ public class DefaultProject implements Project
     {
         return new Dependency()
         {
-            @Nonnull
             @Override
-            public Artifact getArtifact()
+            public String getGroupId()
             {
-                return session.createArtifact( dependency.getGroupId(), dependency.getArtifactId(),
-                        dependency.getVersion(), null, null, dependency.getType() );
+                return dependency.getGroupId();
+            }
+
+            @Override
+            public String getArtifactId()
+            {
+                return dependency.getArtifactId();
+            }
+
+            @Override
+            public String getClassifier()
+            {
+                return dependency.getClassifier();
+            }
+
+            @Override
+            public VersionRange getVersion()
+            {
+                return session.parseVersionRange( dependency.getVersion() );
+            }
+
+            @Override
+            public String getExtension()
+            {
+                return getType().getExtension();
+            }
+
+            @Override
+            public Type getType()
+            {
+                String type = dependency.getType();
+                return session.getService( TypeRegistry.class ).getType( type );
             }
 
             @Nonnull

@@ -19,14 +19,16 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
-import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
-
 import java.util.Collection;
 
-import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Exclusion;
+import org.apache.maven.api.Type;
+import org.apache.maven.api.VersionRange;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.services.TypeRegistry;
+import org.eclipse.aether.artifact.ArtifactProperties;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
@@ -48,11 +50,42 @@ public class DefaultDependency implements Dependency
         return dependency;
     }
 
-    @Nonnull
     @Override
-    public Artifact getArtifact()
+    public String getGroupId()
     {
-        return session.getArtifact( dependency.getArtifact() );
+        return dependency.getArtifact().getGroupId();
+    }
+
+    @Override
+    public String getArtifactId()
+    {
+        return dependency.getArtifact().getArtifactId();
+    }
+
+    @Override
+    public String getClassifier()
+    {
+        return dependency.getArtifact().getClassifier();
+    }
+
+    @Override
+    public VersionRange getVersion()
+    {
+        return session.parseVersionRange( dependency.getArtifact().getVersion() );
+    }
+
+    @Override
+    public String getExtension()
+    {
+        return dependency.getArtifact().getExtension();
+    }
+
+    @Override
+    public Type getType()
+    {
+        String type = dependency.getArtifact().getProperty( ArtifactProperties.TYPE,
+                            dependency.getArtifact().getExtension() );
+        return session.getService( TypeRegistry.class ).getType( type );
     }
 
     @Nonnull

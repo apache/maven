@@ -1,4 +1,4 @@
-package org.apache.maven.api;
+package org.apache.maven.api.services;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,34 +19,29 @@ package org.apache.maven.api;
  * under the License.
  */
 
+import org.apache.maven.api.Service;
+import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * A version usually parsed using the {@link org.apache.maven.api.services.VersionParser} service.
+ * Access to {@link Type} registry.
  *
  * @since 4.0
- * @see org.apache.maven.api.services.VersionParser#parseVersion(String)
- * @see org.apache.maven.api.Session#parseVersion(String)
  */
 @Experimental
-public interface Version
-    extends Comparable<Version>
+public interface TypeRegistry extends Service
 {
 
     /**
-     * Determines whether this artifact uses a snapshot version.
+     * Obtain the {@link Type} from the specified {@code id}.
+     * If no type is known for {@code id}, the registry will
+     * create a custom {@code Type} for it.
      *
-     * @return {@code true} if the artifact is a snapshot, {@code false} otherwise.
-     * @see org.apache.maven.api.Session#isVersionSnapshot(String)
-     */
-    boolean isSnapshot();
-
-    /**
-     * Returns a string representation of this version.
-     * @return the string representation of this version
+     * @param id the id of the type to retrieve
+     * @return the type
      */
     @Nonnull
-    String toString();
+    Type getType( @Nonnull String id );
 
 }

@@ -173,6 +173,19 @@ public interface Session
      * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
      * @see org.apache.maven.api.services.ArtifactFactory#create(Session, String, String, String, String)
      */
+    Coordinate createCoordinate( String groupId, String artifactId, String version, String extension );
+
+    /**
+     * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
+     * @see org.apache.maven.api.services.ArtifactFactory#create(Session, String, String, String, String, String, String)
+     */
+    Coordinate createCoordinate( String groupId, String artifactId, String version, String classifier,
+                                 String extension, String type );
+
+    /**
+     * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
+     * @see org.apache.maven.api.services.ArtifactFactory#create(Session, String, String, String, String)
+     */
     Artifact createArtifact( String groupId, String artifactId, String version, String extension );
 
     /**
@@ -184,11 +197,11 @@ public interface Session
 
     /**
      * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
-     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Artifact)
+     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Coordinate)
      *
      * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
      */
-    Artifact resolveArtifact( Artifact artifact );
+    Artifact resolveArtifact( Coordinate artifact );
 
     /**
      * Shortcut for {@code getService(ArtifactInstaller.class).install(...)}

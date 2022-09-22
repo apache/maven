@@ -24,6 +24,8 @@ import javax.inject.Inject;
 import java.nio.file.Paths;
 import java.util.Collections;
 
+import org.apache.maven.api.Coordinate;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
@@ -80,6 +82,9 @@ public class TestApi
     @Inject
     RuntimeInformation runtimeInformation;
 
+    @Inject
+    ArtifactHandlerManager artifactHandlerManager;
+
     @BeforeEach
     void setup()
     {
@@ -89,7 +94,8 @@ public class TestApi
         DefaultSession session = new DefaultSession( ms, repositorySystem,
                                                      Collections.emptyList(), projectBuilder,
                                                      mavenRepositorySystem, toolchainManagerPrivate,
-                                                     plexusContainer, mojoExecutionScope, runtimeInformation );
+                                                     plexusContainer, mojoExecutionScope, runtimeInformation,
+                                                     artifactHandlerManager );
         DefaultLocalRepository localRepository = new DefaultLocalRepository(
                 new LocalRepository( "target/test-classes/apiv4-repo" ) );
         org.apache.maven.api.RemoteRepository remoteRepository = session.getRemoteRepository(
@@ -103,11 +109,9 @@ public class TestApi
     @Test
     void testCreateAndResolveArtifact() throws Exception
     {
-        Artifact artifact = session.createArtifact( "org.codehaus.plexus", "plexus-utils", "1.4.5", "pom" );
-        assertFalse( artifact.getPath().isPresent() );
+        Coordinate coord = session.createCoordinate( "org.codehaus.plexus", "plexus-utils", "1.4.5", "pom" );
 
-        Artifact resolved =  session.resolveArtifact( artifact );
-        assertNotSame( resolved, artifact );
+        Artifact resolved =  session.resolveArtifact( coord );
         assertTrue( resolved.getPath().isPresent() );
         assertNotNull( resolved.getPath().get() );
 
@@ -117,7 +121,7 @@ public class TestApi
                 .getProject().get();
         assertNotNull( project );
 
-        artifact = session.createArtifact( "org.codehaus.plexus", "plexus-container-default", "1.0-alpha-32", "jar" );
+        Artifact artifact = session.createArtifact( "org.codehaus.plexus", "plexus-container-default", "1.0-alpha-32", "jar" );
         Node root = session.collectDependencies( artifact );
         assertNotNull( root );
     }

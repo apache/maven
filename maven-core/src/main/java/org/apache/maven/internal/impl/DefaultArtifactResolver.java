@@ -55,7 +55,7 @@ public class DefaultArtifactResolver implements ArtifactResolver
         try
         {
             ArtifactRequest req = new ArtifactRequest()
-                    .setArtifact( session.toArtifact( request.getArtifact() ) )
+                    .setArtifact( session.toArtifact( request.getCoordinate() ) )
                     .setRepositories( session.toRepositories( session.getRemoteRepositories() ) );
             ArtifactResult res = repositorySystem.resolveArtifact( session.getSession(), req );
             return new ArtifactResolverResult()

@@ -19,6 +19,7 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.Coordinate;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
@@ -51,7 +52,7 @@ public interface ArtifactResolver extends Service
      *             parameter {@code coordinate} is {@code null} or invalid.
      */
     default ArtifactResolverResult resolve( Session session,
-                                            Artifact artifact )
+                                            Coordinate artifact )
     {
         return resolve( ArtifactResolverRequest.build( session, artifact ) );
     }

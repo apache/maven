@@ -59,6 +59,11 @@ public class DefaultVersionParser implements VersionParser
     @Override
     public boolean isSnapshot( String version )
     {
+        return checkSnapshot( version );
+    }
+
+    private static boolean checkSnapshot( String version )
+    {
         return version.endsWith( SNAPSHOT ) || SNAPSHOT_TIMESTAMP.matcher( version ).matches();
     }
 
@@ -69,6 +74,12 @@ public class DefaultVersionParser implements VersionParser
         DefaultVersion( ArtifactVersion delegate )
         {
             this.delegate = delegate;
+        }
+
+        @Override
+        public boolean isSnapshot()
+        {
+            return checkSnapshot( delegate.toString() );
         }
 
         @Override

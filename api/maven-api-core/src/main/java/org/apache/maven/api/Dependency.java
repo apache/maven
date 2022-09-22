@@ -32,11 +32,8 @@ import java.util.Collection;
  */
 @Experimental
 @Immutable
-public interface Dependency
+public interface Dependency extends Coordinate
 {
-    @Nonnull
-    Artifact getArtifact();
-
     @Nonnull
     String getScope();
 
@@ -45,36 +42,5 @@ public interface Dependency
 
     @Nonnull
     Collection<Exclusion> getExclusions();
-
-    @Nonnull
-    default String getGroupId()
-    {
-        return getArtifact().getGroupId();
-    }
-
-    @Nonnull
-    default String getArtifactId()
-    {
-        return getArtifact().getArtifactId();
-    }
-
-    @Nonnull
-    default String getVersion()
-    {
-        return getArtifact().getVersion();
-    }
-
-    @Nonnull
-    default String getType()
-    {
-        // TODO
-        throw new UnsupportedOperationException( "Not implemented yet" );
-    }
-
-    @Nonnull
-    default String getClassifier()
-    {
-        return getArtifact().getClassifier();
-    }
 
 }

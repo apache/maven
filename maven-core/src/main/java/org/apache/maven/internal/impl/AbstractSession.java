@@ -34,6 +34,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.Coordinate;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Listener;
 import org.apache.maven.api.LocalRepository;
@@ -54,6 +55,7 @@ import org.apache.maven.api.services.ArtifactInstallerException;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.ArtifactResolver;
 import org.apache.maven.api.services.ArtifactResolverException;
+import org.apache.maven.api.services.CoordinateFactory;
 import org.apache.maven.api.services.DependencyCollector;
 import org.apache.maven.api.services.DependencyCollectorException;
 import org.apache.maven.api.services.DependencyFactory;
@@ -190,9 +192,22 @@ public abstract class AbstractSession implements Session
                 artifact.getArtifactId(),
                 artifact.getClassifier(),
                 artifact.getExtension(),
-                artifact.getVersion(),
+                artifact.getVersion().toString(),
                 null,
                 file
+        );
+    }
+
+    public org.eclipse.aether.artifact.Artifact toArtifact( Coordinate coord )
+    {
+        return new org.eclipse.aether.artifact.DefaultArtifact(
+                coord.getGroupId(),
+                coord.getArtifactId(),
+                coord.getClassifier(),
+                coord.getExtension(),
+                coord.getVersion().toString(),
+                null,
+                (File) null
         );
     }
 
@@ -284,6 +299,31 @@ public abstract class AbstractSession implements Session
     }
 
     /**
+     * Shortcut for <code>getService(CoordinateFactory.class).create(...)</code>
+     *
+     * @see ArtifactFactory#create(Session, String, String, String, String)
+     */
+    @Override
+    public Coordinate createCoordinate( String groupId, String artifactId, String version, String extension )
+    {
+        return getService( CoordinateFactory.class )
+                .create( this, groupId, artifactId, version, extension );
+    }
+
+    /**
+     * Shortcut for <code>getService(CoordinateFactory.class).create(...)</code>
+     *
+     * @see CoordinateFactory#create(Session, String, String, String, String, String, String)
+     */
+    @Override
+    public Coordinate createCoordinate( String groupId, String artifactId, String version, String classifier,
+                                        String extension, String type )
+    {
+        return getService( CoordinateFactory.class )
+                .create( this, groupId, artifactId, version, classifier, extension, type );
+    }
+
+    /**
      * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
      *
      * @see ArtifactFactory#create(Session, String, String, String, String)
@@ -312,10 +352,10 @@ public abstract class AbstractSession implements Session
      * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
      *
      * @throws ArtifactResolverException if the artifact resolution failed
-     * @see ArtifactResolver#resolve(Session, Artifact)
+     * @see ArtifactResolver#resolve(Session, Coordinate)
      */
     @Override
-    public Artifact resolveArtifact( Artifact artifact )
+    public Artifact resolveArtifact( Coordinate artifact )
     {
         return getService( ArtifactResolver.class )
                 .resolve( this, artifact )

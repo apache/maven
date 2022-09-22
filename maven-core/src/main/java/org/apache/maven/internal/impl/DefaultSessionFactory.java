@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.api.Session;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
@@ -45,6 +46,7 @@ public class DefaultSessionFactory
     private final PlexusContainer plexusContainer;
     private final MojoExecutionScope mojoExecutionScope;
     private final RuntimeInformation runtimeInformation;
+    private final ArtifactHandlerManager artifactHandlerManager;
 
     @Inject
     @SuppressWarnings( "checkstyle:ParameterNumber" )
@@ -54,7 +56,8 @@ public class DefaultSessionFactory
                                   DefaultToolchainManagerPrivate toolchainManagerPrivate,
                                   PlexusContainer plexusContainer,
                                   MojoExecutionScope mojoExecutionScope,
-                                  RuntimeInformation runtimeInformation )
+                                  RuntimeInformation runtimeInformation,
+                                  ArtifactHandlerManager artifactHandlerManager )
     {
         this.repositorySystem = repositorySystem;
         this.projectBuilder = projectBuilder;
@@ -63,6 +66,7 @@ public class DefaultSessionFactory
         this.plexusContainer = plexusContainer;
         this.mojoExecutionScope = mojoExecutionScope;
         this.runtimeInformation = runtimeInformation;
+        this.artifactHandlerManager = artifactHandlerManager;
     }
 
     public Session getSession( MavenSession mavenSession )
@@ -75,6 +79,7 @@ public class DefaultSessionFactory
     {
         return new DefaultSession(
                 mavenSession, repositorySystem, null, projectBuilder, mavenRepositorySystem,
-                toolchainManagerPrivate, plexusContainer, mojoExecutionScope, runtimeInformation );
+                toolchainManagerPrivate, plexusContainer, mojoExecutionScope, runtimeInformation,
+                artifactHandlerManager );
     }
 }

@@ -20,20 +20,18 @@ package org.apache.maven.api;
  */
 
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Immutable;
-
-import java.nio.file.Path;
-import java.util.Optional;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * An artifact points to a resource such as a jar file or war application.
+ * The {@code Coordinate} object is used to point to an {@link Artifact}
+ * but the version may be specified as a range instead of an exact version.
  *
  * @since 4.0
  */
 @Experimental
 @Immutable
-public interface Artifact
+public interface Coordinate
 {
 
     /**
@@ -66,42 +64,23 @@ public interface Artifact
      * @return The version.
      */
     @Nonnull
-    Version getVersion();
+    VersionRange getVersion();
 
     /**
-     * The file extension of the artifact.
+     * The extension of the artifact.
      *
-     * @return The extension.
+     * @return The extension or an empty string if none, never {@code null}.
      */
     @Nonnull
     String getExtension();
 
     /**
-     * The artifact type.
+     * The type of the artifact.
      *
-     * @return The artifact type, never {@code null}.
+     * @return The type.
      */
     @Nonnull
     Type getType();
-
-    /**
-     * Gets the base version of this artifact, for example "1.0-SNAPSHOT". In contrast to the {@link #getVersion()}, the
-     * base version will always refer to the unresolved version.
-     * TODO: move this inside {@link Version} ?
-     *
-     * @return The base version, never {@code null}.
-     */
-    @Nonnull
-    String getBaseVersion();
-
-    /**
-     * Gets the file of this artifact. Note that only resolved artifacts have a file associated with them. In general,
-     * callers must not assume any relationship between an artifact's filename and its coordinates.
-     *
-     * @return The file or {@link Optional#empty()} if the artifact isn't resolved.
-     */
-    @Nonnull
-    Optional<Path> getPath();
 
     /**
      * Unique id identifying this artifact
@@ -112,7 +91,7 @@ public interface Artifact
                 + ":" + getArtifactId()
                 + ":" + getExtension()
                 + ( getClassifier().isEmpty() ? "" : ":" + getClassifier() )
-                + ":" + getBaseVersion();
+                + ":" + getVersion();
     }
 
 }

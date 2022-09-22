@@ -46,6 +46,7 @@ import org.apache.maven.api.services.ArtifactFactory;
 import org.apache.maven.api.services.ArtifactInstaller;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.ArtifactResolver;
+import org.apache.maven.api.services.CoordinateFactory;
 import org.apache.maven.api.services.DependencyCollector;
 import org.apache.maven.api.services.DependencyFactory;
 import org.apache.maven.api.services.DependencyResolver;
@@ -57,11 +58,13 @@ import org.apache.maven.api.services.ProjectManager;
 import org.apache.maven.api.services.Prompter;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.ToolchainManager;
+import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
 import org.apache.maven.api.services.xml.SettingsXmlFactory;
 import org.apache.maven.api.services.xml.ToolchainsXmlFactory;
 import org.apache.maven.api.settings.Settings;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
@@ -94,6 +97,7 @@ public class DefaultSession extends AbstractSession
     private final PlexusContainer container;
     private final MojoExecutionScope mojoExecutionScope;
     private final RuntimeInformation runtimeInformation;
+    private final ArtifactHandlerManager artifactHandlerManager;
 
     @SuppressWarnings( "checkstyle:ParameterNumber" )
     public DefaultSession( @Nonnull MavenSession session,
@@ -104,7 +108,8 @@ public class DefaultSession extends AbstractSession
                            @Nonnull DefaultToolchainManagerPrivate toolchainManagerPrivate,
                            @Nonnull PlexusContainer container,
                            @Nonnull MojoExecutionScope mojoExecutionScope,
-                           @Nonnull RuntimeInformation runtimeInformation )
+                           @Nonnull RuntimeInformation runtimeInformation,
+                           @Nonnull ArtifactHandlerManager artifactHandlerManager )
     {
         this.mavenSession = nonNull( session );
         this.session = mavenSession.getRepositorySession();
@@ -121,6 +126,7 @@ public class DefaultSession extends AbstractSession
         this.runtimeInformation = runtimeInformation;
         this.artifactManager = new DefaultArtifactManager( this );
         this.projectManager = new DefaultProjectManager( this, artifactManager, container );
+        this.artifactHandlerManager = artifactHandlerManager;
     }
 
     public MavenSession getMavenSession()
@@ -286,7 +292,7 @@ public class DefaultSession extends AbstractSession
         MavenSession newSession = new MavenSession( mavenSession.getContainer(), repoSession,
                 mavenSession.getRequest(), mavenSession.getResult() );
         return new DefaultSession( newSession, repositorySystem, repositories, projectBuilder, mavenRepositorySystem,
-                toolchainManagerPrivate, container, mojoExecutionScope, runtimeInformation );
+                toolchainManagerPrivate, container, mojoExecutionScope, runtimeInformation, artifactHandlerManager );
     }
 
     @Nonnull
@@ -294,7 +300,7 @@ public class DefaultSession extends AbstractSession
     public Session withRemoteRepositories( @Nonnull List<RemoteRepository> repositories )
     {
         return new DefaultSession( mavenSession, repositorySystem, repositories, projectBuilder, mavenRepositorySystem,
-                toolchainManagerPrivate, container, mojoExecutionScope, runtimeInformation );
+                toolchainManagerPrivate, container, mojoExecutionScope, runtimeInformation, artifactHandlerManager );
     }
 
     @Nonnull
@@ -378,6 +384,14 @@ public class DefaultSession extends AbstractSession
         {
             return (T) new DefaultVersionParser();
         }
+        else if ( clazz == CoordinateFactory.class )
+        {
+            return (T) new DefaultCoordinateFactory();
+        }
+        else if ( clazz == TypeRegistry.class )
+        {
+            return (T) new DefaultTypeRegistry( artifactHandlerManager );
+        }
         throw new NoSuchElementException( clazz.getName() );
     }
 
@@ -433,19 +447,15 @@ public class DefaultSession extends AbstractSession
         }
         else
         {
-            String typeId = dependency.getType();
-            org.eclipse.aether.artifact.ArtifactType type = typeId != null
-                    ? session.getArtifactTypeRegistry().get( typeId ) : null;
-            String extension = type != null ? type.getExtension() : null;
             return new org.eclipse.aether.graph.Dependency(
                     new org.eclipse.aether.artifact.DefaultArtifact(
                             dependency.getGroupId(),
                             dependency.getArtifactId(),
                             dependency.getClassifier(),
-                            extension,
-                            dependency.getVersion(),
-                            type
-                    ), null );
+                            dependency.getType().getExtension(),
+                            dependency.getVersion().toString(),
+                            null ),
+                    dependency.getScope() );
         }
     }
 

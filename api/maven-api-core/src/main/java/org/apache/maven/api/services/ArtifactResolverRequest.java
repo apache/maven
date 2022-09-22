@@ -19,12 +19,11 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.Coordinate;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
-
-import org.apache.maven.api.Session;
-import org.apache.maven.api.Artifact;
 import org.apache.maven.api.annotations.NotThreadSafe;
 
 /**
@@ -40,7 +39,7 @@ public interface ArtifactResolverRequest
     Session getSession();
 
     @Nonnull
-    Artifact getArtifact();
+    Coordinate getCoordinate();
 
     @Nonnull
     static ArtifactResolverRequestBuilder builder()
@@ -49,11 +48,11 @@ public interface ArtifactResolverRequest
     }
 
     @Nonnull
-    static ArtifactResolverRequest build( Session session, Artifact artifact )
+    static ArtifactResolverRequest build( Session session, Coordinate coordinate )
     {
         return builder()
                 .session( session )
-                .artifact( artifact )
+                .coordinate( coordinate )
                 .build();
     }
 
@@ -61,7 +60,7 @@ public interface ArtifactResolverRequest
     class ArtifactResolverRequestBuilder
     {
         Session session;
-        Artifact artifact;
+        Coordinate coordinate;
 
         @Nonnull
         public ArtifactResolverRequestBuilder session( Session session )
@@ -71,35 +70,35 @@ public interface ArtifactResolverRequest
         }
 
         @Nonnull
-        public ArtifactResolverRequestBuilder artifact( Artifact artifact )
+        public ArtifactResolverRequestBuilder coordinate( Coordinate artifact )
         {
-            this.artifact = artifact;
+            this.coordinate = artifact;
             return this;
         }
 
         @Nonnull
         public ArtifactResolverRequest build()
         {
-            return new DefaultArtifactResolverRequest( session, artifact );
+            return new DefaultArtifactResolverRequest( session, coordinate );
         }
 
         private static class DefaultArtifactResolverRequest extends BaseRequest implements ArtifactResolverRequest
         {
             @Nonnull
-            private final Artifact artifact;
+            private final Coordinate coordinate;
 
             DefaultArtifactResolverRequest( @Nonnull Session session,
-                                            @Nonnull Artifact artifact )
+                                            @Nonnull Coordinate coordinate )
             {
                 super( session );
-                this.artifact = nonNull( artifact, "artifact can not be null" );
+                this.coordinate = nonNull( coordinate, "artifact can not be null" );
             }
 
             @Nonnull
             @Override
-            public Artifact getArtifact()
+            public Coordinate getCoordinate()
             {
-                return artifact;
+                return coordinate;
             }
         }
     }

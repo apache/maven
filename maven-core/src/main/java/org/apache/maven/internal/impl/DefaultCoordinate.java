@@ -19,16 +19,12 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
-import org.apache.maven.api.Type;
-import org.apache.maven.api.Version;
-import org.apache.maven.api.annotations.Nonnull;
-
-import java.io.File;
-import java.nio.file.Path;
 import java.util.Objects;
-import java.util.Optional;
 
-import org.apache.maven.api.Artifact;
+import org.apache.maven.api.Coordinate;
+import org.apache.maven.api.Type;
+import org.apache.maven.api.VersionRange;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.TypeRegistry;
 import org.eclipse.aether.artifact.ArtifactProperties;
 
@@ -37,54 +33,54 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 /**
  * A wrapper class around a maven resolver artifact.
  */
-public class DefaultArtifact implements Artifact
+public class DefaultCoordinate implements Coordinate
 {
     private final @Nonnull AbstractSession session;
-    private final @Nonnull org.eclipse.aether.artifact.Artifact artifact;
+    private final @Nonnull org.eclipse.aether.artifact.Artifact coordinate;
 
-    public DefaultArtifact( @Nonnull AbstractSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact )
+    public DefaultCoordinate( @Nonnull AbstractSession session,
+                              @Nonnull org.eclipse.aether.artifact.Artifact coordinate )
     {
         this.session = nonNull( session, "session can not be null" );
-        this.artifact = nonNull( artifact, "artifact can not be null" );
+        this.coordinate = nonNull( coordinate, "coordinate can not be null" );
     }
 
-    public org.eclipse.aether.artifact.Artifact getArtifact()
+    public org.eclipse.aether.artifact.Artifact getCoordinate()
     {
-        return artifact;
+        return coordinate;
     }
 
     @Nonnull
     @Override
     public String getGroupId()
     {
-        return artifact.getGroupId();
+        return coordinate.getGroupId();
     }
 
     @Nonnull
     @Override
     public String getArtifactId()
     {
-        return artifact.getArtifactId();
+        return coordinate.getArtifactId();
     }
 
     @Nonnull
     @Override
-    public Version getVersion()
+    public VersionRange getVersion()
     {
-        return session.parseVersion( artifact.getVersion() );
+        return session.parseVersionRange( coordinate.getVersion() );
     }
 
-    @Nonnull
     @Override
     public String getExtension()
     {
-        return artifact.getExtension();
+        return coordinate.getExtension();
     }
 
     @Override
     public Type getType()
     {
-        String type = artifact.getProperty( ArtifactProperties.TYPE, artifact.getExtension() );
+        String type = coordinate.getProperty( ArtifactProperties.TYPE, coordinate.getExtension() );
         return session.getService( TypeRegistry.class ).getType( type );
     }
 
@@ -92,21 +88,7 @@ public class DefaultArtifact implements Artifact
     @Override
     public String getClassifier()
     {
-        return artifact.getClassifier();
-    }
-
-    @Nonnull
-    @Override
-    public String getBaseVersion()
-    {
-        return artifact.getBaseVersion();
-    }
-
-    @Nonnull
-    @Override
-    public Optional<Path> getPath()
-    {
-        return Optional.ofNullable( artifact.getFile() ).map( File::toPath );
+        return coordinate.getClassifier();
     }
 
     @Override
@@ -120,23 +102,23 @@ public class DefaultArtifact implements Artifact
         {
             return false;
         }
-        DefaultArtifact that = (DefaultArtifact) o;
+        DefaultCoordinate that = (DefaultCoordinate) o;
         return Objects.equals( this.getGroupId(), that.getGroupId() )
                 && Objects.equals( this.getArtifactId(), that.getArtifactId() )
                 && Objects.equals( this.getVersion(), that.getVersion() )
                 && Objects.equals( this.getClassifier(), that.getClassifier() )
-                && Objects.equals( this.getExtension(), that.getExtension() );
+                && Objects.equals( this.getType(), that.getType() );
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash( getGroupId(), getArtifactId(), getVersion(), getClassifier(), getExtension() );
+        return Objects.hash( getGroupId(), getArtifactId(), getVersion(), getClassifier(), getType() );
     }
 
     @Override
     public String toString()
     {
-        return artifact.toString();
+        return coordinate.toString();
     }
 }
