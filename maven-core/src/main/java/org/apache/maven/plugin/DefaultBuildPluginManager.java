@@ -27,12 +27,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.api.Project;
 import org.apache.maven.api.plugin.MojoException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.internal.impl.DefaultLog;
+import org.apache.maven.internal.impl.DefaultMojoExecution;
+import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -126,6 +129,8 @@ public class DefaultBuildPluginManager
             scope.seed( MojoExecution.class, mojoExecution );
             scope.seed( org.apache.maven.api.plugin.Log.class, new DefaultLog(
                     LoggerFactory.getLogger( mojoExecution.getMojoDescriptor().getFullGoalName() ) ) );
+            scope.seed( Project.class, ( ( DefaultSession) session.getSession() ).getProject( project ) );
+            scope.seed( org.apache.maven.api.MojoExecution.class, new DefaultMojoExecution( mojoExecution ) );
 
             if ( mojoDescriptor.isV4Api() )
             {

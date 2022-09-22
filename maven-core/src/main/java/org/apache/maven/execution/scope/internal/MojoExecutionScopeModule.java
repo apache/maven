@@ -19,14 +19,13 @@ package org.apache.maven.execution.scope.internal;
  * under the License.
  */
 
+import com.google.inject.AbstractModule;
 import org.apache.maven.api.plugin.Log;
 import org.apache.maven.execution.scope.MojoExecutionScoped;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-
-import com.google.inject.AbstractModule;
 
 /**
  * MojoExecutionScopeModule
@@ -52,10 +51,12 @@ public class MojoExecutionScopeModule
     {
         bindScope( MojoExecutionScoped.class, scope );
         bind( MojoExecutionScope.class ).toInstance( scope );
-
         bind( MavenProject.class ).toProvider( MojoExecutionScope.seededKeyProvider() ).in( scope );
         bind( MojoExecution.class ).toProvider( MojoExecutionScope.seededKeyProvider() ).in( scope );
         bind( Log.class ).toProvider( MojoExecutionScope.seededKeyProvider() ).in( scope );
+        bind( org.apache.maven.api.Project.class ).toProvider( MojoExecutionScope.seededKeyProvider() ).in( scope );
+        bind( org.apache.maven.api.MojoExecution.class )
+                .toProvider( MojoExecutionScope.seededKeyProvider() ).in( scope );
     }
 
 }
