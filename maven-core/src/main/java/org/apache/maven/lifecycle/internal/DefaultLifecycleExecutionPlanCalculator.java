@@ -328,29 +328,38 @@ public class DefaultLifecycleExecutionPlanCalculator
         {
             for ( Parameter parameter : mojoDescriptor.getParameters() )
             {
-                Xpp3Dom parameterConfiguration = executionConfiguration.getChild( parameter.getName() );
+                Xpp3Dom[] parameterConfigurations = executionConfiguration.getChildren( parameter.getName() );
 
-                if ( parameterConfiguration == null )
+                if ( parameterConfigurations.length == 0 && parameter.getAlias() != null )
                 {
-                    parameterConfiguration = executionConfiguration.getChild( parameter.getAlias() );
+                    parameterConfigurations = executionConfiguration.getChildren( parameter.getAlias() );
+                }
+
+                if ( parameterConfigurations.length == 0 )
+                {
+                    parameterConfigurations = new Xpp3Dom[1];
                 }
 
                 Xpp3Dom parameterDefaults = defaultConfiguration.getChild( parameter.getName() );
 
-                parameterConfiguration = Xpp3Dom.mergeXpp3Dom( parameterConfiguration, parameterDefaults,
-                                                               Boolean.TRUE );
-
-                if ( parameterConfiguration != null )
+                for ( Xpp3Dom parameterConfiguration : parameterConfigurations )
                 {
-                    parameterConfiguration = new Xpp3Dom( parameterConfiguration, parameter.getName() );
 
-                    if ( StringUtils.isEmpty( parameterConfiguration.getAttribute( "implementation" ) )
-                        && StringUtils.isNotEmpty( parameter.getImplementation() ) )
+                    parameterConfiguration = Xpp3Dom.mergeXpp3Dom( parameterConfiguration, parameterDefaults,
+                            Boolean.TRUE );
+
+                    if ( parameterConfiguration != null )
                     {
-                        parameterConfiguration.setAttribute( "implementation", parameter.getImplementation() );
-                    }
+                        parameterConfiguration = new Xpp3Dom( parameterConfiguration, parameter.getName() );
 
-                    finalConfiguration.addChild( parameterConfiguration );
+                        if ( StringUtils.isEmpty( parameterConfiguration.getAttribute( "implementation" ) )
+                                && StringUtils.isNotEmpty( parameter.getImplementation() ) )
+                        {
+                            parameterConfiguration.setAttribute( "implementation", parameter.getImplementation() );
+                        }
+
+                        finalConfiguration.addChild( parameterConfiguration );
+                    }
                 }
             }
         }
