@@ -258,16 +258,7 @@ public class DefaultSession extends AbstractSession
             @Override
             public Object computeIfAbsent( @Nonnull Object key, @Nonnull Supplier<Object> supplier )
             {
-                // return data.computeIfAbsent( key, supplier );
-                Object value = data.get( key );
-                if ( value == null )
-                {
-                    if ( !data.set( key, null, supplier.get() ) )
-                    {
-                        value = data.get( key );
-                    }
-                }
-                return value;
+                 return data.computeIfAbsent( key, supplier );
             }
         };
     }
