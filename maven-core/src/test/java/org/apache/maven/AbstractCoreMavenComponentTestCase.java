@@ -32,6 +32,7 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
@@ -48,6 +49,7 @@ import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.internal.impl.DefaultRepositorySystem;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
 
@@ -166,6 +168,9 @@ public abstract class AbstractCoreMavenComponentTestCase
                               new DefaultMavenExecutionResult() );
         session.setProjects( projects );
         session.setAllProjects( session.getProjects() );
+        session.setSession( new DefaultSession( session, new DefaultRepositorySystem(), null,
+                null, null, null, null, null,
+                null, null ) );
 
         return session;
     }
