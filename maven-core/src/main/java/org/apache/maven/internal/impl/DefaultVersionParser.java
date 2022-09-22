@@ -19,6 +19,7 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.apache.maven.api.Version;
@@ -93,6 +94,27 @@ public class DefaultVersionParser implements VersionParser
             {
                 return delegate.compareTo( new DefaultArtifactVersion( o.toString() ) );
             }
+        }
+
+        @Override
+        public boolean equals( Object o )
+        {
+            if ( this == o )
+            {
+                return true;
+            }
+            if ( o == null || getClass() != o.getClass() )
+            {
+                return false;
+            }
+            DefaultVersion that = (DefaultVersion) o;
+            return delegate.equals( that.delegate );
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return Objects.hash( delegate );
         }
 
         @Override

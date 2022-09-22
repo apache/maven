@@ -650,7 +650,7 @@ public class DefaultMavenPluginManager
 
         if ( StringUtils.isEmpty( configuratorId ) )
         {
-            configuratorId = "basic";
+            configuratorId = mojoDescriptor.isV4Api() ? "enhanced" : "basic";
         }
 
         try
