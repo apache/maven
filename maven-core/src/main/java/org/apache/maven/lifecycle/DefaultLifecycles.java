@@ -31,6 +31,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,20 +53,17 @@ public class DefaultLifecycles
 
     // @Configuration(source="org/apache/maven/lifecycle/lifecycles.xml")
 
-    private final Map<String, Lifecycle> lifecyclesMap;
+    private final PlexusContainer plexusContainer;
 
     public DefaultLifecycles()
     {
-        this.lifecyclesMap = null;
+        this.plexusContainer = null;
     }
 
     @Inject
-    public DefaultLifecycles( Map<String, Lifecycle> lifecyclesMap )
+    public DefaultLifecycles( PlexusContainer plexusContainer )
     {
-        // Must keep the lifecyclesMap as is.
-        // During initialization it only contains the default lifecycles.
-        // However, extensions might add custom lifecycles later on.
-        this.lifecyclesMap = lifecyclesMap;
+        this.plexusContainer = plexusContainer;
     }
 
     /**
@@ -139,11 +138,33 @@ public class DefaultLifecycles
             }
         };
 
+        Map<String, Lifecycle> lifecyclesMap = lookupLifecycles();
+
         // ensure canonical order of standard lifecycles
         return lifecyclesMap.values().stream()
                                 .peek( l -> Objects.requireNonNull( l.getId(), "A lifecycle must have an id." ) )
                                 .sorted( Comparator.comparing( Lifecycle::getId, comparator ) )
                                 .collect( Collectors.toList() );
+    }
+
+    private Map<String, Lifecycle> lookupLifecycles()
+    {
+        // TODO: Remove the following code when maven-compat is gone
+        // This code is here to ensure maven-compat's EmptyLifecycleExecutor keeps on working.
+        if ( plexusContainer == null )
+        {
+            return new HashMap<>();
+        }
+
+        // Lifecycles cannot be cached as extensions might add custom lifecycles later in the execution.
+        try
+        {
+            return plexusContainer.lookupMap( Lifecycle.class );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new IllegalStateException( "Unable to lookup lifecycles from the plexus container", e );
+        }
     }
 
     public String getLifecyclePhaseList()

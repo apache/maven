@@ -23,6 +23,7 @@ import org.apache.maven.lifecycle.internal.stub.DefaultLifecyclesStub;
 import org.apache.maven.lifecycle.internal.stub.PluginPrefixResolverStub;
 import org.apache.maven.lifecycle.internal.stub.PluginVersionResolverStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -63,6 +64,7 @@ public class LifecycleExecutionPlanCalculatorTest
     // Maybe also make one with LifeCycleTasks
 
     public static LifecycleExecutionPlanCalculator createExecutionPlaceCalculator( MojoDescriptorCreator mojoDescriptorCreator )
+            throws ComponentLookupException
     {
         LifecyclePluginResolver lifecyclePluginResolver = new LifecyclePluginResolver( new PluginVersionResolverStub() );
         return new DefaultLifecycleExecutionPlanCalculator( new BuildPluginManagerStub(),
