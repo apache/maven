@@ -32,6 +32,7 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.ResolutionScope;
 import org.apache.maven.api.Session;
 
 /**

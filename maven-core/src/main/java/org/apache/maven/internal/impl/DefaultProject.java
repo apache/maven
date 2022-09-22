@@ -19,6 +19,7 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import org.apache.maven.api.Scope;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nonnull;
@@ -29,7 +30,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 import org.apache.maven.RepositoryUtils;
@@ -188,9 +188,9 @@ public class DefaultProject implements Project
 
             @Nonnull
             @Override
-            public String getScope()
+            public Scope getScope()
             {
-                return dependency.getScope().toUpperCase( Locale.ROOT );
+                return Scope.get( dependency.getScope() );
             }
 
             @Override

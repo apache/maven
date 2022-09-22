@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Exclusion;
+import org.apache.maven.api.Scope;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nonnull;
@@ -90,9 +91,9 @@ public class DefaultDependency implements Dependency
 
     @Nonnull
     @Override
-    public String getScope()
+    public Scope getScope()
     {
-        return dependency.getScope();
+        return Scope.get( dependency.getScope() );
     }
 
     @Nullable

@@ -1,4 +1,4 @@
-package org.apache.maven.api.services;
+package org.apache.maven.api;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,21 +19,39 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import java.util.Locale;
+
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * Resolution scope
- * TODO: merge this with {@link org.apache.maven.api.plugin.annotations.ResolutionScope}
- * TODO: should this simply be an EnumSet<Scope> instead ?
+ * Scope for a dependency
  *
  * @since 4.0
  */
 @Experimental
-public enum ResolutionScope
+public enum Scope
 {
-    Compile,
-    CompileRuntime,
-    Runtime,
-    RuntimeSystem,
-    Test
+    COMPILE( "compile" ),
+    PROVIDED ( "provided" ),
+    SYSTEM( "system" ),
+    RUNTIME( "runtime" ),
+    TEST( "test" ),
+    IMPORT( "import" );
+
+    private final String id;
+
+    Scope( String id )
+    {
+        this.id = id;
+    }
+
+    public String id()
+    {
+        return this.id;
+    }
+
+    public static Scope get( String scope )
+    {
+        return Enum.valueOf( Scope.class, scope.toUpperCase( Locale.ROOT ) );
+    }
 }

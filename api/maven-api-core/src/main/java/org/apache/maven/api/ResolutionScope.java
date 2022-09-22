@@ -1,4 +1,4 @@
-package org.apache.maven.api.plugin.annotations;
+package org.apache.maven.api;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -18,6 +18,11 @@ package org.apache.maven.api.plugin.annotations;
  * specific language governing permissions and limitations
  * under the License.
  */
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.maven.api.annotations.Experimental;
 
@@ -41,38 +46,46 @@ public enum ResolutionScope
      * <code>compile</code> resolution scope
      * = <code>compile</code> + <code>system</code> + <code>provided</code> dependencies
      */
-    COMPILE( "compile" ),
+    COMPILE( "compile", Scope.COMPILE, Scope.SYSTEM, Scope.PROVIDED ),
     /**
      * <code>compile+runtime</code> resolution scope (Maven 3 only)
      * = <code>compile</code> + <code>system</code> + <code>provided</code> + <code>runtime</code> dependencies
      */
-    COMPILE_PLUS_RUNTIME( "compile+runtime" ),
+    COMPILE_PLUS_RUNTIME( "compile+runtime", Scope.COMPILE, Scope.SYSTEM, Scope.PROVIDED, Scope.RUNTIME ),
     /**
      * <code>runtime</code> resolution scope
      * = <code>compile</code> + <code>runtime</code> dependencies
      */
-    RUNTIME( "runtime" ),
+    RUNTIME( "runtime", Scope.COMPILE, Scope.RUNTIME ),
     /**
      * <code>runtime+system</code> resolution scope (Maven 3 only)
      * = <code>compile</code> + <code>system</code> + <code>runtime</code> dependencies
      */
-    RUNTIME_PLUS_SYSTEM( "runtime+system" ),
+    RUNTIME_PLUS_SYSTEM( "runtime+system", Scope.COMPILE, Scope.SYSTEM, Scope.RUNTIME ),
     /**
      * <code>test</code> resolution scope
      * = <code>compile</code> + <code>system</code> + <code>provided</code> + <code>runtime</code> + <code>test</code>
      * dependencies
      */
-    TEST( "test" );
+    TEST( "test", Scope.COMPILE, Scope.SYSTEM, Scope.PROVIDED, Scope.RUNTIME, Scope.TEST );
 
     private final String id;
+    private final Set<Scope> scopes;
 
-    ResolutionScope( String id )
+    ResolutionScope( String id, Scope... scopes )
     {
         this.id = id;
+        this.scopes = Collections.unmodifiableSet( new HashSet<>( Arrays.asList( scopes ) ) );
     }
 
     public String id()
     {
         return this.id;
     }
+
+    public Set<Scope> scopes()
+    {
+        return scopes;
+    }
+
 }

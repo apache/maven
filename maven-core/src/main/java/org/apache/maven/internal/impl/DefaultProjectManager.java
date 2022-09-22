@@ -20,7 +20,6 @@ package org.apache.maven.internal.impl;
  */
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -33,23 +32,18 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.ResolutionScope;
+import org.apache.maven.api.Scope;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.ProjectManager;
-import org.apache.maven.api.services.ResolutionScope;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.LifecycleDependencyResolver;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-
-import static org.apache.maven.artifact.Artifact.SCOPE_COMPILE;
-import static org.apache.maven.artifact.Artifact.SCOPE_PROVIDED;
-import static org.apache.maven.artifact.Artifact.SCOPE_RUNTIME;
-import static org.apache.maven.artifact.Artifact.SCOPE_SYSTEM;
-import static org.apache.maven.artifact.Artifact.SCOPE_TEST;
 
 public class DefaultProjectManager implements ProjectManager
 {
@@ -171,21 +165,7 @@ public class DefaultProjectManager implements ProjectManager
 
     private Collection<String> toScopes( ResolutionScope scope )
     {
-        switch ( scope )
-        {
-            case Compile:
-                return Arrays.asList( SCOPE_COMPILE, SCOPE_SYSTEM, SCOPE_PROVIDED );
-            case Runtime:
-                return Arrays.asList( SCOPE_COMPILE, SCOPE_RUNTIME );
-            case CompileRuntime:
-                return Arrays.asList( SCOPE_COMPILE, SCOPE_SYSTEM, SCOPE_PROVIDED, SCOPE_RUNTIME );
-            case RuntimeSystem:
-                return Arrays.asList( SCOPE_COMPILE, SCOPE_SYSTEM, SCOPE_RUNTIME );
-            case Test:
-                return Arrays.asList( SCOPE_COMPILE, SCOPE_SYSTEM, SCOPE_PROVIDED, SCOPE_RUNTIME, SCOPE_TEST );
-            default:
-                throw new IllegalArgumentException();
-        }
+        return scope.scopes().stream().map( Scope::id ).collect( Collectors.toList() );
     }
 
 }

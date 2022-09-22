@@ -455,7 +455,7 @@ public class DefaultSession extends AbstractSession
                             dependency.getType().getExtension(),
                             dependency.getVersion().toString(),
                             null ),
-                    dependency.getScope() );
+                    dependency.getScope().id() );
         }
     }
 

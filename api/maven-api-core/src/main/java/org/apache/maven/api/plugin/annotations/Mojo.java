@@ -26,6 +26,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.apache.maven.api.ResolutionScope;
 import org.apache.maven.api.annotations.Experimental;
 
 /**

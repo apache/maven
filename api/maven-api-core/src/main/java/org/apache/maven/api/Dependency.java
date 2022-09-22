@@ -35,7 +35,7 @@ import java.util.Collection;
 public interface Dependency extends Coordinate
 {
     @Nonnull
-    String getScope();
+    Scope getScope();
 
     @Nullable
     Boolean getOptional();

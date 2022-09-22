@@ -24,30 +24,26 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * The possible types of execution events.
  *
- * TODO: those values are lower cased, while other events are upper-case
- *       we need to align on one strategy
- *       see also {@link MetadataStorage} and {@link org.apache.maven.api.services.ResolutionScope}
- *
  * @since 4.0
  */
 @Experimental
 public enum EventType
 {
-    ProjectDiscoveryStarted,
-    SessionStarted,
-    SessionEnded,
-    ProjectSkipped,
-    ProjectStarted,
-    ProjectSucceeded,
-    ProjectFailed,
-    MojoSkipped,
-    MojoStarted,
-    MojoSucceeded,
-    MojoFailed,
-    ForkStarted,
-    ForkSucceeded,
-    ForkFailed,
-    ForkedProjectStarted,
-    ForkedProjectSucceeded,
-    ForkedProjectFailed,
+    PROJECT_DISCOVERY_STARTED,
+    SESSION_STARTED,
+    SESSION_ENDED,
+    PROJECT_SKIPPED,
+    PROJECT_STARTED,
+    PROJECT_SUCCEEDED,
+    PROJECT_FAILED,
+    MOJO_SKIPPED,
+    MOJO_STARTED,
+    MOJO_SUCCEEDED,
+    MOJO_FAILED,
+    FORK_STARTED,
+    FORK_SUCCEEDED,
+    FORK_FAILED,
+    FORKED_PROJECT_STARTED,
+    FORKED_PROJECT_SUCCEEDED,
+    FORKED_PROJECT_FAILED,
 }
