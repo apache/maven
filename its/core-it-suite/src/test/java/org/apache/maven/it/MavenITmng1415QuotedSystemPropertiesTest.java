@@ -19,7 +19,8 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 import java.util.Properties;
@@ -50,7 +51,7 @@ public class MavenITmng1415QuotedSystemPropertiesTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "-Dtest.property=\"Test Property\"" );
+        verifier.addCliOption( "-Dtest.property=Test Property" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

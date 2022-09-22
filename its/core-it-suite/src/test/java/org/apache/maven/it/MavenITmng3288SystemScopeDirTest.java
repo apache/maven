@@ -21,7 +21,9 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.VerificationException;
 
 /**
  * This is a test for <a href="https://issues.apache.org/jira/browse/MNG-3288">MNG-3288</a>.

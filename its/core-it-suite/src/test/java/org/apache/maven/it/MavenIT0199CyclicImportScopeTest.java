@@ -20,7 +20,8 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
 
 public class MavenIT0199CyclicImportScopeTest extends AbstractMavenIntegrationTestCase {
 
@@ -47,7 +48,7 @@ public class MavenIT0199CyclicImportScopeTest extends AbstractMavenIntegrationTe
         verifier.deleteDirectory("target");
         verifier.executeGoal("install");
         if (expectedArtifact != null) {
-            verifier.assertFilePresent(expectedArtifact);
+            verifier.verifyFilePresent(expectedArtifact);
         }
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

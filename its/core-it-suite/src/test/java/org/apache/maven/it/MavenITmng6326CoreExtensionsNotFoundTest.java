@@ -25,7 +25,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.VerificationException;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-6326">MNG-6326</a>:

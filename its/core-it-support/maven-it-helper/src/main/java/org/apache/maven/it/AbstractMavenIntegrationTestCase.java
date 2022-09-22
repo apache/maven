@@ -35,6 +35,9 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.shared.utils.io.FileUtils;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.VerificationException;
+
 /**
  * @author Jason van Zyl
  * @author Kenney Westerhof

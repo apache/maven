@@ -21,7 +21,8 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
 
 /**
  * This test suite tests whether the consumer pom feature can load a project with a {@code parent} tag 

@@ -19,7 +19,9 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.VerificationException;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;

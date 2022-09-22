@@ -23,7 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.utils.StringUtils;
 import org.apache.maven.shared.utils.io.FileUtils;
 import org.eclipse.jetty.server.Handler;
@@ -184,7 +185,7 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
         verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
-        verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
+        verifier.verifyArtifactContent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
                                          CONTENT );
     }
 
@@ -228,7 +229,7 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
         verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
-        verifier.assertArtifactContents( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
+        verifier.verifyArtifactContent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
                                          CONTENT );
     }
 }

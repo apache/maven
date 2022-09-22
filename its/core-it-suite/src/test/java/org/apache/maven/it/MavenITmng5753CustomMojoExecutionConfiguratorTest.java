@@ -21,7 +21,8 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.utils.io.FileUtils;
 
 public class MavenITmng5753CustomMojoExecutionConfiguratorTest

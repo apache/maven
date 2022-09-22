@@ -20,7 +20,8 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
 
 public class MavenITmng5208EventSpyParallelTest
     extends AbstractMavenIntegrationTestCase

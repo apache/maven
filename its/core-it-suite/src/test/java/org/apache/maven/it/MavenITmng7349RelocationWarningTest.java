@@ -23,7 +23,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
 
 public class MavenITmng7349RelocationWarningTest
     extends AbstractMavenIntegrationTestCase

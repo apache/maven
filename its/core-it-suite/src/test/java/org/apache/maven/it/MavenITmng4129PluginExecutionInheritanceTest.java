@@ -24,7 +24,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4129">MNG-4129</a>.

@@ -26,7 +26,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.VerificationException;
 import org.apache.maven.shared.utils.io.FileUtils;
 
 /**
@@ -81,7 +83,7 @@ public class MavenIT0108SnapshotUpdateTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        assertArtifactContents( "originalArtifact" );
+        verifyArtifactContent( "originalArtifact" );
 
         // set in the past to ensure it is downloaded
         localRepoFile.setLastModified( System.currentTimeMillis() - TIME_OFFSET );
@@ -90,7 +92,7 @@ public class MavenIT0108SnapshotUpdateTest
 
         verifier.executeGoal( "package" );
 
-        assertArtifactContents( "updatedArtifact" );
+        verifyArtifactContent( "updatedArtifact" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -109,7 +111,7 @@ public class MavenIT0108SnapshotUpdateTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        assertArtifactContents( "originalArtifact" );
+        verifyArtifactContent( "originalArtifact" );
 
         FileUtils.fileWrite( artifact.getAbsolutePath(), "updatedArtifact" );
         metadata = new File( repository, "org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml" );
@@ -117,7 +119,7 @@ public class MavenIT0108SnapshotUpdateTest
 
         verifier.executeGoal( "package" );
 
-        assertArtifactContents( "updatedArtifact" );
+        verifyArtifactContent( "updatedArtifact" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -142,7 +144,7 @@ public class MavenIT0108SnapshotUpdateTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        assertArtifactContents( "originalArtifact" );
+        verifyArtifactContent( "originalArtifact" );
         assertFalse( localMetadata.exists() );
 
         FileUtils.fileWrite( localRepoFile.getAbsolutePath(), "localArtifact" );
@@ -155,7 +157,7 @@ public class MavenIT0108SnapshotUpdateTest
 
         verifier.executeGoal( "package" );
 
-        assertArtifactContents( "localArtifact" );
+        verifyArtifactContent( "localArtifact" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -171,7 +173,7 @@ public class MavenIT0108SnapshotUpdateTest
 
         verifier.executeGoal( "package" );
 
-        assertArtifactContents( "originalArtifact" );
+        verifyArtifactContent( "originalArtifact" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -191,7 +193,7 @@ public class MavenIT0108SnapshotUpdateTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        assertArtifactContents( "originalArtifact" );
+        verifyArtifactContent( "originalArtifact" );
 
         FileUtils.fileWrite( artifact.getAbsolutePath(), "updatedArtifact" );
         metadata = new File( repository, "org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml" );
@@ -199,7 +201,7 @@ public class MavenIT0108SnapshotUpdateTest
 
         verifier.executeGoal( "package" );
 
-        assertArtifactContents( "updatedArtifact" );
+        verifyArtifactContent( "updatedArtifact" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -210,11 +212,11 @@ public class MavenIT0108SnapshotUpdateTest
         return new File( verifier.getArtifactMetadataPath( groupId, artifactId, version, "maven-metadata-local.xml" ) );
     }
 
-    private void assertArtifactContents( String s )
+    private void verifyArtifactContent( String s )
         throws IOException, VerificationException
     {
         verifier.verifyArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar" );
-        verifier.assertArtifactContents( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar", s );
+        verifier.verifyArtifactContent( "org.apache.maven", "maven-core-it-support", "1.0-SNAPSHOT", "jar", s );
     }
 
     private static File deleteLocalArtifact( Verifier verifier, File localRepoFile )

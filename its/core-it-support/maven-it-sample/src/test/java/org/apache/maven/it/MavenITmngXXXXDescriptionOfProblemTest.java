@@ -24,7 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.VerificationException;
 
 /**
  * This is a sample integration test. The IT tests typically

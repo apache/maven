@@ -30,6 +30,9 @@ import junit.framework.TestSuite;
 
 import org.codehaus.plexus.util.IOUtil;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.VerificationException;
+
 /**
  * The Core IT suite.
  */

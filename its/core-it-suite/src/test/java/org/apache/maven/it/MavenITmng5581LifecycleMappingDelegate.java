@@ -22,7 +22,9 @@ package org.apache.maven.it;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.VerificationException;
 
 public class MavenITmng5581LifecycleMappingDelegate
     extends AbstractMavenIntegrationTestCase
@@ -50,18 +52,21 @@ public class MavenITmng5581LifecycleMappingDelegate
         Verifier verifier;
 
         // install the test extension
-        verifier = newVerifier( extensionDir.getAbsolutePath(), "remote" );
+        verifier = newVerifier( extensionDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         // compile the test project
-        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
+        verifier = newVerifier( projectDir.getAbsolutePath() );
+        verifier.setLogFileName( "compile-log.txt" );
         verifier.executeGoal( "compile" );
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         // run custom "test-only" build phase
+        verifier = newVerifier( projectDir.getAbsolutePath() );
+        verifier.setLogFileName( "test-only-log.txt" );
         verifier.setForkJvm( true );
         verifier.setMavenDebug( true );
         verifier.executeGoal( "test-only" );

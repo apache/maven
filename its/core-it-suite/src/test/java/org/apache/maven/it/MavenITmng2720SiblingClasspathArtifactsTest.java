@@ -19,7 +19,8 @@
 
 package org.apache.maven.it;
 
-import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 import java.util.List;

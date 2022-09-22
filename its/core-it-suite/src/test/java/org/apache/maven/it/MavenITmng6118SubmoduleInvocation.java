@@ -22,7 +22,8 @@ package org.apache.maven.it;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
 
 /**
  * This is a collection of test cases for <a href="https://issues.apache.org/jira/browse/MNG-6118">MNG-6118</a>,

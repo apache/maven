@@ -24,7 +24,9 @@ import static org.hamcrest.CoreMatchers.containsString;
 
 import java.io.File;
 
-import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.VerificationException;
 
 /**
  * MNG-6030 reintroduced ReactorModelCache, but this ignores invalid relativePaths of parents
