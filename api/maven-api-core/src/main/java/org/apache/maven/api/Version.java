@@ -34,13 +34,6 @@ public interface Version
     extends Comparable<Version>
 {
 
-    /**
-     * Determines whether this artifact uses a snapshot version.
-     *
-     * @return {@code true} if the artifact is a snapshot, {@code false} otherwise.
-     * @see org.apache.maven.api.Session#isVersionSnapshot(String)
-     */
-    boolean isSnapshot();
 
     /**
      * Returns a string representation of this version.

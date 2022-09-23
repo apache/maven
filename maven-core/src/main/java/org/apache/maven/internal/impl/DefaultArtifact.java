@@ -102,6 +102,13 @@ public class DefaultArtifact implements Artifact
         return artifact.getBaseVersion();
     }
 
+    @Override
+    public boolean isSnapshot()
+    {
+        return DefaultVersionParser.checkSnapshot( artifact.toString() );
+    }
+
+
     @Nonnull
     @Override
     public Optional<Path> getPath()

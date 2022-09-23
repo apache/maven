@@ -95,6 +95,14 @@ public interface Artifact
     String getBaseVersion();
 
     /**
+     * Determines whether this artifact uses a snapshot version.
+     *
+     * @return {@code true} if the artifact is a snapshot, {@code false} otherwise.
+     * @see org.apache.maven.api.Session#isVersionSnapshot(String)
+     */
+    boolean isSnapshot();
+
+    /**
      * Gets the file of this artifact. Note that only resolved artifacts have a file associated with them. In general,
      * callers must not assume any relationship between an artifact's filename and its coordinates.
      *
