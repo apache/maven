@@ -58,6 +58,7 @@ public interface Session
     @Nonnull
     SessionData getData();
 
+    // TODO: investigate using Map<String, String> or Map<String, Object> for all properties in the new API
     @Nonnull
     Properties getUserProperties();
 

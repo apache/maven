@@ -112,9 +112,15 @@ public class DefaultVersionParser implements VersionParser
         }
 
         @Override
-        public String toString()
+        public String asString()
         {
             return delegate.toString();
+        }
+
+        @Override
+        public String toString()
+        {
+            return asString();
         }
     }
 
@@ -141,9 +147,15 @@ public class DefaultVersionParser implements VersionParser
         }
 
         @Override
-        public String toString()
+        public String asString()
         {
             return delegate.toString();
+        }
+
+        @Override
+        public String toString()
+        {
+            return asString();
         }
     }
 }

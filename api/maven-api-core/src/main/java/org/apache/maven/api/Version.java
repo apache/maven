@@ -34,12 +34,13 @@ public interface Version
     extends Comparable<Version>
 {
 
+    // TODO: add access to the version information
 
     /**
      * Returns a string representation of this version.
      * @return the string representation of this version
      */
     @Nonnull
-    String toString();
+    String asString();
 
 }
