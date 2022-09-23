@@ -31,7 +31,7 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.ArtifactProperties;
 
 /**
- * @author Benjamin Bentmann
+ * Maven GA level metadata.
  */
 final class VersionsMetadata
     extends MavenMetadata

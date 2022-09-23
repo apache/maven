@@ -318,11 +318,7 @@ public interface Session
 
     Path getPathForLocalArtifact( @Nonnull Artifact artifact );
 
-    Path getPathForLocalMetadata( Metadata metadata );
-
     Path getPathForRemoteArtifact( RemoteRepository remote, Artifact artifact );
-
-    Path getPathForRemoteMetadata( RemoteRepository remote, Metadata metadata );
 
     /**
      * Shortcut for <code>getService(VersionParser.class).parseVersion(...)</code>

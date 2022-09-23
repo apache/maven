@@ -19,14 +19,22 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
-import org.apache.maven.repository.internal.PluginsMetadataInfoProvider.PluginInfo;
+import org.apache.maven.repository.internal.PluginsMetadata.PluginInfo;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.deployment.DeployRequest;
@@ -35,42 +43,35 @@ import org.eclipse.aether.installation.InstallRequest;
 import org.eclipse.aether.metadata.Metadata;
 import org.eclipse.aether.util.ConfigUtils;
 
-import static java.util.Objects.requireNonNull;
-
 /**
- * Plugin G level metadata.
+ * Maven G level metadata generator.
+ * <p>
+ * Plugin metadata contains G level list of "prefix" to A mapping for plugins present under this G.
  */
 class PluginsMetadataGenerator
-    implements MetadataGenerator
+        implements MetadataGenerator
 {
-    private final PluginsMetadataInfoProvider pluginsMetadataInfoProvider;
-
-    private final Map<Object, PluginsMetadata> plugins;
+    private static final String PLUGIN_DESCRIPTOR_LOCATION = "META-INF/maven/plugin.xml";
 
     private final Map<Object, PluginsMetadata> processedPlugins;
 
     private final Date timestamp;
 
-    PluginsMetadataGenerator( PluginsMetadataInfoProvider pluginsMetadataInfoProvider,
-                              RepositorySystemSession session,
+    PluginsMetadataGenerator( RepositorySystemSession session,
                               InstallRequest request )
     {
-        this( pluginsMetadataInfoProvider, session, request.getMetadata() );
+        this( session, request.getMetadata() );
     }
 
-    PluginsMetadataGenerator( PluginsMetadataInfoProvider pluginsMetadataInfoProvider,
-                              RepositorySystemSession session,
+    PluginsMetadataGenerator( RepositorySystemSession session,
                               DeployRequest request )
     {
-        this( pluginsMetadataInfoProvider, session, request.getMetadata() );
+        this( session, request.getMetadata() );
     }
 
-    private PluginsMetadataGenerator( PluginsMetadataInfoProvider pluginsMetadataInfoProvider,
-                                      RepositorySystemSession session,
+    private PluginsMetadataGenerator( RepositorySystemSession session,
                                       Collection<? extends Metadata> metadatas )
     {
-        this.pluginsMetadataInfoProvider = requireNonNull( pluginsMetadataInfoProvider );
-        this.plugins = new LinkedHashMap<>();
         this.processedPlugins = new LinkedHashMap<>();
         this.timestamp = (Date) ConfigUtils.getObject( session, new Date(), "maven.startTime" );
 
@@ -86,8 +87,8 @@ class PluginsMetadataGenerator
             if ( metadata instanceof PluginsMetadata )
             {
                 it.remove();
-                PluginsMetadata pluginMetadata = ( PluginsMetadata ) metadata;
-                processedPlugins.put( pluginMetadata.getKey(), pluginMetadata );
+                PluginsMetadata pluginMetadata = (PluginsMetadata) metadata;
+                processedPlugins.put( pluginMetadata.getGroupId(), pluginMetadata );
             }
         }
     }
@@ -107,12 +108,13 @@ class PluginsMetadataGenerator
     @Override
     public Collection<? extends Metadata> finish( Collection<? extends Artifact> artifacts )
     {
+        LinkedHashMap<String, PluginsMetadata> plugins = new LinkedHashMap<>();
         for ( Artifact artifact : artifacts )
         {
-            PluginInfo pluginInfo = pluginsMetadataInfoProvider.getPluginInfo( artifact );
+            PluginInfo pluginInfo = extractPluginInfo( artifact );
             if ( pluginInfo != null )
             {
-                Object key = PluginsMetadata.getKey( artifact );
+                String key = pluginInfo.groupId;
                 if ( processedPlugins.get( key ) == null )
                 {
                     PluginsMetadata pluginMetadata = plugins.get( key );
@@ -124,7 +126,50 @@ class PluginsMetadataGenerator
                 }
             }
         }
-
         return plugins.values();
+    }
+
+    private PluginInfo extractPluginInfo( Artifact artifact )
+    {
+        // sanity: jar, no classifier and file exists
+        if ( artifact != null
+                && "jar".equals( artifact.getExtension() )
+                && "".equals( artifact.getClassifier() )
+                && artifact.getFile() != null )
+        {
+            Path artifactPath = artifact.getFile().toPath();
+            if ( Files.isRegularFile( artifactPath ) )
+            {
+                try ( JarFile artifactJar = new JarFile( artifactPath.toFile(), false ) )
+                {
+                    ZipEntry pluginDescriptorEntry = artifactJar.getEntry( PLUGIN_DESCRIPTOR_LOCATION );
+
+                    if ( pluginDescriptorEntry != null )
+                    {
+                        try ( Reader reader = ReaderFactory.newXmlReader(
+                                artifactJar.getInputStream( pluginDescriptorEntry ) ) )
+                        {
+                            // Note: using DOM instead of use of
+                            // org.apache.maven.plugin.descriptor.PluginDescriptor
+                            // as it would pull in dependency on:
+                            // - maven-plugin-api (for model)
+                            // - Plexus Container (for model supporting classes and exceptions)
+                            Xpp3Dom root = Xpp3DomBuilder.build( reader );
+                            String groupId = root.getChild( "groupId" ).getValue();
+                            String artifactId = root.getChild( "artifactId" ).getValue();
+                            String goalPrefix = root.getChild( "goalPrefix" ).getValue();
+                            String name = root.getChild( "name" ).getValue();
+                            return new PluginInfo( groupId, artifactId, goalPrefix, name );
+                        }
+
+                    }
+                }
+                catch ( Exception e )
+                {
+                    // here we can have: IO. ZIP or Plexus Conf Ex: but we should not interfere with user intent
+                }
+            }
+        }
+        return null;
     }
 }

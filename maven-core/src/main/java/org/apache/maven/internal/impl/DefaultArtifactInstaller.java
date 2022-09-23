@@ -20,20 +20,13 @@ package org.apache.maven.internal.impl;
  */
 
 import org.apache.maven.api.annotations.Nonnull;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.apache.maven.api.services.ArtifactInstaller;
 import org.apache.maven.api.services.ArtifactInstallerException;
 import org.apache.maven.api.services.ArtifactInstallerRequest;
-import org.apache.maven.api.services.ArtifactManager;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.installation.InstallRequest;
 import org.eclipse.aether.installation.InstallResult;
 import org.eclipse.aether.installation.InstallationException;
-import org.eclipse.aether.metadata.Metadata;
 
 import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
@@ -56,15 +49,8 @@ public class DefaultArtifactInstaller implements ArtifactInstaller
                 "request.session should be a " + DefaultSession.class );
         try
         {
-            ArtifactManager artifactManager = session.getService( ArtifactManager.class );
-            List<Metadata> metadatas = request.getArtifacts().stream()
-                    .map( artifactManager::getAttachedMetadatas )
-                    .flatMap( Collection::stream )
-                    .map( session::toMetadata )
-                    .collect( Collectors.toList() );
             InstallRequest installRequest = new InstallRequest()
-                    .setArtifacts( session.toArtifacts( request.getArtifacts() ) )
-                    .setMetadata( metadatas );
+                    .setArtifacts( session.toArtifacts( request.getArtifacts() ) );
 
             InstallResult result = repositorySystem.install( session.getSession(), installRequest );
         }

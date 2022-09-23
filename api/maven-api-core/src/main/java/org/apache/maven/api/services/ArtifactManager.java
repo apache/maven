@@ -24,11 +24,9 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.Metadata;
 
 /**
  *
@@ -49,16 +47,5 @@ public interface ArtifactManager extends Service
      * Associates the given file path to the artifact.
      */
     void setPath( @Nonnull Artifact artifact, Path path );
-
-    /**
-     * TODO: investigate removing the Metadata api completely
-     */
-    @Nonnull
-    Collection<Metadata> getAttachedMetadatas( @Nonnull Artifact artifact );
-
-    /**
-     * TODO: investigate removing the Metadata api completely
-     */
-    void attachMetadata( @Nonnull Artifact artifact, @Nonnull Metadata metadata );
 
 }

@@ -23,7 +23,6 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.LocalRepository;
-import org.apache.maven.api.Metadata;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
@@ -39,10 +38,6 @@ public interface LocalRepositoryManager extends Service
 
     Path getPathForLocalArtifact( Session session, LocalRepository local, Artifact artifact );
 
-    Path getPathForLocalMetadata( Session session, LocalRepository local, Metadata metadata );
-
     Path getPathForRemoteArtifact( Session session, LocalRepository local, RemoteRepository remote, Artifact artifact );
-
-    Path getPathForRemoteMetadata( Session session, LocalRepository local, RemoteRepository remote, Metadata metadata );
 
 }

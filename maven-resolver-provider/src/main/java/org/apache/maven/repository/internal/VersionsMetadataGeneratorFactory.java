@@ -29,27 +29,29 @@ import org.eclipse.aether.impl.MetadataGeneratorFactory;
 import org.eclipse.aether.installation.InstallRequest;
 
 /**
- * @author Benjamin Bentmann
+ * Maven GA level metadata generator factory.
  */
 @Named( "versions" )
 @Singleton
 public class VersionsMetadataGeneratorFactory
     implements MetadataGeneratorFactory
 {
-
+    @Override
     public MetadataGenerator newInstance( RepositorySystemSession session, InstallRequest request )
     {
         return new VersionsMetadataGenerator( session, request );
     }
 
+    @Override
     public MetadataGenerator newInstance( RepositorySystemSession session, DeployRequest request )
     {
         return new VersionsMetadataGenerator( session, request );
     }
 
+    @SuppressWarnings( "checkstyle:magicnumber" )
+    @Override
     public float getPriority()
     {
-        return 5;
+        return 20; // GA level metadata should be deployed 2nd MD
     }
-
 }

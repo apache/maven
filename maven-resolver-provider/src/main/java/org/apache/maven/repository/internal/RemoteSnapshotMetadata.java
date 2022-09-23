@@ -36,7 +36,7 @@ import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.eclipse.aether.artifact.Artifact;
 
 /**
- * @author Benjamin Bentmann
+ * Maven remote GAV level metadata.
  */
 final class RemoteSnapshotMetadata
     extends MavenSnapshotMetadata

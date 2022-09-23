@@ -33,7 +33,7 @@ import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.eclipse.aether.artifact.Artifact;
 
 /**
- * @author Benjamin Bentmann
+ * Maven local GAV level metadata.
  */
 final class LocalSnapshotMetadata
     extends MavenMetadata

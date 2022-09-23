@@ -39,7 +39,6 @@ import org.apache.maven.api.Dependency;
 import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.Listener;
 import org.apache.maven.api.LocalRepository;
-import org.apache.maven.api.Metadata;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
@@ -217,33 +216,6 @@ public abstract class AbstractSession implements Session
                 null,
                 (File) null
         );
-    }
-
-    public org.eclipse.aether.metadata.Metadata toMetadata( Metadata metadata )
-    {
-        /*
-        if ( metadata instanceof ProjectArtifactMetadata )
-        {
-            Artifact pomArtifact = new SubArtifact( mainArtifact, "", "pom" );
-            pomArtifact = pomArtifact.setFile( ( (ProjectArtifactMetadata) metadata ).getFile() );
-            request.addArtifact( pomArtifact );
-        }
-        else if ( // metadata instanceof SnapshotArtifactRepositoryMetadata ||
-                metadata instanceof ArtifactRepositoryMetadata )
-        {
-            // eaten, handled by repo system
-        }
-        else if ( metadata instanceof org.apache.maven.shared.transfer.metadata.ArtifactMetadata )
-        {
-            org.apache.maven.shared.transfer.metadata.ArtifactMetadata transferMetadata =
-                    (org.apache.maven.shared.transfer.metadata.ArtifactMetadata) metadata;
-
-            request.addMetadata( new Maven31MetadataBridge( metadata ).setFile( transferMetadata.getFile() ) );
-        }
-
-         */
-        // TODO
-        throw new UnsupportedOperationException( "Not implemented yet" );
     }
 
     @Override
@@ -587,24 +559,10 @@ public abstract class AbstractSession implements Session
     }
 
     @Override
-    public Path getPathForLocalMetadata( Metadata metadata )
-    {
-        return getService( LocalRepositoryManager.class )
-                .getPathForLocalMetadata( this, getLocalRepository(), metadata );
-    }
-
-    @Override
     public Path getPathForRemoteArtifact( RemoteRepository remote, Artifact artifact )
     {
         return getService( LocalRepositoryManager.class )
                 .getPathForRemoteArtifact( this, getLocalRepository(), remote, artifact );
-    }
-
-    @Override
-    public Path getPathForRemoteMetadata( RemoteRepository remote, Metadata metadata )
-    {
-        return getService( LocalRepositoryManager.class )
-                .getPathForRemoteMetadata( this, getLocalRepository(), remote, metadata );
     }
 
     @Override

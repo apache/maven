@@ -35,7 +35,9 @@ import org.eclipse.aether.metadata.Metadata;
 import org.eclipse.aether.util.ConfigUtils;
 
 /**
- * @author Benjamin Bentmann
+ * Maven GA level metadata generator.
+ *
+ * Version metadata contains list of existing baseVersions within this GA.
  */
 class VersionsMetadataGenerator
     implements MetadataGenerator
