@@ -85,16 +85,6 @@ public interface Artifact
     Type getType();
 
     /**
-     * Gets the base version of this artifact, for example "1.0-SNAPSHOT". In contrast to the {@link #getVersion()}, the
-     * base version will always refer to the unresolved version.
-     * TODO: move this inside {@link Version} ?
-     *
-     * @return The base version, never {@code null}.
-     */
-    @Nonnull
-    String getBaseVersion();
-
-    /**
      * Determines whether this artifact uses a snapshot version.
      *
      * @return {@code true} if the artifact is a snapshot, {@code false} otherwise.
@@ -110,17 +100,5 @@ public interface Artifact
      */
     @Nonnull
     Optional<Path> getPath();
-
-    /**
-     * Unique id identifying this artifact
-     */
-    default String getId()
-    {
-        return getGroupId()
-                + ":" + getArtifactId()
-                + ":" + getExtension()
-                + ( getClassifier().isEmpty() ? "" : ":" + getClassifier() )
-                + ":" + getBaseVersion();
-    }
 
 }

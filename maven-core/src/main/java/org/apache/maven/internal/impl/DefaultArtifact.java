@@ -95,13 +95,6 @@ public class DefaultArtifact implements Artifact
         return artifact.getClassifier();
     }
 
-    @Nonnull
-    @Override
-    public String getBaseVersion()
-    {
-        return artifact.getBaseVersion();
-    }
-
     @Override
     public boolean isSnapshot()
     {

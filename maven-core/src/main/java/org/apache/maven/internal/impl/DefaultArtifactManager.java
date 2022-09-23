@@ -53,10 +53,10 @@ public class DefaultArtifactManager implements ArtifactManager
     {
         if ( session.getMavenSession().getAllProjects() != null )
         {
-            String id = artifact.getId();
+            String id = id( artifact );
             for ( MavenProject project : session.getMavenSession().getAllProjects() )
             {
-                if ( id.equals( project.getArtifact().getId() ) && project.getArtifact().getFile() != null )
+                if ( id.equals( id( project.getArtifact() ) ) && project.getArtifact().getFile() != null )
                 {
                     return Optional.of( project.getArtifact().getFile().toPath() );
                 }
@@ -71,10 +71,10 @@ public class DefaultArtifactManager implements ArtifactManager
     {
         if ( session.getMavenSession().getAllProjects() != null )
         {
-            String id = artifact.getId();
+            String id = id( artifact );
             for ( MavenProject project : session.getMavenSession().getAllProjects() )
             {
-                if ( id.equals( project.getArtifact().getId() ) )
+                if ( id.equals( id( project.getArtifact() ) ) )
                 {
                     project.getArtifact().setFile( path != null ? path.toFile() : null );
                     break;
@@ -103,6 +103,24 @@ public class DefaultArtifactManager implements ArtifactManager
     public void attachMetadata( @Nonnull Artifact artifact, @Nonnull Metadata metadata )
     {
         metadatas.computeIfAbsent( artifact, a -> new CopyOnWriteArrayList<>() ).add( metadata );
+    }
+
+    private String id( org.apache.maven.artifact.Artifact artifact )
+    {
+        return artifact.getGroupId()
+                + ":" + artifact.getArtifactId()
+                + ":" + artifact.getType()
+                + ( artifact.getClassifier().isEmpty() ? "" : ":" + artifact.getClassifier() )
+                + ":" + artifact.getVersion();
+    }
+
+    private String id( Artifact artifact )
+    {
+        return artifact.getGroupId()
+                + ":" + artifact.getArtifactId()
+                + ":" + artifact.getExtension()
+                + ( artifact.getClassifier().isEmpty() ? "" : ":" + artifact.getClassifier() )
+                + ":" + artifact.getVersion();
     }
 
 }
