@@ -22,8 +22,6 @@ package org.apache.maven.it;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * An integration test which proves that the bug of MNG-7310 is fixed.
