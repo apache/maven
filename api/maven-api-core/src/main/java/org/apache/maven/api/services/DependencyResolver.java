@@ -21,6 +21,7 @@ package org.apache.maven.api.services;
 
 import java.util.function.Predicate;
 
+import org.apache.maven.api.Coordinate;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Dependency;
@@ -48,6 +49,55 @@ public interface DependencyResolver extends Service
      * @throws IllegalArgumentException if {@code request} is null or invalid
      */
     DependencyResolverResult resolve( DependencyResolverRequest request );
+
+    /**
+     * This will resolve the dependencies of the coordinate, not resolving the artifact of the coordinate itself.
+     *
+     * @param session The {@link Session}, must not be {@code null}.
+     * @param coordinate {@link Coordinate}
+     * @return the resolved dependencies.
+     * @throws DependencyResolverException in case of an error.
+     * @throws IllegalArgumentException if {@code request} is null or invalid
+     */
+    @Nonnull
+    default DependencyResolverResult resolve( @Nonnull Session session,
+                                              @Nonnull Coordinate coordinate )
+    {
+        return resolve( session, session.createDependency( coordinate ) );
+    }
+
+    /**
+     * This will resolve the dependencies of the coordinate, not resolving the artifact of the coordinate itself.
+     *
+     * @param session The {@link Session}, must not be {@code null}.
+     * @param coordinate {@link Coordinate}
+     * @return the resolved dependencies.
+     * @throws DependencyResolverException in case of an error.
+     * @throws IllegalArgumentException if {@code request} is null or invalid
+     */
+    @Nonnull
+    default DependencyResolverResult resolve( @Nonnull Session session,
+                                              @Nonnull Coordinate coordinate,
+                                              @Nullable Predicate<Node> filter )
+    {
+        return resolve( session, session.createDependency( coordinate ), filter );
+    }
+
+    /**
+     * This will resolve the dependencies of the coordinate, not resolving the artifact of the coordinate itself.
+     *
+     * @param session The {@link Session}, must not be {@code null}.
+     * @param root {@link Dependency}
+     * @return the resolved dependencies.
+     * @throws DependencyResolverException in case of an error.
+     * @throws IllegalArgumentException if {@code request} is null or invalid
+     */
+    @Nonnull
+    default DependencyResolverResult resolve( @Nonnull Session session,
+                                              @Nonnull Dependency root )
+    {
+        return resolve( session, root, null );
+    }
 
     /**
      * This will resolve the dependencies of the coordinate, not resolving the artifact of the coordinate itself.

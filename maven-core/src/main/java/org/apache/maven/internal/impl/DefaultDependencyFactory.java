@@ -47,7 +47,7 @@ public class DefaultDependencyFactory implements DependencyFactory
         return new DefaultDependency(
                 session,
                 new org.eclipse.aether.graph.Dependency(
-                        session.toArtifact( request.getArtifact() ),
+                        session.toArtifact( request.getCoordinate() ),
                         request.getScope(),
                         request.isOptional(),
                         request.getExclusions().stream().map( this::toExclusion ).collect( Collectors.toList() ) ) );

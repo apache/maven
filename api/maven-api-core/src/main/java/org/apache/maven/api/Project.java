@@ -19,13 +19,12 @@ package org.apache.maven.api;
  * under the License.
  */
 
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
-
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Model;
 
@@ -93,4 +92,14 @@ public interface Project
     }
 
     boolean isExecutionRoot();
+
+    @Nonnull
+    Optional<Project> getParent();
+
+    @Nonnull
+    List<RemoteRepository> getRemoteProjectRepositories();
+
+    @Nonnull
+    List<RemoteRepository> getRemotePluginRepositories();
+
 }

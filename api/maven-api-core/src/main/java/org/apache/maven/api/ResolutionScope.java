@@ -72,6 +72,18 @@ public enum ResolutionScope
     private final String id;
     private final Set<Scope> scopes;
 
+    public static ResolutionScope fromString( String id )
+    {
+        for ( ResolutionScope scope : ResolutionScope.values() )
+        {
+            if ( scope.id().equals( id ) )
+            {
+                return scope;
+            }
+        }
+        throw new IllegalArgumentException( "Unknown resolution scope " + id );
+    }
+
     ResolutionScope( String id, Scope... scopes )
     {
         this.id = id;

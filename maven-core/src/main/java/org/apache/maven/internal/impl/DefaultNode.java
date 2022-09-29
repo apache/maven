@@ -19,51 +19,62 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Node;
-import org.apache.maven.api.NodeVisitor;
 import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.Repository;
 import org.apache.maven.api.annotations.Nonnull;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
+import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 
-public class DefaultNode implements Node
+public class DefaultNode extends AbstractNode
 {
 
-    private final @Nonnull AbstractSession session;
-    private final @Nonnull org.eclipse.aether.graph.DependencyNode node;
+    protected final @Nonnull AbstractSession session;
+    protected final @Nonnull org.eclipse.aether.graph.DependencyNode node;
+    protected final boolean verbose;
 
     public DefaultNode( @Nonnull AbstractSession session,
-                        @Nonnull org.eclipse.aether.graph.DependencyNode node )
+                        @Nonnull org.eclipse.aether.graph.DependencyNode node,
+                        boolean verbose )
     {
         this.session = session;
         this.node = node;
+        this.verbose = verbose;
+    }
+
+    @Override
+    DependencyNode getDependencyNode()
+    {
+        return node;
     }
 
     @Override
     public Artifact getArtifact()
     {
-        return session.getArtifact( node.getArtifact() );
+        return node.getArtifact() != null ? session.getArtifact( node.getArtifact() ) : null;
     }
 
     @Override
     public Dependency getDependency()
     {
-        return session.getDependency( node.getDependency() );
+        return node.getDependency() != null ? session.getDependency( node.getDependency() ) : null;
     }
 
     @Override
     public List<Node> getChildren()
     {
-        return new MappedList<>( node.getChildren(), session::getNode );
+        return new MappedList<>( node.getChildren(), n -> session.getNode( n, verbose ) );
     }
 
     @Override
-    public List<Repository> getRemoteRepositories()
+    public List<RemoteRepository> getRemoteRepositories()
     {
         return new MappedList<>( node.getRepositories(), session::getRemoteRepository );
     }
@@ -76,25 +87,94 @@ public class DefaultNode implements Node
     }
 
     @Override
-    public boolean accept( NodeVisitor visitor )
+    public String asString()
     {
-        if ( visitor.enter( this ) )
+        String nodeString = super.asString();
+
+        if ( !verbose )
         {
-            for ( Node child : getChildren() )
+            return nodeString;
+        }
+
+        org.eclipse.aether.graph.DependencyNode node = getDependencyNode();
+
+        List<String> details = new ArrayList<>();
+
+        org.eclipse.aether.graph.DependencyNode winner =
+                (org.eclipse.aether.graph.DependencyNode) node.getData().get( ConflictResolver.NODE_DATA_WINNER );
+        String winnerVersion = winner != null ? winner.getArtifact().getBaseVersion() : null;
+        boolean included = ( winnerVersion == null );
+
+        String preManagedVersion = DependencyManagerUtils.getPremanagedVersion( node );
+        if ( preManagedVersion != null )
+        {
+            details.add( "version managed from " + preManagedVersion );
+        }
+
+        String preManagedScope = DependencyManagerUtils.getPremanagedScope( node );
+        if ( preManagedScope != null )
+        {
+            details.add( "scope managed from " + preManagedScope );
+        }
+
+        String originalScope = (String) node.getData().get( ConflictResolver.NODE_DATA_ORIGINAL_SCOPE );
+        if ( originalScope != null && !originalScope.equals( node.getDependency().getScope() ) )
+        {
+            details.add( "scope updated from " + originalScope );
+        }
+
+        if ( !included )
+        {
+            if ( Objects.equals( winnerVersion, node.getArtifact().getVersion() ) )
             {
-                if ( !child.accept( visitor ) )
-                {
-                    break;
-                }
+                details.add( "omitted for duplicate" );
+            }
+            else
+            {
+                details.add( "omitted for conflict with " + winnerVersion );
             }
         }
-        return visitor.leave( this );
+
+        StringBuilder buffer = new StringBuilder();
+        if ( included )
+        {
+            buffer.append( nodeString );
+            if ( !details.isEmpty() )
+            {
+                buffer.append( " (" );
+                join( buffer, details, "; " );
+                buffer.append( ")" );
+            }
+        }
+        else
+        {
+            buffer.append( "(" );
+            buffer.append( nodeString );
+            if ( !details.isEmpty() )
+            {
+                buffer.append( " - " );
+                join( buffer, details, "; " );
+            }
+            buffer.append( ")" );
+        }
+        return buffer.toString();
     }
 
-    @Override
-    public Node filter( Predicate<Node> filter )
+    private static void join( StringBuilder buffer, List<String> details, String separator )
     {
-        // TODO
-        throw new UnsupportedOperationException( "Not implemented yet" );
+        boolean first = true;
+        for ( String detail : details )
+        {
+            if ( first )
+            {
+                first = false;
+            }
+            else
+            {
+                buffer.append( separator );
+            }
+            buffer.append( detail );
+        }
     }
+
 }

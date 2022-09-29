@@ -19,6 +19,7 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Scope;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.VersionRange;
@@ -142,6 +143,25 @@ public class DefaultProject implements Project
     public boolean isExecutionRoot()
     {
         return project.isExecutionRoot();
+    }
+
+    @Override
+    public Optional<Project> getParent()
+    {
+        MavenProject parent = project.getParent();
+        return parent != null ? Optional.of( session.getProject( parent ) ) : Optional.empty();
+    }
+
+    @Override
+    public List<RemoteRepository> getRemoteProjectRepositories()
+    {
+        return new MappedList<>( project.getRemoteProjectRepositories(), session::getRemoteRepository );
+    }
+
+    @Override
+    public List<RemoteRepository> getRemotePluginRepositories()
+    {
+        return new MappedList<>( project.getRemotePluginRepositories(), session::getRemoteRepository );
     }
 
     @Nonnull

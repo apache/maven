@@ -88,4 +88,6 @@ public interface ProjectManager extends Service
 
     Node getCollectedDependencies( Project project, ResolutionScope scope );
 
+    void setProperty( Project project, String key, String value );
+
 }

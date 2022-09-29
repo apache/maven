@@ -107,7 +107,7 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest
         nonNull( project, "project can not be null" );
         return builder()
                 .session( session )
-                .root( session.createDependency( project.getArtifact() ) )
+                .rootArtifact( project.getArtifact() )
                 .dependencies( project.getDependencies() )
                 .managedDependencies( project.getManagedDependencies() )
                 .filter( filter )
@@ -129,6 +129,7 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest
         List<Dependency> dependencies = Collections.emptyList();
         List<Dependency> managedDependencies = Collections.emptyList();
         Predicate<Node> filter;
+        boolean verbose;
 
         @Nonnull
         public DependencyResolverRequestBuilder session( @Nonnull Session session )
@@ -246,6 +247,13 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest
         }
 
         @Nonnull
+        public DependencyResolverRequestBuilder verbose( boolean verbose )
+        {
+            this.verbose = verbose;
+            return this;
+        }
+
+        @Nonnull
         public DependencyResolverRequest build()
         {
             return new DefaultDependencyResolverRequest(
@@ -254,7 +262,8 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest
                     root,
                     dependencies,
                     managedDependencies,
-                    filter );
+                    filter,
+                    verbose );
         }
 
         private static class DefaultDependencyResolverRequest extends BaseRequest
@@ -265,6 +274,7 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest
             private final Collection<Dependency> dependencies;
             private final Collection<Dependency> managedDependencies;
             private final Predicate<Node> filter;
+            private final boolean verbose;
 
 
             /**
@@ -280,7 +290,8 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest
                     @Nullable Dependency root,
                     @Nullable Collection<Dependency> dependencies,
                     @Nullable Collection<Dependency> managedDependencies,
-                    @Nullable Predicate<Node> filter )
+                    @Nullable Predicate<Node> filter,
+                    boolean verbose )
             {
                 super( session );
                 this.rootArtifact = rootArtifact;
@@ -288,6 +299,7 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest
                 this.dependencies = unmodifiable( dependencies );
                 this.managedDependencies = unmodifiable( managedDependencies );
                 this.filter = filter;
+                this.verbose = verbose;
             }
 
             @Nonnull
@@ -323,6 +335,12 @@ public interface DependencyResolverRequest extends DependencyCollectorRequest
             public Optional<Predicate<Node>> getFilter()
             {
                 return Optional.ofNullable( filter );
+            }
+
+            @Override
+            public boolean getVerbose()
+            {
+                return verbose;
             }
 
             @Override

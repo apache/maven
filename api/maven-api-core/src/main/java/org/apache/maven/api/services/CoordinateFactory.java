@@ -19,11 +19,15 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Coordinate;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.model.ReportPlugin;
 
 /**
  * Service used to create {@link Coordinate} objects.
@@ -57,5 +61,34 @@ public interface CoordinateFactory extends Service
     {
         return create( CoordinateFactoryRequest.build( session, groupId, artifactId,
                                                      version, classifier, extension, type ) );
+    }
+
+    @Nonnull
+    default Coordinate create( @Nonnull Session session, Dependency dependency )
+    {
+        return create( CoordinateFactoryRequest.build( session,
+                dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), null ) );
+    }
+
+    @Nonnull
+    default Coordinate create( @Nonnull Session session, Artifact artifact )
+    {
+        return create( CoordinateFactoryRequest.build( session,
+                artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion().asString(),
+                artifact.getClassifier(), artifact.getExtension(), artifact.getType().getName() ) );
+    }
+
+    @Nonnull
+    default Coordinate create( @Nonnull Session session, Plugin plugin )
+    {
+        return create( CoordinateFactoryRequest.build( session,
+                plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), null ) );
+    }
+
+    @Nonnull
+    default Coordinate create( @Nonnull Session session, ReportPlugin reportPlugin )
+    {
+        return create( CoordinateFactoryRequest.build( session,
+                reportPlugin.getGroupId(), reportPlugin.getArtifactId(), reportPlugin.getVersion(), null ) );
     }
 }

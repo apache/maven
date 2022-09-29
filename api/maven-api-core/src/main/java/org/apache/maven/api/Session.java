@@ -202,7 +202,15 @@ public interface Session
      *
      * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
      */
-    Artifact resolveArtifact( Coordinate artifact );
+    Artifact resolveArtifact( Coordinate coordinate );
+
+    /**
+     * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
+     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Coordinate)
+     *
+     * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
+     */
+    Artifact resolveArtifact( Artifact artifact );
 
     /**
      * Shortcut for {@code getService(ArtifactInstaller.class).install(...)}
@@ -249,10 +257,10 @@ public interface Session
 
     /**
      * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
-     * @see org.apache.maven.api.services.DependencyFactory#create(Session, Artifact)
+     * @see org.apache.maven.api.services.DependencyFactory#create(Session, Coordinate)
      */
     @Nonnull
-    Dependency createDependency( @Nonnull Artifact artifact );
+    Dependency createDependency( @Nonnull Coordinate coordinate );
 
     /**
      * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>

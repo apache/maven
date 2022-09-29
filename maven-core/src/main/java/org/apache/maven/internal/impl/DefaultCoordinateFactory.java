@@ -46,9 +46,9 @@ public class DefaultCoordinateFactory implements CoordinateFactory
             type = session.getSession().getArtifactTypeRegistry().get( request.getType() );
         }
         String classifier = StringUtils.isNotEmpty( request.getClassifier() )
-                                ? request.getClassifier() : type != null ? type.getClassifier() : null;
+                                ? request.getClassifier() : type != null ? type.getClassifier() : "";
         String extension = StringUtils.isNotEmpty( request.getExtension() )
-                                ? request.getExtension() : type != null ? type.getExtension() : null;
+                                ? request.getExtension() : type != null ? type.getExtension() : "";
         return new DefaultCoordinate(
                 session,
                 new org.eclipse.aether.artifact.DefaultArtifact(

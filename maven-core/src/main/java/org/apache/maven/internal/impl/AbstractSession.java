@@ -91,7 +91,12 @@ public abstract class AbstractSession implements Session
 
     public Node getNode( org.eclipse.aether.graph.DependencyNode node )
     {
-        return allNodes.computeIfAbsent( node, n -> new DefaultNode( this, n ) );
+        return getNode( node, false );
+    }
+
+    public Node getNode( org.eclipse.aether.graph.DependencyNode node, boolean verbose )
+    {
+        return allNodes.computeIfAbsent( node, n -> new DefaultNode( this, n, verbose ) );
     }
 
     @Nonnull
@@ -200,6 +205,10 @@ public abstract class AbstractSession implements Session
 
     public org.eclipse.aether.artifact.Artifact toArtifact( Coordinate coord )
     {
+        if ( coord instanceof DefaultCoordinate )
+        {
+            return ( ( DefaultCoordinate ) coord ).getCoordinate();
+        }
         return new org.eclipse.aether.artifact.DefaultArtifact(
                 coord.getGroupId(),
                 coord.getArtifactId(),
@@ -355,11 +364,25 @@ public abstract class AbstractSession implements Session
      * @see ArtifactResolver#resolve(Session, Coordinate)
      */
     @Override
-    public Artifact resolveArtifact( Coordinate artifact )
+    public Artifact resolveArtifact( Coordinate coordinate )
     {
         return getService( ArtifactResolver.class )
-                .resolve( this, artifact )
+                .resolve( this, coordinate )
                 .getArtifact();
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
+     *
+     * @throws ArtifactResolverException if the artifact resolution failed
+     * @see ArtifactResolver#resolve(Session, Coordinate)
+     */
+    @Override
+    public Artifact resolveArtifact( Artifact artifact )
+    {
+        Coordinate coordinate = getService( CoordinateFactory.class )
+                .create( this, artifact );
+        return resolveArtifact( coordinate );
     }
 
     /**
@@ -440,14 +463,14 @@ public abstract class AbstractSession implements Session
     /**
      * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
      *
-     * @see DependencyFactory#create(Session, Artifact)
+     * @see DependencyFactory#create(Session, Coordinate)
      */
     @Nonnull
     @Override
-    public Dependency createDependency( @Nonnull Artifact artifact )
+    public Dependency createDependency( @Nonnull Coordinate coordinate )
     {
         return getService( DependencyFactory.class )
-                .create( this, artifact );
+                .create( this, coordinate );
     }
 
     /**

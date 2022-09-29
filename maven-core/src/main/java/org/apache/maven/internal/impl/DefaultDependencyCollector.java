@@ -30,12 +30,16 @@ import org.apache.maven.api.services.DependencyCollector;
 import org.apache.maven.api.services.DependencyCollectorException;
 import org.apache.maven.api.services.DependencyCollectorRequest;
 import org.apache.maven.api.services.DependencyCollectorResult;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
+import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 
 import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
@@ -65,15 +69,23 @@ public class DefaultDependencyCollector implements DependencyCollector
         Dependency root = request.getRoot().map( session::toDependency ).orElse( null );
         CollectRequest collectRequest = new CollectRequest()
                 .setRootArtifact( rootArtifact )
-                .setRoot( root != null ? root : new Dependency( rootArtifact, null ) )
+                .setRoot( root )
                 .setDependencies( session.toDependencies( request.getDependencies() ) )
                 .setManagedDependencies( session.toDependencies( request.getManagedDependencies() ) )
                 .setRepositories( session.toRepositories( session.getRemoteRepositories() ) );
 
+        RepositorySystemSession systemSession = session.getSession();
+        if ( request.getVerbose() )
+        {
+            systemSession = new DefaultRepositorySystemSession( systemSession )
+                    .setConfigProperty( ConflictResolver.CONFIG_PROP_VERBOSE, true )
+                    .setConfigProperty( DependencyManagerUtils.CONFIG_PROP_VERBOSE, true );
+        }
+
         try
         {
             final CollectResult
-                    result = repositorySystem.collectDependencies( session.getSession(), collectRequest );
+                    result = repositorySystem.collectDependencies( systemSession, collectRequest );
             return new DependencyCollectorResult()
             {
                 @Override
@@ -85,7 +97,7 @@ public class DefaultDependencyCollector implements DependencyCollector
                 @Override
                 public Node getRoot()
                 {
-                    return session.getNode( result.getRoot() );
+                    return session.getNode( result.getRoot(), request.getVerbose() );
                 }
             };
         }

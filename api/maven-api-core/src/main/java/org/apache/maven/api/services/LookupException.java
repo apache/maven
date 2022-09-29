@@ -9,7 +9,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,36 +19,32 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
-import org.apache.maven.api.Coordinate;
-import org.apache.maven.api.Dependency;
-import org.apache.maven.api.Service;
-import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
 
 /**
+ * The Exception class throw by the {@link Lookup} service.
  *
  * @since 4.0
  */
 @Experimental
-public interface DependencyFactory extends Service
+public class LookupException
+    extends MavenException
 {
+    /**
+     * @param message The message to give.
+     * @param e The {@link Exception}.
+     */
+    public LookupException( String message, Exception e )
+    {
+        super( message, e );
+    }
 
     /**
-     * Creates a new {@link Dependency} object from the request.
-     *
-     * @param request the request containing the various data
-     * @return a new {@link Dependency} object.
-     *
-     * @throws IllegalArgumentException if {@code request} is null or
-     *         if {@code request.getSession()} is null or invalid
+     * @param e The {@link Exception}.
      */
-    @Nonnull
-    Dependency create( @Nonnull DependencyFactoryRequest request );
-
-    @Nonnull
-    default Dependency create( @Nonnull Session session, @Nonnull Coordinate coordinate )
+    public LookupException( Exception e )
     {
-        return create( DependencyFactoryRequest.build( session, coordinate ) );
+        super( e );
     }
+
 }

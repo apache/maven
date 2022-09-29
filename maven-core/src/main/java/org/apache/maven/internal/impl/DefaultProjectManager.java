@@ -158,6 +158,12 @@ public class DefaultProjectManager implements ProjectManager
         throw new UnsupportedOperationException( "Not implemented yet" );
     }
 
+    @Override
+    public void setProperty( Project project, String key, String value )
+    {
+        getMavenProject( project ).getProperties().setProperty( key, value );
+    }
+
     private MavenProject getMavenProject( Project project )
     {
         return ( ( DefaultProject ) project ).getProject();

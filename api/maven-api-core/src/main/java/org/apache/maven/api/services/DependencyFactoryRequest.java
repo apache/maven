@@ -19,17 +19,16 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Immutable;
-import org.apache.maven.api.annotations.Nonnull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.apache.maven.api.Session;
-import org.apache.maven.api.Artifact;
+import org.apache.maven.api.Coordinate;
 import org.apache.maven.api.Exclusion;
+import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 
 /**
@@ -44,7 +43,7 @@ public interface DependencyFactoryRequest
     @Nonnull
     Session getSession();
 
-    Artifact getArtifact();
+    Coordinate getCoordinate();
 
     String getScope();
 
@@ -53,11 +52,11 @@ public interface DependencyFactoryRequest
     @Nonnull
     Collection<Exclusion> getExclusions();
 
-    static DependencyFactoryRequest build( Session session, Artifact artifact )
+    static DependencyFactoryRequest build( Session session, Coordinate coordinate )
     {
         return builder()
                 .session( session )
-                .artifact( artifact )
+                .coordinate( coordinate )
                 .build();
     }
 
@@ -70,7 +69,7 @@ public interface DependencyFactoryRequest
     class DependencyFactoryRequestBuilder
     {
         private Session session;
-        private Artifact artifact;
+        private Coordinate coordinate;
         private String scope;
         private boolean optional;
         private Collection<Exclusion> exclusions = Collections.emptyList();
@@ -81,9 +80,9 @@ public interface DependencyFactoryRequest
             return this;
         }
 
-        public DependencyFactoryRequestBuilder artifact( Artifact artifact )
+        public DependencyFactoryRequestBuilder coordinate( Coordinate coordinate )
         {
-            this.artifact = artifact;
+            this.coordinate = coordinate;
             return this;
         }
 
@@ -127,30 +126,30 @@ public interface DependencyFactoryRequest
 
         public DependencyFactoryRequest build()
         {
-            return new DefaultDependencyFactoryRequest( session, artifact, scope, optional, exclusions );
+            return new DefaultDependencyFactoryRequest( session, coordinate, scope, optional, exclusions );
         }
 
         private static class DefaultDependencyFactoryRequest extends BaseRequest implements DependencyFactoryRequest
         {
-            private final Artifact artifact;
+            private final Coordinate coordinate;
             private final String scope;
             private final boolean optional;
             private final Collection<Exclusion> exclusions;
 
-            private DefaultDependencyFactoryRequest( @Nonnull Session session, Artifact artifact, String scope,
+            private DefaultDependencyFactoryRequest( @Nonnull Session session, Coordinate coordinate, String scope,
                                                      boolean optional, Collection<Exclusion> exclusions )
             {
                 super( session );
-                this.artifact = artifact;
+                this.coordinate = coordinate;
                 this.scope = scope;
                 this.optional = optional;
                 this.exclusions = exclusions;
             }
 
             @Override
-            public Artifact getArtifact()
+            public Coordinate getCoordinate()
             {
-                return artifact;
+                return coordinate;
             }
 
             @Override

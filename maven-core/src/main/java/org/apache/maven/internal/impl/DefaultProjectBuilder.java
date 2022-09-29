@@ -19,6 +19,7 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import org.apache.maven.api.Coordinate;
 import org.apache.maven.api.annotations.Nonnull;
 import javax.inject.Inject;
 
@@ -36,6 +37,7 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.services.ProjectBuilderProblemSeverity;
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelSource;
@@ -109,6 +111,14 @@ public class DefaultProjectBuilder implements ProjectBuilder
                 Artifact a = request.getArtifact().get();
                 org.eclipse.aether.artifact.Artifact aetherArtifact = session.toArtifact( a );
                 org.apache.maven.artifact.Artifact artifact = RepositoryUtils.toArtifact( aetherArtifact );
+                res = builder.build( artifact, request.isAllowStubModel(), req );
+            }
+            else if ( request.getCoordinate().isPresent() )
+            {
+                Coordinate c = request.getCoordinate().get();
+                org.apache.maven.artifact.Artifact artifact = new DefaultArtifact(
+                        c.getGroupId(), c.getArtifactId(), c.getVersion().asString(), null,
+                        c.getType().getName(), c.getClassifier(), null );
                 res = builder.build( artifact, request.isAllowStubModel(), req );
             }
             else

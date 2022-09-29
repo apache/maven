@@ -110,7 +110,8 @@ public class DefaultArtifactManager implements ArtifactManager
         return artifact.getGroupId()
                 + ":" + artifact.getArtifactId()
                 + ":" + artifact.getType()
-                + ( artifact.getClassifier().isEmpty() ? "" : ":" + artifact.getClassifier() )
+                + ( artifact.getClassifier() == null || artifact.getClassifier().isEmpty()
+                        ? "" : ":" + artifact.getClassifier() )
                 + ":" + artifact.getVersion();
     }
 

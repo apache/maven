@@ -45,16 +45,16 @@ public interface ArtifactResolver extends Service
 
     /**
      * @param session {@link Session}
-     * @param artifact {@link Artifact}
+     * @param coordinate {@link Artifact}
      * @return {@link ArtifactResolverResult}
      * @throws ArtifactResolverException in case of an error.
      * @throws IllegalArgumentException in case of parameter {@code buildingRequest} is {@code null} or
      *             parameter {@code coordinate} is {@code null} or invalid.
      */
     default ArtifactResolverResult resolve( Session session,
-                                            Coordinate artifact )
+                                            Coordinate coordinate )
     {
-        return resolve( ArtifactResolverRequest.build( session, artifact ) );
+        return resolve( ArtifactResolverRequest.build( session, coordinate ) );
     }
 
 }

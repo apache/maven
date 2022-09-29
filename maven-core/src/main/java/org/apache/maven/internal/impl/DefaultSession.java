@@ -51,6 +51,7 @@ import org.apache.maven.api.services.DependencyCollector;
 import org.apache.maven.api.services.DependencyFactory;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.LocalRepositoryManager;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.api.services.ProjectBuilder;
@@ -382,6 +383,10 @@ public class DefaultSession extends AbstractSession
         else if ( clazz == TypeRegistry.class )
         {
             return (T) new DefaultTypeRegistry( artifactHandlerManager );
+        }
+        else if ( clazz == Lookup.class )
+        {
+            return (T) new DefaultLookup( container );
         }
         throw new NoSuchElementException( clazz.getName() );
     }

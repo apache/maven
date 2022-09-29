@@ -60,7 +60,7 @@ public interface Node
      * @return repositories of this node
      */
     @Nonnull
-    List<Repository> getRemoteRepositories();
+    List<RemoteRepository> getRemoteRepositories();
 
     /**
      * The repository where this artifact has been downloaded from.
@@ -85,6 +85,13 @@ public interface Node
      * @return a new filtered graph
      */
     Node filter( Predicate<Node> filter );
+
+    /**
+     * Returns a string representation of this dependency node.
+     *
+     * @return the string representation
+     */
+    String asString();
 
     /**
      * Obtain a Stream containing this node and all its descendant.

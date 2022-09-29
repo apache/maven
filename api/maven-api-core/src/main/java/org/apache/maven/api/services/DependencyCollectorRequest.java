@@ -19,20 +19,19 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Immutable;
-import org.apache.maven.api.annotations.Nonnull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
-import org.apache.maven.api.Artifact;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
 
@@ -68,12 +67,14 @@ public interface DependencyCollectorRequest
     @Nonnull
     Collection<Dependency> getManagedDependencies();
 
+    boolean getVerbose();
+
     @Nonnull
     static DependencyCollectorRequest build( @Nonnull Session session, Artifact root )
     {
         return builder()
                 .session( nonNull( session, "session can not be null" ) )
-                .root( session.createDependency( nonNull( root, "root can not be null" ) ) )
+                .rootArtifact( nonNull( root, "root can not be null" ) )
                 .build();
     }
 
@@ -93,7 +94,7 @@ public interface DependencyCollectorRequest
         nonNull( project, "project can not be null" );
         return builder()
                 .session( session )
-                .root( session.createDependency( project.getArtifact() ) )
+                .rootArtifact( project.getArtifact() )
                 .dependencies( project.getDependencies() )
                 .managedDependencies( project.getManagedDependencies() )
                 .build();
@@ -114,6 +115,7 @@ public interface DependencyCollectorRequest
         Dependency root;
         List<Dependency> dependencies = Collections.emptyList();
         List<Dependency> managedDependencies = Collections.emptyList();
+        boolean verbose;
 
         @Nonnull
         public DependencyCollectorRequestBuilder session( @Nonnull Session session )
@@ -223,6 +225,19 @@ public interface DependencyCollectorRequest
             return this;
         }
 
+        /**
+         * Specifies that the collection should be verbose.
+         *
+         * @param verbose whether the collection should be verbose or not.
+         * @return This request for chaining, never {@code null}.
+         */
+        @Nonnull
+        public DependencyCollectorRequestBuilder verbose( boolean verbose )
+        {
+            this.verbose = verbose;
+            return this;
+        }
+
         @Nonnull
         public DependencyCollectorRequest build()
         {
@@ -231,7 +246,8 @@ public interface DependencyCollectorRequest
                     rootArtifact,
                     root,
                     dependencies,
-                    managedDependencies );
+                    managedDependencies,
+                    verbose );
         }
 
         static class DefaultDependencyCollectorRequest extends BaseRequest
@@ -241,6 +257,7 @@ public interface DependencyCollectorRequest
             private final Dependency root;
             private final Collection<Dependency> dependencies;
             private final Collection<Dependency> managedDependencies;
+            private final boolean verbose;
 
 
             /**
@@ -255,14 +272,15 @@ public interface DependencyCollectorRequest
                     @Nullable Artifact rootArtifact,
                     @Nullable Dependency root,
                     @Nonnull Collection<Dependency> dependencies,
-                    @Nonnull Collection<Dependency> managedDependencies )
+                    @Nonnull Collection<Dependency> managedDependencies,
+                    boolean verbose )
             {
                 super( session );
                 this.rootArtifact = rootArtifact;
                 this.root = root;
                 this.dependencies = unmodifiable( dependencies );
                 this.managedDependencies = unmodifiable( managedDependencies );
-
+                this.verbose = verbose;
             }
 
             @Nonnull
@@ -291,6 +309,12 @@ public interface DependencyCollectorRequest
             public Collection<Dependency> getManagedDependencies()
             {
                 return managedDependencies;
+            }
+
+            @Override
+            public boolean getVerbose()
+            {
+                return verbose;
             }
 
             @Nonnull

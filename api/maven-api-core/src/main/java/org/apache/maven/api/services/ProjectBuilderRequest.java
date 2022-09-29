@@ -19,6 +19,7 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.Coordinate;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
@@ -56,6 +57,9 @@ public interface ProjectBuilderRequest
     @Nonnull
     Optional<Artifact> getArtifact();
 
+    @Nonnull
+    Optional<Coordinate> getCoordinate();
+
     boolean isAllowStubModel();
 
     boolean isRecursive();
@@ -92,6 +96,15 @@ public interface ProjectBuilderRequest
     }
 
     @Nonnull
+    static ProjectBuilderRequest build( @Nonnull Session session, @Nonnull Coordinate coordinate )
+    {
+        return builder()
+                .session( nonNull( session, "session can not be null" ) )
+                .coordinate( nonNull( coordinate, "coordinate can not be null" ) )
+                .build();
+    }
+
+    @Nonnull
     static ProjectBuilderRequestBuilder builder()
     {
         return new ProjectBuilderRequestBuilder();
@@ -104,6 +117,7 @@ public interface ProjectBuilderRequest
         Path path;
         ProjectBuilderSource source;
         Artifact artifact;
+        Coordinate coordinate;
         boolean allowStubModel;
         boolean recursive;
         boolean processPlugins = true;
@@ -133,6 +147,12 @@ public interface ProjectBuilderRequest
             return this;
         }
 
+        public ProjectBuilderRequestBuilder coordinate( Coordinate coordinate )
+        {
+            this.coordinate = coordinate;
+            return this;
+        }
+
         public ProjectBuilderRequestBuilder processPlugins( boolean processPlugins )
         {
             this.processPlugins = processPlugins;
@@ -147,7 +167,7 @@ public interface ProjectBuilderRequest
 
         public ProjectBuilderRequest build()
         {
-            return new DefaultProjectBuilderRequest( session, path, source, artifact,
+            return new DefaultProjectBuilderRequest( session, path, source, artifact, coordinate,
                     allowStubModel, recursive, processPlugins, resolveDependencies );
         }
 
@@ -157,6 +177,7 @@ public interface ProjectBuilderRequest
             private final Path path;
             private final ProjectBuilderSource source;
             private final Artifact artifact;
+            private final Coordinate coordinate;
             private final boolean allowStubModel;
             private final boolean recursive;
             private final boolean processPlugins;
@@ -167,6 +188,7 @@ public interface ProjectBuilderRequest
                                           @Nullable Path path,
                                           @Nullable ProjectBuilderSource source,
                                           @Nullable Artifact artifact,
+                                          @Nullable Coordinate coordinate,
                                           boolean allowStubModel,
                                           boolean recursive,
                                           boolean processPlugins,
@@ -176,6 +198,7 @@ public interface ProjectBuilderRequest
                 this.path = path;
                 this.source = source;
                 this.artifact = artifact;
+                this.coordinate = coordinate;
                 this.allowStubModel = allowStubModel;
                 this.recursive = recursive;
                 this.processPlugins = processPlugins;
@@ -201,6 +224,13 @@ public interface ProjectBuilderRequest
             public Optional<Artifact> getArtifact()
             {
                 return Optional.ofNullable( artifact );
+            }
+
+            @Nonnull
+            @Override
+            public Optional<Coordinate> getCoordinate()
+            {
+                return Optional.ofNullable( coordinate );
             }
 
             @Override
