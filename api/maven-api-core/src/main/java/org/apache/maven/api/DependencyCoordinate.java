@@ -1,4 +1,4 @@
-package org.apache.maven.api.services;
+package org.apache.maven.api;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -20,40 +20,35 @@ package org.apache.maven.api.services;
  */
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.annotations.Immutable;
+
+import java.util.Collection;
 
 /**
- * The Exception class in case a resolving does not work.
  *
  * @since 4.0
  */
 @Experimental
-public class DependencyResolverException
-    extends MavenException
+@Immutable
+public interface DependencyCoordinate extends ArtifactCoordinate
 {
-    private static final long serialVersionUID = 5320065249974323888L;
-
     /**
-     * @param cause The {@link Exception cause} of the problem.
+     * The type of the artifact.
+     *
+     * @return The type.
      */
-    protected DependencyResolverException( Exception cause )
-    {
-        super( cause );
-    }
+    @Nonnull
+    Type getType();
 
-    /**
-     * @param message The message to give.
-     * @param e The {@link Exception}.
-     */
-    public DependencyResolverException( String message, Exception e )
-    {
-        super( message, e );
-    }
+    @Nonnull
+    Scope getScope();
 
-    /**
-     * @return {@link DependencyResolverResult}
-     */
-    public DependencyResolverResult getResult()
-    {
-        return null;
-    }
+    @Nullable
+    Boolean getOptional();
+
+    @Nonnull
+    Collection<Exclusion> getExclusions();
+
 }

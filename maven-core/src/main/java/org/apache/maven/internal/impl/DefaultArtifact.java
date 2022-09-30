@@ -19,18 +19,12 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
-import org.apache.maven.api.Type;
-import org.apache.maven.api.Version;
-import org.apache.maven.api.annotations.Nonnull;
-
-import java.io.File;
-import java.nio.file.Path;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.services.TypeRegistry;
-import org.eclipse.aether.artifact.ArtifactProperties;
+import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.Version;
+import org.apache.maven.api.annotations.Nonnull;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
@@ -41,16 +35,28 @@ public class DefaultArtifact implements Artifact
 {
     private final @Nonnull AbstractSession session;
     private final @Nonnull org.eclipse.aether.artifact.Artifact artifact;
+    private final String id;
 
     public DefaultArtifact( @Nonnull AbstractSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact )
     {
         this.session = nonNull( session, "session can not be null" );
         this.artifact = nonNull( artifact, "artifact can not be null" );
+        this.id = getGroupId()
+                + ':' + getArtifactId()
+                + ':' + getExtension()
+                + ( getClassifier().length() > 0 ? ":" + getClassifier() : "" )
+                + ':' + getVersion();
     }
 
     public org.eclipse.aether.artifact.Artifact getArtifact()
     {
         return artifact;
+    }
+
+    @Override
+    public String key()
+    {
+        return id;
     }
 
     @Nonnull
@@ -81,13 +87,6 @@ public class DefaultArtifact implements Artifact
         return artifact.getExtension();
     }
 
-    @Override
-    public Type getType()
-    {
-        String type = artifact.getProperty( ArtifactProperties.TYPE, artifact.getExtension() );
-        return session.getService( TypeRegistry.class ).getType( type );
-    }
-
     @Nonnull
     @Override
     public String getClassifier()
@@ -98,40 +97,27 @@ public class DefaultArtifact implements Artifact
     @Override
     public boolean isSnapshot()
     {
-        return DefaultVersionParser.checkSnapshot( artifact.toString() );
+        return DefaultVersionParser.checkSnapshot( artifact.getVersion() );
     }
-
 
     @Nonnull
     @Override
-    public Optional<Path> getPath()
+    public ArtifactCoordinate toCoordinate()
     {
-        return Optional.ofNullable( artifact.getFile() ).map( File::toPath );
+        return session.createArtifactCoordinate( this );
     }
 
     @Override
     public boolean equals( Object o )
     {
-        if ( this == o )
-        {
-            return true;
-        }
-        if ( o == null || getClass() != o.getClass() )
-        {
-            return false;
-        }
-        DefaultArtifact that = (DefaultArtifact) o;
-        return Objects.equals( this.getGroupId(), that.getGroupId() )
-                && Objects.equals( this.getArtifactId(), that.getArtifactId() )
-                && Objects.equals( this.getVersion(), that.getVersion() )
-                && Objects.equals( this.getClassifier(), that.getClassifier() )
-                && Objects.equals( this.getExtension(), that.getExtension() );
+        return o instanceof DefaultArtifact
+                && Objects.equals( id, ( (DefaultArtifact) o ).id );
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash( getGroupId(), getArtifactId(), getVersion(), getClassifier(), getExtension() );
+        return id.hashCode();
     }
 
     @Override

@@ -19,6 +19,7 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
@@ -26,13 +27,13 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 
 /**
- * A request for creating a {@link org.apache.maven.api.Coordinate} object.
+ * A request for creating a {@link ArtifactCoordinate} object.
  *
  * @since 4.0
  */
 @Experimental
 @Immutable
-public interface CoordinateFactoryRequest
+public interface ArtifactCoordinateFactoryRequest
 {
 
     @Nonnull
@@ -50,10 +51,10 @@ public interface CoordinateFactoryRequest
 
     String getType();
 
-    static CoordinateFactoryRequest build( Session session, String groupId, String artifactId,
-                                           String version, String extension )
+    static ArtifactCoordinateFactoryRequest build( Session session, String groupId, String artifactId,
+                                                   String version, String extension )
     {
-        return CoordinateFactoryRequest.builder()
+        return ArtifactCoordinateFactoryRequest.builder()
                 .session( session )
                 .groupId( groupId )
                 .artifactId( artifactId )
@@ -62,10 +63,10 @@ public interface CoordinateFactoryRequest
                 .build();
     }
 
-    static CoordinateFactoryRequest build( Session session, String groupId, String artifactId,
-                                           String version, String classifier, String extension, String type )
+    static ArtifactCoordinateFactoryRequest build( Session session, String groupId, String artifactId,
+                                                   String version, String classifier, String extension, String type )
     {
-        return CoordinateFactoryRequest.builder()
+        return ArtifactCoordinateFactoryRequest.builder()
                 .session( session )
                 .groupId( groupId )
                 .artifactId( artifactId )
@@ -75,6 +76,19 @@ public interface CoordinateFactoryRequest
                 .type( type )
                 .build();
     }
+
+    static ArtifactCoordinateFactoryRequest build( Session session, ArtifactCoordinate coordinate )
+    {
+        return ArtifactCoordinateFactoryRequest.builder()
+                .session( session )
+                .groupId( coordinate.getGroupId() )
+                .artifactId( coordinate.getArtifactId() )
+                .classifier( coordinate.getClassifier() )
+                .version( coordinate.getVersion().asString() )
+                .extension( coordinate.getExtension() )
+                .build();
+    }
+
 
     static ArtifactFactoryRequestBuilder builder()
     {
@@ -134,13 +148,14 @@ public interface CoordinateFactoryRequest
             return this;
         }
 
-        public CoordinateFactoryRequest build()
+        public ArtifactCoordinateFactoryRequest build()
         {
-            return new DefaultArtifactFactoryRequest( session, groupId, artifactId, version,
+            return new DefaultArtifactFactoryRequestArtifact( session, groupId, artifactId, version,
                                                       classifier, extension, type );
         }
 
-        private static class DefaultArtifactFactoryRequest extends BaseRequest implements CoordinateFactoryRequest
+        private static class DefaultArtifactFactoryRequestArtifact extends BaseRequest implements
+                                                                                       ArtifactCoordinateFactoryRequest
         {
             private final String groupId;
             private final String artifactId;
@@ -149,13 +164,13 @@ public interface CoordinateFactoryRequest
             private final String extension;
             private final String type;
 
-            DefaultArtifactFactoryRequest( @Nonnull Session session,
-                                           String groupId,
-                                           String artifactId,
-                                           String version,
-                                           String classifier,
-                                           String extension,
-                                           String type )
+            DefaultArtifactFactoryRequestArtifact( @Nonnull Session session,
+                                                   String groupId,
+                                                   String artifactId,
+                                                   String version,
+                                                   String classifier,
+                                                   String extension,
+                                                   String type )
             {
                 super( session );
                 this.groupId = groupId;

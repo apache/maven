@@ -21,25 +21,22 @@ package org.apache.maven.internal.impl;
 
 import java.util.Objects;
 
-import org.apache.maven.api.Coordinate;
-import org.apache.maven.api.Type;
+import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.services.TypeRegistry;
-import org.eclipse.aether.artifact.ArtifactProperties;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 /**
  * A wrapper class around a maven resolver artifact.
  */
-public class DefaultCoordinate implements Coordinate
+public class DefaultArtifactCoordinate implements ArtifactCoordinate
 {
     private final @Nonnull AbstractSession session;
     private final @Nonnull org.eclipse.aether.artifact.Artifact coordinate;
 
-    public DefaultCoordinate( @Nonnull AbstractSession session,
-                              @Nonnull org.eclipse.aether.artifact.Artifact coordinate )
+    public DefaultArtifactCoordinate( @Nonnull AbstractSession session,
+                                      @Nonnull org.eclipse.aether.artifact.Artifact coordinate )
     {
         this.session = nonNull( session, "session can not be null" );
         this.coordinate = nonNull( coordinate, "coordinate can not be null" );
@@ -77,13 +74,6 @@ public class DefaultCoordinate implements Coordinate
         return coordinate.getExtension();
     }
 
-    @Override
-    public Type getType()
-    {
-        String type = coordinate.getProperty( ArtifactProperties.TYPE, coordinate.getExtension() );
-        return session.getService( TypeRegistry.class ).getType( type );
-    }
-
     @Nonnull
     @Override
     public String getClassifier()
@@ -102,18 +92,17 @@ public class DefaultCoordinate implements Coordinate
         {
             return false;
         }
-        DefaultCoordinate that = (DefaultCoordinate) o;
+        DefaultArtifactCoordinate that = (DefaultArtifactCoordinate) o;
         return Objects.equals( this.getGroupId(), that.getGroupId() )
                 && Objects.equals( this.getArtifactId(), that.getArtifactId() )
                 && Objects.equals( this.getVersion(), that.getVersion() )
-                && Objects.equals( this.getClassifier(), that.getClassifier() )
-                && Objects.equals( this.getType(), that.getType() );
+                && Objects.equals( this.getClassifier(), that.getClassifier() );
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash( getGroupId(), getArtifactId(), getVersion(), getClassifier(), getType() );
+        return Objects.hash( getGroupId(), getArtifactId(), getVersion(), getClassifier() );
     }
 
     @Override

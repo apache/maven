@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl;
 
 import org.apache.maven.api.annotations.Nonnull;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -63,7 +64,15 @@ public class DefaultArtifactManager implements ArtifactManager
             }
         }
         Path path = paths.get( artifact );
-        return path != null ? Optional.of( path ) : artifact.getPath();
+        if ( path == null && artifact instanceof DefaultArtifact )
+        {
+            File file = ( (DefaultArtifact) artifact ).getArtifact().getFile();
+            if ( file != null )
+            {
+                path = file.toPath();
+            }
+        }
+        return Optional.ofNullable( path );
     }
 
     @Override

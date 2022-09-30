@@ -78,6 +78,6 @@ public interface ProjectBuilderResult
      * @return The result of the dependency resolution for the project.
      */
     @Nonnull
-    Optional<DependencyResolverResult> getDependencyResolverResult();
+    Optional<DependencyCollectorResult> getDependencyResolverResult();
 
 }

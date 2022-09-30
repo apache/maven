@@ -31,7 +31,7 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 @Immutable
-public interface Coordinate
+public interface ArtifactCoordinate
 {
 
     /**
@@ -73,14 +73,6 @@ public interface Coordinate
      */
     @Nonnull
     String getExtension();
-
-    /**
-     * The type of the artifact.
-     *
-     * @return The type.
-     */
-    @Nonnull
-    Type getType();
 
     /**
      * Unique id identifying this artifact

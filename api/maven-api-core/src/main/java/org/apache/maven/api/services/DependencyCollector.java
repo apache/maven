@@ -25,7 +25,7 @@ import org.apache.maven.api.annotations.Nonnull;
 
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.Dependency;
+import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.Project;
 
 /**
@@ -51,7 +51,7 @@ public interface DependencyCollector extends Service
      * @throws IllegalArgumentException if an argument is null or invalid
      *
      * @see DependencyCollector#collect(Session, Project)
-     * @see DependencyCollector#collect(Session, Dependency)
+     * @see DependencyCollector#collect(Session, DependencyCoordinate)
      * @see DependencyCollector#collect(Session, Artifact)
      */
     @Nonnull
@@ -71,7 +71,7 @@ public interface DependencyCollector extends Service
      */
     @Nonnull
     default DependencyCollectorResult collect( @Nonnull Session session,
-                                               @Nonnull Dependency root )
+                                               @Nonnull DependencyCoordinate root )
     {
         return collect( DependencyCollectorRequest.build( session, root ) );
     }

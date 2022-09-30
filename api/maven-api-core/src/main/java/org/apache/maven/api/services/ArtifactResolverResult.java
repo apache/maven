@@ -19,8 +19,12 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import java.nio.file.Path;
+import java.util.Map;
+
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * The Artifact Result
@@ -33,6 +37,7 @@ public interface ArtifactResolverResult
     /**
      * @return {@link Artifact}
      */
-    Artifact getArtifact();
+    @Nonnull
+    Map<Artifact, Path> getArtifacts();
 
 }

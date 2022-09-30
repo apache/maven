@@ -35,7 +35,7 @@ import java.util.Optional;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.Dependency;
+import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.model.DependencyManagement;
@@ -122,14 +122,14 @@ public class DefaultProject implements Project
 
     @Nonnull
     @Override
-    public List<Dependency> getDependencies()
+    public List<DependencyCoordinate> getDependencies()
     {
         return new MappedList<>( getModel().getDependencies(), this::toDependency );
     }
 
     @Nonnull
     @Override
-    public List<Dependency> getManagedDependencies()
+    public List<DependencyCoordinate> getManagedDependencies()
     {
         DependencyManagement dependencyManagement = getModel().getDependencyManagement();
         if ( dependencyManagement != null )
@@ -165,9 +165,9 @@ public class DefaultProject implements Project
     }
 
     @Nonnull
-    private Dependency toDependency( org.apache.maven.api.model.Dependency dependency )
+    private DependencyCoordinate toDependency( org.apache.maven.api.model.Dependency dependency )
     {
-        return new Dependency()
+        return new DependencyCoordinate()
         {
             @Override
             public String getGroupId()

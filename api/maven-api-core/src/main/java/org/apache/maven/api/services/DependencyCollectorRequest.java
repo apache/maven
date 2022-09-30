@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.Dependency;
+import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
@@ -59,13 +59,13 @@ public interface DependencyCollectorRequest
     Optional<Artifact> getRootArtifact();
 
     @Nonnull
-    Optional<Dependency> getRoot();
+    Optional<DependencyCoordinate> getRoot();
 
     @Nonnull
-    Collection<Dependency> getDependencies();
+    Collection<DependencyCoordinate> getDependencies();
 
     @Nonnull
-    Collection<Dependency> getManagedDependencies();
+    Collection<DependencyCoordinate> getManagedDependencies();
 
     boolean getVerbose();
 
@@ -79,7 +79,7 @@ public interface DependencyCollectorRequest
     }
 
     @Nonnull
-    static DependencyCollectorRequest build( @Nonnull Session session, @Nonnull Dependency root )
+    static DependencyCollectorRequest build( @Nonnull Session session, @Nonnull DependencyCoordinate root )
     {
         return builder()
                 .session( nonNull( session, "session can not be null" ) )
@@ -112,9 +112,9 @@ public interface DependencyCollectorRequest
 
         Session session;
         Artifact rootArtifact;
-        Dependency root;
-        List<Dependency> dependencies = Collections.emptyList();
-        List<Dependency> managedDependencies = Collections.emptyList();
+        DependencyCoordinate root;
+        List<DependencyCoordinate> dependencies = Collections.emptyList();
+        List<DependencyCoordinate> managedDependencies = Collections.emptyList();
         boolean verbose;
 
         @Nonnull
@@ -126,11 +126,11 @@ public interface DependencyCollectorRequest
 
         /**
          * Sets the root artifact for the dependency graph.
-         * This must not be confused with {@link #root(Dependency)}: The root <em>dependency</em>, like any
+         * This must not be confused with {@link #root(DependencyCoordinate)}: The root <em>dependency</em>, like any
          * other specified dependency, will be subject to dependency collection/resolution, i.e. should have an artifact
          * descriptor and a corresponding artifact file. The root <em>artifact</em> on the other hand is only used
          * as a label for the root node of the graph in case no root dependency was specified. As such, the configured
-         * root artifact is ignored if {@link #root(Dependency)} has been set.
+         * root artifact is ignored if {@link #root(DependencyCoordinate)} has been set.
          *
          * @param rootArtifact The root artifact for the dependency graph, may be {@code null}.
          * @return This request for chaining, never {@code null}.
@@ -147,7 +147,7 @@ public interface DependencyCollectorRequest
          * @return This request for chaining, never {@code null}.
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder root( @Nonnull Dependency root )
+        public DependencyCollectorRequestBuilder root( @Nonnull DependencyCoordinate root )
         {
             this.root = root;
             return this;
@@ -162,7 +162,7 @@ public interface DependencyCollectorRequest
          * @return This request for chaining, never {@code null}.
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder dependencies( @Nullable List<Dependency> dependencies )
+        public DependencyCollectorRequestBuilder dependencies( @Nullable List<DependencyCoordinate> dependencies )
         {
             this.dependencies = ( dependencies != null ) ? dependencies : Collections.emptyList();
             return this;
@@ -175,7 +175,7 @@ public interface DependencyCollectorRequest
          * @return This request for chaining, never {@code null}.
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder dependency( @Nullable Dependency dependency )
+        public DependencyCollectorRequestBuilder dependency( @Nullable DependencyCoordinate dependency )
         {
             if ( dependency != null )
             {
@@ -198,7 +198,8 @@ public interface DependencyCollectorRequest
          * @return This request for chaining, never {@code null}.
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder managedDependencies( @Nullable List<Dependency> managedDependencies )
+        public DependencyCollectorRequestBuilder managedDependencies(
+                        @Nullable List<DependencyCoordinate> managedDependencies )
         {
             this.managedDependencies = ( managedDependencies != null ) ? managedDependencies : Collections.emptyList();
             return this;
@@ -212,7 +213,7 @@ public interface DependencyCollectorRequest
          * @return This request for chaining, never {@code null}.
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder managedDependency( @Nullable Dependency managedDependency )
+        public DependencyCollectorRequestBuilder managedDependency( @Nullable DependencyCoordinate managedDependency )
         {
             if ( managedDependency != null )
             {
@@ -254,9 +255,9 @@ public interface DependencyCollectorRequest
                 implements DependencyCollectorRequest
         {
             private final Artifact rootArtifact;
-            private final Dependency root;
-            private final Collection<Dependency> dependencies;
-            private final Collection<Dependency> managedDependencies;
+            private final DependencyCoordinate root;
+            private final Collection<DependencyCoordinate> dependencies;
+            private final Collection<DependencyCoordinate> managedDependencies;
             private final boolean verbose;
 
 
@@ -270,9 +271,9 @@ public interface DependencyCollectorRequest
             DefaultDependencyCollectorRequest(
                     @Nonnull Session session,
                     @Nullable Artifact rootArtifact,
-                    @Nullable Dependency root,
-                    @Nonnull Collection<Dependency> dependencies,
-                    @Nonnull Collection<Dependency> managedDependencies,
+                    @Nullable DependencyCoordinate root,
+                    @Nonnull Collection<DependencyCoordinate> dependencies,
+                    @Nonnull Collection<DependencyCoordinate> managedDependencies,
                     boolean verbose )
             {
                 super( session );
@@ -292,21 +293,21 @@ public interface DependencyCollectorRequest
 
             @Nonnull
             @Override
-            public Optional<Dependency> getRoot()
+            public Optional<DependencyCoordinate> getRoot()
             {
                 return Optional.ofNullable( root );
             }
 
             @Nonnull
             @Override
-            public Collection<Dependency> getDependencies()
+            public Collection<DependencyCoordinate> getDependencies()
             {
                 return dependencies;
             }
 
             @Nonnull
             @Override
-            public Collection<Dependency> getManagedDependencies()
+            public Collection<DependencyCoordinate> getManagedDependencies()
             {
                 return managedDependencies;
             }

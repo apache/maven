@@ -22,12 +22,20 @@ package org.apache.maven.internal.impl;
 import org.apache.maven.api.annotations.Nonnull;
 import javax.inject.Inject;
 
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.ArtifactResolver;
 import org.apache.maven.api.services.ArtifactResolverException;
 import org.apache.maven.api.services.ArtifactResolverRequest;
 import org.apache.maven.api.services.ArtifactResolverResult;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
@@ -54,16 +62,25 @@ public class DefaultArtifactResolver implements ArtifactResolver
                 "request.session should be a " + DefaultSession.class );
         try
         {
-            ArtifactRequest req = new ArtifactRequest()
-                    .setArtifact( session.toArtifact( request.getCoordinate() ) )
-                    .setRepositories( session.toRepositories( session.getRemoteRepositories() ) );
-            ArtifactResult res = repositorySystem.resolveArtifact( session.getSession(), req );
+            List<RemoteRepository> repositories = session.toRepositories( session.getRemoteRepositories() );
+            List<ArtifactRequest> requests = request.getCoordinates().stream()
+                    .map( coord ->  new ArtifactRequest( session.toArtifact( coord ), repositories, null ) )
+                    .collect( Collectors.toList() );
+            List<ArtifactResult> results = repositorySystem.resolveArtifacts( session.getSession(), requests );
+            Map<Artifact, Path> paths = new HashMap<>();
+            for ( ArtifactResult result : results )
+            {
+                Artifact artifact = session.getArtifact( result.getArtifact() );
+                Path path = result.getArtifact().getFile().toPath();
+                session.getService( ArtifactManager.class ).setPath( artifact, path );
+                paths.put( artifact, path );
+            }
             return new ArtifactResolverResult()
             {
                 @Override
-                public Artifact getArtifact()
+                public Map<Artifact, Path> getArtifacts()
                 {
-                    return session.getArtifact( res.getArtifact() );
+                    return paths;
                 }
             };
         }

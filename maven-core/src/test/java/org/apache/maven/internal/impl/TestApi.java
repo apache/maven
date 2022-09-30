@@ -21,13 +21,13 @@ package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Collections;
+import java.util.Optional;
 
-import org.apache.maven.api.Coordinate;
+import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
@@ -35,7 +35,6 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.services.ProjectBuilder;
 import org.apache.maven.api.services.ProjectBuilderRequest;
-import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
@@ -109,14 +108,15 @@ public class TestApi
     @Test
     void testCreateAndResolveArtifact() throws Exception
     {
-        Coordinate coord = session.createCoordinate( "org.codehaus.plexus", "plexus-utils", "1.4.5", "pom" );
+        ArtifactCoordinate coord = session.createArtifactCoordinate( "org.codehaus.plexus", "plexus-utils", "1.4.5", "pom" );
 
         Artifact resolved =  session.resolveArtifact( coord );
-        assertTrue( resolved.getPath().isPresent() );
-        assertNotNull( resolved.getPath().get() );
+        Optional<Path> op = session.getArtifactPath( resolved );
+        assertTrue( op.isPresent() );
+        assertNotNull( op.get() );
 
         Project project = session.getService( ProjectBuilder.class ).build(
-                        ProjectBuilderRequest.builder().session( session ).path( resolved.getPath().get() )
+                        ProjectBuilderRequest.builder().session( session ).path( op.get() )
                                 .processPlugins( false ).resolveDependencies( false ).build() )
                 .getProject().get();
         assertNotNull( project );

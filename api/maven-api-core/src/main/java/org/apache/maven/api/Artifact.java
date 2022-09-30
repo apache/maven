@@ -20,11 +20,8 @@ package org.apache.maven.api;
  */
 
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Immutable;
-
-import java.nio.file.Path;
-import java.util.Optional;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * An artifact points to a resource such as a jar file or war application.
@@ -35,6 +32,20 @@ import java.util.Optional;
 @Immutable
 public interface Artifact
 {
+
+    /**
+     * Returns a unique identifier for this artifact.
+     * The identifier is composed of groupId, artifactId, version, classifier, extension
+     * @return the unique identifier
+     */
+    default String key()
+    {
+        return getGroupId()
+                + ':' + getArtifactId()
+                + ':' + getExtension()
+                + ( getClassifier().length() > 0 ? ":" + getClassifier() : "" )
+                + ':' + getVersion();
+    }
 
     /**
      * The groupId of the artifact.
@@ -53,20 +64,20 @@ public interface Artifact
     String getArtifactId();
 
     /**
-     * The classifier of the artifact.
-     *
-     * @return The classifier or an empty string if none, never {@code null}.
-     */
-    @Nonnull
-    String getClassifier();
-
-    /**
      * The version of the artifact.
      *
      * @return The version.
      */
     @Nonnull
     Version getVersion();
+
+    /**
+     * The classifier of the artifact.
+     *
+     * @return The classifier or an empty string if none, never {@code null}.
+     */
+    @Nonnull
+    String getClassifier();
 
     /**
      * The file extension of the artifact.
@@ -77,14 +88,6 @@ public interface Artifact
     String getExtension();
 
     /**
-     * The artifact type.
-     *
-     * @return The artifact type, never {@code null}.
-     */
-    @Nonnull
-    Type getType();
-
-    /**
      * Determines whether this artifact uses a snapshot version.
      *
      * @return {@code true} if the artifact is a snapshot, {@code false} otherwise.
@@ -93,12 +96,12 @@ public interface Artifact
     boolean isSnapshot();
 
     /**
-     * Gets the file of this artifact. Note that only resolved artifacts have a file associated with them. In general,
-     * callers must not assume any relationship between an artifact's filename and its coordinates.
+     * Shortcut for {@code session.createArtifactCoordinate(artifact)}
      *
-     * @return The file or {@link Optional#empty()} if the artifact isn't resolved.
+     * @return an {@link ArtifactCoordinate}
+     * @see org.apache.maven.api.Session#createArtifactCoordinate(Artifact)
      */
     @Nonnull
-    Optional<Path> getPath();
+    ArtifactCoordinate toCoordinate();
 
 }

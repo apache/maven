@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.RemoteRepository;
@@ -53,12 +52,6 @@ public class DefaultNode extends AbstractNode
     DependencyNode getDependencyNode()
     {
         return node;
-    }
-
-    @Override
-    public Artifact getArtifact()
-    {
-        return node.getArtifact() != null ? session.getArtifact( node.getArtifact() ) : null;
     }
 
     @Override

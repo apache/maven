@@ -19,7 +19,7 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
-import org.apache.maven.api.Coordinate;
+import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -96,13 +96,13 @@ public interface ProjectBuilder extends Service
      * Creates a {@link org.apache.maven.api.Project} from a coordinate.
      *
      * @param session The {@link Session}, must not be {@code null}.
-     * @param coordinate The {@link Coordinate}, must not be {@code null}.
+     * @param coordinate The {@link ArtifactCoordinate}, must not be {@code null}.
      * @throws ProjectBuilderException if the project can not be created
      * @throws IllegalArgumentException if an argument is {@code null} or invalid
      * @see #build(ProjectBuilderRequest)
      */
     @Nonnull
-    default ProjectBuilderResult build( @Nonnull Session session, @Nonnull Coordinate coordinate )
+    default ProjectBuilderResult build( @Nonnull Session session, @Nonnull ArtifactCoordinate coordinate )
     {
         return build( ProjectBuilderRequest.build( session, coordinate ) );
     }

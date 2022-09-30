@@ -23,31 +23,44 @@ import javax.inject.Named;
 
 import java.util.stream.Collectors;
 
-import org.apache.maven.api.Dependency;
+import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.services.DependencyFactory;
-import org.apache.maven.api.services.DependencyFactoryRequest;
+import org.apache.maven.api.services.DependencyCoordinateFactory;
+import org.apache.maven.api.services.DependencyCoordinateFactoryRequest;
+import org.eclipse.aether.artifact.ArtifactType;
 
 import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
-public class DefaultDependencyFactory implements DependencyFactory
+public class DefaultDependencyCoordinateFactory implements DependencyCoordinateFactory
 {
 
     @Nonnull
     @Override
-    public Dependency create( @Nonnull DependencyFactoryRequest request )
+    public DependencyCoordinate create( @Nonnull DependencyCoordinateFactoryRequest request )
     {
         nonNull( request, "request can not be null" );
         DefaultSession session = cast( DefaultSession.class, request.getSession(),
                 "request.session should be a " + DefaultSession.class );
 
-        return new DefaultDependency(
+        ArtifactType type = null;
+        if ( request.getType() != null )
+        {
+            type = session.getSession().getArtifactTypeRegistry().get( request.getType() );
+        }
+        return new DefaultDependencyCoordinate(
                 session,
                 new org.eclipse.aether.graph.Dependency(
-                        session.toArtifact( request.getCoordinate() ),
+                        new org.eclipse.aether.artifact.DefaultArtifact(
+                                request.getGroupId(),
+                                request.getArtifactId(),
+                                request.getClassifier(),
+                                request.getExtension(),
+                                request.getVersion(),
+                                type
+                        ),
                         request.getScope(),
                         request.isOptional(),
                         request.getExclusions().stream().map( this::toExclusion ).collect( Collectors.toList() ) ) );

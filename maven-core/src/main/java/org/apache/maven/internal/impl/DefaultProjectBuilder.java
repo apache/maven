@@ -19,8 +19,6 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
-import org.apache.maven.api.Coordinate;
-import org.apache.maven.api.annotations.Nonnull;
 import javax.inject.Inject;
 
 import java.io.File;
@@ -28,15 +26,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.services.DependencyCollectorResult;
+import org.apache.maven.api.services.ProjectBuilder;
+import org.apache.maven.api.services.ProjectBuilderException;
+import org.apache.maven.api.services.ProjectBuilderProblem;
 import org.apache.maven.api.services.ProjectBuilderProblemSeverity;
+import org.apache.maven.api.services.ProjectBuilderRequest;
+import org.apache.maven.api.services.ProjectBuilderResult;
+import org.apache.maven.api.services.ProjectBuilderSource;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.building.ModelProblem;
@@ -45,14 +51,6 @@ import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
-import org.apache.maven.api.services.ArtifactResolverResult;
-import org.apache.maven.api.services.DependencyResolverResult;
-import org.apache.maven.api.services.ProjectBuilder;
-import org.apache.maven.api.services.ProjectBuilderException;
-import org.apache.maven.api.services.ProjectBuilderProblem;
-import org.apache.maven.api.services.ProjectBuilderRequest;
-import org.apache.maven.api.services.ProjectBuilderResult;
-import org.apache.maven.api.services.ProjectBuilderSource;
 
 public class DefaultProjectBuilder implements ProjectBuilder
 {
@@ -115,10 +113,10 @@ public class DefaultProjectBuilder implements ProjectBuilder
             }
             else if ( request.getCoordinate().isPresent() )
             {
-                Coordinate c = request.getCoordinate().get();
+                ArtifactCoordinate c = request.getCoordinate().get();
                 org.apache.maven.artifact.Artifact artifact = new DefaultArtifact(
                         c.getGroupId(), c.getArtifactId(), c.getVersion().asString(), null,
-                        c.getType().getName(), c.getClassifier(), null );
+                        c.getExtension(), c.getClassifier(), null );
                 res = builder.build( artifact, request.isAllowStubModel(), req );
             }
             else
@@ -235,13 +233,13 @@ public class DefaultProjectBuilder implements ProjectBuilder
 
                 @Nonnull
                 @Override
-                public Optional<DependencyResolverResult> getDependencyResolverResult()
+                public Optional<DependencyCollectorResult> getDependencyResolverResult()
                 {
                     return Optional.ofNullable( res.getDependencyResolutionResult() )
-                            .map( r -> new DependencyResolverResult()
+                            .map( r -> new DependencyCollectorResult()
                             {
                                 @Override
-                                public List<Exception> getCollectorExceptions()
+                                public List<Exception> getExceptions()
                                 {
                                     return r.getCollectionErrors();
                                 }
@@ -252,11 +250,11 @@ public class DefaultProjectBuilder implements ProjectBuilder
                                     return session.getNode( r.getDependencyGraph() );
                                 }
 
-                                @Override
-                                public List<ArtifactResolverResult> getArtifactResults()
-                                {
-                                    return Collections.emptyList();
-                                }
+//                                @Override
+//                                public List<ArtifactResolverResult> getArtifactResults()
+//                                {
+//                                    return Collections.emptyList();
+//                                }
                             } );
                 }
             };

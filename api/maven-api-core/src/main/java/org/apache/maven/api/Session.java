@@ -19,10 +19,6 @@ package org.apache.maven.api;
  * under the License.
  */
 
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.ThreadSafe;
-
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Collection;
@@ -31,9 +27,12 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.function.Predicate;
 
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.ThreadSafe;
 import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.services.DependencyCoordinateFactory;
 import org.apache.maven.api.settings.Settings;
 
 /**
@@ -174,14 +173,27 @@ public interface Session
      * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
      * @see org.apache.maven.api.services.ArtifactFactory#create(Session, String, String, String, String)
      */
-    Coordinate createCoordinate( String groupId, String artifactId, String version, String extension );
+    ArtifactCoordinate createArtifactCoordinate( String groupId, String artifactId, String version, String extension );
 
     /**
      * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
      * @see org.apache.maven.api.services.ArtifactFactory#create(Session, String, String, String, String, String, String)
      */
-    Coordinate createCoordinate( String groupId, String artifactId, String version, String classifier,
-                                 String extension, String type );
+    ArtifactCoordinate createArtifactCoordinate( String groupId, String artifactId, String version, String classifier,
+                                                 String extension, String type );
+
+    /**
+     * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
+     * @see org.apache.maven.api.services.ArtifactFactory#create(Session, String, String, String, String, String, String)
+     */
+    ArtifactCoordinate createArtifactCoordinate( Artifact artifact );
+
+    /**
+     * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
+     * @see DependencyCoordinateFactory#create(Session, ArtifactCoordinate)
+     */
+    @Nonnull
+    DependencyCoordinate createDependencyCoordinate( @Nonnull ArtifactCoordinate coordinate );
 
     /**
      * Shortcut for <code>getService(ArtifactFactory.class).create(...)</code>
@@ -198,19 +210,43 @@ public interface Session
 
     /**
      * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
-     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Coordinate)
+     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      *
      * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
      */
-    Artifact resolveArtifact( Coordinate coordinate );
+    Artifact resolveArtifact( ArtifactCoordinate coordinate );
 
     /**
      * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
-     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Coordinate)
+     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
+     *
+     * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
+     */
+    Collection<Artifact> resolveArtifacts( ArtifactCoordinate... coordinates );
+
+    /**
+     * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
+     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
+     *
+     * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
+     */
+    Collection<Artifact> resolveArtifacts( Collection<? extends ArtifactCoordinate> coordinates );
+
+    /**
+     * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
+     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
      *
      * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
      */
     Artifact resolveArtifact( Artifact artifact );
+
+    /**
+     * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
+     * @see org.apache.maven.api.services.ArtifactResolver#resolve(Session, Collection)
+     *
+     * @throws org.apache.maven.api.services.ArtifactResolverException if the artifact resolution failed
+     */
+    Collection<Artifact> resolveArtifacts( Artifact... artifacts );
 
     /**
      * Shortcut for {@code getService(ArtifactInstaller.class).install(...)}
@@ -256,13 +292,6 @@ public interface Session
     boolean isVersionSnapshot( @Nonnull String version );
 
     /**
-     * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
-     * @see org.apache.maven.api.services.DependencyFactory#create(Session, Coordinate)
-     */
-    @Nonnull
-    Dependency createDependency( @Nonnull Coordinate coordinate );
-
-    /**
      * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
      * @see org.apache.maven.api.services.DependencyCollector#collect(Session, Artifact)
      *
@@ -281,22 +310,13 @@ public interface Session
     Node collectDependencies( @Nonnull Project project );
 
     /**
-     * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
-     * @see org.apache.maven.api.services.DependencyCollector#collect(Session, Dependency)
+     * Shortcut for <code>getService(DependencyResolver.class).resolve(...)</code>
+     * @see org.apache.maven.api.services.DependencyCollector#collect(Session, DependencyCoordinate)
      *
      * @throws org.apache.maven.api.services.DependencyCollectorException if the dependency collection failed
      */
     @Nonnull
-    Node collectDependencies( @Nonnull Dependency dependency );
-
-    /**
-     * Shortcut for <code>getService(DependencyResolver.class).resolve(...)</code>
-     * @see org.apache.maven.api.services.DependencyResolver#resolve(Session, Dependency, Predicate)
-     *
-     * @throws org.apache.maven.api.services.DependencyResolverException if the dependency resolution failed
-     */
-    @Nonnull
-    Node resolveDependencies( @Nonnull Dependency dependency );
+    Node collectDependencies( @Nonnull DependencyCoordinate dependency );
 
     Path getPathForLocalArtifact( @Nonnull Artifact artifact );
 

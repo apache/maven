@@ -22,7 +22,11 @@ package org.apache.maven.api;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.annotations.Experimental;
 
@@ -69,20 +73,17 @@ public enum ResolutionScope
      */
     TEST( "test", Scope.COMPILE, Scope.SYSTEM, Scope.PROVIDED, Scope.RUNTIME, Scope.TEST );
 
-    private final String id;
-    private final Set<Scope> scopes;
+    private static final Map<String, ResolutionScope> VALUES
+            = Stream.of( ResolutionScope.values() ).collect( Collectors.toMap( ResolutionScope::id, s -> s ) );
 
     public static ResolutionScope fromString( String id )
     {
-        for ( ResolutionScope scope : ResolutionScope.values() )
-        {
-            if ( scope.id().equals( id ) )
-            {
-                return scope;
-            }
-        }
-        throw new IllegalArgumentException( "Unknown resolution scope " + id );
+        return Optional.ofNullable( VALUES.get( id ) )
+                .orElseThrow( () -> new IllegalArgumentException( "Unknown resolution scope " + id ) );
     }
+
+    private final String id;
+    private final Set<Scope> scopes;
 
     ResolutionScope( String id, Scope... scopes )
     {

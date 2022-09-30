@@ -80,10 +80,10 @@ public interface Project
     }
 
     @Nonnull
-    List<Dependency> getDependencies();
+    List<DependencyCoordinate> getDependencies();
 
     @Nonnull
-    List<Dependency> getManagedDependencies();
+    List<DependencyCoordinate> getManagedDependencies();
 
     @Nonnull
     default String getId()

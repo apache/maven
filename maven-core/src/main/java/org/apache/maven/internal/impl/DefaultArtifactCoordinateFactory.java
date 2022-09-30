@@ -21,10 +21,10 @@ package org.apache.maven.internal.impl;
 
 import javax.inject.Named;
 
-import org.apache.maven.api.Coordinate;
+import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.services.CoordinateFactory;
-import org.apache.maven.api.services.CoordinateFactoryRequest;
+import org.apache.maven.api.services.ArtifactCoordinateFactory;
+import org.apache.maven.api.services.ArtifactCoordinateFactoryRequest;
 import org.apache.maven.shared.utils.StringUtils;
 import org.eclipse.aether.artifact.ArtifactType;
 
@@ -32,10 +32,10 @@ import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
-public class DefaultCoordinateFactory implements CoordinateFactory
+public class DefaultArtifactCoordinateFactory implements ArtifactCoordinateFactory
 {
     @Override
-    public Coordinate create( @Nonnull CoordinateFactoryRequest request )
+    public ArtifactCoordinate create( @Nonnull ArtifactCoordinateFactoryRequest request )
     {
         nonNull( request, "request can not be null" );
         DefaultSession session = cast( DefaultSession.class, request.getSession(),
@@ -49,7 +49,7 @@ public class DefaultCoordinateFactory implements CoordinateFactory
                                 ? request.getClassifier() : type != null ? type.getClassifier() : "";
         String extension = StringUtils.isNotEmpty( request.getExtension() )
                                 ? request.getExtension() : type != null ? type.getExtension() : "";
-        return new DefaultCoordinate(
+        return new DefaultArtifactCoordinate(
                 session,
                 new org.eclipse.aether.artifact.DefaultArtifact(
                     request.getGroupId(),

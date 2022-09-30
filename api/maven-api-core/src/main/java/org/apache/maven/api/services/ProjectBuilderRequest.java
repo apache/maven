@@ -19,7 +19,7 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
-import org.apache.maven.api.Coordinate;
+import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
@@ -58,7 +58,7 @@ public interface ProjectBuilderRequest
     Optional<Artifact> getArtifact();
 
     @Nonnull
-    Optional<Coordinate> getCoordinate();
+    Optional<ArtifactCoordinate> getCoordinate();
 
     boolean isAllowStubModel();
 
@@ -96,7 +96,7 @@ public interface ProjectBuilderRequest
     }
 
     @Nonnull
-    static ProjectBuilderRequest build( @Nonnull Session session, @Nonnull Coordinate coordinate )
+    static ProjectBuilderRequest build( @Nonnull Session session, @Nonnull ArtifactCoordinate coordinate )
     {
         return builder()
                 .session( nonNull( session, "session can not be null" ) )
@@ -117,7 +117,7 @@ public interface ProjectBuilderRequest
         Path path;
         ProjectBuilderSource source;
         Artifact artifact;
-        Coordinate coordinate;
+        ArtifactCoordinate coordinate;
         boolean allowStubModel;
         boolean recursive;
         boolean processPlugins = true;
@@ -147,7 +147,7 @@ public interface ProjectBuilderRequest
             return this;
         }
 
-        public ProjectBuilderRequestBuilder coordinate( Coordinate coordinate )
+        public ProjectBuilderRequestBuilder coordinate( ArtifactCoordinate coordinate )
         {
             this.coordinate = coordinate;
             return this;
@@ -177,7 +177,7 @@ public interface ProjectBuilderRequest
             private final Path path;
             private final ProjectBuilderSource source;
             private final Artifact artifact;
-            private final Coordinate coordinate;
+            private final ArtifactCoordinate coordinate;
             private final boolean allowStubModel;
             private final boolean recursive;
             private final boolean processPlugins;
@@ -188,7 +188,7 @@ public interface ProjectBuilderRequest
                                           @Nullable Path path,
                                           @Nullable ProjectBuilderSource source,
                                           @Nullable Artifact artifact,
-                                          @Nullable Coordinate coordinate,
+                                          @Nullable ArtifactCoordinate coordinate,
                                           boolean allowStubModel,
                                           boolean recursive,
                                           boolean processPlugins,
@@ -228,7 +228,7 @@ public interface ProjectBuilderRequest
 
             @Nonnull
             @Override
-            public Optional<Coordinate> getCoordinate()
+            public Optional<ArtifactCoordinate> getCoordinate()
             {
                 return Optional.ofNullable( coordinate );
             }

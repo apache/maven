@@ -38,10 +38,6 @@ import java.util.stream.Stream;
 @Immutable
 public interface Node
 {
-    /**
-     * @return artifact for this node
-     */
-    Artifact getArtifact();
 
     /**
      * @return dependency for this node

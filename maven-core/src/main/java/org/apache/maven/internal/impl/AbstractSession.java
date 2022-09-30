@@ -30,12 +30,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.Coordinate;
+import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Dependency;
+import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.Listener;
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.Metadata;
@@ -47,6 +48,7 @@ import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.services.ArtifactCoordinateFactory;
 import org.apache.maven.api.services.ArtifactDeployer;
 import org.apache.maven.api.services.ArtifactDeployerException;
 import org.apache.maven.api.services.ArtifactFactory;
@@ -55,12 +57,9 @@ import org.apache.maven.api.services.ArtifactInstallerException;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.ArtifactResolver;
 import org.apache.maven.api.services.ArtifactResolverException;
-import org.apache.maven.api.services.CoordinateFactory;
 import org.apache.maven.api.services.DependencyCollector;
 import org.apache.maven.api.services.DependencyCollectorException;
-import org.apache.maven.api.services.DependencyFactory;
-import org.apache.maven.api.services.DependencyResolver;
-import org.apache.maven.api.services.DependencyResolverException;
+import org.apache.maven.api.services.DependencyCoordinateFactory;
 import org.apache.maven.api.services.LocalRepositoryManager;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.VersionParser;
@@ -165,14 +164,14 @@ public abstract class AbstractSession implements Session
 
     public abstract ArtifactRepository toArtifactRepository( RemoteRepository repository );
 
-    public List<org.eclipse.aether.graph.Dependency> toDependencies( Collection<Dependency> dependencies )
+    public List<org.eclipse.aether.graph.Dependency> toDependencies( Collection<DependencyCoordinate> dependencies )
     {
         return dependencies == null ? null : dependencies.stream()
                 .map( this::toDependency )
                 .collect( Collectors.toList() );
     }
 
-    public abstract org.eclipse.aether.graph.Dependency toDependency( Dependency dependency );
+    public abstract org.eclipse.aether.graph.Dependency toDependency( DependencyCoordinate dependency );
 
     public List<org.eclipse.aether.artifact.Artifact> toArtifacts( Collection<Artifact> artifacts )
     {
@@ -203,11 +202,11 @@ public abstract class AbstractSession implements Session
         );
     }
 
-    public org.eclipse.aether.artifact.Artifact toArtifact( Coordinate coord )
+    public org.eclipse.aether.artifact.Artifact toArtifact( ArtifactCoordinate coord )
     {
-        if ( coord instanceof DefaultCoordinate )
+        if ( coord instanceof DefaultArtifactCoordinate )
         {
-            return ( ( DefaultCoordinate ) coord ).getCoordinate();
+            return ( (DefaultArtifactCoordinate) coord ).getCoordinate();
         }
         return new org.eclipse.aether.artifact.DefaultArtifact(
                 coord.getGroupId(),
@@ -313,23 +312,37 @@ public abstract class AbstractSession implements Session
      * @see ArtifactFactory#create(Session, String, String, String, String)
      */
     @Override
-    public Coordinate createCoordinate( String groupId, String artifactId, String version, String extension )
+    public ArtifactCoordinate createArtifactCoordinate( String groupId, String artifactId,
+                                                        String version, String extension )
     {
-        return getService( CoordinateFactory.class )
+        return getService( ArtifactCoordinateFactory.class )
                 .create( this, groupId, artifactId, version, extension );
     }
 
     /**
      * Shortcut for <code>getService(CoordinateFactory.class).create(...)</code>
      *
-     * @see CoordinateFactory#create(Session, String, String, String, String, String, String)
+     * @see ArtifactCoordinateFactory#create(Session, String, String, String, String, String, String)
      */
     @Override
-    public Coordinate createCoordinate( String groupId, String artifactId, String version, String classifier,
-                                        String extension, String type )
+    public ArtifactCoordinate createArtifactCoordinate( String groupId, String artifactId, String version,
+                                                        String classifier, String extension, String type )
     {
-        return getService( CoordinateFactory.class )
+        return getService( ArtifactCoordinateFactory.class )
                 .create( this, groupId, artifactId, version, classifier, extension, type );
+    }
+
+    /**
+     * Shortcut for <code>getService(CoordinateFactory.class).create(...)</code>
+     *
+     * @see ArtifactCoordinateFactory#create(Session, String, String, String, String, String, String)
+     */
+    @Override
+    public ArtifactCoordinate createArtifactCoordinate( Artifact artifact )
+    {
+        return getService( ArtifactCoordinateFactory.class )
+                .create( this, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion().asString(),
+                         artifact.getClassifier(), artifact.getExtension(), null );
     }
 
     /**
@@ -361,28 +374,64 @@ public abstract class AbstractSession implements Session
      * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
      *
      * @throws ArtifactResolverException if the artifact resolution failed
-     * @see ArtifactResolver#resolve(Session, Coordinate)
+     * @see ArtifactResolver#resolve(Session, Collection)
      */
     @Override
-    public Artifact resolveArtifact( Coordinate coordinate )
+    public Artifact resolveArtifact( ArtifactCoordinate coordinate )
     {
         return getService( ArtifactResolver.class )
-                .resolve( this, coordinate )
-                .getArtifact();
+                .resolve( this, Collections.singletonList( coordinate ) )
+                .getArtifacts().keySet().iterator().next();
     }
 
     /**
      * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
      *
      * @throws ArtifactResolverException if the artifact resolution failed
-     * @see ArtifactResolver#resolve(Session, Coordinate)
+     * @see ArtifactResolver#resolve(Session, Collection)
+     */
+    @Override
+    public Collection<Artifact> resolveArtifacts( ArtifactCoordinate... coordinates )
+    {
+        return resolveArtifacts( Arrays.asList( coordinates ) );
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
+     *
+     * @throws ArtifactResolverException if the artifact resolution failed
+     * @see ArtifactResolver#resolve(Session, Collection)
+     */
+    @Override
+    public Collection<Artifact> resolveArtifacts( Collection<? extends ArtifactCoordinate> coordinates )
+    {
+        return getService( ArtifactResolver.class )
+                .resolve( this, coordinates )
+                .getArtifacts().keySet();
+    }
+
+    /**
+     * Shortcut for <code>getService(ArtifactResolver.class).resolve(...)</code>
+     *
+     * @throws ArtifactResolverException if the artifact resolution failed
+     * @see ArtifactResolver#resolve(Session, Collection)
      */
     @Override
     public Artifact resolveArtifact( Artifact artifact )
     {
-        Coordinate coordinate = getService( CoordinateFactory.class )
+        ArtifactCoordinate coordinate = getService( ArtifactCoordinateFactory.class )
                 .create( this, artifact );
         return resolveArtifact( coordinate );
+    }
+
+    @Override
+    public Collection<Artifact> resolveArtifacts( Artifact... artifacts )
+    {
+        ArtifactCoordinateFactory acf = getService( ArtifactCoordinateFactory.class );
+        ArtifactCoordinate[] coords = Stream.of( artifacts )
+                .map( a -> acf.create( this, a ) )
+                .toArray( ArtifactCoordinate[]::new );
+        return resolveArtifacts( coords );
     }
 
     /**
@@ -463,14 +512,26 @@ public abstract class AbstractSession implements Session
     /**
      * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
      *
-     * @see DependencyFactory#create(Session, Coordinate)
+     * @see DependencyCoordinateFactory#create(Session, ArtifactCoordinate)
      */
     @Nonnull
     @Override
-    public Dependency createDependency( @Nonnull Coordinate coordinate )
+    public DependencyCoordinate createDependencyCoordinate( @Nonnull ArtifactCoordinate coordinate )
     {
-        return getService( DependencyFactory.class )
+        return getService( DependencyCoordinateFactory.class )
                 .create( this, coordinate );
+    }
+
+    /**
+     * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
+     *
+     * @see DependencyCoordinateFactory#create(Session, ArtifactCoordinate)
+     */
+    @Nonnull
+    public DependencyCoordinate createDependencyCoordinate( @Nonnull Dependency dependency )
+    {
+        return getService( DependencyCoordinateFactory.class )
+                .create( this, dependency );
     }
 
     /**
@@ -507,29 +568,14 @@ public abstract class AbstractSession implements Session
      * Shortcut for <code>getService(DependencyCollector.class).collect(...)</code>
      *
      * @throws DependencyCollectorException if the dependency collection failed
-     * @see DependencyCollector#collect(Session, Dependency)
+     * @see DependencyCollector#collect(Session, DependencyCoordinate)
      */
     @Nonnull
     @Override
-    public Node collectDependencies( @Nonnull Dependency dependency )
+    public Node collectDependencies( @Nonnull DependencyCoordinate dependency )
     {
         return getService( DependencyCollector.class )
                 .collect( this, dependency )
-                .getRoot();
-    }
-
-    /**
-     * Shortcut for <code>getService(DependencyResolver.class).resolve(...)</code>
-     *
-     * @throws DependencyResolverException if the dependency resolution failed
-     * @see DependencyResolver#resolve(Session, Dependency, Predicate)
-     */
-    @Nonnull
-    @Override
-    public Node resolveDependencies( @Nonnull Dependency dependency )
-    {
-        return getService( DependencyResolver.class )
-                .resolve( this, dependency, null )
                 .getRoot();
     }
 

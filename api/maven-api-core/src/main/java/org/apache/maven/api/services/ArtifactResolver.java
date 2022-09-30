@@ -19,10 +19,11 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
-import org.apache.maven.api.Coordinate;
+import java.util.Collection;
+
+import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
-import org.apache.maven.api.Artifact;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
@@ -45,16 +46,16 @@ public interface ArtifactResolver extends Service
 
     /**
      * @param session {@link Session}
-     * @param coordinate {@link Artifact}
+     * @param coordinates array of {@link ArtifactCoordinate}
      * @return {@link ArtifactResolverResult}
      * @throws ArtifactResolverException in case of an error.
      * @throws IllegalArgumentException in case of parameter {@code buildingRequest} is {@code null} or
      *             parameter {@code coordinate} is {@code null} or invalid.
      */
     default ArtifactResolverResult resolve( Session session,
-                                            Coordinate coordinate )
+                                            Collection<? extends ArtifactCoordinate> coordinates )
     {
-        return resolve( ArtifactResolverRequest.build( session, coordinate ) );
+        return resolve( ArtifactResolverRequest.build( session, coordinates ) );
     }
 
 }

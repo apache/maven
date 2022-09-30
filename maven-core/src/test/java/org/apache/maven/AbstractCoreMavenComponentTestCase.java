@@ -22,11 +22,13 @@ package org.apache.maven;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.artifact.handler.manager.DefaultArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -170,7 +172,7 @@ public abstract class AbstractCoreMavenComponentTestCase
         session.setAllProjects( session.getProjects() );
         session.setSession( new DefaultSession( session, new DefaultRepositorySystem(), null,
                 null, null, null, null, null,
-                null, null ) );
+                null, new DefaultArtifactHandlerManager( Collections.emptyMap() ) ) );
 
         return session;
     }
