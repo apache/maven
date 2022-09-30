@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3873">MNG-3873</a>.
  *
@@ -46,6 +48,7 @@ public class MavenITmng3873MultipleExecutionGoalsTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitWithoutPluginMngt()
         throws Exception
     {
@@ -58,6 +61,7 @@ public class MavenITmng3873MultipleExecutionGoalsTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitWithPluginMngt()
         throws Exception
     {

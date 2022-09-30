@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3974">MNG-3974</a>.
  *
@@ -45,6 +47,7 @@ public class MavenITmng3974MirrorOrderingTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitFirstMatchWins()
         throws Exception
     {

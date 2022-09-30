@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4768">MNG-4768</a>.
  *
@@ -41,12 +43,14 @@ public class MavenITmng4768NearestMatchConflictResolutionTest
 
     // Ideally, all six permutations of the three direct dependencies should yield the same result...
 
+    @Test
     public void testitABD()
         throws Exception
     {
         testit( "test-abd" );
     }
 
+    @Test
     public void testitADB()
         throws Exception
     {
@@ -54,18 +58,21 @@ public class MavenITmng4768NearestMatchConflictResolutionTest
         testit( "test-adb" );
     }
 
+    @Test
     public void testitBAD()
         throws Exception
     {
         testit( "test-bad" );
     }
 
+    @Test
     public void testitBDA()
         throws Exception
     {
         testit( "test-bda" );
     }
 
+    @Test
     public void testitDAB()
         throws Exception
     {
@@ -73,6 +80,7 @@ public class MavenITmng4768NearestMatchConflictResolutionTest
         testit( "test-dab" );
     }
 
+    @Test
     public void testitDBA()
         throws Exception
     {

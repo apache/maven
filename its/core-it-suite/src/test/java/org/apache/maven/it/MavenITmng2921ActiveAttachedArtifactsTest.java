@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.Collection;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2921">MNG-2921</a>. It naturally includes the
  * test for the related issue <a href="https://issues.apache.org/jira/browse/MNG-2877">MNG-2877</a> whose original test was
@@ -52,6 +54,7 @@ public class MavenITmng2921ActiveAttachedArtifactsTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG2921()
         throws Exception
     {

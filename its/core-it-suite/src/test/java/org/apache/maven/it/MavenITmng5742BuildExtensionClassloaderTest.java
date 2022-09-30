@@ -19,11 +19,13 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
+
+import java.io.File;
+
 import org.apache.maven.shared.utils.io.FileUtils;
+import org.junit.jupiter.api.Test;
 
 public class MavenITmng5742BuildExtensionClassloaderTest
     extends AbstractMavenIntegrationTestCase
@@ -34,6 +36,7 @@ public class MavenITmng5742BuildExtensionClassloaderTest
         super( "(3.2.5,)" );
     }
 
+    @Test
     public void testBuildExtensionClassloader()
         throws Exception
     {

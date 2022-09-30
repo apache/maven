@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 public class MavenITmng5214DontMapWsdlToJar
     extends AbstractMavenIntegrationTestCase
 {
@@ -39,6 +41,7 @@ public class MavenITmng5214DontMapWsdlToJar
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitTestPhase()
         throws Exception
     {

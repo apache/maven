@@ -19,11 +19,13 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2309">MNG-2309</a>.
@@ -45,6 +47,7 @@ public class MavenITmng2309ProfileInjectionOrderTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG2309()
         throws Exception
     {

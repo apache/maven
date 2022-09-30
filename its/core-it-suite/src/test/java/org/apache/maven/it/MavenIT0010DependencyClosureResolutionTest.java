@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 public class MavenIT0010DependencyClosureResolutionTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -40,6 +42,7 @@ public class MavenIT0010DependencyClosureResolutionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit0010()
         throws Exception
     {

@@ -27,6 +27,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4091">MNG-4091</a>:
  * Bad plugin descriptor error handling
@@ -40,6 +42,7 @@ public class MavenITmng4091BadPluginDescriptorTest
         super( "[2.1.0,)" ); // only test in 2.1.0+
     }
 
+    @Test
     public void testitMNG4091_InvalidDescriptor()
         throws Exception
     {
@@ -80,6 +83,7 @@ public class MavenITmng4091BadPluginDescriptorTest
         assertTrue( "User-friendly message was not found in output.", foundMessage );
     }
 
+    @Test
     public void testitMNG4091_PluginDependency()
         throws Exception
     {

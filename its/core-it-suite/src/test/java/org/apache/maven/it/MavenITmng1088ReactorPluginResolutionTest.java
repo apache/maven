@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1088">MNG-1088</a>.
  *
@@ -46,6 +48,7 @@ public class MavenITmng1088ReactorPluginResolutionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG1088()
         throws Exception
     {

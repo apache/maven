@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 public class MavenITmng7051OptionalProfileActivationTest
         extends AbstractMavenIntegrationTestCase
 {
@@ -40,6 +42,7 @@ public class MavenITmng7051OptionalProfileActivationTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testActivatingNonExistingProfileBreaks() throws Exception
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
@@ -66,6 +69,7 @@ public class MavenITmng7051OptionalProfileActivationTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testActivatingNonExistingProfileWithQuestionMarkDoesNotBreak() throws Exception
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
@@ -85,6 +89,7 @@ public class MavenITmng7051OptionalProfileActivationTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testActivatingExistingAndNonExistingProfiles() throws Exception
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
@@ -104,6 +109,7 @@ public class MavenITmng7051OptionalProfileActivationTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testDeactivatingNonExistingProfileWithQuestionMarkDoesNotBreak() throws Exception
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
@@ -123,6 +129,7 @@ public class MavenITmng7051OptionalProfileActivationTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testDeactivatingExistingAndNonExistingProfiles() throws Exception
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );

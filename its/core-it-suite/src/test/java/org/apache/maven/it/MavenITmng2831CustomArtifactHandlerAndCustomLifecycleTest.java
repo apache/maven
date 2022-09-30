@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2831">MNG-2831</a>.
  *
@@ -43,6 +45,7 @@ public class MavenITmng2831CustomArtifactHandlerAndCustomLifecycleTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG2831()
         throws Exception
     {

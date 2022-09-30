@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 public class MavenIT0011DefaultVersionByDependencyManagementTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -38,6 +40,7 @@ public class MavenIT0011DefaultVersionByDependencyManagementTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit0011()
         throws Exception
     {

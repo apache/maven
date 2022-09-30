@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1073">MNG-1073</a>.
  *
@@ -43,6 +45,7 @@ public class MavenITmng1073AggregatorForksReactorTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitForkLifecycle()
         throws Exception
     {
@@ -71,6 +74,7 @@ public class MavenITmng1073AggregatorForksReactorTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitForkGoal()
         throws Exception
     {

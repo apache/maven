@@ -19,12 +19,14 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.VerificationException;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.junit.jupiter.api.Test;
 
 public class MavenITmng7160ExtensionClassloader
         extends AbstractMavenIntegrationTestCase
@@ -34,6 +36,7 @@ public class MavenITmng7160ExtensionClassloader
         super( "[3.9.0,)" );
     }
 
+    @Test
     public void testVerify() throws IOException, VerificationException
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7160-extensionclassloader" );

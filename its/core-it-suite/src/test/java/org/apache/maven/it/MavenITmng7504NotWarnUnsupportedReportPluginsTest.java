@@ -18,13 +18,15 @@
  */
 package org.apache.maven.it;
 
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.VerificationException;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for
@@ -43,6 +45,7 @@ public class MavenITmng7504NotWarnUnsupportedReportPluginsTest extends AbstractM
         super( "[3.9.0]" );
     }
 
+    @Test
     public void testWarnNotPresent() throws IOException, VerificationException
     {
         File rootDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );

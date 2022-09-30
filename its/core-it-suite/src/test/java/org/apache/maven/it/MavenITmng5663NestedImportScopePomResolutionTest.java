@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5663">MNG-5663</a>:
  *
@@ -42,6 +44,7 @@ public class MavenITmng5663NestedImportScopePomResolutionTest
         super( "[3.0.4,3.2.2),(3.2.2,)" );
     }
 
+    @Test
     public void testitMNG5639()
         throws Exception
     {

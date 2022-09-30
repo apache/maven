@@ -21,11 +21,13 @@ package org.apache.maven.it;
 
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.utils.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+
+import org.apache.maven.shared.utils.io.FileUtils;
+import org.junit.jupiter.api.Test;
 
 /**
  * With the build-consumer the pom.xml will be adjusted during the process.
@@ -64,6 +66,7 @@ public class MavenITmng6656BuildConsumer
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testPublishedPoms()
                     throws Exception
     {

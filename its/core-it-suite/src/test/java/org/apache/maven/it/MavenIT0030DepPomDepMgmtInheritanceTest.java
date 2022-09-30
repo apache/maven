@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 public class MavenIT0030DepPomDepMgmtInheritanceTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -38,6 +40,7 @@ public class MavenIT0030DepPomDepMgmtInheritanceTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit0030()
         throws Exception
     {

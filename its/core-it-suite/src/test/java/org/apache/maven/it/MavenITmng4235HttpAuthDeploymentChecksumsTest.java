@@ -21,6 +21,18 @@ package org.apache.maven.it;
 
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Deque;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentLinkedDeque;
+
 import org.apache.maven.it.utils.DeployedResource;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -36,16 +48,9 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Password;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Deque;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentLinkedDeque;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.eclipse.jetty.servlet.ServletContextHandler.SECURITY;
@@ -74,7 +79,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
         super( "[2.0.5,2.2.0),(2.2.0,)" );
     }
 
-    @Override
+    @BeforeEach
     protected void setUp()
         throws Exception
     {
@@ -116,7 +121,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
         System.out.println( "Bound server socket to the port " + port );
     }
 
-    @Override
+    @AfterEach
     protected void tearDown()
         throws Exception
     {
@@ -135,6 +140,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit()
         throws Exception
     {

@@ -19,10 +19,12 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
+
+import java.io.File;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3810">MNG-3810</a>.
@@ -39,6 +41,7 @@ public class MavenITmng3810BadProfileActivationTest
         super( "(2.0.10,2.1.0-M1),(2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)" ); // 2.0.11+, 2.1.0-M2+
     }
 
+    @Test
     public void testitMNG3810Property()
         throws Exception
     {

@@ -19,10 +19,12 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
+
+import java.io.File;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests new <code>mvn prefix:version:goal</code>,
@@ -47,12 +49,14 @@ public class MavenITmng7353CliGoalInvocationTest
         verifier.resetStreams();
     }
 
+    @Test
     public void testPrefixGoal()
         throws Exception
     {
         run( "pluginPrefix-goal", "dependency:list", "maven-dependency-plugin:3.3.0:list (default-cli)" );
     }
 
+    @Test
     public void testPrefixGoalAtId()
         throws Exception
     {
@@ -62,6 +66,7 @@ public class MavenITmng7353CliGoalInvocationTest
     /**
      * new pluginPrefix:version:goal in Maven 3.9.0
      */
+    @Test
     public void testPrefixVersionGoal()
         throws Exception
     {
@@ -71,30 +76,35 @@ public class MavenITmng7353CliGoalInvocationTest
     /**
      * new pluginPrefix:version:goal in Maven 3.9.0
      */
+    @Test
     public void testPrefixVersionGoalAtId()
         throws Exception
     {
         run( "pluginPrefix-goal@id", "dependency:3.1.1:list@id", "maven-dependency-plugin:3.1.1:list (id)" );
     }
 
+    @Test
     public void testGroupIdArtifactIdGoal()
         throws Exception
     {
         run( "groupId-artifactId-goal", "org.apache.maven.plugins:maven-dependency-plugin:list", "maven-dependency-plugin:3.3.0:list (default-cli)" );
     }
 
+    @Test
     public void testGroupIdArtifactIdGoalAtId()
         throws Exception
     {
         run( "groupId-artifactId-goal@id", "org.apache.maven.plugins:maven-dependency-plugin:list@id", "maven-dependency-plugin:3.3.0:list (id)" );
     }
 
+    @Test
     public void testGroupIdArtifactIdVersionGoal()
         throws Exception
     {
         run( "groupId-artifactId-version-goal", "org.apache.maven.plugins:maven-dependency-plugin:3.1.1:list", "maven-dependency-plugin:3.1.1:list (default-cli)" );
     }
 
+    @Test
     public void testGroupIdArtifactIdVersionGoalAtId()
         throws Exception
     {

@@ -19,11 +19,13 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4189">MNG-4189</a>.
@@ -40,6 +42,7 @@ public class MavenITmng4189UniqueVersionSnapshotTest
         super( "[2.2.1,),[3.0-alpha-3,)" );
     }
 
+    @Test
     public void testit()
         throws Exception
     {

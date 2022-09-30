@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4166">MNG-4166</a>.
  *
@@ -46,6 +48,7 @@ public class MavenITmng4166HideCoreCommonsCliTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG4166()
         throws Exception
     {

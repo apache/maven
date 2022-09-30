@@ -5,6 +5,9 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -30,6 +33,7 @@ import java.io.File;
  *
  * @author Kristian Rosenvold
  */
+@Disabled
 public class MavenITmng4633DualCompilerExecutionsWeaveModeTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -45,6 +49,7 @@ public class MavenITmng4633DualCompilerExecutionsWeaveModeTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit()
         throws Exception
     {

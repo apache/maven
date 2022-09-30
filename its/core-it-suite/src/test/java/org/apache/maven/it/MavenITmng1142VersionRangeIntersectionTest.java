@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1142">MNG-1142</a>.
  *
@@ -45,6 +47,7 @@ public class MavenITmng1142VersionRangeIntersectionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitAB()
         throws Exception
     {
@@ -57,6 +60,7 @@ public class MavenITmng1142VersionRangeIntersectionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitBA()
         throws Exception
     {

@@ -21,9 +21,11 @@ package org.apache.maven.it;
 
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.utils.io.FileUtils;
 
 import java.io.File;
+
+import org.apache.maven.shared.utils.io.FileUtils;
+import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2362">MNG-2362</a>.
@@ -45,6 +47,7 @@ public class MavenITmng2362DeployedPomEncodingTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit()
         throws Exception
     {

@@ -24,6 +24,9 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-6084">MNG-6084</a>.
  */
@@ -38,22 +41,14 @@ public class MavenITmng6084Jsr250PluginTest
         super( "[3.5.1,)" );
     }
 
+    @BeforeEach
     public void setUp()
         throws Exception
     {
-        super.setUp();
-
         testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6084-jsr250-support" );
-
     }
 
-    protected void tearDown()
-        throws Exception
-    {
-
-        super.tearDown();
-    }
-
+    @Test
     public void testJsr250PluginExecution()
         throws Exception
     {

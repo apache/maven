@@ -19,74 +19,84 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.PrintStream;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import org.codehaus.plexus.util.IOUtil;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+import org.codehaus.plexus.util.IOUtil;
+import org.junit.jupiter.api.ClassDescriptor;
+import org.junit.jupiter.api.ClassOrderer;
+import org.junit.jupiter.api.ClassOrdererContext;
 
 /**
  * The Core IT suite.
  */
-public class IntegrationTestSuite
-    extends TestCase
+public class TestSuiteOrdering implements ClassOrderer 
 {
+
     private static PrintStream out = System.out;
+
+    final Map<Class<?>, Integer> tests = new HashMap<>();
 
     private static void infoProperty( PrintStream info, String property )
     {
         info.println( property + ": " + System.getProperty( property ) );
     }
 
-    public static Test suite()
-        throws VerificationException, FileNotFoundException
+    static
     {
-        PrintStream info = null;
-        Verifier verifier = null;
         try
         {
-            verifier = new Verifier( "" );
-            String mavenVersion = verifier.getMavenVersion();
-
-            String executable = verifier.getExecutable();
-
-            out.println( "Running integration tests for Maven " + mavenVersion );
-            out.println( "\tusing Maven executable: " + executable );
-            out.println( "\twith verifier.forkMode: " + System.getProperty( "verifier.forkMode", "not defined == fork" ) );
-
-            System.setProperty( "maven.version", mavenVersion );
-
-            String basedir = System.getProperty( "basedir" );
-            info = new PrintStream( new FileOutputStream( new File( basedir, "target/info.txt" ) ) );
-
-            infoProperty( info, "maven.version" );
-            infoProperty( info, "java.version" );
-            infoProperty( info, "os.name" );
-            infoProperty( info, "os.version" );
-        }
-        finally
-        {
-            if ( verifier != null )
+            PrintStream info = null;
+            Verifier verifier = null;
+            try
             {
-                verifier.resetStreams();
-            }
-            IOUtil.close( info );
-        }
+                verifier = new Verifier( "" );
+                String mavenVersion = verifier.getMavenVersion();
 
-        TestSuite suite = new TestSuite();
+                String executable = verifier.getExecutable();
+
+                out.println( "Running integration tests for Maven " + mavenVersion + System.lineSeparator()
+                        + "\tusing Maven executable: " + executable + System.lineSeparator()
+                        + "\twith verifier.forkMode: " + System.getProperty( "verifier.forkMode", "not defined == fork" ) );
+
+                System.setProperty( "maven.version", mavenVersion );
+
+                String basedir = System.getProperty( "basedir" );
+                info = new PrintStream( Files.newOutputStream( Paths.get( basedir, "target/info.txt" ) ) );
+
+                infoProperty( info, "maven.version" );
+                infoProperty( info, "java.version" );
+                infoProperty( info, "os.name" );
+                infoProperty( info, "os.version" );
+            }
+            finally
+            {
+                if ( verifier != null )
+                {
+                    verifier.resetStreams();
+                }
+                IOUtil.close( info );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
+
+    public TestSuiteOrdering()
+    {
+        TestSuiteOrdering suite = this;
 
         /*
          * This must be the first one to ensure the local repository is properly setup.
          */
-        suite.addTestSuite( MavenITBootstrapTest.class );
+        suite.addTestSuite( MavenITBootstrapTest.class, -10 );
 
         /*
          * Add tests in reverse order of implementation. This makes testing new
@@ -95,19 +105,15 @@ public class IntegrationTestSuite
          * a fail fast technique as well.
          */
 
-        // -------------------------------------------------------------------------------------------------------------
-        // Tests that currently don't pass for any Maven version, i.e. the corresponding issue hasn't been resolved yet
-        // -------------------------------------------------------------------------------------------------------------
-        // suite.addTestSuite( MavenITmng3890TransitiveDependencyScopeUpdateTest.class );
-        // suite.addTestSuite( MavenITmng3092SnapshotsExcludedFromVersionRangeTest.class );
-        // suite.addTestSuite( MavenITmng3038TransitiveDepManVersionTest.class );
-        // suite.addTestSuite( MavenITmng2771PomExtensionComponentOverrideTest.class );
-        // suite.addTestSuite( MavenITmng0612NewestConflictResolverTest.class );
-
-        // -------------------------------------------------------------------------------------------------------------
-        // Tests that don't run stable and need to be fixed
-        // -------------------------------------------------------------------------------------------------------------
-        // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
+        suite.addTestSuite( MavenITmng5889FindBasedir.class );
+        suite.addTestSuite( MavenITmng7360BuildConsumer.class );
+        suite.addTestSuite( MavenITmng5452MavenBuildTimestampUTCTest.class );
+        suite.addTestSuite( MavenITmng3890TransitiveDependencyScopeUpdateTest.class );
+        suite.addTestSuite( MavenITmng3092SnapshotsExcludedFromVersionRangeTest.class );
+        suite.addTestSuite( MavenITmng3038TransitiveDepManVersionTest.class );
+        suite.addTestSuite( MavenITmng2771PomExtensionComponentOverrideTest.class );
+        suite.addTestSuite( MavenITmng0612NewestConflictResolverTest.class );
+        suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class );
         suite.addTestSuite( MavenITmng7310LifecycleActivatedInSpecifiedModuleTest.class );
         suite.addTestSuite( MavenITmng7474SessionScopeTest.class );
         suite.addTestSuite( MavenITmng7529VersionRangeRepositorySelection.class );
@@ -139,8 +145,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng6754TimestampInMultimoduleProject.class );
         suite.addTestSuite( MavenITmng6981ProjectListShouldIncludeChildrenTest.class );
         suite.addTestSuite( MavenITmng6972AllowAccessToGraphPackageTest.class );
-        // This IT has been disabled until it is decided how the solution shall look like
-        // suite.addTestSuite( MavenITmng6772NestedImportScopeRepositoryOverride.class );
+        suite.addTestSuite( MavenITmng6772NestedImportScopeRepositoryOverride.class );
         suite.addTestSuite( MavenITmng6759TransitiveDependencyRepositoriesTest.class );
         suite.addTestSuite( MavenITmng6720FailFastTest.class );
         suite.addTestSuite( MavenITmng6656BuildConsumer.class );
@@ -191,7 +196,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng5581LifecycleMappingDelegate.class );
         suite.addTestSuite( MavenITmng5578SessionScopeTest.class );
         suite.addTestSuite( MavenITmng5576CdFriendlyVersions.class );
-        suite.addTestSuite( MavenITmng5572ReactorPluginExtensionsTest.class  );
+        suite.addTestSuite( MavenITmng5572ReactorPluginExtensionsTest.class );
         suite.addTestSuite( MavenITmng5530MojoExecutionScopeTest.class );
         suite.addTestSuite( MavenITmng5482AetherNotFoundTest.class );
         suite.addTestSuite( MavenITmng5445LegacyStringSearchModelInterpolatorTest.class );
@@ -203,7 +208,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng5230MakeReactorWithExcludesTest.class );
         suite.addTestSuite( MavenITmng5224InjectedSettings.class );
         suite.addTestSuite( MavenITmng5214DontMapWsdlToJar.class );
-        //suite.addTestSuite( MavenITmng5208EventSpyParallelTest.class );
+        suite.addTestSuite( MavenITmng5208EventSpyParallelTest.class );
         suite.addTestSuite( MavenITmng5175WagonHttpTest.class );
         suite.addTestSuite( MavenITmng5137ReactorResolutionInForkedBuildTest.class );
         suite.addTestSuite( MavenITmng5135AggregatorDepResolutionModuleExtensionTest.class );
@@ -274,7 +279,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4660OutdatedPackagedArtifact.class );
         suite.addTestSuite( MavenITmng4654ArtifactHandlerForMainArtifactTest.class );
         suite.addTestSuite( MavenITmng4644StrictPomParsingRejectsMisplacedTextTest.class );
-        // suite.addTestSuite( MavenITmng4633DualCompilerExecutionsWeaveModeTest.class );
+        suite.addTestSuite( MavenITmng4633DualCompilerExecutionsWeaveModeTest.class );
         suite.addTestSuite( MavenITmng4629NoPomValidationErrorUponMissingSystemDepTest.class );
         suite.addTestSuite( MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest.class );
         suite.addTestSuite( MavenITmng4618AggregatorBuiltAfterModulesTest.class );
@@ -734,7 +739,24 @@ public class IntegrationTestSuite
         /*
          * Add tests in reverse alpha order above.
          */
-
-        return suite;
     }
+
+    void addTestSuite( Class<?> clazz ) {
+        addTestSuite( clazz, tests.size() );
+    }
+
+    void addTestSuite( Class<?> clazz, int order ) {
+        tests.put( clazz, order );
+    }
+
+    int getIndex( ClassDescriptor cd ) {
+        Integer i = tests.get( cd.getTestClass() );
+        return i != null ? i : -1;
+    }
+
+    public void orderClasses( ClassOrdererContext context )
+    {
+        context.getClassDescriptors().sort( Comparator.comparing( this::getIndex ) );
+    }
+
 }

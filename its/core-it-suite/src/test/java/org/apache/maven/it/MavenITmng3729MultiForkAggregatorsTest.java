@@ -19,10 +19,12 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
+
+import java.io.File;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3729">MNG-3729</a>.
@@ -55,6 +57,7 @@ public class MavenITmng3729MultiForkAggregatorsTest
         super( "(2.0.8,3.0-alpha-1),[3.0-alpha-3,)" ); // only test in 2.0.9+
     }
 
+    @Test
     public void testitMNG3729 ()
         throws Exception
     {

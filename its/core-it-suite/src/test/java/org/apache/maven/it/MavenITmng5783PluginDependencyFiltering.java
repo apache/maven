@@ -1,10 +1,12 @@
 package org.apache.maven.it;
 
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+import org.junit.jupiter.api.Test;
 
 public class MavenITmng5783PluginDependencyFiltering
     extends AbstractMavenIntegrationTestCase
@@ -15,6 +17,7 @@ public class MavenITmng5783PluginDependencyFiltering
         super( "[3.0,)" );
     }
 
+    @Test
     public void testSLF4j()
         throws Exception
     {

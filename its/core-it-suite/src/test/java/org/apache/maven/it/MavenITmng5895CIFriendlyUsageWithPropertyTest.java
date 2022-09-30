@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * The usage of a <code>${revision}</code> for the version in the pom file and furthermore
  * defining the property in the pom file and overwrite it via command line.
@@ -51,6 +53,7 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitShouldResolveTheDependenciesWithoutBuildConsumer()
         throws Exception
     {
@@ -70,6 +73,7 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest
 
     }
 
+    @Test
     public void testitShouldResolveTheDependenciesWithBuildConsumer()
                     throws Exception
     {

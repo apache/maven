@@ -19,12 +19,15 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.VerificationException;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3038">MNG-3038</a>
@@ -32,6 +35,7 @@ import org.apache.maven.shared.verifier.VerificationException;
  * @author Joakim Erdfelt
  *
  */
+@Disabled( "cannot reproduce" )
 public class MavenITmng3038TransitiveDepManVersionTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -40,6 +44,7 @@ public class MavenITmng3038TransitiveDepManVersionTest
         super( ALL_MAVEN_VERSIONS );
     }
 
+    @Test
     public void testitMNG3038()
         throws Exception
     {

@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.VerificationException;
-import org.apache.maven.shared.utils.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,8 +32,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
+import org.apache.maven.shared.utils.io.FileUtils;
+import org.junit.jupiter.api.Test;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
 
@@ -57,6 +56,7 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testShouldWarnWhenPackagedArtifactIsOutdated() throws Exception
     {
         final File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4660-outdated-packaged-artifact" );
@@ -96,8 +96,8 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
                 .toAbsolutePath();
 
         verifier2.verifyFilePresent( module1PropertiesFile.toString() );
-        assertThat( Files.getLastModifiedTime( module1PropertiesFile ),
-                greaterThan ( Files.getLastModifiedTime( module1Jar ) ) );
+        assertTrue( Files.getLastModifiedTime( module1PropertiesFile )
+                .compareTo( Files.getLastModifiedTime( module1Jar ) ) >= 0 );
 
         Path module1Class = testDir.toPath().resolve( "module-a/target/classes/org/apache/maven/it/Example.class" )
                         .toAbsolutePath();

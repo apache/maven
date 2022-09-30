@@ -25,11 +25,15 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3092">MNG-3092</a>.
  *
  * @author Benjamin Bentmann
  */
+@Disabled( "not fixed yet" )
 public class MavenITmng3092SnapshotsExcludedFromVersionRangeTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -45,6 +49,7 @@ public class MavenITmng3092SnapshotsExcludedFromVersionRangeTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit()
         throws Exception
     {

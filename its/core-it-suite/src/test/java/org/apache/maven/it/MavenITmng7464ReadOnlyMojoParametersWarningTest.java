@@ -19,13 +19,15 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for
@@ -43,6 +45,7 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
     /**
      * Test that ensures that warning is not printed for empty and default value
      */
+    @Test
     public void testEmptyConfiguration() throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7464-mojo-read-only-params" );
@@ -64,6 +67,7 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
     /**
      * Test that ensures that warning is printed for read-only parameter set by property
      */
+    @Test
     public void testReadOnlyProperty()
         throws Exception
     {
@@ -90,6 +94,7 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
     /**
      * Test that ensures that warning is printed for read-only parameter set by plugin configuration.
      */
+    @Test
     public void testReadOnlyConfig() throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7464-mojo-read-only-params" );

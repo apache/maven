@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5639">MNG-5639</a>:
  * Check that import POM defined in DependencyManagement can be resolved from a parameterised repository
@@ -37,6 +39,7 @@ public class MavenITmng5639ImportScopePomResolutionTest
         super( "[3.2.2,)" );
     }
 
+    @Test
     public void testitMNG5639()
         throws Exception
     {

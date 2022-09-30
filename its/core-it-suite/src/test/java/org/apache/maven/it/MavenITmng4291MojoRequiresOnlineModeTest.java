@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4291">MNG-4291</a>.
  *
@@ -45,6 +47,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitDirectInvocation()
         throws Exception
     {
@@ -77,6 +80,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitLifecycleInvocation()
         throws Exception
     {

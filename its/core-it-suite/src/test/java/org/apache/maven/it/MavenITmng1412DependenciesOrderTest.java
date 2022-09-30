@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1412">MNG-1412</a>:
  * it tests that dependencies order in classpath matches <code>pom.xml</code>.
@@ -41,6 +43,7 @@ public class MavenITmng1412DependenciesOrderTest
         super( "(2.0.8,)" ); // 2.0.9+
     }
 
+    @Test
     public void testitMNG1412()
         throws Exception
     {

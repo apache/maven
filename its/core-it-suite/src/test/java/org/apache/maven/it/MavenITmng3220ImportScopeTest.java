@@ -26,6 +26,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import java.io.File;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3220">MNG-3220</a>.
  *
@@ -39,6 +41,7 @@ public class MavenITmng3220ImportScopeTest
         super( "(2.0.8,3.0-alpha-1),[3.0-alpha-3,)" );
     }
 
+    @Test
     public void testitMNG3220a()
         throws Exception
     {
@@ -59,6 +62,7 @@ public class MavenITmng3220ImportScopeTest
         verifier.resetStreams();
     }
 
+    @Test
     public void testitMNG3220b()
         throws Exception
     {

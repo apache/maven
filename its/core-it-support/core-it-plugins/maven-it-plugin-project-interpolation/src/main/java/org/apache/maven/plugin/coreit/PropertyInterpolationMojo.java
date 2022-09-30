@@ -34,7 +34,11 @@ public class PropertyInterpolationMojo
     extends AbstractMojo
 {
 
-    /** @parameter default-value="${project}" */
+    /**
+     * The current Maven project.
+     *
+     * @parameter default-value="${project}"
+     */
     private MavenProject project;
 
     public void execute()

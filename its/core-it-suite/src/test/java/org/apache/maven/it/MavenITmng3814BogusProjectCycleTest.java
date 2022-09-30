@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3814">MNG-3814</a>.
  *
@@ -44,6 +46,7 @@ public class MavenITmng3814BogusProjectCycleTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG3814()
         throws Exception
     {

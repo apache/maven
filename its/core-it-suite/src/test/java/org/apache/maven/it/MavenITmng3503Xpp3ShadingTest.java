@@ -19,11 +19,13 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
+
+import java.io.File;
+
 import org.apache.maven.shared.utils.io.FileUtils;
+import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3503">MNG-3503</a>. The first test verifies that
@@ -38,6 +40,7 @@ public class MavenITmng3503Xpp3ShadingTest
         super( "(2.0.9,2.1.0-M1),(2.1.0-M1,)" ); // only test in 2.0.10+, and not in 2.1.0-M1
     }
 
+    @Test
     public void testitMNG3503NoLinkageErrors()
         throws Exception
     {
@@ -57,6 +60,7 @@ public class MavenITmng3503Xpp3ShadingTest
         assertEquals( "<root />", FileUtils.fileRead( new File( dir, "target/serialized.xml" ), "UTF-8" ) );
     }
 
+    @Test
     public void testitMNG3503Xpp3Shading()
         throws Exception
     {

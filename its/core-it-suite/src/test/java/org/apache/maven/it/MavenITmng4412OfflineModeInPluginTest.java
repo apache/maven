@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4412">MNG-4412</a>.
  *
@@ -45,6 +47,7 @@ public class MavenITmng4412OfflineModeInPluginTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitResolver()
         throws Exception
     {
@@ -82,6 +85,7 @@ public class MavenITmng4412OfflineModeInPluginTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitCollector()
         throws Exception
     {

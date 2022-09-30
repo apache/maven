@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3482">MNG-3482</a>.
  *
@@ -40,6 +42,7 @@ public class MavenITmng3482DependencyPomInterpolationTest
         super( ALL_MAVEN_VERSIONS );
     }
 
+    @Test
     public void testitMNG3482()
         throws Exception
     {

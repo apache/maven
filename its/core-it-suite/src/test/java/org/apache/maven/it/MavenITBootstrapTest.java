@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * Core IT Bootstrapping: downloads from central repository every dependency (artifacts, plugins) required to let
  * ITs run without downloading anything later.
@@ -44,6 +46,7 @@ public class MavenITBootstrapTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testBootstrap()
         throws Exception
     {

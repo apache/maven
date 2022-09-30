@@ -26,6 +26,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-471">MNG-471</a>.
  *
@@ -45,6 +47,7 @@ public class MavenITmng0471CustomLifecycleTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG471()
         throws Exception
     {

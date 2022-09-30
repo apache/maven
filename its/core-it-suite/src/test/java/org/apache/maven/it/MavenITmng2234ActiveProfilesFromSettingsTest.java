@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2234">MNG-2234</a>.
  */
@@ -42,6 +44,7 @@ public class MavenITmng2234ActiveProfilesFromSettingsTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG2234()
         throws Exception
     {

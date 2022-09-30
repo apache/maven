@@ -19,13 +19,15 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for
@@ -43,6 +45,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
     /**
      * Test that ensures that warning is not printed for empty configuration
      */
+    @Test
     public void testNoConfiguration() throws Exception
     {
         List<String> warnLines = performTest( "no-config" );
@@ -52,6 +55,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
     /**
      * Test that ensures that warning is not printed for valid parameters
      */
+    @Test
     public void testValidParameter() throws Exception
     {
         List<String> warnLines = performTest( "valid-parameter" );
@@ -61,6 +65,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
     /**
      * Test that ensures that warning is not printed for valid parameters
      */
+    @Test
     public void testValidParameterAlias() throws Exception
     {
         List<String> warnLines = performTest( "valid-parameter-alias" );
@@ -70,6 +75,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
     /**
      * Test that ensures that warning is not printed for valid parameters
      */
+    @Test
     public void testValidParameterForOtherGoal() throws Exception
     {
         List<String> warnLines = performTest( "valid-parameter-other-goal" );
@@ -79,6 +85,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
     /**
      * Test that ensures that warning is printed for configuration
      */
+    @Test
     public void testInBuildPlugin() throws Exception
     {
         List<String> warnLines = performTest( "config-build-plugin" );
@@ -88,6 +95,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
     /**
      * Test that ensures that warning is printed for configuration
      */
+    @Test
     public void testInBuildExecution() throws Exception
     {
         List<String> warnLines = performTest( "config-build-execution" );
@@ -97,6 +105,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
     /**
      * Test that ensures that warning is printed for configuration
      */
+    @Test
     public void testInBuildMixed() throws Exception
     {
         List<String> warnLines = performTest( "config-build-mixed" );
@@ -106,6 +115,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
     /**
      * Test that ensures that warning is printed for configuration
      */
+    @Test
     public void testInPluginManagement() throws Exception
     {
         List<String> warnLines = performTest( "config-plugin-management" );
@@ -115,6 +125,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
     /**
      * Test that ensures that warning is printed for configuration
      */
+    @Test
     public void testInPluginManagementParent() throws Exception
     {
         List<String> warnLines = performTest( "config-plugin-management-parent" );
@@ -124,6 +135,7 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
     /**
      * Test that ensures that warning is printed for configuration
      */
+    @Test
     public void testWithForkedGoalExecution() throws Exception
     {
         List<String> warnLines = performTest( "config-with-fork-goal" );

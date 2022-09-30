@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.Collections;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3139">MNG-3139</a>.
  *
@@ -45,6 +47,7 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG3139()
         throws Exception
     {

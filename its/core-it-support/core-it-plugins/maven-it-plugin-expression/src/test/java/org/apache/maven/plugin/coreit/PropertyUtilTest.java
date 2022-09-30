@@ -19,21 +19,25 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * @author Benjamin Bentmann
  *
  */
 public class PropertyUtilTest
-    extends TestCase
 {
 
+    @Test
     public void testStoreScalar()
     {
         Properties props = new Properties();
@@ -51,6 +55,7 @@ public class PropertyUtilTest
         assertEquals( 4, props.size() );
     }
 
+    @Test
     public void testStoreArray()
     {
         Properties props = new Properties();
@@ -62,6 +67,7 @@ public class PropertyUtilTest
         assertEquals( 3, props.size() );
     }
 
+    @Test
     public void testStoreList()
     {
         Properties props = new Properties();
@@ -73,6 +79,7 @@ public class PropertyUtilTest
         assertEquals( 3, props.size() );
     }
 
+    @Test
     public void testStoreMap()
     {
         Properties props = new Properties();
@@ -83,6 +90,7 @@ public class PropertyUtilTest
         assertEquals( 2, props.size() );
     }
 
+    @Test
     public void testStoreBean()
     {
         Properties props = new Properties();
@@ -93,6 +101,7 @@ public class PropertyUtilTest
         assertEquals( 2, props.size() );
     }
 
+    @Test
     public void testStoreCycle()
     {
         Object[] arr = { null };
@@ -100,9 +109,10 @@ public class PropertyUtilTest
 
         Properties props = new Properties();
         PropertyUtil.store( props, "cycle", arr );
-        assertTrue( "Should not die because of stack overflow", true );
+        assertTrue( true, "Should not die because of stack overflow" );
     }
 
+    @Test
     public void testGetPropertyName()
     {
         assertEquals( "name", PropertyUtil.getPropertyName( "getName" ) );

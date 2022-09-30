@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4776">MNG-4776</a>.
  *
@@ -45,6 +47,7 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitLifecycle()
         throws Exception
     {
@@ -69,6 +72,7 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitCmdLine()
         throws Exception
     {

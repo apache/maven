@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 public class MavenIT0064MojoConfigViaSettersTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -38,6 +40,7 @@ public class MavenIT0064MojoConfigViaSettersTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit0064()
         throws Exception
     {

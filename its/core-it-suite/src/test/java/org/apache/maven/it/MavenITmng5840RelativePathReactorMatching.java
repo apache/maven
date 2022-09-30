@@ -5,6 +5,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 public class MavenITmng5840RelativePathReactorMatching
     extends AbstractMavenIntegrationTestCase
 {
@@ -13,6 +15,7 @@ public class MavenITmng5840RelativePathReactorMatching
         super( ALL_MAVEN_VERSIONS );
     }
 
+    @Test
     public void testRelativePathPointsToWrongVersion()
         throws Exception
     {

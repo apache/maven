@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3645">MNG-3645</a>.
  *
@@ -48,6 +50,7 @@ public class MavenITmng3645POMSyntaxErrorTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit()
         throws Exception
     {

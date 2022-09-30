@@ -15,12 +15,15 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.util.List;
-import java.util.regex.Pattern;
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.VerificationException;
+
+import java.io.File;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import org.junit.jupiter.api.Test;
 
 public class MavenITmng2199ParentVersionRangeTest
     extends AbstractMavenIntegrationTestCase
@@ -31,6 +34,7 @@ public class MavenITmng2199ParentVersionRangeTest
         super( "[3.2.2,)" );
     }
 
+    @Test
     public void testValidParentVersionRangeWithInclusiveUpperBound()
         throws Exception
     {
@@ -66,6 +70,7 @@ public class MavenITmng2199ParentVersionRangeTest
         }
     }
 
+    @Test
     public void testValidParentVersionRangeWithExclusiveUpperBound()
         throws Exception
     {
@@ -100,6 +105,7 @@ public class MavenITmng2199ParentVersionRangeTest
         }
     }
 
+    @Test
     public void testInvalidParentVersionRangeWithoutUpperBound()
         throws Exception
     {
@@ -131,6 +137,7 @@ public class MavenITmng2199ParentVersionRangeTest
         }
     }
 
+    @Test
     public void testValidParentVersionRangeInvalidVersionExpression()
         throws Exception
     {
@@ -162,6 +169,7 @@ public class MavenITmng2199ParentVersionRangeTest
         }
     }
 
+    @Test
     public void testValidParentVersionRangeInvalidVersionInheritance()
         throws Exception
     {
@@ -193,6 +201,7 @@ public class MavenITmng2199ParentVersionRangeTest
         }
     }
 
+    @Test
     public void testValidLocalParentVersionRange()
         throws Exception
     {
@@ -226,6 +235,7 @@ public class MavenITmng2199ParentVersionRangeTest
         }
     }
 
+    @Test
     public void testInvalidLocalParentVersionRange()
         throws Exception
     {
@@ -258,6 +268,7 @@ public class MavenITmng2199ParentVersionRangeTest
         }
     }
 
+    @Test
     public void testInvalidLocalParentVersionRangeFallingBackToRemote()
         throws Exception
     {
@@ -291,6 +302,7 @@ public class MavenITmng2199ParentVersionRangeTest
         }
     }
 
+    @Test
     public void testValidLocalParentVersionRangeInvalidVersionExpression()
         throws Exception
     {
@@ -321,6 +333,7 @@ public class MavenITmng2199ParentVersionRangeTest
         }
     }
 
+    @Test
     public void testValidLocalParentVersionRangeInvalidVersionInheritance()
         throws Exception
     {

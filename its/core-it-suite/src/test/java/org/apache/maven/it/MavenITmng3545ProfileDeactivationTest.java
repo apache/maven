@@ -19,10 +19,12 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
+
+import java.io.File;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3545">MNG-3545</a>:
@@ -43,6 +45,7 @@ public class MavenITmng3545ProfileDeactivationTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testBasicBuildWithDefaultProfiles()
         throws Exception
     {
@@ -70,6 +73,7 @@ public class MavenITmng3545ProfileDeactivationTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testDeactivateDefaultProfilesHyphen()
         throws Exception
     {
@@ -93,6 +97,7 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.resetStreams();
     }
 
+    @Test
     public void testDeactivateDefaultProfilesExclamation()
         throws Exception
     {
@@ -122,6 +127,7 @@ public class MavenITmng3545ProfileDeactivationTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testDeactivateActivatedByProp()
         throws Exception
     {
@@ -153,6 +159,7 @@ public class MavenITmng3545ProfileDeactivationTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testActivateThenDeactivate()
         throws Exception
     {
@@ -184,6 +191,7 @@ public class MavenITmng3545ProfileDeactivationTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testDefaultProfileAutoDeactivation()
         throws Exception
     {

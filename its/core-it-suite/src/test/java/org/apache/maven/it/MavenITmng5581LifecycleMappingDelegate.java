@@ -19,12 +19,14 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-import java.util.List;
-
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.VerificationException;
+
+import java.io.File;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
 
 public class MavenITmng5581LifecycleMappingDelegate
     extends AbstractMavenIntegrationTestCase
@@ -34,6 +36,7 @@ public class MavenITmng5581LifecycleMappingDelegate
         super( "[3.2.1,)" );
     }
 
+    @Test
     public void testCustomLifecycle()
         throws Exception
     {
@@ -65,6 +68,7 @@ public class MavenITmng5581LifecycleMappingDelegate
         verifier.verifyErrorFreeLog();
 
         // run custom "test-only" build phase
+        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         verifier = newVerifier( projectDir.getAbsolutePath() );
         verifier.setLogFileName( "test-only-log.txt" );
         verifier.setForkJvm( true );

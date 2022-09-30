@@ -26,6 +26,8 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-818">MNG-818</a>.
  *
@@ -45,6 +47,7 @@ public class MavenITmng0818WarDepsNotTransitiveTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG0818()
         throws Exception
     {

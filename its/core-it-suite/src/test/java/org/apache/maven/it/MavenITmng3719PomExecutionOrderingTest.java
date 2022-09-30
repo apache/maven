@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3719">MNG-3719</a>.
  *
@@ -47,6 +49,7 @@ public class MavenITmng3719PomExecutionOrderingTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG3719()
         throws Exception
     {

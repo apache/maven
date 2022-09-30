@@ -19,14 +19,15 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import junit.framework.TestCase;
-
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenIntegrationTestCaseTest
-    extends TestCase
 {
 
+    @Test
     public void testRemovePatternForTestWithVersionRange()
     {
         AbstractMavenIntegrationTestCase test = new AbstractMavenIntegrationTestCase( "[2.0,)" )
@@ -49,6 +50,7 @@ public class MavenIntegrationTestCaseTest
         assertEquals( expected, test.removePattern( new DefaultArtifactVersion( version ) ).toString() );
     }
 
+    @Test
     public void testRequiresMavenVersion()
     {
         System.setProperty( "maven.version", "2.1" );

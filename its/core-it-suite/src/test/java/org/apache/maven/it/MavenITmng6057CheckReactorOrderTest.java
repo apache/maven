@@ -26,6 +26,8 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * Using a <code>${revision}</code> in the version will change the reactor order before fixing
  * <a href="https://issues.apache.org/jira/browse/MNG-6057">MNG-6057</a>. Without the fix for this issue the order of
@@ -49,6 +51,7 @@ public class MavenITmng6057CheckReactorOrderTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitReactorShouldResultInExpectedOrder()
         throws Exception
     {

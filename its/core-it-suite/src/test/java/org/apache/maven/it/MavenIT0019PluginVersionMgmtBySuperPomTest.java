@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 public class MavenIT0019PluginVersionMgmtBySuperPomTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -37,6 +39,7 @@ public class MavenIT0019PluginVersionMgmtBySuperPomTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit0019()
         throws Exception
     {

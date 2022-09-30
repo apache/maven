@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Test;
+
 public class MavenIT0090EnvVarInterpolationTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -41,6 +43,7 @@ public class MavenIT0090EnvVarInterpolationTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit0090()
         throws Exception
     {

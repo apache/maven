@@ -26,6 +26,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import java.io.File;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4615">MNG-4615</a>.
  *
@@ -46,6 +48,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitAllSet()
         throws Exception
     {
@@ -69,6 +72,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitExprMissing()
         throws Exception
     {
@@ -98,6 +102,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitExprSet()
         throws Exception
     {
@@ -123,6 +128,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitPomValMissing()
         throws Exception
     {
@@ -154,6 +160,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitPomValSet()
         throws Exception
     {

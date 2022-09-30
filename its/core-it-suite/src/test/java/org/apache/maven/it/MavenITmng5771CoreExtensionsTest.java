@@ -1,10 +1,12 @@
 package org.apache.maven.it;
 
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5771">MNG-5771</a>:
@@ -19,6 +21,7 @@ public class MavenITmng5771CoreExtensionsTest
         super( "(3.2.5,)" );
     }
 
+    @Test
     public void testCoreExtension()
         throws Exception
     {
@@ -37,6 +40,7 @@ public class MavenITmng5771CoreExtensionsTest
         verifier.resetStreams();
     }
 
+    @Test
     public void testCoreExtensionNoDescriptor()
         throws Exception
     {
@@ -58,6 +62,7 @@ public class MavenITmng5771CoreExtensionsTest
     //
     // https://issues.apache.org/jira/browse/MNG-5795: Maven extensions can not be retrieved from authenticated repositories
     //
+    @Test
     public void testCoreExtensionRetrievedFromAMirrorWithBasicAuthentication()
         throws Exception
     {
@@ -103,6 +108,7 @@ public class MavenITmng5771CoreExtensionsTest
     //
     // https://issues.apache.org/jira/browse/MNG-7395: Support properties in extensions.xml
     //
+    @Test
     public void testCoreExtensionWithProperties()
         throws Exception
     {
@@ -127,6 +133,7 @@ public class MavenITmng5771CoreExtensionsTest
     //
     // https://issues.apache.org/jira/browse/MNG-7395: Support properties in extensions.xml
     //
+    @Test
     public void testCoreExtensionWithConfig()
         throws Exception
     {

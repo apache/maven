@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2871">MNG-2871</a>.
  *
@@ -46,6 +48,7 @@ public class MavenITmng2871PrePackageSubartifactResolutionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG2871()
         throws Exception
     {

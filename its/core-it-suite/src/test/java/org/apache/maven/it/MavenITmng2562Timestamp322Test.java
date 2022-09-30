@@ -23,9 +23,11 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
-import java.text.SimpleDateFormat;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2562">MNG-2562</a>.
@@ -39,6 +41,7 @@ public class MavenITmng2562Timestamp322Test
         super( "[3.2.2,)" ); // 3.2.2+ only as we changed the timestamp format
     }
 
+    @Test
     public void testitDefaultFormat()
         throws Exception
     {
@@ -64,6 +67,7 @@ public class MavenITmng2562Timestamp322Test
         assertEquals( timestamp1, timestamp2 );
     }
 
+    @Test
     public void testitCustomFormat()
         throws Exception
     {
@@ -85,6 +89,7 @@ public class MavenITmng2562Timestamp322Test
         assertTrue( now + " vs " + date, Math.abs( now.getTime() - date.getTime() ) < 24 * 60 * 60 * 1000 );
     }
 
+    @Test
     public void testitSameValueAcrossModules()
         throws Exception
     {

@@ -25,12 +25,16 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3890">MNG-3890</a>.
  *
  * @author Benjamin Bentmann
  *
  */
+@Disabled( "won't fix" )
 public class MavenITmng3890TransitiveDependencyScopeUpdateTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -45,6 +49,7 @@ public class MavenITmng3890TransitiveDependencyScopeUpdateTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG3890()
         throws Exception
     {

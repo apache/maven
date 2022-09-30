@@ -19,10 +19,12 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
+
+import java.io.File;
+
+import org.junit.jupiter.api.Test;
 
 public class MavenITmng5561PluginRelocationLosesConfigurationTest
     extends AbstractMavenIntegrationTestCase
@@ -33,6 +35,7 @@ public class MavenITmng5561PluginRelocationLosesConfigurationTest
         super( "[3.8.5,)" );
     }
 
+    @Test
     public void testit()
             throws Exception
     {

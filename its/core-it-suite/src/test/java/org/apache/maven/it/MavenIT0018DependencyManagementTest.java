@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 public class MavenIT0018DependencyManagementTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -39,6 +41,7 @@ public class MavenIT0018DependencyManagementTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit0018()
         throws Exception
     {

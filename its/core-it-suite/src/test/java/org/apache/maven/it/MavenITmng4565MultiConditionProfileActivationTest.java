@@ -19,10 +19,13 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
+
+import java.io.File;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4565">MNG-3106</a>:
@@ -30,6 +33,7 @@ import org.apache.maven.shared.verifier.Verifier;
  * When multiple activators are present in a profile they should be AND'd. All activator must
  * conditions must be satisfied in order for the profile to be activated.
  */
+@Disabled
 public class MavenITmng4565MultiConditionProfileActivationTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -45,6 +49,7 @@ public class MavenITmng4565MultiConditionProfileActivationTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testProfilesWithMultipleActivators()
         throws Exception
     {

@@ -26,6 +26,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3297">MNG-3297</a>.
  *
@@ -46,6 +48,7 @@ public class MavenITmng3297DependenciesNotLeakedToMojoTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit()
         throws Exception
     {

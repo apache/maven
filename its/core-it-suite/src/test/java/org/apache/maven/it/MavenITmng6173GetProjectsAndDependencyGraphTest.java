@@ -23,7 +23,9 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
-import java.util.*;
+import java.util.Properties;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for <a href="https://issues.apache.org/jira/browse/MNG-6173">MNG-6173</a>.
@@ -43,6 +45,7 @@ public class MavenITmng6173GetProjectsAndDependencyGraphTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitShouldReturnProjectsAndProjectDependencyGraph()
             throws Exception
     {

@@ -1,10 +1,12 @@
 package org.apache.maven.it;
 
-import java.io.File;
-
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.VerificationException;
+
+import java.io.File;
+
+import org.junit.jupiter.api.Test;
 
 public class MavenITmng5958LifecyclePhaseBinaryCompat
     extends AbstractMavenIntegrationTestCase
@@ -15,6 +17,7 @@ public class MavenITmng5958LifecyclePhaseBinaryCompat
         super( "(3.3.9,)" );
     }
 
+    @Test
     public void testGood()
         throws Exception
     {
@@ -27,6 +30,7 @@ public class MavenITmng5958LifecyclePhaseBinaryCompat
         verifier.resetStreams();
     }
 
+    @Test
     public void testBad()
         throws Exception
     {

@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-557">MNG-557</a>.
  *
@@ -43,6 +45,7 @@ public class MavenITmng0557UserSettingsCliOptionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG557()
         throws Exception
     {

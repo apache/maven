@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3394">MNG-3394</a>:
  * it checks that plugin versions in the POM obey the correct order
@@ -43,6 +45,7 @@ public class MavenITmng3394POMPluginVersionDominanceTest
         super( "(2.0.8,)" ); // only test in 2.0.9+
     }
 
+    @Test
     public void testitMNG3394a ()
         throws Exception
     {
@@ -59,6 +62,7 @@ public class MavenITmng3394POMPluginVersionDominanceTest
         verifier.verifyFilePresent( "target/resources-resources.txt" );
     }
 
+    @Test
     public void testitMNG3394b()
         throws Exception
     {

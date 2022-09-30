@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.Collection;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1233">MNG-1233</a>.
  *
@@ -44,6 +46,7 @@ public class MavenITmng1233WarDepWithProvidedScopeTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG1233()
         throws Exception
     {

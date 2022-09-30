@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2972">MNG-2972</a>.
  *
@@ -45,6 +47,7 @@ public class MavenITmng2972OverridePluginDependencyTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitLifecycleInvocation()
         throws Exception
     {
@@ -76,6 +79,7 @@ public class MavenITmng2972OverridePluginDependencyTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitCommandLineInvocation()
         throws Exception
     {

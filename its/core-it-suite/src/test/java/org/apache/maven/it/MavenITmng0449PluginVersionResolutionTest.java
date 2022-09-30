@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-449">MNG-449</a>.
  *
@@ -45,6 +47,7 @@ public class MavenITmng0449PluginVersionResolutionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitLifecycleInvocation()
         throws Exception
     {
@@ -89,6 +92,7 @@ public class MavenITmng0449PluginVersionResolutionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitCliInvocation()
         throws Exception
     {

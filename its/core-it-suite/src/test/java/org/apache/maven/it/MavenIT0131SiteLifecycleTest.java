@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  *
  * @author Benjamin Bentmann
@@ -43,6 +45,7 @@ public class MavenIT0131SiteLifecycleTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit0131()
         throws Exception
     {

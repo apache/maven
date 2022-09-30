@@ -26,6 +26,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Test;
+
 /**
  *
  * @author Benjamin Bentmann
@@ -50,6 +52,7 @@ public class MavenIT0143TransitiveDependencyScopesTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitCompileScope()
         throws Exception
     {
@@ -106,6 +109,7 @@ public class MavenIT0143TransitiveDependencyScopesTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitProvidedScope()
         throws Exception
     {
@@ -153,6 +157,7 @@ public class MavenIT0143TransitiveDependencyScopesTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitRuntimeScope()
         throws Exception
     {
@@ -200,6 +205,7 @@ public class MavenIT0143TransitiveDependencyScopesTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitTestScope()
         throws Exception
     {

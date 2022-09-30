@@ -33,10 +33,18 @@ import org.apache.maven.project.MavenProject;
 public class PluginParamInterpolationMojo
     extends AbstractMojo
 {
-    /** @parameter */
+    /**
+     * myDirectory
+     *
+     * @parameter
+     */
     private String myDirectory;
 
-    /** @parameter default-value="${project}" */
+    /**
+     * The current Maven project.
+     *
+     * @parameter default-value="${project}"
+     */
     private MavenProject project;
 
     public void execute()

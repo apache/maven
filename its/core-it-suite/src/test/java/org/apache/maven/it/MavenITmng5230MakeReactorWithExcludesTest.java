@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * Test case adapted from MNG-2576
  * @author Luuk van den Broek
@@ -52,6 +54,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMakeWithExclude()
         throws Exception
     {
@@ -80,6 +83,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMakeUpstreamExclude()
         throws Exception
     {
@@ -108,6 +112,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMakeDownstreamExclude()
         throws Exception
     {
@@ -136,6 +141,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMakeBothExclude()
         throws Exception
     {
@@ -165,6 +171,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMatchesByBasedirExclamationExclude()
         throws Exception
     {
@@ -193,6 +200,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMatchesByBasedirMinusExclude()
         throws Exception
     {
@@ -222,6 +230,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMatchesByIdExclude()
         throws Exception
     {
@@ -249,6 +258,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMatchesByArtifactIdExclude()
         throws Exception
     {
@@ -276,6 +286,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitResumeFromExclude()
         throws Exception
     {

@@ -24,6 +24,9 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5338">MNG-5338</a>.
  *
@@ -40,22 +43,15 @@ public class MavenITmng5338FileOptionToDirectory
         super( "[3.1-A,)" );
     }
 
+    @BeforeEach
     public void setUp()
         throws Exception
     {
-        super.setUp();
-
         testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5338" );
 
     }
 
-    protected void tearDown()
-        throws Exception
-    {
-
-        super.tearDown();
-    }
-
+    @Test
     public void testFileOptionToADirectory()
         throws Exception
     {

@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3863">MNG-3863</a>.
  *
@@ -45,6 +47,7 @@ public class MavenITmng3863AutoPluginGroupIdTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG3853()
         throws Exception
     {

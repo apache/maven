@@ -55,6 +55,7 @@ public class MavenITmngXXXXDescriptionOfProblemTest
         super( "(2.0.8,)" ); // only test in 2.0.9+
     }
 
+    @Test
     public void testitMNGxxxx ()
         throws Exception
     {

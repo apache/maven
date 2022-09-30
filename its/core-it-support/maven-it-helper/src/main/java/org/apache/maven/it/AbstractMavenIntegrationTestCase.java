@@ -20,7 +20,9 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
+import java.io.FilterInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -28,22 +30,23 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import junit.framework.TestCase;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.shared.utils.io.FileUtils;
-
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
+import org.opentest4j.TestAbortedException;
 
 /**
  * @author Jason van Zyl
  * @author Kenney Westerhof
  */
 public abstract class AbstractMavenIntegrationTestCase
-    extends TestCase
 {
     /**
      * Save System.out for progress reports etc.
@@ -73,6 +76,8 @@ public abstract class AbstractMavenIntegrationTestCase
 
     private String matchPattern;
 
+    private String testName;
+
     private static final String DEFAULT_MATCH_PATTERN = "(.*?)-(RC[0-9]+|SNAPSHOT|RC[0-9]+-SNAPSHOT)";
 
     protected static final String ALL_MAVEN_VERSIONS = "[2.0,)";
@@ -86,24 +91,16 @@ public abstract class AbstractMavenIntegrationTestCase
     {
         this.matchPattern = matchPattern;
 
-        try
-        {
-            versionRange = VersionRange.createFromVersionSpec( versionRangeStr );
-        }
-        catch ( InvalidVersionSpecificationException e )
-        {
-            throw (RuntimeException) new IllegalArgumentException( "Invalid version range: " + versionRangeStr, e );
-        }
+        requiresMavenVersion( versionRangeStr );
+    }
 
-        ArtifactVersion version = getMavenVersion();
-        if ( version != null )
+
+    @BeforeAll
+    static void setupInputStream()
+    {
+        if ( !( System.in instanceof NonCloseableInputStream ) )
         {
-            skip = !versionRange.containsVersion( removePattern( version ) );
-        }
-        else
-        {
-            out.println( "WARNING: " + getITName() + ": version range '" + versionRange
-                             + "' supplied but no Maven version - not skipping test." );
+            System.setIn( new NonCloseableInputStream( System.in ) );
         }
     }
 
@@ -260,7 +257,8 @@ public abstract class AbstractMavenIntegrationTestCase
         long milliseconds = System.currentTimeMillis();
         try
         {
-            super.runTest();
+            // TODO: JUNIT5
+            //super.runTest();
             milliseconds = System.currentTimeMillis() - milliseconds;
             if ( invert != null )
             {
@@ -400,8 +398,21 @@ public abstract class AbstractMavenIntegrationTestCase
         }
     }
 
+    private static class NonCloseableInputStream extends FilterInputStream
+    {
+        NonCloseableInputStream( InputStream delegate )
+        {
+            super( delegate );
+        }
+
+        @Override
+        public void close() throws IOException
+        {
+        }
+    }
+
     private class UnsupportedJavaVersionException
-        extends RuntimeException
+        extends TestAbortedException
     {
         @SuppressWarnings( "checkstyle:visibilitymodifier" )
         public ArtifactVersion javaVersion;
@@ -411,6 +422,7 @@ public abstract class AbstractMavenIntegrationTestCase
 
         private UnsupportedJavaVersionException( ArtifactVersion javaVersion, VersionRange supportedRange )
         {
+            super( "Java version " + javaVersion + " not in range " + supportedRange );
             this.javaVersion = javaVersion;
             this.supportedRange = supportedRange;
         }
@@ -418,7 +430,7 @@ public abstract class AbstractMavenIntegrationTestCase
     }
 
     private class UnsupportedMavenVersionException
-        extends RuntimeException
+            extends TestAbortedException
     {
         @SuppressWarnings( "checkstyle:visibilitymodifier" )
         public ArtifactVersion mavenVersion;
@@ -428,6 +440,7 @@ public abstract class AbstractMavenIntegrationTestCase
 
         private UnsupportedMavenVersionException( ArtifactVersion mavenVersion, VersionRange supportedRange )
         {
+            super( "Maven version " + mavenVersion + " not in range " + supportedRange );
             this.mavenVersion = mavenVersion;
             this.supportedRange = supportedRange;
         }
@@ -622,6 +635,17 @@ public abstract class AbstractMavenIntegrationTestCase
         return verifier;
     }
 
+    @BeforeEach
+    void setupContext( TestInfo testInfo )
+    {
+        testName = testInfo.getTestMethod().get().getName();
+    }
+
+    protected String getName()
+    {
+        return testName;
+    }
+
     public static void assertCanonicalFileEquals( String message, File expected, File actual )
         throws IOException
     {
@@ -645,4 +669,70 @@ public abstract class AbstractMavenIntegrationTestCase
     {
         assertCanonicalFileEquals( null, new File( expected ), new File( actual ) );
     }
+
+    public static void assertEquals( Object o1, Object o2 )
+    {
+        assertEquals( null, o1, o2 );
+    }
+
+    public static void assertEquals( String message, Object o1, Object o2 )
+    {
+        org.junit.jupiter.api.Assertions.assertEquals( o1, o2, message );
+    }
+
+    public static void assertNotEquals( Object o1, Object o2 )
+    {
+        assertNotEquals( null, o1, o2 );
+    }
+
+    public static void assertNotEquals( String message, Object o1, Object o2 )
+    {
+        org.junit.jupiter.api.Assertions.assertNotEquals( o1, o2, message );
+    }
+
+    public static void assertTrue( boolean test )
+    {
+        assertTrue( null, test );
+    }
+
+    public static void assertTrue( String message, boolean test )
+    {
+        org.junit.jupiter.api.Assertions.assertTrue( test, message );
+    }
+
+    public static void assertFalse( boolean test )
+    {
+        assertFalse( null, test );
+    }
+
+    public static void assertFalse( String message, boolean test )
+    {
+        org.junit.jupiter.api.Assertions.assertFalse( test, message );
+    }
+
+    public static void assertNotNull( Object o )
+    {
+        assertNotNull( null, o );
+    }
+
+    public static void assertNotNull( String message, Object o )
+    {
+        org.junit.jupiter.api.Assertions.assertNotNull( o, message );
+    }
+
+    public static void assertNull( Object o )
+    {
+        assertNull( null, o );
+    }
+
+    public static void assertNull( String message, Object o )
+    {
+        org.junit.jupiter.api.Assertions.assertNull( o, message );
+    }
+
+    public static void fail( String message )
+    {
+        org.junit.jupiter.api.Assertions.fail( message );
+    }
+
 }

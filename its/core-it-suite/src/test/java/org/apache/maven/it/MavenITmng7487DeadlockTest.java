@@ -18,12 +18,14 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.verifier.VerificationException;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.junit.jupiter.api.Test;
 
 public class MavenITmng7487DeadlockTest extends AbstractMavenIntegrationTestCase
 {
@@ -34,6 +36,7 @@ public class MavenITmng7487DeadlockTest extends AbstractMavenIntegrationTestCase
         super( "(,3.8.4],[3.8.6,)" );
     }
 
+    @Test
     public void testDeadlock() throws IOException, VerificationException
     {
         final File rootDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );

@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.Arrays;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3372">MNG-3372</a>.
  *
@@ -39,6 +41,7 @@ public class MavenITmng3372DirectInvocationOfPluginsTest
         super( "(2.0.5,)" );
     }
 
+    @Test
     public void testitMNG3372()
         throws Exception
     {
@@ -69,6 +72,7 @@ public class MavenITmng3372DirectInvocationOfPluginsTest
         verifier.resetStreams();
     }
 
+    @Test
     public void testDependencyTreeInvocation()
         throws Exception
     {

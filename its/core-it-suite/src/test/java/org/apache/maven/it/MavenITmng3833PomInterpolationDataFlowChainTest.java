@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3833">MNG-3833</a>.
  *
@@ -46,6 +48,7 @@ public class MavenITmng3833PomInterpolationDataFlowChainTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG3833()
         throws Exception
     {

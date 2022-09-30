@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3535">MNG-3535</a>.
  *
@@ -38,6 +40,7 @@ public class MavenITmng3535SelfReferentialPropertiesTest
         super( "[2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)" );
     }
 
+    @Test
     public void testitMNG3535_ShouldSucceed()
         throws Exception
     {
@@ -55,6 +58,7 @@ public class MavenITmng3535SelfReferentialPropertiesTest
         verifier.resetStreams();
     }
 
+    @Test
     public void testitMNG3535_ShouldFail()
         throws Exception
     {

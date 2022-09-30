@@ -19,10 +19,12 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
+
+import java.io.File;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2926">MNG-2926</a>
@@ -45,6 +47,7 @@ public class MavenITmng2926PluginPrefixOrderTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG2926()
         throws Exception
     {

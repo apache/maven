@@ -26,6 +26,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a collection of test cases for <a href="https://issues.apache.org/jira/browse/MNG-6511">MNG-6511</a>,
  * selecting and deselecting optional projects.
@@ -44,6 +46,7 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
         testDir = ResourceExtractor.simpleExtractResources( getClass(), RESOURCE_PATH );
     }
 
+    @Test
     public void testSelectExistingOptionalProfile() throws VerificationException
     {
         newVerifier( testDir.getAbsolutePath() ).executeGoal( "clean" );
@@ -57,6 +60,7 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
         verifier.verifyFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
     }
 
+    @Test
     public void testSelectExistingOptionalProfileByArtifactId() throws VerificationException
     {
         newVerifier( testDir.getAbsolutePath() ).executeGoal( "clean" );
@@ -70,6 +74,7 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
         verifier.verifyFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
     }
 
+    @Test
     public void testSelectNonExistingOptionalProfile() throws VerificationException
     {
         newVerifier( testDir.getAbsolutePath() ).executeGoal( "clean" );
@@ -83,6 +88,7 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
         verifier.verifyFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
     }
 
+    @Test
     public void testDeselectExistingOptionalProfile() throws VerificationException
     {
         newVerifier( testDir.getAbsolutePath() ).executeGoal( "clean" );
@@ -96,6 +102,7 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
         verifier.verifyFileNotPresent( "existing-module/target/touch.txt" ); // existing-module should not have been built.
     }
 
+    @Test
     public void testDeselectNonExistingOptionalProfile() throws VerificationException
     {
         newVerifier( testDir.getAbsolutePath() ).executeGoal( "clean" );

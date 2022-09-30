@@ -19,6 +19,9 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,10 +32,8 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.junit.jupiter.api.Test;
 
 public class MavenITmng6754TimestampInMultimoduleProject
         extends AbstractMavenIntegrationTestCase
@@ -46,6 +47,7 @@ public class MavenITmng6754TimestampInMultimoduleProject
         super( "[3.8.2,)" );
     }
 
+    @Test
     public void testArtifactsHaveSameTimestamp()
             throws Exception
     {

@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3714">MNG-3714</a>.
  *
@@ -44,6 +46,7 @@ public class MavenITmng3714ToolchainsCliOptionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG3714()
         throws Exception
     {

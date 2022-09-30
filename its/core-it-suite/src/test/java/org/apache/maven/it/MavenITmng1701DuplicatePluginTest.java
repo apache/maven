@@ -26,6 +26,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import java.io.File;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1701">MNG-1701</a>.
  *
@@ -45,6 +47,7 @@ public class MavenITmng1701DuplicatePluginTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit()
         throws Exception
     {

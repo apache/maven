@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test case for <a href="https://issues.apache.org/jira/browse/MNG-4660">MNG-4660</a>.
  *
@@ -45,6 +47,7 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testShouldResolveOutputDirectoryFromEarlierBuild() throws Exception
     {
         final File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4660-resume-from" );
@@ -84,6 +87,7 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testShouldResolvePackagedArtifactFromEarlierBuild() throws Exception
     {
         final File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4660-resume-from" );

@@ -37,11 +37,15 @@ public class PropertyInterpolationVerifierMojo
 {
 
     /**
+     * The current Maven project.
+     *
      * @parameter default-value="${project}"
      */
     private MavenProject project;
 
     /**
+     * The properties.
+     *
      * @parameter property="properties"
      */
     private Properties properties;

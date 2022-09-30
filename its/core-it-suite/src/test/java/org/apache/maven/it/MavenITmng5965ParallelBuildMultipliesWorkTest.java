@@ -1,5 +1,9 @@
 package org.apache.maven.it;
 
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.VerificationException;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,9 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test set for <a href="https://issues.apache.org/jira/browse/MNG-5965">MNG-5965</a>.
@@ -22,6 +24,7 @@ public class MavenITmng5965ParallelBuildMultipliesWorkTest
         super( "[3.6.1,)" );
     }
 
+    @Test
     public void testItShouldOnlyRunEachTaskOnce()
         throws Exception
     {

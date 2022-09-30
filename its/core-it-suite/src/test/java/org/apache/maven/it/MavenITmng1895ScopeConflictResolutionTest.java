@@ -26,6 +26,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1895">MNG-1895</a>.
  *
@@ -46,6 +48,7 @@ public class MavenITmng1895ScopeConflictResolutionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitDirectVsIndirect()
         throws Exception
     {
@@ -86,6 +89,7 @@ public class MavenITmng1895ScopeConflictResolutionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitCompileVsRuntime()
         throws Exception
     {
@@ -109,6 +113,7 @@ public class MavenITmng1895ScopeConflictResolutionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitCompileVsTest()
         throws Exception
     {
@@ -132,6 +137,7 @@ public class MavenITmng1895ScopeConflictResolutionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitCompileVsProvided()
         throws Exception
     {
@@ -155,6 +161,7 @@ public class MavenITmng1895ScopeConflictResolutionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitRuntimeVsTest()
         throws Exception
     {
@@ -178,6 +185,7 @@ public class MavenITmng1895ScopeConflictResolutionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitRuntimeVsProvided()
         throws Exception
     {
@@ -201,6 +209,7 @@ public class MavenITmng1895ScopeConflictResolutionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitProvidedVsTest()
         throws Exception
     {

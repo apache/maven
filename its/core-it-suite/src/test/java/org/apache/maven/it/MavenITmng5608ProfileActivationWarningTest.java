@@ -26,6 +26,8 @@ import java.io.File;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5608">MNG-5608</a>:
  * Profile activation warning test when file specification contains <code>${project.basedir}</code>
@@ -40,6 +42,7 @@ public class MavenITmng5608ProfileActivationWarningTest
         super( "(3.2.1,)" );
     }
 
+    @Test
     public void testitMNG5608()
         throws Exception
     {

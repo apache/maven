@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2695">MNG-2695</a>.
  *
@@ -46,6 +48,7 @@ public class MavenITmng2695OfflinePluginSnapshotsTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG2695()
         throws Exception
     {

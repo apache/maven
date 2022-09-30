@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2668">MNG-2668</a>.
  *
@@ -38,6 +40,7 @@ public class MavenITmng2668UsePluginDependenciesForSortingTest
         super( "(2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)" ); // 2.1.0-M2+
     }
 
+    @Test
     public void testitMNG2668()
         throws Exception
     {

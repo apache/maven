@@ -23,8 +23,10 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2054">MNG-2054</a>.
@@ -45,6 +47,7 @@ public class MavenITmng2054PluginExecutionInheritanceTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG2054()
         throws Exception
     {

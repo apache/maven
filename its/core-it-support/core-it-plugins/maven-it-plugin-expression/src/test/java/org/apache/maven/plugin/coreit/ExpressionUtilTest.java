@@ -19,29 +19,33 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
-import junit.framework.TestCase;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Benjamin Bentmann
  *
  */
 public class ExpressionUtilTest
-    extends TestCase
 {
 
+    @Test
     public void testEvaluate()
     {
         Object array = new String[]{ "one", "two", "three" };
-        Object list = Arrays.asList( new String[]{ "0", "-1", "-2" } );
+        Object list = Arrays.asList( "0", "-1", "-2" );
         Object map = Collections.singletonMap( "some.key", "value" );
         Object bean = new BeanTwo();
 
-        Map contexts = new HashMap();
+        Map<String, Object> contexts = new HashMap<>();
         contexts.put( "array", array );
         contexts.put( "list", list );
         contexts.put( "map", map );
@@ -91,6 +95,7 @@ public class ExpressionUtilTest
         return ExpressionUtil.evaluate( expression, context ).get( expression );
     }
 
+    @Test
     public void testGetProperty()
     {
         BeanOne bean1 = new BeanOne();

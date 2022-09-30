@@ -19,16 +19,14 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+
 import java.io.File;
 import java.util.Properties;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
 import org.apache.maven.shared.utils.Os;
-
-import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.CoreMatchers.endsWith;
-import static org.junit.Assert.assertThat;
+import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-6386">MNG-6386</a>.
@@ -42,6 +40,7 @@ public class MavenITmng6386BaseUriPropertyTest
         super( "[3.5.4,)" );
     }
 
+    @Test
     public void testitMNG6386()
         throws Exception
     {
@@ -62,6 +61,8 @@ public class MavenITmng6386BaseUriPropertyTest
         // check that baseUri begins with file:///
         assertTrue( pomProperty.startsWith( "file:///" ) );
     }
+
+     @Test
 
      public void testitMNG6386UnicodeChars()
         throws Exception
@@ -92,8 +93,8 @@ public class MavenITmng6386BaseUriPropertyTest
             assertTrue( pomProperty.startsWith( "file:///" ) );
             // check that baseUri ends with "это по-русский/", but properly URI-encoded
             // We need to make sure that either form NFC or NFD is accepted since HFS+ and APFS might use them
-            assertThat( pomProperty, anyOf( endsWith( "%D1%8D%D1%82%D0%BE%20%D0%BF%D0%BE-%D1%80%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9/" ),
-                                            endsWith( "%D1%8D%D1%82%D0%BE%20%D0%BF%D0%BE-%D1%80%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B8%CC%86/" ) ) );
+            assertTrue( pomProperty.endsWith( "%D1%8D%D1%82%D0%BE%20%D0%BF%D0%BE-%D1%80%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9/" )
+                     || pomProperty.endsWith( "%D1%8D%D1%82%D0%BE%20%D0%BF%D0%BE-%D1%80%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B8%CC%86/" ) );
         }
         else
         {

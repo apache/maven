@@ -88,16 +88,9 @@ under the License.
 
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
       <!-- NOTE: Use compile scope for transitivity. -->
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-all</artifactId>
-      <version>1.3</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -166,9 +159,10 @@ under the License.
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <includes>
-            <include>**/IntegrationTestSuite.java</include>
+            <include>**/MavenIT*.java</include>
           </includes>
-          <forkMode>never</forkMode>
+          <forkCount>0</forkCount>
+          <reuseForks>true</reuseForks>
           <skip>true</skip>
           <systemProperties>
             <property>
@@ -318,7 +312,8 @@ under the License.
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <skip>false</skip>
-              <forkMode>once</forkMode>
+              <forkCount>1</forkCount>
+              <reuseForks>true</reuseForks>
               <argLine>${surefireMemory}
                 -Dcom.sun.management.jmxremote=true</argLine>
               <!-- NOTE: Maven plugins have access to the system class path

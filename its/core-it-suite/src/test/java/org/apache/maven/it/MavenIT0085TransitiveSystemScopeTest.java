@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.Collection;
 
+import org.junit.jupiter.api.Test;
+
 public class MavenIT0085TransitiveSystemScopeTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -41,6 +43,7 @@ public class MavenIT0085TransitiveSystemScopeTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit0085()
         throws Exception
     {

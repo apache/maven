@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * An integration test to verify that builds fail when logs occur
  * above or equal to the --fail-on-severity cli property.
@@ -41,6 +43,7 @@ public class MavenITmng6065FailOnSeverityTest
         super( "[4.0.0-alpha-1,)" );
     }
 
+    @Test
     public void testItShouldFailOnWarnLogMessages()
             throws Exception
     {
@@ -67,6 +70,7 @@ public class MavenITmng6065FailOnSeverityTest
         assertTrue( "Build should have failed", failed );
     }
 
+    @Test
     public void testItShouldSucceedOnWarnLogMessagesWhenFailLevelIsError()
             throws Exception
     {

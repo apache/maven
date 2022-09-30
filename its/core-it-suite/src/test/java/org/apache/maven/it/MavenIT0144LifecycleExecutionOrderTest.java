@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * @author Benjamin Bentmann
  *
@@ -45,6 +47,7 @@ public class MavenIT0144LifecycleExecutionOrderTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit0144()
         throws Exception
     {

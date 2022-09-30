@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -34,10 +35,12 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.util.security.Constraint;
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.util.security.Password;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.security.Password;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.eclipse.jetty.servlet.ServletContextHandler.SECURITY;
 import static org.eclipse.jetty.servlet.ServletContextHandler.SESSIONS;
@@ -63,7 +66,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         super( "[2.1.0,3.0-alpha-1),[3.0-alpha-3,)" );
     }
 
-    @Override
+    @BeforeEach
     protected void setUp()
         throws Exception
     {
@@ -104,7 +107,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         System.out.println( "Bound server socket to the port " + port );
     }
 
-    @Override
+    @AfterEach
     protected void tearDown()
         throws Exception
     {
@@ -120,6 +123,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitBasic()
         throws Exception
     {
@@ -149,6 +153,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitRelocation()
         throws Exception
     {
@@ -186,6 +191,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitEncryption()
         throws Exception
     {

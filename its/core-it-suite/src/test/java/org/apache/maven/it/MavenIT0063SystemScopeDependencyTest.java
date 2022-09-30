@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 public class MavenIT0063SystemScopeDependencyTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -38,6 +40,7 @@ public class MavenIT0063SystemScopeDependencyTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit0063()
         throws Exception
     {

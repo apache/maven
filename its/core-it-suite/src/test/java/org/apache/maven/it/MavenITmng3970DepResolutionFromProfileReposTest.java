@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3970">MNG-3970</a>.
  *
@@ -44,6 +46,7 @@ public class MavenITmng3970DepResolutionFromProfileReposTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitFromPom()
         throws Exception
     {
@@ -67,6 +70,7 @@ public class MavenITmng3970DepResolutionFromProfileReposTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitFromSettings()
         throws Exception
     {

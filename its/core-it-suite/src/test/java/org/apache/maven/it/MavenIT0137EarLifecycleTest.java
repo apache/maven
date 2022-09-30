@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  *
  * @author Benjamin Bentmann
@@ -43,6 +45,7 @@ public class MavenIT0137EarLifecycleTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit0137()
         throws Exception
     {

@@ -26,6 +26,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3886">MNG-3886</a>.
  *
@@ -47,6 +49,7 @@ public class MavenITmng3886ExecutionGoalsOrderTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitWithoutPluginMngt()
         throws Exception
     {
@@ -59,6 +62,7 @@ public class MavenITmng3886ExecutionGoalsOrderTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitWithPluginMngt()
         throws Exception
     {

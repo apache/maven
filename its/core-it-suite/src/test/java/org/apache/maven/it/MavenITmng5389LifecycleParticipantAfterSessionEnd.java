@@ -19,10 +19,12 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
+
+import java.io.File;
+
+import org.junit.jupiter.api.Test;
 
 public class MavenITmng5389LifecycleParticipantAfterSessionEnd
     extends AbstractMavenIntegrationTestCase
@@ -32,6 +34,7 @@ public class MavenITmng5389LifecycleParticipantAfterSessionEnd
         super( "[3.2.1,)" );
     }
 
+    @Test
     public void testit()
         throws Exception
     {

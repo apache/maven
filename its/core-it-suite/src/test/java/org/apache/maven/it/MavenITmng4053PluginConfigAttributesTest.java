@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4053">MNG-4053</a>.
  *
@@ -45,6 +47,7 @@ public class MavenITmng4053PluginConfigAttributesTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitWithoutPluginMngt()
         throws Exception
     {
@@ -57,6 +60,7 @@ public class MavenITmng4053PluginConfigAttributesTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitWithPluginMngt()
         throws Exception
     {
@@ -69,6 +73,7 @@ public class MavenITmng4053PluginConfigAttributesTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitWithPluginMngtAndProfile()
         throws Exception
     {

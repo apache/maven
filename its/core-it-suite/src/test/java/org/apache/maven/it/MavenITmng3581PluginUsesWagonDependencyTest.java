@@ -24,6 +24,8 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3581">MNG-3581</a>.
  *
@@ -44,6 +46,7 @@ public class MavenITmng3581PluginUsesWagonDependencyTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit()
         throws Exception
     {
@@ -52,6 +55,7 @@ public class MavenITmng3581PluginUsesWagonDependencyTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.executeGoal( "initialize" );
+        verifier.addCliOption( "-B" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

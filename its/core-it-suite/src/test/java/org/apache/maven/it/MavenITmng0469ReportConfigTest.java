@@ -25,7 +25,7 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.Properties;
 
-import static org.junit.Assert.assertNotEquals;
+import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-469">MNG-469</a>.
@@ -47,6 +47,7 @@ public class MavenITmng0469ReportConfigTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitBuildConfigDominantDuringBuild()
         throws Exception
     {
@@ -67,6 +68,7 @@ public class MavenITmng0469ReportConfigTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitBuildConfigIrrelevantForReports()
         throws Exception
     {

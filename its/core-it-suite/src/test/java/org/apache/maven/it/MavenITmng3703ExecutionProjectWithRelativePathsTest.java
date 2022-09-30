@@ -19,10 +19,12 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
+
+import java.io.File;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3703">MNG-3703</a>.
@@ -40,6 +42,7 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
         super( "[2.1.0-M1,)" ); // only test in 2.1.0+
     }
 
+    @Test
     public void testForkFromMojo()
         throws Exception
     {
@@ -65,6 +68,7 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
         verifier.resetStreams();
     }
 
+    @Test
     public void testForkFromReport()
         throws Exception
     {

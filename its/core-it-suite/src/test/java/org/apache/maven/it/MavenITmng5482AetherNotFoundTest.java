@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5482">MNG-5482</a>.
  *
@@ -45,12 +47,14 @@ public class MavenITmng5482AetherNotFoundTest
         super( "[3.1-A,)" );
     }
 
+    @Test
     public void testPluginDependency()
         throws IOException, VerificationException
     {
         check( "plugin-dependency" );
     }
 
+    @Test
     public void testPluginSite()
         throws IOException, VerificationException
     {

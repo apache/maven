@@ -21,6 +21,16 @@ package org.apache.maven.it;
 
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
+
 import org.apache.maven.it.utils.DeployedResource;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -36,14 +46,9 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.B64Code;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Password;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.concurrent.ConcurrentLinkedDeque;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.eclipse.jetty.servlet.ServletContextHandler.SECURITY;
 import static org.eclipse.jetty.servlet.ServletContextHandler.SESSIONS;
@@ -71,7 +76,7 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
         super( "[2.0.3,3.0-alpha-1),[3.0-alpha-6,)" );
     }
 
-    @Override
+    @BeforeEach
     protected void setUp()
         throws Exception
     {
@@ -175,7 +180,7 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
         deployed = false;
     }
 
-    @Override
+    @AfterEach
     protected void tearDown()
         throws Exception
     {
@@ -191,6 +196,7 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitRelease()
         throws Exception
     {
@@ -202,6 +208,7 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitSnapshot()
         throws Exception
     {

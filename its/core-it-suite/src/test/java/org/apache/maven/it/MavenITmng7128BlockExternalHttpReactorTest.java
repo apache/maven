@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 public class MavenITmng7128BlockExternalHttpReactorTest
         extends AbstractMavenIntegrationTestCase
 {
@@ -40,6 +42,7 @@ public class MavenITmng7128BlockExternalHttpReactorTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testBlockedHttpRepositoryInPom() throws Exception
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );

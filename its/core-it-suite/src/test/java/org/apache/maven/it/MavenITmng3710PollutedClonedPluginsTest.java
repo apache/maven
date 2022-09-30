@@ -26,6 +26,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3710">MNG-3710</a>.
  *
@@ -43,6 +45,7 @@ public class MavenITmng3710PollutedClonedPluginsTest
         super( "(2.0.8,)" ); // only test in 2.0.9+
     }
 
+    @Test
     public void testitMNG3710_POMInheritance()
         throws Exception
     {
@@ -75,6 +78,7 @@ public class MavenITmng3710PollutedClonedPluginsTest
 
     }
 
+    @Test
     public void testitMNG3710_OriginalModel()
         throws Exception
     {

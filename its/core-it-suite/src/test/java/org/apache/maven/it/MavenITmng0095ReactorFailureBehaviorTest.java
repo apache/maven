@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-95">MNG-95</a>.
  *
@@ -45,6 +47,7 @@ public class MavenITmng0095ReactorFailureBehaviorTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitFailFast()
         throws Exception
     {
@@ -81,6 +84,7 @@ public class MavenITmng0095ReactorFailureBehaviorTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitFailNever()
         throws Exception
     {
@@ -110,6 +114,7 @@ public class MavenITmng0095ReactorFailureBehaviorTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitFailAtEnd()
         throws Exception
     {

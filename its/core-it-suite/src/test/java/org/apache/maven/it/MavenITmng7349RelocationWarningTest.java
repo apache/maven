@@ -19,12 +19,14 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+import org.junit.jupiter.api.Test;
 
 public class MavenITmng7349RelocationWarningTest
     extends AbstractMavenIntegrationTestCase
@@ -35,6 +37,7 @@ public class MavenITmng7349RelocationWarningTest
         super( "[3.8.5,)" );
     }
 
+    @Test
     public void testit()
             throws Exception
     {

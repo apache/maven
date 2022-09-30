@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4408">MNG-4408</a>.
  *
@@ -44,6 +46,7 @@ public class MavenITmng4408NonExistentSettingsFileTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitUserSettings()
         throws Exception
     {
@@ -75,6 +78,7 @@ public class MavenITmng4408NonExistentSettingsFileTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitGlobalSettings()
         throws Exception
     {

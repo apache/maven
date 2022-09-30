@@ -24,12 +24,16 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-612">MNG-612</a>.
  *
  * @author Mark Hobson
  *
  */
+@Disabled
 public class MavenITmng0612NewestConflictResolverTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -43,6 +47,7 @@ public class MavenITmng0612NewestConflictResolverTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG612()
         throws Exception
     {

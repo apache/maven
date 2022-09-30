@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1415">MNG-1415</a>.
  *
@@ -43,6 +45,7 @@ public class MavenITmng1415QuotedSystemPropertiesTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG1415()
         throws Exception
     {

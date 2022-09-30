@@ -35,10 +35,17 @@ import java.util.Properties;
 public class PathInterpolationMojo
     extends AbstractMojo
 {
-    /** @component */
+    /**
+     * The model interpolator
+     * @component
+     */
     private ModelInterpolator modelInterpolator;
 
-    /** @parameter default-value="${project}" */
+    /**
+     * The current Maven project.
+     *
+     * @parameter default-value="${project}"
+     */
     private MavenProject project;
 
     public void execute()

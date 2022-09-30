@@ -26,6 +26,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3877">MNG-3877</a>.
  *
@@ -46,6 +48,7 @@ public class MavenITmng3877BasedirAlignedModelTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testitMNG3877()
         throws Exception
     {

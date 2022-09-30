@@ -19,11 +19,13 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
+import org.apache.maven.shared.verifier.Verifier;
+
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
+import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-6240">MNG-6240</a>.
@@ -50,6 +52,7 @@ public class MavenITmng6240PluginExtensionAetherProvider
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testPluginExtensionDependingOnMavenAetherProvider()
         throws Exception
     {

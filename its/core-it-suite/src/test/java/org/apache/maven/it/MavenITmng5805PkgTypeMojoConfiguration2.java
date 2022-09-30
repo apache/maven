@@ -1,9 +1,11 @@
 package org.apache.maven.it;
 
-import java.io.File;
-
 import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
+
+import java.io.File;
+
+import org.junit.jupiter.api.Test;
 
 public class MavenITmng5805PkgTypeMojoConfiguration2
     extends AbstractMavenIntegrationTestCase
@@ -14,6 +16,7 @@ public class MavenITmng5805PkgTypeMojoConfiguration2
         super( "(3.3.3,)" );
     }
 
+    @Test
     public void testPkgTypeMojoConfiguration()
         throws Exception
     {

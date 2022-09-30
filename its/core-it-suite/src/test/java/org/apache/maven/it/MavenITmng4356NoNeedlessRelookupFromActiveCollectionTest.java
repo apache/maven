@@ -25,11 +25,15 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4356">MNG-4356</a>.
  *
  * @author Benjamin Bentmann
  */
+@Disabled
 public class MavenITmng4356NoNeedlessRelookupFromActiveCollectionTest
     extends AbstractMavenIntegrationTestCase
 {
@@ -45,6 +49,7 @@ public class MavenITmng4356NoNeedlessRelookupFromActiveCollectionTest
      *
      * @throws Exception in case of failure
      */
+    @Test
     public void testit()
         throws Exception
     {

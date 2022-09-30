@@ -26,6 +26,8 @@ import org.apache.maven.shared.verifier.VerificationException;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3506">MNG-3506</a>.
  *
@@ -48,6 +50,7 @@ public class MavenITmng3506ArtifactHandlersFromPluginsTest
         super( "(2.2.0,)" );
     }
 
+    @Test
     public void testProjectPackagingUsage()
         throws IOException, VerificationException
     {

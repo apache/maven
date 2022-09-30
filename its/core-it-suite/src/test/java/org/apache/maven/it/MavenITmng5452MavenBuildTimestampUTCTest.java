@@ -25,6 +25,8 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.Properties;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5452">MNG-5452</a>
  * Make sure that the maven.build.timestamp is in UTC.
@@ -38,6 +40,7 @@ public class MavenITmng5452MavenBuildTimestampUTCTest
         super( "[3.2.2,)" );
     }
 
+    @Test
     public void testMavenBuildTimestampIsUsingUTC()
         throws Exception
     {
