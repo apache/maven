@@ -20,13 +20,13 @@ package org.apache.maven.toolchain.building;
  */
 
 import org.apache.maven.building.StringSource;
+import org.apache.maven.internal.xml.Xpp3Dom;
 import org.apache.maven.toolchain.io.DefaultToolchainsReader;
 import org.apache.maven.toolchain.io.DefaultToolchainsWriter;
 import org.apache.maven.toolchain.io.ToolchainsParseException;
-import org.apache.maven.toolchain.model.PersistedToolchains;
-import org.apache.maven.toolchain.model.ToolchainModel;
+import org.apache.maven.api.toolchain.PersistedToolchains;
+import org.apache.maven.api.toolchain.ToolchainModel;
 import org.codehaus.plexus.interpolation.os.OperatingSystemUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -36,8 +36,10 @@ import org.mockito.Spy;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -87,11 +89,15 @@ public class DefaultToolchainsBuilderTest
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setUserToolchainsSource( new StringSource( "" ) );
 
-        PersistedToolchains userResult = new PersistedToolchains();
-        ToolchainModel toolchain = new ToolchainModel();
-        toolchain.setType( "TYPE" );
-        toolchain.addProvide( "key", "user_value" );
-        userResult.addToolchain(  toolchain );
+        Properties props = new Properties();
+        props.put( "key", "user_value" );
+        ToolchainModel toolchain = ToolchainModel.newBuilder()
+                .type( "TYPE" )
+                .provides( props )
+                .build();
+        PersistedToolchains userResult = PersistedToolchains.newBuilder()
+                        .toolchains( Collections.singletonList( toolchain ) )
+                        .build();
         doReturn(userResult).when( toolchainsReader ).read( any( InputStream.class ), ArgumentMatchers.<String, Object>anyMap());
 
         ToolchainsBuildingResult result = toolchainBuilder.build( request );
@@ -110,11 +116,15 @@ public class DefaultToolchainsBuilderTest
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setGlobalToolchainsSource( new StringSource( "" ) );
 
-        PersistedToolchains globalResult = new PersistedToolchains();
-        ToolchainModel toolchain = new ToolchainModel();
-        toolchain.setType( "TYPE" );
-        toolchain.addProvide( "key", "global_value" );
-        globalResult.addToolchain(  toolchain );
+        Properties props = new Properties();
+        props.put( "key", "global_value" );
+        ToolchainModel toolchain = ToolchainModel.newBuilder()
+                .type( "TYPE" )
+                .provides( props )
+                .build();
+        PersistedToolchains globalResult = PersistedToolchains.newBuilder()
+                .toolchains( Collections.singletonList( toolchain ) )
+                .build();
         doReturn(globalResult).when( toolchainsReader ).read( any( InputStream.class ), ArgumentMatchers.<String, Object>anyMap());
 
         ToolchainsBuildingResult result = toolchainBuilder.build( request );
@@ -134,17 +144,26 @@ public class DefaultToolchainsBuilderTest
         request.setGlobalToolchainsSource( new StringSource( "" ) );
         request.setUserToolchainsSource( new StringSource( "" ) );
 
-        PersistedToolchains userResult = new PersistedToolchains();
-        ToolchainModel userToolchain = new ToolchainModel();
-        userToolchain.setType( "TYPE" );
-        userToolchain.addProvide( "key", "user_value" );
-        userResult.addToolchain(  userToolchain );
+        Properties props = new Properties();
+        props.put( "key", "user_value" );
+        ToolchainModel toolchain = ToolchainModel.newBuilder()
+                .type( "TYPE" )
+                .provides( props )
+                .build();
+        PersistedToolchains userResult = PersistedToolchains.newBuilder()
+                .toolchains( Collections.singletonList( toolchain ) )
+                .build();
 
-        PersistedToolchains globalResult = new PersistedToolchains();
-        ToolchainModel globalToolchain = new ToolchainModel();
-        globalToolchain.setType( "TYPE" );
-        globalToolchain.addProvide( "key", "global_value" );
-        globalResult.addToolchain(  globalToolchain );
+        props = new Properties();
+        props.put( "key", "global_value" );
+        toolchain = ToolchainModel.newBuilder()
+                .type( "TYPE" )
+                .provides( props )
+                .build();
+        PersistedToolchains globalResult = PersistedToolchains.newBuilder()
+                .toolchains( Collections.singletonList( toolchain ) )
+                .build();
+
         doReturn(globalResult).doReturn(userResult).when( toolchainsReader ).read( any( InputStream.class ), ArgumentMatchers.<String, Object>anyMap());
 
         ToolchainsBuildingResult result = toolchainBuilder.build( request );
@@ -203,17 +222,19 @@ public class DefaultToolchainsBuilderTest
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setUserToolchainsSource( new StringSource( "" ) );
 
-        PersistedToolchains persistedToolchains = new PersistedToolchains();
-        ToolchainModel toolchain = new ToolchainModel();
-        toolchain.setType( "TYPE" );
-        toolchain.addProvide( "key", "${env.testKey}" );
+        Properties props = new Properties();
+        props.put( "key", "${env.testKey}" );
+        Xpp3Dom configurationChild = new Xpp3Dom("jdkHome", "${env.testKey}", null, null, null);
+        Xpp3Dom configuration = new Xpp3Dom("configuration", null, null, Collections.singletonList(configurationChild), null);
+        ToolchainModel toolchain = ToolchainModel.newBuilder()
+                .type( "TYPE" )
+                .provides( props )
+                .configuration( configuration )
+                .build();
+        PersistedToolchains persistedToolchains = PersistedToolchains.newBuilder()
+                .toolchains( Collections.singletonList( toolchain ) )
+                .build();
 
-        Xpp3Dom configurationChild = new Xpp3Dom("jdkHome");
-        configurationChild.setValue("${env.testKey}");
-        Xpp3Dom configuration = new Xpp3Dom("configuration");
-        configuration.addChild(configurationChild);
-        toolchain.setConfiguration(configuration);
-        persistedToolchains.addToolchain( toolchain );
         doReturn(persistedToolchains).when( toolchainsReader ).read( any( InputStream.class ), ArgumentMatchers.<String, Object>anyMap());
 
         ToolchainsBuildingResult result = toolchainBuilder.build( request );
@@ -232,12 +253,16 @@ public class DefaultToolchainsBuilderTest
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setUserToolchainsSource( new StringSource( "" ) );
 
-        PersistedToolchains persistedToolchains = new PersistedToolchains();
-        ToolchainModel toolchain = new ToolchainModel();
-        toolchain.setType( "TYPE" );
-        toolchain.addProvide( "key", "${env.testNonExistingKey}" );
+        Properties props = new Properties();
+        props.put( "key", "${env.testNonExistingKey}" );
+        ToolchainModel toolchain = ToolchainModel.newBuilder()
+                .type( "TYPE" )
+                .provides( props )
+                .build();
+        PersistedToolchains persistedToolchains = PersistedToolchains.newBuilder()
+                .toolchains( Collections.singletonList( toolchain ) )
+                .build();
 
-        persistedToolchains.addToolchain( toolchain );
         doReturn(persistedToolchains).when( toolchainsReader ).read( any( InputStream.class ), ArgumentMatchers.<String, Object>anyMap());
 
         ToolchainsBuildingResult result = toolchainBuilder.build( request );
@@ -253,12 +278,16 @@ public class DefaultToolchainsBuilderTest
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setUserToolchainsSource( new StringSource( "" ) );
 
-        PersistedToolchains persistedToolchains = new PersistedToolchains();
-        ToolchainModel toolchain = new ToolchainModel();
-        toolchain.setType( "TYPE" );
-        toolchain.addProvide( "key", "${env.testSpecialCharactersKey}" );
+        Properties props = new Properties();
+        props.put( "key", "${env.testSpecialCharactersKey}" );
+        ToolchainModel toolchain = ToolchainModel.newBuilder()
+                .type( "TYPE" )
+                .provides( props )
+                .build();
+        PersistedToolchains persistedToolchains = PersistedToolchains.newBuilder()
+                .toolchains( Collections.singletonList( toolchain ) )
+                .build();
 
-        persistedToolchains.addToolchain( toolchain );
         doReturn(persistedToolchains).when( toolchainsReader ).read( any( InputStream.class ), ArgumentMatchers.<String, Object>anyMap());
 
         ToolchainsBuildingResult result = toolchainBuilder.build( request );

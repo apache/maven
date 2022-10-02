@@ -21,20 +21,22 @@ package org.apache.maven.model.interpolation;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import org.apache.maven.model.Build;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Organization;
-import org.apache.maven.model.Repository;
-import org.apache.maven.model.Resource;
-import org.apache.maven.model.Scm;
+import org.apache.maven.api.model.Build;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Organization;
+import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.model.Resource;
+import org.apache.maven.api.model.Scm;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
@@ -145,12 +147,8 @@ public abstract class AbstractModelInterpolatorTest
     @Test
     public void testShouldNotThrowExceptionOnReferenceToNonExistentValue() throws Exception
     {
-        Model model = new Model();
-
-        Scm scm = new Scm();
-        scm.setConnection( "${test}/somepath" );
-
-        model.setScm( scm );
+        Scm scm = Scm.newBuilder().connection( "${test}/somepath" ).build();
+        Model model = Model.newBuilder().scm( scm ).build();
 
         ModelInterpolator interpolator = createInterpolator();
 
@@ -165,12 +163,8 @@ public abstract class AbstractModelInterpolatorTest
     @Test
     public void testShouldThrowExceptionOnRecursiveScmConnectionReference() throws Exception
     {
-        Model model = new Model();
-
-        Scm scm = new Scm();
-        scm.setConnection( "${project.scm.connection}/somepath" );
-
-        model.setScm( scm );
+        Scm scm = Scm.newBuilder().connection( "${project.scm.connection}/somepath" ).build();
+        Model model = Model.newBuilder().scm( scm ).build();
 
         ModelInterpolator interpolator = createInterpolator();
 
@@ -182,14 +176,10 @@ public abstract class AbstractModelInterpolatorTest
     @Test
     public void testShouldNotThrowExceptionOnReferenceToValueContainingNakedExpression() throws Exception
     {
-        Model model = new Model();
-
-        Scm scm = new Scm();
-        scm.setConnection( "${test}/somepath" );
-
-        model.setScm( scm );
-
-        model.addProperty( "test", "test" );
+        Scm scm = Scm.newBuilder().connection( "${test}/somepath" ).build();
+        Properties props = new Properties();
+        props.put( "test", "test" );
+        Model model = Model.newBuilder().scm( scm ).properties( props ).build();
 
         ModelInterpolator interpolator = createInterpolator();
 
@@ -207,13 +197,9 @@ public abstract class AbstractModelInterpolatorTest
     {
         String orgName = "MyCo";
 
-        Model model = new Model();
-        model.setName( "${project.organization.name} Tools" );
-
-        Organization org = new Organization();
-        org.setName( orgName );
-
-        model.setOrganization( org );
+        Model model = Model.newBuilder().name( "${project.organization.name} Tools" )
+                .organization( Organization.newBuilder().name( orgName ).build() )
+                .build();
 
         ModelInterpolator interpolator = createInterpolator();
 
@@ -226,13 +212,9 @@ public abstract class AbstractModelInterpolatorTest
     @Test
     public void shouldInterpolateDependencyVersionToSetSameAsProjectVersion() throws Exception
     {
-        Model model = new Model();
-        model.setVersion( "3.8.1" );
-
-        Dependency dep = new Dependency();
-        dep.setVersion( "${project.version}" );
-
-        model.addDependency( dep );
+        Model model = Model.newBuilder().version(  "3.8.1" )
+                .dependencies( Collections.singletonList( Dependency.newBuilder().version( "${project.version}" ).build() ) )
+                .build();
 
         ModelInterpolator interpolator = createInterpolator();
 
@@ -247,13 +229,9 @@ public abstract class AbstractModelInterpolatorTest
     @Test
     public void testShouldNotInterpolateDependencyVersionWithInvalidReference() throws Exception
     {
-        Model model = new Model();
-        model.setVersion( "3.8.1" );
-
-        Dependency dep = new Dependency();
-        dep.setVersion( "${something}" );
-
-        model.addDependency( dep );
+        Model model = Model.newBuilder().version(  "3.8.1" )
+                .dependencies( Collections.singletonList( Dependency.newBuilder().version( "${something}" ).build() ) )
+                .build();
 
         /*
          // This is the desired behaviour, however there are too many crappy poms in the repo and an issue with the
@@ -283,14 +261,10 @@ public abstract class AbstractModelInterpolatorTest
     @Test
     public void testTwoReferences() throws Exception
     {
-        Model model = new Model();
-        model.setVersion( "3.8.1" );
-        model.setArtifactId( "foo" );
-
-        Dependency dep = new Dependency();
-        dep.setVersion( "${project.artifactId}-${project.version}" );
-
-        model.addDependency( dep );
+        Model model = Model.newBuilder().version(  "3.8.1" ).artifactId( "foo" )
+                .dependencies( Collections.singletonList(
+                        Dependency.newBuilder().version( "${project.artifactId}-${project.version}" ).build() ) )
+                .build();
 
         ModelInterpolator interpolator = createInterpolator();
 
@@ -305,15 +279,10 @@ public abstract class AbstractModelInterpolatorTest
     @Test
     public void testBasedir() throws Exception
     {
-        Model model = new Model();
-        model.setVersion( "3.8.1" );
-        model.setArtifactId( "foo" );
-
-        Repository repository = new Repository();
-
-        repository.setUrl( "file://localhost/${basedir}/temp-repo" );
-
-        model.addRepository( repository );
+        Model model = Model.newBuilder().version(  "3.8.1" ).artifactId( "foo" )
+                .repositories( Collections.singletonList(
+                        Repository.newBuilder().url( "file://localhost/${basedir}/temp-repo" ).build() ) )
+                .build();
 
         ModelInterpolator interpolator = createInterpolator();
 
@@ -327,15 +296,10 @@ public abstract class AbstractModelInterpolatorTest
     @Test
     public void testBaseUri() throws Exception
     {
-        Model model = new Model();
-        model.setVersion( "3.8.1" );
-        model.setArtifactId( "foo" );
-
-        Repository repository = new Repository();
-
-        repository.setUrl( "${project.baseUri}/temp-repo" );
-
-        model.addRepository( repository );
+        Model model = Model.newBuilder().version(  "3.8.1" ).artifactId( "foo" )
+                .repositories( Collections.singletonList(
+                        Repository.newBuilder().url( "${project.baseUri}/temp-repo" ).build() ) )
+                .build();
 
         ModelInterpolator interpolator = createInterpolator();
 
@@ -350,16 +314,12 @@ public abstract class AbstractModelInterpolatorTest
     public void testEnvars() throws Exception
     {
         Properties context = new Properties();
-
         context.put( "env.HOME", "/path/to/home" );
 
-        Model model = new Model();
-
         Properties modelProperties = new Properties();
-
         modelProperties.setProperty( "outputDirectory", "${env.HOME}" );
 
-        model.setProperties( modelProperties );
+        Model model = Model.newBuilder().properties( modelProperties ).build();
 
         ModelInterpolator interpolator = createInterpolator();
 
@@ -374,13 +334,11 @@ public abstract class AbstractModelInterpolatorTest
     @Test
     public void envarExpressionThatEvaluatesToNullReturnsTheLiteralString() throws Exception
     {
-        Model model = new Model();
 
         Properties modelProperties = new Properties();
-
         modelProperties.setProperty( "outputDirectory", "${env.DOES_NOT_EXIST}" );
 
-        model.setProperties( modelProperties );
+        Model model = Model.newBuilder().properties( modelProperties ).build();
 
         ModelInterpolator interpolator = createInterpolator();
 
@@ -395,13 +353,10 @@ public abstract class AbstractModelInterpolatorTest
     @Test
     public void expressionThatEvaluatesToNullReturnsTheLiteralString() throws Exception
     {
-        Model model = new Model();
-
         Properties modelProperties = new Properties();
-
         modelProperties.setProperty( "outputDirectory", "${DOES_NOT_EXIST}" );
 
-        model.setProperties( modelProperties );
+        Model model = Model.newBuilder().properties( modelProperties ).build();
 
         ModelInterpolator interpolator = createInterpolator();
 
@@ -416,17 +371,14 @@ public abstract class AbstractModelInterpolatorTest
     @Test
     public void shouldInterpolateSourceDirectoryReferencedFromResourceDirectoryCorrectly() throws Exception
     {
-        Model model = new Model();
-
-        Build build = new Build();
-        build.setSourceDirectory( "correct" );
-
-        Resource res = new Resource();
-        res.setDirectory( "${project.build.sourceDirectory}" );
-
-        build.addResource( res );
-
-        model.setBuild( build );
+        Model model = Model.newBuilder()
+                .build( Build.newBuilder()
+                        .sourceDirectory( "correct" )
+                        .resources( Arrays.asList(
+                                Resource.newBuilder().directory( "${project.build.sourceDirectory}" ).build()
+                        ) )
+                        .build() )
+                .build();
 
         ModelInterpolator interpolator = createInterpolator();
 
@@ -438,18 +390,17 @@ public abstract class AbstractModelInterpolatorTest
         List<Resource> outResources = out.getBuild().getResources();
         Iterator<Resource> resIt = outResources.iterator();
 
-        assertEquals( build.getSourceDirectory(), resIt.next().getDirectory() );
+        assertEquals( model.getBuild().getSourceDirectory(), resIt.next().getDirectory() );
     }
 
     @Test
     public void shouldInterpolateUnprefixedBasedirExpression() throws Exception
     {
         File basedir = new File( "/test/path" );
-        Model model = new Model();
-        Dependency dep = new Dependency();
-        dep.setSystemPath( "${basedir}/artifact.jar" );
-
-        model.addDependency( dep );
+        Model model = Model.newBuilder()
+                .dependencies( Collections.singletonList(
+                        Dependency.newBuilder().systemPath( "${basedir}/artifact.jar" ).build()
+                ) ).build();
 
         ModelInterpolator interpolator = createInterpolator();
 
@@ -474,8 +425,7 @@ public abstract class AbstractModelInterpolatorTest
         props.setProperty( "bb", "${aa}" );
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
 
-        Model model = new Model();
-        model.setProperties( props );
+        Model model = Model.newBuilder().properties( props ).build();
 
         SimpleProblemCollector collector = new SimpleProblemCollector();
         ModelInterpolator interpolator = createInterpolator();
@@ -492,8 +442,7 @@ public abstract class AbstractModelInterpolatorTest
         props.setProperty( "basedir", "${basedir}" );
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
 
-        Model model = new Model();
-        model.setProperties( props );
+        Model model = Model.newBuilder().properties( props ).build();
 
         SimpleProblemCollector collector = new SimpleProblemCollector();
         ModelInterpolator interpolator = createInterpolator();
@@ -511,13 +460,10 @@ public abstract class AbstractModelInterpolatorTest
         final String orgName = "MyCo";
         final String expectedName = "${pom.organization.name} Tools";
 
-        Model model = new Model();
-        model.setName( expectedName );
-
-        Organization org = new Organization();
-        org.setName( orgName );
-
-        model.setOrganization( org );
+        Model model = Model.newBuilder()
+                .name( expectedName )
+                .organization( Organization.newBuilder().name( orgName ).build() )
+                .build();
 
         ModelInterpolator interpolator = createInterpolator();
         SimpleProblemCollector collector = new SimpleProblemCollector();

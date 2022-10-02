@@ -38,7 +38,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 @Named
 @Singleton
 public class DefaultReportConfigurationExpander
-    implements ReportConfigurationExpander
+        implements ReportConfigurationExpander
 {
 
     @Override

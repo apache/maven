@@ -24,12 +24,12 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.internal.xml.XmlPlexusConfiguration;
+import org.apache.maven.internal.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
-import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -309,6 +309,13 @@ public class PluginDescriptorBuilder
             mojo.setThreadSafe( Boolean.parseBoolean( threadSafe ) );
         }
 
+        String v4Api = c.getChild( "v4Api" ).getValue();
+
+        if ( v4Api != null )
+        {
+            mojo.setV4Api( Boolean.parseBoolean( v4Api ) );
+        }
+
         // ----------------------------------------------------------------------
         // Configuration
         // ----------------------------------------------------------------------
@@ -401,7 +408,7 @@ public class PluginDescriptorBuilder
     {
         try
         {
-            return new XmlPlexusConfiguration( Xpp3DomBuilder.build( configuration ) );
+            return XmlPlexusConfiguration.toPlexusConfiguration( Xpp3DomBuilder.build( configuration ) );
         }
         catch ( IOException | XmlPullParserException e )
         {

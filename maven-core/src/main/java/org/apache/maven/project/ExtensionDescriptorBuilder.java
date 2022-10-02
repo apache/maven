@@ -19,9 +19,9 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import org.apache.maven.api.xml.Dom;
+import org.apache.maven.internal.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.BufferedInputStream;
@@ -101,7 +101,7 @@ public class ExtensionDescriptorBuilder
     {
         ExtensionDescriptor extensionDescriptor = new ExtensionDescriptor();
 
-        Xpp3Dom dom;
+        Dom dom;
         try
         {
             dom = Xpp3DomBuilder.build( ReaderFactory.newXmlReader( is ) );
@@ -123,7 +123,7 @@ public class ExtensionDescriptorBuilder
         return extensionDescriptor;
     }
 
-    private List<String> parseStrings( Xpp3Dom dom )
+    private List<String> parseStrings( Dom dom )
     {
         List<String> strings = null;
 
@@ -131,7 +131,7 @@ public class ExtensionDescriptorBuilder
         {
             strings = new ArrayList<>();
 
-            for ( Xpp3Dom child : dom.getChildren() )
+            for ( Dom child : dom.getChildren() )
             {
                 String string = child.getValue();
                 if ( string != null )

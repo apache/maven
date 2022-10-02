@@ -27,14 +27,20 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
+import org.apache.maven.api.Session;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.SettingsUtils;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
@@ -297,6 +303,8 @@ public class MavenSession
 
     private final Settings settings;
 
+    private Session session;
+
     @Deprecated
     /** @deprecated This appears not to be used anywhere within Maven itself. */
     public Map<String, MavenProject> getProjectMap()
@@ -311,7 +319,7 @@ public class MavenSession
         this.container = container;
         this.request = request;
         this.result = result;
-        this.settings = new SettingsAdapter( request );
+        this.settings = adaptSettings( request );
         this.repositorySession = repositorySession;
     }
 
@@ -357,8 +365,31 @@ public class MavenSession
         this.container = container;
         this.request = request;
         this.result = result;
-        this.settings = new SettingsAdapter( request );
+        this.settings = adaptSettings( request );
         setProjects( projects );
+    }
+
+    /**
+     * Adapt a {@link MavenExecutionRequest} to a {@link Settings} object for use in the Maven core.
+     * We want to make sure that what is ask for in the execution request overrides what is in the settings.
+     * The CLI feeds into an execution request so if a particular value is present in the execution request
+     * then we will take that over the value coming from the user settings.
+     */
+    private static Settings adaptSettings( MavenExecutionRequest request )
+    {
+        File localRepo = request.getLocalRepositoryPath();
+        return new Settings( org.apache.maven.api.settings.Settings.newBuilder()
+                .localRepository( localRepo != null ? localRepo.getAbsolutePath() : null )
+                .interactiveMode( request.isInteractiveMode() )
+                .offline( request.isOffline() )
+                .proxies( request.getProxies().stream().map( Proxy::getDelegate ).collect( Collectors.toList() ) )
+                .servers( request.getServers().stream().map( Server::getDelegate ).collect( Collectors.toList() ) )
+                .mirrors( request.getMirrors().stream().map( Mirror::getDelegate ).collect( Collectors.toList() ) )
+                .profiles( request.getProfiles().stream()
+                        .map( SettingsUtils::convertToSettingsProfile ).collect( Collectors.toList() ) )
+                .activeProfiles( request.getActiveProfiles() )
+                .pluginGroups( request.getPluginGroups() )
+                .build() );
     }
 
     @Deprecated
@@ -439,5 +470,14 @@ public class MavenSession
         return container.lookupMap( role );
     }
 
+    public Session getSession()
+    {
+        return session;
+    }
+
+    public void setSession( Session session )
+    {
+        this.session = session;
+    }
     /*end[MAVEN4]*/
 }

@@ -104,6 +104,7 @@ public class DefaultProjectBuilder
     private final ProjectDependenciesResolver dependencyResolver;
     private final ModelCacheFactory modelCacheFactory;
 
+    @SuppressWarnings( "checkstyle:ParameterNumber" )
     @Inject
     public DefaultProjectBuilder(
             ModelBuilder modelBuilder,
@@ -260,9 +261,9 @@ public class DefaultProjectBuilder
         return resolutionResult;
     }
 
-    private List<String> getProfileIds( List<Profile> profiles )
+    private List<String> getProfileIds( List<org.apache.maven.model.Profile> profiles )
     {
-        return profiles.stream().map( Profile::getId ).collect( Collectors.toList() );
+        return profiles.stream().map( org.apache.maven.model.Profile::getId ).collect( Collectors.toList() );
     }
 
     private ModelBuildingRequest getModelBuildingRequest( InternalConfig config )
@@ -484,7 +485,7 @@ public class DefaultProjectBuilder
             noErrors = false;
         }
 
-        Model model = result.getFileModel().clone();
+        Model model = result.getFileModel();
 
         poolBuilder.put( model.getPomFile().toPath(),  model );
 
@@ -515,8 +516,8 @@ public class DefaultProjectBuilder
                 {
                     ModelProblem problem =
                         new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
-                            + " does not exist", ModelProblem.Severity.ERROR, ModelProblem.Version.BASE, model, -1,
-                                                 -1, null );
+                            + " does not exist", ModelProblem.Severity.ERROR, ModelProblem.Version.BASE,
+                                model, -1, -1, null );
                     result.getProblems().add( problem );
 
                     noErrors = false;
@@ -553,7 +554,7 @@ public class DefaultProjectBuilder
                     ModelProblem problem =
                         new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
                             + " forms aggregation cycle " + buffer, ModelProblem.Severity.ERROR,
-                                                 ModelProblem.Version.BASE, model, -1, -1, null );
+                                ModelProblem.Version.BASE, model, -1, -1, null );
                     result.getProblems().add( problem );
 
                     noErrors = false;
@@ -675,9 +676,7 @@ public class DefaultProjectBuilder
                               boolean buildParentIfNotExisting, ModelBuildingResult result,
                               Map<File, Boolean> profilesXmls, ProjectBuildingRequest projectBuildingRequest )
     {
-        Model model = result.getEffectiveModel();
-
-        project.setModel( model );
+        project.setModel( result.getEffectiveModel() );
         project.setOriginalModel( result.getFileModel() );
 
         initParent( project, projects, buildParentIfNotExisting, result, projectBuildingRequest );
@@ -1000,11 +999,11 @@ public class DefaultProjectBuilder
 
         if ( !modelId.isEmpty() )
         {
-            final Model model = result.getRawModel( modelId );
-            version = model.getVersion() != null
-                          ? model.getVersion()
-                          : inheritedVersion( result, modelIndex + 1 );
-
+            version = result.getRawModel( modelId ).getVersion();
+            if ( version == null )
+            {
+                version = inheritedVersion( result, modelIndex + 1 );
+            }
         }
 
         return version;

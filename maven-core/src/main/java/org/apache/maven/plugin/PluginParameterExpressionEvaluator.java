@@ -230,10 +230,6 @@ public class PluginParameterExpressionEvaluator
         {
             value = session.getProjects();
         }
-        else if ( "mojoExecution".equals( expression ) )
-        {
-            value = mojoExecution;
-        }
         else if ( "project".equals( expression ) )
         {
             value = project;
@@ -270,7 +266,7 @@ public class PluginParameterExpressionEvaluator
         {
             value = session.getRepositorySession();
         }
-        else if ( expression.equals( "mojo" ) )
+        else if ( expression.equals( "mojo" ) || expression.equals( "mojoExecution" ) )
         {
             value = mojoExecution;
         }

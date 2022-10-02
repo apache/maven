@@ -29,8 +29,8 @@ import java.util.Objects;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.toolchain.model.PersistedToolchains;
-import org.apache.maven.toolchain.model.io.xpp3.MavenToolchainsXpp3Reader;
+import org.apache.maven.api.toolchain.PersistedToolchains;
+import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Reader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 

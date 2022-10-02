@@ -27,6 +27,8 @@ import java.util.stream.Stream;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.api.xml.Dom;
+import org.apache.maven.internal.xml.Xpp3Dom;
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -37,7 +39,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.logging.MessageBuilder;
 import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,22 +73,23 @@ public class DefaultMojoExecutionConfigurator
             PluginExecution pluginExecution =
                 findPluginExecution( mojoExecution.getExecutionId(), plugin.getExecutions() );
 
-            Xpp3Dom pomConfiguration = null;
+            Dom pomConfiguration = null;
 
             if ( pluginExecution != null )
             {
-                pomConfiguration = (Xpp3Dom) pluginExecution.getConfiguration();
+                pomConfiguration = pluginExecution.getDelegate().getConfiguration();
             }
             else if ( allowPluginLevelConfig )
             {
-                pomConfiguration = (Xpp3Dom) plugin.getConfiguration();
+                pomConfiguration = plugin.getDelegate().getConfiguration();
             }
 
-            Xpp3Dom mojoConfiguration = ( pomConfiguration != null ) ? new Xpp3Dom( pomConfiguration ) : null;
+            Dom mojoConfiguration = mojoExecution.getConfiguration() != null
+                    ? mojoExecution.getConfiguration().getDom() : null;
 
-            mojoConfiguration = Xpp3Dom.mergeXpp3Dom( mojoExecution.getConfiguration(), mojoConfiguration );
+            Dom mergedConfiguration = Xpp3Dom.merge( mojoConfiguration, pomConfiguration );
 
-            mojoExecution.setConfiguration( mojoConfiguration );
+            mojoExecution.setConfiguration( mergedConfiguration );
 
             checkUnknownMojoConfigurationParameters( mojoExecution );
         }
@@ -190,7 +192,7 @@ public class DefaultMojoExecutionConfigurator
     private Set<String> getUnknownParameters( MojoExecution mojoExecution, Set<String> parameters )
     {
         return stream( mojoExecution.getConfiguration().getChildren() )
-            .map( Xpp3Dom::getName )
+            .map( x -> x.getName() )
             .filter( name -> !parameters.contains( name ) )
             .collect( Collectors.toSet() );
     }

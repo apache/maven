@@ -19,7 +19,7 @@ package org.apache.maven.model.normalization;
  * under the License.
  */
 
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 
@@ -39,7 +39,7 @@ public interface ModelNormalizer
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void mergeDuplicates( Model model, ModelBuildingRequest request, ModelProblemCollector problems );
+    Model mergeDuplicates( Model model, ModelBuildingRequest request, ModelProblemCollector problems );
 
     /**
      * Sets default values in the specified model that for technical reasons cannot be set directly in the Modello
@@ -49,6 +49,6 @@ public interface ModelNormalizer
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void injectDefaultValues( Model model, ModelBuildingRequest request, ModelProblemCollector problems );
+    Model injectDefaultValues( Model model, ModelBuildingRequest request, ModelProblemCollector problems );
 
 }

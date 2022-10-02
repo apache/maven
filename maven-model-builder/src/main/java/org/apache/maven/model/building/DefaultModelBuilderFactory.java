@@ -101,6 +101,7 @@ public class DefaultModelBuilderFactory
     private ReportConfigurationExpander reportConfigurationExpander;
     private ReportingConverter reportingConverter;
     private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
+    private ModelVersionProcessor versionProcessor;
 
     public DefaultModelBuilderFactory setModelProcessor( ModelProcessor modelProcessor )
     {
@@ -216,6 +217,12 @@ public class DefaultModelBuilderFactory
         return this;
     }
 
+    public DefaultModelBuilderFactory setVersionProcessor( ModelVersionProcessor versionProcessor )
+    {
+        this.versionProcessor = versionProcessor;
+        return this;
+    }
+
     protected ModelProcessor newModelProcessor()
     {
         return new DefaultModelProcessor( newModelLocator(), newModelReader() );
@@ -261,8 +268,7 @@ public class DefaultModelBuilderFactory
     {
         UrlNormalizer normalizer = newUrlNormalizer();
         PathTranslator pathTranslator = newPathTranslator();
-        ModelVersionProcessor versionProcessor = newModelVersionPropertiesProcessor();
-        return new StringVisitorModelInterpolator( pathTranslator, normalizer, versionProcessor );
+        return new StringVisitorModelInterpolator( pathTranslator, normalizer );
     }
 
     protected ModelVersionProcessor newModelVersionPropertiesProcessor()
@@ -372,7 +378,8 @@ public class DefaultModelBuilderFactory
                 reportConfigurationExpander != null ? reportConfigurationExpander : newReportConfigurationExpander(),
                 reportingConverter != null ? reportingConverter : newReportingConverter(),
                 profileActivationFilePathInterpolator != null
-                        ? profileActivationFilePathInterpolator : newProfileActivationFilePathInterpolator()
+                        ? profileActivationFilePathInterpolator : newProfileActivationFilePathInterpolator(),
+                versionProcessor != null ? versionProcessor : newModelVersionPropertiesProcessor()
         );
     }
 
@@ -381,7 +388,9 @@ public class DefaultModelBuilderFactory
     {
 
         @Override
-        public void injectLifecycleBindings( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
+        public void injectLifecycleBindings( Model model,
+                                             ModelBuildingRequest request,
+                                             ModelProblemCollector problems )
         {
         }
 

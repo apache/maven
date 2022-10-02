@@ -343,7 +343,8 @@ public class StringSearchModelInterpolator
 
         private boolean isQualifiedForInterpolation( Class<?> cls )
         {
-            return !cls.getPackage().getName().startsWith( "java" );
+            return !cls.getPackage().getName().startsWith( "java" )
+                    && !cls.getPackage().getName().startsWith( "sun.nio.fs" );
         }
 
         private boolean isQualifiedForInterpolation( Field field, Class<?> fieldType )

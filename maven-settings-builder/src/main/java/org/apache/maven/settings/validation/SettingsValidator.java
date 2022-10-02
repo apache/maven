@@ -19,7 +19,7 @@ package org.apache.maven.settings.validation;
  * under the License.
  */
 
-import org.apache.maven.settings.Settings;
+import org.apache.maven.api.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblemCollector;
 
 /**

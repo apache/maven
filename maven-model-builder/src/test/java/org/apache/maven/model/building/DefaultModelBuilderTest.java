@@ -1,10 +1,5 @@
 package org.apache.maven.model.building;
 
-  import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.io.File;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -24,14 +19,19 @@ import java.io.File;
  * under the License.
  */
 
-import org.apache.maven.model.Dependency;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.Parent;
+import org.apache.maven.api.model.Repository;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
-import org.apache.maven.model.Repository;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.junit.jupiter.api.Test;
+import java.io.File;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * @author Guillaume Nodet
@@ -98,7 +98,7 @@ public class DefaultModelBuilderTest
     static class CycleInImportsResolver extends BaseModelResolver
     {
         @Override
-        public ModelSource resolveModel(Dependency dependency) throws UnresolvableModelException
+        public ModelSource resolveModel( org.apache.maven.model.Dependency dependency ) throws UnresolvableModelException
         {
             switch ( dependency.getManagementKey() )
             {
@@ -119,13 +119,13 @@ public class DefaultModelBuilderTest
         }
 
         @Override
-        public ModelSource resolveModel( Parent parent ) throws UnresolvableModelException
+        public ModelSource resolveModel( Parent parent, AtomicReference<Parent> modified ) throws UnresolvableModelException
         {
             return null;
         }
 
         @Override
-        public ModelSource resolveModel( Dependency dependency ) throws UnresolvableModelException
+        public ModelSource resolveModel( Dependency dependency, AtomicReference<Dependency> modified ) throws UnresolvableModelException
         {
             return null;
         }
@@ -144,6 +144,32 @@ public class DefaultModelBuilderTest
         public ModelResolver newCopy()
         {
             return this;
+        }
+
+        @Override
+        public ModelSource resolveModel( org.apache.maven.model.Parent parent ) throws UnresolvableModelException
+        {
+            return null;
+        }
+
+        @Override
+        public ModelSource resolveModel( org.apache.maven.model.Dependency dependency )
+                throws UnresolvableModelException
+        {
+            return null;
+        }
+
+        @Override
+        public void addRepository( org.apache.maven.model.Repository repository ) throws InvalidRepositoryException
+        {
+
+        }
+
+        @Override
+        public void addRepository( org.apache.maven.model.Repository repository, boolean replace )
+                throws InvalidRepositoryException
+        {
+
         }
     }
 

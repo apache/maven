@@ -19,9 +19,9 @@ package org.apache.maven.model.profile.activation;
  * under the License.
  */
 
-import org.apache.maven.model.Activation;
-import org.apache.maven.model.ActivationFile;
-import org.apache.maven.model.Profile;
+import org.apache.maven.api.model.Activation;
+import org.apache.maven.api.model.ActivationFile;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.model.path.DefaultPathTranslator;
 import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
@@ -100,26 +100,22 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
 
     private Profile newExistsProfile( String filePath )
     {
-        ActivationFile activationFile = new ActivationFile();
-        activationFile.setExists( filePath );
+        ActivationFile activationFile = ActivationFile.newBuilder()
+                .exists( filePath ).build();
         return newProfile( activationFile );
     }
 
     private Profile newMissingProfile( String filePath )
     {
-        ActivationFile activationFile = new ActivationFile();
-        activationFile.setMissing( filePath );
+        ActivationFile activationFile = ActivationFile.newBuilder()
+                .missing( filePath ).build();
         return newProfile( activationFile );
     }
 
     private Profile newProfile( ActivationFile activationFile )
     {
-        Activation activation = new Activation();
-        activation.setFile( activationFile );
-
-        Profile profile = new Profile();
-        profile.setActivation( activation );
-
-        return profile;
+        Activation activation = Activation.newBuilder()
+                .file( activationFile ).build();
+        return Profile.newBuilder().activation( activation ).build();
     }
 }

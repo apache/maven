@@ -259,6 +259,8 @@ public class ProjectSorterTest
 
         build.addPlugin( plugin );
 
+        declaringProject.getModel().setBuild( build );
+
         projects = new ProjectSorter( projects ).getSortedProjects();
 
         assertEquals( parentProject, projects.get( 0 ) );

@@ -90,7 +90,7 @@ public class EmptyLifecycleExecutor
         {
             PluginExecution pluginExecution = new PluginExecution();
             pluginExecution.setId( "default-" + goal );
-            pluginExecution.addGoal( goal );
+            pluginExecution.setGoals( Collections.singletonList( goal ) );
             plugin.addExecution( pluginExecution );
         }
 

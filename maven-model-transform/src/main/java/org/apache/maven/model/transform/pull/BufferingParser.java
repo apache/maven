@@ -25,6 +25,7 @@ import java.io.Reader;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -37,6 +38,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  */
 public class BufferingParser implements XmlPullParser
 {
+
+    private static final Pattern WHITESPACE_REGEX = Pattern.compile( "[ \r\t\n]+" );
 
     protected XmlPullParser xmlPullParser;
     protected Deque<Event> events;
@@ -200,7 +203,7 @@ public class BufferingParser implements XmlPullParser
         {
             if ( current.event == TEXT || current.event == CDSECT )
             {
-                return current.text.matches( "[ \r\t\n]+" );
+                return WHITESPACE_REGEX.matcher( current.text ).matches();
             }
             else if ( current.event == IGNORABLE_WHITESPACE )
             {

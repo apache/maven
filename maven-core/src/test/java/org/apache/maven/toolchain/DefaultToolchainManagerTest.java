@@ -45,7 +45,7 @@ import org.slf4j.Logger;
 
 public class DefaultToolchainManagerTest
 {
-     // Mocks to inject into toolchainManager
+    // Mocks to inject into toolchainManager
     @Mock
     private Logger logger;
 
@@ -131,7 +131,7 @@ public class DefaultToolchainManagerTest
 
     @Test
     public void testRequirements()
-        throws Exception
+            throws Exception
     {
         MavenSession session = mock( MavenSession.class );
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
@@ -145,7 +145,7 @@ public class DefaultToolchainManagerTest
         when( toolchainFactory_basicType.createToolchain( isA( ToolchainModel.class ) ) ).thenReturn( basicPrivate );
 
         List<Toolchain> toolchains =
-            toolchainManager.getToolchains( session, "basic", Collections.singletonMap( "key", "value" ) );
+                toolchainManager.getToolchains( session, "basic", Collections.singletonMap( "key", "value" ) );
 
         assertEquals( 1, toolchains.size() );
     }

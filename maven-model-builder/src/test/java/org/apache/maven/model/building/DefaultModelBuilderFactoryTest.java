@@ -23,8 +23,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Paths;
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.model.v4.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.jupiter.api.Test;
 
@@ -60,7 +61,8 @@ public class DefaultModelBuilderFactoryTest
         assertNotNull( result );
         assertNotNull( result.getEffectiveModel() );
         assertEquals( "activated", result.getEffectiveModel().getProperties().get( "profile.file" ) );
-        Xpp3Dom conf = (Xpp3Dom) result.getEffectiveModel().getBuild().getPlugins().get( 0 ).getConfiguration();
+        Xpp3Dom conf = ( Xpp3Dom ) result.getEffectiveModel().getBuild().getPlugins().get( 0 ).getConfiguration();
+        assertNotNull( conf );
         assertEquals( "1.5", conf.getChild( "source" ).getValue() );
         assertEquals( "  1.5  ", conf.getChild( "target" ).getValue() );
     }

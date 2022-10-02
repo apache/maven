@@ -27,17 +27,24 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.api.Project;
+import org.apache.maven.api.plugin.MojoException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
+import org.apache.maven.internal.impl.DefaultLog;
+import org.apache.maven.internal.impl.DefaultMojoExecution;
+import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.slf4j.LoggerFactory;
 
 // TODO the antrun plugin has its own configurator, the only plugin that does. might need to think about how that works
 // TODO remove the coreArtifactFilterManager
@@ -120,8 +127,21 @@ public class DefaultBuildPluginManager
         {
             scope.seed( MavenProject.class, project );
             scope.seed( MojoExecution.class, mojoExecution );
+            scope.seed( org.apache.maven.api.plugin.Log.class, new DefaultLog(
+                    LoggerFactory.getLogger( mojoExecution.getMojoDescriptor().getFullGoalName() ) ) );
+            scope.seed( Project.class, ( ( DefaultSession) session.getSession() ).getProject( project ) );
+            scope.seed( org.apache.maven.api.MojoExecution.class, new DefaultMojoExecution( mojoExecution ) );
 
-            mojo = mavenPluginManager.getConfiguredMojo( Mojo.class, session, mojoExecution );
+            if ( mojoDescriptor.isV4Api() )
+            {
+                org.apache.maven.api.plugin.Mojo mojoV4 = mavenPluginManager.getConfiguredMojo(
+                        org.apache.maven.api.plugin.Mojo.class, session, mojoExecution );
+                mojo = new MojoWrapper( mojoV4 );
+            }
+            else
+            {
+                mojo = mavenPluginManager.getConfiguredMojo( Mojo.class, session, mojoExecution );
+            }
 
             legacySupport.setSession( session );
 
@@ -131,11 +151,8 @@ public class DefaultBuildPluginManager
             try
             {
                 MojoExecutionEvent mojoExecutionEvent = new MojoExecutionEvent( session, project, mojoExecution, mojo );
-
                 mojoExecutionListener.beforeMojoExecution( mojoExecutionEvent );
-
                 mojo.execute();
-
                 mojoExecutionListener.afterMojoExecutionSuccess( mojoExecutionEvent );
             }
             catch ( ClassCastException e )
@@ -150,69 +167,56 @@ public class DefaultBuildPluginManager
         }
         catch ( PluginContainerException e )
         {
-            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
-                                                                                 e ) );
-
+            mojoExecutionListener.afterExecutionFailure(
+                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
             throw new PluginExecutionException( mojoExecution, project, e );
         }
         catch ( NoClassDefFoundError e )
         {
-            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
-                                                                                 e ) );
-
+            mojoExecutionListener.afterExecutionFailure(
+                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
             ps.println( "A required class was missing while executing " + mojoDescriptor.getId() + ": "
                 + e.getMessage() );
             pluginRealm.display( ps );
-
             Exception wrapper = new PluginContainerException( mojoDescriptor, pluginRealm, os.toString(), e );
-
             throw new PluginExecutionException( mojoExecution, project, wrapper );
         }
         catch ( LinkageError e )
         {
-            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
-                                                                                 e ) );
-
+            mojoExecutionListener.afterExecutionFailure(
+                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
             ps.println( "An API incompatibility was encountered while executing " + mojoDescriptor.getId() + ": "
                 + e.getClass().getName() + ": " + e.getMessage() );
             pluginRealm.display( ps );
-
             Exception wrapper = new PluginContainerException( mojoDescriptor, pluginRealm, os.toString(), e );
-
             throw new PluginExecutionException( mojoExecution, project, wrapper );
         }
         catch ( ClassCastException e )
         {
-            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
-                                                                                 e ) );
-
+            mojoExecutionListener.afterExecutionFailure(
+                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
             ps.println( "A type incompatibility occurred while executing " + mojoDescriptor.getId() + ": "
                 + e.getMessage() );
             pluginRealm.display( ps );
-
             throw new PluginExecutionException( mojoExecution, project, os.toString(), e );
         }
         catch ( RuntimeException e )
         {
-            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
-                                                                                 e ) );
-
+            mojoExecutionListener.afterExecutionFailure(
+                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
             throw e;
         }
         finally
         {
             mavenPluginManager.releaseMojo( mojo, mojoExecution );
-
             scope.exit();
-
             Thread.currentThread().setContextClassLoader( oldClassLoader );
-
             legacySupport.setSession( oldSession );
         }
     }
@@ -244,4 +248,37 @@ public class DefaultBuildPluginManager
         return mavenPluginManager.getMojoDescriptor( plugin, goal, repositories, session );
     }
 
+    private static class MojoWrapper implements Mojo
+    {
+        private final org.apache.maven.api.plugin.Mojo mojoV4;
+
+        MojoWrapper( org.apache.maven.api.plugin.Mojo mojoV4 )
+        {
+            this.mojoV4 = mojoV4;
+        }
+
+        @Override
+        public void execute() throws MojoExecutionException, MojoFailureException
+        {
+            try
+            {
+                mojoV4.execute();
+            }
+            catch ( MojoException e )
+            {
+                throw new MojoExecutionException( e.getMessage(), e );
+            }
+        }
+
+        @Override
+        public void setLog( Log log )
+        {
+        }
+
+        @Override
+        public Log getLog()
+        {
+            return null;
+        }
+    }
 }

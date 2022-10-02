@@ -30,8 +30,8 @@ import java.util.Objects;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.model.v4.MavenXpp3Writer;
 import org.codehaus.plexus.util.WriterFactory;
 
 /**
@@ -90,4 +90,23 @@ public class DefaultModelWriter
         }
     }
 
+    @Override
+    public void write( File output, Map<String, Object> options, org.apache.maven.model.Model model ) throws IOException
+    {
+        write( output, options, model.getDelegate() );
+    }
+
+    @Override
+    public void write( Writer output, Map<String, Object> options, org.apache.maven.model.Model model )
+            throws IOException
+    {
+        write( output, options, model.getDelegate() );
+    }
+
+    @Override
+    public void write( OutputStream output, Map<String, Object> options, org.apache.maven.model.Model model )
+            throws IOException
+    {
+        write( output, options, model.getDelegate() );
+    }
 }

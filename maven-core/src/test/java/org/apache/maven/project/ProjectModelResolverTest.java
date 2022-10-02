@@ -22,6 +22,7 @@ package org.apache.maven.project;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.model.Dependency;
@@ -69,7 +70,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
 
         UnresolvableModelException e = assertThrows(
                 UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel( parent ),
+                () -> newModelResolver().resolveModel( parent.getDelegate(), new AtomicReference<>() ),
                 "Expected 'UnresolvableModelException' not thrown." );
         assertNotNull( e.getMessage() );
         assertThat( e.getMessage(), startsWith( "Could not find artifact org.apache:apache:pom:0 in central" ) );
@@ -85,7 +86,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
 
         UnresolvableModelException e = assertThrows(
                 UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel( parent ),
+                () -> newModelResolver().resolveModel( parent.getDelegate(), new AtomicReference<>() ),
                 "Expected 'UnresolvableModelException' not thrown." );
         assertEquals( "No versions matched the requested parent version range '[2.0,2.1)'",
                       e.getMessage() );
@@ -101,7 +102,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
 
         UnresolvableModelException e = assertThrows(
                 UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel( parent ),
+                () -> newModelResolver().resolveModel( parent.getDelegate(), new AtomicReference<>() ),
                 "Expected 'UnresolvableModelException' not thrown." );
         assertEquals( "The requested parent version range '[1,)' does not specify an upper bound",
                       e.getMessage() );
@@ -115,7 +116,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         parent.setArtifactId( "apache" );
         parent.setVersion( "1" );
 
-        assertNotNull( this.newModelResolver().resolveModel( parent ) );
+        assertNotNull( this.newModelResolver().resolveModel( parent.getDelegate(), new AtomicReference<>() ) );
         assertEquals( "1", parent.getVersion() );
     }
 
@@ -127,8 +128,9 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         parent.setArtifactId( "apache" );
         parent.setVersion( "(,2.0)" );
 
-        assertNotNull( this.newModelResolver().resolveModel( parent ) );
-        assertEquals( "1", parent.getVersion() );
+        AtomicReference<org.apache.maven.api.model.Parent> modified = new AtomicReference<>();
+        assertNotNull( this.newModelResolver().resolveModel( parent.getDelegate(), modified ) );
+        assertEquals( "1", modified.get().getVersion() );
     }
 
     @Test
@@ -141,7 +143,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
 
         UnresolvableModelException e = assertThrows(
                 UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel( dependency ),
+                () -> newModelResolver().resolveModel( dependency.getDelegate(), new AtomicReference<>() ),
                 "Expected 'UnresolvableModelException' not thrown." );
         assertNotNull( e.getMessage() );
         assertThat( e.getMessage(), startsWith( "Could not find artifact org.apache:apache:pom:0 in central" ) );
@@ -157,7 +159,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
 
         UnresolvableModelException e = assertThrows(
                 UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel( dependency ),
+                () -> newModelResolver().resolveModel( dependency.getDelegate(), new AtomicReference<>() ),
                 "Expected 'UnresolvableModelException' not thrown." );
         assertEquals( "No versions matched the requested dependency version range '[2.0,2.1)'",
                       e.getMessage() );
@@ -173,7 +175,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
 
         UnresolvableModelException e = assertThrows(
                 UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel( dependency ),
+                () -> newModelResolver().resolveModel( dependency.getDelegate(), new AtomicReference<>() ),
                 "Expected 'UnresolvableModelException' not thrown." );
         assertEquals( "The requested dependency version range '[1,)' does not specify an upper bound",
                       e.getMessage() );
@@ -187,7 +189,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         dependency.setArtifactId( "apache" );
         dependency.setVersion( "1" );
 
-        assertNotNull( this.newModelResolver().resolveModel( dependency ) );
+        assertNotNull( this.newModelResolver().resolveModel( dependency.getDelegate(), new AtomicReference<>() ) );
         assertEquals( "1", dependency.getVersion() );
     }
 
@@ -199,8 +201,9 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         dependency.setArtifactId( "apache" );
         dependency.setVersion( "(,2.0)" );
 
-        assertNotNull( this.newModelResolver().resolveModel( dependency ) );
-        assertEquals( "1", dependency.getVersion() );
+        AtomicReference<org.apache.maven.api.model.Dependency> modified = new AtomicReference<>();
+        assertNotNull( this.newModelResolver().resolveModel( dependency.getDelegate(), modified ) );
+        assertEquals( "1", modified.get().getVersion() );
     }
 
     private ModelResolver newModelResolver() throws Exception

@@ -25,7 +25,7 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Map;
 
-import org.apache.maven.settings.Settings;
+import org.apache.maven.api.settings.Settings;
 
 /**
  * Handles serialization of settings into some kind of textual format like XML.

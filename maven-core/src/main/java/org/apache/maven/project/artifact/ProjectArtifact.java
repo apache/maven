@@ -53,12 +53,12 @@ public class ProjectArtifact
 
     public List<Dependency> getDependencies()
     {
-        return project.getDependencies();
+        return project.getModel().getDependencies();
     }
 
     public List<Dependency> getManagedDependencies()
     {
-        DependencyManagement depMngt = project.getDependencyManagement();
+        DependencyManagement depMngt = project.getModel().getDependencyManagement();
         return ( depMngt != null )
                    ? Collections.unmodifiableList( depMngt.getDependencies() )
                    : Collections.emptyList();

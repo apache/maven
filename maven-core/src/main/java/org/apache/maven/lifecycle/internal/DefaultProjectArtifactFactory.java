@@ -50,7 +50,8 @@ public class DefaultProjectArtifactFactory
     public Set<Artifact> createArtifacts( MavenProject project )
         throws InvalidDependencyVersionException
     {
-        return MavenMetadataSource.createArtifacts( artifactFactory, project.getDependencies(), null, null, project );
+        return MavenMetadataSource.createArtifacts( artifactFactory,
+                project.getDependencies(), null, null, project );
     }
 
 }

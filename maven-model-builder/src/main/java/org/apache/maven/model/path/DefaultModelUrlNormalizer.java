@@ -38,7 +38,7 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 @Named
 @Singleton
 public class DefaultModelUrlNormalizer
-    implements ModelUrlNormalizer
+        implements ModelUrlNormalizer
 {
 
     private final UrlNormalizer urlNormalizer;

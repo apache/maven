@@ -25,7 +25,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 
-import org.apache.maven.toolchain.model.PersistedToolchains;
+import org.apache.maven.api.toolchain.PersistedToolchains;
 
 /**
  * Handles deserialization of toolchains from some kind of textual format like XML.

@@ -30,7 +30,7 @@ class DefaultModelBuildingEvent
     implements ModelBuildingEvent
 {
 
-    private final Model model;
+    private Model model;
 
     private final ModelBuildingRequest request;
 

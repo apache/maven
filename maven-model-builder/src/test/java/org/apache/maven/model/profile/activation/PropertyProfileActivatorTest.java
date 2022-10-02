@@ -21,9 +21,9 @@ package org.apache.maven.model.profile.activation;
 
 import java.util.Properties;
 
-import org.apache.maven.model.Activation;
-import org.apache.maven.model.ActivationProperty;
-import org.apache.maven.model.Profile;
+import org.apache.maven.api.model.Activation;
+import org.apache.maven.api.model.ActivationProperty;
+import org.apache.maven.api.model.Profile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -45,15 +45,14 @@ public class PropertyProfileActivatorTest
 
     private Profile newProfile(String key, String value )
     {
-        ActivationProperty ap = new ActivationProperty();
-        ap.setName( key );
-        ap.setValue( value );
+        ActivationProperty ap = ActivationProperty.newBuilder()
+                .name( key )
+                .value( value )
+                .build();
 
-        Activation a = new Activation();
-        a.setProperty( ap );
+        Activation a = Activation.newBuilder().property( ap ).build();
 
-        Profile p = new Profile();
-        p.setActivation( a );
+        Profile p = Profile.newBuilder().activation( a ).build();
 
         return p;
     }
@@ -69,11 +68,11 @@ public class PropertyProfileActivatorTest
     public void testNullSafe()
         throws Exception
     {
-        Profile p = new Profile();
+        Profile p = Profile.newInstance();
 
         assertActivation( false, p, newContext( null, null ) );
 
-        p.setActivation( new Activation() );
+        p = p.withActivation( Activation.newInstance() );
 
         assertActivation( false, p, newContext( null, null ) );
     }

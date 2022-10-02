@@ -61,13 +61,23 @@ under the License.
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
+        <version>2.0.0</version>
+        <!--
         <configuration>
           <models>
             <model>src/main/mdo/lifecycle.mdo</model>
           </models>
           <version>1.0.0</version>
+          <domAsCustom>true</domAsCustom>
+          <domAsCustomInterface>org.apache.maven.api.xml.Dom</domAsCustomInterface>
+          <domAsCustomBuilder>org.apache.maven.internal.xml.DomBuilder</domAsCustomBuilder>
         </configuration>
+        -->
         <executions>
+          <execution>
+            <id>modello</id>
+            <phase>none</phase>
+          </execution>
           <execution>
             <id>modello-site-doc</id>
             <phase>pre-site</phase>
@@ -78,6 +88,36 @@ under the License.
               <models>
                 <model>src/main/mdo/plugin.mdo</model>
               </models>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>modello-plugin-velocity</artifactId>
+        <version>4.0.0-alpha-1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>velocity</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>velocity</goal>
+            </goals>
+            <configuration>
+              <version>1.0.0</version>
+              <models>
+                <model>src/main/mdo/lifecycle.mdo</model>
+              </models>
+              <templates>
+                <template>src/main/mdo/model.vm</template>
+                <template>src/main/mdo/reader.vm</template>
+                <template>src/main/mdo/writer.vm</template>
+              </templates>
+              <params>
+                <param>packageModelV3=org.apache.maven.plugin.lifecycle</param>
+                <param>packageModelV4=org.apache.maven.plugin.lifecycle</param>
+                <param>packageToolV4=org.apache.maven.plugin.lifecycle.io.xpp3</param>
+              </params>
             </configuration>
           </execution>
         </executions>

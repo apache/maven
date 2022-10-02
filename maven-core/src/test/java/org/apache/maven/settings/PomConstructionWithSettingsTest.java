@@ -112,7 +112,7 @@ public class PomConstructionWithSettingsTest
 
         for ( org.apache.maven.settings.Profile rawProfile : settings.getProfiles() )
         {
-            Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile );
+            Profile profile = SettingsUtils.convertFromSettingsProfile( rawProfile.getDelegate() );
             config.addProfile( profile );
         }
 

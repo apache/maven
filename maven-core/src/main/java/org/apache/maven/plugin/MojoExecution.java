@@ -23,9 +23,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.xml.Dom;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * MojoExecution
@@ -41,7 +41,7 @@ public class MojoExecution
 
     private MojoDescriptor mojoDescriptor;
 
-    private Xpp3Dom configuration;
+    private org.codehaus.plexus.util.xml.Xpp3Dom configuration;
 
     /**
      * Describes the source of an execution.
@@ -103,10 +103,17 @@ public class MojoExecution
         this.configuration = null;
     }
 
-    public MojoExecution( MojoDescriptor mojoDescriptor, Xpp3Dom configuration )
+    public MojoExecution( MojoDescriptor mojoDescriptor, org.codehaus.plexus.util.xml.Xpp3Dom configuration )
     {
         this.mojoDescriptor = mojoDescriptor;
         this.configuration = configuration;
+        this.executionId = null;
+    }
+
+    public MojoExecution( MojoDescriptor mojoDescriptor, Dom configuration )
+    {
+        this.mojoDescriptor = mojoDescriptor;
+        this.configuration = new org.codehaus.plexus.util.xml.Xpp3Dom( configuration );
         this.executionId = null;
     }
 
@@ -140,14 +147,19 @@ public class MojoExecution
         return mojoDescriptor;
     }
 
-    public Xpp3Dom getConfiguration()
+    public org.codehaus.plexus.util.xml.Xpp3Dom getConfiguration()
     {
         return configuration;
     }
 
-    public void setConfiguration( Xpp3Dom configuration )
+    public void setConfiguration( org.codehaus.plexus.util.xml.Xpp3Dom configuration )
     {
         this.configuration = configuration;
+    }
+
+    public void setConfiguration( Dom configuration )
+    {
+        this.configuration = configuration != null ? new org.codehaus.plexus.util.xml.Xpp3Dom( configuration ) : null;
     }
 
     public String identify()

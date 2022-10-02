@@ -41,7 +41,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 @Named
 @Singleton
 public class DefaultPluginConfigurationExpander
-    implements PluginConfigurationExpander
+        implements PluginConfigurationExpander
 {
 
     @Override
@@ -75,7 +75,7 @@ public class DefaultPluginConfigurationExpander
                     Xpp3Dom executionConfiguration = (Xpp3Dom) execution.getConfiguration();
 
                     executionConfiguration =
-                        Xpp3Dom.mergeXpp3Dom( executionConfiguration, new Xpp3Dom( pluginConfiguration ) );
+                            Xpp3Dom.mergeXpp3Dom( executionConfiguration, new Xpp3Dom( pluginConfiguration ) );
 
                     execution.setConfiguration( executionConfiguration );
                 }

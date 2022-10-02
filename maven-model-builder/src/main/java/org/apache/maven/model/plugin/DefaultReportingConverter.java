@@ -48,12 +48,12 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 @Named
 @Singleton
 public class DefaultReportingConverter
-    implements ReportingConverter
+        implements ReportingConverter
 {
     private final InputLocation location;
     {
         String modelId = "org.apache.maven:maven-model-builder:"
-            + this.getClass().getPackage().getImplementationVersion() + ":reporting-converter";
+                + this.getClass().getPackage().getImplementationVersion() + ":reporting-converter";
         InputSource inputSource = new InputSource();
         inputSource.setModelId( modelId );
         location = new InputLocation( -1, -1, inputSource );
@@ -111,7 +111,7 @@ public class DefaultReportingConverter
             // in favor of classical reporting section MSITE-647 / MSITE-684
             problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.BASE )
                     .setMessage( "Reporting configuration should be done in <reporting> section, "
-                          + "not in maven-site-plugin <configuration> as reportPlugins parameter." )
+                            + "not in maven-site-plugin <configuration> as reportPlugins parameter." )
                     .setLocation( sitePlugin.getLocation( "configuration" ) ) );
             return;
         }
@@ -144,8 +144,8 @@ public class DefaultReportingConverter
             reportPlugins.addChild( reportPlugin );
 
             if ( !reporting.isExcludeDefaults() && !hasMavenProjectInfoReportsPlugin
-                && "org.apache.maven.plugins".equals( plugin.getGroupId() )
-                && "maven-project-info-reports-plugin".equals( plugin.getArtifactId() ) )
+                    && "org.apache.maven.plugins".equals( plugin.getGroupId() )
+                    && "maven-project-info-reports-plugin".equals( plugin.getArtifactId() ) )
             {
                 hasMavenProjectInfoReportsPlugin = true;
             }
@@ -190,7 +190,7 @@ public class DefaultReportingConverter
     private boolean isSitePlugin( Plugin plugin )
     {
         return "maven-site-plugin".equals( plugin.getArtifactId() )
-            && "org.apache.maven.plugins".equals( plugin.getGroupId() );
+                && "org.apache.maven.plugins".equals( plugin.getGroupId() );
     }
 
     private Xpp3Dom convert( ReportPlugin plugin )

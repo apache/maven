@@ -80,7 +80,11 @@ public class ModelProblemUtils
         {
             return "";
         }
+        return toId( model.getDelegate() );
+    }
 
+    static String toId( org.apache.maven.api.model.Model model )
+    {
         String groupId = model.getGroupId();
         if ( groupId == null && model.getParent() != null )
         {

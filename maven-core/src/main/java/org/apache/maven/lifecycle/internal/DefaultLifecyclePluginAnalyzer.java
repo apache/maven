@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import org.apache.maven.api.xml.Dom;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
 import org.apache.maven.lifecycle.Lifecycle;
@@ -221,13 +222,16 @@ public class DefaultLifecyclePluginAnalyzer
                 execution.setLocation( "phase", location );
                 execution.setLocation( "goals", location );
 
-                Xpp3Dom lifecycleConfiguration = mojo.getConfiguration();
+                Dom lifecycleConfiguration = mojo.getConfiguration();
                 if ( lifecycleConfiguration != null )
                 {
                     execution.setConfiguration( new Xpp3Dom( lifecycleConfiguration ) );
                 }
 
-                plugin.setDependencies( mojo.getDependencies() );
+                if ( mojo.getDependencies() != null )
+                {
+                    plugin.setDependencies( mojo.getDependencies() );
+                }
                 plugin.getExecutions().add( execution );
             }
         }

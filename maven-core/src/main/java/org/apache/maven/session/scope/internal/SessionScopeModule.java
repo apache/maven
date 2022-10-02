@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.maven.SessionScoped;
+import org.apache.maven.api.Session;
 import org.apache.maven.execution.MavenSession;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -62,5 +63,6 @@ public class SessionScopeModule
         bind( SessionScope.class ).toInstance( scope );
 
         bind( MavenSession.class ).toProvider( SessionScope.seededKeyProvider() ).in( scope );
+        bind( Session.class ).toProvider( SessionScope.seededKeyProvider() ).in( scope );
     }
 }

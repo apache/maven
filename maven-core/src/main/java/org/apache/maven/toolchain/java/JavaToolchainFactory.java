@@ -92,8 +92,8 @@ public class JavaToolchainFactory
         }
 
         // populate the configuration section
-        Xpp3Dom dom = (Xpp3Dom) model.getConfiguration();
-        Xpp3Dom javahome = dom.getChild( JavaToolchainImpl.KEY_JAVAHOME );
+        Xpp3Dom dom = ( Xpp3Dom ) model.getConfiguration();
+        Xpp3Dom javahome = dom != null ? dom.getChild( JavaToolchainImpl.KEY_JAVAHOME ) : null;
         if ( javahome == null )
         {
             throw new MisconfiguredToolchainException( "Java toolchain without the "

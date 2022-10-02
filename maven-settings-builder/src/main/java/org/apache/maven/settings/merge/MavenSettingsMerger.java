@@ -20,12 +20,16 @@ package org.apache.maven.settings.merge;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.apache.maven.settings.IdentifiableBase;
-import org.apache.maven.settings.Settings;
+import org.apache.maven.api.settings.IdentifiableBase;
+import org.apache.maven.api.settings.Settings;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -40,66 +44,47 @@ public class MavenSettingsMerger
      * @param recessive
      * @param recessiveSourceLevel
      */
-    public void merge( Settings dominant, Settings recessive, String recessiveSourceLevel )
+    public Settings merge( Settings dominant, Settings recessive, String recessiveSourceLevel )
     {
-        if ( dominant == null || recessive == null )
+        if ( dominant == null )
         {
-            return;
+            return recessive;
+        }
+        else if ( recessive == null )
+        {
+            return dominant;
         }
 
         recessive.setSourceLevel( recessiveSourceLevel );
 
+        Settings.Builder merged = Settings.newBuilder( dominant );
+
         List<String> dominantActiveProfiles = dominant.getActiveProfiles();
         List<String> recessiveActiveProfiles = recessive.getActiveProfiles();
-
-        if ( recessiveActiveProfiles != null )
-        {
-            if ( dominantActiveProfiles == null )
-            {
-                dominantActiveProfiles = new ArrayList<>();
-                dominant.setActiveProfiles( dominantActiveProfiles );
-            }
-
-            for ( String profileId : recessiveActiveProfiles )
-            {
-                if ( !dominantActiveProfiles.contains( profileId ) )
-                {
-                    dominantActiveProfiles.add( profileId );
-                }
-            }
-        }
+        List<String> mergedActiveProfiles = Stream.of( dominantActiveProfiles, recessiveActiveProfiles )
+                    .flatMap( Collection::stream )
+                    .distinct()
+                    .collect( Collectors.toList() );
+        merged.activeProfiles( mergedActiveProfiles );
 
         List<String> dominantPluginGroupIds = dominant.getPluginGroups();
-
         List<String> recessivePluginGroupIds = recessive.getPluginGroups();
+        List<String> mergedPluginGroupIds = Stream.of( dominantPluginGroupIds, recessivePluginGroupIds )
+                .flatMap( Collection::stream )
+                .distinct()
+                .collect( Collectors.toList() );
+        merged.pluginGroups( mergedPluginGroupIds );
 
-        if ( recessivePluginGroupIds != null )
-        {
-            if ( dominantPluginGroupIds == null )
-            {
-                dominantPluginGroupIds = new ArrayList<>();
-                dominant.setPluginGroups( dominantPluginGroupIds );
-            }
+        String localRepository = StringUtils.isEmpty( dominant.getLocalRepository() )
+                ? recessive.getLocalRepository() : dominant.getLocalRepository();
+        merged.localRepository( localRepository );
 
-            for ( String pluginGroupId : recessivePluginGroupIds )
-            {
-                if ( !dominantPluginGroupIds.contains( pluginGroupId ) )
-                {
-                    dominantPluginGroupIds.add( pluginGroupId );
-                }
-            }
-        }
+        merged.mirrors( shallowMergeById( dominant.getMirrors(), recessive.getMirrors(), recessiveSourceLevel ) );
+        merged.servers( shallowMergeById( dominant.getServers(), recessive.getServers(), recessiveSourceLevel ) );
+        merged.proxies( shallowMergeById( dominant.getProxies(), recessive.getProxies(), recessiveSourceLevel ) );
+        merged.profiles( shallowMergeById( dominant.getProfiles(), recessive.getProfiles(), recessiveSourceLevel ) );
 
-        if ( StringUtils.isEmpty( dominant.getLocalRepository() ) )
-        {
-            dominant.setLocalRepository( recessive.getLocalRepository() );
-        }
-
-        shallowMergeById( dominant.getMirrors(), recessive.getMirrors(), recessiveSourceLevel );
-        shallowMergeById( dominant.getServers(), recessive.getServers(), recessiveSourceLevel );
-        shallowMergeById( dominant.getProxies(), recessive.getProxies(), recessiveSourceLevel );
-        shallowMergeById( dominant.getProfiles(), recessive.getProfiles(), recessiveSourceLevel );
-
+        return merged.build();
     }
 
     /**
@@ -107,23 +92,21 @@ public class MavenSettingsMerger
      * @param recessive
      * @param recessiveSourceLevel
      */
-    private static <T extends IdentifiableBase> void shallowMergeById( List<T> dominant, List<T> recessive,
-                                                                       String recessiveSourceLevel )
+    private static <T extends IdentifiableBase> List<T> shallowMergeById(
+            List<T> dominant, List<T> recessive, String recessiveSourceLevel )
     {
-        Map<String, T> dominantById = mapById( dominant );
-        final List<T> identifiables = new ArrayList<>( recessive.size() );
-
+        Set<String> dominantIds = dominant.stream().map( IdentifiableBase::getId ).collect( Collectors.toSet() );
+        final List<T> merged = new ArrayList<>( dominant.size() + recessive.size() );
+        merged.addAll( dominant );
         for ( T identifiable : recessive )
         {
-            if ( !dominantById.containsKey( identifiable.getId() ) )
+            if ( !dominantIds.contains( identifiable.getId() ) )
             {
                 identifiable.setSourceLevel( recessiveSourceLevel );
-
-                identifiables.add( identifiable );
+                merged.add( identifiable );
             }
         }
-
-        dominant.addAll( 0, identifiables );
+        return merged;
     }
 
     /**

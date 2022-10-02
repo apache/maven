@@ -19,15 +19,14 @@ package org.apache.maven.project.harness;
  * under the License.
  */
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.model.NodeIterator;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.apache.maven.internal.xml.Xpp3Dom;
 
 /**
  * An attribute iterator for JXPath to support <code>Xpp3Dom</code>.
@@ -35,7 +34,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * @author Benjamin Bentmann
  */
 class Xpp3DomAttributeIterator
-    implements NodeIterator
+        implements NodeIterator
 {
 
     private NodePointer parent;
@@ -53,16 +52,9 @@ class Xpp3DomAttributeIterator
         this.parent = parent;
         this.node = (Xpp3Dom) parent.getNode();
 
-        Map<String, String> map = new LinkedHashMap<>();
-        for ( String name : this.node.getAttributeNames() )
-        {
-            if ( name.equals( qname.getName() ) || "*".equals( qname.getName() ) )
-            {
-                String value = this.node.getAttribute( name );
-                map.put( name, value );
-            }
-        }
-        this.attributes = new ArrayList<>( map.entrySet() );
+        this.attributes = this.node.getAttributes().entrySet().stream()
+                .filter( a -> a.getKey().equals( qname.getName() ) || "*".equals( qname.getName() ) )
+                .collect( Collectors.toList() );
     }
 
     public NodePointer getNodePointer()

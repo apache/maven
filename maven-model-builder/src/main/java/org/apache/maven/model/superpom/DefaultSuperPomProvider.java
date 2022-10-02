@@ -28,8 +28,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.model.InputSource;
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.InputSource;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.ModelProcessor;
 
 /**
@@ -78,9 +78,8 @@ public class DefaultSuperPomProvider
 
                 String modelId = "org.apache.maven:maven-model-builder:"
                     + this.getClass().getPackage().getImplementationVersion() + ":super-pom";
-                InputSource inputSource = new InputSource();
-                inputSource.setModelId( modelId );
-                inputSource.setLocation( getClass().getResource( resource ).toExternalForm() );
+                InputSource inputSource = new InputSource(
+                        modelId, getClass().getResource( resource ).toExternalForm() );
                 options.put( ModelProcessor.INPUT_SOURCE, inputSource );
 
                 superModel = modelProcessor.read( is, options );

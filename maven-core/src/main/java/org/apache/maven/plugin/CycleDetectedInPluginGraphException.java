@@ -19,7 +19,7 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
-import org.apache.maven.model.Plugin;
+import org.apache.maven.api.model.Plugin;
 import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
 
 /**

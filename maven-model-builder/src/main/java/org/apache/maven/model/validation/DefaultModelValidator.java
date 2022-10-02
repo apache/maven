@@ -19,33 +19,9 @@ package org.apache.maven.model.validation;
  * under the License.
  */
 
-import org.apache.maven.model.Activation;
-import org.apache.maven.model.ActivationFile;
-import org.apache.maven.model.Build;
-import org.apache.maven.model.BuildBase;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.model.Exclusion;
-import org.apache.maven.model.InputLocation;
-import org.apache.maven.model.InputLocationTracker;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
-import org.apache.maven.model.PluginManagement;
-import org.apache.maven.model.Profile;
-import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.model.Reporting;
-import org.apache.maven.model.Repository;
-import org.apache.maven.model.Resource;
-import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelProblem.Severity;
-import org.apache.maven.model.building.ModelProblem.Version;
-import org.apache.maven.model.building.ModelProblemCollector;
-import org.apache.maven.model.building.ModelProblemCollectorRequest;
-import org.apache.maven.model.interpolation.ModelVersionProcessor;
-import org.codehaus.plexus.util.StringUtils;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.util.Arrays;
@@ -58,9 +34,33 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import org.apache.maven.api.model.Activation;
+import org.apache.maven.api.model.ActivationFile;
+import org.apache.maven.api.model.Build;
+import org.apache.maven.api.model.BuildBase;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
+import org.apache.maven.api.model.DistributionManagement;
+import org.apache.maven.api.model.Exclusion;
+import org.apache.maven.api.model.InputLocation;
+import org.apache.maven.api.model.InputLocationTracker;
+import org.apache.maven.api.model.Parent;
+import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.model.PluginExecution;
+import org.apache.maven.api.model.PluginManagement;
+import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.model.ReportPlugin;
+import org.apache.maven.api.model.Reporting;
+import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.model.Resource;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblem.Severity;
+import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblemCollectorRequest;
+import org.apache.maven.model.interpolation.ModelVersionProcessor;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -94,8 +94,11 @@ public class DefaultModelValidator
     }
 
     @Override
-    public void validateFileModel( Model m, ModelBuildingRequest request, ModelProblemCollector problems )
+    public void validateFileModel( Model ma, ModelBuildingRequest request, ModelProblemCollector problems )
     {
+
+        org.apache.maven.api.model.Model m = ma.getDelegate();
+
         Parent parent = m.getParent();
         if ( parent != null )
         {
@@ -239,8 +242,10 @@ public class DefaultModelValidator
     }
 
     @Override
-    public void validateRawModel( Model m, ModelBuildingRequest request, ModelProblemCollector problems )
+    public void validateRawModel( Model ma, ModelBuildingRequest request, ModelProblemCollector problems )
     {
+        org.apache.maven.api.model.Model m = ma.getDelegate();
+
         Parent parent = m.getParent();
 
         if ( parent != null )
@@ -360,8 +365,10 @@ public class DefaultModelValidator
     }
 
     @Override
-    public void validateEffectiveModel( Model m, ModelBuildingRequest request, ModelProblemCollector problems )
+    public void validateEffectiveModel( Model ma, ModelBuildingRequest request, ModelProblemCollector problems )
     {
+        org.apache.maven.api.model.Model m = ma.getDelegate();
+
         validateStringNotEmpty( "modelVersion", problems, Severity.ERROR, Version.BASE, m.getModelVersion(), m );
 
         validateCoordinateId( "groupId", problems, m.getGroupId(), m );
@@ -563,7 +570,8 @@ public class DefaultModelValidator
         }
     }
 
-    private void validate20RawDependenciesSelfReferencing( ModelProblemCollector problems, Model m,
+    private void validate20RawDependenciesSelfReferencing( ModelProblemCollector problems,
+                                                           org.apache.maven.api.model.Model m,
                                                            List<Dependency> dependencies, String prefix,
                                                            ModelBuildingRequest request )
     {
@@ -589,7 +597,8 @@ public class DefaultModelValidator
         }
     }
 
-    private void validateEffectiveDependencies( ModelProblemCollector problems, Model m, List<Dependency> dependencies,
+    private void validateEffectiveDependencies( ModelProblemCollector problems, org.apache.maven.api.model.Model m,
+                                                List<Dependency> dependencies,
                                                 boolean management, ModelBuildingRequest request )
     {
         Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
@@ -629,7 +638,8 @@ public class DefaultModelValidator
         }
     }
 
-    private void validateEffectiveModelAgainstDependency( String prefix, ModelProblemCollector problems, Model m,
+    private void validateEffectiveModelAgainstDependency( String prefix, ModelProblemCollector problems,
+                                                          org.apache.maven.api.model.Model m,
                                                           Dependency d, ModelBuildingRequest request )
     {
         String key = d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion()
@@ -1357,13 +1367,11 @@ public class DefaultModelValidator
 
         buffer.append( ' ' ).append( message );
 
-        // CHECKSTYLE_OFF: LineLength
-        problems.add( new ModelProblemCollectorRequest( severity, version ).setMessage(
-                                                                                        buffer.toString() ).setLocation( getLocation( fieldName, tracker ) ) );
-        // CHECKSTYLE_ON: LineLength
+        problems.add( new ModelProblemCollectorRequest( severity, version )
+                .setMessage( buffer.toString() ).setLocation( getLocation( fieldName, tracker ) ) );
     }
 
-    private static InputLocation getLocation( String fieldName, InputLocationTracker tracker )
+    private static org.apache.maven.model.InputLocation getLocation( String fieldName, InputLocationTracker tracker )
     {
         InputLocation location = null;
 
@@ -1402,7 +1410,7 @@ public class DefaultModelValidator
             }
         }
 
-        return location;
+        return location != null ? new org.apache.maven.model.InputLocation( location ) : null;
     }
 
     private static boolean equals( String s1, String s2 )

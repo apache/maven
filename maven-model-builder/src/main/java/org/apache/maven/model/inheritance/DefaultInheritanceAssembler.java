@@ -29,13 +29,13 @@ import java.util.Properties;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.model.InputLocation;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.ModelBase;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginContainer;
-import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.model.Reporting;
+import org.apache.maven.api.model.InputLocation;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.ModelBase;
+import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.model.PluginContainer;
+import org.apache.maven.api.model.ReportPlugin;
+import org.apache.maven.api.model.Reporting;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
@@ -60,14 +60,14 @@ public class DefaultInheritanceAssembler
     private static final String CHILD_DIRECTORY_PROPERTY = "project.directory";
 
     @Override
-    public void assembleModelInheritance( Model child, Model parent, ModelBuildingRequest request,
+    public Model assembleModelInheritance( Model child, Model parent, ModelBuildingRequest request,
                                           ModelProblemCollector problems )
     {
         Map<Object, Object> hints = new HashMap<>();
         String childPath = child.getProperties().getProperty( CHILD_DIRECTORY_PROPERTY, child.getArtifactId() );
         hints.put( CHILD_DIRECTORY, childPath );
         hints.put( MavenModelMerger.CHILD_PATH_ADJUSTMENT, getChildPathAdjustment( child, parent, childPath ) );
-        merger.merge( child, parent, false, hints );
+        return merger.merge( child, parent, false, hints );
     }
 
     /**
@@ -106,7 +106,7 @@ public class DefaultInheritanceAssembler
              */
             if ( child.getProjectDirectory() != null )
             {
-                childName = child.getProjectDirectory().getName();
+                childName = child.getProjectDirectory().getFileName().toString();
             }
 
             for ( String module : parent.getModules() )
@@ -206,7 +206,8 @@ public class DefaultInheritanceAssembler
         }
 
         @Override
-        protected void mergeModelBase_Properties( ModelBase target, ModelBase source, boolean sourceDominant,
+        protected void mergeModelBase_Properties( ModelBase.Builder builder,
+                                                  ModelBase target, ModelBase source, boolean sourceDominant,
                                                   Map<Object, Object> context )
         {
             Properties merged = new Properties();
@@ -220,8 +221,8 @@ public class DefaultInheritanceAssembler
                 putAll( merged, source.getProperties(), CHILD_DIRECTORY_PROPERTY );
                 merged.putAll( target.getProperties() );
             }
-            target.setProperties( merged );
-            target.setLocation( "properties",
+            builder.properties( merged );
+            builder.location( "properties",
                                 InputLocation.merge( target.getLocation( "properties" ),
                                                      source.getLocation( "properties" ), sourceDominant ) );
         }
@@ -238,7 +239,8 @@ public class DefaultInheritanceAssembler
         }
 
         @Override
-        protected void mergePluginContainer_Plugins( PluginContainer target, PluginContainer source,
+        protected void mergePluginContainer_Plugins( PluginContainer.Builder builder,
+                                                     PluginContainer target, PluginContainer source,
                                                      boolean sourceDominant, Map<Object, Object> context )
         {
             List<Plugin> src = source.getPlugins();
@@ -252,12 +254,10 @@ public class DefaultInheritanceAssembler
                     if ( element.isInherited() || !element.getExecutions().isEmpty() )
                     {
                         // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions
-                        Plugin plugin = new Plugin();
-                        plugin.setLocation( "", element.getLocation( "" ) );
-                        plugin.setGroupId( null );
-                        mergePlugin( plugin, element, sourceDominant, context );
+                        Plugin plugin = Plugin.newInstance( false );
+                        plugin = mergePlugin( plugin, element, sourceDominant, context );
 
-                        Object key = getPluginKey().apply( element );
+                        Object key = getPluginKey().apply( plugin );
 
                         master.put( key, plugin );
                     }
@@ -271,7 +271,7 @@ public class DefaultInheritanceAssembler
                     Plugin existing = master.get( key );
                     if ( existing != null )
                     {
-                        mergePlugin( element, existing, sourceDominant, context );
+                        element = mergePlugin( element, existing, sourceDominant, context );
 
                         master.put( key, element );
 
@@ -299,27 +299,31 @@ public class DefaultInheritanceAssembler
                 }
                 result.addAll( pending );
 
-                target.setPlugins( result );
+                builder.plugins( result );
             }
         }
 
         @Override
-        protected void mergePlugin( Plugin target, Plugin source, boolean sourceDominant, Map<Object, Object> context )
+        protected Plugin mergePlugin( Plugin target, Plugin source,
+                                      boolean sourceDominant, Map<Object, Object> context )
         {
+            Plugin.Builder builder = Plugin.newBuilder( target );
             if ( source.isInherited() )
             {
-                mergeConfigurationContainer( target, source, sourceDominant, context );
+                mergeConfigurationContainer( builder, target, source, sourceDominant, context );
             }
-            mergePlugin_GroupId( target, source, sourceDominant, context );
-            mergePlugin_ArtifactId( target, source, sourceDominant, context );
-            mergePlugin_Version( target, source, sourceDominant, context );
-            mergePlugin_Extensions( target, source, sourceDominant, context );
-            mergePlugin_Dependencies( target, source, sourceDominant, context );
-            mergePlugin_Executions( target, source, sourceDominant, context );
+            mergePlugin_GroupId( builder, target, source, sourceDominant, context );
+            mergePlugin_ArtifactId( builder, target, source, sourceDominant, context );
+            mergePlugin_Version( builder, target, source, sourceDominant, context );
+            mergePlugin_Extensions( builder, target, source, sourceDominant, context );
+            mergePlugin_Executions( builder, target, source, sourceDominant, context );
+            mergePlugin_Dependencies( builder, target, source, sourceDominant, context );
+            return builder.build();
         }
 
         @Override
-        protected void mergeReporting_Plugins( Reporting target, Reporting source, boolean sourceDominant,
+        protected void mergeReporting_Plugins( Reporting.Builder builder,
+                                               Reporting target, Reporting source, boolean sourceDominant,
                                                Map<Object, Object> context )
         {
             List<ReportPlugin> src = source.getPlugins();
@@ -331,16 +335,13 @@ public class DefaultInheritanceAssembler
 
                 for ( ReportPlugin element :  src )
                 {
-                    Object key = getReportPluginKey().apply( element );
                     if ( element.isInherited() )
                     {
                         // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions as well
-                        ReportPlugin plugin = new ReportPlugin();
-                        plugin.setLocation( "", element.getLocation( "" ) );
-                        plugin.setGroupId( null );
-                        mergeReportPlugin( plugin, element, sourceDominant, context );
+                        ReportPlugin plugin = ReportPlugin.newInstance();
+                        plugin = mergeReportPlugin( plugin, element, sourceDominant, context );
 
-                        merged.put( key, plugin );
+                        merged.put( getReportPluginKey().apply( element ), plugin );
                     }
                 }
 
@@ -350,12 +351,12 @@ public class DefaultInheritanceAssembler
                     ReportPlugin existing = merged.get( key );
                     if ( existing != null )
                     {
-                        mergeReportPlugin( element, existing, sourceDominant, context );
+                        element = mergeReportPlugin( element, existing, sourceDominant, context );
                     }
                     merged.put( key, element );
                 }
 
-                target.setPlugins( new ArrayList<>( merged.values() ) );
+                builder.plugins( merged.values() );
             }
         }
     }

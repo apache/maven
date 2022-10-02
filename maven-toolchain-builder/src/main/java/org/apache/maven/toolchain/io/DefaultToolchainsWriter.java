@@ -19,8 +19,8 @@ package org.apache.maven.toolchain.io;
  * under the License.
  */
 
-import org.apache.maven.toolchain.model.PersistedToolchains;
-import org.apache.maven.toolchain.model.io.xpp3.MavenToolchainsXpp3Writer;
+import org.apache.maven.api.toolchain.PersistedToolchains;
+import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Writer;
 
 import javax.inject.Named;
 import javax.inject.Singleton;

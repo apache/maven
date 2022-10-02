@@ -24,6 +24,7 @@ import static org.apache.maven.model.building.Result.newResult;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.InputLocation;
-import org.apache.maven.model.InputSource;
+import org.apache.maven.api.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
@@ -67,11 +68,11 @@ import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.ModelInterpolator;
+import org.apache.maven.model.interpolation.ModelVersionProcessor;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.management.DependencyManagementInjector;
 import org.apache.maven.model.management.PluginManagementInjector;
-import org.apache.maven.model.merge.ModelMerger;
 import org.apache.maven.model.normalization.ModelNormalizer;
 import org.apache.maven.model.path.ModelPathTranslator;
 import org.apache.maven.model.path.ModelUrlNormalizer;
@@ -89,6 +90,7 @@ import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
+import org.apache.maven.model.v4.MavenMerger;
 import org.apache.maven.model.validation.ModelValidator;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
@@ -101,9 +103,9 @@ import org.eclipse.sisu.Nullable;
 @Named
 @Singleton
 public class DefaultModelBuilder
-    implements ModelBuilder
+        implements ModelBuilder
 {
-    private final ModelMerger modelMerger = new FileToRawModelMerger();
+    private final MavenMerger modelMerger = new FileToRawModelMerger();
 
     private final ModelProcessor modelProcessor;
     private final ModelValidator modelValidator;
@@ -123,7 +125,9 @@ public class DefaultModelBuilder
     private final ReportConfigurationExpander reportConfigurationExpander;
     private final ReportingConverter reportingConverter;
     private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
+    private final ModelVersionProcessor versionProcessor;
 
+    @SuppressWarnings( "checkstyle:ParameterNumber" )
     @Inject
     public DefaultModelBuilder(
             ModelProcessor modelProcessor,
@@ -143,7 +147,8 @@ public class DefaultModelBuilder
             PluginConfigurationExpander pluginConfigurationExpander,
             ReportConfigurationExpander reportConfigurationExpander,
             ReportingConverter reportingConverter,
-            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator )
+            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
+            ModelVersionProcessor versionProcessor )
     {
         this.modelProcessor = modelProcessor;
         this.modelValidator = modelValidator;
@@ -163,6 +168,7 @@ public class DefaultModelBuilder
         this.reportConfigurationExpander = reportConfigurationExpander;
         this.reportingConverter = reportingConverter;
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
+        this.versionProcessor = versionProcessor;
     }
 
     /**
@@ -176,7 +182,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -190,7 +196,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -204,7 +210,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -218,7 +224,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -232,7 +238,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -246,7 +252,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -260,7 +266,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -274,7 +280,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -288,7 +294,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -302,7 +308,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -316,7 +322,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -331,7 +337,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -346,7 +352,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -360,7 +366,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -374,7 +380,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -388,7 +394,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -402,7 +408,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     /**
@@ -417,7 +423,7 @@ public class DefaultModelBuilder
                 modelPathTranslator, modelUrlNormalizer, superPomProvider, inheritanceAssembler, profileSelector,
                 profileInjector, pluginManagementInjector, dependencyManagementInjector, dependencyManagementImporter,
                 lifecycleBindingsInjector, pluginConfigurationExpander, reportConfigurationExpander,
-                reportingConverter, profileActivationFilePathInterpolator );
+                reportingConverter, profileActivationFilePathInterpolator, versionProcessor );
     }
 
     @Override
@@ -462,8 +468,8 @@ public class DefaultModelBuilder
     }
 
     private void activateFileModel( final ModelBuildingRequest request, final DefaultModelBuildingResult result,
-                          DefaultModelProblemCollector problems )
-        throws ModelBuildingException
+                                    DefaultModelProblemCollector problems )
+            throws ModelBuildingException
     {
         Model inputModel = request.getFileModel();
         problems.setRootModel( inputModel );
@@ -495,7 +501,7 @@ public class DefaultModelBuilder
 
         // model normalization
         problems.setSource( inputModel );
-        modelNormalizer.mergeDuplicates( inputModel, request, problems );
+        inputModel.update( modelNormalizer.mergeDuplicates( inputModel.getDelegate(), request, problems ) );
 
         Map<String, Activation> interpolatedActivations = getProfileActivations( inputModel, false );
         injectProfileActivations( inputModel, interpolatedActivations );
@@ -564,7 +570,7 @@ public class DefaultModelBuilder
             problems.setSource( tmpModel );
 
             // model normalization
-            modelNormalizer.mergeDuplicates( tmpModel, request, problems );
+            tmpModel = new Model( modelNormalizer.mergeDuplicates( tmpModel.getDelegate(), request, problems ) );
 
             profileActivationContext.setProjectProperties( tmpModel.getProperties() );
 
@@ -628,9 +634,7 @@ public class DefaultModelBuilder
         checkPluginVersions( lineage, request, problems );
 
         // inheritance assembly
-        assembleInheritance( lineage, request, problems );
-
-        Model resultModel = lineage.get( 0 );
+        Model resultModel = assembleInheritance( lineage, request, problems );
 
         // consider caching inherited model
 
@@ -746,7 +750,7 @@ public class DefaultModelBuilder
         // dependency management injection
         dependencyManagementInjector.injectManagement( resultModel, request, problems );
 
-        modelNormalizer.injectDefaultValues( resultModel, request, problems );
+        resultModel.update( modelNormalizer.injectDefaultValues( resultModel.getDelegate(), request, problems ) );
 
         if ( request.isProcessPlugins() )
         {
@@ -806,7 +810,7 @@ public class DefaultModelBuilder
         throws ModelBuildingException
     {
         ModelSource modelSource = request.getModelSource();
-        Model model = fromCache( request.getModelCache(), modelSource, ModelCacheTag.FILE );
+        org.apache.maven.api.model.Model model = fromCache( request.getModelCache(), modelSource, ModelCacheTag.FILE );
         if ( model == null )
         {
             model = doReadFileModel( modelSource, request, problems );
@@ -824,15 +828,15 @@ public class DefaultModelBuilder
             }
         }
 
-        return model;
+        return new Model( model );
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
-    private Model doReadFileModel( ModelSource modelSource, ModelBuildingRequest request,
-                                 DefaultModelProblemCollector problems )
+    private org.apache.maven.api.model.Model doReadFileModel( ModelSource modelSource, ModelBuildingRequest request,
+                                                              DefaultModelProblemCollector problems )
             throws ModelBuildingException
     {
-        Model model;
+        org.apache.maven.api.model.Model model;
         problems.setSource( modelSource.getLocation() );
         try
         {
@@ -845,7 +849,8 @@ public class DefaultModelBuilder
             InputSource source;
             if ( request.isLocationTracking() )
             {
-                source = (InputSource) options.computeIfAbsent( ModelProcessor.INPUT_SOURCE, k -> new InputSource() );
+                source = new InputSource( null, modelSource.getLocation() );
+                options.put( ModelProcessor.INPUT_SOURCE, source );
             }
             else
             {
@@ -883,8 +888,17 @@ public class DefaultModelBuilder
 
             if ( source != null )
             {
-                source.setModelId( ModelProblemUtils.toId( model ) );
-                source.setLocation( modelSource.getLocation() );
+                try
+                {
+                    Field field = InputSource.class.getDeclaredField( "modelId" );
+                    field.setAccessible( true );
+                    field.set( source, ModelProblemUtils.toId( model ) );
+                }
+                catch ( Throwable t )
+                {
+                    // TODO: use a lazy source ?
+                    throw new IllegalStateException( "Unable to set modelId on InputSource", t );
+                }
             }
         }
         catch ( ModelParseException e )
@@ -916,11 +930,14 @@ public class DefaultModelBuilder
 
         if ( modelSource instanceof FileModelSource )
         {
-            model.setPomFile( ( (FileModelSource) modelSource ).getFile() );
+            model = model.withPomFile( ( (FileModelSource) modelSource ).getFile().toPath() );
         }
-        problems.setSource( model );
 
-        modelValidator.validateFileModel( model, request, problems );
+        Model retModel = new Model( model );
+
+        problems.setSource( retModel );
+
+        modelValidator.validateFileModel( retModel, request, problems );
 
         if ( hasFatalErrors( problems ) )
         {
@@ -957,13 +974,14 @@ public class DefaultModelBuilder
             try
             {
                 // must implement TransformContext, but should use request to access system properties/modelcache
-                Model transformedFileModel = modelProcessor.read( pomFile,
-                   Collections.singletonMap( ModelReader.TRANSFORMER_CONTEXT, context ) );
+                org.apache.maven.api.model.Model transformedFileModel = modelProcessor.read( pomFile,
+                        Collections.singletonMap( ModelReader.TRANSFORMER_CONTEXT, context ) );
 
                 // rawModel with locationTrackers, required for proper feedback during validations
 
                 // Apply enriched data
-                modelMerger.merge( rawModel, transformedFileModel, false, null );
+                rawModel = new Model( modelMerger.merge( rawModel.getDelegate(),
+                        transformedFileModel, false, null ) );
             }
             catch ( IOException e )
             {
@@ -997,6 +1015,11 @@ public class DefaultModelBuilder
     }
 
     private String getGroupId( Model model )
+    {
+        return getGroupId( model.getDelegate() );
+    }
+
+    private String getGroupId( org.apache.maven.api.model.Model model )
     {
         String groupId = model.getGroupId();
         if ( groupId == null && model.getParent() != null )
@@ -1055,8 +1078,8 @@ public class DefaultModelBuilder
             catch ( InvalidRepositoryException e )
             {
                 problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Invalid repository " + repository.getId() + ": " + e.getMessage() )
-                    .setLocation( repository.getLocation( "" ) ).setException( e ) );
+                        .setMessage( "Invalid repository " + repository.getId() + ": " + e.getMessage() )
+                        .setLocation( repository.getLocation( "" ) ).setException( e ) );
             }
         }
     }
@@ -1113,15 +1136,16 @@ public class DefaultModelBuilder
         }
     }
 
-    private void assembleInheritance( List<Model> lineage, ModelBuildingRequest request,
+    private Model assembleInheritance( List<Model> lineage, ModelBuildingRequest request,
                                       ModelProblemCollector problems )
     {
+        org.apache.maven.api.model.Model parent = lineage.get( lineage.size() - 1 ).getDelegate();
         for ( int i = lineage.size() - 2; i >= 0; i-- )
         {
-            Model parent = lineage.get( i + 1 );
             Model child = lineage.get( i );
-            inheritanceAssembler.assembleModelInheritance( child, parent, request, problems );
+            parent = inheritanceAssembler.assembleModelInheritance( child.getDelegate(), parent, request, problems );
         }
+        return new Model( parent );
     }
 
     private Map<String, Activation> getProfileActivations( Model model, boolean clone )
@@ -1168,8 +1192,8 @@ public class DefaultModelBuilder
         // save profile activations before interpolation, since they are evaluated with limited scope
         Map<String, Activation> originalActivations = getProfileActivations( model, true );
 
-        Model interpolatedModel =
-            modelInterpolator.interpolateModel( model, model.getProjectDirectory(), request, problems );
+        Model interpolatedModel = new Model( modelInterpolator.interpolateModel(
+                model.getDelegate(), model.getProjectDirectory(), request, problems ) );
         if ( interpolatedModel.getParent() != null )
         {
             StringSearchInterpolator ssi = new StringSearchInterpolator();
@@ -1187,10 +1211,10 @@ public class DefaultModelBuilder
             catch ( Exception e )
             {
                 ModelProblemCollectorRequest mpcr =
-                    new ModelProblemCollectorRequest( Severity.ERROR,
-                                                      Version.BASE ).setMessage( "Failed to interpolate field: "
-                                                          + interpolatedModel.getParent().getVersion()
-                                                          + " on class: " ).setException( e );
+                        new ModelProblemCollectorRequest( Severity.ERROR,
+                                Version.BASE ).setMessage( "Failed to interpolate field: "
+                                + interpolatedModel.getParent().getVersion()
+                                + " on class: " ).setException( e );
                 problems.add( mpcr );
             }
 
@@ -1481,7 +1505,7 @@ public class DefaultModelBuilder
 
     private Model getSuperModel()
     {
-        return superPomProvider.getSuperModel( "4.0.0" ).clone();
+        return new Model( superPomProvider.getSuperModel( "4.0.0" ) );
     }
 
     private void importDependencyManagement( Model model, ModelBuildingRequest request,
@@ -1498,7 +1522,7 @@ public class DefaultModelBuilder
 
         importIds.add( importing );
 
-        List<DependencyManagement> importMgmts = null;
+        List<org.apache.maven.api.model.DependencyManagement> importMgmts = null;
 
         for ( Iterator<Dependency> it = depMgmt.getDependencies().iterator(); it.hasNext(); )
         {
@@ -1512,7 +1536,7 @@ public class DefaultModelBuilder
             it.remove();
 
             DependencyManagement importMgmt = loadDependencyManagement( model, request, problems,
-                                                                        dependency, importIds );
+                    dependency, importIds );
 
             if ( importMgmt != null )
             {
@@ -1521,13 +1545,14 @@ public class DefaultModelBuilder
                     importMgmts = new ArrayList<>();
                 }
 
-                importMgmts.add( importMgmt );
+                importMgmts.add( importMgmt.getDelegate() );
             }
         }
 
         importIds.remove( importing );
 
-        dependencyManagementImporter.importManagement( model, importMgmts, request, problems );
+        model.update( dependencyManagementImporter.importManagement(
+                model.getDelegate(), importMgmts, request, problems ) );
     }
 
     private DependencyManagement loadDependencyManagement( Model model, ModelBuildingRequest request,
@@ -1581,19 +1606,21 @@ public class DefaultModelBuilder
             return null;
         }
 
-        DependencyManagement importMgmt = fromCache( request.getModelCache(), groupId, artifactId, version,
-                                                    ModelCacheTag.IMPORT );
+        org.apache.maven.api.model.DependencyManagement importMgmt =
+                fromCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT );
         if ( importMgmt == null )
         {
-            importMgmt = doLoadDependencyManagement( model, request, problems, dependency,
-                                                     groupId, artifactId, version, importIds );
-            if ( importMgmt != null )
+            DependencyManagement importMgmtV3 = doLoadDependencyManagement( model, request, problems, dependency,
+                    groupId, artifactId, version, importIds );
+            if ( importMgmtV3 != null )
             {
-                intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, importMgmt );
+                importMgmt = importMgmtV3.getDelegate();
+                intoCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT,
+                        importMgmt );
             }
         }
 
-        return importMgmt;
+        return importMgmt != null ? new DependencyManagement( importMgmt ) : null;
     }
 
     @SuppressWarnings( "checkstyle:parameternumber" )
@@ -1836,7 +1863,14 @@ public class DefaultModelBuilder
                         {
                             ModelBuildingRequest gaBuildingRequest = new DefaultModelBuildingRequest( request )
                                 .setModelSource( (ModelSource) source );
-                            return readRawModel( gaBuildingRequest, problems );
+                            Model model = readRawModel( gaBuildingRequest, problems );
+                            if ( source instanceof FileModelSource )
+                            {
+                                Path path = ( ( FileModelSource ) source ).getFile().toPath();
+                                context.modelByPath.computeIfAbsent( path, k -> new DefaultTransformerContext.Holder() )
+                                        .computeIfAbsent( () -> model );
+                            }
+                            return model;
                         }
                         catch ( ModelBuildingException e )
                         {
@@ -1859,7 +1893,12 @@ public class DefaultModelBuilder
 
                     try
                     {
-                        return readRawModel( req, problems );
+                        Model model = readRawModel( req, problems );
+                        DefaultTransformerContext.GAKey key =
+                                new DefaultTransformerContext.GAKey( getGroupId( model ), model.getArtifactId() );
+                        context.modelByGA.computeIfAbsent( key, k -> new DefaultTransformerContext.Holder() )
+                                .computeIfAbsent( () -> model );
+                        return model;
                     }
                     catch ( ModelBuildingException e )
                     {

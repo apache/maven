@@ -25,11 +25,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.maven.model.Dependency;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.Parent;
+import org.apache.maven.api.model.Repository;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
-import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ArtifactModelSource;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelSource;
@@ -138,7 +139,8 @@ public class ProjectModelResolver
         }
 
         List<RemoteRepository> newRepositories =
-            Collections.singletonList( ArtifactDescriptorUtils.toRemoteRepository( repository ) );
+            Collections.singletonList( ArtifactDescriptorUtils.toRemoteRepository(
+                    new org.apache.maven.model.Repository( repository ) ) );
 
         if ( ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT.equals( repositoryMerging ) )
         {
@@ -192,7 +194,7 @@ public class ProjectModelResolver
     }
 
     @Override
-    public ModelSource resolveModel( final Parent parent )
+    public ModelSource resolveModel( final Parent parent, AtomicReference<Parent> modified )
         throws UnresolvableModelException
     {
         try
@@ -226,9 +228,13 @@ public class ProjectModelResolver
 
             }
 
-            parent.setVersion( versionRangeResult.getHighestVersion().toString() );
+            String newVersion = versionRangeResult.getHighestVersion().toString();
+            if ( !parent.getVersion().equals( newVersion ) )
+            {
+                modified.set( parent.withVersion( newVersion ) );
+            }
 
-            return resolveModel( parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
+            return resolveModel( parent.getGroupId(), parent.getArtifactId(), newVersion );
         }
         catch ( final VersionRangeResolutionException e )
         {
@@ -239,7 +245,7 @@ public class ProjectModelResolver
     }
 
     @Override
-    public ModelSource resolveModel( final Dependency dependency )
+    public ModelSource resolveModel( final Dependency dependency, AtomicReference<Dependency> modified )
         throws UnresolvableModelException
     {
         try
@@ -273,12 +279,16 @@ public class ProjectModelResolver
 
             }
 
-            dependency.setVersion( versionRangeResult.getHighestVersion().toString() );
+            String newVersion = versionRangeResult.getHighestVersion().toString();
+            if ( !dependency.getVersion().equals( newVersion ) )
+            {
+                modified.set( dependency.withVersion( newVersion ) );
+            }
 
             if ( modelPool != null )
             {
                 Model model =
-                    modelPool.get( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+                    modelPool.get( dependency.getGroupId(), dependency.getArtifactId(), newVersion );
 
                 if ( model != null )
                 {
@@ -286,7 +296,7 @@ public class ProjectModelResolver
                 }
             }
 
-            return resolveModel( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+            return resolveModel( dependency.getGroupId(), dependency.getArtifactId(), newVersion );
         }
         catch ( VersionRangeResolutionException e )
         {
@@ -294,5 +304,42 @@ public class ProjectModelResolver
                                                   dependency.getVersion(), e );
 
         }
+    }
+
+    @Override
+    public ModelSource resolveModel( org.apache.maven.model.Parent parent ) throws UnresolvableModelException
+    {
+        AtomicReference<org.apache.maven.api.model.Parent> resolvedParent = new AtomicReference<>();
+        ModelSource result = resolveModel( parent.getDelegate(), resolvedParent );
+        if ( resolvedParent.get() != null )
+        {
+            parent.setVersion( resolvedParent.get().getVersion() );
+        }
+        return result;
+    }
+
+    @Override
+    public ModelSource resolveModel( org.apache.maven.model.Dependency dependency ) throws UnresolvableModelException
+    {
+        AtomicReference<org.apache.maven.api.model.Dependency> resolvedDependency = new AtomicReference<>();
+        ModelSource result = resolveModel( dependency.getDelegate(), resolvedDependency );
+        if ( resolvedDependency.get() != null )
+        {
+            dependency.setVersion( resolvedDependency.get().getVersion() );
+        }
+        return result;
+    }
+
+    @Override
+    public void addRepository( org.apache.maven.model.Repository repository ) throws InvalidRepositoryException
+    {
+        addRepository( repository.getDelegate() );
+    }
+
+    @Override
+    public void addRepository( org.apache.maven.model.Repository repository, boolean replace )
+            throws InvalidRepositoryException
+    {
+        addRepository( repository.getDelegate(), replace );
     }
 }

@@ -22,6 +22,8 @@ under the License.
 <extension>
   <exportedPackages>
     <!-- maven-* -->
+    <exportedPackage>org.apache.maven.api</exportedPackage>
+
     <exportedPackage>org.apache.maven.*</exportedPackage>
     <exportedPackage>org.apache.maven.artifact</exportedPackage>
     <exportedPackage>org.apache.maven.classrealm</exportedPackage>

@@ -27,7 +27,7 @@ import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.interpolation.DefaultModelVersionProcessor;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.v4.MavenXpp3Reader;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +50,7 @@ public class DefaultModelValidatorTest
         String resource = "/poms/validation/" + pom;
         InputStream is = getClass().getResourceAsStream( resource );
         assertNotNull( is, "missing resource: " + resource );
-        return new MavenXpp3Reader().read( is );
+        return new Model( new MavenXpp3Reader().read( is ) );
     }
 
     private SimpleProblemCollector validate( String pom )

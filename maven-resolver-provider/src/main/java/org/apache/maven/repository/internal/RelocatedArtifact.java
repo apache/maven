@@ -152,4 +152,5 @@ public final class RelocatedArtifact
     {
         return message;
     }
+
 }

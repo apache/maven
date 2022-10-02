@@ -19,9 +19,11 @@ package org.apache.maven.model.resolution;
  * under the License.
  */
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Parent;
-import org.apache.maven.model.Repository;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.Parent;
+import org.apache.maven.api.model.Repository;
 import org.apache.maven.model.building.ModelSource;
 
 /**
@@ -64,7 +66,7 @@ public interface ModelResolver
      *
      * @see Parent#clone()
      */
-    ModelSource resolveModel( Parent parent )
+    ModelSource resolveModel( org.apache.maven.model.Parent parent )
         throws UnresolvableModelException;
 
     /**
@@ -85,7 +87,7 @@ public interface ModelResolver
      *
      * @see Dependency#clone()
      */
-    ModelSource resolveModel( Dependency dependency )
+    ModelSource resolveModel( org.apache.maven.model.Dependency dependency )
         throws UnresolvableModelException;
 
     /**
@@ -96,7 +98,7 @@ public interface ModelResolver
      * @param repository The repository to add to the internal search chain, must not be {@code null}.
      * @throws InvalidRepositoryException If the repository could not be added (e.g. due to invalid URL or layout).
      */
-    void addRepository( Repository repository )
+    void addRepository( org.apache.maven.model.Repository repository )
         throws InvalidRepositoryException;
 
     /**
@@ -110,7 +112,7 @@ public interface ModelResolver
      * @param repository The repository to add to the internal search chain, must not be {@code null}.
      * @throws InvalidRepositoryException If the repository could not be added (e.g. due to invalid URL or layout).
      */
-    void addRepository( Repository repository, boolean replace )
+    void addRepository( org.apache.maven.model.Repository repository, boolean replace )
             throws InvalidRepositoryException;
 
     /**
@@ -122,4 +124,39 @@ public interface ModelResolver
      */
     ModelResolver newCopy();
 
+    default ModelSource resolveModel( Parent parent, AtomicReference<Parent> modified )
+            throws UnresolvableModelException
+    {
+        org.apache.maven.model.Parent p = new org.apache.maven.model.Parent( parent );
+        ModelSource result = resolveModel( p );
+        if ( p.getDelegate() != parent )
+        {
+            modified.set( p.getDelegate() );
+        }
+        return result;
+    }
+
+    default ModelSource resolveModel( Dependency dependency, AtomicReference<Dependency> modified )
+            throws UnresolvableModelException
+    {
+        org.apache.maven.model.Dependency d = new org.apache.maven.model.Dependency( dependency );
+        ModelSource result = resolveModel( d );
+        if ( d.getDelegate() != dependency )
+        {
+            modified.set( d.getDelegate() );
+        }
+        return result;
+    }
+
+    default void addRepository( Repository repository )
+            throws InvalidRepositoryException
+    {
+        addRepository( new org.apache.maven.model.Repository( repository ) );
+    }
+
+    default void addRepository( Repository repository, boolean replace )
+            throws InvalidRepositoryException
+    {
+        addRepository( new org.apache.maven.model.Repository( repository ), replace );
+    }
 }

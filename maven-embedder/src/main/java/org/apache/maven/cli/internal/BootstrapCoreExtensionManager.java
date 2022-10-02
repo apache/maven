@@ -34,7 +34,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
-import org.apache.maven.model.Plugin;
+import org.apache.maven.api.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.internal.DefaultPluginDependenciesResolver;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -181,13 +181,15 @@ public class BootstrapCoreExtensionManager
              * resolveCoreExtension method which uses a CoreExtension
              * object instead of a Plugin as this makes no sense.
              */
-            Plugin plugin = new Plugin();
-            plugin.setGroupId( interpolator.interpolate( extension.getGroupId() ) );
-            plugin.setArtifactId( interpolator.interpolate( extension.getArtifactId() ) );
-            plugin.setVersion( interpolator.interpolate( extension.getVersion() ) );
+            Plugin plugin = Plugin.newBuilder()
+                    .groupId( interpolator.interpolate( extension.getGroupId() ) )
+                    .artifactId( interpolator.interpolate( extension.getArtifactId() ) )
+                    .version( interpolator.interpolate( extension.getVersion() ) )
+                    .build();
 
             DependencyNode root = pluginDependenciesResolver
-                    .resolveCoreExtension( plugin, dependencyFilter, repositories, repoSession );
+                    .resolveCoreExtension( new org.apache.maven.model.Plugin( plugin ),
+                            dependencyFilter, repositories, repoSession );
             PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
             root.accept( nlg );
 

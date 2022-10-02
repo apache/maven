@@ -41,7 +41,7 @@ public class DefaultToolchainTest
 
     @BeforeEach
     public void setUp()
-        throws Exception
+            throws Exception
     {
         MockitoAnnotations.initMocks( this );
     }

@@ -70,6 +70,7 @@ public class DefaultArtifactHandler
         );
     }
 
+    @SuppressWarnings( "checkstyle:ParameterNumber" )
     public DefaultArtifactHandler( final String type,
                                    final String extension,
                                    final String classifier,

@@ -21,7 +21,7 @@ package org.apache.maven.model.profile.activation;
 
 import java.util.Properties;
 
-import org.apache.maven.model.Profile;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
 import org.apache.maven.model.profile.ProfileActivationContext;
@@ -59,7 +59,7 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator>
     {
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
-        assertEquals( active, activator.isActive( profile, context, problems ) );
+        assertEquals( active, activator.isActive( new org.apache.maven.model.Profile( profile ), context, problems ) );
 
         assertEquals( 0, problems.getErrors().size(), problems.getErrors().toString() );
         assertEquals( 0, problems.getWarnings().size(), problems.getWarnings().toString() );

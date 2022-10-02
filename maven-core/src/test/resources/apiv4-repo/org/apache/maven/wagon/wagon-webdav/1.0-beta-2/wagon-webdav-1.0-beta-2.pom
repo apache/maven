@@ -1,0 +1,50 @@
+<?xml version="1.0"?><project>
+  <parent>
+    <artifactId>wagon-providers</artifactId>
+    <groupId>org.apache.maven.wagon</groupId>
+    <version>1.0-beta-2</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>wagon-webdav</artifactId>
+  <name>Maven Wagon WebDav Provider</name>
+  <version>1.0-beta-2</version>
+  <description>Wagon that gets and puts artifacts through webdav protocol</description>
+  <contributors>
+    <contributor>
+      <name>Henry Isidro</name>
+      <email>hisidro@exist.com</email>
+    </contributor>
+    <contributor>
+      <name>Joakim Erdfelt</name>
+      <email>joakim@erdfelt.com</email>
+    </contributor>
+  </contributors>
+  <dependencies>
+    <dependency>
+      <groupId>slide</groupId>
+      <artifactId>slide-webdavlib</artifactId>
+      <version>2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.0.4</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>it.could</groupId>
+      <artifactId>webdav</artifactId>
+      <version>0.4</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mortbay.jetty</groupId>
+      <artifactId>jetty</artifactId>
+      <version>4.2.12</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <distributionManagement>
+    <status>deployed</status>
+  </distributionManagement>
+</project>

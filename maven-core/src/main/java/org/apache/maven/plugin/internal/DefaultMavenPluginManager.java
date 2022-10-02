@@ -20,10 +20,12 @@ package org.apache.maven.plugin.internal;
  */
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.xml.Dom;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
+import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.ContextEnabled;
 import org.apache.maven.plugin.DebugConfigurationListener;
@@ -42,6 +44,7 @@ import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
+import org.apache.maven.plugin.PluginParameterExpressionEvaluatorV4;
 import org.apache.maven.plugin.PluginRealmCache;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -57,6 +60,7 @@ import org.apache.maven.project.ExtensionDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.session.scope.internal.SessionScopeModule;
+import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -69,12 +73,11 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
-import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
@@ -149,6 +152,7 @@ public class DefaultMavenPluginManager
     private final PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
 
     @Inject
+    @SuppressWarnings( "checkstyle:ParameterNumber" )
     public DefaultMavenPluginManager(
             PlexusContainer container,
             ClassRealmManager classRealmManager,
@@ -591,20 +595,32 @@ public class DefaultMavenPluginManager
                 ( (Mojo) mojo ).setLog( new MojoLogWrapper( mojoLogger ) );
             }
 
-            Xpp3Dom dom = mojoExecution.getConfiguration();
+            Dom dom = mojoExecution.getConfiguration() != null
+                        ? mojoExecution.getConfiguration().getDom() : null;
 
             PlexusConfiguration pomConfiguration;
 
             if ( dom == null )
             {
-                pomConfiguration = new XmlPlexusConfiguration( "configuration" );
+                pomConfiguration = new DefaultPlexusConfiguration( "configuration" );
             }
             else
             {
-                pomConfiguration = new XmlPlexusConfiguration( dom );
+                pomConfiguration = XmlPlexusConfiguration.toPlexusConfiguration( dom );
             }
 
-            ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
+            ExpressionEvaluator expressionEvaluator;
+            if ( mojoDescriptor.isV4Api() )
+            {
+                expressionEvaluator = new PluginParameterExpressionEvaluatorV4(
+                        session.getSession(),
+                        ( ( DefaultSession ) session.getSession() ).getProject( session.getCurrentProject() ),
+                        mojoExecution );
+            }
+            else
+            {
+                expressionEvaluator = new PluginParameterExpressionEvaluator( session, mojoExecution );
+            }
 
             for ( MavenPluginConfigurationValidator validator: configurationValidators )
             {
@@ -634,7 +650,7 @@ public class DefaultMavenPluginManager
 
         if ( StringUtils.isEmpty( configuratorId ) )
         {
-            configuratorId = "basic";
+            configuratorId = mojoDescriptor.isV4Api() ? "enhanced" : "basic";
         }
 
         try
@@ -837,6 +853,8 @@ public class DefaultMavenPluginManager
                 throw new PluginManagerException( plugin, e.getMessage(), e );
             }
         }
+
+        // TODO: store plugin version
 
         // resolve plugin artifacts
         List<Artifact> artifacts;

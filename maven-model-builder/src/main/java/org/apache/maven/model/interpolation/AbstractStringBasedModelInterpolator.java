@@ -29,8 +29,9 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.path.UrlNormalizer;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
@@ -76,15 +77,20 @@ public abstract class AbstractStringBasedModelInterpolator
 
     private final PathTranslator pathTranslator;
     private final UrlNormalizer urlNormalizer;
-    private final ModelVersionProcessor versionProcessor;
 
     @Inject
-    public AbstractStringBasedModelInterpolator( PathTranslator pathTranslator, UrlNormalizer urlNormalizer,
-                                                 ModelVersionProcessor processor )
+    public AbstractStringBasedModelInterpolator( PathTranslator pathTranslator, UrlNormalizer urlNormalizer )
     {
         this.pathTranslator = pathTranslator;
         this.urlNormalizer = urlNormalizer;
-        this.versionProcessor = processor;
+    }
+
+    @Override
+    public org.apache.maven.model.Model interpolateModel( org.apache.maven.model.Model model, File projectDir,
+                                                          ModelBuildingRequest request, ModelProblemCollector problems )
+    {
+        return new org.apache.maven.model.Model( interpolateModel( model.getDelegate(), projectDir,
+                request, problems ) );
     }
 
     protected List<ValueSource> createValueSources( final Model model, final File projectDir,
@@ -132,10 +138,6 @@ public abstract class AbstractStringBasedModelInterpolator
         valueSources.add( projectPrefixValueSource );
 
         valueSources.add( new MapBasedValueSource( config.getUserProperties() ) );
-
-        // Overwrite existing values in model properties. Otherwise it's not possible
-        // to define the version via command line: mvn -Drevision=6.5.7 ...
-        versionProcessor.overwriteModelProperties( modelProperties, config );
 
         valueSources.add( new MapBasedValueSource( modelProperties ) );
 

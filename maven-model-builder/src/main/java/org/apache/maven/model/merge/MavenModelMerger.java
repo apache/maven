@@ -26,26 +26,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.model.BuildBase;
-import org.apache.maven.model.CiManagement;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DeploymentRepository;
-import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.model.Exclusion;
-import org.apache.maven.model.Extension;
-import org.apache.maven.model.InputLocation;
-import org.apache.maven.model.IssueManagement;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.ModelBase;
-import org.apache.maven.model.Organization;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
-import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.model.ReportSet;
-import org.apache.maven.model.Repository;
-import org.apache.maven.model.RepositoryBase;
-import org.apache.maven.model.Scm;
-import org.apache.maven.model.Site;
+import org.apache.maven.api.model.BuildBase;
+import org.apache.maven.api.model.CiManagement;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DeploymentRepository;
+import org.apache.maven.api.model.DistributionManagement;
+import org.apache.maven.api.model.Exclusion;
+import org.apache.maven.api.model.Extension;
+import org.apache.maven.api.model.InputLocation;
+import org.apache.maven.api.model.IssueManagement;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.ModelBase;
+import org.apache.maven.api.model.Organization;
+import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.model.PluginExecution;
+import org.apache.maven.api.model.ReportPlugin;
+import org.apache.maven.api.model.ReportSet;
+import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.model.RepositoryBase;
+import org.apache.maven.api.model.Scm;
+import org.apache.maven.api.model.Site;
+import org.apache.maven.model.v4.MavenMerger;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -55,7 +56,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @author Benjamin Bentmann
  */
 public class MavenModelMerger
-    extends ModelMerger
+        extends MavenMerger
 {
 
     /**
@@ -69,42 +70,44 @@ public class MavenModelMerger
     public static final String ARTIFACT_ID = "artifact-id";
 
     @Override
-    protected void mergeModel( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    protected Model mergeModel( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
     {
         context.put( ARTIFACT_ID, target.getArtifactId() );
 
-        super.mergeModel( target, source, sourceDominant, context );
+        return super.mergeModel( target, source, sourceDominant, context );
     }
 
     @Override
-    protected void mergeModel_Name( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeModel_Name( Model.Builder builder, Model target, Model source,
+                                    boolean sourceDominant, Map<Object, Object> context )
     {
         String src = source.getName();
         if ( src != null )
         {
             if ( sourceDominant )
             {
-                target.setName( src );
-                target.setLocation( "name", source.getLocation( "name" ) );
+                builder.name( src );
+                builder.location( "name", source.getLocation( "name" ) );
             }
         }
     }
 
     @Override
-    protected void mergeModel_Url( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeModel_Url( Model.Builder builder, Model target, Model source,
+                                   boolean sourceDominant, Map<Object, Object> context )
     {
         String src = source.getUrl();
         if ( src != null )
         {
             if ( sourceDominant )
             {
-                target.setUrl( src );
-                target.setLocation( "url", source.getLocation( "url" ) );
+                builder.url( src );
+                builder.location( "url", source.getLocation( "url" ) );
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( extrapolateChildUrl( src, source.isChildProjectUrlInheritAppendPath(), context ) );
-                target.setLocation( "url", source.getLocation( "url" ) );
+                builder.url( extrapolateChildUrl( src, source.isChildProjectUrlInheritAppendPath(), context ) );
+                builder.location( "url", source.getLocation( "url" ) );
             }
         }
     }
@@ -114,7 +117,7 @@ public class MavenModelMerger
      * merger
      */
     @Override
-    protected void mergeModel_Organization( Model target, Model source, boolean sourceDominant,
+    protected void mergeModel_Organization( Model.Builder builder, Model target, Model source, boolean sourceDominant,
                                             Map<Object, Object> context )
     {
         Organization src = source.getOrganization();
@@ -123,17 +126,15 @@ public class MavenModelMerger
             Organization tgt = target.getOrganization();
             if ( tgt == null )
             {
-                tgt = new Organization();
-                tgt.setLocation( "", src.getLocation( "" ) );
-                target.setOrganization( tgt );
-                mergeOrganization( tgt, src, sourceDominant, context );
+                builder.organization( src );
+                builder.location( "organisation", source.getLocation( "organisation" ) );
             }
         }
     }
 
     @Override
-    protected void mergeModel_IssueManagement( Model target, Model source, boolean sourceDominant,
-                                               Map<Object, Object> context )
+    protected void mergeModel_IssueManagement( Model.Builder builder, Model target, Model source,
+                                               boolean sourceDominant, Map<Object, Object> context )
     {
         IssueManagement src = source.getIssueManagement();
         if ( src != null )
@@ -141,16 +142,14 @@ public class MavenModelMerger
             IssueManagement tgt = target.getIssueManagement();
             if ( tgt == null )
             {
-                tgt = new IssueManagement();
-                tgt.setLocation( "", src.getLocation( "" ) );
-                target.setIssueManagement( tgt );
-                mergeIssueManagement( tgt, src, sourceDominant, context );
+                builder.issueManagement( src );
+                builder.location( "issueManagement", source.getLocation( "issueManagement" ) );
             }
         }
     }
 
     @Override
-    protected void mergeModel_CiManagement( Model target, Model source, boolean sourceDominant,
+    protected void mergeModel_CiManagement( Model.Builder builder, Model target, Model source, boolean sourceDominant,
                                             Map<Object, Object> context )
     {
         CiManagement src = source.getCiManagement();
@@ -159,85 +158,75 @@ public class MavenModelMerger
             CiManagement tgt = target.getCiManagement();
             if ( tgt == null )
             {
-                tgt = new CiManagement();
-                tgt.setLocation( "", src.getLocation( "" ) );
-                target.setCiManagement( tgt );
-                mergeCiManagement( tgt, src, sourceDominant, context );
+                builder.ciManagement( src );
+                builder.location( "ciManagement", source.getLocation( "ciManagement" ) );
             }
         }
     }
 
     @Override
-    protected void mergeModel_ModelVersion( Model target, Model source, boolean sourceDominant,
+    protected void mergeModel_ModelVersion( Model.Builder builder, Model target, Model source, boolean sourceDominant,
                                             Map<Object, Object> context )
     {
         // neither inherited nor injected
     }
 
     @Override
-    protected void mergeModel_ArtifactId( Model target, Model source, boolean sourceDominant,
+    protected void mergeModel_ArtifactId( Model.Builder builder, Model target, Model source, boolean sourceDominant,
                                           Map<Object, Object> context )
     {
         // neither inherited nor injected
     }
 
     @Override
-    protected void mergeModel_Profiles( Model target, Model source, boolean sourceDominant,
+    protected void mergeModel_Profiles( Model.Builder builder, Model target, Model source, boolean sourceDominant,
                                         Map<Object, Object> context )
     {
         // neither inherited nor injected
     }
 
     @Override
-    protected void mergeModel_Prerequisites( Model target, Model source, boolean sourceDominant,
+    protected void mergeModel_Prerequisites( Model.Builder builder, Model target, Model source, boolean sourceDominant,
                                              Map<Object, Object> context )
     {
         // neither inherited nor injected
     }
 
     @Override
-    protected void mergeModel_Licenses( Model target, Model source, boolean sourceDominant,
+    protected void mergeModel_Licenses( Model.Builder builder, Model target, Model source, boolean sourceDominant,
                                         Map<Object, Object> context )
     {
-        if ( target.getLicenses().isEmpty() )
-        {
-            target.setLicenses( new ArrayList<>( source.getLicenses() ) );
-        }
+        builder.licenses( target.getLicenses().isEmpty() ? source.getLicenses() : target.getLicenses() );
     }
 
     @Override
-    protected void mergeModel_Developers( Model target, Model source, boolean sourceDominant,
+    protected void mergeModel_Developers( Model.Builder builder, Model target, Model source, boolean sourceDominant,
                                           Map<Object, Object> context )
     {
-        if ( target.getDevelopers().isEmpty() )
-        {
-            target.setDevelopers( new ArrayList<>( source.getDevelopers() ) );
-        }
+        builder.developers( target.getDevelopers().isEmpty() ? source.getDevelopers() : target.getDevelopers() );
     }
 
     @Override
-    protected void mergeModel_Contributors( Model target, Model source, boolean sourceDominant,
+    protected void mergeModel_Contributors( Model.Builder builder, Model target, Model source, boolean sourceDominant,
                                             Map<Object, Object> context )
     {
-        if ( target.getContributors().isEmpty() )
-        {
-            target.setContributors( new ArrayList<>( source.getContributors() ) );
-        }
+        builder.contributors( target.getContributors().isEmpty()
+                ? source.getContributors() : target.getContributors() );
     }
 
     @Override
-    protected void mergeModel_MailingLists( Model target, Model source, boolean sourceDominant,
+    protected void mergeModel_MailingLists( Model.Builder builder, Model target, Model source, boolean sourceDominant,
                                             Map<Object, Object> context )
     {
         if ( target.getMailingLists().isEmpty() )
         {
-            target.setMailingLists( new ArrayList<>( source.getMailingLists() ) );
+            builder.mailingLists( source.getMailingLists() );
         }
     }
 
     @Override
-    protected void mergeModelBase_Modules( ModelBase target, ModelBase source, boolean sourceDominant,
-                                           Map<Object, Object> context )
+    protected void mergeModelBase_Modules( ModelBase.Builder builder, ModelBase target, ModelBase source,
+                                           boolean sourceDominant, Map<Object, Object> context )
     {
         List<String> src = source.getModules();
         if ( !src.isEmpty() && sourceDominant )
@@ -260,8 +249,8 @@ public class MavenModelMerger
                     indices.add( ~i );
                 }
             }
-            target.setModules( merged );
-            target.setLocation( "modules", InputLocation.merge( target.getLocation( "modules" ),
+            builder.modules( merged );
+            builder.location( "modules", InputLocation.merge( target.getLocation( "modules" ),
                                                                 source.getLocation( "modules" ), indices ) );
         }
     }
@@ -271,8 +260,8 @@ public class MavenModelMerger
      * source-first, dominant-first, recessive-first
      */
     @Override
-    protected void mergeModelBase_Repositories( ModelBase target, ModelBase source, boolean sourceDominant,
-                                                Map<Object, Object> context )
+    protected void mergeModelBase_Repositories( ModelBase.Builder builder, ModelBase target, ModelBase source,
+                                                boolean sourceDominant, Map<Object, Object> context )
     {
         List<Repository> src = source.getRepositories();
         if ( !src.isEmpty() )
@@ -307,13 +296,13 @@ public class MavenModelMerger
                 }
             }
 
-            target.setRepositories( new ArrayList<>( merged.values() ) );
+            builder.repositories( merged.values() );
         }
     }
 
     @Override
-    protected void mergeModelBase_PluginRepositories( ModelBase target, ModelBase source, boolean sourceDominant,
-                                                      Map<Object, Object> context )
+    protected void mergeModelBase_PluginRepositories( ModelBase.Builder builder, ModelBase target, ModelBase source,
+                                                      boolean sourceDominant, Map<Object, Object> context )
     {
         List<Repository> src = source.getPluginRepositories();
         if ( !src.isEmpty() )
@@ -348,7 +337,7 @@ public class MavenModelMerger
                 }
             }
 
-            target.setPluginRepositories( new ArrayList<>( merged.values() ) );
+            builder.pluginRepositories( merged.values() );
         }
     }
 
@@ -356,8 +345,8 @@ public class MavenModelMerger
      * TODO: Whether duplicates should be removed looks like an option for the generated merger.
      */
     @Override
-    protected void mergeBuildBase_Filters( BuildBase target, BuildBase source, boolean sourceDominant,
-                                           Map<Object, Object> context )
+    protected void mergeBuildBase_Filters( BuildBase.Builder builder, BuildBase target, BuildBase source,
+                                           boolean sourceDominant, Map<Object, Object> context )
     {
         List<String> src = source.getFilters();
         if ( !src.isEmpty() )
@@ -373,33 +362,48 @@ public class MavenModelMerger
                     merged.add( s );
                 }
             }
-            target.setFilters( merged );
+            builder.filters( merged );
         }
     }
 
     @Override
-    protected void mergeBuildBase_Resources( BuildBase target, BuildBase source, boolean sourceDominant,
-                                             Map<Object, Object> context )
+    protected void mergeBuildBase_Resources( BuildBase.Builder builder, BuildBase target, BuildBase source,
+                                             boolean sourceDominant, Map<Object, Object> context )
     {
         if ( sourceDominant || target.getResources().isEmpty() )
         {
-            super.mergeBuildBase_Resources( target, source, sourceDominant, context );
+            super.mergeBuildBase_Resources( builder, target, source, sourceDominant, context );
         }
     }
 
     @Override
-    protected void mergeBuildBase_TestResources( BuildBase target, BuildBase source, boolean sourceDominant,
+    protected void mergeBuildBase_TestResources( BuildBase.Builder builder,
+                                                 BuildBase target,
+                                                 BuildBase source,
+                                                 boolean sourceDominant,
                                                  Map<Object, Object> context )
     {
         if ( sourceDominant || target.getTestResources().isEmpty() )
         {
-            super.mergeBuildBase_TestResources( target, source, sourceDominant, context );
+            super.mergeBuildBase_TestResources( builder, target, source, sourceDominant, context );
         }
     }
 
     @Override
-    protected void mergeDistributionManagement_Repository( DistributionManagement target,
-                                                           DistributionManagement source, boolean sourceDominant,
+    protected void mergeDistributionManagement_Relocation( DistributionManagement.Builder builder,
+                                                           DistributionManagement target,
+                                                           DistributionManagement source,
+                                                           boolean sourceDominant,
+                                                           Map<Object, Object> context )
+    {
+    }
+
+
+    @Override
+    protected void mergeDistributionManagement_Repository( DistributionManagement.Builder builder,
+                                                           DistributionManagement target,
+                                                           DistributionManagement source,
+                                                           boolean sourceDominant,
                                                            Map<Object, Object> context )
     {
         DeploymentRepository src = source.getRepository();
@@ -408,16 +412,15 @@ public class MavenModelMerger
             DeploymentRepository tgt = target.getRepository();
             if ( sourceDominant || tgt == null )
             {
-                tgt = new DeploymentRepository();
-                tgt.setLocation( "", src.getLocation( "" ) );
-                target.setRepository( tgt );
-                mergeDeploymentRepository( tgt, src, sourceDominant, context );
+                tgt = DeploymentRepository.newInstance( false );
+                builder.repository( mergeDeploymentRepository( tgt, src, sourceDominant, context ) );
             }
         }
     }
 
     @Override
-    protected void mergeDistributionManagement_SnapshotRepository( DistributionManagement target,
+    protected void mergeDistributionManagement_SnapshotRepository( DistributionManagement.Builder builder,
+                                                                   DistributionManagement target,
                                                                    DistributionManagement source,
                                                                    boolean sourceDominant,
                                                                    Map<Object, Object> context )
@@ -428,42 +431,41 @@ public class MavenModelMerger
             DeploymentRepository tgt = target.getSnapshotRepository();
             if ( sourceDominant || tgt == null )
             {
-                tgt = new DeploymentRepository();
-                tgt.setLocation( "", src.getLocation( "" ) );
-                target.setSnapshotRepository( tgt );
-                mergeDeploymentRepository( tgt, src, sourceDominant, context );
+                tgt = DeploymentRepository.newInstance( false );
+                builder.snapshotRepository( mergeDeploymentRepository( tgt, src, sourceDominant, context ) );
             }
         }
     }
 
     @Override
-    protected void mergeDistributionManagement_Site( DistributionManagement target, DistributionManagement source,
-                                                     boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeDistributionManagement_Site( DistributionManagement.Builder builder,
+                                                     DistributionManagement target,
+                                                     DistributionManagement source,
+                                                     boolean sourceDominant,
+                                                     Map<Object, Object> context )
     {
         Site src = source.getSite();
         if ( src != null )
         {
             Site tgt = target.getSite();
+            if ( tgt == null )
+            {
+                tgt = Site.newBuilder( false ).build();
+            }
+            Site.Builder sbuilder = Site.newBuilder( tgt );
             if ( sourceDominant || tgt == null || isSiteEmpty( tgt ) )
             {
-                if ( tgt == null )
-                {
-                    tgt = new Site();
-                }
-                tgt.setLocation( "", src.getLocation( "" ) );
-                target.setSite( tgt );
-                mergeSite( tgt, src, sourceDominant, context );
+                mergeSite( sbuilder, tgt, src, sourceDominant, context );
             }
-            mergeSite_ChildSiteUrlInheritAppendPath( tgt, src, sourceDominant, context );
+            super.mergeSite_ChildSiteUrlInheritAppendPath( sbuilder, tgt, src, sourceDominant, context );
+            builder.site( sbuilder.build() );
         }
     }
 
     @Override
-    protected void mergeSite( Site target, Site source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeSite_ChildSiteUrlInheritAppendPath( Site.Builder builder, Site target, Site source,
+                                                            boolean sourceDominant, Map<Object, Object> context )
     {
-        mergeSite_Id( target, source, sourceDominant, context );
-        mergeSite_Name( target, source, sourceDominant, context );
-        mergeSite_Url( target, source, sourceDominant, context );
     }
 
     protected boolean isSiteEmpty( Site site )
@@ -473,87 +475,90 @@ public class MavenModelMerger
     }
 
     @Override
-    protected void mergeSite_Url( Site target, Site source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeSite_Url( Site.Builder builder, Site target, Site source,
+                                  boolean sourceDominant, Map<Object, Object> context )
     {
         String src = source.getUrl();
         if ( src != null )
         {
             if ( sourceDominant )
             {
-                target.setUrl( src );
-                target.setLocation( "url", source.getLocation( "url" ) );
+                builder.url( src );
+                builder.location( "url", source.getLocation( "url" ) );
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( extrapolateChildUrl( src, source.isChildSiteUrlInheritAppendPath(), context ) );
-                target.setLocation( "url", source.getLocation( "url" ) );
+                builder.url( extrapolateChildUrl( src, source.isChildSiteUrlInheritAppendPath(), context ) );
+                builder.location( "url", source.getLocation( "url" ) );
             }
         }
     }
 
     @Override
-    protected void mergeScm_Url( Scm target, Scm source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeScm_Url( Scm.Builder builder, Scm target, Scm source,
+                                 boolean sourceDominant, Map<Object, Object> context )
     {
         String src = source.getUrl();
         if ( src != null )
         {
             if ( sourceDominant )
             {
-                target.setUrl( src );
-                target.setLocation( "url", source.getLocation( "url" ) );
+                builder.url( src );
+                builder.location( "url", source.getLocation( "url" ) );
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( extrapolateChildUrl( src, source.isChildScmUrlInheritAppendPath(), context ) );
-                target.setLocation( "url", source.getLocation( "url" ) );
+                builder.url( extrapolateChildUrl( src, source.isChildScmUrlInheritAppendPath(), context ) );
+                builder.location( "url", source.getLocation( "url" ) );
             }
         }
     }
 
     @Override
-    protected void mergeScm_Connection( Scm target, Scm source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeScm_Connection( Scm.Builder builder, Scm target, Scm source,
+                                        boolean sourceDominant, Map<Object, Object> context )
     {
         String src = source.getConnection();
         if ( src != null )
         {
             if ( sourceDominant )
             {
-                target.setConnection( src );
-                target.setLocation( "connection", source.getLocation( "connection" ) );
+                builder.connection( src );
+                builder.location( "connection", source.getLocation( "connection" ) );
             }
             else if ( target.getConnection() == null )
             {
-                target.setConnection( extrapolateChildUrl( src, source.isChildScmConnectionInheritAppendPath(),
+                builder.connection( extrapolateChildUrl( src, source.isChildScmConnectionInheritAppendPath(),
                                                            context ) );
-                target.setLocation( "connection", source.getLocation( "connection" ) );
+                builder.location( "connection", source.getLocation( "connection" ) );
             }
         }
     }
 
     @Override
-    protected void mergeScm_DeveloperConnection( Scm target, Scm source, boolean sourceDominant,
-                                                 Map<Object, Object> context )
+    protected void mergeScm_DeveloperConnection( Scm.Builder builder, Scm target, Scm source,
+                                                 boolean sourceDominant, Map<Object, Object> context )
     {
         String src = source.getDeveloperConnection();
         if ( src != null )
         {
             if ( sourceDominant )
             {
-                target.setDeveloperConnection( src );
-                target.setLocation( "developerConnection", source.getLocation( "developerConnection" ) );
+                builder.developerConnection( src );
+                builder.location( "developerConnection", source.getLocation( "developerConnection" ) );
             }
             else if ( target.getDeveloperConnection() == null )
             {
                 String e = extrapolateChildUrl( src, source.isChildScmDeveloperConnectionInheritAppendPath(), context );
-                target.setDeveloperConnection( e );
-                target.setLocation( "developerConnection", source.getLocation( "developerConnection" ) );
+                builder.developerConnection( e );
+                builder.location( "developerConnection", source.getLocation( "developerConnection" ) );
             }
         }
     }
 
     @Override
-    protected void mergePlugin_Executions( Plugin target, Plugin source, boolean sourceDominant,
-                                           Map<Object, Object> context )
+    protected void mergePlugin_Executions( Plugin.Builder builder, Plugin target, Plugin source,
+                                           boolean sourceDominant, Map<Object, Object> context )
     {
         List<PluginExecution> src = source.getExecutions();
         if ( !src.isEmpty() )
@@ -578,17 +583,18 @@ public class MavenModelMerger
                 PluginExecution existing = merged.get( key );
                 if ( existing != null )
                 {
-                    mergePluginExecution( element, existing, sourceDominant, context );
+                    element = mergePluginExecution( element, existing, sourceDominant, context );
                 }
                 merged.put( key, element );
             }
 
-            target.setExecutions( new ArrayList<>( merged.values() ) );
+            builder.executions( merged.values() );
         }
     }
 
     @Override
-    protected void mergePluginExecution_Goals( PluginExecution target, PluginExecution source, boolean sourceDominant,
+    protected void mergePluginExecution_Goals( PluginExecution.Builder builder, PluginExecution target,
+                                               PluginExecution source, boolean sourceDominant,
                                                Map<Object, Object> context )
     {
         List<String> src = source.getGoals();
@@ -605,12 +611,13 @@ public class MavenModelMerger
                     merged.add( s );
                 }
             }
-            target.setGoals( merged );
+            builder.goals( merged );
         }
     }
 
     @Override
-    protected void mergeReportPlugin_ReportSets( ReportPlugin target, ReportPlugin source, boolean sourceDominant,
+    protected void mergeReportPlugin_ReportSets( ReportPlugin.Builder builder, ReportPlugin target,
+                                                 ReportPlugin source, boolean sourceDominant,
                                                  Map<Object, Object> context )
     {
         List<ReportSet> src = source.getReportSets();
@@ -639,7 +646,7 @@ public class MavenModelMerger
                 merged.put( key, element );
             }
 
-            target.setReportSets( new ArrayList<>( merged.values() ) );
+            builder.reportSets( merged.values() );
         }
     }
 

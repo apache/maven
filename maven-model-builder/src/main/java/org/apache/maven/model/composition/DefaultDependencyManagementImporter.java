@@ -19,7 +19,6 @@ package org.apache.maven.model.composition;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +26,9 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyManagement;
-import org.apache.maven.model.Model;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 
@@ -45,7 +44,7 @@ public class DefaultDependencyManagementImporter
 {
 
     @Override
-    public void importManagement( Model target, List<? extends DependencyManagement> sources,
+    public Model importManagement( Model target, List<? extends DependencyManagement> sources,
                                   ModelBuildingRequest request, ModelProblemCollector problems )
     {
         if ( sources != null && !sources.isEmpty() )
@@ -63,8 +62,7 @@ public class DefaultDependencyManagementImporter
             }
             else
             {
-                depMgmt = new DependencyManagement();
-                target.setDependencyManagement( depMgmt );
+                depMgmt = DependencyManagement.newInstance();
             }
 
             for ( DependencyManagement source : sources )
@@ -72,15 +70,14 @@ public class DefaultDependencyManagementImporter
                 for ( Dependency dependency : source.getDependencies() )
                 {
                     String key = dependency.getManagementKey();
-                    if ( !dependencies.containsKey( key ) )
-                    {
-                        dependencies.put( key, dependency );
-                    }
+                    dependencies.putIfAbsent( key, dependency );
                 }
             }
 
-            depMgmt.setDependencies( new ArrayList<>( dependencies.values() ) );
+            return target.withDependencyManagement(
+                    depMgmt.withDependencies( dependencies.values() ) );
         }
+        return target;
     }
 
 }
