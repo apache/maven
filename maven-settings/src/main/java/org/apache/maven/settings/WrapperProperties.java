@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Map;
@@ -38,13 +39,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class WrapperProperties extends Properties
+class WrapperProperties extends Properties
 {
 
-    final Supplier<Properties> getter;
+    final Supplier<Map<String, String>> getter;
     final Consumer<Properties> setter;
 
-    public WrapperProperties( Supplier<Properties> getter, Consumer<Properties> setter )
+    WrapperProperties( Supplier<Map<String, String>> getter, Consumer<Properties> setter )
     {
         this.getter = getter;
         this.setter = setter;
@@ -53,25 +54,25 @@ public class WrapperProperties extends Properties
     @Override
     public String getProperty( String key )
     {
-        return getter.get().getProperty( key );
+        return getter.get().get( key );
     }
 
     @Override
     public String getProperty( String key, String defaultValue )
     {
-        return getter.get().getProperty( key, defaultValue );
+        return getter.get().getOrDefault( key, defaultValue );
     }
 
     @Override
     public Enumeration<?> propertyNames()
     {
-        return getter.get().propertyNames();
+        return Collections.enumeration( getter.get().keySet() );
     }
 
     @Override
     public Set<String> stringPropertyNames()
     {
-        return getter.get().stringPropertyNames();
+        return getter.get().keySet();
     }
 
     @Override
@@ -101,19 +102,19 @@ public class WrapperProperties extends Properties
     @Override
     public Enumeration<Object> keys()
     {
-        return getter.get().keys();
+        return Collections.enumeration( (Set) getter.get().keySet() );
     }
 
     @Override
     public Enumeration<Object> elements()
     {
-        return getter.get().elements();
+        return Collections.enumeration( (Collection) getter.get().values() );
     }
 
     @Override
     public boolean contains( Object value )
     {
-        return getter.get().contains( value );
+        return getter.get().containsKey( value != null ? value.toString() : null );
     }
 
     @Override
@@ -143,19 +144,19 @@ public class WrapperProperties extends Properties
     @Override
     public Set<Object> keySet()
     {
-        return getter.get().keySet();
+        return (Set) getter.get().keySet();
     }
 
     @Override
     public Collection<Object> values()
     {
-        return getter.get().values();
+        return (Collection) getter.get().values();
     }
 
     @Override
     public Set<Map.Entry<Object, Object>> entrySet()
     {
-        return getter.get().entrySet();
+        return (Set) getter.get().entrySet();
     }
 
     @Override
@@ -177,7 +178,7 @@ public class WrapperProperties extends Properties
     @Override
     public Object getOrDefault( Object key, Object defaultValue )
     {
-        return getter.get().getOrDefault( key, defaultValue );
+        return getter.get().getOrDefault( key, defaultValue != null ? defaultValue.toString() : null );
     }
 
     @Override
@@ -320,19 +321,25 @@ public class WrapperProperties extends Properties
     @Override
     public void save( OutputStream out, String comments )
     {
-        throw new UnsupportedOperationException();
+        Properties props = new Properties();
+        props.putAll( getter.get() );
+        props.save( out, comments );
     }
 
     @Override
     public void store( Writer writer, String comments ) throws IOException
     {
-        throw new UnsupportedOperationException();
+        Properties props = new Properties();
+        props.putAll( getter.get() );
+        props.store( writer, comments );
     }
 
     @Override
     public void store( OutputStream out, String comments ) throws IOException
     {
-        throw new UnsupportedOperationException();
+        Properties props = new Properties();
+        props.putAll( getter.get() );
+        props.store( out, comments );
     }
 
     @Override
@@ -344,13 +351,17 @@ public class WrapperProperties extends Properties
     @Override
     public void storeToXML( OutputStream os, String comment ) throws IOException
     {
-        throw new UnsupportedOperationException();
+        Properties props = new Properties();
+        props.putAll( getter.get() );
+        props.storeToXML( os, comment );
     }
 
     @Override
     public void storeToXML( OutputStream os, String comment, String encoding ) throws IOException
     {
-        throw new UnsupportedOperationException();
+        Properties props = new Properties();
+        props.putAll( getter.get() );
+        props.storeToXML( os, comment, encoding );
     }
 
 }

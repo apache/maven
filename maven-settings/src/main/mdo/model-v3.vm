@@ -195,13 +195,17 @@ public class ${class.name}
 
     public void set${cap}( ${type} ${field.name} )
     {
-      #if ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
+      #if ( $field.type == "DOM" )
+        delegate = getDelegate().with${cap}( ( ( Xpp3Dom ) ${field.name} ).getDom() );
+      #elseif( $field.type == "java.util.Properties" )
+        Map<String, String> map = ${field.name}.entrySet().stream()
+                .collect( Collectors.toMap( e -> e.getKey().toString(), e -> e.getValue().toString() ) );
+        delegate = getDelegate().with${cap}( map );
+      #elseif ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
         delegate = getDelegate().with${cap}(
                 ${field.name}.stream().map( c -> c.getDelegate() ).collect( Collectors.toList() ) );
       #elseif ( $field.to && $field.to != "String" )
         delegate = getDelegate().with${cap}( ${field.name}.getDelegate() );
-      #elseif ( $field.type == "DOM" )
-        delegate = getDelegate().with${cap}( ( ( Xpp3Dom ) ${field.name} ).getDom() );
       #else
         delegate = getDelegate().with${cap}( ${field.name} );
       #end

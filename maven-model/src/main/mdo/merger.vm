@@ -122,10 +122,10 @@ public class ${className}
       #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
         builder.${field.name}( merge( target.get${capField}(), source.get${capField}(), sourceDominant, e -> e ) );
       #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
-        Properties src = source.get${capField}();
+        Map<String, String> src = source.get${capField}();
         if ( !src.isEmpty() )
         {
-            Properties tgt = target.get${capField}();
+            Map<String, String> tgt = target.get${capField}();
             if ( tgt.isEmpty() )
             {
                 builder.${field.name}( src );
@@ -135,7 +135,7 @@ public class ${className}
             }
             else
             {
-                Properties merged = new Properties();
+                Map<String, String> merged = new HashMap<>();
                 merged.putAll( sourceDominant ? target.get${capField}() : source.get${capField}() );
                 merged.putAll( sourceDominant ? source.get${capField}() : target.get${capField}() );
                 builder.${field.name}( merged );

@@ -298,17 +298,17 @@ public class ${className}
         }
     }
 
-    private <T> void writeProperties( String tagName, Properties props, XmlSerializer serializer, InputLocationTracker locationTracker )
+    private <T> void writeProperties( String tagName, Map<String, String> props, XmlSerializer serializer, InputLocationTracker locationTracker )
             throws IOException
     {
         if ( props != null && !props.isEmpty() )
         {
             serializer.startTag( NAMESPACE, tagName );
             InputLocation location = locationTracker != null ? locationTracker.getLocation( tagName ) : null;
-            for ( Map.Entry<Object, Object> entry : props.entrySet() )
+            for ( Map.Entry<String, String> entry : props.entrySet() )
             {
-                String key = entry.getKey().toString();
-                writeTag( key, null, entry.getValue().toString(), serializer, null );
+                String key = entry.getKey();
+                writeTag( key, null, entry.getValue(), serializer, null );
                 writeLocationTracking( location, key, serializer );
             }
             serializer.endTag( NAMESPACE, tagName );

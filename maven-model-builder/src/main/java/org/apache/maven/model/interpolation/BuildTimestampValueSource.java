@@ -20,7 +20,7 @@ package org.apache.maven.model.interpolation;
  */
 
 import java.util.Date;
-import java.util.Properties;
+import java.util.Map;
 
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 
@@ -29,7 +29,7 @@ class BuildTimestampValueSource
 {
     private final MavenBuildTimestamp mavenBuildTimestamp;
 
-    BuildTimestampValueSource( Date startTime, Properties properties )
+    BuildTimestampValueSource( Date startTime, Map<String, String> properties )
     {
         super( false );
         this.mavenBuildTimestamp = new MavenBuildTimestamp( startTime, properties );

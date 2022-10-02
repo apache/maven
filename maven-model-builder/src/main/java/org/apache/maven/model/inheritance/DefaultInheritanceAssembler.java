@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -64,7 +63,7 @@ public class DefaultInheritanceAssembler
                                           ModelProblemCollector problems )
     {
         Map<Object, Object> hints = new HashMap<>();
-        String childPath = child.getProperties().getProperty( CHILD_DIRECTORY_PROPERTY, child.getArtifactId() );
+        String childPath = child.getProperties().getOrDefault( CHILD_DIRECTORY_PROPERTY, child.getArtifactId() );
         hints.put( CHILD_DIRECTORY, childPath );
         hints.put( MavenModelMerger.CHILD_PATH_ADJUSTMENT, getChildPathAdjustment( child, parent, childPath ) );
         return merger.merge( child, parent, false, hints );
@@ -210,7 +209,7 @@ public class DefaultInheritanceAssembler
                                                   ModelBase target, ModelBase source, boolean sourceDominant,
                                                   Map<Object, Object> context )
         {
-            Properties merged = new Properties();
+            Map<String, String> merged = new HashMap<>();
             if ( sourceDominant )
             {
                 merged.putAll( target.getProperties() );
@@ -227,9 +226,9 @@ public class DefaultInheritanceAssembler
                                                      source.getLocation( "properties" ), sourceDominant ) );
         }
 
-        private void putAll( Map<Object, Object> s, Map<Object, Object> t, Object excludeKey )
+        private void putAll( Map<String, String> s, Map<String, String> t, Object excludeKey )
         {
-            for ( Map.Entry<Object, Object> e : t.entrySet() )
+            for ( Map.Entry<String, String> e : t.entrySet() )
             {
                 if ( !e.getKey().equals( excludeKey ) )
                 {

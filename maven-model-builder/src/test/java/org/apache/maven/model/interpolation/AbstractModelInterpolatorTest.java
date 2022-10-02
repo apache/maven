@@ -25,8 +25,10 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
@@ -177,7 +179,7 @@ public abstract class AbstractModelInterpolatorTest
     public void testShouldNotThrowExceptionOnReferenceToValueContainingNakedExpression() throws Exception
     {
         Scm scm = Scm.newBuilder().connection( "${test}/somepath" ).build();
-        Properties props = new Properties();
+        Map<String, String> props = new HashMap<>();
         props.put( "test", "test" );
         Model model = Model.newBuilder().scm( scm ).properties( props ).build();
 
@@ -316,8 +318,8 @@ public abstract class AbstractModelInterpolatorTest
         Properties context = new Properties();
         context.put( "env.HOME", "/path/to/home" );
 
-        Properties modelProperties = new Properties();
-        modelProperties.setProperty( "outputDirectory", "${env.HOME}" );
+        Map<String, String> modelProperties = new HashMap<>();
+        modelProperties.put( "outputDirectory", "${env.HOME}" );
 
         Model model = Model.newBuilder().properties( modelProperties ).build();
 
@@ -328,15 +330,15 @@ public abstract class AbstractModelInterpolatorTest
                 collector );
         assertProblemFree( collector );
 
-        assertEquals( "/path/to/home", out.getProperties().getProperty( "outputDirectory" ) );
+        assertEquals( "/path/to/home", out.getProperties().get( "outputDirectory" ) );
     }
 
     @Test
     public void envarExpressionThatEvaluatesToNullReturnsTheLiteralString() throws Exception
     {
 
-        Properties modelProperties = new Properties();
-        modelProperties.setProperty( "outputDirectory", "${env.DOES_NOT_EXIST}" );
+        Map<String, String> modelProperties = new HashMap<>();
+        modelProperties.put( "outputDirectory", "${env.DOES_NOT_EXIST}" );
 
         Model model = Model.newBuilder().properties( modelProperties ).build();
 
@@ -347,14 +349,14 @@ public abstract class AbstractModelInterpolatorTest
                 collector );
         assertProblemFree( collector );
 
-        assertEquals( out.getProperties().getProperty( "outputDirectory" ), "${env.DOES_NOT_EXIST}" );
+        assertEquals( out.getProperties().get( "outputDirectory" ), "${env.DOES_NOT_EXIST}" );
     }
 
     @Test
     public void expressionThatEvaluatesToNullReturnsTheLiteralString() throws Exception
     {
-        Properties modelProperties = new Properties();
-        modelProperties.setProperty( "outputDirectory", "${DOES_NOT_EXIST}" );
+        Map<String, String> modelProperties = new HashMap<>();
+        modelProperties.put( "outputDirectory", "${DOES_NOT_EXIST}" );
 
         Model model = Model.newBuilder().properties( modelProperties ).build();
 
@@ -365,7 +367,7 @@ public abstract class AbstractModelInterpolatorTest
                 collector );
         assertProblemFree( collector );
 
-        assertEquals( out.getProperties().getProperty( "outputDirectory" ), "${DOES_NOT_EXIST}" );
+        assertEquals( out.getProperties().get( "outputDirectory" ), "${DOES_NOT_EXIST}" );
     }
 
     @Test
@@ -420,9 +422,9 @@ public abstract class AbstractModelInterpolatorTest
     @Test
     public void testRecursiveExpressionCycleNPE() throws Exception
     {
-        Properties props = new Properties();
-        props.setProperty( "aa", "${bb}" );
-        props.setProperty( "bb", "${aa}" );
+        Map<String, String> props = new HashMap<>();
+        props.put( "aa", "${bb}" );
+        props.put( "bb", "${aa}" );
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
 
         Model model = Model.newBuilder().properties( props ).build();
@@ -438,8 +440,8 @@ public abstract class AbstractModelInterpolatorTest
     @Test
     public void testRecursiveExpressionCycleBaseDir() throws Exception
     {
-        Properties props = new Properties();
-        props.setProperty( "basedir", "${basedir}" );
+        Map<String, String> props = new HashMap<>();
+        props.put( "basedir", "${basedir}" );
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
 
         Model model = Model.newBuilder().properties( props ).build();

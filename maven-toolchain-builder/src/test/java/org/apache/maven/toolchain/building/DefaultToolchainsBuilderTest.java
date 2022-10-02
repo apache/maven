@@ -89,7 +89,7 @@ public class DefaultToolchainsBuilderTest
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setUserToolchainsSource( new StringSource( "" ) );
 
-        Properties props = new Properties();
+        Map<String, String> props = new HashMap<>();
         props.put( "key", "user_value" );
         ToolchainModel toolchain = ToolchainModel.newBuilder()
                 .type( "TYPE" )
@@ -104,7 +104,7 @@ public class DefaultToolchainsBuilderTest
         assertNotNull( result.getEffectiveToolchains() );
         assertEquals( 1, result.getEffectiveToolchains().getToolchains().size() );
         assertEquals( "TYPE", result.getEffectiveToolchains().getToolchains().get(0).getType() );
-        assertEquals( "user_value", result.getEffectiveToolchains().getToolchains().get(0).getProvides().getProperty( "key" ) );
+        assertEquals( "user_value", result.getEffectiveToolchains().getToolchains().get(0).getProvides().get( "key" ) );
         assertNotNull( result.getProblems() );
         assertEquals( 0, result.getProblems().size() );
     }
@@ -116,7 +116,7 @@ public class DefaultToolchainsBuilderTest
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setGlobalToolchainsSource( new StringSource( "" ) );
 
-        Properties props = new Properties();
+        Map<String, String> props = new HashMap<>();
         props.put( "key", "global_value" );
         ToolchainModel toolchain = ToolchainModel.newBuilder()
                 .type( "TYPE" )
@@ -131,7 +131,7 @@ public class DefaultToolchainsBuilderTest
         assertNotNull( result.getEffectiveToolchains() );
         assertEquals( 1, result.getEffectiveToolchains().getToolchains().size() );
         assertEquals( "TYPE", result.getEffectiveToolchains().getToolchains().get(0).getType() );
-        assertEquals( "global_value", result.getEffectiveToolchains().getToolchains().get(0).getProvides().getProperty( "key" ) );
+        assertEquals( "global_value", result.getEffectiveToolchains().getToolchains().get(0).getProvides().get( "key" ) );
         assertNotNull( result.getProblems() );
         assertEquals( 0, result.getProblems().size() );
     }
@@ -144,7 +144,7 @@ public class DefaultToolchainsBuilderTest
         request.setGlobalToolchainsSource( new StringSource( "" ) );
         request.setUserToolchainsSource( new StringSource( "" ) );
 
-        Properties props = new Properties();
+        Map<String, String> props = new HashMap<>();
         props.put( "key", "user_value" );
         ToolchainModel toolchain = ToolchainModel.newBuilder()
                 .type( "TYPE" )
@@ -154,7 +154,7 @@ public class DefaultToolchainsBuilderTest
                 .toolchains( Collections.singletonList( toolchain ) )
                 .build();
 
-        props = new Properties();
+        props = new HashMap<>();
         props.put( "key", "global_value" );
         toolchain = ToolchainModel.newBuilder()
                 .type( "TYPE" )
@@ -170,9 +170,9 @@ public class DefaultToolchainsBuilderTest
         assertNotNull( result.getEffectiveToolchains() );
         assertEquals( 2, result.getEffectiveToolchains().getToolchains().size() );
         assertEquals( "TYPE", result.getEffectiveToolchains().getToolchains().get(0).getType() );
-        assertEquals( "user_value", result.getEffectiveToolchains().getToolchains().get(0).getProvides().getProperty( "key" ) );
+        assertEquals( "user_value", result.getEffectiveToolchains().getToolchains().get(0).getProvides().get( "key" ) );
         assertEquals( "TYPE", result.getEffectiveToolchains().getToolchains().get(1).getType() );
-        assertEquals( "global_value", result.getEffectiveToolchains().getToolchains().get(1).getProvides().getProperty( "key" ) );
+        assertEquals( "global_value", result.getEffectiveToolchains().getToolchains().get(1).getProvides().get( "key" ) );
         assertNotNull( result.getProblems() );
         assertEquals( 0, result.getProblems().size() );
     }
@@ -222,7 +222,7 @@ public class DefaultToolchainsBuilderTest
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setUserToolchainsSource( new StringSource( "" ) );
 
-        Properties props = new Properties();
+        Map<String, String> props = new HashMap<>();
         props.put( "key", "${env.testKey}" );
         Xpp3Dom configurationChild = new Xpp3Dom("jdkHome", "${env.testKey}", null, null, null);
         Xpp3Dom configuration = new Xpp3Dom("configuration", null, null, Collections.singletonList(configurationChild), null);
@@ -239,7 +239,7 @@ public class DefaultToolchainsBuilderTest
 
         ToolchainsBuildingResult result = toolchainBuilder.build( request );
         String interpolatedValue = "testValue";
-        assertEquals(interpolatedValue, result.getEffectiveToolchains().getToolchains().get(0).getProvides().getProperty( "key" ) );
+        assertEquals(interpolatedValue, result.getEffectiveToolchains().getToolchains().get(0).getProvides().get( "key" ) );
         Xpp3Dom toolchainConfiguration = (Xpp3Dom) result.getEffectiveToolchains().getToolchains().get(0).getConfiguration();
         assertEquals(interpolatedValue, toolchainConfiguration.getChild("jdkHome").getValue());
         assertNotNull( result.getProblems() );
@@ -253,7 +253,7 @@ public class DefaultToolchainsBuilderTest
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setUserToolchainsSource( new StringSource( "" ) );
 
-        Properties props = new Properties();
+        Map<String, String> props = new HashMap<>();
         props.put( "key", "${env.testNonExistingKey}" );
         ToolchainModel toolchain = ToolchainModel.newBuilder()
                 .type( "TYPE" )
@@ -266,7 +266,7 @@ public class DefaultToolchainsBuilderTest
         doReturn(persistedToolchains).when( toolchainsReader ).read( any( InputStream.class ), ArgumentMatchers.<String, Object>anyMap());
 
         ToolchainsBuildingResult result = toolchainBuilder.build( request );
-        assertEquals("${env.testNonExistingKey}", result.getEffectiveToolchains().getToolchains().get(0).getProvides().getProperty( "key" ) );
+        assertEquals("${env.testNonExistingKey}", result.getEffectiveToolchains().getToolchains().get(0).getProvides().get( "key" ) );
         assertNotNull( result.getProblems() );
         assertEquals( 0, result.getProblems().size() );
     }
@@ -278,7 +278,7 @@ public class DefaultToolchainsBuilderTest
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setUserToolchainsSource( new StringSource( "" ) );
 
-        Properties props = new Properties();
+        Map<String, String> props = new HashMap<>();
         props.put( "key", "${env.testSpecialCharactersKey}" );
         ToolchainModel toolchain = ToolchainModel.newBuilder()
                 .type( "TYPE" )
@@ -292,7 +292,7 @@ public class DefaultToolchainsBuilderTest
 
         ToolchainsBuildingResult result = toolchainBuilder.build( request );
         String interpolatedValue = "<test&Value>";
-        assertEquals(interpolatedValue, result.getEffectiveToolchains().getToolchains().get(0).getProvides().getProperty( "key" ) );
+        assertEquals(interpolatedValue, result.getEffectiveToolchains().getToolchains().get(0).getProvides().get( "key" ) );
         assertNotNull( result.getProblems() );
         assertEquals( 0, result.getProblems().size() );
     }

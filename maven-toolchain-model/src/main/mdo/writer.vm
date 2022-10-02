@@ -273,15 +273,15 @@ public class ${className}
         }
     }
 
-    private <T> void writeProperties( String tagName, Properties props, XmlSerializer serializer )
+    private <T> void writeProperties( String tagName, Map<String, String> props, XmlSerializer serializer )
             throws IOException
     {
         if ( props != null && !props.isEmpty() )
         {
             serializer.startTag( NAMESPACE, tagName );
-            for ( Map.Entry<Object, Object> entry : props.entrySet() )
+            for ( Map.Entry<String, String> entry : props.entrySet() )
             {
-                writeTag( entry.getKey().toString(), null, entry.getValue().toString(), serializer );
+                writeTag( entry.getKey(), null, entry.getValue(), serializer );
             }
             serializer.endTag( NAMESPACE, tagName );
         }

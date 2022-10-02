@@ -21,7 +21,9 @@ package org.apache.maven.settings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
@@ -87,11 +89,11 @@ public class SettingsUtilsTest
                 .property( ap )
                 .os( ao )
                 .build();
-        Properties props = new Properties();
+        Map<String, String> props = new HashMap<>();
         int count = entropy.nextInt( 10 );
         for ( int i = 0; i < count; i++ )
         {
-            props.setProperty( "name" + Long.toHexString( entropy.nextLong() ),
+            props.put( "name" + Long.toHexString( entropy.nextLong() ),
                     "value" + Long.toHexString( entropy.nextLong() ) );
         }
         count = entropy.nextInt( 3 );
