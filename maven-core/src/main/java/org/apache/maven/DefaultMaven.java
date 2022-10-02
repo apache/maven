@@ -293,7 +293,9 @@ public class DefaultMaven
 
             lifecycleStarter.execute( session );
 
-            validateActivatedProfiles( session.getProjects(), request.getActiveProfiles() );
+            validateActivatedProfiles( session.getProjects(),
+                    request.getActiveProfiles(),
+                    request.getInactiveProfiles() );
 
             if ( session.getResult().hasExceptions() )
             {
@@ -466,7 +468,9 @@ public class DefaultMaven
         }
     }
 
-    private void validateActivatedProfiles( List<MavenProject> projects, List<String> activeProfileIds )
+    private void validateActivatedProfiles( List<MavenProject> projects,
+                                            List<String> activeProfileIds,
+                                            List<String> inactiveProfileIds )
     {
         Collection<String> notActivatedProfileIds = new LinkedHashSet<>( activeProfileIds );
 
@@ -477,6 +481,8 @@ public class DefaultMaven
                 notActivatedProfileIds.removeAll( profileIds );
             }
         }
+
+        notActivatedProfileIds.removeAll( inactiveProfileIds );
 
         for ( String notActivatedProfileId : notActivatedProfileIds )
         {
