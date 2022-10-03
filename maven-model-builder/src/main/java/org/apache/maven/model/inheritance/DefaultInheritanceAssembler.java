@@ -67,9 +67,10 @@ public class DefaultInheritanceAssembler
                                           ModelProblemCollector problems )
     {
         // The use of the cache using a WeakHashMap is permitted because Model does not define equals/hashCode
-        return CACHE
-                .computeIfAbsent( child, c -> Collections.synchronizedMap( new WeakHashMap<>() ) )
-                .computeIfAbsent( parent, c -> doAssemble( child, parent ) );
+//        return CACHE
+//                .computeIfAbsent( child, c -> Collections.synchronizedMap( new WeakHashMap<>() ) )
+//                .computeIfAbsent( parent, c -> doAssemble( child, parent ) );
+        return doAssemble( child, parent );
     }
 
     private Model doAssemble( Model child, Model parent )
