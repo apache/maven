@@ -455,7 +455,7 @@ under the License.
           <required>true</required>
           <version>1.0.0+</version>
           <type>String</type>
-          <description>Parameter expression, to let user override default value with a system property, pom property or settings property.</description>
+          <description>Parameter expression, to let user override default value with a user property, system property or project property.</description>
         </field>
         <field xml.attribute="true" xml.tagName="implementation">
           <name>implementation</name>

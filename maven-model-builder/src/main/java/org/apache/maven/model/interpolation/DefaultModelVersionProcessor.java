@@ -49,6 +49,7 @@ public class DefaultModelVersionProcessor
             || SHA1_PROPERTY.equals( property );
     }
 
+    // TODO This class MUST test for user properties and THEN for system properties
     @Override
     public void overwriteModelProperties( Properties modelProperties, ModelBuildingRequest request )
     {

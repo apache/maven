@@ -576,8 +576,17 @@ public class MavenMetadataSource
                     configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
                     configuration.setProcessPlugins( false );
                     configuration.setRepositoryMerging( ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT );
-                    configuration.setSystemProperties( getSystemProperties() );
-                    configuration.setUserProperties( new Properties() );
+                    MavenSession session = legacySupport.getSession();
+                    if ( session != null )
+                    {
+                        configuration.setSystemProperties( session.getSystemProperties() );
+                        configuration.setUserProperties( session.getUserProperties() );
+                    }
+                    else
+                    {
+                        configuration.setSystemProperties( getSystemProperties() );
+                        configuration.setUserProperties( new Properties() );
+                    }
                     configuration.setRepositorySession( legacySupport.getRepositorySession() );
 
                     project = projectBuilder.build( pomArtifact, configuration ).getProject();

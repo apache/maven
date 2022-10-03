@@ -41,7 +41,7 @@ Maven Model Builder
 
    ** profile activation: see {{{./apidocs/org/apache/maven/model/profile/activation/package-summary.html}available activators}}.
    Notice that model interpolation hasn't happened yet, then interpolation for file-based activation is limited to
-   <<<$\{basedir}>>> (since Maven 3), System properties and request properties
+   <<<$\{basedir}>>> (since Maven 3), system properties and user properties
 
    ** file model validation: <<<ModelValidator>>> ({{{./apidocs/org/apache/maven/model/validation/ModelValidator.html}javadoc}}),
    with its <<<DefaultModelValidator>>> implementation
@@ -162,7 +162,7 @@ Maven Model Builder
 
   Notice that model interpolation happens <after> profile activation, then profile activation doesn't benefit from every values:
   interpolation for file-based activation is limited to <<<$\{basedir}>>> (which was introduced in Maven 3 and is not deprecated
-  in this context), System properties and request properties.
+  in this context), system properties and user properties.
 
   Values are evaluated in sequence from different syntaxes:
 
@@ -198,8 +198,10 @@ Maven Model Builder
 *----+------+------+
 | <<<maven.repo.local>>> | The repository on the local machine Maven shall use to store installed and downloaded artifacts (POMs, JARs, etc). | <<<$\{user.home\}/.m2/repository>>> |
 *----+------+------+
-| <<<*>>> | Java system properties (see {{{http://download.oracle.com/javase/6/docs/api/java/lang/System.html#getProperties()}JDK reference}}) | <<<$\{user.home\}>>>\
+| <<<*>>> | Java system properties (see {{{https://docs.oracle.com/javase/8/docs/api/java/lang/System.html#getProperties()}JDK reference}}) | <<<$\{user.home\}>>>\
  | | <<<$\{java.home\}>>> |
+*----+------+------+
+| <<<*>>> | User properties | <<<$\{foo\}>>> |
 *----+------+------+
 | <<<env.*>>>\
 <<<*>>> | environment variables | <<<$\{env.PATH\}>>> |

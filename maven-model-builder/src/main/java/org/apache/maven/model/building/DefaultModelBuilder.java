@@ -173,7 +173,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#setModelProcessor(ModelProcessor) 
+     * @see DefaultModelBuilderFactory#setModelProcessor(ModelProcessor)
      */
     @Deprecated
     public DefaultModelBuilder setModelProcessor( ModelProcessor modelProcessor )
@@ -187,7 +187,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#setModelProcessor(ModelProcessor) 
+     * @see DefaultModelBuilderFactory#setModelProcessor(ModelProcessor)
      */
     @Deprecated
     public DefaultModelBuilder setModelValidator( ModelValidator modelValidator )
@@ -201,7 +201,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#setModelNormalizer(ModelNormalizer) 
+     * @see DefaultModelBuilderFactory#setModelNormalizer(ModelNormalizer)
      */
     @Deprecated
     public DefaultModelBuilder setModelNormalizer( ModelNormalizer modelNormalizer )
@@ -215,7 +215,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#setModelInterpolator(ModelInterpolator) 
+     * @see DefaultModelBuilderFactory#setModelInterpolator(ModelInterpolator)
      */
     @Deprecated
     public DefaultModelBuilder setModelInterpolator( ModelInterpolator modelInterpolator )
@@ -243,7 +243,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#setModelUrlNormalizer(ModelUrlNormalizer) 
+     * @see DefaultModelBuilderFactory#setModelUrlNormalizer(ModelUrlNormalizer)
      */
     @Deprecated
     public DefaultModelBuilder setModelUrlNormalizer( ModelUrlNormalizer modelUrlNormalizer )
@@ -257,7 +257,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#setSuperPomProvider(SuperPomProvider) 
+     * @see DefaultModelBuilderFactory#setSuperPomProvider(SuperPomProvider)
      */
     @Deprecated
     public DefaultModelBuilder setSuperPomProvider( SuperPomProvider superPomProvider )
@@ -271,7 +271,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#setInheritanceAssembler(InheritanceAssembler) 
+     * @see DefaultModelBuilderFactory#setInheritanceAssembler(InheritanceAssembler)
      */
     @Deprecated
     public DefaultModelBuilder setInheritanceAssembler( InheritanceAssembler inheritanceAssembler )
@@ -299,7 +299,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#setProfileInjector(ProfileInjector) 
+     * @see DefaultModelBuilderFactory#setProfileInjector(ProfileInjector)
      */
     @Deprecated
     public DefaultModelBuilder setProfileInjector( ProfileInjector profileInjector )
@@ -313,7 +313,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#setPluginManagementInjector(PluginManagementInjector) 
+     * @see DefaultModelBuilderFactory#setPluginManagementInjector(PluginManagementInjector)
      */
     @Deprecated
     public DefaultModelBuilder setPluginManagementInjector( PluginManagementInjector pluginManagementInjector )
@@ -327,7 +327,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#setDependencyManagementInjector(DependencyManagementInjector)  
+     * @see DefaultModelBuilderFactory#setDependencyManagementInjector(DependencyManagementInjector)
      */
     @Deprecated
     public DefaultModelBuilder setDependencyManagementInjector(
@@ -342,7 +342,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#setDependencyManagementImporter(DependencyManagementImporter) 
+     * @see DefaultModelBuilderFactory#setDependencyManagementImporter(DependencyManagementImporter)
      */
     @Deprecated
     public DefaultModelBuilder setDependencyManagementImporter(
@@ -357,7 +357,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#setLifecycleBindingsInjector(LifecycleBindingsInjector) 
+     * @see DefaultModelBuilderFactory#setLifecycleBindingsInjector(LifecycleBindingsInjector)
      */
     @Deprecated
     public DefaultModelBuilder setLifecycleBindingsInjector( LifecycleBindingsInjector lifecycleBindingsInjector )
@@ -371,7 +371,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#setPluginConfigurationExpander(PluginConfigurationExpander) 
+     * @see DefaultModelBuilderFactory#setPluginConfigurationExpander(PluginConfigurationExpander)
      */
     @Deprecated
     public DefaultModelBuilder setPluginConfigurationExpander( PluginConfigurationExpander pluginConfigurationExpander )
@@ -385,7 +385,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#setReportConfigurationExpander(ReportConfigurationExpander)  
+     * @see DefaultModelBuilderFactory#setReportConfigurationExpander(ReportConfigurationExpander)
      */
     @Deprecated
     public DefaultModelBuilder setReportConfigurationExpander( ReportConfigurationExpander reportConfigurationExpander )
@@ -399,7 +399,7 @@ public class DefaultModelBuilder
 
     /**
      * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#setReportingConverter(ReportingConverter) 
+     * @see DefaultModelBuilderFactory#setReportingConverter(ReportingConverter)
      */
     @Deprecated
     public DefaultModelBuilder setReportingConverter( ReportingConverter reportingConverter )
@@ -973,7 +973,7 @@ public class DefaultModelBuilder
 
             try
             {
-                // must implement TransformContext, but should use request to access system properties/modelcache
+                // must implement TransformContext, but should use request to access properties/model cache
                 org.apache.maven.api.model.Model transformedFileModel = modelProcessor.read( pomFile,
                         Collections.singletonMap( ModelReader.TRANSFORMER_CONTEXT, context ) );
 
@@ -1352,7 +1352,7 @@ public class DefaultModelBuilder
 
                 // Validate versions aren't inherited when using parent ranges the same way as when read externally.
                 String rawChildModelVersion = childModel.getVersion();
-                
+
                 if ( rawChildModelVersion == null )
                 {
                     // Message below is checked for in the MNG-2199 core IT.
@@ -1483,7 +1483,7 @@ public class DefaultModelBuilder
         if ( !parent.getVersion().equals( version ) )
         {
             String rawChildModelVersion = childModel.getVersion();
-            
+
             if ( rawChildModelVersion == null )
             {
                 // Message below is checked for in the MNG-2199 core IT.
