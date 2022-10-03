@@ -63,8 +63,9 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
  *                             <td>{@link MojoExecution#getMojoDescriptor()}.{@link MojoDescriptor#getPluginDescriptor()
  *                                 getPluginDescriptor()}</td></tr>
  * <tr><td><code>plugin.*</code></td>          <td></td>               <td></td></tr>
- * <tr><td><code>*</code></td>                 <td></td>               <td>system properties</td></tr>
+ * <tr><td><code>*</code></td>                 <td></td>               <td>user properties</td></tr>
  * <tr><td><code>*</code></td>                 <td></td>               <td>project properties</td></tr>
+ * <tr><td><code>*</code></td>                 <td></td>               <td>system properties</td></tr>
  * </table>
  * <i>Notice:</i> <code>reports</code> was supported in Maven 2.x but was removed in Maven 3
  *
@@ -382,7 +383,7 @@ public class PluginParameterExpressionEvaluator
         /*
          * MNG-4312: We neither have reserved all of the above magic expressions nor is their set fixed/well-known (it
          * gets occasionally extended by newer Maven versions). This imposes the risk for existing plugins to
-         * unintentionally use such a magic expression for an ordinary system property. So here we check whether we
+         * unintentionally use such a magic expression for an ordinary property. So here we check whether we
          * ended up with a magic value that is not compatible with the type of the configured mojo parameter (a string
          * could still be converted by the configurator so we leave those alone). If so, back off to evaluating the
          * expression from properties only.
@@ -398,10 +399,10 @@ public class PluginParameterExpressionEvaluator
 
             if ( properties != null )
             {
-                // We will attempt to get nab a system property as a way to specify a
-                // parameter to a plugins. My particular case here is allowing the surefire
-                // plugin to run a single test so I want to specify that class on the cli
-                // as a parameter.
+                // We will attempt to get nab a property as a way to specify a parameter
+                // to a plugin. My particular case here is allowing the surefire plugin
+                // to run a single test so I want to specify that class on the cli as
+                // a parameter.
 
                 value = properties.getProperty( expression );
             }

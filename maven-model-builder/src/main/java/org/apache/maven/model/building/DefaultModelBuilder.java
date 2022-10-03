@@ -1058,7 +1058,7 @@ public class DefaultModelBuilder
 
                 // Validate versions aren't inherited when using parent ranges the same way as when read externally.
                 String rawChildModelVersion = childModel.getVersion();
-                
+
                 if ( rawChildModelVersion == null )
                 {
                     // Message below is checked for in the MNG-2199 core IT.
@@ -1198,7 +1198,7 @@ public class DefaultModelBuilder
         if ( !parent.getVersion().equals( version ) )
         {
             String rawChildModelVersion = childModel.getVersion();
-            
+
             if ( rawChildModelVersion == null )
             {
                 // Message below is checked for in the MNG-2199 core IT.

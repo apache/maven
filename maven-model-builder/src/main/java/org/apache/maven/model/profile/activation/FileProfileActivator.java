@@ -41,7 +41,7 @@ import org.codehaus.plexus.util.StringUtils;
  * Determines profile activation based on the existence/absence of some file.
  * File name interpolation support is limited to <code>${basedir}</code> (since Maven 3,
  * see <a href="https://issues.apache.org/jira/browse/MNG-2363">MNG-2363</a>),
- * System properties and request properties.
+ * system properties and user properties.
  * <code>${project.basedir}</code> is intentionally not supported as this form would suggest that other
  * <code>${project.*}</code> expressions can be used, which is however beyond the design.
  *

@@ -250,8 +250,8 @@ public class MavenCliTest
         String revision = System.getProperty( "revision" );
         assertEquals( "8.2.0", revision );
 
-        assertEquals( "bar ", request.getSystemProperties().getProperty( "foo" ) );
-        assertEquals( "bar two", request.getSystemProperties().getProperty( "foo2" ) );
+        assertEquals( "bar ", request.getUserProperties().getProperty( "foo" ) );
+        assertEquals( "bar two", request.getUserProperties().getProperty( "foo2" ) );
 
         assertEquals( "-Dpom.xml", request.getCommandLine().getOptionValue( CLIManager.ALTERNATE_POM_FILE ) );
     }

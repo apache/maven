@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  * A core extension to monitor Maven's execution. Typically, such an extension gets loaded into Maven by specifying the
- * system property {@code maven.ext.class.path} on the command line. As soon as dependency injection is setup, Maven
+ * property {@code maven.ext.class.path} on the command line. As soon as dependency injection is set up, Maven
  * looks up all implementers of this interface and calls their {@link #init(Context)} method. <em>Note:</em>
  * Implementors are strongly advised to inherit from {@link AbstractEventSpy} instead of directly implementing this
  * interface.

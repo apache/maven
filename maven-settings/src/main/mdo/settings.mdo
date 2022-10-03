@@ -789,7 +789,7 @@
           <version>1.0.0+</version>
           <description>
             <![CDATA[
-            Specifies that this profile will be activated when this System property is specified.
+            Specifies that this profile will be activated when this property is specified.
             ]]>
           </description>
           <association>

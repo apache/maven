@@ -2663,7 +2663,7 @@
         <field>
           <name>property</name>
           <version>4.0.0+</version>
-          <description>Specifies that this profile will be activated when this system property is
+          <description>Specifies that this profile will be activated when this property is
             specified.</description>
           <association>
             <type>ActivationProperty</type>
@@ -2765,7 +2765,7 @@
         activated. On the other hand, <code>exists</code> will test for the existence of the file and if it is
         there, the profile will be activated.<br>
         Variable interpolation for these file specifications is limited to <code>${basedir}</code>,
-        System properties and request properties.]]></description>
+        system properties and user properties.]]></description>
       <fields>
         <field>
           <name>missing</name>

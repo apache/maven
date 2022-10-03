@@ -123,6 +123,7 @@ public class DefaultRepositorySystemSessionFactory
         configProps.put( ConfigurationProperties.USER_AGENT, getUserAgent() );
         configProps.put( ConfigurationProperties.INTERACTIVE, request.isInteractiveMode() );
         configProps.put( "maven.startTime", request.getStartTime() );
+        // Resolver's ConfigUtils solely rely on config properties, that is why we need to add both here as well.
         configProps.putAll( request.getSystemProperties() );
         configProps.putAll( request.getUserProperties() );
 
@@ -282,13 +283,13 @@ public class DefaultRepositorySystemSessionFactory
                     + MAVEN_RESOLVER_TRANSPORT_NATIVE + ", " + MAVEN_RESOLVER_TRANSPORT_AUTO );
         }
 
-        session.setTransferListener( request.getTransferListener() );
-
-        session.setRepositoryListener( eventSpyDispatcher.chainListener( new LoggingRepositoryListener( logger ) ) );
-
         session.setUserProperties( request.getUserProperties() );
         session.setSystemProperties( request.getSystemProperties() );
         session.setConfigProperties( configProps );
+
+        session.setTransferListener( request.getTransferListener() );
+
+        session.setRepositoryListener( eventSpyDispatcher.chainListener( new LoggingRepositoryListener( logger ) ) );
 
         mavenRepositorySystem.injectMirror( request.getRemoteRepositories(), request.getMirrors() );
         mavenRepositorySystem.injectProxy( session, request.getRemoteRepositories() );
