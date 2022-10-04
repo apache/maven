@@ -223,7 +223,17 @@ public class DefaultProjectBuilder
                 this.poolBuilder = new ReactorModelPool.Builder();
                 this.modelPool = poolBuilder.build();
                 this.transformerContextBuilder = modelBuilder.newTransformerContextBuilder();
-                this.forkJoinPool = new ForkJoinPool();
+                int parallelism = Runtime.getRuntime().availableProcessors();
+                try
+                {
+                    String str = request.getUserProperties().getProperty( "maven.projectBuilder.parallelism" );
+                    parallelism = Integer.parseInt( str );
+                }
+                catch ( Exception e )
+                {
+                    // ignore
+                }
+                this.forkJoinPool = new ForkJoinPool( parallelism );
             }
             else
             {
