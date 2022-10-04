@@ -40,8 +40,8 @@ public class DefaultArtifactManager implements ArtifactManager
 
     @Nonnull
     private final DefaultSession session;
-    private final Map<Artifact, Path> paths = new ConcurrentHashMap<>();
-    private final Map<Artifact, Collection<Metadata>> metadatas = new ConcurrentHashMap<>();
+    private final Map<String, Path> paths = new ConcurrentHashMap<>();
+    private final Map<String, Collection<Metadata>> metadatas = new ConcurrentHashMap<>();
 
     public DefaultArtifactManager( @Nonnull DefaultSession session )
     {
@@ -52,9 +52,9 @@ public class DefaultArtifactManager implements ArtifactManager
     @Override
     public Optional<Path> getPath( @Nonnull Artifact artifact )
     {
+        String id = id( artifact );
         if ( session.getMavenSession().getAllProjects() != null )
         {
-            String id = id( artifact );
             for ( MavenProject project : session.getMavenSession().getAllProjects() )
             {
                 if ( id.equals( id( project.getArtifact() ) ) && project.getArtifact().getFile() != null )
@@ -63,7 +63,7 @@ public class DefaultArtifactManager implements ArtifactManager
                 }
             }
         }
-        Path path = paths.get( artifact );
+        Path path = paths.get( id );
         if ( path == null && artifact instanceof DefaultArtifact )
         {
             File file = ( (DefaultArtifact) artifact ).getArtifact().getFile();
@@ -78,9 +78,9 @@ public class DefaultArtifactManager implements ArtifactManager
     @Override
     public void setPath( @Nonnull Artifact artifact, Path path )
     {
+        String id = id( artifact );
         if ( session.getMavenSession().getAllProjects() != null )
         {
-            String id = id( artifact );
             for ( MavenProject project : session.getMavenSession().getAllProjects() )
             {
                 if ( id.equals( id( project.getArtifact() ) ) )
@@ -92,11 +92,11 @@ public class DefaultArtifactManager implements ArtifactManager
         }
         if ( path == null )
         {
-            paths.remove( artifact );
+            paths.remove( id );
         }
         else
         {
-            paths.put( artifact, path );
+            paths.put( id, path );
         }
     }
 
@@ -104,14 +104,14 @@ public class DefaultArtifactManager implements ArtifactManager
     @Override
     public Collection<Metadata> getAttachedMetadatas( @Nonnull Artifact artifact )
     {
-        Collection<Metadata> m = metadatas.get( artifact );
+        Collection<Metadata> m = metadatas.get( id( artifact ) );
         return m != null ? Collections.unmodifiableCollection( m ) : Collections.emptyList();
     }
 
     @Override
     public void attachMetadata( @Nonnull Artifact artifact, @Nonnull Metadata metadata )
     {
-        metadatas.computeIfAbsent( artifact, a -> new CopyOnWriteArrayList<>() ).add( metadata );
+        metadatas.computeIfAbsent( id( artifact ), a -> new CopyOnWriteArrayList<>() ).add( metadata );
     }
 
     private String id( org.apache.maven.artifact.Artifact artifact )
@@ -126,11 +126,7 @@ public class DefaultArtifactManager implements ArtifactManager
 
     private String id( Artifact artifact )
     {
-        return artifact.getGroupId()
-                + ":" + artifact.getArtifactId()
-                + ":" + artifact.getExtension()
-                + ( artifact.getClassifier().isEmpty() ? "" : ":" + artifact.getClassifier() )
-                + ":" + artifact.getVersion();
+        return artifact.key();
     }
 
 }
