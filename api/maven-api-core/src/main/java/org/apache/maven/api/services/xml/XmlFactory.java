@@ -22,6 +22,8 @@ package org.apache.maven.api.services.xml;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Path;
 
@@ -95,4 +97,32 @@ public interface XmlFactory<T> extends Service
 
     void write( @Nonnull XmlWriterRequest<T> request ) throws XmlWriterException;
 
+    /**
+     * Simply parse the given xml string.
+     * 
+     * @param xml the input xml string
+     * @return the parsed object
+     * @throws XmlReaderException if an error occurs during the parsing
+     * @see #toXmlString(Object) 
+     */
+    default T fromXmlString( @Nonnull String xml ) throws XmlReaderException
+    {
+        return read( new StringReader( xml ) );
+    }
+    
+    /**
+     * Simply converts the given content to an xml string.
+     * 
+     * @param content the object to convert
+     * @return the xml string representation
+     * @throws XmlWriterException if an error occurs during the transformation
+     * @see #fromXmlString(String) 
+     */
+    default String toXmlString( @Nonnull T content ) throws XmlWriterException
+    {
+        StringWriter sw = new StringWriter();
+        write( content, sw );
+        return sw.toString();
+    }
+    
 }
