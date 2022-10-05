@@ -532,23 +532,6 @@ under the License.
           <artifactId>buildnumber-maven-plugin</artifactId>
           <version>1.4</version>
         </plugin>
-        <plugin>
-          <groupId>org.apache.rat</groupId>
-          <artifactId>apache-rat-plugin</artifactId>
-          <configuration>
-            <excludes>
-              <exclude>src/test/resources*/**</exclude>
-              <exclude>src/test/projects/**</exclude>
-              <exclude>src/test/remote-repo/**</exclude>
-              <exclude>**/*.odg</exclude>
-              <!--
-                ! Excluded the license files itself cause they do not have have a license of themselves.
-              -->
-              <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
-              <exclude>src/main/appended-resources/licenses/unrecognized-javax.annotation-api-1.2.txt</exclude>
-            </excludes>
-          </configuration>
-        </plugin>
         <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
@@ -615,13 +598,27 @@ under the License.
       <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
-        <configuration>
-          <excludes combine.children="append">
-            <exclude>bootstrap/**</exclude>
-            <exclude>README.bootstrap.txt</exclude>
-            <exclude>README.md</exclude>
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <id>rat-check</id>
+            <inherited>false</inherited>
+            <configuration>
+              <excludes>
+                <exclude>**/.gitattributes</exclude>
+                <exclude>src/test/resources*/**</exclude>
+                <exclude>src/test/projects/**</exclude>
+                <exclude>src/test/remote-repo/**</exclude>
+                <exclude>**/*.odg</exclude>
+                <exclude>.asf.yaml</exclude>
+                <!--
+                  ! Excluded the license files itself cause they do not have have a license of themselves.
+                -->
+                <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
+                <exclude>src/main/appended-resources/licenses/unrecognized-javax.annotation-api-1.2.txt</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
