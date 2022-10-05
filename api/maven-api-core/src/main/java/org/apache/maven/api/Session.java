@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Properties;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -57,12 +56,11 @@ public interface Session
     @Nonnull
     SessionData getData();
 
-    // TODO: investigate using Map<String, String> or Map<String, Object> for all properties in the new API
     @Nonnull
-    Properties getUserProperties();
+    Map<String, String> getUserProperties();
 
     @Nonnull
-    Properties getSystemProperties();
+    Map<String, String> getSystemProperties();
 
     /**
      * Returns the current maven version
