@@ -107,23 +107,20 @@ public class ${className}
       #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
         builder.${field.name}( transform( target.get${capField}(), this::transform ) );
       #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
-        Properties props = target.get${capField}();
-        Properties newProps = null;
-        for ( Map.Entry<Object, Object> entry : props.entrySet() )
+        Map<String, String> props = target.get${capField}();
+        Map<String, String> newProps = null;
+        for ( Map.Entry<String, String> entry : props.entrySet() )
         {
-            if ( entry.getKey() instanceof String && entry.getValue() instanceof String )
+            String newVal = transform( entry.getValue() );
+            if ( newVal != null && newVal != entry.getValue() )
             {
-                String newVal = transform( ( String ) entry.getValue() );
-                if ( newVal != null && newVal != entry.getValue() )
+                if ( newProps == null )
                 {
-                    if ( newProps == null )
-                    {
-                        newProps = new Properties();
-                        newProps.putAll( props );
-                        builder.${field.name}( newProps );
-                    }
-                    newProps.put( ( String ) entry.getKey(), newVal );
+                    newProps = new HashMap<>();
+                    newProps.putAll( props );
+                    builder.${field.name}( newProps );
                 }
+                newProps.put( entry.getKey(), newVal );
             }
         }
       #elseif ( $field.to && $field.multiplicity == "1" )

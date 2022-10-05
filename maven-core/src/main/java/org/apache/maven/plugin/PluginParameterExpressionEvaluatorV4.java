@@ -45,7 +45,7 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
  * <tr><td><code>session.*</code></td>         <td>(since Maven 3)</td><td></td></tr>
  * <tr><td><code>localRepository</code></td>   <td></td>
  *                                             <td>{@link Session#getLocalRepository()}</td></tr>
- * <tr><td><code>reactorProjects</code></td>   <td></td>               <td>{@link MavenSession#getProjects()}</td></tr>
+ * <tr><td><code>reactorProjects</code></td>   <td></td>               <td>{@link Session#getProjects()}</td></tr>
  * <tr><td><code>project</code></td>           <td></td>
  *                                             <td>{@link Session#getCurrentProject()}</td></tr>
  * <tr><td><code>project.*</code></td>         <td></td>               <td></td></tr>
@@ -402,7 +402,7 @@ public class PluginParameterExpressionEvaluatorV4
 
             if ( ( value == null ) && ( ( project != null ) && ( project.getModel().getProperties() != null ) ) )
             {
-                value = project.getModel().getProperties().getProperty( expression );
+                value = project.getModel().getProperties().get( expression );
             }
 
         }

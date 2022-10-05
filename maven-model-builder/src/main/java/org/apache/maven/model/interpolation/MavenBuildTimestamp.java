@@ -22,7 +22,7 @@ package org.apache.maven.model.interpolation;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Properties;
+import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -49,9 +49,9 @@ public class MavenBuildTimestamp
         this( time, DEFAULT_BUILD_TIMESTAMP_FORMAT );
     }
 
-    public MavenBuildTimestamp( Date time, Properties properties )
+    public MavenBuildTimestamp( Date time, Map<String, String> properties )
     {
-        this( time, properties != null ? properties.getProperty( BUILD_TIMESTAMP_FORMAT_PROPERTY ) : null );
+        this( time, properties != null ? properties.get( BUILD_TIMESTAMP_FORMAT_PROPERTY ) : null );
     }
 
     public MavenBuildTimestamp( Date time, String timestampFormat )

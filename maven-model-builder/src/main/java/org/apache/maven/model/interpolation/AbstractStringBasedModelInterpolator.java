@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -96,7 +96,7 @@ public abstract class AbstractStringBasedModelInterpolator
     protected List<ValueSource> createValueSources( final Model model, final File projectDir,
                                                     final ModelBuildingRequest config )
     {
-        Properties modelProperties = model.getProperties();
+        Map<String, String> modelProperties = model.getProperties();
 
         ValueSource projectPrefixValueSource = new PrefixedObjectValueSource( PROJECT_PREFIXES, model, false );
 

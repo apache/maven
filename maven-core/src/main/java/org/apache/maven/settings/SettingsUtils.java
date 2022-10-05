@@ -117,7 +117,8 @@ public final class SettingsUtils
             profile.activation( activation.build() );
         }
 
-        profile.properties( modelProfile.getProperties() );
+        profile.properties( modelProfile.getProperties().entrySet().stream()
+                .collect( Collectors.toMap( e -> e.getKey().toString(), e -> e.getValue().toString() ) ) );
 
         List<org.apache.maven.model.Repository> repos = modelProfile.getRepositories();
         if ( repos != null )

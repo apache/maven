@@ -197,6 +197,13 @@ public class ${class.name}
             update( getDelegate().with${cap}( ( ( Xpp3Dom ) ${field.name} ).getDom() ) );
             ( ( Xpp3Dom ) ${field.name} ).setChildrenTracking( this::replace );
         }
+      #elseif( $field.type == "java.util.Properties" )
+        Map<String, String> map = ${field.name}.entrySet().stream()
+                .collect( Collectors.toMap( e -> e.getKey().toString(), e -> e.getValue().toString() ) );
+        if ( !Objects.equals( map, getDelegate().get${cap}() ) )
+        {
+            update( getDelegate().with${cap}( map ) );
+        }
       #else
         if ( !Objects.equals( ${field.name}, getDelegate().${pfx}${cap}() ) )
         {

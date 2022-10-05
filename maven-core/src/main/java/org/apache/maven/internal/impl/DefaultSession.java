@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Properties;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -180,16 +179,16 @@ public class DefaultSession extends AbstractSession
 
     @Nonnull
     @Override
-    public Properties getUserProperties()
+    public Map<String, String> getUserProperties()
     {
-        return mavenSession.getUserProperties();
+        return new PropertiesAsMap( mavenSession.getUserProperties() );
     }
 
     @Nonnull
     @Override
-    public Properties getSystemProperties()
+    public Map<String, String> getSystemProperties()
     {
-        return mavenSession.getSystemProperties();
+        return new PropertiesAsMap( mavenSession.getSystemProperties() );
     }
 
     @Nonnull

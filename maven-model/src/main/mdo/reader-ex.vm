@@ -43,7 +43,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import org.apache.maven.api.annotations.Generated;
 import org.apache.maven.internal.xml.DomBuilder;
@@ -274,7 +273,7 @@ public class ${className}
                     ${classLcapName}.${field.name}( ${field.name} );
                     break;
       #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
-                    Properties ${field.name} = new Properties();
+                    Map<String, String> ${field.name} = new HashMap<>();
                     locations = new HashMap<>();
                     while ( parser.nextTag() == XmlPullParser.START_TAG )
                     {
