@@ -41,39 +41,15 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.services.ArtifactDeployer;
-import org.apache.maven.api.services.ArtifactFactory;
-import org.apache.maven.api.services.ArtifactInstaller;
-import org.apache.maven.api.services.ArtifactManager;
-import org.apache.maven.api.services.ArtifactResolver;
-import org.apache.maven.api.services.ArtifactCoordinateFactory;
-import org.apache.maven.api.services.DependencyCollector;
-import org.apache.maven.api.services.DependencyCoordinateFactory;
-import org.apache.maven.api.services.LocalRepositoryManager;
-import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MavenException;
-import org.apache.maven.api.services.MessageBuilderFactory;
-import org.apache.maven.api.services.ProjectBuilder;
-import org.apache.maven.api.services.ProjectManager;
-import org.apache.maven.api.services.Prompter;
-import org.apache.maven.api.services.RepositoryFactory;
-import org.apache.maven.api.services.ToolchainManager;
-import org.apache.maven.api.services.TypeRegistry;
-import org.apache.maven.api.services.VersionParser;
-import org.apache.maven.api.services.xml.ModelXmlFactory;
-import org.apache.maven.api.services.xml.SettingsXmlFactory;
-import org.apache.maven.api.services.xml.ToolchainsXmlFactory;
 import org.apache.maven.api.settings.Settings;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.rtinfo.RuntimeInformation;
-import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -89,26 +65,18 @@ public class DefaultSession extends AbstractSession
     private final RepositorySystemSession session;
     private final RepositorySystem repositorySystem;
     private final List<RemoteRepository> repositories;
-    private final org.apache.maven.project.ProjectBuilder projectBuilder;
     private final MavenRepositorySystem mavenRepositorySystem;
-    private final DefaultToolchainManagerPrivate toolchainManagerPrivate;
     private final PlexusContainer container;
-    private final MojoExecutionScope mojoExecutionScope;
     private final RuntimeInformation runtimeInformation;
-    private final ArtifactHandlerManager artifactHandlerManager;
     private final Map<Class<? extends Service>, Service> services = new HashMap<>();
 
     @SuppressWarnings( "checkstyle:ParameterNumber" )
     public DefaultSession( @Nonnull MavenSession session,
                            @Nonnull RepositorySystem repositorySystem,
                            @Nullable List<RemoteRepository> repositories,
-                           @Nonnull org.apache.maven.project.ProjectBuilder projectBuilder,
                            @Nonnull MavenRepositorySystem mavenRepositorySystem,
-                           @Nonnull DefaultToolchainManagerPrivate toolchainManagerPrivate,
                            @Nonnull PlexusContainer container,
-                           @Nonnull MojoExecutionScope mojoExecutionScope,
-                           @Nonnull RuntimeInformation runtimeInformation,
-                           @Nonnull ArtifactHandlerManager artifactHandlerManager )
+                           @Nonnull RuntimeInformation runtimeInformation )
     {
         this.mavenSession = nonNull( session );
         this.session = mavenSession.getRepositorySession();
@@ -117,38 +85,9 @@ public class DefaultSession extends AbstractSession
                 ? repositories
                 : mavenSession.getRequest().getRemoteRepositories().stream()
                 .map( RepositoryUtils::toRepo ).map( this::getRemoteRepository ).collect( Collectors.toList() );
-        this.projectBuilder = projectBuilder;
         this.mavenRepositorySystem = mavenRepositorySystem;
-        this.toolchainManagerPrivate = toolchainManagerPrivate;
         this.container = container;
-        this.mojoExecutionScope = mojoExecutionScope;
         this.runtimeInformation = runtimeInformation;
-        this.artifactHandlerManager = artifactHandlerManager;
-
-        ArtifactManager artifactManager = new DefaultArtifactManager( this );
-        ProjectManager projectManager = new DefaultProjectManager( this, artifactManager, container );
-
-        services.put( ArtifactFactory.class, new DefaultArtifactFactory() );
-        services.put( ArtifactResolver.class, new DefaultArtifactResolver( repositorySystem ) );
-        services.put( ArtifactDeployer.class, new DefaultArtifactDeployer( repositorySystem ) );
-        services.put( ArtifactInstaller.class, new DefaultArtifactInstaller( repositorySystem ) );
-        services.put( ArtifactManager.class, artifactManager );
-        services.put( DependencyCoordinateFactory.class, new DefaultDependencyCoordinateFactory() );
-        services.put( DependencyCollector.class, new DefaultDependencyCollector( repositorySystem ) );
-        services.put( ProjectBuilder.class, new DefaultProjectBuilder( projectBuilder ) );
-        services.put( ProjectManager.class, projectManager );
-        services.put( LocalRepositoryManager.class, new DefaultLocalRepositoryManager() );
-        services.put( RepositoryFactory.class, new DefaultRepositoryFactory( repositorySystem ) );
-        services.put( ToolchainManager.class, new DefaultToolchainManager( toolchainManagerPrivate ) );
-        services.put( ModelXmlFactory.class, new DefaultModelXmlFactory() );
-        services.put( SettingsXmlFactory.class, new DefaultSettingsXmlFactory() );
-        services.put( ToolchainsXmlFactory.class, new DefaultToolchainsXmlFactory() );
-        services.put( Prompter.class, new DefaultPrompter( container ) );
-        services.put( MessageBuilderFactory.class, new DefaultMessageBuilderFactory() );
-        services.put( VersionParser.class, new DefaultVersionParser() );
-        services.put( ArtifactCoordinateFactory.class, new DefaultArtifactCoordinateFactory() );
-        services.put( TypeRegistry.class, new DefaultTypeRegistry( artifactHandlerManager ) );
-        services.put( Lookup.class, new DefaultLookup( container ) );
     }
 
     public MavenSession getMavenSession()
@@ -304,16 +243,16 @@ public class DefaultSession extends AbstractSession
                 .setLocalRepositoryManager( localRepositoryManager );
         MavenSession newSession = new MavenSession( mavenSession.getContainer(), repoSession,
                 mavenSession.getRequest(), mavenSession.getResult() );
-        return new DefaultSession( newSession, repositorySystem, repositories, projectBuilder, mavenRepositorySystem,
-                toolchainManagerPrivate, container, mojoExecutionScope, runtimeInformation, artifactHandlerManager );
+        return new DefaultSession( newSession, repositorySystem, repositories,
+                mavenRepositorySystem, container, runtimeInformation );
     }
 
     @Nonnull
     @Override
     public Session withRemoteRepositories( @Nonnull List<RemoteRepository> repositories )
     {
-        return new DefaultSession( mavenSession, repositorySystem, repositories, projectBuilder, mavenRepositorySystem,
-                toolchainManagerPrivate, container, mojoExecutionScope, runtimeInformation, artifactHandlerManager );
+        return new DefaultSession( mavenSession, repositorySystem, repositories,
+                mavenRepositorySystem, container, runtimeInformation );
     }
 
     @Nonnull
@@ -321,12 +260,26 @@ public class DefaultSession extends AbstractSession
     @SuppressWarnings( "unchecked" )
     public <T extends Service> T getService( Class<T> clazz ) throws NoSuchElementException
     {
-        T t = (T) services.get( clazz );
+        T t = (T) services.computeIfAbsent( clazz, this::lookup );
         if ( t == null )
         {
             throw new NoSuchElementException( clazz.getName() );
         }
         return t;
+    }
+
+    private Service lookup( Class<? extends Service> c )
+    {
+        try
+        {
+            return container.lookup( c );
+        }
+        catch ( ComponentLookupException e )
+        {
+            NoSuchElementException nsee = new NoSuchElementException( c.getName() );
+            e.initCause( e );
+            throw nsee;
+        }
     }
 
     @Nonnull

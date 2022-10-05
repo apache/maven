@@ -19,6 +19,10 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.apache.maven.SessionScoped;
 import org.apache.maven.api.annotations.Nonnull;
 
 import java.io.File;
@@ -35,6 +39,8 @@ import org.apache.maven.api.Metadata;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.project.MavenProject;
 
+@Named
+@SessionScoped
 public class DefaultArtifactManager implements ArtifactManager
 {
 
@@ -43,6 +49,7 @@ public class DefaultArtifactManager implements ArtifactManager
     private final Map<String, Path> paths = new ConcurrentHashMap<>();
     private final Map<String, Collection<Metadata>> metadatas = new ConcurrentHashMap<>();
 
+    @Inject
     public DefaultArtifactManager( @Nonnull DefaultSession session )
     {
         this.session = session;

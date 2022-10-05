@@ -19,6 +19,9 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -26,12 +29,14 @@ import org.apache.maven.api.services.Prompter;
 import org.apache.maven.api.services.PrompterException;
 import org.codehaus.plexus.PlexusContainer;
 
+@Named
 public class DefaultPrompter implements Prompter
 {
 
     private static final String PROMPTER_CLASS = "org.codehaus.plexus.components.interactivity.Prompter";
     private final PlexusContainer container;
 
+    @Inject
     public DefaultPrompter( PlexusContainer container )
     {
         this.container = container;

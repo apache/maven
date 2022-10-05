@@ -24,13 +24,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.api.Session;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.scope.internal.MojoExecutionScope;
-import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.rtinfo.RuntimeInformation;
-import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
 import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.SessionData;
@@ -40,33 +36,21 @@ import org.eclipse.aether.SessionData;
 public class DefaultSessionFactory
 {
     private final RepositorySystem repositorySystem;
-    private final org.apache.maven.project.ProjectBuilder projectBuilder;
     private final MavenRepositorySystem mavenRepositorySystem;
-    private final DefaultToolchainManagerPrivate toolchainManagerPrivate;
     private final PlexusContainer plexusContainer;
-    private final MojoExecutionScope mojoExecutionScope;
     private final RuntimeInformation runtimeInformation;
-    private final ArtifactHandlerManager artifactHandlerManager;
 
     @Inject
     @SuppressWarnings( "checkstyle:ParameterNumber" )
     public DefaultSessionFactory( RepositorySystem repositorySystem,
-                                  ProjectBuilder projectBuilder,
                                   MavenRepositorySystem mavenRepositorySystem,
-                                  DefaultToolchainManagerPrivate toolchainManagerPrivate,
                                   PlexusContainer plexusContainer,
-                                  MojoExecutionScope mojoExecutionScope,
-                                  RuntimeInformation runtimeInformation,
-                                  ArtifactHandlerManager artifactHandlerManager )
+                                  RuntimeInformation runtimeInformation )
     {
         this.repositorySystem = repositorySystem;
-        this.projectBuilder = projectBuilder;
         this.mavenRepositorySystem = mavenRepositorySystem;
-        this.toolchainManagerPrivate = toolchainManagerPrivate;
         this.plexusContainer = plexusContainer;
-        this.mojoExecutionScope = mojoExecutionScope;
         this.runtimeInformation = runtimeInformation;
-        this.artifactHandlerManager = artifactHandlerManager;
     }
 
     public Session getSession( MavenSession mavenSession )
@@ -78,8 +62,7 @@ public class DefaultSessionFactory
     private Session newSession( MavenSession mavenSession )
     {
         return new DefaultSession(
-                mavenSession, repositorySystem, null, projectBuilder, mavenRepositorySystem,
-                toolchainManagerPrivate, plexusContainer, mojoExecutionScope, runtimeInformation,
-                artifactHandlerManager );
+                mavenSession, repositorySystem, null,
+                mavenRepositorySystem, plexusContainer, runtimeInformation );
     }
 }

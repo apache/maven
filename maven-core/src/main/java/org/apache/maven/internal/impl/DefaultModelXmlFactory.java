@@ -19,6 +19,8 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import javax.inject.Named;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -41,6 +43,7 @@ import org.codehaus.plexus.util.ReaderFactory;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
+@Named
 public class DefaultModelXmlFactory
         implements ModelXmlFactory
 {

@@ -19,6 +19,9 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.maven.api.annotations.Nonnull;
 
 import java.util.Collection;
@@ -38,11 +41,13 @@ import org.eclipse.aether.metadata.Metadata;
 import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
+@Named
 public class DefaultArtifactInstaller implements ArtifactInstaller
 {
 
     private final RepositorySystem repositorySystem;
 
+    @Inject
     DefaultArtifactInstaller( @Nonnull RepositorySystem repositorySystem )
     {
         this.repositorySystem = nonNull( repositorySystem );

@@ -19,6 +19,8 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import javax.inject.Named;
+
 import java.util.Objects;
 
 import org.apache.maven.api.annotations.Experimental;
@@ -28,6 +30,7 @@ import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.shared.utils.logging.MessageUtils;
 
 @Experimental
+@Named
 public class DefaultMessageBuilderFactory implements MessageBuilderFactory
 {
 

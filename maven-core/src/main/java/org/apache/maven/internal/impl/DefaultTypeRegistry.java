@@ -19,6 +19,9 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.TypeRegistry;
@@ -27,11 +30,13 @@ import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
+@Named
 public class DefaultTypeRegistry implements TypeRegistry
 {
 
     private final ArtifactHandlerManager manager;
 
+    @Inject
     public DefaultTypeRegistry( ArtifactHandlerManager manager )
     {
         this.manager = nonNull( manager, "artifactHandlerManager" );

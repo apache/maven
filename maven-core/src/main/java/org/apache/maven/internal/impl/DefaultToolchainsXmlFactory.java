@@ -19,6 +19,8 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import javax.inject.Named;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -36,6 +38,8 @@ import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Reader;
 import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Writer;
 
+
+@Named
 public class DefaultToolchainsXmlFactory
         implements ToolchainsXmlFactory
 {

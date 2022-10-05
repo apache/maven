@@ -19,6 +19,8 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import javax.inject.Named;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -36,6 +38,7 @@ import org.apache.maven.api.settings.Settings;
 import org.apache.maven.settings.v4.SettingsXpp3Reader;
 import org.apache.maven.settings.v4.SettingsXpp3Writer;
 
+@Named
 public class DefaultSettingsXmlFactory
         implements SettingsXmlFactory
 {
