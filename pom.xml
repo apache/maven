@@ -573,27 +573,6 @@ under the License.
           <artifactId>buildnumber-maven-plugin</artifactId>
           <version>1.4</version>
         </plugin>
-        <plugin>
-          <groupId>org.apache.rat</groupId>
-          <artifactId>apache-rat-plugin</artifactId>
-          <configuration>
-            <excludes>
-              <exclude>**/.gitattributes</exclude>
-              <exclude>src/test/resources*/**</exclude>
-              <exclude>src/test/projects/**</exclude>
-              <exclude>src/test/remote-repo/**</exclude>
-              <exclude>**/*.odg</exclude>
-              <!--
-                ! Excluded the license files itself cause they do not have have a license of themselves.
-              -->
-              <exclude>src/main/appended-resources/licenses/MIT-slf4j-api-1.7.30.txt</exclude>
-              <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
-              <exclude>src/main/appended-resources/licenses/unrecognized-aopalliance-1.0.txt</exclude>
-              <exclude>src/main/appended-resources/licenses/unrecognized-javax.annotation-api-1.3.2.txt</exclude>
-              <exclude>plexus-utils/target/**</exclude>
-            </excludes>
-          </configuration>
-        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -635,14 +614,29 @@ under the License.
       <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
-        <configuration>
-          <excludes combine.children="append">
-            <exclude>bootstrap/**</exclude>
-            <exclude>README.bootstrap.txt</exclude>
-            <exclude>README.md</exclude>
-            <exclude>**/.factorypath</exclude>
-          </excludes>
-        </configuration>
+        <executions>
+          <execution>
+            <id>rat-check</id>
+            <inherited>false</inherited>
+            <configuration>
+              <excludes>
+                <exclude>**/.gitattributes</exclude>
+                <exclude>src/test/resources*/**</exclude>
+                <exclude>src/test/projects/**</exclude>
+                <exclude>src/test/remote-repo/**</exclude>
+                <exclude>**/*.odg</exclude>
+                <exclude>.asf.yaml</exclude>
+                <!--
+                  ! Excluded the license files itself cause they do not have have a license of themselves.
+                -->
+                <exclude>src/main/appended-resources/licenses/MIT-slf4j-api-1.7.30.txt</exclude>
+                <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
+                <exclude>src/main/appended-resources/licenses/unrecognized-aopalliance-1.0.txt</exclude>
+                <exclude>src/main/appended-resources/licenses/unrecognized-javax.annotation-api-1.3.2.txt</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
