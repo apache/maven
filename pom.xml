@@ -590,7 +590,8 @@ under the License.
               <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
               <exclude>src/main/appended-resources/licenses/unrecognized-aopalliance-1.0.txt</exclude>
               <exclude>src/main/appended-resources/licenses/unrecognized-javax.annotation-api-1.3.2.txt</exclude>
-              <exclude>plexus-utils/target/**</exclude>
+              <!-- exclude all files in the target folder -->
+              <exclude>**/target/**</exclude>
             </excludes>
           </configuration>
         </plugin>
