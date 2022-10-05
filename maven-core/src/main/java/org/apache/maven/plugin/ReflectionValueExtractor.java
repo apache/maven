@@ -21,6 +21,7 @@ package org.apache.maven.plugin;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -32,6 +33,9 @@ import org.apache.maven.plugin.MethodMap.AmbiguousException;
 /**
  * Using simple dotted expressions to extract the values from an Object instance using JSP-like expressions
  * such as {@code project.build.sourceDirectory}.
+ * <p>
+ * In addition to usual getters using {@code getXxx} or {@code isXxx} suffixes, accessors
+ * using {@code asXxx} or {@code toXxx} prefixes are also supported.
  */
 class ReflectionValueExtractor {
     private static final Object[] OBJECT_ARGS = new Object[0];
@@ -261,22 +265,14 @@ class ReflectionValueExtractor {
 
         ClassMap classMap = getClassMap(value.getClass());
         String methodBase = Character.toTitleCase(property.charAt(0)) + property.substring(1);
-        String methodName = "get" + methodBase;
         try {
-            Method method = classMap.findMethod(methodName);
-
-            if (method == null) {
-                // perhaps this is a boolean property??
-                methodName = "is" + methodBase;
-
-                method = classMap.findMethod(methodName);
+            for (String prefix : Arrays.asList("get", "is", "to", "as")) {
+                Method method = classMap.findMethod(prefix + methodBase);
+                if (method != null) {
+                    return method.invoke(value, OBJECT_ARGS);
+                }
             }
-
-            if (method == null) {
-                return null;
-            }
-
-            return method.invoke(value, OBJECT_ARGS);
+            return null;
         } catch (InvocationTargetException e) {
             throw new IntrospectionException(e.getTargetException());
         } catch (AmbiguousException | IllegalAccessException e) {

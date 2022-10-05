@@ -177,7 +177,13 @@ public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpression
                 if (pathSeparator > 0) {
                     String pathExpression = expression.substring(1, pathSeparator);
                     value = ReflectionValueExtractor.evaluate(pathExpression, session);
-                    value = value + expression.substring(pathSeparator);
+                    if (pathSeparator < expression.length() - 1) {
+                        if (value instanceof Path) {
+                            value = ((Path) value).resolve(expression.substring(pathSeparator + 1));
+                        } else {
+                            value = value + expression.substring(pathSeparator);
+                        }
+                    }
                 } else {
                     value = ReflectionValueExtractor.evaluate(expression.substring(1), session);
                 }
