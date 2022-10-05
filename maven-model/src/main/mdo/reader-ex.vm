@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -273,7 +274,7 @@ public class ${className}
                     ${classLcapName}.${field.name}( ${field.name} );
                     break;
       #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
-                    Map<String, String> ${field.name} = new HashMap<>();
+                    Map<String, String> ${field.name} = new LinkedHashMap<>();
                     locations = new HashMap<>();
                     while ( parser.nextTag() == XmlPullParser.START_TAG )
                     {
