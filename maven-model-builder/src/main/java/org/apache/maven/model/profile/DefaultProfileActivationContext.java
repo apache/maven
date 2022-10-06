@@ -25,9 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toMap;
-
 /**
  * Describes the environmental context used to determine the activation status of profiles.
  *
@@ -227,15 +224,11 @@ public class DefaultProfileActivationContext
         return projectProperties;
     }
 
-    public DefaultProfileActivationContext setProjectProperties( Properties projectProperties )
+    public DefaultProfileActivationContext setProjectProperties( Map<String, String> projectProperties )
     {
         if ( projectProperties != null )
         {
-            this.projectProperties = projectProperties.entrySet().stream()
-                    .collect(
-                            collectingAndThen(
-                                    toMap( k -> String.valueOf( k.getKey() ), v -> String.valueOf( v ) ),
-                                    Collections::unmodifiableMap ) );
+            this.projectProperties = Collections.unmodifiableMap( projectProperties );
         }
         else
         {

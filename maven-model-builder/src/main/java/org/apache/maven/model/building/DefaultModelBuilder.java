@@ -492,7 +492,7 @@ public class DefaultModelBuilder
             profileActivationContext.setUserProperties( profileProps );
         }
 
-        profileActivationContext.setProjectProperties( inputModel.getProperties() );
+        profileActivationContext.setProjectProperties( inputModel.getDelegate().getProperties() );
         problems.setSource( inputModel );
         List<Profile> activePomProfiles = profileSelector.getActiveProfiles( inputModel.getProfiles(),
                                                                              profileActivationContext, problems );

@@ -20,12 +20,10 @@ package org.apache.maven.model.inheritance;
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -58,22 +56,11 @@ public class DefaultInheritanceAssembler
 
     private static final String CHILD_DIRECTORY_PROPERTY = "project.directory";
 
-    private static final Map<Model, Map<Model, Model>> CACHE = Collections.synchronizedMap( new WeakHashMap<>() );
-
-    private InheritanceModelMerger merger = new InheritanceModelMerger();
+    private final InheritanceModelMerger merger = new InheritanceModelMerger();
 
     @Override
     public Model assembleModelInheritance( Model child, Model parent, ModelBuildingRequest request,
                                           ModelProblemCollector problems )
-    {
-        // The use of the cache using a WeakHashMap is permitted because Model does not define equals/hashCode
-//        return CACHE
-//                .computeIfAbsent( child, c -> Collections.synchronizedMap( new WeakHashMap<>() ) )
-//                .computeIfAbsent( parent, c -> doAssemble( child, parent ) );
-        return doAssemble( child, parent );
-    }
-
-    private Model doAssemble( Model child, Model parent )
     {
         Map<Object, Object> hints = new HashMap<>();
         String childPath = child.getProperties().getOrDefault( CHILD_DIRECTORY_PROPERTY, child.getArtifactId() );
