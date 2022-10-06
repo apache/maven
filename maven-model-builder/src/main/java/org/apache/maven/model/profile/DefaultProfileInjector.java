@@ -60,6 +60,11 @@ public class DefaultProfileInjector
     private static final Map<Model, Map<List<Profile>, Model>> CACHE
             = Collections.synchronizedMap( new WeakHashMap<>() );
 
+    // In order for the weak hash map to work correctly, we must not hold any reference to
+    // the model used as the key.  So we use a dummy model as a placeholder to indicate that
+    // we want to store the model used as they key.
+    private static final Model KEY = Model.newInstance();
+
     private ProfileModelMerger merger = new ProfileModelMerger();
 
     @Override
@@ -83,12 +88,14 @@ public class DefaultProfileInjector
     public Model injectProfiles( Model model, List<Profile> profiles, ModelBuildingRequest request,
                                  ModelProblemCollector problems )
     {
-        return CACHE.computeIfAbsent( model, k -> new ConcurrentHashMap<>() )
+        Model result = CACHE.computeIfAbsent( model, k -> new ConcurrentHashMap<>() )
                 .computeIfAbsent( profiles, l -> doInjectProfiles( model, profiles ) );
+        return result == KEY ? model : result;
     }
 
     private Model doInjectProfiles( Model model, List<Profile> profiles )
     {
+        Model orgModel = model;
         for ( Profile profile : profiles )
         {
             if ( profile != null )
@@ -107,7 +114,7 @@ public class DefaultProfileInjector
                 model = builder.build();
             }
         }
-        return model;
+        return model == orgModel ? KEY : model;
     }
 
     /**
