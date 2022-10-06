@@ -593,12 +593,8 @@ public class DefaultProjectBuilder
         private List<ProjectBuildingResult> build( Map<File, MavenProject> projectIndex,
                                                    List<InterimResult> interimResults )
         {
-            List<ForkJoinTask<List<ProjectBuildingResult>>> tasks = interimResults.stream().map( interimResult ->
-                    ForkJoinTask.adapt( () -> doBuild( projectIndex, interimResult ) ) )
-                    .collect( Collectors.toList() );
-
-            return ForkJoinTask.invokeAll( tasks ).stream()
-                    .map( ForkJoinTask::getRawResult )
+            return interimResults.parallelStream()
+                    .map( interimResult -> doBuild( projectIndex, interimResult ) )
                     .flatMap( List::stream )
                     .collect( Collectors.toList() );
         }
