@@ -99,6 +99,8 @@ import org.slf4j.LoggerFactory;
 public class DefaultProjectBuilder
     implements ProjectBuilder
 {
+    private static final String BUILDER_PARALLELISM = "maven.projectBuilder.parallelism";
+
     private final Logger logger = LoggerFactory.getLogger( getClass() );
     private final ModelBuilder modelBuilder;
     private final ModelProcessor modelProcessor;
@@ -223,17 +225,7 @@ public class DefaultProjectBuilder
                 this.poolBuilder = new ReactorModelPool.Builder();
                 this.modelPool = poolBuilder.build();
                 this.transformerContextBuilder = modelBuilder.newTransformerContextBuilder();
-                int parallelism = Runtime.getRuntime().availableProcessors();
-                try
-                {
-                    String str = request.getUserProperties().getProperty( "maven.projectBuilder.parallelism" );
-                    parallelism = Integer.parseInt( str );
-                }
-                catch ( Exception e )
-                {
-                    // ignore
-                }
-                this.forkJoinPool = new ForkJoinPool( parallelism );
+                this.forkJoinPool = new ForkJoinPool( getParallelism( request ) );
             }
             else
             {
@@ -242,6 +234,28 @@ public class DefaultProjectBuilder
                 this.transformerContextBuilder = null;
                 this.forkJoinPool = null;
             }
+        }
+
+        private int getParallelism( ProjectBuildingRequest request )
+        {
+            int parallelism = Runtime.getRuntime().availableProcessors();
+            try
+            {
+                String str = request.getUserProperties().getProperty( BUILDER_PARALLELISM );
+                if ( str == null )
+                {
+                    str = request.getSystemProperties().getProperty( BUILDER_PARALLELISM );
+                }
+                if ( str != null )
+                {
+                    parallelism = Integer.parseInt( str );
+                }
+            }
+            catch ( Exception e )
+            {
+                // ignore
+            }
+            return parallelism;
         }
 
         ProjectBuildingResult build( File pomFile, ModelSource modelSource )
