@@ -20,6 +20,7 @@ package org.apache.maven.internal.impl;
  */
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,6 +40,7 @@ import org.apache.maven.settings.v4.SettingsXpp3Reader;
 import org.apache.maven.settings.v4.SettingsXpp3Writer;
 
 @Named
+@Singleton
 public class DefaultSettingsXmlFactory
         implements SettingsXmlFactory
 {

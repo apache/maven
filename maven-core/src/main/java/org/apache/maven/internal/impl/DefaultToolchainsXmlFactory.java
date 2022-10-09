@@ -20,6 +20,7 @@ package org.apache.maven.internal.impl;
  */
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,6 +41,7 @@ import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Writer;
 
 
 @Named
+@Singleton
 public class DefaultToolchainsXmlFactory
         implements ToolchainsXmlFactory
 {

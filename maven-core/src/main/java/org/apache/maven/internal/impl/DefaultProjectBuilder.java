@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,6 +55,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 
 @Named
+@Singleton
 public class DefaultProjectBuilder implements ProjectBuilder
 {
 

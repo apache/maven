@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.nio.file.Path;
 
@@ -32,6 +33,7 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.repository.RepositoryPolicy;
 
 @Named
+@Singleton
 public class DefaultRepositoryFactory implements RepositoryFactory
 {
 

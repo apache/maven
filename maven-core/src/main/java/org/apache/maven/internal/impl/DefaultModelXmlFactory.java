@@ -20,6 +20,7 @@ package org.apache.maven.internal.impl;
  */
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -44,6 +45,7 @@ import org.codehaus.plexus.util.ReaderFactory;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
+@Singleton
 public class DefaultModelXmlFactory
         implements ModelXmlFactory
 {

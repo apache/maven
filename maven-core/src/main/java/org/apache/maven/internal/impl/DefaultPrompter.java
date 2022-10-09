@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.apache.maven.api.services.PrompterException;
 import org.codehaus.plexus.PlexusContainer;
 
 @Named
+@Singleton
 public class DefaultPrompter implements Prompter
 {
 

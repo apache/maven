@@ -20,6 +20,7 @@ package org.apache.maven.internal.impl;
  */
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.Objects;
 
@@ -31,6 +32,7 @@ import org.apache.maven.shared.utils.logging.MessageUtils;
 
 @Experimental
 @Named
+@Singleton
 public class DefaultMessageBuilderFactory implements MessageBuilderFactory
 {
 

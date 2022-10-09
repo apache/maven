@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 @Named
+@Singleton
 public class DefaultLookup implements Lookup
 {
 
