@@ -51,13 +51,13 @@ public interface ProjectBuilder extends Service
      * Creates a {@link org.apache.maven.api.Project} from a POM file.
      *
      * @param session The {@link Session}, must not be {@code null}.
-     * @param source The {@link ProjectBuilderSource}, must not be {@code null}.
+     * @param source The {@link Source}, must not be {@code null}.
      * @throws ProjectBuilderException if the project can not be created
      * @throws IllegalArgumentException if an argument is {@code null} or invalid
      * @see #build(ProjectBuilderRequest)
      */
     @Nonnull
-    default ProjectBuilderResult build( @Nonnull Session session, @Nonnull ProjectBuilderSource source )
+    default ProjectBuilderResult build( @Nonnull Session session, @Nonnull Source source )
     {
         return build( ProjectBuilderRequest.build( session, source ) );
     }

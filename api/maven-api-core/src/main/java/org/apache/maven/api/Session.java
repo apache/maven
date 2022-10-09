@@ -56,9 +56,21 @@ public interface Session
     @Nonnull
     SessionData getData();
 
+    /**
+     * Gets the user properties to use for interpolation. The user properties have been configured directly by the user
+     * on his discretion, e.g. via the {@code -Dkey=value} parameter on the command line.
+     *
+     * @return The user properties, never {@code null}.
+     */
     @Nonnull
     Map<String, String> getUserProperties();
 
+    /**
+     * Gets the system properties to use for interpolation. The system properties are collected from the runtime
+     * environment like {@link System#getProperties()} and environment variables.
+     *
+     * @return The system properties, never {@code null}.
+     */
     @Nonnull
     Map<String, String> getSystemProperties();
 

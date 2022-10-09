@@ -20,6 +20,9 @@ package org.apache.maven.api.services;
  */
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Describes a problem that was encountered during project building. A problem can either be an exception that was
@@ -28,7 +31,8 @@ import org.apache.maven.api.annotations.Experimental;
  * @since 4.0
  */
 @Experimental
-public interface ProjectBuilderProblem
+@Immutable
+public interface BuilderProblem
 {
 
     /**
@@ -39,6 +43,7 @@ public interface ProjectBuilderProblem
      *
      * @return The hint about the source of the problem or an empty string if unknown, never {@code null}.
      */
+    @Nonnull
     String getSource();
 
     /**
@@ -64,6 +69,7 @@ public interface ProjectBuilderProblem
      *
      * @return The location of the problem, never {@code null}.
      */
+    @Nonnull
     String getLocation();
 
     /**
@@ -71,6 +77,7 @@ public interface ProjectBuilderProblem
      *
      * @return The exception that caused this problem or {@code null} if not applicable.
      */
+    @Nullable
     Exception getException();
 
     /**
@@ -78,6 +85,7 @@ public interface ProjectBuilderProblem
      *
      * @return The message describing this problem, never {@code null}.
      */
+    @Nonnull
     String getMessage();
 
     /**
@@ -85,6 +93,7 @@ public interface ProjectBuilderProblem
      *
      * @return The severity level of this problem, never {@code null}.
      */
-    ProjectBuilderProblemSeverity getSeverity();
+    @Nonnull
+    BuilderProblemSeverity getSeverity();
 
 }

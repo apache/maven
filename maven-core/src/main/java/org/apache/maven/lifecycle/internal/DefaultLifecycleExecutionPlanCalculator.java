@@ -371,9 +371,9 @@ public class DefaultLifecycleExecutionPlanCalculator
         mojoExecution.setConfiguration( finalConfiguration );
     }
 
-    private Xpp3Dom getMojoConfiguration( MojoDescriptor mojoDescriptor )
+    private Dom getMojoConfiguration( MojoDescriptor mojoDescriptor )
     {
-        return MojoDescriptorCreator.convert( mojoDescriptor );
+        return MojoDescriptorCreator.convert( mojoDescriptor ).getDom();
     }
 
     @Override

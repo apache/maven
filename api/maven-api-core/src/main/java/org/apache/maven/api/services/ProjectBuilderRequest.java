@@ -52,7 +52,7 @@ public interface ProjectBuilderRequest
     Optional<Path> getPath();
 
     @Nonnull
-    Optional<ProjectBuilderSource> getSource();
+    Optional<Source> getSource();
 
     @Nonnull
     Optional<Artifact> getArtifact();
@@ -69,7 +69,7 @@ public interface ProjectBuilderRequest
     boolean isResolveDependencies();
 
     @Nonnull
-    static ProjectBuilderRequest build( @Nonnull Session session, @Nonnull ProjectBuilderSource source )
+    static ProjectBuilderRequest build( @Nonnull Session session, @Nonnull Source source )
     {
         return builder()
                 .session( nonNull( session, "session can not be null" ) )
@@ -115,7 +115,7 @@ public interface ProjectBuilderRequest
     {
         Session session;
         Path path;
-        ProjectBuilderSource source;
+        Source source;
         Artifact artifact;
         ArtifactCoordinate coordinate;
         boolean allowStubModel;
@@ -135,7 +135,7 @@ public interface ProjectBuilderRequest
             return this;
         }
 
-        public ProjectBuilderRequestBuilder source( ProjectBuilderSource source )
+        public ProjectBuilderRequestBuilder source( Source source )
         {
             this.source = source;
             return this;
@@ -175,7 +175,7 @@ public interface ProjectBuilderRequest
             implements ProjectBuilderRequest
         {
             private final Path path;
-            private final ProjectBuilderSource source;
+            private final Source source;
             private final Artifact artifact;
             private final ArtifactCoordinate coordinate;
             private final boolean allowStubModel;
@@ -186,7 +186,7 @@ public interface ProjectBuilderRequest
             @SuppressWarnings( "checkstyle:ParameterNumber" )
             DefaultProjectBuilderRequest( @Nonnull Session session,
                                           @Nullable Path path,
-                                          @Nullable ProjectBuilderSource source,
+                                          @Nullable Source source,
                                           @Nullable Artifact artifact,
                                           @Nullable ArtifactCoordinate coordinate,
                                           boolean allowStubModel,
@@ -214,7 +214,7 @@ public interface ProjectBuilderRequest
 
             @Nonnull
             @Override
-            public Optional<ProjectBuilderSource> getSource()
+            public Optional<Source> getSource()
             {
                 return Optional.ofNullable( source );
             }

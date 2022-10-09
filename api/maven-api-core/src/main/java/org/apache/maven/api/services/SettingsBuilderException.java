@@ -1,4 +1,4 @@
-package org.apache.maven.toolchain.building;
+package org.apache.maven.api.services;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.toolchain.building;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,32 +19,25 @@ package org.apache.maven.toolchain.building;
  * under the License.
  */
 
-import java.util.List;
-
-import org.apache.maven.building.Problem;
-import org.apache.maven.toolchain.model.PersistedToolchains;
+import org.apache.maven.api.annotations.Experimental;
 
 /**
- * Collects the output of the toolchains builder.
+ * The Exception class throw by the {@link SettingsBuilder}.
  *
- * @author Robert Scholte
- * @since 3.3.0
+ * @since 4.0
  */
-public interface ToolchainsBuildingResult
+@Experimental
+public class SettingsBuilderException
+    extends MavenException
 {
-
     /**
-     * Gets the assembled toolchains.
-     *
-     * @return The assembled toolchains, never {@code null}.
+     * @param message The message to give.
+     * @param e The {@link Exception}.
      */
-    PersistedToolchains getEffectiveToolchains();
+    public SettingsBuilderException( String message, Exception e )
+    {
+        super( message, e );
+    }
 
-    /**
-     * Return a list of problems, if any.
-     *
-     * @return a list of problems, never {@code null}.
-     */
-    List<Problem> getProblems();
-
+    // TODO: add SettingsBuilderResult
 }

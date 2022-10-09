@@ -88,8 +88,8 @@ public class DefaultToolchainsBuilder
             throw new ToolchainsBuildingException( problems.getProblems() );
         }
 
-
-        return new DefaultToolchainsBuildingResult( merged, problems.getProblems() );
+        return new DefaultToolchainsBuildingResult(
+                new org.apache.maven.toolchain.model.PersistedToolchains( merged ), problems.getProblems() );
     }
 
     private PersistedToolchains interpolate( PersistedToolchains toolchains, ProblemCollector problems )

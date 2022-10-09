@@ -22,7 +22,6 @@ package org.apache.maven.settings;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.maven.api.settings.Settings;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 

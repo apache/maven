@@ -57,7 +57,9 @@ import org.apache.maven.api.services.ProjectBuilder;
 import org.apache.maven.api.services.ProjectManager;
 import org.apache.maven.api.services.Prompter;
 import org.apache.maven.api.services.RepositoryFactory;
+import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.services.ToolchainManager;
+import org.apache.maven.api.services.ToolchainsBuilder;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
@@ -96,6 +98,8 @@ public class DefaultSession extends AbstractSession
     private final MojoExecutionScope mojoExecutionScope;
     private final RuntimeInformation runtimeInformation;
     private final ArtifactHandlerManager artifactHandlerManager;
+    private final org.apache.maven.settings.building.SettingsBuilder settingsBuilder;
+    private final org.apache.maven.toolchain.building.ToolchainsBuilder toolchainsBuilder;
     private final Map<Class<? extends Service>, Service> services = new HashMap<>();
 
     @SuppressWarnings( "checkstyle:ParameterNumber" )
@@ -108,7 +112,9 @@ public class DefaultSession extends AbstractSession
                            @Nonnull PlexusContainer container,
                            @Nonnull MojoExecutionScope mojoExecutionScope,
                            @Nonnull RuntimeInformation runtimeInformation,
-                           @Nonnull ArtifactHandlerManager artifactHandlerManager )
+                           @Nonnull ArtifactHandlerManager artifactHandlerManager,
+                           @Nonnull org.apache.maven.settings.building.SettingsBuilder settingsBuilder,
+                           @Nonnull org.apache.maven.toolchain.building.ToolchainsBuilder toolchainsBuilder )
     {
         this.mavenSession = nonNull( session );
         this.session = mavenSession.getRepositorySession();
@@ -124,6 +130,8 @@ public class DefaultSession extends AbstractSession
         this.mojoExecutionScope = mojoExecutionScope;
         this.runtimeInformation = runtimeInformation;
         this.artifactHandlerManager = artifactHandlerManager;
+        this.settingsBuilder = settingsBuilder;
+        this.toolchainsBuilder = toolchainsBuilder;
 
         ArtifactManager artifactManager = new DefaultArtifactManager( this );
         ProjectManager projectManager = new DefaultProjectManager( this, artifactManager, container );
@@ -149,6 +157,8 @@ public class DefaultSession extends AbstractSession
         services.put( ArtifactCoordinateFactory.class, new DefaultArtifactCoordinateFactory() );
         services.put( TypeRegistry.class, new DefaultTypeRegistry( artifactHandlerManager ) );
         services.put( Lookup.class, new DefaultLookup( container ) );
+        services.put( SettingsBuilder.class, new DefaultSettingsBuilder( settingsBuilder ) );
+        services.put( ToolchainsBuilder.class, new DefaultToolchainsBuilder( toolchainsBuilder ) );
     }
 
     public MavenSession getMavenSession()
@@ -305,7 +315,8 @@ public class DefaultSession extends AbstractSession
         MavenSession newSession = new MavenSession( mavenSession.getContainer(), repoSession,
                 mavenSession.getRequest(), mavenSession.getResult() );
         return new DefaultSession( newSession, repositorySystem, repositories, projectBuilder, mavenRepositorySystem,
-                toolchainManagerPrivate, container, mojoExecutionScope, runtimeInformation, artifactHandlerManager );
+                toolchainManagerPrivate, container, mojoExecutionScope, runtimeInformation, artifactHandlerManager,
+                settingsBuilder, toolchainsBuilder );
     }
 
     @Nonnull
@@ -313,7 +324,8 @@ public class DefaultSession extends AbstractSession
     public Session withRemoteRepositories( @Nonnull List<RemoteRepository> repositories )
     {
         return new DefaultSession( mavenSession, repositorySystem, repositories, projectBuilder, mavenRepositorySystem,
-                toolchainManagerPrivate, container, mojoExecutionScope, runtimeInformation, artifactHandlerManager );
+                toolchainManagerPrivate, container, mojoExecutionScope, runtimeInformation, artifactHandlerManager,
+                settingsBuilder, toolchainsBuilder );
     }
 
     @Nonnull

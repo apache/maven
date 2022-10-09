@@ -1,4 +1,4 @@
-package org.apache.maven.settings.building;
+package org.apache.maven.api.services;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,40 +19,19 @@ package org.apache.maven.settings.building;
  * under the License.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.maven.settings.Settings;
+import org.apache.maven.api.annotations.Experimental;
 
 /**
- * Collects the output of the settings builder.
+ * The different severity levels for a problem, in decreasing order.
  *
- * @author Benjamin Bentmann
+ * @since 4.0
  */
-class DefaultSettingsBuildingResult
-    implements SettingsBuildingResult
+@Experimental
+public enum BuilderProblemSeverity
 {
 
-    private Settings effectiveSettings;
-
-    private List<SettingsProblem> problems;
-
-    DefaultSettingsBuildingResult( Settings effectiveSettings, List<SettingsProblem> problems )
-    {
-        this.effectiveSettings = effectiveSettings;
-        this.problems = ( problems != null ) ? problems : new ArrayList<>();
-    }
-
-    @Override
-    public Settings getEffectiveSettings()
-    {
-        return effectiveSettings;
-    }
-
-    @Override
-    public List<SettingsProblem> getProblems()
-    {
-        return problems;
-    }
+    FATAL, //
+    ERROR, //
+    WARNING //
 
 }

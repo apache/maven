@@ -172,7 +172,7 @@ public abstract class AbstractCoreMavenComponentTestCase
         session.setAllProjects( session.getProjects() );
         session.setSession( new DefaultSession( session, new DefaultRepositorySystem(), null,
                 null, null, null, null, null,
-                null, new DefaultArtifactHandlerManager( Collections.emptyMap() ) ) );
+                null, new DefaultArtifactHandlerManager( Collections.emptyMap() ), null, null ) );
 
         return session;
     }
