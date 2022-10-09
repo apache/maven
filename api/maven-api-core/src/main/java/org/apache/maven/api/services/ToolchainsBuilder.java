@@ -19,24 +19,24 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
+import org.apache.maven.api.Service;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * The Exception class throw by the {@link ToolchainManager}.
- *
- * @since 4.0
+ * Builds the effective toolchains from a user toolchains file and/or a global toolchains file.
  */
 @Experimental
-public class ToolchainManagerException
-    extends MavenException
+
+public interface ToolchainsBuilder extends Service
 {
+
     /**
-     * @param message the message to give
-     * @param e the {@link Exception}
+     * Builds the effective toolchains of the specified toolchains files.
+     *
+     * @param request the toolchains building request that holds the parameters, must not be {@code null}
+     * @return the result of the toolchains building, never {@code null}
+     * @throws ToolchainsBuilderException if the effective toolchains could not be built
      */
-    public ToolchainManagerException( String message, Exception e )
-    {
-        super( message, e );
-    }
+    ToolchainsBuilderResult build( ToolchainsBuilderRequest request );
 
 }

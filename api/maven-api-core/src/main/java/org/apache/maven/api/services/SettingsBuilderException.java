@@ -22,21 +22,22 @@ package org.apache.maven.api.services;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * The Exception class throw by the {@link ToolchainManager}.
+ * The Exception class throw by the {@link SettingsBuilder}.
  *
  * @since 4.0
  */
 @Experimental
-public class ToolchainManagerException
+public class SettingsBuilderException
     extends MavenException
 {
     /**
      * @param message the message to give
      * @param e the {@link Exception}
      */
-    public ToolchainManagerException( String message, Exception e )
+    public SettingsBuilderException( String message, Exception e )
     {
         super( message, e );
     }
 
+    // TODO: add SettingsBuilderResult
 }

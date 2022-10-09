@@ -19,24 +19,29 @@ package org.apache.maven.api.services;
  * under the License.
  */
 
-import org.apache.maven.api.annotations.Experimental;
+import java.util.List;
 
-/**
- * The Exception class throw by the {@link ToolchainManager}.
- *
- * @since 4.0
- */
-@Experimental
-public class ToolchainManagerException
-    extends MavenException
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.toolchain.PersistedToolchains;
+
+public interface ToolchainsBuilderResult
 {
     /**
-     * @param message the message to give
-     * @param e the {@link Exception}
+     * Gets the assembled toolchains.
+     *
+     * @return the assembled toolchains, never {@code null}
      */
-    public ToolchainManagerException( String message, Exception e )
-    {
-        super( message, e );
-    }
+    @Nonnull
+    PersistedToolchains getEffectiveToolchains();
+
+    /**
+     * Gets the problems that were encountered during the settings building. Note that only problems of severity
+     * {@link BuilderProblem.Severity#WARNING} and below are reported here. Problems with a higher severity level cause
+     * the settings builder to fail with a {@link ToolchainsBuilderException}.
+     *
+     * @return the problems that were encountered during the settings building, can be empty but never {@code null}
+     */
+    @Nonnull
+    List<BuilderProblem> getProblems();
 
 }

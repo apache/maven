@@ -70,7 +70,7 @@ public interface ProjectBuilderResult
      * @return the problems that were encountered during the project building, can be empty but never {@code null}
      */
     @Nonnull
-    Collection<ProjectBuilderProblem> getProblems();
+    Collection<BuilderProblem> getProblems();
 
     /**
      * Gets the result of the dependency resolution for the project.

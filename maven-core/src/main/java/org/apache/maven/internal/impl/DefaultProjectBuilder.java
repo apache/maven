@@ -40,11 +40,10 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.DependencyCollectorResult;
 import org.apache.maven.api.services.ProjectBuilder;
 import org.apache.maven.api.services.ProjectBuilderException;
-import org.apache.maven.api.services.ProjectBuilderProblem;
-import org.apache.maven.api.services.ProjectBuilderProblemSeverity;
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ProjectBuilderRequest;
 import org.apache.maven.api.services.ProjectBuilderResult;
-import org.apache.maven.api.services.ProjectBuilderSource;
+import org.apache.maven.api.services.Source;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.building.ModelProblem;
@@ -91,7 +90,7 @@ public class DefaultProjectBuilder implements ProjectBuilder
             }
             else if ( request.getSource().isPresent() )
             {
-                ProjectBuilderSource source = request.getSource().get();
+                Source source = request.getSource().get();
                 ModelSource modelSource = new ModelSource()
                 {
                     @Override
@@ -153,14 +152,14 @@ public class DefaultProjectBuilder implements ProjectBuilder
 
                 @Nonnull
                 @Override
-                public Collection<ProjectBuilderProblem> getProblems()
+                public Collection<BuilderProblem> getProblems()
                 {
                     return new MappedCollection<>( res.getProblems(), this::toProblem );
                 }
 
-                private ProjectBuilderProblem toProblem( ModelProblem problem )
+                private BuilderProblem toProblem( ModelProblem problem )
                 {
-                    return new ProjectBuilderProblem()
+                    return new BuilderProblem()
                     {
                         @Override
                         public String getSource()
@@ -228,9 +227,9 @@ public class DefaultProjectBuilder implements ProjectBuilder
                         }
 
                         @Override
-                        public ProjectBuilderProblemSeverity getSeverity()
+                        public Severity getSeverity()
                         {
-                            return ProjectBuilderProblemSeverity.valueOf( problem.getSeverity().name() );
+                            return Severity.valueOf( problem.getSeverity().name() );
                         }
                     };
                 }
