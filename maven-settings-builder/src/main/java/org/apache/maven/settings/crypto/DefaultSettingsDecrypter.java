@@ -61,6 +61,8 @@ public class DefaultSettingsDecrypter
 
         for ( Server server : request.getServers() )
         {
+            server = server.clone();
+
             try
             {
                 server.setPassword( decrypt( server.getPassword() ) );
