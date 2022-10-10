@@ -64,7 +64,7 @@ public interface ArtifactDeployerRequest
                                           @Nonnull Collection<Artifact> artifacts )
     {
         return builder()
-                .session( nonNull( session, "session can not be null" ) )
+                .session( nonNull( session, "session cannot be null" ) )
                 .repository( repository )
                 .artifacts( artifacts )
                 .build();
@@ -127,8 +127,8 @@ public interface ArtifactDeployerRequest
                                             int retryFailedDeploymentCount )
             {
                 super( session );
-                this.repository = nonNull( repository, "repository can not be null" );
-                this.artifacts = nonNull( artifacts, "artifacts can not be null" );
+                this.repository = nonNull( repository, "repository cannot be null" );
+                this.artifacts = nonNull( artifacts, "artifacts cannot be null" );
                 this.retryFailedDeploymentCount = retryFailedDeploymentCount;
             }
 

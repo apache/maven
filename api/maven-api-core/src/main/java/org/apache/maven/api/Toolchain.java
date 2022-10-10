@@ -42,7 +42,7 @@ public interface Toolchain
      * Gets the platform tool executable.
      *
      * @param toolName the tool platform independent tool name.
-     * @return file representing the tool executable, or null if the tool can not be found
+     * @return file representing the tool executable, or null if the tool cannot be found
      */
     String findTool( String toolName );
 

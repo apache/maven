@@ -73,8 +73,8 @@ public interface DependencyCollectorRequest
     static DependencyCollectorRequest build( @Nonnull Session session, Artifact root )
     {
         return builder()
-                .session( nonNull( session, "session can not be null" ) )
-                .rootArtifact( nonNull( root, "root can not be null" ) )
+                .session( nonNull( session, "session cannot be null" ) )
+                .rootArtifact( nonNull( root, "root cannot be null" ) )
                 .build();
     }
 
@@ -82,19 +82,17 @@ public interface DependencyCollectorRequest
     static DependencyCollectorRequest build( @Nonnull Session session, @Nonnull DependencyCoordinate root )
     {
         return builder()
-                .session( nonNull( session, "session can not be null" ) )
-                .root( nonNull( root, "root can not be null" ) )
+                .session( nonNull( session, "session cannot be null" ) )
+                .root( nonNull( root, "root cannot be null" ) )
                 .build();
     }
 
     @Nonnull
     static DependencyCollectorRequest build( @Nonnull Session session, @Nonnull Project project )
     {
-        nonNull( session, "session can not be null" );
-        nonNull( project, "project can not be null" );
         return builder()
-                .session( session )
-                .rootArtifact( project.getArtifact() )
+                .session( nonNull( session, "session cannot be null" ) )
+                .rootArtifact( nonNull( project, "project cannot be null" ).getArtifact() )
                 .dependencies( project.getDependencies() )
                 .managedDependencies( project.getManagedDependencies() )
                 .build();
@@ -283,8 +281,8 @@ public interface DependencyCollectorRequest
                 super( session );
                 this.rootArtifact = rootArtifact;
                 this.root = root;
-                this.dependencies = unmodifiable( dependencies );
-                this.managedDependencies = unmodifiable( managedDependencies );
+                this.dependencies = unmodifiable( nonNull( dependencies, "dependencies cannot be null" ) );
+                this.managedDependencies = unmodifiable( nonNull( managedDependencies, "managedDependencies cannot be null" ) );
                 this.verbose = verbose;
             }
 

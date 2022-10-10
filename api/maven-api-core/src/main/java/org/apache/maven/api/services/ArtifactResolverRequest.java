@@ -97,7 +97,7 @@ public interface ArtifactResolverRequest
                                             @Nonnull Collection<? extends ArtifactCoordinate> coordinates )
             {
                 super( session );
-                this.coordinates = nonNull( coordinates, "coordinates can not be null" );
+                this.coordinates = nonNull( coordinates, "coordinates cannot be null" );
             }
 
             @Nonnull

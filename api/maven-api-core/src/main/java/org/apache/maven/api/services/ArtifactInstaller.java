@@ -46,7 +46,7 @@ public interface ArtifactInstaller extends Service
     /**
      * @param session the repository session
      * @param artifact the {@link Artifact} to install
-     * @throws ArtifactInstallerException In case of an error which can be the a given artifact can not be found or the
+     * @throws ArtifactInstallerException In case of an error which can be the a given artifact cannot be found or the
      *             installation has failed.
      * @throws IllegalArgumentException in case of parameter {@code session} is {@code null} or
      *          {@code artifact} is {@code null}.
@@ -59,7 +59,7 @@ public interface ArtifactInstaller extends Service
     /**
      * @param session the repository session
      * @param artifacts Collection of {@link Artifact MavenArtifacts}
-     * @throws ArtifactInstallerException In case of an error which can be the a given artifact can not be found or the
+     * @throws ArtifactInstallerException In case of an error which can be the a given artifact cannot be found or the
      *             installation has failed.
      * @throws IllegalArgumentException in case of parameter {@code request} is {@code null} or parameter
      *             {@code localRepository} is {@code null} or {@code localRepository} is not a directory
