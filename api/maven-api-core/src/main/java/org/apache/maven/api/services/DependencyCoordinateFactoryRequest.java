@@ -32,6 +32,8 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 
+import static org.apache.maven.api.services.BaseRequest.nonNull;
+
 /**
  *
  * @since 4.0
@@ -48,11 +50,12 @@ public interface DependencyCoordinateFactoryRequest extends ArtifactCoordinateFa
     @Nonnull
     Collection<Exclusion> getExclusions();
 
-    static DependencyCoordinateFactoryRequest build( Session session, String groupId, String artifactId,
+    @Nonnull
+    static DependencyCoordinateFactoryRequest build( @Nonnull Session session, String groupId, String artifactId,
                                                    String version, String classifier, String extension, String type )
     {
         return DependencyCoordinateFactoryRequest.builder()
-                .session( session )
+                .session( nonNull( session, "session cannot be null" ) )
                 .groupId( groupId )
                 .artifactId( artifactId )
                 .version( version )
@@ -62,11 +65,12 @@ public interface DependencyCoordinateFactoryRequest extends ArtifactCoordinateFa
                 .build();
     }
 
-    static DependencyCoordinateFactoryRequest build( Session session, ArtifactCoordinate coordinate )
+    @Nonnull
+    static DependencyCoordinateFactoryRequest build( @Nonnull Session session, @Nonnull ArtifactCoordinate coordinate )
     {
         return builder()
-                .session( session )
-                .groupId( coordinate.getGroupId() )
+                .session( nonNull( session, "session cannot be null" ) )
+                .groupId( nonNull( coordinate, "coordinate cannot be null" ).getGroupId() )
                 .artifactId( coordinate.getArtifactId() )
                 .version( coordinate.getVersion().asString() )
                 .classifier( coordinate.getClassifier() )
@@ -74,11 +78,12 @@ public interface DependencyCoordinateFactoryRequest extends ArtifactCoordinateFa
                 .build();
     }
 
-    static DependencyCoordinateFactoryRequest build( Session session, Dependency dependency )
+    @Nonnull
+    static DependencyCoordinateFactoryRequest build( @Nonnull Session session, @Nonnull Dependency dependency )
     {
         return builder()
-                .session( session )
-                .groupId( dependency.getGroupId() )
+                .session( nonNull( session, "session cannot be null" ) )
+                .groupId( nonNull( dependency, "dependency" ).getGroupId() )
                 .artifactId( dependency.getArtifactId() )
                 .version( dependency.getVersion().asString() )
                 .classifier( dependency.getClassifier() )
@@ -89,6 +94,7 @@ public interface DependencyCoordinateFactoryRequest extends ArtifactCoordinateFa
                 .build();
     }
 
+    @Nonnull
     static DependencyCoordinateFactoryRequestBuilder builder()
     {
         return new DependencyCoordinateFactoryRequestBuilder();

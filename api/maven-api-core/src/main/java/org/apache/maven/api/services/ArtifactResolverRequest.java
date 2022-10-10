@@ -28,6 +28,8 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 
+import static org.apache.maven.api.services.BaseRequest.nonNull;
+
 /**
  * A request for resolving an artifact.
  *
@@ -50,11 +52,11 @@ public interface ArtifactResolverRequest
     }
 
     @Nonnull
-    static ArtifactResolverRequest build( Session session, Collection<? extends ArtifactCoordinate> coordinates )
+    static ArtifactResolverRequest build( @Nonnull Session session, @Nonnull Collection<? extends ArtifactCoordinate> coordinates )
     {
         return builder()
-                .session( session )
-                .coordinates( coordinates )
+                .session( nonNull( session, "session cannot be null" ) )
+                .coordinates( nonNull( coordinates, "coordinates cannot be null" ) )
                 .build();
     }
 

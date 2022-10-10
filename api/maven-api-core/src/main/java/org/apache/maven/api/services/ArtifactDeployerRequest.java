@@ -65,8 +65,8 @@ public interface ArtifactDeployerRequest
     {
         return builder()
                 .session( nonNull( session, "session cannot be null" ) )
-                .repository( repository )
-                .artifacts( artifacts )
+                .repository( nonNull( repository, "repository cannot be null" ) )
+                .artifacts( nonNull( artifacts, "artifacts cannot be null" ) )
                 .build();
     }
 
