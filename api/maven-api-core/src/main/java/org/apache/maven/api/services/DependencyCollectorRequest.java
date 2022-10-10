@@ -282,7 +282,8 @@ public interface DependencyCollectorRequest
                 this.rootArtifact = rootArtifact;
                 this.root = root;
                 this.dependencies = unmodifiable( nonNull( dependencies, "dependencies cannot be null" ) );
-                this.managedDependencies = unmodifiable( nonNull( managedDependencies, "managedDependencies cannot be null" ) );
+                this.managedDependencies = unmodifiable( nonNull( managedDependencies,
+                                                         "managedDependencies cannot be null" ) );
                 this.verbose = verbose;
             }
 

@@ -52,7 +52,8 @@ public interface ArtifactResolverRequest
     }
 
     @Nonnull
-    static ArtifactResolverRequest build( @Nonnull Session session, @Nonnull Collection<? extends ArtifactCoordinate> coordinates )
+    static ArtifactResolverRequest build( @Nonnull Session session,
+                                          @Nonnull Collection<? extends ArtifactCoordinate> coordinates )
     {
         return builder()
                 .session( nonNull( session, "session cannot be null" ) )
