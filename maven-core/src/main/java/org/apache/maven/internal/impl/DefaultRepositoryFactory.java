@@ -19,6 +19,10 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.nio.file.Path;
 
 import org.apache.maven.api.LocalRepository;
@@ -28,11 +32,14 @@ import org.apache.maven.api.model.Repository;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.repository.RepositoryPolicy;
 
+@Named
+@Singleton
 public class DefaultRepositoryFactory implements RepositoryFactory
 {
 
     private final RepositorySystem repositorySystem;
 
+    @Inject
     public DefaultRepositoryFactory( RepositorySystem repositorySystem )
     {
         this.repositorySystem = repositorySystem;

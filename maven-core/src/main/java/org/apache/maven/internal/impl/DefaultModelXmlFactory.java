@@ -19,6 +19,9 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -28,19 +31,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.model.InputSource;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.services.xml.XmlWriterException;
 import org.apache.maven.api.services.xml.XmlWriterRequest;
-import org.apache.maven.api.model.InputSource;
-import org.apache.maven.api.model.Model;
 import org.apache.maven.model.v4.MavenXpp3ReaderEx;
 import org.apache.maven.model.v4.MavenXpp3WriterEx;
 import org.codehaus.plexus.util.ReaderFactory;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
+@Named
+@Singleton
 public class DefaultModelXmlFactory
         implements ModelXmlFactory
 {
@@ -120,4 +125,31 @@ public class DefaultModelXmlFactory
             throw new XmlWriterException( "Unable to write model", e );
         }
     }
+
+    /**
+     * Simply parse the given xml string.
+     *
+     * @param xml the input xml string
+     * @return the parsed object
+     * @throws XmlReaderException if an error occurs during the parsing
+     * @see #toXmlString(Object)
+     */
+    public static Model fromXml( @Nonnull String xml ) throws XmlReaderException
+    {
+        return new DefaultModelXmlFactory().fromXmlString( xml );
+    }
+
+    /**
+     * Simply converts the given content to an xml string.
+     *
+     * @param content the object to convert
+     * @return the xml string representation
+     * @throws XmlWriterException if an error occurs during the transformation
+     * @see #fromXmlString(String)
+     */
+    public static String toXml( @Nonnull Model content ) throws XmlWriterException
+    {
+        return new DefaultModelXmlFactory().toXmlString( content );
+    }
+
 }

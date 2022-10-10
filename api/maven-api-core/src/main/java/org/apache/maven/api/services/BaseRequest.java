@@ -41,7 +41,7 @@ abstract class BaseRequest
 
     protected BaseRequest( @Nonnull Session session )
     {
-        this.session = nonNull( session, "session can not be null" );
+        this.session = nonNull( session, "session cannot be null" );
     }
 
     @Nonnull

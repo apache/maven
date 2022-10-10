@@ -21,6 +21,8 @@ package org.apache.maven.internal.impl;
 
 import org.apache.maven.api.annotations.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -43,6 +45,8 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
+@Named
+@Singleton
 public class DefaultArtifactResolver implements ArtifactResolver
 {
     private final RepositorySystem repositorySystem;

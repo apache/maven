@@ -72,8 +72,8 @@ public interface ProjectBuilderRequest
     static ProjectBuilderRequest build( @Nonnull Session session, @Nonnull ProjectBuilderSource source )
     {
         return builder()
-                .session( nonNull( session, "session can not be null" ) )
-                .source( nonNull( source, "source can not be null" ) )
+                .session( nonNull( session, "session cannot be null" ) )
+                .source( nonNull( source, "source cannot be null" ) )
                 .build();
     }
 
@@ -81,8 +81,8 @@ public interface ProjectBuilderRequest
     static ProjectBuilderRequest build( @Nonnull Session session, @Nonnull Path path )
     {
         return builder()
-                .session( nonNull( session, "session can not be null" ) )
-                .path( nonNull( path, "path can not be null" ) )
+                .session( nonNull( session, "session cannot be null" ) )
+                .path( nonNull( path, "path cannot be null" ) )
                 .build();
     }
 
@@ -90,8 +90,8 @@ public interface ProjectBuilderRequest
     static ProjectBuilderRequest build( @Nonnull Session session, @Nonnull Artifact artifact )
     {
         return builder()
-                .session( nonNull( session, "session can not be null" ) )
-                .artifact( nonNull( artifact, "artifact can not be null" ) )
+                .session( nonNull( session, "session cannot be null" ) )
+                .artifact( nonNull( artifact, "artifact cannot be null" ) )
                 .build();
     }
 
@@ -99,8 +99,8 @@ public interface ProjectBuilderRequest
     static ProjectBuilderRequest build( @Nonnull Session session, @Nonnull ArtifactCoordinate coordinate )
     {
         return builder()
-                .session( nonNull( session, "session can not be null" ) )
-                .coordinate( nonNull( coordinate, "coordinate can not be null" ) )
+                .session( nonNull( session, "session cannot be null" ) )
+                .coordinate( nonNull( coordinate, "coordinate cannot be null" ) )
                 .build();
     }
 
@@ -122,6 +122,10 @@ public interface ProjectBuilderRequest
         boolean recursive;
         boolean processPlugins = true;
         boolean resolveDependencies = true;
+
+        ProjectBuilderRequestBuilder()
+        {
+        }
 
         public ProjectBuilderRequestBuilder session( Session session )
         {

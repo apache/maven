@@ -19,6 +19,12 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.apache.maven.SessionScoped;
+import org.apache.maven.api.annotations.Nonnull;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
@@ -30,13 +36,16 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.project.MavenProject;
 
+@Named
+@SessionScoped
 public class DefaultArtifactManager implements ArtifactManager
 {
 
     @Nonnull
     private final DefaultSession session;
-    private final Map<Artifact, Path> paths = new ConcurrentHashMap<>();
+    private final Map<String, Path> paths = new ConcurrentHashMap<>();
 
+    @Inject
     public DefaultArtifactManager( @Nonnull DefaultSession session )
     {
         this.session = session;
@@ -46,9 +55,9 @@ public class DefaultArtifactManager implements ArtifactManager
     @Override
     public Optional<Path> getPath( @Nonnull Artifact artifact )
     {
+        String id = id( artifact );
         if ( session.getMavenSession().getAllProjects() != null )
         {
-            String id = id( artifact );
             for ( MavenProject project : session.getMavenSession().getAllProjects() )
             {
                 if ( id.equals( id( project.getArtifact() ) ) && project.getArtifact().getFile() != null )
@@ -57,7 +66,7 @@ public class DefaultArtifactManager implements ArtifactManager
                 }
             }
         }
-        Path path = paths.get( artifact );
+        Path path = paths.get( id );
         if ( path == null && artifact instanceof DefaultArtifact )
         {
             File file = ( (DefaultArtifact) artifact ).getArtifact().getFile();
@@ -72,9 +81,9 @@ public class DefaultArtifactManager implements ArtifactManager
     @Override
     public void setPath( @Nonnull Artifact artifact, Path path )
     {
+        String id = id( artifact );
         if ( session.getMavenSession().getAllProjects() != null )
         {
-            String id = id( artifact );
             for ( MavenProject project : session.getMavenSession().getAllProjects() )
             {
                 if ( id.equals( id( project.getArtifact() ) ) )
@@ -86,11 +95,11 @@ public class DefaultArtifactManager implements ArtifactManager
         }
         if ( path == null )
         {
-            paths.remove( artifact );
+            paths.remove( id );
         }
         else
         {
-            paths.put( artifact, path );
+            paths.put( id, path );
         }
     }
 
@@ -106,11 +115,7 @@ public class DefaultArtifactManager implements ArtifactManager
 
     private String id( Artifact artifact )
     {
-        return artifact.getGroupId()
-                + ":" + artifact.getArtifactId()
-                + ":" + artifact.getExtension()
-                + ( artifact.getClassifier().isEmpty() ? "" : ":" + artifact.getClassifier() )
-                + ":" + artifact.getVersion();
+        return artifact.key();
     }
 
 }

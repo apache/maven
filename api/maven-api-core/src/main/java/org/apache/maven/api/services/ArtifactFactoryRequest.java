@@ -26,6 +26,8 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.NotThreadSafe;
 
+import static org.apache.maven.api.services.BaseRequest.nonNull;
+
 /**
  *
  *
@@ -55,7 +57,7 @@ public interface ArtifactFactoryRequest
                                          String version, String extension )
     {
         return ArtifactFactoryRequest.builder()
-                .session( session )
+                .session( nonNull( session, "session cannot be null" ) )
                 .groupId( groupId )
                 .artifactId( artifactId )
                 .version( version )
@@ -67,7 +69,7 @@ public interface ArtifactFactoryRequest
                                          String version, String classifier, String extension, String type )
     {
         return ArtifactFactoryRequest.builder()
-                .session( session )
+                .session( nonNull( session, "session cannot be null" ) )
                 .groupId( groupId )
                 .artifactId( artifactId )
                 .version( version )
@@ -92,6 +94,10 @@ public interface ArtifactFactoryRequest
         private String classifier;
         private String extension;
         private String type;
+
+        ArtifactFactoryRequestBuilder()
+        {
+        }
 
         public ArtifactFactoryRequestBuilder session( Session session )
         {

@@ -20,6 +20,7 @@ package org.apache.maven.internal.impl;
  */
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
+@Singleton
 public class DefaultDependencyCoordinateFactory implements DependencyCoordinateFactory
 {
 

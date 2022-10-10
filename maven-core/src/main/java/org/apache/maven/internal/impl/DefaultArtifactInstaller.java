@@ -19,6 +19,10 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.ArtifactInstaller;
 import org.apache.maven.api.services.ArtifactInstallerException;
@@ -31,11 +35,14 @@ import org.eclipse.aether.installation.InstallationException;
 import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
+@Named
+@Singleton
 public class DefaultArtifactInstaller implements ArtifactInstaller
 {
 
     private final RepositorySystem repositorySystem;
 
+    @Inject
     DefaultArtifactInstaller( @Nonnull RepositorySystem repositorySystem )
     {
         this.repositorySystem = nonNull( repositorySystem );
