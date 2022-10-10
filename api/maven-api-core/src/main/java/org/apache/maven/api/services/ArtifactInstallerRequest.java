@@ -31,6 +31,8 @@ import java.util.Collections;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
 
+import static org.apache.maven.api.services.BaseRequest.nonNull;
+
 /**
  * A request for installing one or more artifacts in the local repository.
  *
@@ -57,8 +59,8 @@ public interface ArtifactInstallerRequest
     static ArtifactInstallerRequest build( Session session, Collection<Artifact> artifacts )
     {
         return builder()
-                .session( session )
-                .artifacts( artifacts )
+                .session( nonNull( session, "session cannot be null" ) )
+                .artifacts( nonNull( artifacts, "artifacts cannot be null" ) )
                 .build();
     }
 
@@ -67,6 +69,10 @@ public interface ArtifactInstallerRequest
     {
         Session session;
         Collection<Artifact> artifacts = Collections.emptyList();
+
+        ArtifactInstallerRequestBuilder()
+        {
+        }
 
         @Nonnull
         public ArtifactInstallerRequestBuilder session( @Nonnull Session session )
@@ -98,7 +104,7 @@ public interface ArtifactInstallerRequest
                                              @Nonnull Collection<Artifact> artifacts )
             {
                 super( session );
-                this.artifacts = nonNull( artifacts, "artifacts can not be null" );
+                this.artifacts = unmodifiable( nonNull( artifacts, "artifacts cannot be null" ) );
             }
 
             @Nonnull

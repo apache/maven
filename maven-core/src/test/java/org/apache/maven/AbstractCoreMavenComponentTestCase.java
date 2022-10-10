@@ -19,16 +19,16 @@ package org.apache.maven;
  * under the License.
  */
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.handler.manager.DefaultArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -47,15 +47,13 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.DefaultRepositorySystem;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
-
-import javax.inject.Inject;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 
@@ -74,7 +72,8 @@ public abstract class AbstractCoreMavenComponentTestCase
 
     abstract protected String getProjectsDirectory();
 
-    protected PlexusContainer getContainer() {
+    protected PlexusContainer getContainer()
+    {
         return container;
     }
 
@@ -144,10 +143,10 @@ public abstract class AbstractCoreMavenComponentTestCase
             projects.add( project );
             if ( includeModules )
             {
-                for( String module : project.getModules() )
+                for ( String module : project.getModules() )
                 {
                     File modulePom = new File( pom.getParentFile(), module );
-                    if( modulePom.isDirectory() )
+                    if ( modulePom.isDirectory() )
                     {
                         modulePom = new File( modulePom, "pom.xml" );
                     }
@@ -171,8 +170,7 @@ public abstract class AbstractCoreMavenComponentTestCase
         session.setProjects( projects );
         session.setAllProjects( session.getProjects() );
         session.setSession( new DefaultSession( session, new DefaultRepositorySystem(), null,
-                null, null, null, null, null,
-                null, new DefaultArtifactHandlerManager( Collections.emptyMap() ), null, null ) );
+                null, null, null ) );
 
         return session;
     }
@@ -245,7 +243,7 @@ public abstract class AbstractCoreMavenComponentTestCase
             model.setGroupId( groupId );
             model.setArtifactId( artifactId );
             model.setVersion( version );
-            model.setBuild(  new Build() );
+            model.setBuild( new Build() );
             project = new MavenProject( model );
         }
 
@@ -271,20 +269,23 @@ public abstract class AbstractCoreMavenComponentTestCase
         //
         public ProjectBuilder addDependency( String groupId, String artifactId, String version, String scope )
         {
-            return addDependency( groupId, artifactId, version, scope, (Exclusion)null );
+            return addDependency( groupId, artifactId, version, scope, (Exclusion) null );
         }
 
-        public ProjectBuilder addDependency( String groupId, String artifactId, String version, String scope, Exclusion exclusion )
+        public ProjectBuilder addDependency( String groupId, String artifactId, String version, String scope,
+                                             Exclusion exclusion )
         {
             return addDependency( groupId, artifactId, version, scope, null, exclusion );
         }
 
-        public ProjectBuilder addDependency( String groupId, String artifactId, String version, String scope, String systemPath )
+        public ProjectBuilder addDependency( String groupId, String artifactId, String version, String scope,
+                                             String systemPath )
         {
             return addDependency( groupId, artifactId, version, scope, systemPath, null );
         }
 
-        public ProjectBuilder addDependency( String groupId, String artifactId, String version, String scope, String systemPath, Exclusion exclusion )
+        public ProjectBuilder addDependency( String groupId, String artifactId, String version, String scope,
+                                             String systemPath, Exclusion exclusion )
         {
             Dependency d = new Dependency();
             d.setGroupId( groupId );
@@ -292,7 +293,7 @@ public abstract class AbstractCoreMavenComponentTestCase
             d.setVersion( version );
             d.setScope( scope );
 
-            if ( systemPath != null && scope.equals(  Artifact.SCOPE_SYSTEM ) )
+            if ( systemPath != null && scope.equals( Artifact.SCOPE_SYSTEM ) )
             {
                 d.setSystemPath( systemPath );
             }

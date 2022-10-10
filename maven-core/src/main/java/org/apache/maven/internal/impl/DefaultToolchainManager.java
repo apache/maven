@@ -19,6 +19,10 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +37,13 @@ import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
 import org.apache.maven.toolchain.ToolchainPrivate;
 
+@Named
+@Singleton
 public class DefaultToolchainManager implements ToolchainManager
 {
     private final DefaultToolchainManagerPrivate toolchainManagerPrivate;
 
+    @Inject
     public DefaultToolchainManager( DefaultToolchainManagerPrivate toolchainManagerPrivate )
     {
         this.toolchainManagerPrivate = toolchainManagerPrivate;
