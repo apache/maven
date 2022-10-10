@@ -19,6 +19,9 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.nio.file.Path;
 
 import org.apache.maven.api.Artifact;
@@ -28,6 +31,8 @@ import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.LocalRepositoryManager;
 
+@Named
+@Singleton
 public class DefaultLocalRepositoryManager implements LocalRepositoryManager
 {
 

@@ -19,6 +19,9 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -33,6 +36,8 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import static org.apache.maven.artifact.versioning.VersionRange.createFromVersionSpec;
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
+@Named
+@Singleton
 public class DefaultVersionParser implements VersionParser
 {
     private static final String SNAPSHOT = "SNAPSHOT";

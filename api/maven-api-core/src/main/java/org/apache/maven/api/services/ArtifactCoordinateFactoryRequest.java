@@ -26,6 +26,8 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 
+import static org.apache.maven.api.services.BaseRequest.nonNull;
+
 /**
  * A request for creating a {@link ArtifactCoordinate} object.
  *
@@ -51,11 +53,12 @@ public interface ArtifactCoordinateFactoryRequest
 
     String getType();
 
-    static ArtifactCoordinateFactoryRequest build( Session session, String groupId, String artifactId,
+    @Nonnull
+    static ArtifactCoordinateFactoryRequest build( @Nonnull Session session, String groupId, String artifactId,
                                                    String version, String extension )
     {
         return ArtifactCoordinateFactoryRequest.builder()
-                .session( session )
+                .session( nonNull( session, "session cannot be null" ) )
                 .groupId( groupId )
                 .artifactId( artifactId )
                 .version( version )
@@ -63,11 +66,12 @@ public interface ArtifactCoordinateFactoryRequest
                 .build();
     }
 
-    static ArtifactCoordinateFactoryRequest build( Session session, String groupId, String artifactId,
+    @Nonnull
+    static ArtifactCoordinateFactoryRequest build( @Nonnull Session session, String groupId, String artifactId,
                                                    String version, String classifier, String extension, String type )
     {
         return ArtifactCoordinateFactoryRequest.builder()
-                .session( session )
+                .session( nonNull( session, "session cannot be null" ) )
                 .groupId( groupId )
                 .artifactId( artifactId )
                 .version( version )
@@ -77,11 +81,12 @@ public interface ArtifactCoordinateFactoryRequest
                 .build();
     }
 
-    static ArtifactCoordinateFactoryRequest build( Session session, ArtifactCoordinate coordinate )
+    @Nonnull
+    static ArtifactCoordinateFactoryRequest build( @Nonnull Session session, @Nonnull ArtifactCoordinate coordinate )
     {
         return ArtifactCoordinateFactoryRequest.builder()
-                .session( session )
-                .groupId( coordinate.getGroupId() )
+                .session( nonNull( session, "session cannot be null" ) )
+                .groupId( nonNull( coordinate, "coordinate cannot be null" ).getGroupId() )
                 .artifactId( coordinate.getArtifactId() )
                 .classifier( coordinate.getClassifier() )
                 .version( coordinate.getVersion().asString() )
@@ -105,6 +110,10 @@ public interface ArtifactCoordinateFactoryRequest
         private String classifier;
         private String extension;
         private String type;
+
+        ArtifactFactoryRequestBuilder()
+        {
+        }
 
         public ArtifactFactoryRequestBuilder session( Session session )
         {

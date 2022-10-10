@@ -19,6 +19,10 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.List;
 import java.util.Map;
 
@@ -27,11 +31,14 @@ import org.apache.maven.api.services.LookupException;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
+@Named
+@Singleton
 public class DefaultLookup implements Lookup
 {
 
     private final PlexusContainer container;
 
+    @Inject
     public DefaultLookup( PlexusContainer container )
     {
         this.container = container;

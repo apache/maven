@@ -19,6 +19,9 @@ package org.apache.maven.internal.impl;
  * under the License.
  */
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,6 +31,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.SessionScoped;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
@@ -45,6 +49,8 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
+@Named
+@SessionScoped
 public class DefaultProjectManager implements ProjectManager
 {
 
@@ -52,6 +58,7 @@ public class DefaultProjectManager implements ProjectManager
     private final ArtifactManager artifactManager;
     private final PlexusContainer container;
 
+    @Inject
     public DefaultProjectManager( Session session,
                                   ArtifactManager artifactManager,
                                   PlexusContainer container )

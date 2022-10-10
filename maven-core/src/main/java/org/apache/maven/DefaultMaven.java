@@ -35,6 +35,7 @@ import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.graph.GraphBuilder;
 import org.apache.maven.graph.ProjectSelector;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
+import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.internal.aether.MavenChainedWorkspaceReader;
@@ -240,6 +241,7 @@ public class DefaultMaven
 
             sessionScope.seed( MavenSession.class, session );
             sessionScope.seed( Session.class, session.getSession() );
+            sessionScope.seed( DefaultSession.class, (DefaultSession) session.getSession() );
 
             legacySupport.setSession( session );
 
