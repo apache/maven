@@ -104,7 +104,7 @@ public interface ArtifactInstallerRequest
                                              @Nonnull Collection<Artifact> artifacts )
             {
                 super( session );
-                this.artifacts = nonNull( artifacts, "artifacts can not be null" );
+                this.artifacts = unmodifiable( nonNull( artifacts, "artifacts cannot be null" ) );
             }
 
             @Nonnull

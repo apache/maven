@@ -128,7 +128,7 @@ public interface ArtifactDeployerRequest
             {
                 super( session );
                 this.repository = nonNull( repository, "repository cannot be null" );
-                this.artifacts = nonNull( artifacts, "artifacts cannot be null" );
+                this.artifacts = unmodifiable( nonNull( artifacts, "artifacts cannot be null" ) );
                 this.retryFailedDeploymentCount = retryFailedDeploymentCount;
             }
 
