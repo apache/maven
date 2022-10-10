@@ -117,6 +117,10 @@ public interface DependencyCollectorRequest
         List<DependencyCoordinate> managedDependencies = Collections.emptyList();
         boolean verbose;
 
+        DependencyCollectorRequestBuilder()
+        {
+        }
+
         @Nonnull
         public DependencyCollectorRequestBuilder session( @Nonnull Session session )
         {

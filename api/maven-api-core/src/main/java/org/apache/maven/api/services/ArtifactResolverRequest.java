@@ -64,6 +64,10 @@ public interface ArtifactResolverRequest
         Session session;
         Collection<? extends ArtifactCoordinate> coordinates;
 
+        ArtifactResolverRequestBuilder()
+        {
+        }
+
         @Nonnull
         public ArtifactResolverRequestBuilder session( Session session )
         {

@@ -77,6 +77,10 @@ public interface ArtifactDeployerRequest
         Collection<Artifact> artifacts;
         int retryFailedDeploymentCount;
 
+        ArtifactDeployerRequestBuilder()
+        {
+        }
+
         @Nonnull
         public ArtifactDeployerRequestBuilder session( Session session )
         {

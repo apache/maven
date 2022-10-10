@@ -68,6 +68,10 @@ public interface ArtifactInstallerRequest
         Session session;
         Collection<Artifact> artifacts = Collections.emptyList();
 
+        ArtifactInstallerRequestBuilder()
+        {
+        }
+
         @Nonnull
         public ArtifactInstallerRequestBuilder session( @Nonnull Session session )
         {

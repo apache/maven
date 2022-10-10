@@ -108,6 +108,10 @@ public interface DependencyCoordinateFactoryRequest extends ArtifactCoordinateFa
         private boolean optional;
         private Collection<Exclusion> exclusions = Collections.emptyList();
 
+        DependencyCoordinateFactoryRequestBuilder()
+        {
+        }
+
         public DependencyCoordinateFactoryRequestBuilder session( Session session )
         {
             this.session = session;

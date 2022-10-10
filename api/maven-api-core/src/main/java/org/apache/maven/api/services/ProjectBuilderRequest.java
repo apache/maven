@@ -123,6 +123,10 @@ public interface ProjectBuilderRequest
         boolean processPlugins = true;
         boolean resolveDependencies = true;
 
+        ProjectBuilderRequestBuilder()
+        {
+        }
+
         public ProjectBuilderRequestBuilder session( Session session )
         {
             this.session = session;

@@ -93,6 +93,10 @@ public interface ArtifactFactoryRequest
         private String extension;
         private String type;
 
+        ArtifactFactoryRequestBuilder()
+        {
+        }
+
         public ArtifactFactoryRequestBuilder session( Session session )
         {
             this.session = session;
