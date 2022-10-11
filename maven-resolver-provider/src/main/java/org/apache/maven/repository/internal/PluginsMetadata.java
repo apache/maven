@@ -27,15 +27,32 @@ import java.util.List;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
-import org.apache.maven.repository.internal.PluginsMetadataInfoProvider.PluginInfo;
-import org.eclipse.aether.artifact.Artifact;
 
 /**
- * Plugin G level metadata.
+ * Maven G level metadata.
  */
 final class PluginsMetadata
     extends MavenMetadata
 {
+    static final class PluginInfo
+    {
+        final String groupId;
+
+        private final String artifactId;
+
+        private final String goalPrefix;
+
+        private final String name;
+
+        PluginInfo( String groupId, String artifactId, String goalPrefix, String name )
+        {
+            this.groupId = groupId;
+            this.artifactId = artifactId;
+            this.goalPrefix = goalPrefix;
+            this.name = name;
+        }
+    }
+
     private final PluginInfo pluginInfo;
 
     PluginsMetadata( PluginInfo pluginInfo, Date timestamp )
@@ -54,9 +71,9 @@ final class PluginsMetadata
     {
         Metadata result = new Metadata();
         Plugin plugin = new Plugin();
-        plugin.setPrefix( pluginInfo.getPluginPrefix() );
-        plugin.setArtifactId( pluginInfo.getPluginArtifactId() );
-        plugin.setName( pluginInfo.getPluginName() );
+        plugin.setPrefix( pluginInfo.goalPrefix );
+        plugin.setArtifactId( pluginInfo.artifactId );
+        plugin.setName( pluginInfo.name );
         result.getPlugins().add( plugin );
         return result;
     }
@@ -75,16 +92,6 @@ final class PluginsMetadata
         }
     }
 
-    public Object getKey()
-    {
-        return getGroupId();
-    }
-
-    public static Object getKey( Artifact artifact )
-    {
-        return artifact.getGroupId();
-    }
-
     @Override
     public MavenMetadata setFile( File file )
     {
@@ -94,7 +101,7 @@ final class PluginsMetadata
     @Override
     public String getGroupId()
     {
-        return pluginInfo.getPluginGroupId();
+        return pluginInfo.groupId;
     }
 
     @Override
