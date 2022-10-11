@@ -41,7 +41,6 @@ import org.apache.maven.api.services.DependencyCollectorResult;
 import org.apache.maven.api.services.ProjectBuilder;
 import org.apache.maven.api.services.ProjectBuilderException;
 import org.apache.maven.api.services.BuilderProblem;
-import org.apache.maven.api.services.BuilderProblemSeverity;
 import org.apache.maven.api.services.ProjectBuilderRequest;
 import org.apache.maven.api.services.ProjectBuilderResult;
 import org.apache.maven.api.services.Source;
@@ -228,9 +227,9 @@ public class DefaultProjectBuilder implements ProjectBuilder
                         }
 
                         @Override
-                        public BuilderProblemSeverity getSeverity()
+                        public Severity getSeverity()
                         {
-                            return BuilderProblemSeverity.valueOf( problem.getSeverity().name() );
+                            return Severity.valueOf( problem.getSeverity().name() );
                         }
                     };
                 }

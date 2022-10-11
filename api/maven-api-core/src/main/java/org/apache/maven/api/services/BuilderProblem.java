@@ -94,6 +94,20 @@ public interface BuilderProblem
      * @return the severity level of this problem, never {@code null}
      */
     @Nonnull
-    BuilderProblemSeverity getSeverity();
+    Severity getSeverity();
 
+    /**
+     * The different severity levels for a problem, in decreasing order.
+     *
+     * @since 4.0
+     */
+    @Experimental
+    enum Severity
+    {
+
+        FATAL, //
+        ERROR, //
+        WARNING //
+
+    }
 }

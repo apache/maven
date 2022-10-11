@@ -31,7 +31,6 @@ import java.util.Properties;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.BuilderProblem;
-import org.apache.maven.api.services.BuilderProblemSeverity;
 import org.apache.maven.api.services.ToolchainsBuilder;
 import org.apache.maven.api.services.ToolchainsBuilderException;
 import org.apache.maven.api.services.ToolchainsBuilderRequest;
@@ -180,9 +179,9 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder
         }
 
         @Override
-        public BuilderProblemSeverity getSeverity()
+        public Severity getSeverity()
         {
-            return BuilderProblemSeverity.valueOf( problem.getSeverity().name() );
+            return Severity.valueOf( problem.getSeverity().name() );
         }
     }
 }

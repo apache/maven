@@ -36,7 +36,7 @@ public interface ToolchainsBuilderResult
 
     /**
      * Gets the problems that were encountered during the settings building. Note that only problems of severity
-     * {@link BuilderProblemSeverity#WARNING} and below are reported here. Problems with a higher severity level cause
+     * {@link BuilderProblem.Severity#WARNING} and below are reported here. Problems with a higher severity level cause
      * the settings builder to fail with a {@link ToolchainsBuilderException}.
      *
      * @return the problems that were encountered during the settings building, can be empty but never {@code null}
