@@ -235,7 +235,7 @@ public class DefaultRepositorySystemSessionFactory
 
             if ( server.getConfiguration() != null )
             {
-                Dom dom = ( ( org.codehaus.plexus.util.xml.Xpp3Dom ) server.getConfiguration() ).getDom();
+                Dom dom = server.getConfiguration();
                 List<Dom> children = dom.getChildren().stream()
                         .filter( c -> !"wagonProvider".equals( c.getName() ) )
                         .collect( Collectors.toList() );
