@@ -37,7 +37,7 @@ public class MojoException
     protected String longMessage;
 
     /**
-     * Construct a new <code>MojoExecutionException</code> exception providing the source and a short and long message:
+     * Construct a new <code>MojoException</code> exception providing the source and a short and long message:
      * these messages are used to improve the message written at the end of Maven build.
      */
     public MojoException( Object source, String shortMessage, String longMessage )
@@ -45,15 +45,6 @@ public class MojoException
         super( shortMessage );
         this.source = source;
         this.longMessage = longMessage;
-    }
-
-    /**
-     * Construct a new <code>MojoExecutionException</code> exception wrapping an underlying <code>Exception</code>
-     * and providing a <code>message</code>.
-     */
-    public MojoException( String message, Exception cause )
-    {
-        super( message, cause );
     }
 
     /**
@@ -78,7 +69,6 @@ public class MojoException
      *
      * @param cause the cause which is saved for later retrieval by the {@link #getCause()} method.
      *              A {@code null} value is permitted, and indicates that the cause is nonexistent or unknown.
-     * @since 3.8.3
      */
     public MojoException( Throwable cause )
     {
