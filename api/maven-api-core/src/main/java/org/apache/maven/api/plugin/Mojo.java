@@ -39,7 +39,7 @@ public interface Mojo
      * This is the main trigger for the <code>Mojo</code> inside the <code>Maven</code> system, and allows
      * the <code>Mojo</code> to communicate errors.
      *
-     * @throws MojoException if a problem occurs.
+     * @throws MojoException if a problem occurs
      */
     void execute();
 

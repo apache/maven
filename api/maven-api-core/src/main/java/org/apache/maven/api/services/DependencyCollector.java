@@ -45,9 +45,9 @@ public interface DependencyCollector extends Service
      * Note that this operation is only concerned about determining the coordinates of the
      * transitive dependencies and does not actually resolve the artifact files.
      *
-     * @param request The dependency collection request, must not be {@code null}.
-     * @return The collection result, never {@code null}.
-     * @throws DependencyCollectorException If the dependency tree could not be built.
+     * @param request the dependency collection request, must not be {@code null}
+     * @return the collection result, never {@code null}
+     * @throws DependencyCollectorException if the dependency tree could not be built
      * @throws IllegalArgumentException if an argument is null or invalid
      *
      * @see DependencyCollector#collect(Session, Project)
@@ -62,10 +62,10 @@ public interface DependencyCollector extends Service
      * only concerned about determining the coordinates of the transitive dependencies and does not actually resolve the
      * artifact files.
      *
-     * @param session The {@link Session}, must not be {@code null}.
-     * @param root The Maven Dependency, must not be {@code null}.
-     * @return The collection result, never {@code null}.
-     * @throws DependencyCollectorException If the dependency tree could not be built.
+     * @param session the {@link Session}, must not be {@code null}
+     * @param root the Maven Dependency, must not be {@code null}
+     * @return the collection result, never {@code null}
+     * @throws DependencyCollectorException if the dependency tree could not be built
      * @throws IllegalArgumentException if an argument is null or invalid
      * @see #collect(DependencyCollectorRequest)
      */
@@ -81,10 +81,10 @@ public interface DependencyCollector extends Service
      * only concerned about determining the coordinates of the transitive dependencies and does not actually resolve the
      * artifact files.
      *
-     * @param session The {@link Session}, must not be {@code null}.
-     * @param project The {@link Project}, must not be {@code null}.
-     * @return The collection result, never {@code null}.
-     * @throws DependencyCollectorException If the dependency tree could not be built.
+     * @param session the {@link Session}, must not be {@code null}
+     * @param project the {@link Project}, must not be {@code null}
+     * @return the collection result, never {@code null}
+     * @throws DependencyCollectorException if the dependency tree could not be built
      * @throws IllegalArgumentException if an argument is null or invalid
      * @see #collect(DependencyCollectorRequest)
      */
@@ -100,10 +100,10 @@ public interface DependencyCollector extends Service
      * only concerned about determining the coordinates of the transitive dependencies and does not actually resolve the
      * artifact files.
      *
-     * @param session The {@link Session}, must not be {@code null}.
-     * @param artifact The {@link Artifact}, must not be {@code null}.
-     * @return The collection result, never {@code null}.
-     * @throws DependencyCollectorException If the dependency tree could not be built.
+     * @param session the {@link Session}, must not be {@code null}
+     * @param artifact the {@link Artifact}, must not be {@code null}
+     * @return the collection result, never {@code null}
+     * @throws DependencyCollectorException if the dependency tree could not be built
      * @throws IllegalArgumentException if an argument is null or invalid
      * @see #collect(DependencyCollectorRequest)
      */

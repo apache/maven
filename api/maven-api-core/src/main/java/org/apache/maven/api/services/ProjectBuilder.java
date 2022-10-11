@@ -50,8 +50,8 @@ public interface ProjectBuilder extends Service
     /**
      * Creates a {@link org.apache.maven.api.Project} from a POM file.
      *
-     * @param session The {@link Session}, must not be {@code null}.
-     * @param source The {@link Source}, must not be {@code null}.
+     * @param session the {@link Session}, must not be {@code null}
+     * @param source the {@link Source}, must not be {@code null}
      * @throws ProjectBuilderException if the project cannot be created
      * @throws IllegalArgumentException if an argument is {@code null} or invalid
      * @see #build(ProjectBuilderRequest)
@@ -65,8 +65,8 @@ public interface ProjectBuilder extends Service
     /**
      * Creates a {@link org.apache.maven.api.Project} from a POM file.
      *
-     * @param session The {@link Session}, must not be {@code null}.
-     * @param path The {@link Path}, must not be {@code null}.
+     * @param session the {@link Session}, must not be {@code null}
+     * @param path the {@link Path}, must not be {@code null}
      * @throws ProjectBuilderException if the project cannot be created
      * @throws IllegalArgumentException if an argument is {@code null} or invalid
      * @see #build(ProjectBuilderRequest)
@@ -80,8 +80,8 @@ public interface ProjectBuilder extends Service
     /**
      * Creates a {@link org.apache.maven.api.Project} from an artifact.
      *
-     * @param session The {@link Session}, must not be {@code null}.
-     * @param artifact The {@link Artifact}, must not be {@code null}.
+     * @param session the {@link Session}, must not be {@code null}
+     * @param artifact the {@link Artifact}, must not be {@code null}
      * @throws ProjectBuilderException if the project cannot be created
      * @throws IllegalArgumentException if an argument is {@code null} or invalid
      * @see #build(ProjectBuilderRequest)
@@ -95,8 +95,8 @@ public interface ProjectBuilder extends Service
     /**
      * Creates a {@link org.apache.maven.api.Project} from a coordinate.
      *
-     * @param session The {@link Session}, must not be {@code null}.
-     * @param coordinate The {@link ArtifactCoordinate}, must not be {@code null}.
+     * @param session the {@link Session}, must not be {@code null}
+     * @param coordinate the {@link ArtifactCoordinate}, must not be {@code null}
      * @throws ProjectBuilderException if the project cannot be created
      * @throws IllegalArgumentException if an argument is {@code null} or invalid
      * @see #build(ProjectBuilderRequest)

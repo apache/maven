@@ -37,7 +37,7 @@ public interface ToolchainsBuilderRequest
     /**
      * Gets the global Toolchains path.
      *
-     * @return The global Toolchains path or {@code null} if none.
+     * @return the global Toolchains path or {@code null} if none
      */
     @Nonnull
     Optional<Path> getGlobalToolchainsPath();
@@ -45,7 +45,7 @@ public interface ToolchainsBuilderRequest
     /**
      * Gets the global Toolchains source.
      *
-     * @return The global Toolchains source or {@code null} if none.
+     * @return the global Toolchains source or {@code null} if none
      */
     @Nonnull
     Optional<Source> getGlobalToolchainsSource();
@@ -53,7 +53,7 @@ public interface ToolchainsBuilderRequest
     /**
      * Gets the user Toolchains path.
      *
-     * @return The user Toolchains path or {@code null} if none.
+     * @return the user Toolchains path or {@code null} if none
      */
     @Nonnull
     Optional<Path> getUserToolchainsPath();
@@ -61,7 +61,7 @@ public interface ToolchainsBuilderRequest
     /**
      * Gets the user Toolchains source.
      *
-     * @return The user Toolchains source or {@code null} if none.
+     * @return the user Toolchains source or {@code null} if none
      */
     @Nonnull
     Optional<Source> getUserToolchainsSource();

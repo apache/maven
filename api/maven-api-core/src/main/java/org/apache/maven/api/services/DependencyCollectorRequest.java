@@ -134,8 +134,8 @@ public interface DependencyCollectorRequest
          * as a label for the root node of the graph in case no root dependency was specified. As such, the configured
          * root artifact is ignored if {@link #root(DependencyCoordinate)} has been set.
          *
-         * @param rootArtifact The root artifact for the dependency graph, may be {@code null}.
-         * @return This request for chaining, never {@code null}.
+         * @param rootArtifact the root artifact for the dependency graph, may be {@code null}
+         * @return this request for chaining, never {@code null}
          */
         @Nonnull
         public DependencyCollectorRequestBuilder rootArtifact( @Nullable Artifact rootArtifact )
@@ -146,7 +146,7 @@ public interface DependencyCollectorRequest
 
         /**
          * @param root The root dependency
-         * @return This request for chaining, never {@code null}.
+         * @return this request for chaining, never {@code null}
          */
         @Nonnull
         public DependencyCollectorRequestBuilder root( @Nonnull DependencyCoordinate root )
@@ -160,8 +160,8 @@ public interface DependencyCollectorRequest
          * direct dependencies from the request will be merged with the direct dependencies from the root dependency's
          * artifact descriptor, giving higher priority to the dependencies from the request.
          *
-         * @param dependencies The direct dependencies, may be {@code null}.
-         * @return This request for chaining, never {@code null}.
+         * @param dependencies the direct dependencies, may be {@code null}
+         * @return this request for chaining, never {@code null}
          */
         @Nonnull
         public DependencyCollectorRequestBuilder dependencies( @Nullable List<DependencyCoordinate> dependencies )
@@ -173,8 +173,8 @@ public interface DependencyCollectorRequest
         /**
          * Adds the specified direct dependency.
          *
-         * @param dependency The dependency to add, may be {@code null}.
-         * @return This request for chaining, never {@code null}.
+         * @param dependency the dependency to add, may be {@code null}
+         * @return this request for chaining, never {@code null}
          */
         @Nonnull
         public DependencyCollectorRequestBuilder dependency( @Nullable DependencyCoordinate dependency )
@@ -196,8 +196,8 @@ public interface DependencyCollectorRequest
          * apply to
          * the direct dependencies of the root node.
          *
-         * @param managedDependencies The dependency management, may be {@code null}.
-         * @return This request for chaining, never {@code null}.
+         * @param managedDependencies the dependency management, may be {@code null}
+         * @return this request for chaining, never {@code null}
          */
         @Nonnull
         public DependencyCollectorRequestBuilder managedDependencies(
@@ -212,7 +212,7 @@ public interface DependencyCollectorRequest
          *
          * @param managedDependency The managed dependency to add, may be {@code null} in which case the call
          *                          will have no effect.
-         * @return This request for chaining, never {@code null}.
+         * @return this request for chaining, never {@code null}
          */
         @Nonnull
         public DependencyCollectorRequestBuilder managedDependency( @Nullable DependencyCoordinate managedDependency )
@@ -231,8 +231,8 @@ public interface DependencyCollectorRequest
         /**
          * Specifies that the collection should be verbose.
          *
-         * @param verbose whether the collection should be verbose or not.
-         * @return This request for chaining, never {@code null}.
+         * @param verbose whether the collection should be verbose or not
+         * @return this request for chaining, never {@code null}
          */
         @Nonnull
         public DependencyCollectorRequestBuilder verbose( boolean verbose )

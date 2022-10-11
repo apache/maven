@@ -36,8 +36,8 @@ public interface VersionRange
     /**
      * Determines whether the specified version is contained within this range.
      *
-     * @param version The version to test, must not be {@code null}.
-     * @return {@code true} if this range contains the specified version, {@code false} otherwise.
+     * @param version the version to test, must not be {@code null}
+     * @return {@code true} if this range contains the specified version, {@code false} otherwise
      */
     boolean contains( @Nonnull Version version );
 

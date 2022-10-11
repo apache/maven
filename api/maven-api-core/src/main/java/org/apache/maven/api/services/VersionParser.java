@@ -36,9 +36,9 @@ public interface VersionParser extends Service
     /**
      * Parses the specified version string, for example "1.0".
      *
-     * @param version The version string to parse, must not be {@code null}.
-     * @return The parsed version, never {@code null}.
-     * @throws VersionParserException If the string violates the syntax rules of this scheme.
+     * @param version the version string to parse, must not be {@code null}
+     * @return the parsed version, never {@code null}
+     * @throws VersionParserException if the string violates the syntax rules of this scheme
      * @see org.apache.maven.api.Session#parseVersion(String) 
      */
     @Nonnull
@@ -47,9 +47,9 @@ public interface VersionParser extends Service
     /**
      * Parses the specified version range specification, for example "[1.0,2.0)".
      *
-     * @param range The range specification to parse, must not be {@code null}.
-     * @return The parsed version range, never {@code null}.
-     * @throws VersionParserException If the range specification violates the syntax rules of this scheme.
+     * @param range the range specification to parse, must not be {@code null}
+     * @return the parsed version range, never {@code null}
+     * @throws VersionParserException if the range specification violates the syntax rules of this scheme
      */
     @Nonnull
     VersionRange parseVersionRange( @Nonnull String range );

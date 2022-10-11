@@ -60,7 +60,7 @@ public interface Session
      * Gets the user properties to use for interpolation. The user properties have been configured directly by the user
      * on his discretion, e.g. via the {@code -Dkey=value} parameter on the command line.
      *
-     * @return The user properties, never {@code null}.
+     * @return the user properties, never {@code null}
      */
     @Nonnull
     Map<String, String> getUserProperties();
@@ -69,14 +69,14 @@ public interface Session
      * Gets the system properties to use for interpolation. The system properties are collected from the runtime
      * environment like {@link System#getProperties()} and environment variables.
      *
-     * @return The system properties, never {@code null}.
+     * @return the system properties, never {@code null}
      */
     @Nonnull
     Map<String, String> getSystemProperties();
 
     /**
      * Returns the current maven version
-     * @return the maven version, never {@code null}.
+     * @return the maven version, never {@code null}
      */
     @Nonnull
     String getMavenVersion();

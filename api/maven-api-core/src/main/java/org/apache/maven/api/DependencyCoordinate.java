@@ -37,7 +37,7 @@ public interface DependencyCoordinate extends ArtifactCoordinate
     /**
      * The type of the artifact.
      *
-     * @return The type.
+     * @return the type
      */
     @Nonnull
     Type getType();

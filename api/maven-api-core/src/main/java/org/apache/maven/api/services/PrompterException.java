@@ -31,8 +31,8 @@ public class PrompterException
     extends MavenException
 {
     /**
-     * @param message The message to give.
-     * @param e The {@link Exception}.
+     * @param message the message to give
+     * @param e the {@link Exception}
      */
     public PrompterException( String message, Exception e )
     {

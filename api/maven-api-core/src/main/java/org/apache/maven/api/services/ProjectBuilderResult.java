@@ -42,7 +42,7 @@ public interface ProjectBuilderResult
      * <groupId>:<artifactId>:<version>} but some of these coordinates may still be unknown at the point the exception
      * is thrown so this information is merely meant to assist the user.
      *
-     * @return The identifier of the project or an empty string if not known, never {@code null}.
+     * @return the identifier of the project or an empty string if not known, never {@code null}
      */
     @Nonnull
     String getProjectId();
@@ -50,7 +50,7 @@ public interface ProjectBuilderResult
     /**
      * Gets the POM file from which the project was built.
      *
-     * @return The optional POM file.
+     * @return the optional POM file
      */
     @Nonnull
     Optional<Path> getPomFile();
@@ -67,7 +67,7 @@ public interface ProjectBuilderResult
     /**
      * Gets the problems that were encountered during the project building.
      *
-     * @return The problems that were encountered during the project building, can be empty but never {@code null}.
+     * @return the problems that were encountered during the project building, can be empty but never {@code null}
      */
     @Nonnull
     Collection<BuilderProblem> getProblems();
@@ -75,7 +75,7 @@ public interface ProjectBuilderResult
     /**
      * Gets the result of the dependency resolution for the project.
      *
-     * @return The result of the dependency resolution for the project.
+     * @return the result of the dependency resolution for the project
      */
     @Nonnull
     Optional<DependencyCollectorResult> getDependencyResolverResult();

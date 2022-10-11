@@ -45,7 +45,7 @@ public interface SettingsBuilderRequest
     /**
      * Gets the global settings path.
      *
-     * @return The global settings path or {@code null} if none.
+     * @return the global settings path or {@code null} if none
      */
     @Nonnull
     Optional<Path> getGlobalSettingsPath();
@@ -53,7 +53,7 @@ public interface SettingsBuilderRequest
     /**
      * Gets the global settings source.
      *
-     * @return The global settings source or {@code null} if none.
+     * @return the global settings source or {@code null} if none
      */
     @Nonnull
     Optional<Source> getGlobalSettingsSource();
@@ -61,7 +61,7 @@ public interface SettingsBuilderRequest
     /**
      * Gets the user settings path.
      *
-     * @return The user settings path or {@code null} if none.
+     * @return the user settings path or {@code null} if none
      */
     @Nonnull
     Optional<Path> getUserSettingsPath();
@@ -69,7 +69,7 @@ public interface SettingsBuilderRequest
     /**
      * Gets the user settings source.
      *
-     * @return The user settings source or {@code null} if none.
+     * @return the user settings source or {@code null} if none
      */
     @Nonnull
     Optional<Source> getUserSettingsSource();

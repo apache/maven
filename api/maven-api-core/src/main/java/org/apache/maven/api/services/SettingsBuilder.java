@@ -34,9 +34,9 @@ public interface SettingsBuilder extends Service
     /**
      * Builds the effective settings of the specified settings files.
      *
-     * @param request The settings building request that holds the parameters, must not be {@code null}.
-     * @return The result of the settings building, never {@code null}.
-     * @throws SettingsBuilderException If the effective settings could not be built.
+     * @param request the settings building request that holds the parameters, must not be {@code null}
+     * @return the result of the settings building, never {@code null}
+     * @throws SettingsBuilderException if the effective settings could not be built
      */
     @Nonnull
     SettingsBuilderResult build( @Nonnull SettingsBuilderRequest request );
@@ -44,8 +44,8 @@ public interface SettingsBuilder extends Service
     /**
      * Builds the effective settings of the specified settings sources.
      *
-     * @return The result of the settings building, never {@code null}.
-     * @throws SettingsBuilderException If the effective settings could not be built.
+     * @return the result of the settings building, never {@code null}
+     * @throws SettingsBuilderException if the effective settings could not be built
      */
     @Nonnull
     default SettingsBuilderResult build( @Nonnull Session session,
@@ -58,8 +58,8 @@ public interface SettingsBuilder extends Service
     /**
      * Builds the effective settings of the specified settings paths.
      *
-     * @return The result of the settings building, never {@code null}.
-     * @throws SettingsBuilderException If the effective settings could not be built.
+     * @return the result of the settings building, never {@code null}
+     * @throws SettingsBuilderException if the effective settings could not be built
      */
     @Nonnull
     default SettingsBuilderResult build( @Nonnull Session session,

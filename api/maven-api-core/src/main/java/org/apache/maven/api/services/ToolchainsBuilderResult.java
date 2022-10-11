@@ -29,7 +29,7 @@ public interface ToolchainsBuilderResult
     /**
      * Gets the assembled toolchains.
      *
-     * @return The assembled toolchains, never {@code null}.
+     * @return the assembled toolchains, never {@code null}
      */
     @Nonnull
     PersistedToolchains getEffectiveToolchains();
@@ -39,7 +39,7 @@ public interface ToolchainsBuilderResult
      * {@link BuilderProblemSeverity#WARNING} and below are reported here. Problems with a higher severity level cause
      * the settings builder to fail with a {@link ToolchainsBuilderException}.
      *
-     * @return The problems that were encountered during the settings building, can be empty but never {@code null}.
+     * @return the problems that were encountered during the settings building, can be empty but never {@code null}
      */
     @Nonnull
     List<BuilderProblem> getProblems();

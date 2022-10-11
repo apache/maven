@@ -33,9 +33,9 @@ public interface ToolchainsBuilder extends Service
     /**
      * Builds the effective toolchains of the specified toolchains files.
      *
-     * @param request The toolchains building request that holds the parameters, must not be {@code null}.
-     * @return The result of the toolchains building, never {@code null}.
-     * @throws ToolchainsBuilderException If the effective toolchains could not be built.
+     * @param request the toolchains building request that holds the parameters, must not be {@code null}
+     * @return the result of the toolchains building, never {@code null}
+     * @throws ToolchainsBuilderException if the effective toolchains could not be built
      */
     ToolchainsBuilderResult build( ToolchainsBuilderRequest request );
 

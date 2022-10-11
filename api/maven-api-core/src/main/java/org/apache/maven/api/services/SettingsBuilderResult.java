@@ -30,7 +30,7 @@ public interface SettingsBuilderResult
     /**
      * Gets the assembled settings.
      *
-     * @return The assembled settings, never {@code null}.
+     * @return the assembled settings, never {@code null}
      */
     @Nonnull
     Settings getEffectiveSettings();
@@ -40,7 +40,7 @@ public interface SettingsBuilderResult
      * {@link BuilderProblemSeverity#WARNING} and below are reported here. Problems with a higher severity level cause
      * the settings builder to fail with a {@link SettingsBuilderException}.
      *
-     * @return The problems that were encountered during the settings building, can be empty but never {@code null}.
+     * @return the problems that were encountered during the settings building, can be empty but never {@code null}
      */
     @Nonnull
     List<BuilderProblem> getProblems();

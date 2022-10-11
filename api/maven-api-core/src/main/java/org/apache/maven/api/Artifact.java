@@ -35,7 +35,8 @@ public interface Artifact
 
     /**
      * Returns a unique identifier for this artifact.
-     * The identifier is composed of groupId, artifactId, version, classifier, extension
+     * The identifier is composed of groupId, artifactId, version, classifier, extension.
+     *
      * @return the unique identifier
      */
     default String key()
@@ -50,7 +51,7 @@ public interface Artifact
     /**
      * The groupId of the artifact.
      *
-     * @return The groupId.
+     * @return the groupId
      */
     @Nonnull
     String getGroupId();
@@ -58,7 +59,7 @@ public interface Artifact
     /**
      * The artifactId of the artifact.
      *
-     * @return The artifactId.
+     * @return the artifactId
      */
     @Nonnull
     String getArtifactId();
@@ -66,7 +67,7 @@ public interface Artifact
     /**
      * The version of the artifact.
      *
-     * @return The version.
+     * @return the version
      */
     @Nonnull
     Version getVersion();
@@ -74,7 +75,7 @@ public interface Artifact
     /**
      * The classifier of the artifact.
      *
-     * @return The classifier or an empty string if none, never {@code null}.
+     * @return the classifier or an empty string if none, never {@code null}
      */
     @Nonnull
     String getClassifier();
@@ -82,7 +83,7 @@ public interface Artifact
     /**
      * The file extension of the artifact.
      *
-     * @return The extension.
+     * @return the extension
      */
     @Nonnull
     String getExtension();
@@ -90,7 +91,7 @@ public interface Artifact
     /**
      * Determines whether this artifact uses a snapshot version.
      *
-     * @return {@code true} if the artifact is a snapshot, {@code false} otherwise.
+     * @return {@code true} if the artifact is a snapshot, {@code false} otherwise
      * @see org.apache.maven.api.Session#isVersionSnapshot(String)
      */
     boolean isSnapshot();

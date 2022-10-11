@@ -41,7 +41,7 @@ public interface DependencyCoordinateFactory extends Service
      * Creates a new {@link DependencyCoordinate} object from the request.
      *
      * @param request the request containing the various data
-     * @return a new {@link DependencyCoordinate} object.
+     * @return a new {@link DependencyCoordinate} object
      *
      * @throws IllegalArgumentException if {@code request} is null or
      *         if {@code request.getSession()} is null or invalid

@@ -67,8 +67,8 @@ public interface Node
     /**
      * Traverses this node and potentially its children using the specified visitor.
      *
-     * @param visitor The visitor to call back, must not be {@code null}.
-     * @return {@code true} to visit siblings nodes of this node as well, {@code false} to skip siblings.
+     * @param visitor the  visitor to call back, must not be {@code null}
+     * @return {@code true} to visit siblings nodes of this node as well, {@code false} to skip siblings
      */
     boolean accept( @Nonnull NodeVisitor visitor );
 

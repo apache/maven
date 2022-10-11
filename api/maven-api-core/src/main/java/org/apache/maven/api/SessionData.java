@@ -47,8 +47,8 @@ public interface SessionData
     /**
      * Associates the specified session data with the given key.
      * 
-     * @param key The key under which to store the session data, must not be {@code null}.
-     * @param value The data to associate with the key, may be {@code null} to remove the mapping.
+     * @param key the  key under which to store the session data, must not be {@code null}
+     * @param value the data to associate with the key, may be {@code null} to remove the mapping
      */
     void set( @Nonnull Object key, @Nullable Object value );
 
@@ -56,9 +56,9 @@ public interface SessionData
      * Associates the specified session data with the given key if the key is currently mapped to the given value. This
      * method provides an atomic compare-and-update of some key's value.
      * 
-     * @param key The key under which to store the session data, must not be {@code null}.
-     * @param oldValue The expected data currently associated with the key, may be {@code null}.
-     * @param newValue The data to associate with the key, may be {@code null} to remove the mapping.
+     * @param key the key under which to store the session data, must not be {@code null}
+     * @param oldValue the expected data currently associated with the key, may be {@code null}
+     * @param newValue the data to associate with the key, may be {@code null} to remove the mapping
      * @return {@code true} if the key mapping was successfully updated from the old value to the new value,
      *         {@code false} if the current key mapping didn't match the expected value and was not updated.
      */
@@ -67,8 +67,8 @@ public interface SessionData
     /**
      * Gets the session data associated with the specified key.
      * 
-     * @param key The key for which to retrieve the session data, must not be {@code null}.
-     * @return The session data associated with the key or {@code null} if none.
+     * @param key the key for which to retrieve the session data, must not be {@code null}
+     * @return the session data associated with the key or {@code null} if none
      */
     @Nullable
     Object get( @Nonnull Object key );
@@ -76,9 +76,9 @@ public interface SessionData
     /**
      * Retrieve of compute the data associated with the specified key.
      *
-     * @param key The key for which to retrieve the session data, must not be {@code null}.
-     * @param supplier The supplier will compute the new value.
-     * @return The session data associated with the key.
+     * @param key the key for which to retrieve the session data, must not be {@code null}
+     * @param supplier the supplier will compute the new value
+     * @return the session data associated with the key
      */
     @Nullable
     Object computeIfAbsent( @Nonnull Object key, @Nonnull Supplier<Object> supplier );

@@ -41,7 +41,7 @@ public interface BuilderProblem
      * track the problem back to its origin. A concrete example for such a source hint can be the file path or URL from
      * which the settings were read.
      *
-     * @return The hint about the source of the problem or an empty string if unknown, never {@code null}.
+     * @return the hint about the source of the problem or an empty string if unknown, never {@code null}
      */
     @Nonnull
     String getSource();
@@ -50,7 +50,7 @@ public interface BuilderProblem
      * Gets the one-based index of the line containing the problem. The line number should refer to some text file that
      * is given by {@link #getSource()}.
      *
-     * @return The one-based index of the line containing the problem or a non-positive value if unknown.
+     * @return the one-based index of the line containing the problem or a non-positive value if unknown
      */
     int getLineNumber();
 
@@ -58,7 +58,7 @@ public interface BuilderProblem
      * Gets the one-based index of the column containing the problem. The column number should refer to some text file
      * that is given by {@link #getSource()}.
      *
-     * @return The one-based index of the column containing the problem or non-positive value if unknown.
+     * @return the one-based index of the column containing the problem or non-positive value if unknown
      */
     int getColumnNumber();
 
@@ -67,7 +67,7 @@ public interface BuilderProblem
      * {@link #getSource()}, {@link #getLineNumber()} and {@link #getColumnNumber()}. The exact syntax of the returned
      * value is undefined.
      *
-     * @return The location of the problem, never {@code null}.
+     * @return the location of the problem, never {@code null}
      */
     @Nonnull
     String getLocation();
@@ -75,7 +75,7 @@ public interface BuilderProblem
     /**
      * Gets the exception that caused this problem (if any).
      *
-     * @return The exception that caused this problem or {@code null} if not applicable.
+     * @return the exception that caused this problem or {@code null} if not applicable
      */
     @Nullable
     Exception getException();
@@ -83,7 +83,7 @@ public interface BuilderProblem
     /**
      * Gets the message that describes this problem.
      *
-     * @return The message describing this problem, never {@code null}.
+     * @return the message describing this problem, never {@code null}
      */
     @Nonnull
     String getMessage();
@@ -91,7 +91,7 @@ public interface BuilderProblem
     /**
      * Gets the severity level of this problem.
      *
-     * @return The severity level of this problem, never {@code null}.
+     * @return the severity level of this problem, never {@code null}
      */
     @Nonnull
     BuilderProblemSeverity getSeverity();
