@@ -22,20 +22,15 @@ package org.apache.maven.internal.impl;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.maven.SessionScoped;
-import org.apache.maven.api.annotations.Nonnull;
-
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.maven.SessionScoped;
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.Metadata;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.project.MavenProject;
 
@@ -47,7 +42,6 @@ public class DefaultArtifactManager implements ArtifactManager
     @Nonnull
     private final DefaultSession session;
     private final Map<String, Path> paths = new ConcurrentHashMap<>();
-    private final Map<String, Collection<Metadata>> metadatas = new ConcurrentHashMap<>();
 
     @Inject
     public DefaultArtifactManager( @Nonnull DefaultSession session )
@@ -105,20 +99,6 @@ public class DefaultArtifactManager implements ArtifactManager
         {
             paths.put( id, path );
         }
-    }
-
-    @Nonnull
-    @Override
-    public Collection<Metadata> getAttachedMetadatas( @Nonnull Artifact artifact )
-    {
-        Collection<Metadata> m = metadatas.get( id( artifact ) );
-        return m != null ? Collections.unmodifiableCollection( m ) : Collections.emptyList();
-    }
-
-    @Override
-    public void attachMetadata( @Nonnull Artifact artifact, @Nonnull Metadata metadata )
-    {
-        metadatas.computeIfAbsent( id( artifact ), a -> new CopyOnWriteArrayList<>() ).add( metadata );
     }
 
     private String id( org.apache.maven.artifact.Artifact artifact )

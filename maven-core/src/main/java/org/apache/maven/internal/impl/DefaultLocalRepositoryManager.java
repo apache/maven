@@ -26,7 +26,6 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.LocalRepository;
-import org.apache.maven.api.Metadata;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.LocalRepositoryManager;
@@ -45,30 +44,12 @@ public class DefaultLocalRepositoryManager implements LocalRepositoryManager
     }
 
     @Override
-    public Path getPathForLocalMetadata( Session session, LocalRepository local, Metadata metadata )
-    {
-        DefaultSession s = (DefaultSession) session;
-        String path = getManager( s, local ).getPathForLocalMetadata( s.toMetadata( metadata ) );
-        return local.getPath().resolve( path );
-    }
-
-    @Override
     public Path getPathForRemoteArtifact( Session session, LocalRepository local,
                                           RemoteRepository remote, Artifact artifact )
     {
         DefaultSession s = (DefaultSession) session;
         String path = getManager( s, local ).getPathForRemoteArtifact(
                 s.toArtifact( artifact ), s.toRepository( remote ), null );
-        return local.getPath().resolve( path );
-    }
-
-    @Override
-    public Path getPathForRemoteMetadata( Session session, LocalRepository local,
-                                          RemoteRepository remote, Metadata metadata )
-    {
-        DefaultSession s = (DefaultSession) session;
-        String path = getManager( s, local ).getPathForRemoteMetadata(
-                s.toMetadata( metadata ), s.toRepository( remote ), null );
         return local.getPath().resolve( path );
     }
 

@@ -27,18 +27,14 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.services.ArtifactDeployer;
 import org.apache.maven.api.services.ArtifactDeployerException;
 import org.apache.maven.api.services.ArtifactDeployerRequest;
-import org.apache.maven.api.services.ArtifactManager;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.deployment.DeployResult;
 import org.eclipse.aether.deployment.DeploymentException;
-import org.eclipse.aether.metadata.Metadata;
 
 import static org.apache.maven.internal.impl.Utils.cast;
 import static org.apache.maven.internal.impl.Utils.nonNull;
@@ -68,16 +64,9 @@ public class DefaultArtifactDeployer implements ArtifactDeployer
         RemoteRepository repository = nonNull( request.getRepository(), "request.repository can not be null" );
         try
         {
-            ArtifactManager artifactManager = session.getService( ArtifactManager.class );
-            List<Metadata> metadatas = artifacts.stream()
-                    .map( artifactManager::getAttachedMetadatas )
-                    .flatMap( Collection::stream )
-                    .map( session::toMetadata )
-                    .collect( Collectors.toList() );
             DeployRequest deployRequest = new DeployRequest()
                     .setRepository( session.toRepository( repository ) )
-                    .setArtifacts( session.toArtifacts( artifacts ) )
-                    .setMetadata( metadatas );
+                    .setArtifacts( session.toArtifacts( artifacts ) );
 
             DeployResult result = repositorySystem.deploy( session.getSession(), deployRequest );
         }

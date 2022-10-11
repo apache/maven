@@ -33,10 +33,12 @@ import org.eclipse.aether.metadata.Metadata;
 import org.eclipse.aether.util.ConfigUtils;
 
 /**
- * @author Benjamin Bentmann
+ * Maven local GAV level metadata generator.
+ * <p>
+ * Local snapshot metadata contains non-transformed snapshot version.
  */
 class LocalSnapshotMetadataGenerator
-    implements MetadataGenerator
+        implements MetadataGenerator
 {
 
     private Map<Object, LocalSnapshotMetadata> snapshots;

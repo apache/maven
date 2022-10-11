@@ -29,27 +29,29 @@ import org.eclipse.aether.impl.MetadataGeneratorFactory;
 import org.eclipse.aether.installation.InstallRequest;
 
 /**
- * @author Benjamin Bentmann
+ * Maven GAV level metadata generator factory.
  */
 @Named( "snapshot" )
 @Singleton
 public class SnapshotMetadataGeneratorFactory
     implements MetadataGeneratorFactory
 {
-
+    @Override
     public MetadataGenerator newInstance( RepositorySystemSession session, InstallRequest request )
     {
         return new LocalSnapshotMetadataGenerator( session, request );
     }
 
+    @Override
     public MetadataGenerator newInstance( RepositorySystemSession session, DeployRequest request )
     {
         return new RemoteSnapshotMetadataGenerator( session, request );
     }
 
+    @SuppressWarnings( "checkstyle:magicnumber" )
+    @Override
     public float getPriority()
     {
-        return 10;
+        return 30; // GAV level metadata should be deployed 1st MD
     }
-
 }

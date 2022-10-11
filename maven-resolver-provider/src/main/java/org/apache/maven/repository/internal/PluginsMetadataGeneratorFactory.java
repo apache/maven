@@ -19,7 +19,6 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -29,39 +28,30 @@ import org.eclipse.aether.impl.MetadataGenerator;
 import org.eclipse.aether.impl.MetadataGeneratorFactory;
 import org.eclipse.aether.installation.InstallRequest;
 
-import static java.util.Objects.requireNonNull;
-
 /**
- * Plugin G level metadata.
+ * Maven G level metadata generator factory.
  */
 @Named( "plugins" )
 @Singleton
 public class PluginsMetadataGeneratorFactory
     implements MetadataGeneratorFactory
 {
-    private final PluginsMetadataInfoProvider pluginsMetadataInfoProvider;
-
-    @Inject
-    public PluginsMetadataGeneratorFactory( PluginsMetadataInfoProvider pluginsMetadataInfoProvider )
-    {
-        this.pluginsMetadataInfoProvider = requireNonNull( pluginsMetadataInfoProvider );
-    }
-
     @Override
     public MetadataGenerator newInstance( RepositorySystemSession session, InstallRequest request )
     {
-        return new PluginsMetadataGenerator( pluginsMetadataInfoProvider, session, request );
+        return new PluginsMetadataGenerator( session, request );
     }
 
     @Override
     public MetadataGenerator newInstance( RepositorySystemSession session, DeployRequest request )
     {
-        return new PluginsMetadataGenerator( pluginsMetadataInfoProvider, session, request );
+        return new PluginsMetadataGenerator( session, request );
     }
 
+    @SuppressWarnings( "checkstyle:magicnumber" )
     @Override
     public float getPriority()
     {
-        return 5;
+        return 10; // G level MD should be deployed as 3rd MD
     }
 }
