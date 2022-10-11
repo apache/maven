@@ -179,10 +179,10 @@ public class DefaultMaven
         // so that @SessionScoped components can be @Injected into AbstractLifecycleParticipants.
         //
         sessionScope.enter();
+        DefaultRepositorySystemSession repoSession =
+                (DefaultRepositorySystemSession) newRepositorySession( request );
         try
         {
-            DefaultRepositorySystemSession repoSession =
-                (DefaultRepositorySystemSession) newRepositorySession( request );
             MavenSession session = new MavenSession( container, repoSession, request, result );
 
             sessionScope.seed( MavenSession.class, session );
@@ -193,6 +193,7 @@ public class DefaultMaven
         }
         finally
         {
+            repoSession.close();
             sessionScope.exit();
         }
     }

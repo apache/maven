@@ -95,10 +95,17 @@ public class BootstrapCoreExtensionManager
         throws Exception
     {
         RepositorySystemSession repoSession = repositorySystemSessionFactory.newRepositorySession( request );
-        List<RemoteRepository> repositories = RepositoryUtils.toRepos( request.getPluginArtifactRepositories() );
-        Interpolator interpolator = createInterpolator( request );
+        try
+        {
+            List<RemoteRepository> repositories = RepositoryUtils.toRepos( request.getPluginArtifactRepositories() );
+            Interpolator interpolator = createInterpolator( request );
 
-        return resolveCoreExtensions( repoSession, repositories, providedArtifacts, extensions, interpolator );
+            return resolveCoreExtensions( repoSession, repositories, providedArtifacts, extensions, interpolator );
+        }
+        finally
+        {
+            repoSession.close();
+        }
     }
 
     private List<CoreExtensionEntry> resolveCoreExtensions( RepositorySystemSession repoSession,
