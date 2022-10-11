@@ -72,9 +72,9 @@ public interface ToolchainsBuilderRequest
                                          @Nonnull Source userToolchainsSource )
     {
         return builder()
-                .session( nonNull( session, "session can not be null" ) )
-                .globalToolchainsSource( nonNull( globalToolchainsSource, "globalToolchainsSource can not be null" ) )
-                .userToolchainsSource( nonNull( userToolchainsSource, "userToolchainsSource can not be null" ) )
+                .session( nonNull( session, "session cannot be null" ) )
+                .globalToolchainsSource( nonNull( globalToolchainsSource, "globalToolchainsSource cannot be null" ) )
+                .userToolchainsSource( nonNull( userToolchainsSource, "userToolchainsSource cannot be null" ) )
                 .build();
     }
 
@@ -84,9 +84,9 @@ public interface ToolchainsBuilderRequest
                                          @Nonnull Path userToolchainsPath )
     {
         return builder()
-                .session( nonNull( session, "session can not be null" ) )
-                .globalToolchainsPath( nonNull( globalToolchainsPath, "globalToolchainsPath can not be null" ) )
-                .userToolchainsPath( nonNull( userToolchainsPath, "userToolchainsPath can not be null" ) )
+                .session( nonNull( session, "session cannot be null" ) )
+                .globalToolchainsPath( nonNull( globalToolchainsPath, "globalToolchainsPath cannot be null" ) )
+                .userToolchainsPath( nonNull( userToolchainsPath, "userToolchainsPath cannot be null" ) )
                 .build();
     }
 
