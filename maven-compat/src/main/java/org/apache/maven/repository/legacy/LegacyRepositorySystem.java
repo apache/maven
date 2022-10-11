@@ -563,9 +563,9 @@ public class LegacyRepositorySystem
 
                 if ( server != null )
                 {
-                    SettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest( server.getDelegate() );
+                    SettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest( server );
                     SettingsDecryptionResult result = settingsDecrypter.decrypt( request );
-                    server = new Server( result.getServer() );
+                    server = result.getServer();
 
                     if ( logger.isDebugEnabled() )
                     {
@@ -670,9 +670,9 @@ public class LegacyRepositorySystem
 
                 if ( proxy != null )
                 {
-                    SettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest( proxy.getDelegate() );
+                    SettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest( proxy );
                     SettingsDecryptionResult result = settingsDecrypter.decrypt( request );
-                    proxy = new org.apache.maven.settings.Proxy( result.getProxy() );
+                    proxy = result.getProxy();
 
                     if ( logger.isDebugEnabled() )
                     {
