@@ -102,7 +102,7 @@ public class MojoDescriptorCreator
         return null;
     }
 
-    public static Xpp3Dom convert( MojoDescriptor mojoDescriptor )
+    public static org.codehaus.plexus.util.xml.Xpp3Dom convert( MojoDescriptor mojoDescriptor )
     {
         PlexusConfiguration c = mojoDescriptor.getMojoConfiguration();
 
@@ -125,7 +125,7 @@ public class MojoDescriptorCreator
         }
 
         Xpp3Dom dom = new Xpp3Dom( "configuration", null, null, children, null );
-        return dom;
+        return new org.codehaus.plexus.util.xml.Xpp3Dom( dom );
     }
 
     // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process@executionId
