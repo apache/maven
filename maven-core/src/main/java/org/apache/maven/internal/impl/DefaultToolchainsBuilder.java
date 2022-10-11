@@ -89,7 +89,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder
                 @Override
                 public PersistedToolchains getEffectiveToolchains()
                 {
-                    return result.getEffectiveToolchains().getDelegate();
+                    return result.getEffectiveToolchains();
                 }
 
                 @Override

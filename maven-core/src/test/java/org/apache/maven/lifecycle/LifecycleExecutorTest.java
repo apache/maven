@@ -291,7 +291,7 @@ public class LifecycleExecutorTest
         MojoDescriptor mojoDescriptor =
             mojoDescriptorCreator.getMojoDescriptor( "org.apache.maven.its.plugins:maven-it-plugin:0.1:java", session,
                                                      session.getCurrentProject() );
-        Dom dom = MojoDescriptorCreator.convert( mojoDescriptor ).getDom();
+        Dom dom = MojoDescriptorCreator.convert( mojoDescriptor );
         System.out.println( dom );
     }
 

@@ -73,6 +73,7 @@ import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuilder;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
+import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -1334,7 +1335,7 @@ public class MavenCli
         eventSpyDispatcher.onEvent( toolchainsResult );
 
         executionRequestPopulator.populateFromToolchains( cliRequest.request,
-                                      toolchainsResult.getEffectiveToolchains() );
+                                      new PersistedToolchains( toolchainsResult.getEffectiveToolchains() ) );
 
         if ( !toolchainsResult.getProblems().isEmpty() && slf4jLogger.isWarnEnabled() )
         {

@@ -194,8 +194,8 @@ public class DefaultRepositorySystemSessionFactory
                 request.getWorkspaceReader() != null ? request.getWorkspaceReader() : workspaceRepository );
 
         DefaultSettingsDecryptionRequest decrypt = new DefaultSettingsDecryptionRequest();
-        decrypt.setProxies( request.getProxies() );
-        decrypt.setServers( request.getServers() );
+        decrypt.setProxies( Proxy.proxyToApiV4( request.getProxies() ) );
+        decrypt.setServers( Server.serverToApiV4( request.getServers() ) );
         SettingsDecryptionResult decrypted = settingsDecrypter.decrypt( decrypt );
 
         if ( logger.isDebugEnabled() )
@@ -215,7 +215,7 @@ public class DefaultRepositorySystemSessionFactory
         session.setMirrorSelector( mirrorSelector );
 
         DefaultProxySelector proxySelector = new DefaultProxySelector();
-        for ( Proxy proxy : decrypted.getProxies() )
+        for ( org.apache.maven.api.settings.Proxy proxy : decrypted.getProxies() )
         {
             AuthenticationBuilder authBuilder = new AuthenticationBuilder();
             authBuilder.addUsername( proxy.getUsername() ).addPassword( proxy.getPassword() );
@@ -226,7 +226,7 @@ public class DefaultRepositorySystemSessionFactory
         session.setProxySelector( proxySelector );
 
         DefaultAuthenticationSelector authSelector = new DefaultAuthenticationSelector();
-        for ( Server server : decrypted.getServers() )
+        for ( org.apache.maven.api.settings.Server server : decrypted.getServers() )
         {
             AuthenticationBuilder authBuilder = new AuthenticationBuilder();
             authBuilder.addUsername( server.getUsername() ).addPassword( server.getPassword() );

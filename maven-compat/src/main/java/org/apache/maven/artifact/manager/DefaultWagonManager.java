@@ -86,8 +86,8 @@ public class DefaultWagonManager
                         if ( id.equalsIgnoreCase( server.getId() ) )
                         {
                             SettingsDecryptionResult result = settingsDecrypter.decrypt(
-                                    new DefaultSettingsDecryptionRequest( server ) );
-                            server = result.getServer();
+                                    new DefaultSettingsDecryptionRequest( server.getDelegate() ) );
+                            server = new Server( result.getServer() );
 
                             AuthenticationInfo authInfo = new AuthenticationInfo();
                             authInfo.setUserName( server.getUsername() );
@@ -125,8 +125,8 @@ public class DefaultWagonManager
                         if ( proxy.isActive() && protocol.equalsIgnoreCase( proxy.getProtocol() ) )
                         {
                             SettingsDecryptionResult result = settingsDecrypter.decrypt(
-                                    new DefaultSettingsDecryptionRequest( proxy ) );
-                            proxy = result.getProxy();
+                                    new DefaultSettingsDecryptionRequest( proxy.getDelegate() ) );
+                            proxy = new Proxy( result.getProxy() );
 
                             ProxyInfo proxyInfo = new ProxyInfo();
                             proxyInfo.setHost( proxy.getHost() );

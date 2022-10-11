@@ -90,7 +90,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder
                 @Override
                 public Settings getEffectiveSettings()
                 {
-                    return result.getEffectiveSettings().getDelegate();
+                    return result.getEffectiveSettings();
                 }
 
                 @Override

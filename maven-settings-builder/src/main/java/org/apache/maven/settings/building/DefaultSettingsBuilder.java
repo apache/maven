@@ -34,7 +34,7 @@ import javax.inject.Singleton;
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;
 import org.apache.maven.api.settings.Settings;
-import org.apache.maven.settings.TrackableBase;
+import org.apache.maven.api.settings.TrackableBase;
 import org.apache.maven.settings.io.SettingsParseException;
 import org.apache.maven.settings.io.SettingsReader;
 import org.apache.maven.settings.io.SettingsWriter;
@@ -128,8 +128,7 @@ public class DefaultSettingsBuilder
             throw new SettingsBuildingException( problems.getProblems() );
         }
 
-        return new DefaultSettingsBuildingResult( new org.apache.maven.settings.Settings( userSettings ),
-                                                  problems.getProblems() );
+        return new DefaultSettingsBuildingResult( userSettings, problems.getProblems() );
     }
 
     private boolean hasErrors( List<SettingsProblem> problems )

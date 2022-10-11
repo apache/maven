@@ -35,12 +35,11 @@ import org.apache.maven.cli.CLIManager;
 import org.apache.maven.cli.CliRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
-import org.apache.maven.settings.Mirror;
-import org.apache.maven.settings.Profile;
-import org.apache.maven.settings.Proxy;
-import org.apache.maven.settings.Repository;
-import org.apache.maven.settings.Server;
-import org.apache.maven.settings.Settings;
+import org.apache.maven.api.settings.Mirror;
+import org.apache.maven.api.settings.Proxy;
+import org.apache.maven.api.settings.Repository;
+import org.apache.maven.api.settings.Server;
+import org.apache.maven.api.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuilder;
@@ -189,7 +188,7 @@ public class SettingsXmlConfigurationProcessor
 
         for ( Server server : settings.getServers() )
         {
-            request.addServer( server );
+            request.addServer( new org.apache.maven.settings.Server( server ) );
         }
 
         //  <proxies>
@@ -211,7 +210,7 @@ public class SettingsXmlConfigurationProcessor
                 continue;
             }
 
-            request.addProxy( proxy );
+            request.addProxy( new org.apache.maven.settings.Proxy( proxy ) );
         }
 
         // <mirrors>
@@ -224,14 +223,14 @@ public class SettingsXmlConfigurationProcessor
 
         for ( Mirror mirror : settings.getMirrors() )
         {
-            request.addMirror( mirror );
+            request.addMirror( new org.apache.maven.settings.Mirror( mirror ) );
         }
 
         request.setActiveProfiles( settings.getActiveProfiles() );
 
-        for ( Profile rawProfile : settings.getProfiles() )
+        for ( org.apache.maven.api.settings.Profile rawProfile : settings.getProfiles() )
         {
-            request.addProfile( SettingsUtils.convertFromSettingsProfile( rawProfile.getDelegate() ) );
+            request.addProfile( SettingsUtils.convertFromSettingsProfile( rawProfile ) );
 
             if ( settings.getActiveProfiles().contains( rawProfile.getId() ) )
             {
@@ -240,8 +239,8 @@ public class SettingsXmlConfigurationProcessor
                 {
                     try
                     {
-                        request.addRemoteRepository(
-                                    MavenRepositorySystem.buildArtifactRepository( remoteRepository ) );
+                        request.addRemoteRepository( MavenRepositorySystem.buildArtifactRepository(
+                                new org.apache.maven.settings.Repository( remoteRepository ) ) );
                     }
                     catch ( InvalidRepositoryException e )
                     {
@@ -255,7 +254,7 @@ public class SettingsXmlConfigurationProcessor
                     try
                     {
                         request.addPluginArtifactRepository( MavenRepositorySystem.buildArtifactRepository(
-                                pluginRepository ) );
+                                new org.apache.maven.settings.Repository( pluginRepository ) ) );
                     }
                     catch ( InvalidRepositoryException e )
                     {

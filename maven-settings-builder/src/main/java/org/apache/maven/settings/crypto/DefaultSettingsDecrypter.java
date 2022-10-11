@@ -26,8 +26,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.settings.Proxy;
-import org.apache.maven.settings.Server;
+import org.apache.maven.api.settings.Proxy;
+import org.apache.maven.api.settings.Server;
 import org.apache.maven.settings.building.DefaultSettingsProblem;
 import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
@@ -61,11 +61,9 @@ public class DefaultSettingsDecrypter
 
         for ( Server server : request.getServers() )
         {
-            server = server.clone();
-
             try
             {
-                server.setPassword( decrypt( server.getPassword() ) );
+                server = server.withPassword( decrypt( server.getPassword() ) );
             }
             catch ( SecDispatcherException e )
             {
@@ -75,7 +73,7 @@ public class DefaultSettingsDecrypter
 
             try
             {
-                server.setPassphrase( decrypt( server.getPassphrase() ) );
+                server = server.withPassphrase( decrypt( server.getPassphrase() ) );
             }
             catch ( SecDispatcherException e )
             {
@@ -92,7 +90,7 @@ public class DefaultSettingsDecrypter
         {
             try
             {
-                proxy.setPassword( decrypt( proxy.getPassword() ) );
+                proxy = proxy.withPassword( decrypt( proxy.getPassword() ) );
             }
             catch ( SecDispatcherException e )
             {

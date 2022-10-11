@@ -21,7 +21,7 @@ package org.apache.maven.settings.building;
 
 import java.util.List;
 
-import org.apache.maven.settings.Settings;
+import org.apache.maven.api.settings.Settings;
 
 /**
  * Collects the output of the settings builder.

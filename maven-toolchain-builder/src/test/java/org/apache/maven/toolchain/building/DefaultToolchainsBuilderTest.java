@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -239,8 +240,7 @@ public class DefaultToolchainsBuilderTest
         ToolchainsBuildingResult result = toolchainBuilder.build( request );
         String interpolatedValue = "testValue";
         assertEquals(interpolatedValue, result.getEffectiveToolchains().getToolchains().get(0).getProvides().get( "key" ) );
-        org.codehaus.plexus.util.xml.Xpp3Dom toolchainConfiguration =
-                (org.codehaus.plexus.util.xml.Xpp3Dom) result.getEffectiveToolchains().getToolchains().get(0).getConfiguration();
+        Xpp3Dom toolchainConfiguration = (Xpp3Dom) result.getEffectiveToolchains().getToolchains().get(0).getConfiguration();
         assertEquals(interpolatedValue, toolchainConfiguration.getChild("jdkHome").getValue());
         assertNotNull( result.getProblems() );
         assertEquals( 0, result.getProblems().size() );
