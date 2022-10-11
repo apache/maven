@@ -47,7 +47,7 @@ public interface SessionData
     /**
      * Associates the specified session data with the given key.
      * 
-     * @param key the  key under which to store the session data, must not be {@code null}
+     * @param key the key under which to store the session data, must not be {@code null}
      * @param value the data to associate with the key, may be {@code null} to remove the mapping
      */
     void set( @Nonnull Object key, @Nullable Object value );
