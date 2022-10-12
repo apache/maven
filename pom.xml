@@ -666,18 +666,99 @@ under the License.
         </executions>
       </plugin>
       <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>2.27.1</version>
+        <configuration>
+          <java>
+            <importOrder>
+              <file>config/maven-eclipse-importorder.txt</file>
+            </importOrder>
+            <removeUnusedImports />
+            <eclipse>
+              <file>config/maven-eclipse-codestyle.xml</file>
+            </eclipse>
+            <licenseHeader>
+              <file>config/maven-header-plain.txt</file>
+            </licenseHeader>
+          </java>
+          <upToDateChecking>
+            <enabled>true</enabled>
+          </upToDateChecking>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>${spotless.action}</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-shared-resources</artifactId>
+            <version>5-SNAPSHOT</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.2.0</version>
         <configuration>
           <violationSeverity>info</violationSeverity>
           <violationIgnore>JavadocVariable,JavadocMethod,HiddenField</violationIgnore>
-<!--          <suppressionsLocation>${maven.multiModuleProjectDirectory}/build/checkstyle-suppressions.xml</suppressionsLocation>-->
+          <suppressionsLocation>${maven.multiModuleProjectDirectory}/build/checkstyle-suppressions.xml</suppressionsLocation>
         </configuration>
+        <executions>
+          <execution>
+            <id>checkstyle-check</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>process-sources</phase>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>9.3</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-shared-resources</artifactId>
+            <version>5-SNAPSHOT</version>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>
 
   <profiles>
+    <profile>
+      <id>format-check</id>
+      <activation>
+        <property>
+          <name>!format</name>
+        </property>
+      </activation>
+      <properties>
+        <spotless.action>check</spotless.action>
+      </properties>
+    </profile>
+    <profile>
+      <id>format</id>
+      <activation>
+        <property>
+          <name>format</name>
+        </property>
+      </activation>
+      <properties>
+        <spotless.action>apply</spotless.action>
+      </properties>
+    </profile>
     <profile>
       <id>apache-release</id>
       <build>

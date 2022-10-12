@@ -26,4 +26,14 @@ under the License.
 <suppressions>
     <suppress checks="JavadocVariable|JavadocMethod" files=".*" />
     <suppress checks="HiddenField" files=".*" />
+    <!-- the spotless plugin will check a few things, no need to duplicate the work -->
+    <suppress checks="LineLength" files=".*" />
+    <suppress checks="RegexpHeader" files=".*" />
+    <suppress checks="LeftCurly" files=".*" />
+    <suppress checks="RightCurly" files=".*" />
+    <suppress checks="OperatorWrap" files=".*" />
+    <suppress checks="ParenPad" files=".*" />
+    <suppress checks="WhitespaceAfter" files=".*" />
+    <suppress checks="WhitespaceAround" files=".*" />
+    <suppress checks="GenericWhitespace" files=".*" />
 </suppressions>
