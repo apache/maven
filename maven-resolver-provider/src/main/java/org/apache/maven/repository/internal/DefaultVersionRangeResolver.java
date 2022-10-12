@@ -44,6 +44,7 @@ import org.eclipse.aether.spi.synccontext.SyncContextFactory;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
+import org.eclipse.aether.version.VersionRange;
 import org.eclipse.aether.version.VersionScheme;
 
 import javax.inject.Inject;
@@ -111,28 +112,36 @@ public class DefaultVersionRangeResolver
         }
         else
         {
-            Map<String, ArtifactRepository> versionIndex = getVersions( session, result, request );
-
-            List<Version> versions = new ArrayList<>();
-            for ( Map.Entry<String, ArtifactRepository> v : versionIndex.entrySet() )
+            VersionRange.Bound lowerBound = versionConstraint.getRange().getLowerBound();
+            if ( lowerBound != null && lowerBound.equals( versionConstraint.getRange().getUpperBound() ) )
             {
-                try
+                result.addVersion( lowerBound.getVersion() );
+            }
+            else
+            {
+                Map<String, ArtifactRepository> versionIndex = getVersions( session, result, request );
+
+                List<Version> versions = new ArrayList<>();
+                for ( Map.Entry<String, ArtifactRepository> v : versionIndex.entrySet() )
                 {
-                    Version ver = versionScheme.parseVersion( v.getKey() );
-                    if ( versionConstraint.containsVersion( ver ) )
+                    try
                     {
-                        versions.add( ver );
-                        result.setRepository( ver, v.getValue() );
+                        Version ver = versionScheme.parseVersion( v.getKey() );
+                        if ( versionConstraint.containsVersion( ver ) )
+                        {
+                            versions.add( ver );
+                            result.setRepository( ver, v.getValue() );
+                        }
+                    }
+                    catch ( InvalidVersionSpecificationException e )
+                    {
+                        result.addException( e );
                     }
                 }
-                catch ( InvalidVersionSpecificationException e )
-                {
-                    result.addException( e );
-                }
-            }
 
-            Collections.sort( versions );
-            result.setVersions( versions );
+                Collections.sort( versions );
+                result.setVersions( versions );
+            }
         }
 
         return result;
