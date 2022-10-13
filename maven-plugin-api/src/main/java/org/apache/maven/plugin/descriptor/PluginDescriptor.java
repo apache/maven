@@ -80,6 +80,8 @@ public class PluginDescriptor
 
     private String requiredMavenVersion;
 
+    private String requiredJavaVersion;
+
     private Plugin plugin;
 
     private Artifact pluginArtifact;
@@ -349,6 +351,16 @@ public class PluginDescriptor
     public String getRequiredMavenVersion()
     {
         return requiredMavenVersion;
+    }
+
+    public void setRequiredJavaVersion( String requiredJavaVersion )
+    {
+        this.requiredJavaVersion = requiredJavaVersion;
+    }
+
+    public String getRequiredJavaVersion()
+    {
+        return requiredJavaVersion;
     }
 
     public void setPlugin( Plugin plugin )

@@ -72,18 +72,22 @@ public class JdkVersionProfileActivator
                     .setLocation( activation.getLocation( "jdk" ) ) );
             return false;
         }
+        return isJavaVersionCompatible( jdk, version );
+    }
 
-        if ( jdk.startsWith( "!" ) )
+    public static boolean isJavaVersionCompatible( String requiredJdkRange, String currentJavaVersion )
+    {
+        if ( requiredJdkRange.startsWith( "!" ) )
         {
-            return !version.startsWith( jdk.substring( 1 ) );
+            return !currentJavaVersion.startsWith( requiredJdkRange.substring( 1 ) );
         }
-        else if ( isRange( jdk ) )
+        else if ( isRange( requiredJdkRange ) )
         {
-            return isInRange( version, getRange( jdk ) );
+            return isInRange( currentJavaVersion, getRange( requiredJdkRange ) );
         }
         else
         {
-            return version.startsWith( jdk );
+            return currentJavaVersion.startsWith( requiredJdkRange );
         }
     }
 

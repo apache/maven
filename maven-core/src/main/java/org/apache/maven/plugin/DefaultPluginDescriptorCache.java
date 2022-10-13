@@ -94,6 +94,7 @@ public class DefaultPluginDescriptorCache
             clone.setName( original.getName() );
             clone.setDescription( original.getDescription() );
             clone.setRequiredMavenVersion( original.getRequiredMavenVersion() );
+            clone.setRequiredJavaVersion( original.getRequiredJavaVersion() );
 
             clone.setPluginArtifact( ArtifactUtils.copyArtifactSafe( original.getPluginArtifact() ) );
 

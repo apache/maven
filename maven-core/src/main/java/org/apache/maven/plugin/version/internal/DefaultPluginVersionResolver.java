@@ -294,6 +294,7 @@ public class DefaultPluginVersionResolver
         try
         {
             pluginManager.checkRequiredMavenVersion( pluginDescriptor );
+            pluginManager.checkRequiredJavaVersion( pluginDescriptor );
         }
         catch ( Exception e )
         {

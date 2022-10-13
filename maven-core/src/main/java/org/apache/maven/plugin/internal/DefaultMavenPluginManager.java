@@ -27,6 +27,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.profile.activation.JdkVersionProfileActivator;
 import org.apache.maven.plugin.ContextEnabled;
 import org.apache.maven.plugin.DebugConfigurationListener;
 import org.apache.maven.plugin.ExtensionRealmCache;
@@ -325,6 +326,23 @@ public class DefaultMavenPluginManager
         }
     }
 
+    @Override
+    public void checkRequiredJavaVersion( PluginDescriptor pluginDescriptor )
+        throws PluginIncompatibleException
+    {
+        String requiredJavaVersion = pluginDescriptor.getRequiredJavaVersion();
+        if ( StringUtils.isNotBlank( requiredJavaVersion ) )
+        {
+            if ( JdkVersionProfileActivator.isJavaVersionCompatible( requiredJavaVersion, 
+                                                                     System.getProperty( "java.version" ) ) )
+            {
+                throw new PluginIncompatibleException( pluginDescriptor.getPlugin(),
+                                                       "The plugin " + pluginDescriptor.getId()
+                                                           + " requires Java version " + requiredJavaVersion );
+            }
+        }
+    }
+    
     public synchronized void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session,
                                                ClassLoader parent, List<String> imports, DependencyFilter filter )
         throws PluginResolutionException, PluginContainerException

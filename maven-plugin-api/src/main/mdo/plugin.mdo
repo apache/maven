@@ -91,6 +91,12 @@ under the License.
           <type>boolean</type>
           <defaultValue>true</defaultValue>
         </field>
+        <field>
+          <name>requiredJavaVersion</name>
+          <version>1.1.0</version>
+          <description>A version range which specifies the supported Java versions.</description>
+          <type>String</type>
+        </field>
         <field xdoc.separator="blank">
           <name>mojos</name>
           <version>1.0.0</version>
