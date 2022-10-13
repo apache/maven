@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -28,26 +27,25 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- * This filter will bypass all following filters and write directly to the output.
- * Should be used in case of a DOM that should not be effected by other filters,
- * even though the elements match.
+ * This filter will bypass all following filters and write directly to the output. Should be used in case of a DOM that
+ * should not be effected by other filters, even though the elements match.
  *
  * @author Robert Scholte
  * @author Guillaume Nodet
  * @since 4.0.0
  */
-class FastForwardFilter extends BufferingParser
+class FastForwardFilter
+    extends BufferingParser
 {
     /**
      * DOM elements of pom
-     *
      * <ul>
-     *  <li>execution.configuration</li>
-     *  <li>plugin.configuration</li>
-     *  <li>plugin.goals</li>
-     *  <li>profile.reports</li>
-     *  <li>project.reports</li>
-     *  <li>reportSet.configuration</li>
+     * <li>execution.configuration</li>
+     * <li>plugin.configuration</li>
+     * <li>plugin.goals</li>
+     * <li>profile.reports</li>
+     * <li>project.reports</li>
+     * <li>reportSet.configuration</li>
      * <ul>
      */
     private final Deque<String> state = new ArrayDeque<>();
@@ -60,7 +58,8 @@ class FastForwardFilter extends BufferingParser
     }
 
     @Override
-    public int next() throws XmlPullParserException, IOException
+    public int next()
+        throws XmlPullParserException, IOException
     {
         int event = super.next();
         filter();
@@ -68,14 +67,16 @@ class FastForwardFilter extends BufferingParser
     }
 
     @Override
-    public int nextToken() throws XmlPullParserException, IOException
+    public int nextToken()
+        throws XmlPullParserException, IOException
     {
         int event = super.nextToken();
         filter();
         return event;
     }
 
-    protected void filter() throws XmlPullParserException, IOException
+    protected void filter()
+        throws XmlPullParserException, IOException
     {
         if ( xmlPullParser.getEventType() == START_TAG )
         {

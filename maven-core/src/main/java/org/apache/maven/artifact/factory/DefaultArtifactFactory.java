@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.factory;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.factory;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.factory;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.factory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,7 +30,6 @@ import org.apache.maven.artifact.versioning.VersionRange;
 
 /**
  * DefaultArtifactFactory
- *
  */
 @Named
 @Singleton
@@ -58,27 +56,26 @@ public class DefaultArtifactFactory
         return createArtifact( groupId, artifactId, version, null, type, classifier, null );
     }
 
-    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange,
-                                              String type, String classifier, String scope )
+    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
+                                              String classifier, String scope )
     {
         return createArtifact( groupId, artifactId, versionRange, type, classifier, scope, null );
     }
 
-    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange,
-                                              String type, String classifier, String scope, boolean optional )
+    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
+                                              String classifier, String scope, boolean optional )
     {
         return createArtifact( groupId, artifactId, versionRange, type, classifier, scope, null, optional );
     }
 
-    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange,
-                                              String type, String classifier, String scope, String inheritedScope )
+    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
+                                              String classifier, String scope, String inheritedScope )
     {
         return createArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope );
     }
 
-    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange,
-                                              String type, String classifier, String scope, String inheritedScope,
-                                              boolean optional )
+    public Artifact createDependencyArtifact( String groupId, String artifactId, VersionRange versionRange, String type,
+                                              String classifier, String scope, String inheritedScope, boolean optional )
     {
         return createArtifact( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope, optional );
     }

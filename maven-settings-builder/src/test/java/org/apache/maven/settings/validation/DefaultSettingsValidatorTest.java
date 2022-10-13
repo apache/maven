@@ -1,5 +1,3 @@
-package org.apache.maven.settings.validation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.settings.validation;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.settings.validation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.validation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -182,7 +181,7 @@ public class DefaultSettingsValidatorTest
 
     @Test
     public void testValidateUniqueProxyId()
-            throws Exception
+        throws Exception
     {
         Proxy proxy = Proxy.newBuilder().id( "foo" ).host( "www.example.com" ).build();
         Settings settings = Settings.newBuilder().proxies( Arrays.asList( proxy, proxy ) ).build();
@@ -190,14 +189,14 @@ public class DefaultSettingsValidatorTest
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate( settings, problems );
         assertEquals( 1, problems.messages.size() );
-        assertContains( problems.messages.get( 0 ), "'proxies.proxy.id' must be unique"
-                + " but found duplicate proxy with id foo" );
+        assertContains( problems.messages.get( 0 ),
+                        "'proxies.proxy.id' must be unique" + " but found duplicate proxy with id foo" );
 
     }
 
     @Test
     public void testValidateUniqueProxyNullId()
-            throws Exception
+        throws Exception
     {
         Proxy proxy = Proxy.newBuilder( false ).host( "www.example.com" ).build();
         Settings settings = Settings.newBuilder().proxies( Arrays.asList( proxy, proxy ) ).build();
@@ -205,8 +204,8 @@ public class DefaultSettingsValidatorTest
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate( settings, problems );
         assertEquals( 1, problems.messages.size() );
-        assertContains( problems.messages.get( 0 ), "'proxies.proxy.id' must be unique"
-                + " but found duplicate proxy with id null" );
+        assertContains( problems.messages.get( 0 ),
+                        "'proxies.proxy.id' must be unique" + " but found duplicate proxy with id null" );
 
     }
 

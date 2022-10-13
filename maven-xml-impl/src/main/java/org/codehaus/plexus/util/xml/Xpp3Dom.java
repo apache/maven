@@ -1,5 +1,3 @@
-package org.codehaus.plexus.util.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,7 @@ package org.codehaus.plexus.util.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.api.xml.Dom;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.pull.XmlSerializer;
+package org.codehaus.plexus.util.xml;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -30,11 +25,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.xml.Dom;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.pull.XmlSerializer;
+
 /**
- *  NOTE: remove all the util code in here when separated, this class should be pure data.
+ * NOTE: remove all the util code in here when separated, this class should be pure data.
  */
 public class Xpp3Dom
-        implements Serializable
+    implements Serializable
 {
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
@@ -70,6 +69,7 @@ public class Xpp3Dom
     public static final String DEFAULT_SELF_COMBINATION_MODE = SELF_COMBINATION_MERGE;
 
     private ChildrenTracking childrenTracking;
+
     private Dom dom;
 
     public Xpp3Dom( String name )
@@ -89,6 +89,7 @@ public class Xpp3Dom
 
     /**
      * Copy constructor.
+     * 
      * @param src The source Dom.
      */
     public Xpp3Dom( Xpp3Dom src )
@@ -98,6 +99,7 @@ public class Xpp3Dom
 
     /**
      * Copy constructor with alternative name.
+     * 
      * @param src The source Dom.
      * @param name The name of the Dom.
      */
@@ -148,8 +150,8 @@ public class Xpp3Dom
 
     public void setValue( String value )
     {
-        update( new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), value, dom.getAttributes(), dom.getChildren(), dom.getInputLocation() ) );
+        update( new org.apache.maven.internal.xml.Xpp3Dom( dom.getName(), value, dom.getAttributes(), dom.getChildren(),
+                                                           dom.getInputLocation() ) );
     }
 
     // ----------------------------------------------------------------------
@@ -167,21 +169,20 @@ public class Xpp3Dom
     }
 
     /**
-     *
      * @param name name of the attribute to be removed
      * @return <code>true</code> if the attribute has been removed
      * @since 3.4.0
      */
     public boolean removeAttribute( String name )
     {
-        if ( ! StringUtils.isEmpty( name ) )
+        if ( !StringUtils.isEmpty( name ) )
         {
             Map<String, String> attrs = new HashMap<>( dom.getAttributes() );
             boolean ret = attrs.remove( name ) != null;
             if ( ret )
             {
-                update( new org.apache.maven.internal.xml.Xpp3Dom(
-                        dom.getName(), dom.getValue(), attrs, dom.getChildren(), dom.getInputLocation() ) );
+                update( new org.apache.maven.internal.xml.Xpp3Dom( dom.getName(), dom.getValue(), attrs,
+                                                                   dom.getChildren(), dom.getInputLocation() ) );
             }
             return ret;
         }
@@ -206,8 +207,8 @@ public class Xpp3Dom
         }
         Map<String, String> attrs = new HashMap<>( dom.getAttributes() );
         attrs.put( name, value );
-        update( new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), dom.getValue(), attrs, dom.getChildren(), dom.getInputLocation() ) );
+        update( new org.apache.maven.internal.xml.Xpp3Dom( dom.getName(), dom.getValue(), attrs, dom.getChildren(),
+                                                           dom.getInputLocation() ) );
     }
 
     // ----------------------------------------------------------------------
@@ -230,21 +231,19 @@ public class Xpp3Dom
         List<Dom> children = new ArrayList<>( dom.getChildren() );
         children.add( xpp3Dom.dom );
         xpp3Dom.childrenTracking = this::replace;
-        update( new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation() ) );
+        update( new org.apache.maven.internal.xml.Xpp3Dom( dom.getName(), dom.getValue(), dom.getAttributes(), children,
+                                                           dom.getInputLocation() ) );
     }
 
     public Xpp3Dom[] getChildren()
     {
-        return dom.getChildren().stream()
-                .map( d -> new Xpp3Dom( d, this ) ).toArray( Xpp3Dom[]::new );
+        return dom.getChildren().stream().map( d -> new Xpp3Dom( d, this ) ).toArray( Xpp3Dom[]::new );
     }
 
     public Xpp3Dom[] getChildren( String name )
     {
-        return dom.getChildren().stream()
-                .filter( c -> c.getName().equals( name ) )
-                .map( d -> new Xpp3Dom( d, this ) ).toArray( Xpp3Dom[]::new );
+        return dom.getChildren().stream().filter( c -> c.getName().equals( name ) ).map( d -> new Xpp3Dom( d,
+                                                                                                           this ) ).toArray( Xpp3Dom[]::new );
     }
 
     public int getChildCount()
@@ -256,16 +255,16 @@ public class Xpp3Dom
     {
         List<Dom> children = new ArrayList<>( dom.getChildren() );
         children.remove( i );
-        update( new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation() ) );
+        update( new org.apache.maven.internal.xml.Xpp3Dom( dom.getName(), dom.getValue(), dom.getAttributes(), children,
+                                                           dom.getInputLocation() ) );
     }
 
     public void removeChild( Xpp3Dom child )
     {
         List<Dom> children = new ArrayList<>( dom.getChildren() );
         children.remove( child.dom );
-        update( new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation() ) );
+        update( new org.apache.maven.internal.xml.Xpp3Dom( dom.getName(), dom.getValue(), dom.getAttributes(), children,
+                                                           dom.getInputLocation() ) );
     }
 
     // ----------------------------------------------------------------------
@@ -300,8 +299,8 @@ public class Xpp3Dom
      */
     public void setInputLocation( Object inputLocation )
     {
-        update( new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), dom.getValue(), dom.getAttributes(), dom.getChildren(), inputLocation ) );
+        update( new org.apache.maven.internal.xml.Xpp3Dom( dom.getName(), dom.getValue(), dom.getAttributes(),
+                                                           dom.getChildren(), inputLocation ) );
     }
 
     // ----------------------------------------------------------------------
@@ -309,7 +308,7 @@ public class Xpp3Dom
     // ----------------------------------------------------------------------
 
     public void writeToSerializer( String namespace, XmlSerializer serializer )
-            throws IOException
+        throws IOException
     {
         // TODO: WARNING! Later versions of plexus-utils psit out an <?xml ?> header due to thinking this is a new
         // document - not the desired behaviour!
@@ -322,40 +321,43 @@ public class Xpp3Dom
     }
 
     /**
-     * Merges one DOM into another, given a specific algorithm and possible override points for that algorithm.<p>
+     * Merges one DOM into another, given a specific algorithm and possible override points for that algorithm.
+     * <p>
      * The algorithm is as follows:
      * <ol>
-     * <li> if the recessive DOM is null, there is nothing to do... return.</li>
-     * <li> Determine whether the dominant node will suppress the recessive one (flag=mergeSelf).
-     *   <ol type="A">
-     *   <li> retrieve the 'combine.self' attribute on the dominant node, and try to match against 'override'...
-     *        if it matches 'override', then set mergeSelf == false...the dominant node suppresses the recessive one
-     *        completely.</li>
-     *   <li> otherwise, use the default value for mergeSelf, which is true...this is the same as specifying
-     *        'combine.self' == 'merge' as an attribute of the dominant root node.</li>
-     *   </ol></li>
-     * <li> If mergeSelf == true
-     *   <ol type="A">
-     *   <li> if the dominant root node's value is empty, set it to the recessive root node's value</li>
-     *   <li> For each attribute in the recessive root node which is not set in the dominant root node, set it.</li>
-     *   <li> Determine whether children from the recessive DOM will be merged or appended to the dominant DOM as
-     *        siblings (flag=mergeChildren).
-     *     <ol type="i">
-     *     <li> if childMergeOverride is set (non-null), use that value (true/false)</li>
-     *     <li> retrieve the 'combine.children' attribute on the dominant node, and try to match against
-     *          'append'...</li>
-     *     <li> if it matches 'append', then set mergeChildren == false...the recessive children will be appended as
-     *          siblings of the dominant children.</li>
-     *     <li> otherwise, use the default value for mergeChildren, which is true...this is the same as specifying
-     *         'combine.children' == 'merge' as an attribute on the dominant root node.</li>
-     *     </ol></li>
-     *   <li> Iterate through the recessive children, and:
-     *     <ol type="i">
-     *     <li> if mergeChildren == true and there is a corresponding dominant child (matched by element name),
-     *          merge the two.</li>
-     *     <li> otherwise, add the recessive child as a new child on the dominant root node.</li>
-     *     </ol></li>
-     *   </ol></li>
+     * <li>if the recessive DOM is null, there is nothing to do... return.</li>
+     * <li>Determine whether the dominant node will suppress the recessive one (flag=mergeSelf).
+     * <ol type="A">
+     * <li>retrieve the 'combine.self' attribute on the dominant node, and try to match against 'override'... if it
+     * matches 'override', then set mergeSelf == false...the dominant node suppresses the recessive one completely.</li>
+     * <li>otherwise, use the default value for mergeSelf, which is true...this is the same as specifying 'combine.self'
+     * == 'merge' as an attribute of the dominant root node.</li>
+     * </ol>
+     * </li>
+     * <li>If mergeSelf == true
+     * <ol type="A">
+     * <li>if the dominant root node's value is empty, set it to the recessive root node's value</li>
+     * <li>For each attribute in the recessive root node which is not set in the dominant root node, set it.</li>
+     * <li>Determine whether children from the recessive DOM will be merged or appended to the dominant DOM as siblings
+     * (flag=mergeChildren).
+     * <ol type="i">
+     * <li>if childMergeOverride is set (non-null), use that value (true/false)</li>
+     * <li>retrieve the 'combine.children' attribute on the dominant node, and try to match against 'append'...</li>
+     * <li>if it matches 'append', then set mergeChildren == false...the recessive children will be appended as siblings
+     * of the dominant children.</li>
+     * <li>otherwise, use the default value for mergeChildren, which is true...this is the same as specifying
+     * 'combine.children' == 'merge' as an attribute on the dominant root node.</li>
+     * </ol>
+     * </li>
+     * <li>Iterate through the recessive children, and:
+     * <ol type="i">
+     * <li>if mergeChildren == true and there is a corresponding dominant child (matched by element name), merge the
+     * two.</li>
+     * <li>otherwise, add the recessive child as a new child on the dominant root node.</li>
+     * </ol>
+     * </li>
+     * </ol>
+     * </li>
      * </ol>
      */
     private static void mergeIntoXpp3Dom( Xpp3Dom dominant, Xpp3Dom recessive, Boolean childMergeOverride )
@@ -444,7 +446,7 @@ public class Xpp3Dom
 
     public String toUnescapedString()
     {
-        return ( ( Xpp3Dom ) dom ).toUnescapedString();
+        return ( (Xpp3Dom) dom ).toUnescapedString();
     }
 
     public static boolean isNotEmpty( String str )
@@ -469,9 +471,9 @@ public class Xpp3Dom
     private boolean replace( Object prevChild, Object newChild )
     {
         List<Dom> children = new ArrayList<>( dom.getChildren() );
-        children.replaceAll( d -> d == prevChild ? ( Dom ) newChild : d );
-        update( new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation() ) );
+        children.replaceAll( d -> d == prevChild ? (Dom) newChild : d );
+        update( new org.apache.maven.internal.xml.Xpp3Dom( dom.getName(), dom.getValue(), dom.getAttributes(), children,
+                                                           dom.getInputLocation() ) );
         return true;
     }
 

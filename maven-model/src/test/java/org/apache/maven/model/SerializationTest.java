@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -47,14 +46,14 @@ public class SerializationTest
         Build build = model.getBuild();
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try( ObjectOutputStream oos = new ObjectOutputStream( baos ) )
+        try ( ObjectOutputStream oos = new ObjectOutputStream( baos ) )
         {
             oos.writeObject( build );
         }
 
         Build build2;
         ByteArrayInputStream bais = new ByteArrayInputStream( baos.toByteArray() );
-        try( ObjectInputStream ois = new ObjectInputStream( bais ) )
+        try ( ObjectInputStream ois = new ObjectInputStream( bais ) )
         {
             build2 = (Build) ois.readObject();
         }

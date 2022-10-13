@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 /**
  * Base exception.
@@ -44,8 +43,8 @@ public abstract class AbstractMojoExecutionException
     /**
      * Constructs a new {@code AbstractMojoExecutionException} exception wrapping an underlying {@code Throwable}.
      *
-     * @param cause the cause which is saved for later retrieval by the {@link #getCause()} method.
-     *              A {@code null} value is permitted, and indicates that the cause is nonexistent or unknown.
+     * @param cause the cause which is saved for later retrieval by the {@link #getCause()} method. A {@code null} value
+     *            is permitted, and indicates that the cause is nonexistent or unknown.
      * @since 3.8.3
      */
     public AbstractMojoExecutionException( Throwable cause )

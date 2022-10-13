@@ -1,5 +1,3 @@
-package org.apache.maven.model.validation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model.validation;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.model.validation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.validation;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -177,8 +176,8 @@ public class DefaultModelValidator
 
             validateRawRepositories( problems, m.getRepositories(), "repositories.repository.", EMPTY, request );
 
-            validateRawRepositories( problems, m.getPluginRepositories(), "pluginRepositories.pluginRepository.",
-                                     EMPTY, request );
+            validateRawRepositories( problems, m.getPluginRepositories(), "pluginRepositories.pluginRepository.", EMPTY,
+                                     request );
 
             Build build = m.getBuild();
             if ( build != null )
@@ -188,8 +187,8 @@ public class DefaultModelValidator
                 PluginManagement mgmt = build.getPluginManagement();
                 if ( mgmt != null )
                 {
-                    validate20RawPlugins( problems, mgmt.getPlugins(), "build.pluginManagement.plugins.plugin.",
-                                          EMPTY, request );
+                    validate20RawPlugins( problems, mgmt.getPlugins(), "build.pluginManagement.plugins.plugin.", EMPTY,
+                                          request );
                 }
             }
 
@@ -207,23 +206,23 @@ public class DefaultModelValidator
                                   "must be unique but found duplicate profile with id " + profile.getId(), profile );
                 }
 
-                validate30RawProfileActivation( problems, profile.getActivation(), profile.getId(),
-                                                prefix, "activation", request );
+                validate30RawProfileActivation( problems, profile.getActivation(), profile.getId(), prefix,
+                                                "activation", request );
 
                 validate20RawDependencies( problems, profile.getDependencies(), prefix, "dependencies.dependency.",
                                            request );
 
                 if ( profile.getDependencyManagement() != null )
                 {
-                    validate20RawDependencies( problems, profile.getDependencyManagement().getDependencies(),
-                                               prefix, "dependencyManagement.dependencies.dependency.", request );
+                    validate20RawDependencies( problems, profile.getDependencyManagement().getDependencies(), prefix,
+                                               "dependencyManagement.dependencies.dependency.", request );
                 }
 
                 validateRawRepositories( problems, profile.getRepositories(), prefix, "repositories.repository.",
                                          request );
 
-                validateRawRepositories( problems, profile.getPluginRepositories(),
-                                         prefix, "pluginRepositories.pluginRepository.", request );
+                validateRawRepositories( problems, profile.getPluginRepositories(), prefix,
+                                         "pluginRepositories.pluginRepository.", request );
 
                 BuildBase buildBase = profile.getBuild();
                 if ( buildBase != null )
@@ -551,8 +550,7 @@ public class DefaultModelValidator
                 String msg;
                 if ( equals( existing.getVersion(), dependency.getVersion() ) )
                 {
-                    msg = "duplicate declaration of version "
-                        + Objects.toString( dependency.getVersion(), "(?)" );
+                    msg = "duplicate declaration of version " + Objects.toString( dependency.getVersion(), "(?)" );
                 }
                 else
                 {
@@ -583,7 +581,7 @@ public class DefaultModelValidator
         for ( Dependency dependency : dependencies )
         {
             String key = dependency.getGroupId() + ":" + dependency.getArtifactId() + ":" + dependency.getVersion()
-                    + ( dependency.getClassifier() != null ? ":" + dependency.getClassifier() : EMPTY  );
+                + ( dependency.getClassifier() != null ? ":" + dependency.getClassifier() : EMPTY );
             String mKey = m.getGroupId() + ":" + m.getArtifactId() + ":" + m.getVersion();
             if ( key.equals( mKey ) )
             {
@@ -598,8 +596,8 @@ public class DefaultModelValidator
     }
 
     private void validateEffectiveDependencies( ModelProblemCollector problems, org.apache.maven.api.model.Model m,
-                                                List<Dependency> dependencies,
-                                                boolean management, ModelBuildingRequest request )
+                                                List<Dependency> dependencies, boolean management,
+                                                ModelBuildingRequest request )
     {
         Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
 
@@ -639,11 +637,11 @@ public class DefaultModelValidator
     }
 
     private void validateEffectiveModelAgainstDependency( String prefix, ModelProblemCollector problems,
-                                                          org.apache.maven.api.model.Model m,
-                                                          Dependency d, ModelBuildingRequest request )
+                                                          org.apache.maven.api.model.Model m, Dependency d,
+                                                          ModelBuildingRequest request )
     {
         String key = d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion()
-                + ( d.getClassifier() != null ? ":" + d.getClassifier() : EMPTY  );
+            + ( d.getClassifier() != null ? ":" + d.getClassifier() : EMPTY );
         String mKey = m.getGroupId() + ":" + m.getArtifactId() + ":" + m.getVersion();
         if ( key.equals( mKey ) )
         {
@@ -685,10 +683,10 @@ public class DefaultModelValidator
                                               String prefix, ModelBuildingRequest request )
     {
         validateCoordinateId( prefix, "artifactId", problems, Severity.ERROR, Version.BASE, d.getArtifactId(),
-                    d.getManagementKey(), d );
+                              d.getManagementKey(), d );
 
         validateCoordinateId( prefix, "groupId", problems, Severity.ERROR, Version.BASE, d.getGroupId(),
-                    d.getManagementKey(), d );
+                              d.getManagementKey(), d );
 
         if ( !management )
         {
@@ -849,8 +847,8 @@ public class DefaultModelValidator
 
         for ( Resource resource : resources )
         {
-            validateStringNotEmpty( prefix, "directory", problems, Severity.ERROR, Version.V20,
-                                    resource.getDirectory(), null, resource );
+            validateStringNotEmpty( prefix, "directory", problems, Severity.ERROR, Version.V20, resource.getDirectory(),
+                                    null, resource );
 
             validateBoolean( prefix, "filtering", problems, errOn30, Version.V20, resource.getFiltering(),
                              resource.getDirectory(), resource );
@@ -1129,9 +1127,9 @@ public class DefaultModelValidator
      * </ul>
      */
     @SuppressWarnings( "checkstyle:parameternumber" )
-    private boolean validateNotNull( String prefix, String prefix2, String fieldName,
-                                     ModelProblemCollector problems, Severity severity, Version version,
-                                     Object object, String sourceHint, InputLocationTracker tracker )
+    private boolean validateNotNull( String prefix, String prefix2, String fieldName, ModelProblemCollector problems,
+                                     Severity severity, Version version, Object object, String sourceHint,
+                                     InputLocationTracker tracker )
     {
         if ( object != null )
         {
@@ -1215,7 +1213,8 @@ public class DefaultModelValidator
         {
             addViolation( problems, Severity.FATAL, Version.V20, "modelVersion", null,
                           "of '" + string + "' is newer than the versions supported by this version of Maven: " + values
-                              + ". Building this project requires a newer version of Maven.", tracker );
+                              + ". Building this project requires a newer version of Maven.",
+                          tracker );
 
         }
         else if ( olderThanAll )
@@ -1223,7 +1222,8 @@ public class DefaultModelValidator
             // note this will not be hit for Maven 1.x project.xml as it is an incompatible schema
             addViolation( problems, Severity.FATAL, Version.V20, "modelVersion", null,
                           "of '" + string + "' is older than the versions supported by this version of Maven: " + values
-                              + ". Building this project requires an older version of Maven.", tracker );
+                              + ". Building this project requires an older version of Maven.",
+                          tracker );
 
         }
         else
@@ -1241,7 +1241,7 @@ public class DefaultModelValidator
      * @param first the first version.
      * @param second the second version.
      * @return negative if the first version is newer than the second version, zero if they are the same or positive if
-     * the second version is the newer.
+     *         the second version is the newer.
      */
     private static int compareModelVersions( String first, String second )
     {
@@ -1367,8 +1367,8 @@ public class DefaultModelValidator
 
         buffer.append( ' ' ).append( message );
 
-        problems.add( new ModelProblemCollectorRequest( severity, version )
-                .setMessage( buffer.toString() ).setLocation( getLocation( fieldName, tracker ) ) );
+        problems.add( new ModelProblemCollectorRequest( severity, version ).setMessage(
+                                                                                        buffer.toString() ).setLocation( getLocation( fieldName, tracker ) ) );
     }
 
     private static org.apache.maven.model.InputLocation getLocation( String fieldName, InputLocationTracker tracker )

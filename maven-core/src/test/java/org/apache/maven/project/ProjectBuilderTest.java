@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -51,7 +50,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 
 public class ProjectBuilderTest
     extends AbstractCoreMavenComponentTestCase
@@ -104,10 +102,12 @@ public class ProjectBuilderTest
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession( mavenSession.getRepositorySession() );
 
-        ProjectBuildingException e = assertThrows( ProjectBuildingException.class,
-                      () -> getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration ) );
-        assertThat( e.getResults(), contains( projectBuildingResultWithProblemMessage(
-                "'dependencies.dependency.version' for org.apache.maven.its:a:jar is missing" ) ) );
+        ProjectBuildingException e =
+            assertThrows( ProjectBuildingException.class,
+                          () -> getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile,
+                                                                                                              configuration ) );
+        assertThat( e.getResults(),
+                    contains( projectBuildingResultWithProblemMessage( "'dependencies.dependency.version' for org.apache.maven.its:a:jar is missing" ) ) );
         assertThat( e.getResults(), contains( projectBuildingResultWithLocation( 17, 9 ) ) );
     }
 
@@ -122,24 +122,27 @@ public class ProjectBuilderTest
         configuration.setResolveDependencies( true );
 
         // single project build entry point
-        ProjectBuildingResult result = getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration );
+        ProjectBuildingResult result =
+            getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration );
         assertEquals( 1, result.getProject().getArtifacts().size() );
         // multi projects build entry point
         List<ProjectBuildingResult> results =
-                getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( Collections.singletonList( pomFile ), false,
-                                                                           configuration );
+            getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( Collections.singletonList( pomFile ),
+                                                                                          false, configuration );
         assertEquals( 1, results.size() );
         MavenProject mavenProject = results.get( 0 ).getProject();
         assertEquals( 1, mavenProject.getArtifacts().size() );
 
         final MavenProject project = mavenProject;
         final AtomicInteger artifactsResultInAnotherThread = new AtomicInteger();
-        Thread t = new Thread(new Runnable() {
+        Thread t = new Thread( new Runnable()
+        {
             @Override
-            public void run() {
-                artifactsResultInAnotherThread.set(project.getArtifacts().size());
+            public void run()
+            {
+                artifactsResultInAnotherThread.set( project.getArtifacts().size() );
             }
-        });
+        } );
         t.start();
         t.join();
         assertEquals( project.getArtifacts().size(), artifactsResultInAnotherThread.get() );
@@ -156,17 +159,23 @@ public class ProjectBuilderTest
         configuration.setResolveDependencies( false );
 
         // single project build entry point
-        ProjectBuildingResult result = getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration );
+        ProjectBuildingResult result =
+            getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( pomFile, configuration );
         assertEquals( 0, result.getProject().getArtifacts().size() );
         // multi projects build entry point
-        List<ProjectBuildingResult> results = getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( Collections.singletonList( pomFile ), false, configuration );
+        List<ProjectBuildingResult> results =
+            getContainer().lookup( org.apache.maven.project.ProjectBuilder.class ).build( Collections.singletonList( pomFile ),
+                                                                                          false, configuration );
         assertEquals( 1, results.size() );
         MavenProject mavenProject = results.get( 0 ).getProject();
         assertEquals( 0, mavenProject.getArtifacts().size() );
     }
 
     @Test
-    public void testReadModifiedPoms( @TempDir Path tempDir ) throws Exception {
+    public void testReadModifiedPoms( @TempDir
+    Path tempDir )
+        throws Exception
+    {
         // TODO a similar test should be created to test the dependency management (basically all usages
         // of DefaultModelBuilder.getCache() are affected by MNG-6530
 
@@ -174,15 +183,17 @@ public class ProjectBuilderTest
         MavenSession mavenSession = createMavenSession( null );
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession( mavenSession.getRepositorySession() );
-        org.apache.maven.project.ProjectBuilder projectBuilder = getContainer().lookup( org.apache.maven.project.ProjectBuilder.class );
+        org.apache.maven.project.ProjectBuilder projectBuilder =
+            getContainer().lookup( org.apache.maven.project.ProjectBuilder.class );
         File child = new File( tempDir.toFile(), "child/pom.xml" );
         // build project once
         projectBuilder.build( child, configuration );
         // modify parent
         File parent = new File( tempDir.toFile(), "pom.xml" );
         String parentContent = FileUtils.readFileToString( parent, "UTF-8" );
-        parentContent = parentContent.replaceAll( "<packaging>pom</packaging>",
-                 "<packaging>pom</packaging><properties><addedProperty>addedValue</addedProperty></properties>" );
+        parentContent =
+            parentContent.replaceAll( "<packaging>pom</packaging>",
+                                      "<packaging>pom</packaging><properties><addedProperty>addedValue</addedProperty></properties>" );
         FileUtils.write( parent, parentContent, "UTF-8" );
         // re-build pom with modified parent
         ProjectBuildingResult result = projectBuilder.build( child, configuration );
@@ -199,7 +210,7 @@ public class ProjectBuilderTest
         configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
         configuration.setRepositorySession( mavenSession.getRepositorySession() );
         org.apache.maven.project.ProjectBuilder projectBuilder =
-                getContainer().lookup( org.apache.maven.project.ProjectBuilder.class );
+            getContainer().lookup( org.apache.maven.project.ProjectBuilder.class );
 
         // single project build entry point
         ProjectBuildingException ex1 =
@@ -233,7 +244,7 @@ public class ProjectBuilderTest
         configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
         configuration.setRepositorySession( mavenSession.getRepositorySession() );
         org.apache.maven.project.ProjectBuilder projectBuilder =
-                getContainer().lookup( org.apache.maven.project.ProjectBuilder.class );
+            getContainer().lookup( org.apache.maven.project.ProjectBuilder.class );
 
         // single project build entry point
         Exception ex = assertThrows( Exception.class, () -> projectBuilder.build( pomFile, configuration ) );
@@ -246,7 +257,8 @@ public class ProjectBuilderTest
         assertEquals( 1, pex.getResults().size() );
         assertNotNull( pex.getResults().get( 0 ).getPomFile() );
         assertThat( pex.getResults().get( 0 ).getProblems().size(), greaterThan( 0 ) );
-        assertThat( pex.getResults(), contains( projectBuildingResultWithProblemMessage( "expected START_TAG or END_TAG not TEXT" ) ) );
+        assertThat( pex.getResults(),
+                    contains( projectBuildingResultWithProblemMessage( "expected START_TAG or END_TAG not TEXT" ) ) );
     }
 
     @Test
@@ -262,13 +274,14 @@ public class ProjectBuilderTest
         configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
         configuration.setRepositorySession( mavenSession.getRepositorySession() );
         org.apache.maven.project.ProjectBuilder projectBuilder =
-                getContainer().lookup( org.apache.maven.project.ProjectBuilder.class );
+            getContainer().lookup( org.apache.maven.project.ProjectBuilder.class );
 
         // read poms separately
         boolean parentFileWasFoundOnChild = false;
         for ( File file : toRead )
         {
-            List<ProjectBuildingResult> results = projectBuilder.build( Collections.singletonList( file ), false, configuration );
+            List<ProjectBuildingResult> results =
+                projectBuilder.build( Collections.singletonList( file ), false, configuration );
             assertResultShowNoError( results );
             MavenProject project = findChildProject( results );
             if ( project != null )
@@ -312,14 +325,15 @@ public class ProjectBuilderTest
 
     @Test
     public void testBuildProperties()
-            throws Exception
+        throws Exception
     {
         File file = new File( getProject( "MNG-6716" ).getParentFile(), "project/pom.xml" );
         MavenSession mavenSession = createMavenSession( null );
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setRepositorySession( mavenSession.getRepositorySession() );
         configuration.setResolveDependencies( true );
-        List<ProjectBuildingResult> result = projectBuilder.build( Collections.singletonList( file ), true, configuration );
+        List<ProjectBuildingResult> result =
+            projectBuilder.build( Collections.singletonList( file ), true, configuration );
         MavenProject project = result.get( 0 ).getProject();
         // verify a few typical parameters are not duplicated
         assertEquals( 1, project.getTestCompileSourceRoots().size() );
@@ -330,14 +344,15 @@ public class ProjectBuilderTest
 
     @Test
     public void testPropertyInPluginManagementGroupId()
-            throws Exception
+        throws Exception
     {
         File pom = getProject( "MNG-6983" );
 
         MavenSession session = createMavenSession( pom );
         MavenProject project = session.getCurrentProject();
 
-        for (Plugin buildPlugin : project.getBuildPlugins()) {
+        for ( Plugin buildPlugin : project.getBuildPlugins() )
+        {
             assertNotNull( "Missing version for build plugin " + buildPlugin.getKey(), buildPlugin.getVersion() );
         }
     }

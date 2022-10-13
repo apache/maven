@@ -1,5 +1,3 @@
-package org.apache.maven.project.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.artifact;
 
 import java.io.File;
 import java.io.IOException;
@@ -73,9 +72,8 @@ public class ProjectArtifactMetadata
     public void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
         throws RepositoryMetadataStoreException
     {
-        File destination =
-            new File( localRepository.getBasedir(), localRepository.pathOfLocalRepositoryMetadata( this,
-                                                                                                   remoteRepository ) );
+        File destination = new File( localRepository.getBasedir(),
+                                     localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
 
         // ----------------------------------------------------------------------------
         // I'm fully aware that the file could just be moved using File.rename but

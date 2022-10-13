@@ -1,5 +1,3 @@
-package org.apache.maven.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,14 +16,14 @@ package org.apache.maven.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.metadata;
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
- * This object is tinted with ClasspathTransformation and GraphConflictResolver.
- * Get rid of them after debugging
+ * This object is tinted with ClasspathTransformation and GraphConflictResolver. Get rid of them after debugging
  *
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  */
@@ -34,27 +32,30 @@ public class MetadataResolutionResult
     MetadataTreeNode treeRoot;
 
     /**
-     * these components are initialized on demand by
-     * explicit call of the initTreeProcessing()
+     * these components are initialized on demand by explicit call of the initTreeProcessing()
      */
     ClasspathTransformation classpathTransformation;
+
     GraphConflictResolver conflictResolver;
 
-    //----------------------------------------------------------------------------
-    public MetadataResolutionResult( )
+    // ----------------------------------------------------------------------------
+    public MetadataResolutionResult()
     {
     }
-    //----------------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------------
     public MetadataResolutionResult( MetadataTreeNode root )
     {
         this.treeRoot = root;
     }
-    //----------------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------------
     public MetadataTreeNode getTree()
     {
         return treeRoot;
     }
-    //----------------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------------
     public void setTree( MetadataTreeNode root )
     {
         this.treeRoot = root;
@@ -66,13 +67,15 @@ public class MetadataResolutionResult
         classpathTransformation = plexus.lookup( ClasspathTransformation.class );
         conflictResolver = plexus.lookup( GraphConflictResolver.class );
     }
-    //----------------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------------
     public MetadataGraph getGraph()
         throws MetadataResolutionException
     {
         return treeRoot == null ? null : new MetadataGraph( treeRoot );
     }
-    //----------------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------------
     public MetadataGraph getGraph( ArtifactScopeEnum scope )
         throws MetadataResolutionException, GraphConflictResolutionException
     {
@@ -88,7 +91,8 @@ public class MetadataResolutionResult
 
         return conflictResolver.resolveConflicts( getGraph(), scope );
     }
-    //----------------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------------
     public MetadataGraph getGraph( MetadataResolutionRequestTypeEnum requestType )
         throws MetadataResolutionException, GraphConflictResolutionException
     {
@@ -133,7 +137,8 @@ public class MetadataResolutionResult
         }
         return null;
     }
-    //----------------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------------
     public ClasspathContainer getClasspath( ArtifactScopeEnum scope )
         throws MetadataGraphTransformationException, MetadataResolutionException
     {
@@ -151,7 +156,7 @@ public class MetadataResolutionResult
         return classpathTransformation.transform( dirtyGraph, scope, false );
     }
 
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     public MetadataTreeNode getClasspathTree( ArtifactScopeEnum scope )
         throws MetadataGraphTransformationException, MetadataResolutionException
     {
@@ -163,6 +168,6 @@ public class MetadataResolutionResult
 
         return cpc.getClasspathAsTree();
     }
-    //----------------------------------------------------------------------------
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 }

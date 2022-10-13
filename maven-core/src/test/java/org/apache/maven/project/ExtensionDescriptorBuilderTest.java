@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -28,11 +27,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Tests {@link ExtensionDescriptorBuilder}.
@@ -82,12 +81,11 @@ public class ExtensionDescriptorBuilderTest
     public void testCompleteDescriptor()
         throws Exception
     {
-        String xml =
-            "<?xml version='1.0' encoding='UTF-8'?>" + "<extension>" + "<exportedPackages>"
-                + "<exportedPackage>a</exportedPackage>" + "<exportedPackage>b</exportedPackage>"
-                + "<exportedPackage>c</exportedPackage>" + "</exportedPackages>" + "<exportedArtifacts>"
-                + "<exportedArtifact>x</exportedArtifact>" + "<exportedArtifact>y</exportedArtifact>"
-                + "<exportedArtifact> z </exportedArtifact>" + "</exportedArtifacts>" + "</extension>";
+        String xml = "<?xml version='1.0' encoding='UTF-8'?>" + "<extension>" + "<exportedPackages>"
+            + "<exportedPackage>a</exportedPackage>" + "<exportedPackage>b</exportedPackage>"
+            + "<exportedPackage>c</exportedPackage>" + "</exportedPackages>" + "<exportedArtifacts>"
+            + "<exportedArtifact>x</exportedArtifact>" + "<exportedArtifact>y</exportedArtifact>"
+            + "<exportedArtifact> z </exportedArtifact>" + "</exportedArtifacts>" + "</extension>";
 
         ExtensionDescriptor ed = builder.build( toStream( xml ) );
 

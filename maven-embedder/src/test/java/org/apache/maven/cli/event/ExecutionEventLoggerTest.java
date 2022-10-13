@@ -1,5 +1,3 @@
-package org.apache.maven.cli.event;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,7 @@ package org.apache.maven.cli.event;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.ArgumentMatchers.matches;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.when;
+package org.apache.maven.cli.event;
 
 import java.io.File;
 
@@ -42,10 +34,17 @@ import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 
+import static org.mockito.ArgumentMatchers.matches;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.when;
+
 class ExecutionEventLoggerTest
 {
 
     private Logger logger;
+
     private ExecutionEventLogger executionEventLogger;
 
     @BeforeAll
@@ -61,7 +60,8 @@ class ExecutionEventLoggerTest
     }
 
     @BeforeEach
-    void beforeEach() {
+    void beforeEach()
+    {
         logger = mock( Logger.class );
         when( logger.isInfoEnabled() ).thenReturn( true );
         executionEventLogger = new ExecutionEventLogger( logger );
@@ -200,9 +200,9 @@ class ExecutionEventLoggerTest
     void testMultiModuleProjectProgress()
     {
         // prepare
-        MavenProject project1 = generateMavenProject("Apache Maven Embedder 1");
-        MavenProject project2 = generateMavenProject("Apache Maven Embedder 2");
-        MavenProject project3 = generateMavenProject("Apache Maven Embedder 3");
+        MavenProject project1 = generateMavenProject( "Apache Maven Embedder 1" );
+        MavenProject project2 = generateMavenProject( "Apache Maven Embedder 2" );
+        MavenProject project3 = generateMavenProject( "Apache Maven Embedder 3" );
 
         MavenSession session = mock( MavenSession.class );
         when( session.getProjects() ).thenReturn( ImmutableList.of( project1, project2, project3 ) );
@@ -225,18 +225,18 @@ class ExecutionEventLoggerTest
 
         // verify
         InOrder inOrder = inOrder( logger );
-        inOrder.verify( logger ).info( matches(".*Apache Maven Embedder 1.*\\[1\\/3\\]") );
-        inOrder.verify( logger ).info( matches(".*Apache Maven Embedder 2.*\\[2\\/3\\]") );
-        inOrder.verify( logger ).info( matches(".*Apache Maven Embedder 3.*\\[3\\/3\\]") );
+        inOrder.verify( logger ).info( matches( ".*Apache Maven Embedder 1.*\\[1\\/3\\]" ) );
+        inOrder.verify( logger ).info( matches( ".*Apache Maven Embedder 2.*\\[2\\/3\\]" ) );
+        inOrder.verify( logger ).info( matches( ".*Apache Maven Embedder 3.*\\[3\\/3\\]" ) );
     }
 
     @Test
     void testMultiModuleProjectResumeFromProgress()
     {
         // prepare
-        MavenProject project1 = generateMavenProject("Apache Maven Embedder 1");
-        MavenProject project2 = generateMavenProject("Apache Maven Embedder 2");
-        MavenProject project3 = generateMavenProject("Apache Maven Embedder 3");
+        MavenProject project1 = generateMavenProject( "Apache Maven Embedder 1" );
+        MavenProject project2 = generateMavenProject( "Apache Maven Embedder 2" );
+        MavenProject project3 = generateMavenProject( "Apache Maven Embedder 3" );
 
         MavenSession session = mock( MavenSession.class );
         when( session.getProjects() ).thenReturn( ImmutableList.of( project2, project3 ) );
@@ -256,9 +256,9 @@ class ExecutionEventLoggerTest
 
         // verify
         InOrder inOrder = inOrder( logger );
-        inOrder.verify( logger, never() ).info( matches(".*Apache Maven Embedder 1.*\\[1\\/3\\]") );
-        inOrder.verify( logger ).info( matches(".*Apache Maven Embedder 2.*\\[2\\/3\\]") );
-        inOrder.verify( logger ).info( matches(".*Apache Maven Embedder 3.*\\[3\\/3\\]") );
+        inOrder.verify( logger, never() ).info( matches( ".*Apache Maven Embedder 1.*\\[1\\/3\\]" ) );
+        inOrder.verify( logger ).info( matches( ".*Apache Maven Embedder 2.*\\[2\\/3\\]" ) );
+        inOrder.verify( logger ).info( matches( ".*Apache Maven Embedder 3.*\\[3\\/3\\]" ) );
     }
 
     private static MavenProject generateMavenProject( String projectName )

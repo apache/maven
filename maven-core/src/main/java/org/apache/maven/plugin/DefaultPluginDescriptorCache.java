@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,16 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -197,10 +196,8 @@ public class DefaultPluginDescriptorCache
 
             CacheKey that = (CacheKey) obj;
 
-            return Objects.equals( this.artifactId, that.artifactId )
-                && Objects.equals( this.groupId, that.groupId )
-                && Objects.equals( this.version, that.version )
-                && Objects.equals( this.localRepo, that.localRepo )
+            return Objects.equals( this.artifactId, that.artifactId ) && Objects.equals( this.groupId, that.groupId )
+                && Objects.equals( this.version, that.version ) && Objects.equals( this.localRepo, that.localRepo )
                 && Objects.equals( this.workspace, that.workspace )
                 && RepositoryUtils.repositoriesEquals( this.repositories, that.repositories );
         }

@@ -1,5 +1,3 @@
-package org.apache.maven.model.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,12 @@ package org.apache.maven.model.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.util.List;
+package org.apache.maven.model.plugin;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.List;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
@@ -41,7 +40,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 @Named
 @Singleton
 public class DefaultPluginConfigurationExpander
-        implements PluginConfigurationExpander
+    implements PluginConfigurationExpander
 {
 
     @Override
@@ -75,7 +74,7 @@ public class DefaultPluginConfigurationExpander
                     Xpp3Dom executionConfiguration = (Xpp3Dom) execution.getConfiguration();
 
                     executionConfiguration =
-                            Xpp3Dom.mergeXpp3Dom( executionConfiguration, new Xpp3Dom( pluginConfiguration ) );
+                        Xpp3Dom.mergeXpp3Dom( executionConfiguration, new Xpp3Dom( pluginConfiguration ) );
 
                     execution.setConfiguration( executionConfiguration );
                 }

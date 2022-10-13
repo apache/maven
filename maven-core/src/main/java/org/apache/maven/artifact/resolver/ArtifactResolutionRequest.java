@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.resolver;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +33,8 @@ import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 
 /**
- * A resolution request allows you to either use an existing MavenProject, or a coordinate (gid:aid:version)
- * to process a POMs dependencies.
+ * A resolution request allows you to either use an existing MavenProject, or a coordinate (gid:aid:version) to process
+ * a POMs dependencies.
  *
  * @author Jason van Zyl
  */
@@ -234,12 +233,8 @@ public class ArtifactResolutionRequest
 
     public String toString()
     {
-        StringBuilder sb = new StringBuilder()
-                .append( "REQUEST: " ).append( LS )
-                .append( "artifact: " ).append( artifact ).append( LS )
-                .append( artifactDependencies ).append( LS )
-                .append( "localRepository: " ).append( localRepository ).append( LS )
-                .append( "remoteRepositories: " ).append( remoteRepositories );
+        StringBuilder sb =
+            new StringBuilder().append( "REQUEST: " ).append( LS ).append( "artifact: " ).append( artifact ).append( LS ).append( artifactDependencies ).append( LS ).append( "localRepository: " ).append( localRepository ).append( LS ).append( "remoteRepositories: " ).append( remoteRepositories );
 
         return sb.toString();
     }

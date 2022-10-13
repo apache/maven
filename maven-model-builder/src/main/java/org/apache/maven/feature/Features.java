@@ -1,5 +1,3 @@
-package org.apache.maven.feature;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.feature;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.feature;
 
 import java.util.Properties;
 
@@ -58,7 +57,7 @@ public final class Features
 
         public boolean isActive()
         {
-           return active;
+            return active;
         }
 
         public String propertyName()

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.descriptor;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.descriptor;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,17 +16,7 @@ package org.apache.maven.plugin.descriptor;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.lifecycle.Lifecycle;
-import org.apache.maven.plugin.lifecycle.LifecycleConfiguration;
-import org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Reader;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+package org.apache.maven.plugin.descriptor;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,6 +30,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.lifecycle.Lifecycle;
+import org.apache.maven.plugin.lifecycle.LifecycleConfiguration;
+import org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Reader;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * @author Jason van Zyl
@@ -174,9 +173,7 @@ public class PluginDescriptor
     }
 
     /**
-     * Parse maven-...-plugin.
-     *
-     * TODO move to plugin-tools-api as a default only
+     * Parse maven-...-plugin. TODO move to plugin-tools-api as a default only
      */
     public static String getGoalPrefixFromArtifactId( String artifactId )
     {
@@ -316,9 +313,7 @@ public class PluginDescriptor
 
     public Set<Artifact> getIntroducedDependencyArtifacts()
     {
-        return ( introducedDependencyArtifacts != null )
-            ? introducedDependencyArtifacts
-            : Collections.emptySet();
+        return ( introducedDependencyArtifacts != null ) ? introducedDependencyArtifacts : Collections.emptySet();
     }
 
     public void setName( String name )

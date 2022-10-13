@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,8 +48,8 @@ public class EmptyProjectBuildingHelper
         }
     }
 
-    public ProjectRealmCache.CacheRecord createProjectRealm( MavenProject project,
-                                                             Model model, ProjectBuildingRequest request )
+    public ProjectRealmCache.CacheRecord createProjectRealm( MavenProject project, Model model,
+                                                             ProjectBuildingRequest request )
     {
         return new ProjectRealmCache.CacheRecord( null, null );
     }

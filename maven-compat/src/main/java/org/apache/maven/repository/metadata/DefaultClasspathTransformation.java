@@ -1,5 +1,3 @@
-package org.apache.maven.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.metadata;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +30,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
  * default implementation of the metadata classpath transformer
  *
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
- *
  */
 @Component( role = ClasspathTransformation.class )
 public class DefaultClasspathTransformation
@@ -40,7 +38,7 @@ public class DefaultClasspathTransformation
     @Requirement
     GraphConflictResolver conflictResolver;
 
-    //----------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------
     public ClasspathContainer transform( MetadataGraph dirtyGraph, ArtifactScopeEnum scope, boolean resolve )
         throws MetadataGraphTransformationException
     {
@@ -81,10 +79,10 @@ public class DefaultClasspathTransformation
         }
     }
 
-    //===================================================================================================
+    // ===================================================================================================
     /**
-     * Helper class to traverse graph. Required to make the containing method thread-safe
-     * and yet use class level data to lessen stack usage in recursion
+     * Helper class to traverse graph. Required to make the containing method thread-safe and yet use class level data
+     * to lessen stack usage in recursion
      */
     private class ClasspathGraphVisitor
     {
@@ -113,34 +111,33 @@ public class DefaultClasspathTransformation
             }
 
             cpc.add( md );
-//
-//            TreeSet<MetadataGraphEdge> deps = new TreeSet<MetadataGraphEdge>(
-//                        new Comparator<MetadataGraphEdge>()
-//                        {
-//                            public int compare( MetadataGraphEdge e1
-//                                              , MetadataGraphEdge e2
-//                                              )
-//                            {
-//                                if( e1.getDepth() == e2.getDepth() )
-//                                {
-//                                    if( e2.getPomOrder() == e1.getPomOrder() )
-//                                        return e1.getTarget().toString().compareTo(e2.getTarget().toString() );
-//
-//                                    return e2.getPomOrder() - e1.getPomOrder();
-//                                }
-//
-//                                return e2.getDepth() - e1.getDepth();
-//                            }
-//                        }
-//                    );
+            //
+            // TreeSet<MetadataGraphEdge> deps = new TreeSet<MetadataGraphEdge>(
+            // new Comparator<MetadataGraphEdge>()
+            // {
+            // public int compare( MetadataGraphEdge e1
+            // , MetadataGraphEdge e2
+            // )
+            // {
+            // if( e1.getDepth() == e2.getDepth() )
+            // {
+            // if( e2.getPomOrder() == e1.getPomOrder() )
+            // return e1.getTarget().toString().compareTo(e2.getTarget().toString() );
+            //
+            // return e2.getPomOrder() - e1.getPomOrder();
+            // }
+            //
+            // return e2.getDepth() - e1.getDepth();
+            // }
+            // }
+            // );
 
             List<MetadataGraphEdge> exits = graph.getExcidentEdges( node );
 
             if ( exits != null && exits.size() > 0 )
             {
                 MetadataGraphEdge[] sortedExits = exits.toArray( new MetadataGraphEdge[0] );
-                Arrays.sort( sortedExits, ( e1, e2 ) ->
-                {
+                Arrays.sort( sortedExits, ( e1, e2 ) -> {
                     if ( e1.getDepth() == e2.getDepth() )
                     {
                         if ( e2.getPomOrder() == e1.getPomOrder() )
@@ -162,12 +159,9 @@ public class DefaultClasspathTransformation
             }
 
         }
-        //-----------------------------------------------------------------------
-        //-----------------------------------------------------------------------
+        // -----------------------------------------------------------------------
+        // -----------------------------------------------------------------------
     }
-    //----------------------------------------------------------------------------------------------------
-    //----------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------
 }
-
-
-

@@ -1,5 +1,3 @@
-package org.apache.maven.model.management;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.management;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.management;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;

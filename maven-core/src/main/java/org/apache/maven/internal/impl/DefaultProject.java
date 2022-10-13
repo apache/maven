@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,13 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.Scope;
-import org.apache.maven.api.Type;
-import org.apache.maven.api.VersionRange;
-import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
+package org.apache.maven.internal.impl;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -38,16 +30,24 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.Project;
+import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.Scope;
+import org.apache.maven.api.Type;
+import org.apache.maven.api.VersionRange;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.project.MavenProject;
 
-public class DefaultProject implements Project
+public class DefaultProject
+    implements Project
 {
 
     private final AbstractSession session;
+
     private final MavenProject project;
 
     public DefaultProject( AbstractSession session, MavenProject project )

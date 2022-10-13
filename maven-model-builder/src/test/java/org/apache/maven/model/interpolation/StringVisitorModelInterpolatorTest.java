@@ -1,5 +1,3 @@
-package org.apache.maven.model.interpolation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,8 +16,10 @@ package org.apache.maven.model.interpolation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.interpolation;
 
-public class StringVisitorModelInterpolatorTest extends AbstractModelInterpolatorTest
+public class StringVisitorModelInterpolatorTest
+    extends AbstractModelInterpolatorTest
 {
     protected ModelInterpolator createInterpolator()
     {

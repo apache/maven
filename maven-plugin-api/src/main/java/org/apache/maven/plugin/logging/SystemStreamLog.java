@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.logging;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.logging;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.logging;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.logging;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -26,7 +25,6 @@ import java.io.StringWriter;
  * Logger with "standard" output and error output stream.
  *
  * @author jdcasey
- *
  * @deprecated Use SLF4J directly
  */
 @Deprecated
@@ -123,8 +121,8 @@ public class SystemStreamLog
 
         error.printStackTrace( pWriter );
 
-        System.err.println( "[error] " + content.toString()
-                            + System.lineSeparator() + System.lineSeparator() + sWriter.toString() );
+        System.err.println( "[error] " + content.toString() + System.lineSeparator() + System.lineSeparator()
+            + sWriter.toString() );
     }
 
     /**
@@ -195,7 +193,7 @@ public class SystemStreamLog
 
         error.printStackTrace( pWriter );
 
-        System.out.println( "[" + prefix + "] " + content.toString()
-                            + System.lineSeparator() + System.lineSeparator() + sWriter.toString() );
+        System.out.println( "[" + prefix + "] " + content.toString() + System.lineSeparator() + System.lineSeparator()
+            + sWriter.toString() );
     }
 }

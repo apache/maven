@@ -1,5 +1,3 @@
-package org.apache.maven.api.plugin.annotations;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.plugin.annotations;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.plugin.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -44,12 +43,14 @@ public @interface Component
 {
     /**
      * role of the component to inject.
+     * 
      * @return the role
      */
     Class<?> role() default Object.class;
 
     /**
      * hint of the component to inject.
+     * 
      * @return the hint
      */
     String hint() default "";

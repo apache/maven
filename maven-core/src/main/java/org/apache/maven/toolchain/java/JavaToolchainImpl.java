@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain.java;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.toolchain.java;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.toolchain.java;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain.java;
 
 import java.io.File;
 
@@ -39,7 +38,7 @@ class JavaToolchainImpl
 {
     private String javaHome;
 
-    public static final String KEY_JAVAHOME = "jdkHome"; //NOI18N
+    public static final String KEY_JAVAHOME = "jdkHome"; // NOI18N
 
     JavaToolchainImpl( ToolchainModel model, Logger logger )
     {
@@ -73,7 +72,7 @@ class JavaToolchainImpl
 
     private static File findTool( String toolName, File installFolder )
     {
-        File bin = new File( installFolder, "bin" ); //NOI18N
+        File bin = new File( installFolder, "bin" ); // NOI18N
         if ( bin.exists() )
         {
             File tool = new File( bin, toolName + ( Os.isFamily( "windows" ) ? ".exe" : "" ) ); // NOI18N
@@ -83,5 +82,5 @@ class JavaToolchainImpl
             }
         }
         return null;
-   }
+    }
 }

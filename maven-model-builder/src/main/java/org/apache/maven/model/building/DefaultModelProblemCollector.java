@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -173,9 +172,8 @@ class DefaultModelProblemCollector
             column = e.getColumnNumber();
         }
 
-        ModelProblem problem =
-            new DefaultModelProblem( req.getMessage(), req.getSeverity(), req.getVersion(), source, line, column,
-                                     modelId, req.getException() );
+        ModelProblem problem = new DefaultModelProblem( req.getMessage(), req.getSeverity(), req.getVersion(), source,
+                                                        line, column, modelId, req.getException() );
 
         add( problem );
     }

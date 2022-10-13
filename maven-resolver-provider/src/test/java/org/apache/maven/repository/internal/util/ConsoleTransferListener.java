@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal.util;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal.util;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal.util;
 
 import java.io.PrintStream;
 import java.text.DecimalFormat;
@@ -55,7 +54,8 @@ public class ConsoleTransferListener
     {
         String message = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
 
-        println( "transferInitiated", message + ": " + event.getResource().getRepositoryUrl() + event.getResource().getResourceName() );
+        println( "transferInitiated",
+                 message + ": " + event.getResource().getRepositoryUrl() + event.getResource().getResourceName() );
     }
 
     @Override
@@ -144,7 +144,7 @@ public class ConsoleTransferListener
     {
         transferCompleted( event );
 
-        println( "transferFailed", event.getException().getClass() + ": " + event.getException().getMessage()  );
+        println( "transferFailed", event.getException().getClass() + ": " + event.getException().getMessage() );
     }
 
     private void transferCompleted( TransferEvent event )

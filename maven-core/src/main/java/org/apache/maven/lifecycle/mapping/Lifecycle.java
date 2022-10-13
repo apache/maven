@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.mapping;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.mapping;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.lifecycle.mapping;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.mapping;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -89,7 +88,7 @@ public class Lifecycle
         }
 
         Map<String, String> phases = new LinkedHashMap<>();
-        for ( Map.Entry<String, LifecyclePhase> e: lphases.entrySet() )
+        for ( Map.Entry<String, LifecyclePhase> e : lphases.entrySet() )
         {
             phases.put( e.getKey(), e.getValue().toString() );
         }
@@ -100,7 +99,7 @@ public class Lifecycle
     public void setPhases( Map<String, String> phases )
     {
         Map<String, LifecyclePhase> lphases = new LinkedHashMap<>();
-        for ( Map.Entry<String, String> e: phases.entrySet() )
+        for ( Map.Entry<String, String> e : phases.entrySet() )
         {
             lphases.put( e.getKey(), new LifecyclePhase( e.getValue() ) );
         }

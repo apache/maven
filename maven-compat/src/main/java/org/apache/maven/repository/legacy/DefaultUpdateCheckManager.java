@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.legacy;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,16 +16,7 @@ package org.apache.maven.repository.legacy;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.Authentication;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
-import org.apache.maven.repository.Proxy;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
+package org.apache.maven.repository.legacy;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,6 +27,16 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.Date;
 import java.util.Properties;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.Authentication;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
+import org.apache.maven.repository.Proxy;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 
 /**
  * DefaultUpdateCheckManager
@@ -74,9 +73,8 @@ public class DefaultUpdateCheckManager
         {
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug(
-                    "Skipping update check for " + artifact + " (" + file + ") from " + repository.getId() + " ("
-                        + repository.getUrl() + ")" );
+                getLogger().debug( "Skipping update check for " + artifact + " (" + file + ") from "
+                    + repository.getId() + " (" + repository.getUrl() + ")" );
             }
 
             return false;
@@ -84,9 +82,8 @@ public class DefaultUpdateCheckManager
 
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug(
-                "Determining update check for " + artifact + " (" + file + ") from " + repository.getId() + " ("
-                    + repository.getUrl() + ")" );
+            getLogger().debug( "Determining update check for " + artifact + " (" + file + ") from " + repository.getId()
+                + " (" + repository.getUrl() + ")" );
         }
 
         if ( file == null )
@@ -124,9 +121,8 @@ public class DefaultUpdateCheckManager
         {
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug(
-                    "Skipping update check for " + metadata.getKey() + " (" + file + ") from " + repository.getId()
-                        + " (" + repository.getUrl() + ")" );
+                getLogger().debug( "Skipping update check for " + metadata.getKey() + " (" + file + ") from "
+                    + repository.getId() + " (" + repository.getUrl() + ")" );
             }
 
             return false;
@@ -134,9 +130,8 @@ public class DefaultUpdateCheckManager
 
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug(
-                "Determining update check for " + metadata.getKey() + " (" + file + ") from " + repository.getId()
-                    + " (" + repository.getUrl() + ")" );
+            getLogger().debug( "Determining update check for " + metadata.getKey() + " (" + file + ") from "
+                + repository.getId() + " (" + repository.getUrl() + ")" );
         }
 
         if ( file == null )
@@ -231,7 +226,7 @@ public class DefaultUpdateCheckManager
             if ( !touchfile.getParentFile().exists() && !touchfile.getParentFile().mkdirs() )
             {
                 getLogger().debug( "Failed to create directory: " + touchfile.getParent()
-                                       + " for tracking artifact metadata resolution." );
+                    + " for tracking artifact metadata resolution." );
                 return;
             }
 
@@ -273,9 +268,8 @@ public class DefaultUpdateCheckManager
             }
             catch ( IOException e )
             {
-                getLogger().debug(
-                    "Failed to record lastUpdated information for resolution.\nFile: " + touchfile.toString()
-                        + "; key: " + key, e );
+                getLogger().debug( "Failed to record lastUpdated information for resolution.\nFile: "
+                    + touchfile.toString() + "; key: " + key, e );
             }
             finally
             {

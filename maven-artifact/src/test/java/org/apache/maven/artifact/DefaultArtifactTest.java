@@ -1,5 +1,3 @@
-package org.apache.maven.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact;
 
 import org.apache.maven.artifact.handler.ArtifactHandlerMock;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -35,13 +34,15 @@ public class DefaultArtifactTest
 
     private DefaultArtifact snapshotArtifact;
 
-    private String groupId = "groupid", artifactId = "artifactId", version = "1.0", scope = "artifactScope", type = "type",
-        classifier = "classifier";
+    private String groupId = "groupid", artifactId = "artifactId", version = "1.0", scope = "artifactScope",
+                    type = "type", classifier = "classifier";
 
     private String snapshotSpecVersion = "1.0-SNAPSHOT";
+
     private String snapshotResolvedVersion = "1.0-20070606.010101-1";
 
     private VersionRange versionRange;
+
     private VersionRange snapshotVersionRange;
 
     private ArtifactHandlerMock artifactHandler;
@@ -55,7 +56,8 @@ public class DefaultArtifactTest
         artifact = new DefaultArtifact( groupId, artifactId, versionRange, scope, type, classifier, artifactHandler );
 
         snapshotVersionRange = VersionRange.createFromVersion( snapshotResolvedVersion );
-        snapshotArtifact = new DefaultArtifact( groupId, artifactId, snapshotVersionRange, scope, type, classifier, artifactHandler );
+        snapshotArtifact =
+            new DefaultArtifact( groupId, artifactId, snapshotVersionRange, scope, type, classifier, artifactHandler );
     }
 
     @Test
@@ -64,7 +66,7 @@ public class DefaultArtifactTest
         assertEquals( snapshotResolvedVersion, snapshotArtifact.getVersion() );
 
         // this is FOUL!
-//        snapshotArtifact.isSnapshot();
+        // snapshotArtifact.isSnapshot();
 
         assertEquals( snapshotSpecVersion, snapshotArtifact.getBaseVersion() );
     }
@@ -136,7 +138,7 @@ public class DefaultArtifactTest
         assertTrue( artifact2.compareTo( artifact1 ) > 0 );
 
         Artifact artifact = new DefaultArtifact( groupId, artifactId, VersionRange.createFromVersion( "5.0" ), scope,
-                                                  type, classifier, artifactHandler );
+                                                 type, classifier, artifactHandler );
         assertTrue( artifact.compareTo( artifact1 ) == 0 );
         assertTrue( artifact1.compareTo( artifact ) == 0 );
     }

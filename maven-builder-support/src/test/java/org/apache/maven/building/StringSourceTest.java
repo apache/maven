@@ -1,5 +1,3 @@
-package org.apache.maven.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.building;
 
 import java.io.InputStream;
 import java.util.Scanner;
@@ -34,8 +33,7 @@ public class StringSourceTest
     {
         StringSource source = new StringSource( "Hello World!" );
 
-        try ( InputStream is = source.getInputStream();
-              Scanner scanner = new Scanner( is ) )
+        try ( InputStream is = source.getInputStream(); Scanner scanner = new Scanner( is ) )
         {
             assertEquals( "Hello World!", scanner.nextLine() );
         }

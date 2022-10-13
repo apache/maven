@@ -1,5 +1,3 @@
-package org.apache.maven.profiles;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.profiles;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,13 @@ package org.apache.maven.profiles;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.profiles;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
@@ -30,12 +35,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 /**
  * DefaultProfileManager
@@ -71,9 +70,8 @@ public class DefaultProfileManager
     }
 
     /**
-     * the properties passed to the profile manager are the props that
-     * are passed to maven, possibly containing profile activator properties
-     *
+     * the properties passed to the profile manager are the props that are passed to maven, possibly containing profile
+     * activator properties
      */
     public DefaultProfileManager( PlexusContainer container, Properties props )
     {
@@ -99,9 +97,10 @@ public class DefaultProfileManager
         return profilesById;
     }
 
-    /* (non-Javadoc)
-    * @see org.apache.maven.profiles.ProfileManager#addProfile(org.apache.maven.model.Profile)
-    */
+    /*
+     * (non-Javadoc)
+     * @see org.apache.maven.profiles.ProfileManager#addProfile(org.apache.maven.model.Profile)
+     */
     public void addProfile( Profile profile )
     {
         String profileId = profile.getId();
@@ -123,9 +122,10 @@ public class DefaultProfileManager
         }
     }
 
-    /* (non-Javadoc)
-    * @see org.apache.maven.profiles.ProfileManager#explicitlyActivate(java.lang.String)
-    */
+    /*
+     * (non-Javadoc)
+     * @see org.apache.maven.profiles.ProfileManager#explicitlyActivate(java.lang.String)
+     */
     public void explicitlyActivate( String profileId )
     {
         if ( !activatedIds.contains( profileId ) )
@@ -136,9 +136,10 @@ public class DefaultProfileManager
         }
     }
 
-    /* (non-Javadoc)
-    * @see org.apache.maven.profiles.ProfileManager#explicitlyActivate(java.util.List)
-    */
+    /*
+     * (non-Javadoc)
+     * @see org.apache.maven.profiles.ProfileManager#explicitlyActivate(java.util.List)
+     */
     public void explicitlyActivate( List<String> profileIds )
     {
         for ( String profileId1 : profileIds )
@@ -147,9 +148,10 @@ public class DefaultProfileManager
         }
     }
 
-    /* (non-Javadoc)
-    * @see org.apache.maven.profiles.ProfileManager#explicitlyDeactivate(java.lang.String)
-    */
+    /*
+     * (non-Javadoc)
+     * @see org.apache.maven.profiles.ProfileManager#explicitlyDeactivate(java.lang.String)
+     */
     public void explicitlyDeactivate( String profileId )
     {
         if ( !deactivatedIds.contains( profileId ) )
@@ -160,9 +162,10 @@ public class DefaultProfileManager
         }
     }
 
-    /* (non-Javadoc)
-    * @see org.apache.maven.profiles.ProfileManager#explicitlyDeactivate(java.util.List)
-    */
+    /*
+     * (non-Javadoc)
+     * @see org.apache.maven.profiles.ProfileManager#explicitlyDeactivate(java.util.List)
+     */
     public void explicitlyDeactivate( List<String> profileIds )
     {
         for ( String profileId1 : profileIds )
@@ -171,9 +174,10 @@ public class DefaultProfileManager
         }
     }
 
-    /* (non-Javadoc)
-    * @see org.apache.maven.profiles.ProfileManager#getActiveProfiles()
-    */
+    /*
+     * (non-Javadoc)
+     * @see org.apache.maven.profiles.ProfileManager#getActiveProfiles()
+     */
     public List getActiveProfiles()
         throws ProfileActivationException
     {
@@ -185,8 +189,7 @@ public class DefaultProfileManager
 
         final List<ProfileActivationException> errors = new ArrayList<>();
 
-        List<Profile> profiles = profileSelector.getActiveProfiles( profilesById.values(), context, req ->
-        {
+        List<Profile> profiles = profileSelector.getActiveProfiles( profilesById.values(), context, req -> {
             if ( !ModelProblem.Severity.WARNING.equals( req.getSeverity() ) )
             {
                 errors.add( new ProfileActivationException( req.getMessage(), req.getException() ) );
@@ -201,7 +204,8 @@ public class DefaultProfileManager
         return profiles;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see org.apache.maven.profiles.ProfileManager#addProfiles(java.util.List)
      */
     public void addProfiles( List<Profile> profiles )
@@ -225,7 +229,7 @@ public class DefaultProfileManager
         return activatedIds;
     }
 
-    public List<String>  getExplicitlyDeactivatedIds()
+    public List<String> getExplicitlyDeactivatedIds()
     {
         return deactivatedIds;
     }

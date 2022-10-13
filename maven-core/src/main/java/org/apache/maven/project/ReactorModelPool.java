@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -54,13 +53,11 @@ class ReactorModelPool
      */
     public Model get( String groupId, String artifactId, String version )
     {
-        return modelsByGa.getOrDefault( new GAKey( groupId, artifactId ), Collections.emptySet() ).stream()
-                        .filter( m -> version == null || version.equals( getVersion( m ) ) )
-                        .reduce( ( a, b ) ->
-                        {
-                            throw new IllegalStateException( "Multiple modules with key "
-                                + a.getGroupId() + ':' + a.getArtifactId() );
-                        } ).orElse( null );
+        return modelsByGa.getOrDefault( new GAKey( groupId, artifactId ),
+                                        Collections.emptySet() ).stream().filter( m -> version == null || version.equals( getVersion( m ) ) ).reduce( ( a, b ) -> {
+                                            throw new IllegalStateException( "Multiple modules with key "
+                                                + a.getGroupId() + ':' + a.getArtifactId() );
+                                        } ).orElse( null );
     }
 
     /**

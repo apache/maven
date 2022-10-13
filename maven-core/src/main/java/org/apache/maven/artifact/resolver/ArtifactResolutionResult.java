@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.resolver;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,18 +31,17 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 /**
  * Specific problems during resolution that we want to account for:
  * <ul>
- *   <li>missing metadata</li>
- *   <li>version range violations</li>
- *   <li>version circular dependencies</li>
- *   <li>missing artifacts</li>
- *   <li>network/transfer errors</li>
- *   <li>file system errors: permissions</li>
+ * <li>missing metadata</li>
+ * <li>version range violations</li>
+ * <li>version circular dependencies</li>
+ * <li>missing artifacts</li>
+ * <li>network/transfer errors</li>
+ * <li>file system errors: permissions</li>
  * </ul>
  *
- * @author Jason van Zyl
- * TODO carlos: all these possible has*Exceptions and get*Exceptions methods make the clients too
- *       complex requiring a long list of checks, need to create a parent/interface/encapsulation
- *       for the types of exceptions
+ * @author Jason van Zyl TODO carlos: all these possible has*Exceptions and get*Exceptions methods make the clients too
+ *         complex requiring a long list of checks, need to create a parent/interface/encapsulation for the types of
+ *         exceptions
  */
 public class ArtifactResolutionResult
 {
@@ -132,9 +130,7 @@ public class ArtifactResolutionResult
 
     public List<Artifact> getMissingArtifacts()
     {
-        return missingArtifacts == null
-                   ? Collections.emptyList()
-                   : Collections.unmodifiableList( missingArtifacts );
+        return missingArtifacts == null ? Collections.emptyList() : Collections.unmodifiableList( missingArtifacts );
 
     }
 
@@ -170,9 +166,7 @@ public class ArtifactResolutionResult
 
     public List<Exception> getExceptions()
     {
-        return exceptions == null
-                   ? Collections.emptyList()
-                   : Collections.unmodifiableList( exceptions );
+        return exceptions == null ? Collections.emptyList() : Collections.unmodifiableList( exceptions );
 
     }
 
@@ -187,8 +181,7 @@ public class ArtifactResolutionResult
 
     /**
      * TODO this needs to accept a {@link OverConstrainedVersionException} as returned by
-     *       {@link #getVersionRangeViolation(int)} but it's not used like that in
-     *       DefaultLegacyArtifactCollector
+     * {@link #getVersionRangeViolation(int)} but it's not used like that in DefaultLegacyArtifactCollector
      *
      * @param e an exception
      * @return {@code this}
@@ -213,9 +206,8 @@ public class ArtifactResolutionResult
 
     public List<Exception> getVersionRangeViolations()
     {
-        return versionRangeViolations == null
-                   ? Collections.emptyList()
-                   : Collections.unmodifiableList( versionRangeViolations );
+        return versionRangeViolations == null ? Collections.emptyList()
+                        : Collections.unmodifiableList( versionRangeViolations );
 
     }
 
@@ -248,9 +240,8 @@ public class ArtifactResolutionResult
 
     public List<ArtifactResolutionException> getMetadataResolutionExceptions()
     {
-        return metadataResolutionExceptions == null
-                   ? Collections.emptyList()
-                   : Collections.unmodifiableList( metadataResolutionExceptions );
+        return metadataResolutionExceptions == null ? Collections.emptyList()
+                        : Collections.unmodifiableList( metadataResolutionExceptions );
 
     }
 

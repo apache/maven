@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,23 +16,26 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
-import org.apache.maven.api.annotations.Nonnull;
 import javax.inject.Inject;
 
 import java.nio.file.Path;
 
 import org.apache.maven.api.LocalRepository;
+import org.apache.maven.api.annotations.Nonnull;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
-public class DefaultLocalRepository implements LocalRepository
+public class DefaultLocalRepository
+    implements LocalRepository
 {
 
     private final @Nonnull org.eclipse.aether.repository.LocalRepository repository;
 
     @Inject
-    public DefaultLocalRepository( @Nonnull org.eclipse.aether.repository.LocalRepository repository )
+    public DefaultLocalRepository( @Nonnull
+    org.eclipse.aether.repository.LocalRepository repository )
     {
         this.repository = nonNull( repository, "repository can not be null" );
     }

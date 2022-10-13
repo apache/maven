@@ -1,5 +1,3 @@
-package org.apache.maven.project.collector;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,13 @@ package org.apache.maven.project.collector;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.collector;
+
+import java.util.List;
 
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
-
-import java.util.List;
 
 /**
  * Describes strategies for finding projects that Maven could build.
@@ -31,11 +30,10 @@ import java.util.List;
 public interface ProjectCollectionStrategy
 {
     /**
-     *
      * @param request
      * @return
      * @throws ProjectBuildingException
      */
     List<MavenProject> collectProjects( MavenExecutionRequest request )
-            throws ProjectBuildingException;
+        throws ProjectBuildingException;
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.project.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,11 @@ package org.apache.maven.project.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.artifact;
+
+import java.io.File;
+import java.util.Collection;
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -29,17 +32,13 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.project.MavenProject;
 
-import java.io.File;
-import java.util.Collection;
-import java.util.List;
-
 /**
  * Wraps an active project instance to be able to receive updates from its artifact without affecting the original
  * attributes of this artifact.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * TODO I think this exposes a design flaw in that the immutable and mutable parts of an artifact are in one class and
- * should be split. ie scope, file, etc depend on the context of use, whereas everything else is immutable.
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a> TODO I think this exposes a design flaw in that the
+ *         immutable and mutable parts of an artifact are in one class and should be split. ie scope, file, etc depend
+ *         on the context of use, whereas everything else is immutable.
  */
 @Deprecated
 public class ActiveProjectArtifact

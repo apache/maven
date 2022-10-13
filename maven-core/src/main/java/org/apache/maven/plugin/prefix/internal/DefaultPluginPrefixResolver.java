@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.prefix.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,17 @@ package org.apache.maven.plugin.prefix.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.prefix.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.MetadataReader;
@@ -69,15 +68,16 @@ public class DefaultPluginPrefixResolver
     private static final String REPOSITORY_CONTEXT = "plugin";
 
     private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     private final BuildPluginManager pluginManager;
+
     private final RepositorySystem repositorySystem;
+
     private final MetadataReader metadataReader;
 
     @Inject
-    public DefaultPluginPrefixResolver(
-            BuildPluginManager pluginManager,
-            RepositorySystem repositorySystem,
-            MetadataReader metadataReader )
+    public DefaultPluginPrefixResolver( BuildPluginManager pluginManager, RepositorySystem repositorySystem,
+                                        MetadataReader metadataReader )
     {
         this.pluginManager = pluginManager;
         this.repositorySystem = repositorySystem;
@@ -248,8 +248,7 @@ public class DefaultPluginPrefixResolver
     }
 
     private PluginPrefixResult resolveFromRepository( PluginPrefixRequest request, RequestTrace trace,
-                                                      String pluginGroup,
-                                                      org.eclipse.aether.metadata.Metadata metadata,
+                                                      String pluginGroup, org.eclipse.aether.metadata.Metadata metadata,
                                                       ArtifactRepository repository )
     {
         if ( metadata != null && metadata.getFile() != null && metadata.getFile().isFile() )

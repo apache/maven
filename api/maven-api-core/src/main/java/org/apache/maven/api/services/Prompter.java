@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import java.util.List;
 
@@ -30,7 +29,8 @@ import org.apache.maven.api.annotations.Experimental;
  * @since 4.0
  */
 @Experimental
-public interface Prompter extends Service
+public interface Prompter
+    extends Service
 {
     /**
      * Prompts the user for a string.
@@ -40,7 +40,7 @@ public interface Prompter extends Service
      * @throws PrompterException if an exception occurs
      */
     default String prompt( String message )
-            throws PrompterException
+        throws PrompterException
     {
         return prompt( message, null, null );
     }
@@ -54,7 +54,7 @@ public interface Prompter extends Service
      * @throws PrompterException if an exception occurs
      */
     default String prompt( String message, String defaultReply )
-            throws PrompterException
+        throws PrompterException
     {
         return prompt( message, null, defaultReply );
     }
@@ -68,7 +68,7 @@ public interface Prompter extends Service
      * @throws PrompterException if an exception occurs
      */
     default String prompt( String message, List<String> possibleValues )
-            throws PrompterException
+        throws PrompterException
     {
         return prompt( message, possibleValues, null );
     }
@@ -83,7 +83,7 @@ public interface Prompter extends Service
      * @throws PrompterException if an exception occurs
      */
     String prompt( String message, List<String> possibleValues, String defaultReply )
-            throws PrompterException;
+        throws PrompterException;
 
     /**
      * Prompts the user for a password.
@@ -93,7 +93,7 @@ public interface Prompter extends Service
      * @throws PrompterException if an exception occurs
      */
     String promptForPassword( String message )
-            throws PrompterException;
+        throws PrompterException;
 
     /**
      * Displays a message to the user.
@@ -102,5 +102,5 @@ public interface Prompter extends Service
      * @throws PrompterException if an exception occurs
      */
     void showMessage( String message )
-            throws PrompterException;
+        throws PrompterException;
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,11 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.project.MavenProject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.apache.maven.execution;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -35,22 +30,31 @@ import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This implementation of {@link BuildResumptionDataRepository} persists information in a properties file. The file is
  * stored in the build output directory under the Maven execution root.
  */
 @Named
 @Singleton
-public class DefaultBuildResumptionDataRepository implements BuildResumptionDataRepository
+public class DefaultBuildResumptionDataRepository
+    implements BuildResumptionDataRepository
 {
     private static final String RESUME_PROPERTIES_FILENAME = "resume.properties";
+
     private static final String REMAINING_PROJECTS = "remainingProjects";
+
     private static final String PROPERTY_DELIMITER = ", ";
+
     private static final Logger LOGGER = LoggerFactory.getLogger( DefaultBuildResumptionDataRepository.class );
 
     @Override
     public void persistResumptionData( MavenProject rootProject, BuildResumptionData buildResumptionData )
-            throws BuildResumptionPersistenceException
+        throws BuildResumptionPersistenceException
     {
         Properties properties = convertToProperties( buildResumptionData );
 
@@ -126,13 +130,10 @@ public class DefaultBuildResumptionDataRepository implements BuildResumptionData
     // This method is made package-private for testing purposes
     void applyResumptionProperties( MavenExecutionRequest request, Properties properties )
     {
-        if ( properties.containsKey( REMAINING_PROJECTS )
-                && StringUtils.isEmpty( request.getResumeFrom() ) )
+        if ( properties.containsKey( REMAINING_PROJECTS ) && StringUtils.isEmpty( request.getResumeFrom() ) )
         {
             String propertyValue = properties.getProperty( REMAINING_PROJECTS );
-            Stream.of( propertyValue.split( PROPERTY_DELIMITER ) )
-                    .filter( StringUtils::isNotEmpty )
-                    .forEach( request.getProjectActivation()::activateOptionalProject );
+            Stream.of( propertyValue.split( PROPERTY_DELIMITER ) ).filter( StringUtils::isNotEmpty ).forEach( request.getProjectActivation()::activateOptionalProject );
             LOGGER.info( "Resuming from {} due to the --resume / -r feature.", propertyValue );
         }
     }

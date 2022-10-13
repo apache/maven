@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -40,32 +39,101 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
  * Recognized values are:
  * <table border="1">
  * <caption>Expression matrix</caption>
- * <tr><th>expression</th>                     <th></th>               <th>evaluation result</th></tr>
- * <tr><td><code>session</code></td>           <td></td>               <td>the actual {@link Session}</td></tr>
- * <tr><td><code>session.*</code></td>         <td>(since Maven 3)</td><td></td></tr>
- * <tr><td><code>localRepository</code></td>   <td></td>
- *                                             <td>{@link Session#getLocalRepository()}</td></tr>
- * <tr><td><code>reactorProjects</code></td>   <td></td>               <td>{@link Session#getProjects()}</td></tr>
- * <tr><td><code>project</code></td>           <td></td>
- *                                             <td>{@link Session#getCurrentProject()}</td></tr>
- * <tr><td><code>project.*</code></td>         <td></td>               <td></td></tr>
- * <tr><td><code>pom.*</code></td>             <td>(since Maven 3)</td><td>same as <code>project.*</code></td></tr>
- * <tr><td><code>executedProject</code></td>   <td></td>
- *                                             <td>{@link MavenProject#getExecutionProject()}</td></tr>
- * <tr><td><code>settings</code></td>          <td></td>               <td>{@link Session#getSettings()}</td></tr>
- * <tr><td><code>settings.*</code></td>        <td></td>               <td></td></tr>
- * <tr><td><code>basedir</code></td>           <td></td>
- *                                             <td>{@link Session#getExecutionRootDirectory()} or
- *                                                 <code>System.getProperty( "user.dir" )</code> if null</td></tr>
- * <tr><td><code>mojoExecution</code></td>     <td></td>               <td>the actual {@link MojoExecution}</td></tr>
- * <tr><td><code>mojo</code></td>              <td>(since Maven 3)</td><td>same as <code>mojoExecution</code></td></tr>
- * <tr><td><code>mojo.*</code></td>            <td>(since Maven 3)</td><td></td></tr>
- * <tr><td><code>plugin</code></td>            <td>(since Maven 3)</td>
- *                             <td>{@link MojoExecution#getMojoDescriptor()}.{@link MojoDescriptor#getPluginDescriptor()
- *                                 getPluginDescriptor()}</td></tr>
- * <tr><td><code>plugin.*</code></td>          <td></td>               <td></td></tr>
- * <tr><td><code>*</code></td>                 <td></td>               <td>system properties</td></tr>
- * <tr><td><code>*</code></td>                 <td></td>               <td>project properties</td></tr>
+ * <tr>
+ * <th>expression</th>
+ * <th></th>
+ * <th>evaluation result</th>
+ * </tr>
+ * <tr>
+ * <td><code>session</code></td>
+ * <td></td>
+ * <td>the actual {@link Session}</td>
+ * </tr>
+ * <tr>
+ * <td><code>session.*</code></td>
+ * <td>(since Maven 3)</td>
+ * <td></td>
+ * </tr>
+ * <tr>
+ * <td><code>localRepository</code></td>
+ * <td></td>
+ * <td>{@link Session#getLocalRepository()}</td>
+ * </tr>
+ * <tr>
+ * <td><code>reactorProjects</code></td>
+ * <td></td>
+ * <td>{@link Session#getProjects()}</td>
+ * </tr>
+ * <tr>
+ * <td><code>project</code></td>
+ * <td></td>
+ * <td>{@link Session#getCurrentProject()}</td>
+ * </tr>
+ * <tr>
+ * <td><code>project.*</code></td>
+ * <td></td>
+ * <td></td>
+ * </tr>
+ * <tr>
+ * <td><code>pom.*</code></td>
+ * <td>(since Maven 3)</td>
+ * <td>same as <code>project.*</code></td>
+ * </tr>
+ * <tr>
+ * <td><code>executedProject</code></td>
+ * <td></td>
+ * <td>{@link MavenProject#getExecutionProject()}</td>
+ * </tr>
+ * <tr>
+ * <td><code>settings</code></td>
+ * <td></td>
+ * <td>{@link Session#getSettings()}</td>
+ * </tr>
+ * <tr>
+ * <td><code>settings.*</code></td>
+ * <td></td>
+ * <td></td>
+ * </tr>
+ * <tr>
+ * <td><code>basedir</code></td>
+ * <td></td>
+ * <td>{@link Session#getExecutionRootDirectory()} or <code>System.getProperty( "user.dir" )</code> if null</td>
+ * </tr>
+ * <tr>
+ * <td><code>mojoExecution</code></td>
+ * <td></td>
+ * <td>the actual {@link MojoExecution}</td>
+ * </tr>
+ * <tr>
+ * <td><code>mojo</code></td>
+ * <td>(since Maven 3)</td>
+ * <td>same as <code>mojoExecution</code></td>
+ * </tr>
+ * <tr>
+ * <td><code>mojo.*</code></td>
+ * <td>(since Maven 3)</td>
+ * <td></td>
+ * </tr>
+ * <tr>
+ * <td><code>plugin</code></td>
+ * <td>(since Maven 3)</td>
+ * <td>{@link MojoExecution#getMojoDescriptor()}.{@link MojoDescriptor#getPluginDescriptor() getPluginDescriptor()}</td>
+ * </tr>
+ * <tr>
+ * <td><code>plugin.*</code></td>
+ * <td></td>
+ * <td></td>
+ * </tr>
+ * <tr>
+ * <td><code>*</code></td>
+ * <td></td>
+ * <td>system properties</td>
+ * </tr>
+ * <tr>
+ * <td><code>*</code></td>
+ * <td></td>
+ * <td>project properties</td>
+ * </tr>
  * </table>
  * <i>Notice:</i> <code>reports</code> was supported in Maven 2.x but was removed in Maven 3
  *
@@ -239,8 +307,8 @@ public class PluginParameterExpressionEvaluatorV4
         }
         else if ( "executedProject".equals( expression ) )
         {
-            value = ( (DefaultSession) session ).getProject(
-                    ( (DefaultSession) session ).getMavenSession().getCurrentProject().getExecutionProject() );
+            value =
+                ( (DefaultSession) session ).getProject( ( (DefaultSession) session ).getMavenSession().getCurrentProject().getExecutionProject() );
         }
         else if ( expression.startsWith( "project" ) || expression.startsWith( "pom" ) )
         {
@@ -439,7 +507,7 @@ public class PluginParameterExpressionEvaluatorV4
         }
         // likely Boolean -> boolean, Short -> int etc. conversions, it's not the problem case we try to avoid
         return ( ( type.isPrimitive() || type.getName().startsWith( "java.lang." ) )
-                        && value.getClass().getName().startsWith( "java.lang." ) );
+            && value.getClass().getName().startsWith( "java.lang." ) );
     }
 
     private String stripTokens( String expr )

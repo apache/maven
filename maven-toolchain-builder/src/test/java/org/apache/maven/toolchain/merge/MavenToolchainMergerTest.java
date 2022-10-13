@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain.merge;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.toolchain.merge;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,15 +16,15 @@ package org.apache.maven.toolchain.merge;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.api.xml.Dom;
-import org.apache.maven.api.toolchain.PersistedToolchains;
-import org.apache.maven.api.toolchain.ToolchainModel;
-import org.apache.maven.api.toolchain.TrackableBase;
-import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Reader;
-import org.junit.jupiter.api.Test;
+package org.apache.maven.toolchain.merge;
 
 import java.io.InputStream;
+
+import org.apache.maven.api.toolchain.PersistedToolchains;
+import org.apache.maven.api.toolchain.TrackableBase;
+import org.apache.maven.api.xml.Dom;
+import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Reader;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -51,7 +49,7 @@ public class MavenToolchainMergerTest
         throws Exception
     {
         try ( InputStream isDominant = getClass().getResourceAsStream( "toolchains-jdks.xml" );
-              InputStream isRecessive = getClass().getResourceAsStream( "toolchains-jdks.xml" ) )
+                        InputStream isRecessive = getClass().getResourceAsStream( "toolchains-jdks.xml" ) )
         {
             PersistedToolchains dominant = reader.read( isDominant );
             PersistedToolchains recessive = reader.read( isRecessive );
@@ -67,7 +65,7 @@ public class MavenToolchainMergerTest
         throws Exception
     {
         try ( InputStream jdksIS = getClass().getResourceAsStream( "toolchains-jdks.xml" );
-              InputStream jdksExtraIS = getClass().getResourceAsStream( "toolchains-jdks-extra.xml" ) )
+                        InputStream jdksExtraIS = getClass().getResourceAsStream( "toolchains-jdks-extra.xml" ) )
         {
             PersistedToolchains jdks = reader.read( jdksIS );
             PersistedToolchains jdksExtra = reader.read( jdksExtraIS );
@@ -80,7 +78,7 @@ public class MavenToolchainMergerTest
             assertEquals( 2, jdksExtra.getToolchains().size() );
         }
         try ( InputStream jdksIS = getClass().getResourceAsStream( "toolchains-jdks.xml" );
-              InputStream jdksExtraIS = getClass().getResourceAsStream( "toolchains-jdks-extra.xml" ) )
+                        InputStream jdksExtraIS = getClass().getResourceAsStream( "toolchains-jdks-extra.xml" ) )
         {
             PersistedToolchains jdks = reader.read( jdksIS );
             PersistedToolchains jdksExtra = reader.read( jdksExtraIS );
@@ -88,7 +86,7 @@ public class MavenToolchainMergerTest
             assertEquals( 2, jdksExtra.getToolchains().size() );
 
             // switch dominant with recessive
-            PersistedToolchains merged =  merger.merge( jdksExtra, jdks, TrackableBase.USER_LEVEL );
+            PersistedToolchains merged = merger.merge( jdksExtra, jdks, TrackableBase.USER_LEVEL );
             assertEquals( 4, merged.getToolchains().size() );
             assertEquals( 2, jdks.getToolchains().size() );
             assertEquals( 2, jdksExtra.getToolchains().size() );
@@ -100,7 +98,7 @@ public class MavenToolchainMergerTest
         throws Exception
     {
         try ( InputStream jdksIS = getClass().getResourceAsStream( "toolchains-jdks.xml" );
-              InputStream jdksExtendIS = getClass().getResourceAsStream( "toolchains-jdks-extend.xml" ) )
+                        InputStream jdksExtendIS = getClass().getResourceAsStream( "toolchains-jdks-extend.xml" ) )
         {
             PersistedToolchains jdks = reader.read( jdksIS );
             PersistedToolchains jdksExtend = reader.read( jdksExtendIS );
@@ -118,7 +116,7 @@ public class MavenToolchainMergerTest
             assertEquals( 2, jdksExtend.getToolchains().size() );
         }
         try ( InputStream jdksIS = getClass().getResourceAsStream( "toolchains-jdks.xml" );
-              InputStream jdksExtendIS = getClass().getResourceAsStream( "toolchains-jdks-extend.xml" ) )
+                        InputStream jdksExtendIS = getClass().getResourceAsStream( "toolchains-jdks-extend.xml" ) )
         {
             PersistedToolchains jdks = reader.read( jdksIS );
             PersistedToolchains jdksExtend = reader.read( jdksExtendIS );

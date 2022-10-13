@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile.activation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,13 @@ package org.apache.maven.model.profile.activation;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.io.File;
+package org.apache.maven.model.profile.activation;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.io.File;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
@@ -38,10 +37,9 @@ import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
- * Determines profile activation based on the existence/absence of some file.
- * File name interpolation support is limited to <code>${basedir}</code> (since Maven 3,
- * see <a href="https://issues.apache.org/jira/browse/MNG-2363">MNG-2363</a>),
- * System properties and request properties.
+ * Determines profile activation based on the existence/absence of some file. File name interpolation support is limited
+ * to <code>${basedir}</code> (since Maven 3, see
+ * <a href="https://issues.apache.org/jira/browse/MNG-2363">MNG-2363</a>), System properties and request properties.
  * <code>${project.basedir}</code> is intentionally not supported as this form would suggest that other
  * <code>${project.*}</code> expressions can be used, which is however beyond the design.
  *
@@ -104,11 +102,8 @@ public class FileProfileActivator
         }
         catch ( InterpolationException e )
         {
-            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Failed to interpolate file location " + path + " for profile " + profile.getId()
-                            + ": " + e.getMessage() )
-                    .setLocation( file.getLocation( missing ? "missing" : "exists" ) )
-                    .setException( e ) );
+            problems.add( new ModelProblemCollectorRequest( Severity.ERROR,
+                                                            Version.BASE ).setMessage( "Failed to interpolate file location " + path + " for profile " + profile.getId() + ": " + e.getMessage() ).setLocation( file.getLocation( missing ? "missing" : "exists" ) ).setException( e ) );
             return false;
         }
 

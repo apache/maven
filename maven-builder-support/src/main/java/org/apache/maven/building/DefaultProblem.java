@@ -1,5 +1,3 @@
-package org.apache.maven.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.building;
 
 /**
  * Describes a problem that was encountered during settings building. A problem can either be an exception that was
@@ -44,8 +43,8 @@ class DefaultProblem
     private final Severity severity;
 
     /**
-     * Creates a new problem with the specified message and exception.
-     * Either {@code message} or {@code exception} is required
+     * Creates a new problem with the specified message and exception. Either {@code message} or {@code exception} is
+     * required
      *
      * @param message The message describing the problem, may be {@code null}.
      * @param severity The severity level of the problem, may be {@code null} to default to
@@ -56,7 +55,7 @@ class DefaultProblem
      * @param exception The exception that caused this problem, may be {@code null}.
      */
     DefaultProblem( String message, Severity severity, String source, int lineNumber, int columnNumber,
-                                   Exception exception )
+                    Exception exception )
     {
         this.message = message;
         this.severity = ( severity != null ) ? severity : Severity.ERROR;
@@ -156,10 +155,9 @@ class DefaultProblem
         String location = getLocation();
         if ( !location.isEmpty() )
         {
-             buffer.append( " @ " );
-             buffer.append( location );
+            buffer.append( " @ " );
+            buffer.append( location );
         }
-
 
         return buffer.toString();
     }

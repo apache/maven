@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,9 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
+
+import javax.inject.Inject;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -54,8 +55,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import javax.inject.Inject;
-
 /**
  * @author Jason van Zyl
  */
@@ -79,8 +78,7 @@ public class PluginParameterExpressionEvaluatorTest
 
         System.out.println( "Result: " + result );
 
-        assertSame( exec.getMojoDescriptor().getPluginDescriptor(),
-                    result,
+        assertSame( exec.getMojoDescriptor().getPluginDescriptor(), result,
                     "${plugin} expression does not return plugin descriptor." );
     }
 
@@ -127,14 +125,14 @@ public class PluginParameterExpressionEvaluatorTest
 
         @SuppressWarnings( "unchecked" )
         Map<String, Artifact> depResults =
-            (Map<String, Artifact>) new PluginParameterExpressionEvaluator( session, exec ).evaluate( "${plugin.artifactMap}" );
+            (Map<String, Artifact>) new PluginParameterExpressionEvaluator( session,
+                                                                            exec ).evaluate( "${plugin.artifactMap}" );
 
         System.out.println( "Result: " + depResults );
 
         assertNotNull( depResults );
         assertEquals( 1, depResults.size() );
-        assertSame( depArtifact,
-                    depResults.get( ArtifactUtils.versionlessKey( depArtifact ) ),
+        assertSame( depArtifact, depResults.get( ArtifactUtils.versionlessKey( depArtifact ) ),
                     "dependency artifact is wrong." );
     }
 
@@ -150,8 +148,7 @@ public class PluginParameterExpressionEvaluatorTest
 
         System.out.println( "Result: " + result );
 
-        assertSame( exec.getMojoDescriptor().getPluginDescriptor().getArtifactId(),
-                    result,
+        assertSame( exec.getMojoDescriptor().getPluginDescriptor().getArtifactId(), result,
                     "${plugin.artifactId} expression does not return plugin descriptor's artifactId." );
     }
 
@@ -323,16 +320,15 @@ public class PluginParameterExpressionEvaluatorTest
     }
 
     @SuppressWarnings( "deprecation" )
-    private static MavenSession createSession( PlexusContainer container, ArtifactRepository repo, Properties properties )
+    private static MavenSession createSession( PlexusContainer container, ArtifactRepository repo,
+                                               Properties properties )
         throws CycleDetectedException, DuplicateProjectException
     {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setSystemProperties( properties )
-            .setGoals( Collections.<String>emptyList() )
-            .setBaseDirectory( new File( "" ) )
-            .setLocalRepository( repo );
+        MavenExecutionRequest request =
+            new DefaultMavenExecutionRequest().setSystemProperties( properties ).setGoals( Collections.<String>emptyList() ).setBaseDirectory( new File( "" ) ).setLocalRepository( repo );
 
-        return new MavenSession( container, request, new DefaultMavenExecutionResult(), Collections.<MavenProject>emptyList()  );
+        return new MavenSession( container, request, new DefaultMavenExecutionResult(),
+                                 Collections.<MavenProject>emptyList() );
     }
 
     @Test
@@ -396,7 +392,8 @@ public class PluginParameterExpressionEvaluatorTest
         return new MavenProject( new Model() );
     }
 
-    private ExpressionEvaluator createExpressionEvaluator( MavenProject project, PluginDescriptor pluginDescriptor, Properties executionProperties )
+    private ExpressionEvaluator createExpressionEvaluator( MavenProject project, PluginDescriptor pluginDescriptor,
+                                                           Properties executionProperties )
         throws Exception
     {
         ArtifactRepository repo = factory.createDefaultLocalRepository();

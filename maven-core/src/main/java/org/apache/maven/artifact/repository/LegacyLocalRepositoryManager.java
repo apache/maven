@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.repository;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.repository;
 
 import java.io.File;
 import java.util.Collections;
@@ -92,9 +91,8 @@ public class LegacyLocalRepositoryManager
         this.delegate = Objects.requireNonNull( delegate, "delegate cannot be null" );
 
         ArtifactRepositoryLayout layout = delegate.getLayout();
-        repo =
-            new LocalRepository( new File( delegate.getBasedir() ),
-                                 ( layout != null ) ? layout.getClass().getSimpleName() : "legacy" );
+        repo = new LocalRepository( new File( delegate.getBasedir() ),
+                                    ( layout != null ) ? layout.getClass().getSimpleName() : "legacy" );
 
         /*
          * NOTE: "invoker:install" vs "appassembler:assemble": Both mojos use the artifact installer to put an artifact

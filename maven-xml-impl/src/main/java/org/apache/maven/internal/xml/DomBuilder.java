@@ -1,5 +1,3 @@
-package org.apache.maven.internal.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,10 @@ package org.apache.maven.internal.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.xml;
 
 import java.io.Reader;
 
-//import org.apache.maven.api.model.InputLocation;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -30,13 +28,13 @@ public class DomBuilder
 {
 
     public static Xpp3Dom build( Reader reader )
-            throws MavenXmlException
+        throws MavenXmlException
     {
         return build( reader, true );
     }
 
     public static Xpp3Dom build( Reader reader, boolean trim )
-            throws MavenXmlException
+        throws MavenXmlException
     {
         try
         {
@@ -65,7 +63,7 @@ public class DomBuilder
         try
         {
             Xpp3DomBuilder.InputLocationBuilder ilb =
-                    locationBuilder != null ? ( p -> locationBuilder.getLocation() ) : null;
+                locationBuilder != null ? ( p -> locationBuilder.getLocation() ) : null;
             return Xpp3DomBuilder.build( parser, trim, ilb );
         }
         catch ( Exception e )

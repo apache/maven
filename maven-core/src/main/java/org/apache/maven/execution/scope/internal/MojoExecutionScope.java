@@ -1,5 +1,3 @@
-package org.apache.maven.execution.scope.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.execution.scope.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution.scope.internal;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,16 +24,15 @@ import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.apache.maven.execution.MojoExecutionEvent;
-import org.apache.maven.execution.MojoExecutionListener;
-import org.apache.maven.execution.scope.WeakMojoExecutionListener;
-import org.apache.maven.plugin.MojoExecutionException;
-
 import com.google.inject.Key;
 import com.google.inject.OutOfScopeException;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
 import com.google.inject.util.Providers;
+import org.apache.maven.execution.MojoExecutionEvent;
+import org.apache.maven.execution.MojoExecutionListener;
+import org.apache.maven.execution.scope.WeakMojoExecutionListener;
+import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * MojoExecutionScope
@@ -42,8 +40,7 @@ import com.google.inject.util.Providers;
 public class MojoExecutionScope
     implements Scope, MojoExecutionListener
 {
-    private static final Provider<Object> SEEDED_KEY_PROVIDER = () ->
-    {
+    private static final Provider<Object> SEEDED_KEY_PROVIDER = () -> {
         throw new IllegalStateException();
     };
 
@@ -108,8 +105,7 @@ public class MojoExecutionScope
 
     public <T> Provider<T> scope( final Key<T> key, final Provider<T> unscoped )
     {
-        return () ->
-        {
+        return () -> {
             LinkedList<ScopeState> stack = values.get();
             if ( stack == null || stack.isEmpty() )
             {
@@ -172,8 +168,7 @@ public class MojoExecutionScope
     {
         // the same instance can be provided multiple times under different Key's
         // deduplicate instances to avoid redundant beforeXXX/afterXXX callbacks
-        IdentityHashMap<WeakMojoExecutionListener, Object> listeners =
-            new IdentityHashMap<>();
+        IdentityHashMap<WeakMojoExecutionListener, Object> listeners = new IdentityHashMap<>();
         for ( Object provided : getScopeState().provided.values() )
         {
             if ( provided instanceof WeakMojoExecutionListener )

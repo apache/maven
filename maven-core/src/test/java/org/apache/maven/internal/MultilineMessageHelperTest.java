@@ -1,5 +1,3 @@
-package org.apache.maven.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,13 +42,12 @@ public class MultilineMessageHelperTest
         msgs.add( "* question, not against maven-core                              *" );
         msgs.add( "*****************************************************************" );
 
-        assertEquals( msgs, MultilineMessageHelper.format(
-                "Your build is requesting parallel execution, but project contains the following "
-                        + "plugin(s) that have goals not marked as @threadSafe to support parallel building.",
-                "While this /may/ work fine, please look for plugin updates and/or "
-                        + "request plugins be made thread-safe.",
-                "If reporting an issue, report it against the plugin in question, not against maven-core"
-        ) );
+        assertEquals( msgs,
+                      MultilineMessageHelper.format( "Your build is requesting parallel execution, but project contains the following "
+                          + "plugin(s) that have goals not marked as @threadSafe to support parallel building.",
+                                                     "While this /may/ work fine, please look for plugin updates and/or "
+                                                         + "request plugins be made thread-safe.",
+                                                     "If reporting an issue, report it against the plugin in question, not against maven-core" ) );
     }
 
     @Test
@@ -63,9 +61,9 @@ public class MultilineMessageHelperTest
         msgs.add( "* until the aggregator work is done.                            *" );
         msgs.add( "*****************************************************************" );
 
-        assertEquals( msgs, MultilineMessageHelper.format(
-                "An aggregator Mojo is already executing in parallel build, but aggregator "
-                        + "Mojos require exclusive access to reactor to prevent race conditions. This "
-                        + "mojo execution will be blocked until the aggregator work is done." ) );
+        assertEquals( msgs,
+                      MultilineMessageHelper.format( "An aggregator Mojo is already executing in parallel build, but aggregator "
+                          + "Mojos require exclusive access to reactor to prevent race conditions. This "
+                          + "mojo execution will be blocked until the aggregator work is done." ) );
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,9 +43,9 @@ import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
 /**
- * Populates Aether {@link ArtifactDescriptorResult} from Maven project {@link Model}.
- *
- * <strong>Note:</strong> This class is part of work in progress and can be changed or removed without notice.
+ * Populates Aether {@link ArtifactDescriptorResult} from Maven project {@link Model}. <strong>Note:</strong> This class
+ * is part of work in progress and can be changed or removed without notice.
+ * 
  * @since 3.2.4
  */
 public class ArtifactDescriptorReaderDelegate
@@ -125,10 +124,7 @@ public class ArtifactDescriptorReaderDelegate
         }
 
         return new Dependency( artifact, dependency.getScope(),
-                                            dependency.getOptional() != null
-                                                ? dependency.isOptional()
-                                                : null,
-                                            exclusions );
+                               dependency.getOptional() != null ? dependency.isOptional() : null, exclusions );
     }
 
     private Exclusion convert( org.apache.maven.model.Exclusion exclusion )

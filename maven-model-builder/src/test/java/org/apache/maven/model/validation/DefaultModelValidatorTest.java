@@ -1,5 +1,3 @@
-package org.apache.maven.model.validation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model.validation;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.model.validation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.validation;
 
 import java.io.InputStream;
 import java.util.List;
@@ -70,7 +69,7 @@ public class DefaultModelValidatorTest
     {
         ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel( level );
 
-        Model model =  read( pom );
+        Model model = read( pom );
 
         SimpleProblemCollector problems = new SimpleProblemCollector( model );
 
@@ -794,7 +793,8 @@ public class DefaultModelValidatorTest
     }
 
     @Test
-    public void testSelfReferencingDependencyWithClassifierInRawModel() throws Exception
+    public void testSelfReferencingDependencyWithClassifierInRawModel()
+        throws Exception
     {
         SimpleProblemCollector result = validateRaw( "raw-model/self-referencing-classifier.xml" );
 
@@ -866,7 +866,8 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validateRaw( "raw-model/bad-parent-version-latest.xml" );
         assertViolations( result, 0, 0, 1 );
-        assertEquals( "'parent.version' is either LATEST or RELEASE (both of them are being deprecated)", result.getWarnings().get( 0 ) );
+        assertEquals( "'parent.version' is either LATEST or RELEASE (both of them are being deprecated)",
+                      result.getWarnings().get( 0 ) );
     }
 
     @Test
@@ -875,19 +876,23 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validateRaw( "raw-model/bad-parent-version-release.xml" );
         assertViolations( result, 0, 0, 1 );
-        assertEquals( "'parent.version' is either LATEST or RELEASE (both of them are being deprecated)", result.getWarnings().get( 0 ) );
+        assertEquals( "'parent.version' is either LATEST or RELEASE (both of them are being deprecated)",
+                      result.getWarnings().get( 0 ) );
     }
 
     @Test
-    public void repositoryWithExpression() throws Exception
+    public void repositoryWithExpression()
+        throws Exception
     {
         SimpleProblemCollector result = validateRaw( "raw-model/repository-with-expression.xml" );
         assertViolations( result, 0, 1, 0 );
-        assertEquals( "'repositories.repository.[repo].url' contains an expression but should be a constant.", result.getErrors().get( 0 ) );
+        assertEquals( "'repositories.repository.[repo].url' contains an expression but should be a constant.",
+                      result.getErrors().get( 0 ) );
     }
 
     @Test
-    public void repositoryWithBasedirExpression() throws Exception
+    public void repositoryWithBasedirExpression()
+        throws Exception
     {
         SimpleProblemCollector result = validateRaw( "raw-model/repository-with-basedir-expression.xml" );
         assertViolations( result, 0, 0, 0 );

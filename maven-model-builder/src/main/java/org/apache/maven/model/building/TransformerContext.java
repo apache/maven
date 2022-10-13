@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.nio.file.Path;
 
@@ -25,7 +24,6 @@ import org.apache.maven.model.Model;
 
 /**
  * Context used to transform a pom file.
- *
  *
  * @author Robert Scholte
  * @since 4.0.0
@@ -39,6 +37,7 @@ public interface TransformerContext
 
     /**
      * Get the value of the commandline argument {@code -Dkey=value}
+     * 
      * @param key
      * @return
      */

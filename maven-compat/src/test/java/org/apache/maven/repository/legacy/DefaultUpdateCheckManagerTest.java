@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.legacy;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,10 +16,11 @@ package org.apache.maven.repository.legacy;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.io.File;
+package org.apache.maven.repository.legacy;
 
 import javax.inject.Inject;
+
+import java.io.File;
 
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
@@ -66,15 +65,15 @@ public class DefaultUpdateCheckManagerTest
     }
 
     @Test
-    public void testArtifact() throws Exception
+    public void testArtifact()
+        throws Exception
     {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
 
         Artifact a = createArtifact( "a", "0.0.1-SNAPSHOT" );
-        File file = new File( localRepository.getBasedir(),
-                              localRepository.pathOf( a ) );
+        File file = new File( localRepository.getBasedir(), localRepository.pathOf( a ) );
         file.delete();
         a.setFile( file );
 
@@ -104,8 +103,7 @@ public class DefaultUpdateCheckManagerTest
         ArtifactRepository localRepository = localRepository();
 
         Artifact a = createArtifact( "a", "0.0.1-SNAPSHOT" );
-        File file = new File( localRepository.getBasedir(),
-                              localRepository.pathOf( a ) );
+        File file = new File( localRepository.getBasedir(), localRepository.pathOf( a ) );
         file.delete();
         a.setFile( file );
 
@@ -124,15 +122,15 @@ public class DefaultUpdateCheckManagerTest
     }
 
     @Test
-    public void testPom() throws Exception
+    public void testPom()
+        throws Exception
     {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
 
         Artifact a = createArtifact( "a", "0.0.1", "pom" );
-        File file = new File( localRepository.getBasedir(),
-                              localRepository.pathOf( a ) );
+        File file = new File( localRepository.getBasedir(), localRepository.pathOf( a ) );
         file.delete();
         a.setFile( file );
 
@@ -162,8 +160,7 @@ public class DefaultUpdateCheckManagerTest
         ArtifactRepository localRepository = localRepository();
 
         Artifact a = createArtifact( "a", "0.0.1", "pom" );
-        File file = new File( localRepository.getBasedir(),
-                              localRepository.pathOf( a ) );
+        File file = new File( localRepository.getBasedir(), localRepository.pathOf( a ) );
         file.delete();
         a.setFile( file );
 
@@ -182,7 +179,8 @@ public class DefaultUpdateCheckManagerTest
     }
 
     @Test
-    public void testMetadata() throws Exception
+    public void testMetadata()
+        throws Exception
     {
         ArtifactRepository remoteRepository = remoteRepository();
 
@@ -206,11 +204,14 @@ public class DefaultUpdateCheckManagerTest
 
         assertFalse( updateCheckManager.isUpdateRequired( metadata, remoteRepository, file ) );
 
-        assertNotNull( updateCheckManager.readLastUpdated( touchFile, updateCheckManager.getMetadataKey( remoteRepository, file ) ) );
+        assertNotNull( updateCheckManager.readLastUpdated( touchFile,
+                                                           updateCheckManager.getMetadataKey( remoteRepository,
+                                                                                              file ) ) );
     }
 
     @Test
-    public void testMissingMetadata() throws Exception
+    public void testMissingMetadata()
+        throws Exception
     {
         ArtifactRepository remoteRepository = remoteRepository();
 
@@ -232,24 +233,25 @@ public class DefaultUpdateCheckManagerTest
 
         assertFalse( updateCheckManager.isUpdateRequired( metadata, remoteRepository, file ) );
 
-        assertNotNull( updateCheckManager.readLastUpdated( touchFile, updateCheckManager.getMetadataKey( remoteRepository, file ) ) );
+        assertNotNull( updateCheckManager.readLastUpdated( touchFile,
+                                                           updateCheckManager.getMetadataKey( remoteRepository,
+                                                                                              file ) ) );
     }
 
     @Test
-    public void testArtifactTouchFileName() throws Exception
+    public void testArtifactTouchFileName()
+        throws Exception
     {
         ArtifactRepository localRepository = localRepository();
 
         Artifact a = artifactFactory.createArtifactWithClassifier( "groupId", "a", "0.0.1-SNAPSHOT", "jar", null );
-        File file = new File( localRepository.getBasedir(),
-                              localRepository.pathOf( a ) );
+        File file = new File( localRepository.getBasedir(), localRepository.pathOf( a ) );
         a.setFile( file );
 
         assertEquals( "a-0.0.1-SNAPSHOT.jar.lastUpdated", updateCheckManager.getTouchfile( a ).getName() );
 
         a = artifactFactory.createArtifactWithClassifier( "groupId", "a", "0.0.1-SNAPSHOT", "jar", "classifier" );
-        file = new File( localRepository.getBasedir(),
-                              localRepository.pathOf( a ) );
+        file = new File( localRepository.getBasedir(), localRepository.pathOf( a ) );
         a.setFile( file );
 
         assertEquals( "a-0.0.1-SNAPSHOT-classifier.jar.lastUpdated", updateCheckManager.getTouchfile( a ).getName() );

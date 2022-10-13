@@ -1,5 +1,3 @@
-package org.apache.maven.settings;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.settings;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,7 +46,8 @@ public class GlobalSettingsTest
         File globalSettingsFile = new File( basedir, "src/assembly/maven/conf/settings.xml" );
         assertTrue( globalSettingsFile.isFile(), globalSettingsFile.getAbsolutePath() );
 
-        try ( Reader reader = new InputStreamReader( new FileInputStream( globalSettingsFile ), StandardCharsets.UTF_8) )
+        try ( Reader reader =
+            new InputStreamReader( new FileInputStream( globalSettingsFile ), StandardCharsets.UTF_8 ) )
         {
             new SettingsXpp3Reader().read( reader );
         }

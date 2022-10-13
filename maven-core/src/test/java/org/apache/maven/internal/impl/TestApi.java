@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 
@@ -41,7 +40,6 @@ import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
-import org.apache.maven.toolchain.building.ToolchainsBuilder;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.RepositorySystem;
@@ -93,46 +91,40 @@ public class TestApi
         RepositorySystemSession rss = MavenRepositorySystemUtils.newSession();
         DefaultMavenExecutionRequest mer = new DefaultMavenExecutionRequest();
         MavenSession ms = new MavenSession( null, rss, mer, null );
-        DefaultSession session = new DefaultSession( ms, repositorySystem,
-                                                     Collections.emptyList(),
-                                                     mavenRepositorySystem,
-                                                     plexusContainer,
-                                                     runtimeInformation );
-        DefaultLocalRepository localRepository = new DefaultLocalRepository(
-                new LocalRepository( "target/test-classes/apiv4-repo" ) );
-        org.apache.maven.api.RemoteRepository remoteRepository = session.getRemoteRepository(
-                new RemoteRepository.Builder( "mirror", "default",
-                        "file:target/test-classes/repo" ).build() );
-        this.session = session
-                .withLocalRepository( localRepository )
-                .withRemoteRepositories( Collections.singletonList( remoteRepository ) );
+        DefaultSession session = new DefaultSession( ms, repositorySystem, Collections.emptyList(),
+                                                     mavenRepositorySystem, plexusContainer, runtimeInformation );
+        DefaultLocalRepository localRepository =
+            new DefaultLocalRepository( new LocalRepository( "target/test-classes/apiv4-repo" ) );
+        org.apache.maven.api.RemoteRepository remoteRepository =
+            session.getRemoteRepository( new RemoteRepository.Builder( "mirror", "default",
+                                                                       "file:target/test-classes/repo" ).build() );
+        this.session =
+            session.withLocalRepository( localRepository ).withRemoteRepositories( Collections.singletonList( remoteRepository ) );
 
         sessionScope.enter();
         sessionScope.seed( DefaultSession.class, (DefaultSession) this.session );
     }
 
     @Test
-    void testCreateAndResolveArtifact() throws Exception
+    void testCreateAndResolveArtifact()
+        throws Exception
     {
         ArtifactCoordinate coord =
-                session.createArtifactCoordinate( "org.codehaus.plexus", "plexus-utils", "1.4.5", "pom" );
+            session.createArtifactCoordinate( "org.codehaus.plexus", "plexus-utils", "1.4.5", "pom" );
 
         Artifact resolved = session.resolveArtifact( coord );
         Optional<Path> op = session.getArtifactPath( resolved );
         assertTrue( op.isPresent() );
         assertNotNull( op.get() );
 
-        Project project = session.getService( ProjectBuilder.class ).build(
-                        ProjectBuilderRequest.builder().session( session ).path( op.get() )
-                                .processPlugins( false ).resolveDependencies( false ).build() )
-                .getProject().get();
+        Project project =
+            session.getService( ProjectBuilder.class ).build( ProjectBuilderRequest.builder().session( session ).path( op.get() ).processPlugins( false ).resolveDependencies( false ).build() ).getProject().get();
         assertNotNull( project );
 
         Artifact artifact =
-                session.createArtifact( "org.codehaus.plexus", "plexus-container-default", "1.0-alpha-32", "jar" );
+            session.createArtifact( "org.codehaus.plexus", "plexus-container-default", "1.0-alpha-32", "jar" );
         Node root = session.collectDependencies( artifact );
         assertNotNull( root );
     }
-
 
 }

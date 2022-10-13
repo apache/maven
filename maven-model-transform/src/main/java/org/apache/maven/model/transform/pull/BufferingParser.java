@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform.pull;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.transform.pull;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform.pull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,26 +35,37 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * @author Guillaume Nodet
  * @since 4.0.0
  */
-public class BufferingParser implements XmlPullParser
+public class BufferingParser
+    implements XmlPullParser
 {
 
     private static final Pattern WHITESPACE_REGEX = Pattern.compile( "[ \r\t\n]+" );
 
     protected XmlPullParser xmlPullParser;
+
     protected Deque<Event> events;
+
     protected Event current;
+
     protected boolean bypass;
 
     @SuppressWarnings( "checkstyle:VisibilityModifier" )
     public static class Event
     {
         public int event;
+
         public String name;
+
         public String prefix;
+
         public String namespace;
+
         public boolean empty;
+
         public String text;
+
         public Attribute[] attributes;
+
         public Namespace[] namespaces;
     }
 
@@ -63,6 +73,7 @@ public class BufferingParser implements XmlPullParser
     public static class Namespace
     {
         public String prefix;
+
         public String uri;
     }
 
@@ -70,13 +81,17 @@ public class BufferingParser implements XmlPullParser
     public static class Attribute
     {
         public String name;
+
         public String prefix;
+
         public String namespace;
+
         public String type;
+
         public String value;
+
         public boolean isDefault;
     }
-
 
     public BufferingParser( XmlPullParser xmlPullParser )
     {
@@ -84,7 +99,8 @@ public class BufferingParser implements XmlPullParser
     }
 
     @Override
-    public void setFeature( String name, boolean state ) throws XmlPullParserException
+    public void setFeature( String name, boolean state )
+        throws XmlPullParserException
     {
         xmlPullParser.setFeature( name, state );
     }
@@ -96,7 +112,8 @@ public class BufferingParser implements XmlPullParser
     }
 
     @Override
-    public void setProperty( String name, Object value ) throws XmlPullParserException
+    public void setProperty( String name, Object value )
+        throws XmlPullParserException
     {
         xmlPullParser.setProperty( name, value );
     }
@@ -108,13 +125,15 @@ public class BufferingParser implements XmlPullParser
     }
 
     @Override
-    public void setInput( Reader in ) throws XmlPullParserException
+    public void setInput( Reader in )
+        throws XmlPullParserException
     {
         xmlPullParser.setInput( in );
     }
 
     @Override
-    public void setInput( InputStream inputStream, String inputEncoding ) throws XmlPullParserException
+    public void setInput( InputStream inputStream, String inputEncoding )
+        throws XmlPullParserException
     {
         xmlPullParser.setInput( inputStream, inputEncoding );
     }
@@ -126,43 +145,47 @@ public class BufferingParser implements XmlPullParser
     }
 
     @Override
-    public void defineEntityReplacementText( String entityName, String replacementText ) throws XmlPullParserException
+    public void defineEntityReplacementText( String entityName, String replacementText )
+        throws XmlPullParserException
     {
         xmlPullParser.defineEntityReplacementText( entityName, replacementText );
     }
 
     @Override
-    public int getNamespaceCount( int depth ) throws XmlPullParserException
+    public int getNamespaceCount( int depth )
+        throws XmlPullParserException
     {
-//  TODO:      if (current != null) throw new IllegalStateException("Not supported during events replay");
+        // TODO: if (current != null) throw new IllegalStateException("Not supported during events replay");
         return xmlPullParser.getNamespaceCount( depth );
     }
 
     @Override
-    public String getNamespacePrefix( int pos ) throws XmlPullParserException
+    public String getNamespacePrefix( int pos )
+        throws XmlPullParserException
     {
-//  TODO:      if (current != null) throw new IllegalStateException("Not supported during events replay");
+        // TODO: if (current != null) throw new IllegalStateException("Not supported during events replay");
         return xmlPullParser.getNamespacePrefix( pos );
     }
 
     @Override
-    public String getNamespaceUri( int pos ) throws XmlPullParserException
+    public String getNamespaceUri( int pos )
+        throws XmlPullParserException
     {
-//  TODO:      if (current != null) throw new IllegalStateException("Not supported during events replay");
+        // TODO: if (current != null) throw new IllegalStateException("Not supported during events replay");
         return xmlPullParser.getNamespaceUri( pos );
     }
 
     @Override
     public String getNamespace( String prefix )
     {
-//  TODO:      if (current != null) throw new IllegalStateException("Not supported during events replay");
+        // TODO: if (current != null) throw new IllegalStateException("Not supported during events replay");
         return xmlPullParser.getNamespace( prefix );
     }
 
     @Override
     public int getDepth()
     {
-//  TODO:      if (current != null) throw new IllegalStateException("Not supported during events replay");
+        // TODO: if (current != null) throw new IllegalStateException("Not supported during events replay");
         return xmlPullParser.getDepth();
     }
 
@@ -197,7 +220,8 @@ public class BufferingParser implements XmlPullParser
     }
 
     @Override
-    public boolean isWhitespace() throws XmlPullParserException
+    public boolean isWhitespace()
+        throws XmlPullParserException
     {
         if ( current != null )
         {
@@ -252,7 +276,8 @@ public class BufferingParser implements XmlPullParser
     }
 
     @Override
-    public boolean isEmptyElementTag() throws XmlPullParserException
+    public boolean isEmptyElementTag()
+        throws XmlPullParserException
     {
         return current != null ? current.empty : xmlPullParser.isEmptyElementTag();
     }
@@ -357,8 +382,7 @@ public class BufferingParser implements XmlPullParser
             {
                 for ( Attribute attr : current.attributes )
                 {
-                    if ( Objects.equals( namespace, attr.namespace )
-                            && Objects.equals( name, attr.name ) )
+                    if ( Objects.equals( namespace, attr.namespace ) && Objects.equals( name, attr.name ) )
                     {
                         return attr.value;
                     }
@@ -373,7 +397,8 @@ public class BufferingParser implements XmlPullParser
     }
 
     @Override
-    public void require( int type, String namespace, String name ) throws XmlPullParserException, IOException
+    public void require( int type, String namespace, String name )
+        throws XmlPullParserException, IOException
     {
         if ( current != null )
         {
@@ -383,13 +408,15 @@ public class BufferingParser implements XmlPullParser
     }
 
     @Override
-    public int getEventType() throws XmlPullParserException
+    public int getEventType()
+        throws XmlPullParserException
     {
         return current != null ? current.event : xmlPullParser.getEventType();
     }
 
     @Override
-    public int next() throws XmlPullParserException, IOException
+    public int next()
+        throws XmlPullParserException, IOException
     {
         while ( true )
         {
@@ -415,7 +442,8 @@ public class BufferingParser implements XmlPullParser
     }
 
     @Override
-    public int nextToken() throws XmlPullParserException, IOException
+    public int nextToken()
+        throws XmlPullParserException, IOException
     {
         while ( true )
         {
@@ -441,7 +469,8 @@ public class BufferingParser implements XmlPullParser
     }
 
     @Override
-    public int nextTag() throws XmlPullParserException, IOException
+    public int nextTag()
+        throws XmlPullParserException, IOException
     {
         int eventType = next();
         if ( eventType == TEXT && isWhitespace() )
@@ -450,14 +479,15 @@ public class BufferingParser implements XmlPullParser
         }
         if ( eventType != START_TAG && eventType != END_TAG )
         {
-            throw new XmlPullParserException( "expected START_TAG or END_TAG not "
-                    + TYPES[getEventType()], this, null );
+            throw new XmlPullParserException( "expected START_TAG or END_TAG not " + TYPES[getEventType()], this,
+                                              null );
         }
         return eventType;
     }
 
     @Override
-    public String nextText() throws XmlPullParserException, IOException
+    public String nextText()
+        throws XmlPullParserException, IOException
     {
         int eventType = getEventType();
         if ( eventType != START_TAG )
@@ -472,7 +502,7 @@ public class BufferingParser implements XmlPullParser
             if ( eventType != END_TAG )
             {
                 throw new XmlPullParserException( "TEXT must be immediately followed by END_TAG and not "
-                        + TYPES[getEventType()], this, null );
+                    + TYPES[getEventType()], this, null );
             }
             return result;
         }
@@ -486,7 +516,8 @@ public class BufferingParser implements XmlPullParser
         }
     }
 
-    protected Event bufferEvent() throws XmlPullParserException
+    protected Event bufferEvent()
+        throws XmlPullParserException
     {
         Event event = new Event();
         XmlPullParser pp = xmlPullParser;
@@ -529,7 +560,8 @@ public class BufferingParser implements XmlPullParser
         events.add( event );
     }
 
-    protected boolean accept() throws XmlPullParserException, IOException
+    protected boolean accept()
+        throws XmlPullParserException, IOException
     {
         return true;
     }
@@ -545,9 +577,7 @@ public class BufferingParser implements XmlPullParser
 
     public boolean bypass()
     {
-        return bypass
-                || ( xmlPullParser instanceof BufferingParser
-                        && ( (BufferingParser) xmlPullParser ).bypass() );
+        return bypass || ( xmlPullParser instanceof BufferingParser && ( (BufferingParser) xmlPullParser ).bypass() );
     }
 
     protected static String nullSafeAppend( String originalValue, String charSegment )

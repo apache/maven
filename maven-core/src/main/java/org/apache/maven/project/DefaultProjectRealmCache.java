@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,15 +16,16 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
@@ -54,9 +53,8 @@ public class DefaultProjectRealmCache
 
         public CacheKey( List<? extends ClassRealm> extensionRealms )
         {
-            this.extensionRealms = ( extensionRealms != null )
-                                       ? Collections.unmodifiableList( extensionRealms )
-                                       : Collections.emptyList();
+            this.extensionRealms =
+                ( extensionRealms != null ) ? Collections.unmodifiableList( extensionRealms ) : Collections.emptyList();
 
             this.hashCode = this.extensionRealms.hashCode();
         }

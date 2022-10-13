@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -56,7 +55,8 @@ import org.apache.maven.project.ProjectBuildingResult;
 
 @Named
 @Singleton
-public class DefaultProjectBuilder implements ProjectBuilder
+public class DefaultProjectBuilder
+    implements ProjectBuilder
 {
 
     private final org.apache.maven.project.ProjectBuilder builder;
@@ -71,18 +71,14 @@ public class DefaultProjectBuilder implements ProjectBuilder
     @Nonnull
     @Override
     public ProjectBuilderResult build( ProjectBuilderRequest request )
-            throws ProjectBuilderException, IllegalArgumentException
+        throws ProjectBuilderException, IllegalArgumentException
     {
-        DefaultSession session = ( DefaultSession ) request.getSession();
+        DefaultSession session = (DefaultSession) request.getSession();
         try
         {
-            List<ArtifactRepository> repositories =
-                    session.toArtifactRepositories( session.getRemoteRepositories() );
-            ProjectBuildingRequest req = new DefaultProjectBuildingRequest()
-                    .setRepositorySession( session.getSession() )
-                    .setRemoteRepositories( repositories )
-                    .setPluginArtifactRepositories( repositories )
-                    .setProcessPlugins( request.isProcessPlugins() );
+            List<ArtifactRepository> repositories = session.toArtifactRepositories( session.getRemoteRepositories() );
+            ProjectBuildingRequest req =
+                new DefaultProjectBuildingRequest().setRepositorySession( session.getSession() ).setRemoteRepositories( repositories ).setPluginArtifactRepositories( repositories ).setProcessPlugins( request.isProcessPlugins() );
             ProjectBuildingResult res;
             if ( request.getPath().isPresent() )
             {
@@ -95,7 +91,8 @@ public class DefaultProjectBuilder implements ProjectBuilder
                 ModelSource modelSource = new ModelSource()
                 {
                     @Override
-                    public InputStream getInputStream() throws IOException
+                    public InputStream getInputStream()
+                        throws IOException
                     {
                         return source.getInputStream();
                     }
@@ -118,9 +115,9 @@ public class DefaultProjectBuilder implements ProjectBuilder
             else if ( request.getCoordinate().isPresent() )
             {
                 ArtifactCoordinate c = request.getCoordinate().get();
-                org.apache.maven.artifact.Artifact artifact = new DefaultArtifact(
-                        c.getGroupId(), c.getArtifactId(), c.getVersion().asString(), null,
-                        c.getExtension(), c.getClassifier(), null );
+                org.apache.maven.artifact.Artifact artifact =
+                    new DefaultArtifact( c.getGroupId(), c.getArtifactId(), c.getVersion().asString(), null,
+                                         c.getExtension(), c.getClassifier(), null );
                 res = builder.build( artifact, request.isAllowStubModel(), req );
             }
             else
@@ -147,8 +144,7 @@ public class DefaultProjectBuilder implements ProjectBuilder
                 @Override
                 public Optional<Project> getProject()
                 {
-                    return Optional.ofNullable( res.getProject() )
-                            .map( session::getProject );
+                    return Optional.ofNullable( res.getProject() ).map( session::getProject );
                 }
 
                 @Nonnull
@@ -239,27 +235,26 @@ public class DefaultProjectBuilder implements ProjectBuilder
                 @Override
                 public Optional<DependencyCollectorResult> getDependencyResolverResult()
                 {
-                    return Optional.ofNullable( res.getDependencyResolutionResult() )
-                            .map( r -> new DependencyCollectorResult()
-                            {
-                                @Override
-                                public List<Exception> getExceptions()
-                                {
-                                    return r.getCollectionErrors();
-                                }
+                    return Optional.ofNullable( res.getDependencyResolutionResult() ).map( r -> new DependencyCollectorResult()
+                    {
+                        @Override
+                        public List<Exception> getExceptions()
+                        {
+                            return r.getCollectionErrors();
+                        }
 
-                                @Override
-                                public Node getRoot()
-                                {
-                                    return session.getNode( r.getDependencyGraph() );
-                                }
+                        @Override
+                        public Node getRoot()
+                        {
+                            return session.getNode( r.getDependencyGraph() );
+                        }
 
-//                                @Override
-//                                public List<ArtifactResolverResult> getArtifactResults()
-//                                {
-//                                    return Collections.emptyList();
-//                                }
-                            } );
+                        // @Override
+                        // public List<ArtifactResolverResult> getArtifactResults()
+                        // {
+                        // return Collections.emptyList();
+                        // }
+                    } );
                 }
             };
         }

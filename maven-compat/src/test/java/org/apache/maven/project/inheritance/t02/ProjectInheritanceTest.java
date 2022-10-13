@@ -1,5 +1,3 @@
-package org.apache.maven.project.inheritance.t02;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.inheritance.t02;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.inheritance.t02;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.inheritance.t02;
 
 import java.io.File;
 import java.util.HashMap;
@@ -36,13 +35,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * A test which demonstrates maven's recursive inheritance where
- * a distinct value is taken from each parent contributing to
- * the final model of the project being assembled. There is no
- * overriding going on amongst the models being used in this test:
- * each model in the lineage is providing a value that is not present
- * anywhere else in the lineage. We are just making sure that values
- * down in the lineage are bubbling up where they should.
+ * A test which demonstrates maven's recursive inheritance where a distinct value is taken from each parent contributing
+ * to the final model of the project being assembled. There is no overriding going on amongst the models being used in
+ * this test: each model in the lineage is providing a value that is not present anywhere else in the lineage. We are
+ * just making sure that values down in the lineage are bubbling up where they should.
  *
  * @author Jason van Zyl
  */
@@ -141,7 +137,8 @@ public class ProjectInheritanceTest
         {
             String pluginArtifactId = plugin.getArtifactId();
 
-            assertTrue( validPluginCounts.containsKey( pluginArtifactId ), "Illegal plugin found: " + pluginArtifactId );
+            assertTrue( validPluginCounts.containsKey( pluginArtifactId ),
+                        "Illegal plugin found: " + pluginArtifactId );
 
             if ( pluginArtifactId.equals( testPluginArtifactId ) )
             {

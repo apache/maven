@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,21 +16,22 @@ package org.apache.maven.model.profile;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.profile.activation.ProfileActivator;
 
@@ -127,15 +126,13 @@ public class DefaultProfileSelector
             {
                 if ( activator.presentInConfig( profile, context, problems ) )
                 {
-                    isActive &=  activator.isActive( profile, context, problems );
+                    isActive &= activator.isActive( profile, context, problems );
                 }
             }
             catch ( RuntimeException e )
             {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                        .setMessage( "Failed to determine activation for profile " + profile.getId() )
-                        .setLocation( profile.getLocation( "" ) )
-                        .setException( e ) );
+                problems.add( new ModelProblemCollectorRequest( Severity.ERROR,
+                                                                Version.BASE ).setMessage( "Failed to determine activation for profile " + profile.getId() ).setLocation( profile.getLocation( "" ) ).setException( e ) );
                 return false;
             }
         }

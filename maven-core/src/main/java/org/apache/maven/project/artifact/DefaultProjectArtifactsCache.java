@@ -1,5 +1,3 @@
-package org.apache.maven.project.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,10 @@ package org.apache.maven.project.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.artifact;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,9 +31,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -81,9 +80,8 @@ public class DefaultProjectArtifactsCache
 
         private final int hashCode;
 
-        public CacheKey( MavenProject project, List<RemoteRepository> repositories,
-            Collection<String> scopesToCollect, Collection<String> scopesToResolve, boolean aggregating,
-            RepositorySystemSession session )
+        public CacheKey( MavenProject project, List<RemoteRepository> repositories, Collection<String> scopesToCollect,
+                         Collection<String> scopesToResolve, boolean aggregating, RepositorySystemSession session )
         {
 
             groupId = project.getGroupId();
@@ -93,10 +91,10 @@ public class DefaultProjectArtifactsCache
             Set<String> deps = new LinkedHashSet<>();
             if ( project.getDependencyArtifacts() != null )
             {
-              for ( Artifact dep: project.getDependencyArtifacts() )
-              {
-                deps.add( dep.toString() );
-              }
+                for ( Artifact dep : project.getDependencyArtifacts() )
+                {
+                    deps.add( dep.toString() );
+                }
             }
             dependencyArtifacts = Collections.unmodifiableSet( deps );
 
@@ -114,12 +112,10 @@ public class DefaultProjectArtifactsCache
                     this.repositories.add( repository );
                 }
             }
-            collect = scopesToCollect == null
-                ? Collections.emptySet()
-                : Collections.unmodifiableSet( new HashSet<>( scopesToCollect ) );
-            resolve = scopesToResolve == null
-                ? Collections.emptySet()
-                : Collections.unmodifiableSet( new HashSet<>( scopesToResolve ) );
+            collect = scopesToCollect == null ? Collections.emptySet()
+                            : Collections.unmodifiableSet( new HashSet<>( scopesToCollect ) );
+            resolve = scopesToResolve == null ? Collections.emptySet()
+                            : Collections.unmodifiableSet( new HashSet<>( scopesToResolve ) );
             this.aggregating = aggregating;
 
             int hash = 17;
@@ -166,11 +162,9 @@ public class DefaultProjectArtifactsCache
             return Objects.equals( groupId, that.groupId ) && Objects.equals( artifactId, that.artifactId )
                 && Objects.equals( version, that.version )
                 && Objects.equals( dependencyArtifacts, that.dependencyArtifacts )
-                && Objects.equals( workspace, that.workspace )
-                && Objects.equals( localRepo, that.localRepo )
+                && Objects.equals( workspace, that.workspace ) && Objects.equals( localRepo, that.localRepo )
                 && RepositoryUtils.repositoriesEquals( repositories, that.repositories )
-                && Objects.equals( collect, that.collect )
-                && Objects.equals( resolve, that.resolve )
+                && Objects.equals( collect, that.collect ) && Objects.equals( resolve, that.resolve )
                 && aggregating == that.aggregating;
         }
     }
@@ -178,11 +172,11 @@ public class DefaultProjectArtifactsCache
     protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<>();
 
     @Override
-    public Key createKey( MavenProject project, Collection<String> scopesToCollect,
-        Collection<String> scopesToResolve, boolean aggregating, RepositorySystemSession session )
+    public Key createKey( MavenProject project, Collection<String> scopesToCollect, Collection<String> scopesToResolve,
+                          boolean aggregating, RepositorySystemSession session )
     {
         return new CacheKey( project, project.getRemoteProjectRepositories(), scopesToCollect, scopesToResolve,
-            aggregating, session );
+                             aggregating, session );
     }
 
     @Override
@@ -206,8 +200,7 @@ public class DefaultProjectArtifactsCache
 
         assertUniqueKey( key );
 
-        CacheRecord record =
-            new CacheRecord( Collections.unmodifiableSet( new LinkedHashSet<>( projectArtifacts ) ) );
+        CacheRecord record = new CacheRecord( Collections.unmodifiableSet( new LinkedHashSet<>( projectArtifacts ) ) );
 
         cache.put( key, record );
 

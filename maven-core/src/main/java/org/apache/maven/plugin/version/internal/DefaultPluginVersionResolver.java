@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.version.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,11 @@ package org.apache.maven.plugin.version.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.version.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,10 +32,6 @@ import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
@@ -81,17 +80,18 @@ public class DefaultPluginVersionResolver
     private static final Object CACHE_KEY = new Object();
 
     private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     private final RepositorySystem repositorySystem;
+
     private final MetadataReader metadataReader;
+
     private final MavenPluginManager pluginManager;
+
     private final VersionScheme versionScheme;
 
     @Inject
-    public DefaultPluginVersionResolver(
-            RepositorySystem repositorySystem,
-            MetadataReader metadataReader,
-            MavenPluginManager pluginManager,
-            VersionScheme versionScheme )
+    public DefaultPluginVersionResolver( RepositorySystem repositorySystem, MetadataReader metadataReader,
+                                         MavenPluginManager pluginManager, VersionScheme versionScheme )
     {
         this.repositorySystem = repositorySystem;
         this.metadataReader = metadataReader;
@@ -126,7 +126,7 @@ public class DefaultPluginVersionResolver
             else if ( logger.isDebugEnabled() )
             {
                 logger.debug( "Reusing cached resolved plugin version for " + request.getGroupId() + ":"
-                        + request.getArtifactId() + " to " + result.getVersion() + " from POM " + request.getPom() );
+                    + request.getArtifactId() + " to " + result.getVersion() + " from POM " + request.getPom() );
             }
         }
         else if ( logger.isDebugEnabled() )
@@ -415,8 +415,7 @@ public class DefaultPluginVersionResolver
     @SuppressWarnings( "unchecked" )
     private ConcurrentMap<Key, PluginVersionResult> getCache( SessionData data )
     {
-        ConcurrentMap<Key, PluginVersionResult> cache =
-                ( ConcurrentMap<Key, PluginVersionResult> ) data.get( CACHE_KEY );
+        ConcurrentMap<Key, PluginVersionResult> cache = (ConcurrentMap<Key, PluginVersionResult>) data.get( CACHE_KEY );
         while ( cache == null )
         {
             cache = new ConcurrentHashMap<>( 256 );
@@ -424,7 +423,7 @@ public class DefaultPluginVersionResolver
             {
                 break;
             }
-            cache = ( ConcurrentMap<Key, PluginVersionResult> ) data.get( CACHE_KEY );
+            cache = (ConcurrentMap<Key, PluginVersionResult>) data.get( CACHE_KEY );
         }
         return cache;
     }
@@ -437,8 +436,11 @@ public class DefaultPluginVersionResolver
     static class Key
     {
         final String groupId;
+
         final String artifactId;
+
         final List<RemoteRepository> repositories;
+
         final int hash;
 
         Key( String groupId, String artifactId, List<RemoteRepository> repositories )
@@ -460,10 +462,9 @@ public class DefaultPluginVersionResolver
             {
                 return false;
             }
-            Key key = ( Key ) o;
-            return groupId.equals( key.groupId )
-                    && artifactId.equals( key.artifactId )
-                    && repositories.equals( key.repositories );
+            Key key = (Key) o;
+            return groupId.equals( key.groupId ) && artifactId.equals( key.artifactId )
+                && repositories.equals( key.repositories );
         }
 
         @Override

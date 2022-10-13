@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.io.File;
 import java.util.Objects;
@@ -30,7 +29,9 @@ import org.apache.maven.building.FileSource;
  * @author Robert Scholte
  * @since 4.0.0
  */
-public class ArtifactModelSource extends FileSource implements ModelSource
+public class ArtifactModelSource
+    extends FileSource
+    implements ModelSource
 {
     private final String groupId;
 
@@ -82,14 +83,13 @@ public class ArtifactModelSource extends FileSource implements ModelSource
             return false;
         }
 
-        if ( !ArtifactModelSource.class.equals( obj.getClass() )  )
+        if ( !ArtifactModelSource.class.equals( obj.getClass() ) )
         {
             return false;
         }
 
         ArtifactModelSource other = (ArtifactModelSource) obj;
-        return Objects.equals( artifactId, other.artifactId )
-            && Objects.equals( groupId, other.groupId )
+        return Objects.equals( artifactId, other.artifactId ) && Objects.equals( groupId, other.groupId )
             && Objects.equals( version, other.version );
     }
 }

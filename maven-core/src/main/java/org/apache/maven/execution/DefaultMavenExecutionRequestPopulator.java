@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.execution;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,11 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,26 +29,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.repository.RepositorySystem;
-//
-// All of this needs to go away and be couched in terms of the execution request
-//
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
-//
-// Settings in core
-//
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.util.StringUtils;
@@ -66,7 +59,6 @@ public class DefaultMavenExecutionRequestPopulator
     {
         this.repositorySystem = repositorySystem;
     }
-
 
     @Override
     public MavenExecutionRequest populateFromToolchains( MavenExecutionRequest request, PersistedToolchains toolchains )
@@ -213,7 +205,7 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
 
-    /*if_not[MAVEN4]*/
+    /* if_not[MAVEN4] */
 
     @Override
     @Deprecated
@@ -240,17 +232,17 @@ public class DefaultMavenExecutionRequestPopulator
             request.addServer( server );
         }
 
-        //  <proxies>
-        //    <proxy>
-        //      <active>true</active>
-        //      <protocol>http</protocol>
-        //      <host>proxy.somewhere.com</host>
-        //      <port>8080</port>
-        //      <username>proxyuser</username>
-        //      <password>somepassword</password>
-        //      <nonProxyHosts>www.google.com|*.somewhere.com</nonProxyHosts>
-        //    </proxy>
-        //  </proxies>
+        // <proxies>
+        // <proxy>
+        // <active>true</active>
+        // <protocol>http</protocol>
+        // <host>proxy.somewhere.com</host>
+        // <port>8080</port>
+        // <username>proxyuser</username>
+        // <password>somepassword</password>
+        // <nonProxyHosts>www.google.com|*.somewhere.com</nonProxyHosts>
+        // </proxy>
+        // </proxies>
 
         for ( Proxy proxy : settings.getProxies() )
         {
@@ -265,11 +257,11 @@ public class DefaultMavenExecutionRequestPopulator
         }
 
         // <mirrors>
-        //   <mirror>
-        //     <id>nexus</id>
-        //     <mirrorOf>*</mirrorOf>
-        //     <url>http://repository.sonatype.org/content/groups/public</url>
-        //   </mirror>
+        // <mirror>
+        // <id>nexus</id>
+        // <mirrorOf>*</mirrorOf>
+        // <url>http://repository.sonatype.org/content/groups/public</url>
+        // </mirror>
         // </mirrors>
 
         for ( Mirror mirror : settings.getMirrors() )
@@ -292,8 +284,7 @@ public class DefaultMavenExecutionRequestPopulator
                 {
                     try
                     {
-                        request.addRemoteRepository(
-                                MavenRepositorySystem.buildArtifactRepository( remoteRepository ) );
+                        request.addRemoteRepository( MavenRepositorySystem.buildArtifactRepository( remoteRepository ) );
                     }
                     catch ( InvalidRepositoryException e )
                     {
@@ -306,8 +297,7 @@ public class DefaultMavenExecutionRequestPopulator
                 {
                     try
                     {
-                        request.addPluginArtifactRepository(
-                                MavenRepositorySystem.buildArtifactRepository( pluginRepo ) );
+                        request.addPluginArtifactRepository( MavenRepositorySystem.buildArtifactRepository( pluginRepo ) );
                     }
                     catch ( InvalidRepositoryException e )
                     {
@@ -320,6 +310,6 @@ public class DefaultMavenExecutionRequestPopulator
         return request;
     }
 
-    /*end[MAVEN4]*/
+    /* end[MAVEN4] */
 
 }

@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
 
 import javax.inject.Inject;
 
@@ -77,7 +76,7 @@ public abstract class AbstractCoreMavenComponentTestCase
         return container;
     }
 
-    protected File getProject(String name )
+    protected File getProject( String name )
         throws Exception
     {
         File source = new File( new File( getBasedir(), getProjectsDirectory() ), name );
@@ -89,15 +88,8 @@ public abstract class AbstractCoreMavenComponentTestCase
     protected MavenExecutionRequest createMavenExecutionRequest( File pom )
         throws Exception
     {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-            .setPom( pom )
-            .setProjectPresent( true )
-            .setShowErrors( true )
-            .setPluginGroups( Arrays.asList( "org.apache.maven.plugins" ) )
-            .setLocalRepository( getLocalRepository() )
-            .setRemoteRepositories( getRemoteRepositories() )
-            .setPluginArtifactRepositories( getPluginArtifactRepositories() )
-            .setGoals( Arrays.asList( "package" ) );
+        MavenExecutionRequest request =
+            new DefaultMavenExecutionRequest().setPom( pom ).setProjectPresent( true ).setShowErrors( true ).setPluginGroups( Arrays.asList( "org.apache.maven.plugins" ) ).setLocalRepository( getLocalRepository() ).setRemoteRepositories( getRemoteRepositories() ).setPluginArtifactRepositories( getPluginArtifactRepositories() ).setGoals( Arrays.asList( "package" ) );
 
         if ( pom != null )
         {
@@ -117,7 +109,7 @@ public abstract class AbstractCoreMavenComponentTestCase
     }
 
     protected MavenSession createMavenSession( File pom, Properties executionProperties )
-                    throws Exception
+        throws Exception
     {
         return createMavenSession( pom, executionProperties, false );
     }
@@ -127,12 +119,8 @@ public abstract class AbstractCoreMavenComponentTestCase
     {
         MavenExecutionRequest request = createMavenExecutionRequest( pom );
 
-        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest()
-            .setLocalRepository( request.getLocalRepository() )
-            .setRemoteRepositories( request.getRemoteRepositories() )
-            .setPluginArtifactRepositories( request.getPluginArtifactRepositories() )
-            .setSystemProperties( executionProperties )
-            .setUserProperties( new Properties() );
+        ProjectBuildingRequest configuration =
+            new DefaultProjectBuildingRequest().setLocalRepository( request.getLocalRepository() ).setRemoteRepositories( request.getRemoteRepositories() ).setPluginArtifactRepositories( request.getPluginArtifactRepositories() ).setSystemProperties( executionProperties ).setUserProperties( new Properties() );
 
         List<MavenProject> projects = new ArrayList<>();
 
@@ -164,13 +152,11 @@ public abstract class AbstractCoreMavenComponentTestCase
 
         initRepoSession( configuration );
 
-        MavenSession session =
-            new MavenSession( getContainer(), configuration.getRepositorySession(), request,
-                              new DefaultMavenExecutionResult() );
+        MavenSession session = new MavenSession( getContainer(), configuration.getRepositorySession(), request,
+                                                 new DefaultMavenExecutionResult() );
         session.setProjects( projects );
         session.setAllProjects( session.getProjects() );
-        session.setSession( new DefaultSession( session, new DefaultRepositorySystem(), null,
-                null, null, null ) );
+        session.setSession( new DefaultSession( session, new DefaultRepositorySystem(), null, null, null, null ) );
 
         return session;
     }
@@ -181,7 +167,8 @@ public abstract class AbstractCoreMavenComponentTestCase
         File localRepoDir = new File( request.getLocalRepository().getBasedir() );
         LocalRepository localRepo = new LocalRepository( localRepoDir );
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
-        session.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( session, localRepo ) );
+        session.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( session,
+                                                                                                  localRepo ) );
         request.setRepositorySession( session );
     }
 

@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy.resolver.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.legacy.resolver.transform;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.repository.legacy.resolver.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy.resolver.transform;
 
 import java.util.List;
 
@@ -41,8 +40,8 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 /**
  * Describes a version transformation during artifact resolution.
  *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * TODO try and refactor to remove abstract methods - not particular happy about current design
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a> TODO try and refactor to remove abstract methods - not
+ *         particular happy about current design
  */
 public abstract class AbstractVersionTransformation
     extends AbstractLogEnabled

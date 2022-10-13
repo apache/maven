@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 import java.io.File;
 
@@ -36,7 +35,9 @@ public class VersionNotFoundException
     private Dependency dependency;
 
     private String projectId;
+
     private File pomFile;
+
     private InvalidVersionSpecificationException cause;
 
     public VersionNotFoundException( String projectId, Dependency dependency, File pomFile,
@@ -78,6 +79,5 @@ public class VersionNotFoundException
     {
         return cause;
     }
-
 
 }

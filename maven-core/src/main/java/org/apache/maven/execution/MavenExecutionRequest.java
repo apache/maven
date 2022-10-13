@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.execution;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import java.io.File;
 import java.util.Date;
@@ -30,13 +29,9 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.ProjectBuildingRequest;
-//
-// These settings values need to be removed and pushed down into a provider of configuration information
-//
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
-//
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositoryCache;
@@ -185,6 +180,7 @@ public interface MavenExecutionRequest
 
     /**
      * Sets whether the build should be resumed from the data in the resume.properties file.
+     * 
      * @param resume Whether or not to resume a previous build.
      * @return This request, never {@code null}.
      */
@@ -341,12 +337,14 @@ public interface MavenExecutionRequest
 
     /**
      * Return the requested activation(s) of project(s) in this execution.
+     * 
      * @return requested (de-)activation(s) of project(s) in this execution. Never {@code null}.
      */
     ProjectActivation getProjectActivation();
 
     /**
      * Return the requested activation(s) of profile(s) in this execution.
+     * 
      * @return requested (de-)activation(s) of profile(s) in this execution. Never {@code null}.
      */
     ProfileActivation getProfileActivation();
@@ -426,15 +424,12 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setUserToolchainsFile( File userToolchainsFile );
 
     /**
-     *
-     *
      * @return the global toolchains file
      * @since 3.3.0
      */
     File getGlobalToolchainsFile();
 
     /**
-     *
      * @param globalToolchainsFile the global toolchains file
      * @return this request
      * @since 3.3.0
@@ -458,23 +453,22 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setUseLegacyLocalRepository( boolean useLegacyLocalRepository );
 
     /**
-     * Controls the {@link org.apache.maven.lifecycle.internal.builder.Builder} used by Maven by specification
-     * of the builder's id.
+     * Controls the {@link org.apache.maven.lifecycle.internal.builder.Builder} used by Maven by specification of the
+     * builder's id.
      *
      * @since 3.2.0
      */
     MavenExecutionRequest setBuilderId( String builderId );
 
     /**
-     * Controls the {@link org.apache.maven.lifecycle.internal.builder.Builder} used by Maven by specification
-     * of the builders id.
+     * Controls the {@link org.apache.maven.lifecycle.internal.builder.Builder} used by Maven by specification of the
+     * builders id.
      *
      * @since 3.2.0
      */
     String getBuilderId();
 
     /**
-     *
      * @param toolchains all toolchains grouped by type
      * @return this request
      * @since 3.3.0
@@ -482,7 +476,6 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setToolchains( Map<String, List<ToolchainModel>> toolchains );
 
     /**
-     *
      * @return all toolchains grouped by type, never {@code null}
      * @since 3.3.0
      */

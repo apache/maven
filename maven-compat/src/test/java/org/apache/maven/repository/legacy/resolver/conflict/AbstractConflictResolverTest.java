@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy.resolver.conflict;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.legacy.resolver.conflict;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,9 @@ package org.apache.maven.repository.legacy.resolver.conflict;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy.resolver.conflict;
+
+import javax.inject.Inject;
 
 import java.util.Collections;
 
@@ -27,11 +28,9 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ResolutionNode;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.BeforeEach;
-
-import javax.inject.Inject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -81,7 +80,7 @@ public abstract class AbstractConflictResolverTest
      */
     @BeforeEach
     public void setUp()
-            throws Exception
+        throws Exception
     {
         conflictResolver = (ConflictResolver) container.lookup( ConflictResolver.ROLE, roleHint );
 
@@ -97,7 +96,8 @@ public abstract class AbstractConflictResolverTest
         return conflictResolver;
     }
 
-    protected void assertResolveConflict( ResolutionNode expectedNode, ResolutionNode actualNode1, ResolutionNode actualNode2 )
+    protected void assertResolveConflict( ResolutionNode expectedNode, ResolutionNode actualNode1,
+                                          ResolutionNode actualNode2 )
     {
         ResolutionNode resolvedNode = getConflictResolver().resolveConflict( actualNode1, actualNode2 );
 
@@ -105,7 +105,8 @@ public abstract class AbstractConflictResolverTest
         assertEquals( expectedNode, resolvedNode, "Resolution node" );
     }
 
-    protected Artifact createArtifact( String id, String version ) throws InvalidVersionSpecificationException
+    protected Artifact createArtifact( String id, String version )
+        throws InvalidVersionSpecificationException
     {
         return createArtifact( id, version, Artifact.SCOPE_COMPILE );
     }
@@ -116,19 +117,21 @@ public abstract class AbstractConflictResolverTest
         return createArtifact( id, version, scope, null, false );
     }
 
-    protected Artifact createArtifact( String id, String version, String scope, String inheritedScope, boolean optional )
+    protected Artifact createArtifact( String id, String version, String scope, String inheritedScope,
+                                       boolean optional )
         throws InvalidVersionSpecificationException
     {
         VersionRange versionRange = VersionRange.createFromVersionSpec( version );
 
-        return artifactFactory.createDependencyArtifact( GROUP_ID, id, versionRange, "jar", null, scope,
-                                                         inheritedScope, optional );
+        return artifactFactory.createDependencyArtifact( GROUP_ID, id, versionRange, "jar", null, scope, inheritedScope,
+                                                         optional );
     }
 
     protected ResolutionNode createResolutionNode( Artifact Artifact )
     {
         return new ResolutionNode( Artifact, Collections.<ArtifactRepository>emptyList() );
     }
+
     protected ResolutionNode createResolutionNode( Artifact Artifact, ResolutionNode parent )
     {
         return new ResolutionNode( Artifact, Collections.<ArtifactRepository>emptyList(), parent );

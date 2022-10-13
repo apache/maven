@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,11 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.net.MalformedURLException;
+package org.apache.maven.repository.internal;
 
 import javax.inject.Inject;
+
+import java.net.MalformedURLException;
 
 import org.apache.maven.repository.internal.util.ConsoleRepositoryListener;
 import org.apache.maven.repository.internal.util.ConsoleTransferListener;
@@ -54,11 +53,12 @@ public abstract class AbstractRepositoryTestCase
         session = newMavenRepositorySystemSession( system );
     }
 
-    protected PlexusContainer getContainer() {
+    protected PlexusContainer getContainer()
+    {
         return container;
     }
 
-    public static RepositorySystemSession newMavenRepositorySystemSession(RepositorySystem system )
+    public static RepositorySystemSession newMavenRepositorySystemSession( RepositorySystem system )
     {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
 

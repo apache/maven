@@ -1,5 +1,3 @@
-package org.apache.maven.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.metadata;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,19 +30,21 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  * maven dependency metadata graph
  *
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
- *
  */
 public class MetadataGraph
 {
     public static final int DEFAULT_VERTICES = 32;
-    public static final int DEFAULT_EDGES    = 64;
+
+    public static final int DEFAULT_EDGES = 64;
 
     // flags to indicate the granularity of vertices
     private boolean versionedVertices = false;
-    private boolean scopedVertices    = false;
+
+    private boolean scopedVertices = false;
+
     /**
-    * the entry point we started building the graph from
-    */
+     * the entry point we started building the graph from
+     */
     MetadataGraphVertex entry;
 
     // graph vertices
@@ -53,15 +54,15 @@ public class MetadataGraph
      * incident and excident edges per node
      */
     Map<MetadataGraphVertex, List<MetadataGraphEdge>> incidentEdges;
+
     Map<MetadataGraphVertex, List<MetadataGraphEdge>> excidentEdges;
 
     /**
-     *  null in dirty graph, actual
-     *  scope for conflict-resolved graph
+     * null in dirty graph, actual scope for conflict-resolved graph
      */
     ArtifactScopeEnum scope;
 
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /**
      * init graph
      */
@@ -69,11 +70,13 @@ public class MetadataGraph
     {
         init( nVertices, 2 * nVertices );
     }
+
     public MetadataGraph( int nVertices, int nEdges )
     {
         init( nVertices, nEdges );
     }
-    //------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
     /**
      * construct a single vertex
      */
@@ -89,7 +92,8 @@ public class MetadataGraph
         vertices.add( entry );
         this.entry = entry;
     }
-    //------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
     /**
      * construct graph from a "dirty" tree
      */
@@ -98,15 +102,15 @@ public class MetadataGraph
     {
         this( tree, false, false );
     }
-    //------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
     /**
      * construct graph from a "dirty" tree
      *
      * @param tree "dirty" tree root
      * @param versionedVertices true if graph nodes should be versioned (different versions -&gt; different nodes)
-     * @param scopedVertices true if graph nodes should be versioned and scoped
-     * (different versions and/or scopes -&gt; different nodes)
-     *
+     * @param scopedVertices true if graph nodes should be versioned and scoped (different versions and/or scopes -&gt;
+     *            different nodes)
      */
     public MetadataGraph( MetadataTreeNode tree, boolean versionedVertices, boolean scopedVertices )
         throws MetadataResolutionException
@@ -128,7 +132,8 @@ public class MetadataGraph
 
         processTreeNodes( null, tree, 0, 0 );
     }
-    //------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
     private void processTreeNodes( MetadataGraphVertex parentVertex, MetadataTreeNode node, int depth, int pomOrder )
         throws MetadataResolutionException
     {
@@ -167,7 +172,8 @@ public class MetadataGraph
             processTreeNodes( vertex, n, depth + 1, i );
         }
     }
-    //------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
     public MetadataGraphVertex findVertex( ArtifactMetadata md )
     {
         if ( md == null || vertices == null || vertices.size() < 1 )
@@ -189,7 +195,8 @@ public class MetadataGraph
 
         return null;
     }
-    //------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
     public MetadataGraphVertex addVertex( ArtifactMetadata md )
     {
         if ( md == null )
@@ -213,7 +220,8 @@ public class MetadataGraph
         vertices.add( v );
         return v;
     }
-    //------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
     /**
      * init graph
      */
@@ -248,6 +256,7 @@ public class MetadataGraph
             vertices = new TreeSet<>();
         }
     }
+
     private void checkEdges()
     {
         int count = DEFAULT_EDGES;
@@ -259,6 +268,7 @@ public class MetadataGraph
 
         checkEdges( count );
     }
+
     private void checkEdges( int nEdges )
     {
         if ( incidentEdges == null )
@@ -270,7 +280,8 @@ public class MetadataGraph
             excidentEdges = new HashMap<>( nEdges );
         }
     }
-    //------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
     private static void checkVertex( MetadataGraphVertex v )
         throws MetadataResolutionException
     {
@@ -283,7 +294,8 @@ public class MetadataGraph
             throw new MetadataResolutionException( "vertex without metadata" );
         }
     }
-    //------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
     private static void checkEdge( MetadataGraphEdge e )
         throws MetadataResolutionException
     {
@@ -292,7 +304,8 @@ public class MetadataGraph
             throw new MetadataResolutionException( "badly formed edge" );
         }
     }
-    //------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
     public List<MetadataGraphEdge> getEdgesBetween( MetadataGraphVertex vFrom, MetadataGraphVertex vTo )
     {
         List<MetadataGraphEdge> edges = getIncidentEdges( vTo );
@@ -313,7 +326,8 @@ public class MetadataGraph
 
         return res;
     }
-    //------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
     public MetadataGraph addEdge( MetadataGraphVertex vFrom, MetadataGraphVertex vTo, MetadataGraphEdge e )
         throws MetadataResolutionException
     {
@@ -347,7 +361,8 @@ public class MetadataGraph
 
         return this;
     }
-    //------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
     public MetadataGraph removeVertex( MetadataGraphVertex v )
     {
         if ( vertices != null && v != null )
@@ -368,7 +383,8 @@ public class MetadataGraph
         return this;
 
     }
-    //------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
     private static int countNodes( MetadataTreeNode tree )
     {
         if ( tree == null )
@@ -390,7 +406,7 @@ public class MetadataGraph
         return count;
     }
 
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     public MetadataGraphVertex getEntry()
     {
         return entry;
@@ -460,12 +476,13 @@ public class MetadataGraph
         return entry == null || vertices == null || vertices.isEmpty();
     }
 
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     public boolean isEmptyEdges()
     {
         return isEmpty() || incidentEdges == null || incidentEdges.isEmpty();
     }
-    //------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
     @Override
     public String toString()
     {
@@ -509,6 +526,6 @@ public class MetadataGraph
         return sb.toString();
     }
 
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 }

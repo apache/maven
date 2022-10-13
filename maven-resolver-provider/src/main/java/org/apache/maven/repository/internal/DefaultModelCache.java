@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.util.Map;
 import java.util.Objects;
@@ -49,7 +48,7 @@ public class DefaultModelCache
         }
         else
         {
-            cache = ( Map ) session.getCache().get( session, KEY );
+            cache = (Map) session.getCache().get( session, KEY );
             if ( cache == null )
             {
                 cache = new ConcurrentHashMap<>();
@@ -159,10 +158,7 @@ public class DefaultModelCache
         @Override
         public String toString()
         {
-            return "GavCacheKey{"
-                    + "gav='" + gav + '\''
-                    + ", tag='" + tag + '\''
-                    + '}';
+            return "GavCacheKey{" + "gav='" + gav + '\'' + ", tag='" + tag + '\'' + '}';
         }
     }
 
@@ -184,10 +180,7 @@ public class DefaultModelCache
         @Override
         public String toString()
         {
-            return "SourceCacheKey{"
-                    + "source=" + source
-                    + ", tag='" + tag + '\''
-                    + '}';
+            return "SourceCacheKey{" + "source=" + source + ", tag='" + tag + '\'' + '}';
         }
 
         @Override

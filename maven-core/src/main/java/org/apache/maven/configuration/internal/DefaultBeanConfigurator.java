@@ -1,5 +1,3 @@
-package org.apache.maven.configuration.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,15 @@ package org.apache.maven.configuration.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.configuration.internal;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.configuration.BeanConfigurationException;
 import org.apache.maven.configuration.BeanConfigurationPathTranslator;
@@ -107,8 +106,8 @@ public class DefaultBeanConfigurator
 
         try
         {
-            converter.processConfiguration( converterLookup, request.getBean(), classLoader,
-                                            plexusConfig, evaluator, null );
+            converter.processConfiguration( converterLookup, request.getBean(), classLoader, plexusConfig, evaluator,
+                                            null );
         }
         catch ( ComponentConfigurationException e )
         {
@@ -164,7 +163,8 @@ public class DefaultBeanConfigurator
 
     }
 
-    static class PathConverter extends AbstractBasicConverter
+    static class PathConverter
+        extends AbstractBasicConverter
     {
         @Override
         public boolean canConvert( Class<?> type )
@@ -173,7 +173,8 @@ public class DefaultBeanConfigurator
         }
 
         @Override
-        protected Object fromString( String value ) throws ComponentConfigurationException
+        protected Object fromString( String value )
+            throws ComponentConfigurationException
         {
             return Paths.get( value.replace( '/' == File.separatorChar ? '\\' : '/', File.separatorChar ) );
         }
@@ -182,13 +183,13 @@ public class DefaultBeanConfigurator
         public Object fromConfiguration( final ConverterLookup lookup, final PlexusConfiguration configuration,
                                          final Class<?> type, final Class<?> enclosingType, final ClassLoader loader,
                                          final ExpressionEvaluator evaluator, final ConfigurationListener listener )
-                throws ComponentConfigurationException
+            throws ComponentConfigurationException
         {
             final Object result =
-                    super.fromConfiguration( lookup, configuration, type, enclosingType, loader, evaluator, listener );
+                super.fromConfiguration( lookup, configuration, type, enclosingType, loader, evaluator, listener );
 
-            return result instanceof Path
-                    ? evaluator.alignToBaseDirectory( ( (Path) result ).toFile() ).toPath() : result;
+            return result instanceof Path ? evaluator.alignToBaseDirectory( ( (Path) result ).toFile() ).toPath()
+                            : result;
         }
 
     }

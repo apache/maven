@@ -1,5 +1,3 @@
-package org.apache.maven.api.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.xml;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,8 @@ import org.apache.maven.api.annotations.ThreadSafe;
  * @since 4.0
  */
 @Experimental
-@ThreadSafe @Immutable
+@ThreadSafe
+@Immutable
 public interface Dom
 {
 
@@ -77,7 +77,8 @@ public interface Dom
     Map<String, String> getAttributes();
 
     @Nullable
-    String getAttribute( @Nonnull String name );
+    String getAttribute( @Nonnull
+    String name );
 
     @Nonnull
     List<Dom> getChildren();
@@ -88,32 +89,39 @@ public interface Dom
     @Nullable
     Object getInputLocation();
 
-    default Dom merge( @Nullable Dom source )
+    default Dom merge( @Nullable
+    Dom source )
     {
         return merge( source, (Boolean) null );
     }
 
-    Dom merge( @Nullable Dom source, @Nullable Boolean childMergeOverride );
+    Dom merge( @Nullable
+    Dom source, @Nullable
+    Boolean childMergeOverride );
 
     Dom clone();
 
     /**
-     * Merge recessive into dominant and return either {@code dominant}
-     * with merged information or a clone of {@code recessive} if
-     * {@code dominant} is {@code null}.
+     * Merge recessive into dominant and return either {@code dominant} with merged information or a clone of
+     * {@code recessive} if {@code dominant} is {@code null}.
      *
      * @param dominant the node
      * @param recessive if {@code null}, nothing will happen
      * @return the merged node
      */
     @Nullable
-    static Dom merge( @Nullable Dom dominant, @Nullable Dom recessive )
+    static Dom merge( @Nullable
+    Dom dominant, @Nullable
+    Dom recessive )
     {
         return merge( dominant, recessive, null );
     }
 
     @Nullable
-    static Dom merge( @Nullable Dom dominant, @Nullable Dom recessive, @Nullable Boolean childMergeOverride )
+    static Dom merge( @Nullable
+    Dom dominant, @Nullable
+    Dom recessive, @Nullable
+    Boolean childMergeOverride )
     {
         if ( recessive == null )
         {

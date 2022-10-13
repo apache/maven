@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.lifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.lifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.lifecycle;
 
 import java.io.Serializable;
 import java.util.AbstractList;
@@ -48,6 +47,7 @@ class ImmutableCollections
         {
             throw new IndexOutOfBoundsException();
         }
+
         @Override
         public int size()
         {
@@ -72,6 +72,7 @@ class ImmutableCollections
                         {
                             return false;
                         }
+
                         @Override
                         public Entry<Object, Object> next()
                         {
@@ -79,6 +80,7 @@ class ImmutableCollections
                         }
                     };
                 }
+
                 @Override
                 public int size()
                 {
@@ -96,7 +98,7 @@ class ImmutableCollections
         }
         else if ( collection instanceof AbstractImmutableList )
         {
-            return ( List<E> ) collection;
+            return (List<E>) collection;
         }
         else
         {
@@ -118,7 +120,7 @@ class ImmutableCollections
     @SuppressWarnings( "unchecked" )
     static <E> List<E> emptyList()
     {
-        return ( List<E> ) EMPTY_LIST;
+        return (List<E>) EMPTY_LIST;
     }
 
     static <E> List<E> singletonList( E element )
@@ -154,7 +156,7 @@ class ImmutableCollections
     @SuppressWarnings( "unchecked" )
     static <K, V> Map<K, V> emptyMap()
     {
-        return ( Map<K, V> ) EMPTY_MAP;
+        return (Map<K, V>) EMPTY_MAP;
     }
 
     static <K, V> Map<K, V> singletonMap( K key, V value )
@@ -171,7 +173,8 @@ class ImmutableCollections
         return new ROProperties( properties );
     }
 
-    private static class List1<E> extends AbstractImmutableList<E>
+    private static class List1<E>
+        extends AbstractImmutableList<E>
     {
         private final E element;
 
@@ -197,9 +200,11 @@ class ImmutableCollections
         }
     }
 
-    private static class List2<E> extends AbstractImmutableList<E>
+    private static class List2<E>
+        extends AbstractImmutableList<E>
     {
         private final E element1;
+
         private final E element2;
 
         private List2( E element1, E element2 )
@@ -229,7 +234,8 @@ class ImmutableCollections
         }
     }
 
-    private static class ListN<E> extends AbstractImmutableList<E>
+    private static class ListN<E>
+        extends AbstractImmutableList<E>
     {
         private final Object[] elements;
 
@@ -242,7 +248,7 @@ class ImmutableCollections
         @Override
         public E get( int index )
         {
-            return ( E ) elements[ index ];
+            return (E) elements[index];
         }
 
         @Override
@@ -355,9 +361,11 @@ class ImmutableCollections
             return new IndexOutOfBoundsException( "Index: " + index + ", Size: " + size() );
         }
 
-        private class SubList extends AbstractImmutableList<E>
+        private class SubList
+            extends AbstractImmutableList<E>
         {
             private final int fromIndex;
+
             private final int toIndex;
 
             private SubList( int fromIndex, int toIndex )
@@ -383,7 +391,8 @@ class ImmutableCollections
             }
         }
 
-        private class Itr implements ListIterator<E>
+        private class Itr
+            implements ListIterator<E>
         {
             int index;
 
@@ -448,7 +457,8 @@ class ImmutableCollections
         }
     }
 
-    private static class ROProperties extends Properties
+    private static class ROProperties
+        extends Properties
     {
         private ROProperties( Properties props )
         {
@@ -542,7 +552,8 @@ class ImmutableCollections
         }
     }
 
-    private static class Map1<K, V> extends AbstractImmutableMap<K, V>
+    private static class Map1<K, V>
+        extends AbstractImmutableMap<K, V>
     {
         private final Entry<K, V> entry;
 
@@ -562,6 +573,7 @@ class ImmutableCollections
                     return new Iterator<Entry<K, V>>()
                     {
                         int index = 0;
+
                         @Override
                         public boolean hasNext()
                         {
@@ -589,7 +601,8 @@ class ImmutableCollections
         }
     }
 
-    private static class MapN<K, V> extends AbstractImmutableMap<K, V>
+    private static class MapN<K, V>
+        extends AbstractImmutableMap<K, V>
     {
         private final Object[] entries;
 
@@ -609,6 +622,7 @@ class ImmutableCollections
                     return new Iterator<Entry<K, V>>()
                     {
                         int index = 0;
+
                         @Override
                         public boolean hasNext()
                         {
@@ -621,7 +635,7 @@ class ImmutableCollections
                         {
                             if ( index < entries.length )
                             {
-                                return ( Entry<K, V> ) entries[index++];
+                                return (Entry<K, V>) entries[index++];
                             }
                             throw new NoSuchElementException();
                         }

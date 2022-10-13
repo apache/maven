@@ -1,5 +1,3 @@
-package org.apache.maven.api.plugin.annotations;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.plugin.annotations;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.plugin.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -42,6 +41,7 @@ public @interface Execute
 {
     /**
      * lifecycle phase to fork. Note that specifying a phase overrides specifying a goal.
+     * 
      * @return the phase
      */
     LifecyclePhase phase() default LifecyclePhase.NONE;
@@ -49,6 +49,7 @@ public @interface Execute
     /**
      * goal to fork. Note that specifying a phase overrides specifying a goal. The specified <code>goal</code> must be
      * another goal of the same plugin.
+     * 
      * @return the goal
      */
     String goal() default "";

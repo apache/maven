@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.deployer;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.deployer;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.deployer;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.deployer;
 
 import java.io.File;
 
@@ -32,8 +31,8 @@ public interface ArtifactDeployer
     String ROLE = ArtifactDeployer.class.getName();
 
     /**
-     * Deploy an artifact from a particular directory. The artifact handler is used to determine the
-     * filename of the source file.
+     * Deploy an artifact from a particular directory. The artifact handler is used to determine the filename of the
+     * source file.
      *
      * @param basedir the directory where the artifact is stored
      * @param finalName the name of the artifact without extension
@@ -41,8 +40,7 @@ public interface ArtifactDeployer
      * @param deploymentRepository the repository to deploy to
      * @param localRepository the local repository to install into
      * @throws ArtifactDeploymentException if an error occurred deploying the artifact
-     * @deprecated to be removed before 2.0 after the install/deploy plugins use the alternate
-     *             method
+     * @deprecated to be removed before 2.0 after the install/deploy plugins use the alternate method
      */
     @Deprecated
     void deploy( String basedir, String finalName, Artifact artifact, ArtifactRepository deploymentRepository,

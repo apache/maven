@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform;
 
 import java.util.List;
 
@@ -31,7 +30,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
  * @author Guillaume Nodet
  * @since 4.0.0
  */
-public class RelativePathXMLFilter extends NodeBufferingParser
+public class RelativePathXMLFilter
+    extends NodeBufferingParser
 {
 
     public RelativePathXMLFilter( XmlPullParser xmlPullParser )

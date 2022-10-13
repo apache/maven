@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -26,7 +25,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-class PropertiesAsMap extends AbstractMap<String, String>
+class PropertiesAsMap
+    extends AbstractMap<String, String>
 {
 
     private final Map<Object, Object> properties;
@@ -98,16 +98,13 @@ class PropertiesAsMap extends AbstractMap<String, String>
             @Override
             public int size()
             {
-                return (int) properties.entrySet()
-                        .stream().filter( PropertiesAsMap::matches )
-                        .count();
+                return (int) properties.entrySet().stream().filter( PropertiesAsMap::matches ).count();
             }
         };
     }
 
     private static boolean matches( Entry<Object, Object> entry )
     {
-        return entry.getKey() instanceof String
-                && entry.getValue() instanceof String;
+        return entry.getKey() instanceof String && entry.getValue() instanceof String;
     }
 }

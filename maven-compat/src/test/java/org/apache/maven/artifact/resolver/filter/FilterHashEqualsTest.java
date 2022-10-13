@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver.filter;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.resolver.filter;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver.filter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,8 +40,8 @@ public class FilterHashEqualsTest
 
         IncludesArtifactFilter f2 = new IncludesArtifactFilter( patterns );
 
-        assertTrue( f1.equals(f2) );
-        assertTrue( f2.equals(f1) );
+        assertTrue( f1.equals( f2 ) );
+        assertTrue( f2.equals( f1 ) );
         assertTrue( f1.hashCode() == f2.hashCode() );
 
         IncludesArtifactFilter f3 = new IncludesArtifactFilter( Arrays.asList( "d", "c", "e" ) );

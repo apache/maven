@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -66,7 +65,7 @@ import org.eclipse.aether.RepositorySystemSession;
 @Named
 @Singleton
 public class TestRepositorySystem
-        implements RepositorySystem
+    implements RepositorySystem
 {
 
     private final ModelReader modelReader;
@@ -81,10 +80,10 @@ public class TestRepositorySystem
     }
 
     public ArtifactRepository buildArtifactRepository( Repository repository )
-            throws InvalidRepositoryException
+        throws InvalidRepositoryException
     {
         return new MavenArtifactRepository( repository.getId(), repository.getUrl(), new DefaultRepositoryLayout(),
-                new ArtifactRepositoryPolicy(), new ArtifactRepositoryPolicy() );
+                                            new ArtifactRepositoryPolicy(), new ArtifactRepositoryPolicy() );
     }
 
     public Artifact createArtifact( String groupId, String artifactId, String version, String packaging )
@@ -109,30 +108,31 @@ public class TestRepositorySystem
                                                   String classifier )
     {
         return new DefaultArtifact( groupId, artifactId, version, null, type, classifier,
-                new TestArtifactHandler( type ) );
+                                    new TestArtifactHandler( type ) );
     }
 
     public ArtifactRepository createDefaultLocalRepository()
-            throws InvalidRepositoryException
+        throws InvalidRepositoryException
     {
-        return createLocalRepository( new File( System.getProperty( "basedir", "." ), "target/local-repo" ).getAbsoluteFile() );
+        return createLocalRepository( new File( System.getProperty( "basedir", "." ),
+                                                "target/local-repo" ).getAbsoluteFile() );
     }
 
     public ArtifactRepository createDefaultRemoteRepository()
-            throws InvalidRepositoryException
+        throws InvalidRepositoryException
     {
         return new MavenArtifactRepository( DEFAULT_REMOTE_REPO_ID, "file://"
-                + new File( System.getProperty( "basedir", "." ), "src/test/remote-repo" ).getAbsoluteFile().toURI().getPath(),
-                new DefaultRepositoryLayout(), new ArtifactRepositoryPolicy(),
-                new ArtifactRepositoryPolicy() );
+            + new File( System.getProperty( "basedir", "." ),
+                        "src/test/remote-repo" ).getAbsoluteFile().toURI().getPath(), new DefaultRepositoryLayout(),
+                                            new ArtifactRepositoryPolicy(), new ArtifactRepositoryPolicy() );
     }
 
     public Artifact createDependencyArtifact( Dependency dependency )
     {
         Artifact artifact =
-                new DefaultArtifact( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),
-                        dependency.getScope(), dependency.getType(), dependency.getClassifier(),
-                        new TestArtifactHandler( dependency.getType() ) );
+            new DefaultArtifact( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),
+                                 dependency.getScope(), dependency.getType(), dependency.getClassifier(),
+                                 new TestArtifactHandler( dependency.getType() ) );
 
         if ( Artifact.SCOPE_SYSTEM.equals( dependency.getScope() ) )
         {
@@ -144,11 +144,11 @@ public class TestRepositorySystem
     }
 
     public ArtifactRepository createLocalRepository( File localRepository )
-            throws InvalidRepositoryException
+        throws InvalidRepositoryException
     {
         return new MavenArtifactRepository( DEFAULT_LOCAL_REPO_ID, "file://" + localRepository.toURI().getPath(),
-                new DefaultRepositoryLayout(), new ArtifactRepositoryPolicy(),
-                new ArtifactRepositoryPolicy() );
+                                            new DefaultRepositoryLayout(), new ArtifactRepositoryPolicy(),
+                                            new ArtifactRepositoryPolicy() );
     }
 
     public Artifact createPluginArtifact( Plugin plugin )
@@ -200,7 +200,7 @@ public class TestRepositorySystem
 
     public void publish( ArtifactRepository repository, File source, String remotePath,
                          ArtifactTransferListener transferListener )
-            throws ArtifactTransferFailedException
+        throws ArtifactTransferFailedException
     {
         // TODO Auto-generated method stub
 
@@ -243,11 +243,10 @@ public class TestRepositorySystem
             else
             {
                 Artifact pomArtifact =
-                        createProjectArtifact( request.getArtifact().getGroupId(), request.getArtifact().getArtifactId(),
-                                request.getArtifact().getVersion() );
-                File pomFile =
-                        new File( request.getLocalRepository().getBasedir(),
-                                request.getLocalRepository().pathOf( pomArtifact ) );
+                    createProjectArtifact( request.getArtifact().getGroupId(), request.getArtifact().getArtifactId(),
+                                           request.getArtifact().getVersion() );
+                File pomFile = new File( request.getLocalRepository().getBasedir(),
+                                         request.getLocalRepository().pathOf( pomArtifact ) );
 
                 try
                 {
@@ -288,7 +287,7 @@ public class TestRepositorySystem
     }
 
     private void resolve( Artifact artifact, ArtifactResolutionRequest request )
-            throws IOException
+        throws IOException
     {
         if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
         {
@@ -320,7 +319,7 @@ public class TestRepositorySystem
 
     public void retrieve( ArtifactRepository repository, File destination, String remotePath,
                           ArtifactTransferListener transferListener )
-            throws ArtifactTransferFailedException, ArtifactDoesNotExistException
+        throws ArtifactTransferFailedException, ArtifactDoesNotExistException
     {
         // TODO Auto-generated method stub
 

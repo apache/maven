@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,15 +16,15 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
+package org.apache.maven.api.services;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
 import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Base class for requests.
@@ -39,7 +37,8 @@ abstract class BaseRequest
 
     private final Session session;
 
-    protected BaseRequest( @Nonnull Session session )
+    protected BaseRequest( @Nonnull
+    Session session )
     {
         this.session = nonNull( session, "session cannot be null" );
     }
@@ -61,7 +60,7 @@ abstract class BaseRequest
 
     protected static <T> Collection<T> unmodifiable( Collection<T> obj )
     {
-        return obj != null && !obj.isEmpty()
-                ? Collections.unmodifiableCollection( new ArrayList<>( obj ) ) : Collections.emptyList();
+        return obj != null && !obj.isEmpty() ? Collections.unmodifiableCollection( new ArrayList<>( obj ) )
+                        : Collections.emptyList();
     }
 }

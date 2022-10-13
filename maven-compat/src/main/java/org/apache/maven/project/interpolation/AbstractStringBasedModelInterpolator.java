@@ -1,5 +1,3 @@
-package org.apache.maven.project.interpolation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.interpolation;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,18 @@ package org.apache.maven.project.interpolation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.interpolation;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -43,22 +53,11 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 /**
  * Use a regular expression search to find and resolve expressions within the POM.
  *
- * @author jdcasey Created on Feb 3, 2005
- * TODO Consolidate this logic with the PluginParameterExpressionEvaluator, minus deprecations/bans.
+ * @author jdcasey Created on Feb 3, 2005 TODO Consolidate this logic with the PluginParameterExpressionEvaluator, minus
+ *         deprecations/bans.
  */
 @Deprecated
 public abstract class AbstractStringBasedModelInterpolator
@@ -114,16 +113,14 @@ public abstract class AbstractStringBasedModelInterpolator
     }
 
     /**
-     * Serialize the inbound Model instance to a StringWriter, perform the regex replacement to resolve
-     * POM expressions, then re-parse into the resolved Model instance.
+     * Serialize the inbound Model instance to a StringWriter, perform the regex replacement to resolve POM expressions,
+     * then re-parse into the resolved Model instance.
      * <p>
      * <b>NOTE:</b> This will result in a different instance of Model being returned!!!
      *
      * @param model The inbound Model instance, to serialize and reference for expression resolution
      * @param context The other context map to be used during resolution
-     *
      * @return The resolved instance of the inbound Model. This is a different instance!
-     *
      * @deprecated Use {@link ModelInterpolator#interpolate(Model, File, ProjectBuilderConfiguration, boolean)} instead.
      */
     public Model interpolate( Model model, Map<String, ?> context, boolean strict )
@@ -132,16 +129,11 @@ public abstract class AbstractStringBasedModelInterpolator
         Properties props = new Properties();
         props.putAll( context );
 
-        return interpolate( model,
-                            null,
-                            new DefaultProjectBuilderConfiguration().setExecutionProperties( props ),
+        return interpolate( model, null, new DefaultProjectBuilderConfiguration().setExecutionProperties( props ),
                             true );
     }
 
-    public Model interpolate( Model model,
-                              File projectDir,
-                              ProjectBuilderConfiguration config,
-                              boolean debugEnabled )
+    public Model interpolate( Model model, File projectDir, ProjectBuilderConfiguration config, boolean debugEnabled )
         throws ModelInterpolationException
     {
         StringWriter sWriter = new StringWriter( 1024 );
@@ -168,8 +160,8 @@ public abstract class AbstractStringBasedModelInterpolator
         }
         catch ( IOException | XmlPullParserException e )
         {
-            throw new ModelInterpolationException(
-                "Cannot read project model from interpolating filter of serialized version.", e );
+            throw new ModelInterpolationException( "Cannot read project model from interpolating filter of serialized version.",
+                                                   e );
         }
 
         return model;
@@ -180,17 +172,14 @@ public abstract class AbstractStringBasedModelInterpolator
      * <p>
      * The algorithm used for each expression is:
      * <ul>
-     *   <li>If it starts with either "pom." or "project.", the expression is evaluated against the model.</li>
-     *   <li>If the value is null, get the value from the context.</li>
-     *   <li>If the value is null, but the context contains the expression, don't replace the expression string
-     *       with the value, and continue to find other expressions.</li>
-     *   <li>If the value is null, get it from the model properties.</li>
+     * <li>If it starts with either "pom." or "project.", the expression is evaluated against the model.</li>
+     * <li>If the value is null, get the value from the context.</li>
+     * <li>If the value is null, but the context contains the expression, don't replace the expression string with the
+     * value, and continue to find other expressions.</li>
+     * <li>If the value is null, get it from the model properties.</li>
      * </ul>
      */
-    public String interpolate( String src,
-                               Model model,
-                               final File projectDir,
-                               ProjectBuilderConfiguration config,
+    public String interpolate( String src, Model model, final File projectDir, ProjectBuilderConfiguration config,
                                boolean debug )
         throws ModelInterpolationException
     {
@@ -275,12 +264,10 @@ public abstract class AbstractStringBasedModelInterpolator
     protected List<InterpolationPostProcessor> createPostProcessors( final Model model, final File projectDir,
                                                                      final ProjectBuilderConfiguration config )
     {
-        return Collections.singletonList(
-            (InterpolationPostProcessor) new PathTranslatingPostProcessor(
-                PROJECT_PREFIXES,
-                TRANSLATED_PATH_EXPRESSIONS,
-                projectDir,
-                pathTranslator ) );
+        return Collections.singletonList( (InterpolationPostProcessor) new PathTranslatingPostProcessor( PROJECT_PREFIXES,
+                                                                                                         TRANSLATED_PATH_EXPRESSIONS,
+                                                                                                         projectDir,
+                                                                                                         pathTranslator ) );
 
     }
 

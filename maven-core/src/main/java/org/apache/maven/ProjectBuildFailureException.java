@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,17 +16,16 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
 
 import org.apache.maven.plugin.MojoFailureException;
 
 /**
- * Exception which occurs when a normal (i.e. non-aggregator) mojo fails to
- * execute. In this case, the mojo failed while executing against a particular
- * project instance, so we can wrap the {@link MojoFailureException} with context
+ * Exception which occurs when a normal (i.e. non-aggregator) mojo fails to execute. In this case, the mojo failed while
+ * executing against a particular project instance, so we can wrap the {@link MojoFailureException} with context
  * information including projectId that caused the failure.
  *
  * @author jdcasey
- *
  */
 public class ProjectBuildFailureException
     extends BuildFailureException

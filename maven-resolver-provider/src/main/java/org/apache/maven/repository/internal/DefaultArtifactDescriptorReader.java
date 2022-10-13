@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,17 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
@@ -73,39 +72,42 @@ import org.slf4j.LoggerFactory;
  */
 @Named
 @Singleton
-public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
+public class DefaultArtifactDescriptorReader
+    implements ArtifactDescriptorReader
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( DefaultArtifactDescriptorReader.class );
 
     private final RemoteRepositoryManager remoteRepositoryManager;
+
     private final VersionResolver versionResolver;
+
     private final VersionRangeResolver versionRangeResolver;
+
     private final ArtifactResolver artifactResolver;
+
     private final RepositoryEventDispatcher repositoryEventDispatcher;
+
     private final ModelBuilder modelBuilder;
+
     private final ModelCacheFactory modelCacheFactory;
 
     @Inject
-    public DefaultArtifactDescriptorReader(
-            RemoteRepositoryManager remoteRepositoryManager,
-            VersionResolver versionResolver,
-            VersionRangeResolver versionRangeResolver,
-            ArtifactResolver artifactResolver,
-            ModelBuilder modelBuilder,
-            RepositoryEventDispatcher repositoryEventDispatcher,
-            ModelCacheFactory modelCacheFactory )
+    public DefaultArtifactDescriptorReader( RemoteRepositoryManager remoteRepositoryManager,
+                                            VersionResolver versionResolver, VersionRangeResolver versionRangeResolver,
+                                            ArtifactResolver artifactResolver, ModelBuilder modelBuilder,
+                                            RepositoryEventDispatcher repositoryEventDispatcher,
+                                            ModelCacheFactory modelCacheFactory )
     {
-        this.remoteRepositoryManager = Objects.requireNonNull( remoteRepositoryManager,
-                "remoteRepositoryManager cannot be null" );
+        this.remoteRepositoryManager =
+            Objects.requireNonNull( remoteRepositoryManager, "remoteRepositoryManager cannot be null" );
         this.versionResolver = Objects.requireNonNull( versionResolver, "versionResolver cannot be null" );
         this.versionRangeResolver =
-                Objects.requireNonNull( versionRangeResolver, "versionRangeResolver cannot be null" );
+            Objects.requireNonNull( versionRangeResolver, "versionRangeResolver cannot be null" );
         this.artifactResolver = Objects.requireNonNull( artifactResolver, "artifactResolver cannot be null" );
         this.modelBuilder = Objects.requireNonNull( modelBuilder, "modelBuilder cannot be null" );
-        this.repositoryEventDispatcher = Objects.requireNonNull( repositoryEventDispatcher,
-                "repositoryEventDispatcher cannot be null" );
-        this.modelCacheFactory = Objects.requireNonNull( modelCacheFactory,
-                "modelCacheFactory cannot be null" );
+        this.repositoryEventDispatcher =
+            Objects.requireNonNull( repositoryEventDispatcher, "repositoryEventDispatcher cannot be null" );
+        this.modelCacheFactory = Objects.requireNonNull( modelCacheFactory, "modelCacheFactory cannot be null" );
     }
 
     public ArtifactDescriptorResult readArtifactDescriptor( RepositorySystemSession session,
@@ -265,8 +267,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
             if ( relocation != null )
             {
                 result.addRelocation( a );
-                a =
-                    new RelocatedArtifact( a, relocation.getGroupId(), relocation.getArtifactId(),
+                a = new RelocatedArtifact( a, relocation.getGroupId(), relocation.getArtifactId(),
                                            relocation.getVersion(), relocation.getMessage() );
                 result.setArtifact( a );
             }

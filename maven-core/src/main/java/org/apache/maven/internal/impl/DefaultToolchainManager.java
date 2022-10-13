@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -39,7 +38,8 @@ import org.apache.maven.toolchain.ToolchainPrivate;
 
 @Named
 @Singleton
-public class DefaultToolchainManager implements ToolchainManager
+public class DefaultToolchainManager
+    implements ToolchainManager
 {
     private final DefaultToolchainManagerPrivate toolchainManagerPrivate;
 
@@ -51,26 +51,26 @@ public class DefaultToolchainManager implements ToolchainManager
 
     @Override
     public List<Toolchain> getToolchains( Session session, String type, Map<String, String> requirements )
-            throws ToolchainManagerException
+        throws ToolchainManagerException
     {
-        MavenSession s = ( ( DefaultSession ) session ).getMavenSession();
+        MavenSession s = ( (DefaultSession) session ).getMavenSession();
         List<org.apache.maven.toolchain.Toolchain> toolchains =
-                toolchainManagerPrivate.getToolchains( s, type, requirements );
+            toolchainManagerPrivate.getToolchains( s, type, requirements );
         return new MappedList<>( toolchains, this::toToolchain );
     }
 
     @Override
     public Optional<Toolchain> getToolchainFromBuildContext( Session session, String type )
-            throws ToolchainManagerException
+        throws ToolchainManagerException
     {
-        MavenSession s = ( ( DefaultSession ) session ).getMavenSession();
-        return Optional.ofNullable( toolchainManagerPrivate.getToolchainFromBuildContext( type, s ) )
-                .map( this::toToolchain );
+        MavenSession s = ( (DefaultSession) session ).getMavenSession();
+        return Optional.ofNullable( toolchainManagerPrivate.getToolchainFromBuildContext( type,
+                                                                                          s ) ).map( this::toToolchain );
     }
 
     @Override
     public List<Toolchain> getToolchainsForType( Session session, String type )
-            throws ToolchainManagerException
+        throws ToolchainManagerException
     {
         try
         {
@@ -86,11 +86,11 @@ public class DefaultToolchainManager implements ToolchainManager
 
     @Override
     public void storeToolchainToBuildContext( Session session, Toolchain toolchain )
-            throws ToolchainManagerException
+        throws ToolchainManagerException
     {
-        MavenSession s = ( ( DefaultSession ) session ).getMavenSession();
+        MavenSession s = ( (DefaultSession) session ).getMavenSession();
         org.apache.maven.toolchain.ToolchainPrivate tc =
-                (org.apache.maven.toolchain.ToolchainPrivate) ( (ToolchainWrapper) toolchain ).toolchain;
+            (org.apache.maven.toolchain.ToolchainPrivate) ( (ToolchainWrapper) toolchain ).toolchain;
         toolchainManagerPrivate.storeToolchainToBuildContext( tc, s );
     }
 
@@ -99,7 +99,8 @@ public class DefaultToolchainManager implements ToolchainManager
         return new ToolchainWrapper( toolchain );
     }
 
-    private static class ToolchainWrapper implements Toolchain
+    private static class ToolchainWrapper
+        implements Toolchain
     {
         private final org.apache.maven.toolchain.Toolchain toolchain;
 

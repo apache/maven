@@ -1,5 +1,3 @@
-package org.apache.maven.project.interpolation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.interpolation;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,12 +16,13 @@ package org.apache.maven.project.interpolation;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.model.Model;
-import org.apache.maven.project.ProjectBuilderConfiguration;
+package org.apache.maven.project.interpolation;
 
 import java.io.File;
 import java.util.Map;
+
+import org.apache.maven.model.Model;
+import org.apache.maven.project.ProjectBuilderConfiguration;
 
 /**
  * @author jdcasey
@@ -49,16 +48,10 @@ public interface ModelInterpolator
     Model interpolate( Model model, Map<String, ?> context, boolean strict )
         throws ModelInterpolationException;
 
-    Model interpolate( Model model,
-                       File projectDir,
-                       ProjectBuilderConfiguration config,
-                       boolean debugEnabled )
+    Model interpolate( Model model, File projectDir, ProjectBuilderConfiguration config, boolean debugEnabled )
         throws ModelInterpolationException;
 
-    String interpolate( String src,
-                        Model model,
-                        File projectDir,
-                        ProjectBuilderConfiguration config,
+    String interpolate( String src, Model model, File projectDir, ProjectBuilderConfiguration config,
                         boolean debugEnabled )
         throws ModelInterpolationException;
 }

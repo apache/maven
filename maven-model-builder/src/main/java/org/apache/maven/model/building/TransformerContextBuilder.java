@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,11 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 /**
- * The transformerContextBuilder is responsible for initializing the TransformerContext.
- * In case rawModels are missing, it could do new buildingRequests on the ModelBuilder.
+ * The transformerContextBuilder is responsible for initializing the TransformerContext. In case rawModels are missing,
+ * it could do new buildingRequests on the ModelBuilder.
  *
  * @author Robert Scholte
  * @since 4.0.0

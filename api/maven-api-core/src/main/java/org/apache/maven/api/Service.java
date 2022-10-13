@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.ThreadSafe;
@@ -25,10 +24,9 @@ import org.apache.maven.api.annotations.ThreadSafe;
 /**
  * Marker interface for all services provided by the {@link Session}.
  * <p>
- * Services can be retrieved from the session using the
- * {@link Session#getService(Class)} method.
+ * Services can be retrieved from the session using the {@link Session#getService(Class)} method.
  * 
- * @see Session#getService(Class) 
+ * @see Session#getService(Class)
  */
 @Experimental
 @ThreadSafe

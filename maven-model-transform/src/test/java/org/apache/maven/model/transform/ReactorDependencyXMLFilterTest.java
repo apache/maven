@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform;
 
 import java.util.function.BiFunction;
 
@@ -33,26 +32,24 @@ public class ReactorDependencyXMLFilterTest
     private BiFunction<String, String, String> reactorVersionMapper;
 
     @BeforeEach
-    protected void reset() {
+    protected void reset()
+    {
         reactorVersionMapper = null;
     }
 
     @Override
-    protected ReactorDependencyXMLFilter getFilter(XmlPullParser parser)
+    protected ReactorDependencyXMLFilter getFilter( XmlPullParser parser )
     {
-        return new ReactorDependencyXMLFilter( parser,
-                reactorVersionMapper != null ? reactorVersionMapper : (g, a) -> "1.0.0" );
+        return new ReactorDependencyXMLFilter( parser, reactorVersionMapper != null ? reactorVersionMapper
+                        : ( g, a ) -> "1.0.0" );
     }
 
     @Test
     public void testDefaultDependency()
         throws Exception
     {
-        String input = "<dependency>"
-            + "<groupId>GROUPID</groupId>"
-            + "<artifactId>ARTIFACTID</artifactId>"
-            + "<version>VERSION</version>"
-            + "</dependency>";
+        String input = "<dependency>" + "<groupId>GROUPID</groupId>" + "<artifactId>ARTIFACTID</artifactId>"
+            + "<version>VERSION</version>" + "</dependency>";
         String expected = input;
 
         String actual = transform( input );
@@ -64,12 +61,10 @@ public class ReactorDependencyXMLFilterTest
     public void testManagedDependency()
         throws Exception
     {
-        reactorVersionMapper = (g, a) -> null;
+        reactorVersionMapper = ( g, a ) -> null;
 
-        String input = "<dependency>"
-            + "<groupId>GROUPID</groupId>"
-            + "<artifactId>ARTIFACTID</artifactId>"
-            + "</dependency>";
+        String input =
+            "<dependency>" + "<groupId>GROUPID</groupId>" + "<artifactId>ARTIFACTID</artifactId>" + "</dependency>";
         String expected = input;
 
         String actual = transform( input );
@@ -81,15 +76,10 @@ public class ReactorDependencyXMLFilterTest
     public void testReactorDependency()
         throws Exception
     {
-        String input = "<dependency>"
-                        + "<groupId>GROUPID</groupId>"
-                        + "<artifactId>ARTIFACTID</artifactId>"
-                        + "</dependency>";
-        String expected = "<dependency>"
-                        + "<groupId>GROUPID</groupId>"
-                        + "<artifactId>ARTIFACTID</artifactId>"
-                        + "<version>1.0.0</version>"
-                        + "</dependency>";
+        String input =
+            "<dependency>" + "<groupId>GROUPID</groupId>" + "<artifactId>ARTIFACTID</artifactId>" + "</dependency>";
+        String expected = "<dependency>" + "<groupId>GROUPID</groupId>" + "<artifactId>ARTIFACTID</artifactId>"
+            + "<version>1.0.0</version>" + "</dependency>";
 
         String actual = transform( input );
 
@@ -100,17 +90,11 @@ public class ReactorDependencyXMLFilterTest
     public void testReactorDependencyLF()
         throws Exception
     {
-        String input = "<dependency>\n"
-                        + "  <groupId>GROUPID</groupId>\n"
-                        + "  <artifactId>ARTIFACTID</artifactId>\n"
-                        + "  <!-- include version here --> "
-                        + "</dependency>";
-        String expected = "<dependency>\n"
-                        + "  <groupId>GROUPID</groupId>\n"
-                        + "  <artifactId>ARTIFACTID</artifactId>\n"
-                        + "  <!-- include version here -->\n"
-                        + "  <version>1.0.0</version>\n"
-                        + "</dependency>";
+        String input = "<dependency>\n" + "  <groupId>GROUPID</groupId>\n" + "  <artifactId>ARTIFACTID</artifactId>\n"
+            + "  <!-- include version here --> " + "</dependency>";
+        String expected =
+            "<dependency>\n" + "  <groupId>GROUPID</groupId>\n" + "  <artifactId>ARTIFACTID</artifactId>\n"
+                + "  <!-- include version here -->\n" + "  <version>1.0.0</version>\n" + "</dependency>";
 
         String actual = transform( input );
 
@@ -121,36 +105,18 @@ public class ReactorDependencyXMLFilterTest
     public void multipleDependencies()
         throws Exception
     {
-        String input = "<project>\n" +
-            "  <modelVersion>4.0.0</modelVersion>\n" +
-            "    <groupId>tests.project</groupId>\n" +
-            "    <artifactId>duplicate-plugin-defs-merged</artifactId>\n" +
-            "    <version>1</version>\n" +
-            "    <build>\n" +
-            "      <plugins>\n" +
-            "        <plugin>\n" +
-            "          <artifactId>maven-compiler-plugin</artifactId>\n" +
-            "          <dependencies>\n" +
-            "            <dependency>\n" +
-            "              <groupId>group</groupId>\n" +
-            "              <artifactId>first</artifactId>\n" +
-            "              <version>1</version>\n" +
-            "            </dependency>\n" +
-            "          </dependencies>\n" +
-            "        </plugin>\n" +
-            "        <plugin>\n" +
-            "          <artifactId>maven-compiler-plugin</artifactId>\n" +
-            "          <dependencies>\n" +
-            "            <dependency>\n" +
-            "              <groupId>group</groupId>\n" +
-            "              <artifactId>second</artifactId>\n" +
-            "              <version>1</version>\n" +
-            "            </dependency>\n" +
-            "          </dependencies>\n" +
-            "        </plugin>\n" +
-            "      </plugins>\n" +
-            "    </build>\n" +
-            "</project>";
+        String input = "<project>\n" + "  <modelVersion>4.0.0</modelVersion>\n"
+            + "    <groupId>tests.project</groupId>\n" + "    <artifactId>duplicate-plugin-defs-merged</artifactId>\n"
+            + "    <version>1</version>\n" + "    <build>\n" + "      <plugins>\n" + "        <plugin>\n"
+            + "          <artifactId>maven-compiler-plugin</artifactId>\n" + "          <dependencies>\n"
+            + "            <dependency>\n" + "              <groupId>group</groupId>\n"
+            + "              <artifactId>first</artifactId>\n" + "              <version>1</version>\n"
+            + "            </dependency>\n" + "          </dependencies>\n" + "        </plugin>\n"
+            + "        <plugin>\n" + "          <artifactId>maven-compiler-plugin</artifactId>\n"
+            + "          <dependencies>\n" + "            <dependency>\n" + "              <groupId>group</groupId>\n"
+            + "              <artifactId>second</artifactId>\n" + "              <version>1</version>\n"
+            + "            </dependency>\n" + "          </dependencies>\n" + "        </plugin>\n"
+            + "      </plugins>\n" + "    </build>\n" + "</project>";
         String expected = input;
 
         String actual = transform( input );

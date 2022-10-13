@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,11 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,10 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
+import org.apache.maven.api.model.Model;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -45,7 +45,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.api.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.ModelReader;
@@ -112,16 +111,17 @@ public class TestRepositorySystem
     public ArtifactRepository createDefaultLocalRepository()
         throws InvalidRepositoryException
     {
-        return createLocalRepository( new File( System.getProperty( "basedir", "." ), "target/local-repo" ).getAbsoluteFile() );
+        return createLocalRepository( new File( System.getProperty( "basedir", "." ),
+                                                "target/local-repo" ).getAbsoluteFile() );
     }
 
     public ArtifactRepository createDefaultRemoteRepository()
         throws InvalidRepositoryException
     {
         return new MavenArtifactRepository( DEFAULT_REMOTE_REPO_ID, "file://"
-            + new File( System.getProperty( "basedir", "." ), "src/test/remote-repo" ).getAbsoluteFile().toURI().getPath(),
-                                            new DefaultRepositoryLayout(), new ArtifactRepositoryPolicy(),
-                                            new ArtifactRepositoryPolicy() );
+            + new File( System.getProperty( "basedir", "." ),
+                        "src/test/remote-repo" ).getAbsoluteFile().toURI().getPath(), new DefaultRepositoryLayout(),
+                                            new ArtifactRepositoryPolicy(), new ArtifactRepositoryPolicy() );
     }
 
     public Artifact createDependencyArtifact( Dependency dependency )
@@ -242,15 +242,15 @@ public class TestRepositorySystem
                 Artifact pomArtifact =
                     createProjectArtifact( request.getArtifact().getGroupId(), request.getArtifact().getArtifactId(),
                                            request.getArtifact().getVersion() );
-                File pomFile =
-                    new File( request.getLocalRepository().getBasedir(),
-                              request.getLocalRepository().pathOf( pomArtifact ) );
+                File pomFile = new File( request.getLocalRepository().getBasedir(),
+                                         request.getLocalRepository().pathOf( pomArtifact ) );
 
                 try
                 {
                     Model model = modelReader.read( pomFile, null );
 
-                    dependencies = model.getDependencies().stream().map( Dependency::new ).collect( Collectors.toList() );
+                    dependencies =
+                        model.getDependencies().stream().map( Dependency::new ).collect( Collectors.toList() );
                 }
                 catch ( IOException e )
                 {

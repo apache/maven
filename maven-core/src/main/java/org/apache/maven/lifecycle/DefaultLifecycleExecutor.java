@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,14 +16,15 @@ package org.apache.maven.lifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+package org.apache.maven.lifecycle;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
@@ -48,9 +47,8 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 
 /**
- * A facade that provides lifecycle services to components outside maven core.
- *
- * Note that this component is not normally used from within core itself.
+ * A facade that provides lifecycle services to components outside maven core. Note that this component is not normally
+ * used from within core itself.
  *
  * @author Jason van Zyl
  * @author Benjamin Bentmann
@@ -63,22 +61,26 @@ public class DefaultLifecycleExecutor
 {
 
     private final LifeCyclePluginAnalyzer lifeCyclePluginAnalyzer;
+
     private final DefaultLifecycles defaultLifeCycles;
+
     private final LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator;
+
     private final LifecycleExecutionPlanCalculator lifecycleExecutionPlanCalculator;
+
     private final MojoExecutor mojoExecutor;
+
     private final LifecycleStarter lifecycleStarter;
+
     private final MojoDescriptorCreator mojoDescriptorCreator;
 
     @Inject
-    public DefaultLifecycleExecutor(
-            LifeCyclePluginAnalyzer lifeCyclePluginAnalyzer,
-            DefaultLifecycles defaultLifeCycles,
-            LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator,
-            LifecycleExecutionPlanCalculator lifecycleExecutionPlanCalculator,
-            MojoExecutor mojoExecutor,
-            LifecycleStarter lifecycleStarter,
-            MojoDescriptorCreator mojoDescriptorCreator )
+    public DefaultLifecycleExecutor( LifeCyclePluginAnalyzer lifeCyclePluginAnalyzer,
+                                     DefaultLifecycles defaultLifeCycles,
+                                     LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator,
+                                     LifecycleExecutionPlanCalculator lifecycleExecutionPlanCalculator,
+                                     MojoExecutor mojoExecutor, LifecycleStarter lifecycleStarter,
+                                     MojoDescriptorCreator mojoDescriptorCreator )
     {
         this.lifeCyclePluginAnalyzer = lifeCyclePluginAnalyzer;
         this.defaultLifeCycles = defaultLifeCycles;

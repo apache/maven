@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.profile;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile;
 
 import java.io.File;
 import java.util.Collections;
@@ -211,7 +210,7 @@ public class DefaultProfileActivationContext
      * Sets the base directory of the current project.
      *
      * @param projectDirectory The base directory of the current project, may be {@code null} if profile activation
-     *                         happens in the context of metadata retrieval rather than project building.
+     *            happens in the context of metadata retrieval rather than project building.
      * @return This context, never {@code null}.
      */
     public DefaultProfileActivationContext setProjectDirectory( File projectDirectory )
@@ -231,11 +230,10 @@ public class DefaultProfileActivationContext
     {
         if ( projectProperties != null )
         {
-            this.projectProperties = projectProperties.entrySet().stream()
-                    .collect(
-                            collectingAndThen(
-                                    toMap( k -> String.valueOf( k.getKey() ), v -> String.valueOf( v ) ),
-                                    Collections::unmodifiableMap ) );
+            this.projectProperties =
+                projectProperties.entrySet().stream().collect( collectingAndThen( toMap( k -> String.valueOf( k.getKey() ),
+                                                                                         v -> String.valueOf( v ) ),
+                                                                                  Collections::unmodifiableMap ) );
         }
         else
         {

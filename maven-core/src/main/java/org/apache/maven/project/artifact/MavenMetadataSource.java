@@ -1,5 +1,3 @@
-package org.apache.maven.project.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,11 @@ package org.apache.maven.project.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.artifact;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,10 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -94,19 +93,20 @@ public class MavenMetadataSource
     implements ArtifactMetadataSource
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     private final RepositoryMetadataManager repositoryMetadataManager;
+
     private final ArtifactFactory repositorySystem;
+
     private final ProjectBuilder projectBuilder;
+
     private final MavenMetadataCache cache;
+
     private final LegacySupport legacySupport;
 
     @Inject
-    public MavenMetadataSource(
-            RepositoryMetadataManager repositoryMetadataManager,
-            ArtifactFactory repositorySystem,
-            ProjectBuilder projectBuilder,
-            MavenMetadataCache cache,
-            LegacySupport legacySupport )
+    public MavenMetadataSource( RepositoryMetadataManager repositoryMetadataManager, ArtifactFactory repositorySystem,
+                                ProjectBuilder projectBuilder, MavenMetadataCache cache, LegacySupport legacySupport )
     {
         this.repositoryMetadataManager = repositoryMetadataManager;
         this.repositorySystem = repositorySystem;
@@ -160,12 +160,11 @@ public class MavenMetadataSource
             return new ResolutionGroup( null, null, null );
         }
 
-        ResolutionGroup cached =
-            cache.get( artifact, request.isResolveManagedVersions(), request.getLocalRepository(),
-                       request.getRemoteRepositories() );
+        ResolutionGroup cached = cache.get( artifact, request.isResolveManagedVersions(), request.getLocalRepository(),
+                                            request.getRemoteRepositories() );
 
         if ( cached != null
-        // if the POM has no file, we cached a missing artifact, only return the cached data if no update forced
+            // if the POM has no file, we cached a missing artifact, only return the cached data if no update forced
             && ( !request.isForceUpdate() || hasFile( cached.getPomArtifact() ) ) )
         {
             return cached;
@@ -196,11 +195,8 @@ public class MavenMetadataSource
             DependencyManagement dependencyManagement = model.getDependencyManagement();
             managedDependencies = dependencyManagement == null ? null : dependencyManagement.getDependencies();
             MavenSession session = legacySupport.getSession();
-            pomRepositories = session.getProjects().stream()
-                    .filter( p -> artifact.equals( p.getArtifact() ) )
-                    .map( MavenProject::getRemoteArtifactRepositories )
-                    .findFirst()
-                    .orElseGet( ArrayList::new );
+            pomRepositories =
+                session.getProjects().stream().filter( p -> artifact.equals( p.getArtifact() ) ).map( MavenProject::getRemoteArtifactRepositories ).findFirst().orElseGet( ArrayList::new );
         }
         else if ( artifact instanceof ArtifactWithDependencies )
         {
@@ -461,7 +457,7 @@ public class MavenMetadataSource
 
     public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact,
                                                                                     ArtifactRepository localRepository,
-                                                                              ArtifactRepository deploymentRepository )
+                                                                                    ArtifactRepository deploymentRepository )
         throws ArtifactMetadataRetrievalException
     {
         RepositoryMetadata metadata = new ArtifactRepositoryMetadata( artifact );
@@ -545,10 +541,8 @@ public class MavenMetadataSource
         {
             project = null;
 
-            pomArtifact =
-                repositorySystem.createProjectArtifact( artifact.getGroupId(),
-                                                        artifact.getArtifactId(),
-                                                        artifact.getVersion(), artifact.getScope() );
+            pomArtifact = repositorySystem.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+                                                                  artifact.getVersion(), artifact.getScope() );
 
             if ( "pom".equals( artifact.getType() ) )
             {
@@ -580,10 +574,8 @@ public class MavenMetadataSource
                     ModelProblem missingParentPom = hasMissingParentPom( e );
                     if ( missingParentPom != null )
                     {
-                        throw new ArtifactMetadataRetrievalException( "Failed to process POM for "
-                            + artifact.getId() + ": " + missingParentPom.getMessage(),
-                                                                      missingParentPom.getException(),
-                                                                      artifact );
+                        throw new ArtifactMetadataRetrievalException( "Failed to process POM for " + artifact.getId()
+                            + ": " + missingParentPom.getMessage(), missingParentPom.getException(), artifact );
                     }
 
                     String message;
@@ -594,16 +586,14 @@ public class MavenMetadataSource
                     }
                     else if ( isNonTransferablePom( e ) )
                     {
-                        throw new ArtifactMetadataRetrievalException( "Failed to retrieve POM for "
-                            + artifact.getId() + ": " + e.getCause().getMessage(), e.getCause(),
-                                                                      artifact );
+                        throw new ArtifactMetadataRetrievalException( "Failed to retrieve POM for " + artifact.getId()
+                            + ": " + e.getCause().getMessage(), e.getCause(), artifact );
                     }
                     else
                     {
-                        message =
-                            "Invalid POM for " + artifact.getId()
-                                + ", transitive dependencies (if any) will not be available"
-                                + ", enable verbose output (-X) for more details";
+                        message = "Invalid POM for " + artifact.getId()
+                            + ", transitive dependencies (if any) will not be available"
+                            + ", enable verbose output (-X) for more details";
                     }
 
                     if ( logger.isDebugEnabled() )
@@ -668,9 +658,8 @@ public class MavenMetadataSource
                             artifact.setAvailableVersions( available );
                         }
 
-                        String message =
-                            "  this artifact has been relocated to " + artifact.getGroupId() + ":"
-                                + artifact.getArtifactId() + ":" + artifact.getVersion() + ".";
+                        String message = "  this artifact has been relocated to " + artifact.getGroupId() + ":"
+                            + artifact.getArtifactId() + ":" + artifact.getVersion() + ".";
 
                         if ( relocation.getMessage() != null )
                         {

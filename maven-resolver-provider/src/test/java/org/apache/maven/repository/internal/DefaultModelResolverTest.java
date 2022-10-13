@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.net.MalformedURLException;
 import java.util.Arrays;
@@ -44,7 +43,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Christian Schulte
  * @since 3.5.0
  */
-public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
+public final class DefaultModelResolverTest
+    extends AbstractRepositoryTestCase
 {
 
     /**
@@ -56,73 +56,66 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
     }
 
     @Test
-    public void testResolveParentThrowsUnresolvableModelExceptionWhenNotFound() throws Exception
+    public void testResolveParentThrowsUnresolvableModelExceptionWhenNotFound()
+        throws Exception
     {
-        final Parent parent = Parent.newBuilder()
-                .groupId( "ut.simple" )
-                .artifactId( "artifact" )
-                .version( "0" ).build();
+        final Parent parent =
+            Parent.newBuilder().groupId( "ut.simple" ).artifactId( "artifact" ).version( "0" ).build();
 
-        UnresolvableModelException e = assertThrows(
-                UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel( parent, new AtomicReference<>() ),
-                "Expected 'UnresolvableModelException' not thrown." );
+        UnresolvableModelException e =
+            assertThrows( UnresolvableModelException.class,
+                          () -> newModelResolver().resolveModel( parent, new AtomicReference<>() ),
+                          "Expected 'UnresolvableModelException' not thrown." );
         assertNotNull( e.getMessage() );
         assertTrue( e.getMessage().startsWith( "Could not find artifact ut.simple:artifact:pom:0 in repo" ) );
     }
 
     @Test
-    public void testResolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception
+    public void testResolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound()
+        throws Exception
     {
-        final Parent parent = Parent.newBuilder()
-                .groupId( "ut.simple" )
-                .artifactId( "artifact" )
-                .version( "[2.0,2.1)" ).build();
+        final Parent parent =
+            Parent.newBuilder().groupId( "ut.simple" ).artifactId( "artifact" ).version( "[2.0,2.1)" ).build();
 
-        UnresolvableModelException e = assertThrows(
-                UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel( parent, new AtomicReference<>() ),
-                "Expected 'UnresolvableModelException' not thrown." );
+        UnresolvableModelException e =
+            assertThrows( UnresolvableModelException.class,
+                          () -> newModelResolver().resolveModel( parent, new AtomicReference<>() ),
+                          "Expected 'UnresolvableModelException' not thrown." );
         assertNotNull( e.getMessage() );
-        assertEquals( "No versions matched the requested parent version range '[2.0,2.1)'",
-                      e.getMessage() );
+        assertEquals( "No versions matched the requested parent version range '[2.0,2.1)'", e.getMessage() );
     }
 
     @Test
-    public void testResolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception
+    public void testResolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound()
+        throws Exception
     {
-        final Parent parent = Parent.newBuilder()
-                .groupId( "ut.simple" )
-                .artifactId( "artifact" )
-                .version( "[1.0,)" ).build();
+        final Parent parent =
+            Parent.newBuilder().groupId( "ut.simple" ).artifactId( "artifact" ).version( "[1.0,)" ).build();
 
-        UnresolvableModelException e = assertThrows(
-                UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel( parent, new AtomicReference<>() ),
-                "Expected 'UnresolvableModelException' not thrown." );
-        assertEquals( "The requested parent version range '[1.0,)' does not specify an upper bound",
-                      e.getMessage() );
+        UnresolvableModelException e =
+            assertThrows( UnresolvableModelException.class,
+                          () -> newModelResolver().resolveModel( parent, new AtomicReference<>() ),
+                          "Expected 'UnresolvableModelException' not thrown." );
+        assertEquals( "The requested parent version range '[1.0,)' does not specify an upper bound", e.getMessage() );
     }
 
     @Test
-    public void testResolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception
+    public void testResolveParentSuccessfullyResolvesExistingParentWithoutRange()
+        throws Exception
     {
-        final Parent parent = Parent.newBuilder()
-                .groupId( "ut.simple" )
-                .artifactId( "artifact" )
-                .version( "1.0" ).build();
+        final Parent parent =
+            Parent.newBuilder().groupId( "ut.simple" ).artifactId( "artifact" ).version( "1.0" ).build();
 
         assertNotNull( this.newModelResolver().resolveModel( parent, new AtomicReference<>() ) );
         assertEquals( "1.0", parent.getVersion() );
     }
 
     @Test
-    public void testResolveParentSuccessfullyResolvesExistingParentUsingHighestVersion() throws Exception
+    public void testResolveParentSuccessfullyResolvesExistingParentUsingHighestVersion()
+        throws Exception
     {
-        final Parent parent = Parent.newBuilder()
-                .groupId( "ut.simple" )
-                .artifactId( "artifact" )
-                .version( "(,2.0)" ).build();
+        final Parent parent =
+            Parent.newBuilder().groupId( "ut.simple" ).artifactId( "artifact" ).version( "(,2.0)" ).build();
 
         AtomicReference<Parent> modified = new AtomicReference<>();
         assertNotNull( this.newModelResolver().resolveModel( parent, modified ) );
@@ -131,72 +124,66 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
     }
 
     @Test
-    public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNotFound() throws Exception
+    public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNotFound()
+        throws Exception
     {
-        final Dependency dependency = Dependency.newBuilder()
-                .groupId( "ut.simple" )
-                .artifactId( "artifact" )
-                .version( "0" ).build();
+        final Dependency dependency =
+            Dependency.newBuilder().groupId( "ut.simple" ).artifactId( "artifact" ).version( "0" ).build();
 
-        UnresolvableModelException e = assertThrows(
-                UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel( dependency, new AtomicReference<>() ),
-                "Expected 'UnresolvableModelException' not thrown." );
+        UnresolvableModelException e =
+            assertThrows( UnresolvableModelException.class,
+                          () -> newModelResolver().resolveModel( dependency, new AtomicReference<>() ),
+                          "Expected 'UnresolvableModelException' not thrown." );
         assertNotNull( e.getMessage() );
         assertTrue( e.getMessage().startsWith( "Could not find artifact ut.simple:artifact:pom:0 in repo" ) );
     }
 
     @Test
-    public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception
+    public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound()
+        throws Exception
     {
-        final Dependency dependency = Dependency.newBuilder()
-                .groupId( "ut.simple" )
-                .artifactId( "artifact" )
-                .version( "[2.0,2.1)" ).build();
+        final Dependency dependency =
+            Dependency.newBuilder().groupId( "ut.simple" ).artifactId( "artifact" ).version( "[2.0,2.1)" ).build();
 
-        UnresolvableModelException e = assertThrows(
-                UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel( dependency, new AtomicReference<>() ),
-                "Expected 'UnresolvableModelException' not thrown." );
-        assertEquals( "No versions matched the requested dependency version range '[2.0,2.1)'",
-                      e.getMessage() );
+        UnresolvableModelException e =
+            assertThrows( UnresolvableModelException.class,
+                          () -> newModelResolver().resolveModel( dependency, new AtomicReference<>() ),
+                          "Expected 'UnresolvableModelException' not thrown." );
+        assertEquals( "No versions matched the requested dependency version range '[2.0,2.1)'", e.getMessage() );
     }
 
     @Test
-    public void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception
+    public void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound()
+        throws Exception
     {
-        final Dependency dependency = Dependency.newBuilder()
-                .groupId( "ut.simple" )
-                .artifactId( "artifact" )
-                .version( "[1.0,)" ).build();
+        final Dependency dependency =
+            Dependency.newBuilder().groupId( "ut.simple" ).artifactId( "artifact" ).version( "[1.0,)" ).build();
 
-        UnresolvableModelException e = assertThrows(
-                UnresolvableModelException.class,
-                () -> newModelResolver().resolveModel( dependency, new AtomicReference<>() ),
-                "Expected 'UnresolvableModelException' not thrown." );
+        UnresolvableModelException e =
+            assertThrows( UnresolvableModelException.class,
+                          () -> newModelResolver().resolveModel( dependency, new AtomicReference<>() ),
+                          "Expected 'UnresolvableModelException' not thrown." );
         assertEquals( "The requested dependency version range '[1.0,)' does not specify an upper bound",
                       e.getMessage() );
     }
 
     @Test
-    public void testResolveDependencySuccessfullyResolvesExistingDependencyWithoutRange() throws Exception
+    public void testResolveDependencySuccessfullyResolvesExistingDependencyWithoutRange()
+        throws Exception
     {
-        final Dependency dependency = Dependency.newBuilder()
-                .groupId( "ut.simple" )
-                .artifactId( "artifact" )
-                .version( "1.0" ).build();
+        final Dependency dependency =
+            Dependency.newBuilder().groupId( "ut.simple" ).artifactId( "artifact" ).version( "1.0" ).build();
 
         assertNotNull( this.newModelResolver().resolveModel( dependency, new AtomicReference<>() ) );
         assertEquals( "1.0", dependency.getVersion() );
     }
 
     @Test
-    public void testResolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion() throws Exception
+    public void testResolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion()
+        throws Exception
     {
-        final Dependency dependency = Dependency.newBuilder()
-                .groupId( "ut.simple" )
-                .artifactId( "artifact" )
-                .version( "(,2.0)" ).build();
+        final Dependency dependency =
+            Dependency.newBuilder().groupId( "ut.simple" ).artifactId( "artifact" ).version( "(,2.0)" ).build();
 
         AtomicReference<Dependency> modified = new AtomicReference<>();
         assertNotNull( this.newModelResolver().resolveModel( dependency, modified ) );
@@ -204,10 +191,12 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTestCase
         assertEquals( "1.0", modified.get().getVersion() );
     }
 
-    private ModelResolver newModelResolver() throws ComponentLookupException, MalformedURLException
+    private ModelResolver newModelResolver()
+        throws ComponentLookupException, MalformedURLException
     {
         return new DefaultModelResolver( this.session, null, this.getClass().getName(),
-                                         getContainer().lookup( ArtifactResolver.class ), getContainer().lookup( VersionRangeResolver.class ),
+                                         getContainer().lookup( ArtifactResolver.class ),
+                                         getContainer().lookup( VersionRangeResolver.class ),
                                          getContainer().lookup( RemoteRepositoryManager.class ),
                                          Arrays.asList( newTestRepository() ) );
 

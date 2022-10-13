@@ -1,5 +1,3 @@
-package org.apache.maven.cli.transfer;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.cli.transfer;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.cli.transfer;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli.transfer;
 
 import java.io.PrintStream;
 import java.text.DecimalFormat;
@@ -39,14 +38,14 @@ public abstract class AbstractMavenTransferListener
 
     // CHECKSTYLE_OFF: LineLength
     /**
-     * Formats file size with the associated <a href="https://en.wikipedia.org/wiki/Metric_prefix">SI</a> prefix
-     * (GB, MB, kB) and using the patterns <code>#0.0</code> for numbers between 1 and 10
-     * and <code>###0</code> for numbers between 10 and 1000+ by default.
+     * Formats file size with the associated <a href="https://en.wikipedia.org/wiki/Metric_prefix">SI</a> prefix (GB,
+     * MB, kB) and using the patterns <code>#0.0</code> for numbers between 1 and 10 and <code>###0</code> for numbers
+     * between 10 and 1000+ by default.
      *
      * @see <a href="https://en.wikipedia.org/wiki/Metric_prefix">https://en.wikipedia.org/wiki/Metric_prefix</a>
      * @see <a href="https://en.wikipedia.org/wiki/Binary_prefix">https://en.wikipedia.org/wiki/Binary_prefix</a>
-     * @see <a
-     *      href="https://en.wikipedia.org/wiki/Octet_%28computing%29">https://en.wikipedia.org/wiki/Octet_(computing)</a>
+     * @see <a href=
+     *      "https://en.wikipedia.org/wiki/Octet_%28computing%29">https://en.wikipedia.org/wiki/Octet_(computing)</a>
      */
     // CHECKSTYLE_ON: LineLength
     // TODO Move me to Maven Shared Utils
@@ -112,6 +111,7 @@ public abstract class AbstractMavenTransferListener
             };
 
             public abstract long bytes();
+
             public abstract String symbol();
 
             public static ScaleUnit getScaleUnit( long size )
@@ -138,6 +138,7 @@ public abstract class AbstractMavenTransferListener
         }
 
         private DecimalFormat smallFormat;
+
         private DecimalFormat largeFormat;
 
         FileSizeFormat( Locale locale )
@@ -193,7 +194,7 @@ public abstract class AbstractMavenTransferListener
         {
             Validate.isTrue( progressedSize >= 0L, "progressed file size cannot be negative: %s", progressedSize );
             Validate.isTrue( size < 0L || progressedSize <= size,
-                "progressed file size cannot be greater than size: %s > %s", progressedSize, size );
+                             "progressed file size cannot be greater than size: %s > %s", progressedSize, size );
 
             if ( size >= 0L && progressedSize != size )
             {

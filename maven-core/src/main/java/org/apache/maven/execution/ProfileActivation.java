@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.execution;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +38,7 @@ public class ProfileActivation
 
     /**
      * Mimics the pre-Maven 4 "active profiles" list.
+     * 
      * @deprecated Use {@link #getRequiredActiveProfileIds()} and {@link #getOptionalActiveProfileIds()} instead.
      */
     @Deprecated
@@ -49,6 +49,7 @@ public class ProfileActivation
 
     /**
      * Mimics the pre-Maven 4 "inactive profiles" list.
+     * 
      * @deprecated Use {@link #getRequiredInactiveProfileIds()} and {@link #getOptionalInactiveProfileIds()} instead.
      */
     @Deprecated
@@ -59,6 +60,7 @@ public class ProfileActivation
 
     /**
      * Overwrites the active profiles based on a pre-Maven 4 "active profiles" list.
+     * 
      * @param activeProfileIds A {@link List} of profile IDs that must be activated.
      * @deprecated Use {@link #activateOptionalProfile(String)} or {@link #activateRequiredProfile(String)} instead.
      */
@@ -71,6 +73,7 @@ public class ProfileActivation
 
     /**
      * Overwrites the inactive profiles based on a pre-Maven 4 "inactive profiles" list.
+     * 
      * @param inactiveProfileIds A {@link List} of profile IDs that must be deactivated.
      * @deprecated Use {@link #deactivateOptionalProfile(String)} or {@link #deactivateRequiredProfile(String)} instead.
      */
@@ -83,6 +86,7 @@ public class ProfileActivation
 
     /**
      * Mark a profile as required and activated.
+     * 
      * @param id The identifier of the profile.
      */
     public void activateRequiredProfile( String id )
@@ -92,6 +96,7 @@ public class ProfileActivation
 
     /**
      * Mark a profile as optional and activated.
+     * 
      * @param id The identifier of the profile.
      */
     public void activateOptionalProfile( String id )
@@ -101,6 +106,7 @@ public class ProfileActivation
 
     /**
      * Mark a profile as required and deactivated.
+     * 
      * @param id The identifier of the profile.
      */
     public void deactivateRequiredProfile( String id )
@@ -110,6 +116,7 @@ public class ProfileActivation
 
     /**
      * Mark a profile as optional and deactivated.
+     * 
      * @param id The identifier of the profile.
      */
     public void deactivateOptionalProfile( String id )
@@ -119,6 +126,7 @@ public class ProfileActivation
 
     /**
      * Adds a profile activation to the request.
+     * 
      * @param id The identifier of the profile.
      * @param active Should the profile be activated?
      * @param optional Can the build continue if the profile does not exist?
@@ -131,10 +139,7 @@ public class ProfileActivation
 
     private Set<String> getProfileIds( final Predicate<ActivationSettings> predicate )
     {
-        return this.activations.entrySet().stream()
-                .filter( e -> predicate.test( e.getValue() ) )
-                .map( Map.Entry::getKey )
-                .collect( toSet() );
+        return this.activations.entrySet().stream().filter( e -> predicate.test( e.getValue() ) ).map( Map.Entry::getKey ).collect( toSet() );
     }
 
     /**

@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,7 +16,7 @@ package org.apache.maven.artifact.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
-
+package org.apache.maven.artifact.repository;
 
 import org.junit.jupiter.api.Test;
 
@@ -27,11 +25,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenArtifactRepositoryTest
 {
-    private static class MavenArtifactRepositorySubclass extends MavenArtifactRepository
+    private static class MavenArtifactRepositorySubclass
+        extends MavenArtifactRepository
     {
         String id;
 
-        public MavenArtifactRepositorySubclass(String id)
+        public MavenArtifactRepositorySubclass( String id )
         {
             this.id = id;
         }

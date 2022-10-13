@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.io.File;
 import java.util.Map;
@@ -93,11 +92,11 @@ public final class RelocatedArtifact
     @Override
     public Artifact setVersion( String version )
     {
-         String current = getVersion();
-         if ( current.equals( version ) || ( version == null && current.length() <= 0 ) )
-         {
-             return this;
-         }
+        String current = getVersion();
+        if ( current.equals( version ) || ( version == null && current.length() <= 0 ) )
+        {
+            return this;
+        }
         return new RelocatedArtifact( artifact, groupId, artifactId, version, message );
     }
 
@@ -107,7 +106,7 @@ public final class RelocatedArtifact
         File current = getFile();
         if ( Objects.equals( current, file ) )
         {
-             return this;
+            return this;
         }
         return new RelocatedArtifact( artifact.setFile( file ), groupId, artifactId, version, message );
     }
@@ -118,7 +117,7 @@ public final class RelocatedArtifact
         Map<String, String> current = getProperties();
         if ( current.equals( properties ) || ( properties == null && current.isEmpty() ) )
         {
-             return this;
+            return this;
         }
         return new RelocatedArtifact( artifact.setProperties( properties ), groupId, artifactId, version, message );
     }

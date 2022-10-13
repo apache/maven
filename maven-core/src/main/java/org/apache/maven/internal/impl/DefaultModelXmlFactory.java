@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -47,10 +46,12 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 @Named
 @Singleton
 public class DefaultModelXmlFactory
-        implements ModelXmlFactory
+    implements ModelXmlFactory
 {
     @Override
-    public Model read( @Nonnull XmlReaderRequest request ) throws XmlReaderException
+    public Model read( @Nonnull
+    XmlReaderRequest request )
+        throws XmlReaderException
     {
         nonNull( request, "request can not be null" );
         Path path = request.getPath();
@@ -91,7 +92,8 @@ public class DefaultModelXmlFactory
     }
 
     @Override
-    public void write( XmlWriterRequest<Model> request ) throws XmlWriterException
+    public void write( XmlWriterRequest<Model> request )
+        throws XmlWriterException
     {
         nonNull( request, "request can not be null" );
         Model content = nonNull( request.getContent(), "content can not be null" );
@@ -134,7 +136,9 @@ public class DefaultModelXmlFactory
      * @throws XmlReaderException if an error occurs during the parsing
      * @see #toXmlString(Object)
      */
-    public static Model fromXml( @Nonnull String xml ) throws XmlReaderException
+    public static Model fromXml( @Nonnull
+    String xml )
+        throws XmlReaderException
     {
         return new DefaultModelXmlFactory().fromXmlString( xml );
     }
@@ -147,7 +151,9 @@ public class DefaultModelXmlFactory
      * @throws XmlWriterException if an error occurs during the transformation
      * @see #fromXmlString(String)
      */
-    public static String toXml( @Nonnull Model content ) throws XmlWriterException
+    public static String toXml( @Nonnull
+    Model content )
+        throws XmlWriterException
     {
         return new DefaultModelXmlFactory().toXmlString( content );
     }

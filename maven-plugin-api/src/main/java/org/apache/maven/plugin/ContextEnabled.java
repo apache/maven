@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,12 +16,13 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import java.util.Map;
 
 /**
- * Interface to allow <code>Mojos</code> to communicate with each others <code>Mojos</code>, other than
- * project's source root and project's attachment.<br>
+ * Interface to allow <code>Mojos</code> to communicate with each others <code>Mojos</code>, other than project's source
+ * root and project's attachment.<br>
  * The plugin manager would pull the context out of the plugin container context, and populate it into the Mojo.
  *
  * @author jdcasey

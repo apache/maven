@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,9 +53,8 @@ public class MavenProjectTest
 
         MavenProject childProject = new MavenProject( childModel );
 
-        File childFile =
-            new File( System.getProperty( "java.io.tmpdir" ), "maven-project-tests" + System.currentTimeMillis()
-                + "/child/pom.xml" );
+        File childFile = new File( System.getProperty( "java.io.tmpdir" ),
+                                   "maven-project-tests" + System.currentTimeMillis() + "/child/pom.xml" );
 
         childProject.setFile( childFile );
 
@@ -97,7 +95,7 @@ public class MavenProjectTest
         MavenProject project = new MavenProject();
 
         assertEquals( MavenProject.EMPTY_PROJECT_GROUP_ID + ":" + MavenProject.EMPTY_PROJECT_ARTIFACT_ID + ":jar:"
-                        + MavenProject.EMPTY_PROJECT_VERSION, project.getId() );
+            + MavenProject.EMPTY_PROJECT_VERSION, project.getId() );
     }
 
     @Test
@@ -135,7 +133,8 @@ public class MavenProjectTest
         Map<?, ?> clonedMap = clonedProject.getManagedVersionMap();
         assertNotNull( clonedMap, "ManagedVersionMap not copied" );
         assertTrue( !clonedMap.isEmpty(), "ManagedVersionMap is empty" );
-        assertTrue( clonedMap.containsKey( "maven-test:maven-test-b:jar" ), "ManagedVersionMap does not contain test key" );
+        assertTrue( clonedMap.containsKey( "maven-test:maven-test-b:jar" ),
+                    "ManagedVersionMap does not contain test key" );
     }
 
     @Test
@@ -167,7 +166,8 @@ public class MavenProjectTest
         MavenProject projectToClone = getProject( f );
 
         MavenProject clonedProject = projectToClone.clone();
-        assertNotNull( clonedProject.getDistributionManagementArtifactRepository(), "clonedProject - distributionManagement" );
+        assertNotNull( clonedProject.getDistributionManagementArtifactRepository(),
+                       "clonedProject - distributionManagement" );
     }
 
     @Test
@@ -188,7 +188,7 @@ public class MavenProjectTest
         assertEquals( 1, activeProfilesClone.size(), "Expecting 1 active profile" );
 
         assertNotSame( activeProfilesOrig, activeProfilesClone,
-                      "The list of active profiles should have been cloned too but is same" );
+                       "The list of active profiles should have been cloned too but is same" );
     }
 
     @Test
@@ -200,7 +200,8 @@ public class MavenProjectTest
         projectToClone.setPomFile( new File( new File( f.getParentFile(), "target" ), "flattened.xml" ) );
         MavenProject clonedProject = projectToClone.clone();
         assertEquals( projectToClone.getFile(), clonedProject.getFile(), "POM file is preserved across clone" );
-        assertEquals( projectToClone.getBasedir(), clonedProject.getBasedir(), "Base directory is preserved across clone" );
+        assertEquals( projectToClone.getBasedir(), clonedProject.getBasedir(),
+                      "Base directory is preserved across clone" );
     }
 
     @Test

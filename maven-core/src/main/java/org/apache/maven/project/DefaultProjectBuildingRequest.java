@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -226,8 +225,8 @@ public class DefaultProjectBuildingRequest
 
     /**
      * @since 3.2.2
-     * @deprecated This got added when implementing MNG-2199 and is no longer used.
-     * Commit 6cf9320942c34bc68205425ab696b1712ace9ba4 updated the way 'MavenProject' objects are initialized.
+     * @deprecated This got added when implementing MNG-2199 and is no longer used. Commit
+     *             6cf9320942c34bc68205425ab696b1712ace9ba4 updated the way 'MavenProject' objects are initialized.
      */
     @Deprecated
     public ProjectBuildingRequest setResolveVersionRanges( boolean value )
@@ -238,8 +237,8 @@ public class DefaultProjectBuildingRequest
 
     /**
      * @since 3.2.2
-     * @deprecated This got added when implementing MNG-2199 and is no longer used.
-     * Commit 6cf9320942c34bc68205425ab696b1712ace9ba4 updated the way 'MavenProject' objects are initialized.
+     * @deprecated This got added when implementing MNG-2199 and is no longer used. Commit
+     *             6cf9320942c34bc68205425ab696b1712ace9ba4 updated the way 'MavenProject' objects are initialized.
      */
     @Deprecated
     public boolean isResolveVersionRanges()

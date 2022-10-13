@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.handler;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.handler;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.handler;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.handler;
 
 import static java.util.Objects.requireNonNull;
 
@@ -45,8 +44,8 @@ public class DefaultArtifactHandler
     private boolean addedToClasspath;
 
     /**
-     * Default ctor for Plexus compatibility, as many plugins have artifact handlers declared in legacy Plexus XML.
-     * Do not use directly!
+     * Default ctor for Plexus compatibility, as many plugins have artifact handlers declared in legacy Plexus XML. Do
+     * not use directly!
      *
      * @deprecated This ctor is present only for Plexus XML defined component compatibility, do not use it.
      */
@@ -58,27 +57,13 @@ public class DefaultArtifactHandler
 
     public DefaultArtifactHandler( final String type )
     {
-        this(
-            type,
-            null,
-            null,
-            null,
-            null,
-            false,
-            null,
-            false
-        );
+        this( type, null, null, null, null, false, null, false );
     }
 
     @SuppressWarnings( "checkstyle:ParameterNumber" )
-    public DefaultArtifactHandler( final String type,
-                                   final String extension,
-                                   final String classifier,
-                                   final String directory,
-                                   final String packaging,
-                                   final boolean includesDependencies,
-                                   final String language,
-                                   final boolean addedToClasspath )
+    public DefaultArtifactHandler( final String type, final String extension, final String classifier,
+                                   final String directory, final String packaging, final boolean includesDependencies,
+                                   final String language, final boolean addedToClasspath )
     {
         this.type = requireNonNull( type );
         this.extension = extension;

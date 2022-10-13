@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,44 +16,43 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
-import org.apache.maven.api.Service;
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
-
-import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.Project;
+import org.apache.maven.api.Service;
+import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * The DependencyCollector service can be used to collect dependencies
- * for a given artifact and builds a graph of them.
- * The dependencies collection mechanism will not download any artifacts,
- * and only the pom files will be downloaded.
+ * The DependencyCollector service can be used to collect dependencies for a given artifact and builds a graph of them.
+ * The dependencies collection mechanism will not download any artifacts, and only the pom files will be downloaded.
  *
  * @since 4.0
  */
 @Experimental
-public interface DependencyCollector extends Service
+public interface DependencyCollector
+    extends Service
 {
 
     /**
-     * Collects the transitive dependencies and builds a dependency graph.
-     * Note that this operation is only concerned about determining the coordinates of the
-     * transitive dependencies and does not actually resolve the artifact files.
+     * Collects the transitive dependencies and builds a dependency graph. Note that this operation is only concerned
+     * about determining the coordinates of the transitive dependencies and does not actually resolve the artifact
+     * files.
      *
      * @param request The dependency collection request, must not be {@code null}.
      * @return The collection result, never {@code null}.
      * @throws DependencyCollectorException If the dependency tree could not be built.
      * @throws IllegalArgumentException if an argument is null or invalid
-     *
      * @see DependencyCollector#collect(Session, Project)
      * @see DependencyCollector#collect(Session, DependencyCoordinate)
      * @see DependencyCollector#collect(Session, Artifact)
      */
     @Nonnull
-    DependencyCollectorResult collect( @Nonnull DependencyCollectorRequest request );
+    DependencyCollectorResult collect( @Nonnull
+    DependencyCollectorRequest request );
 
     /**
      * Collects the transitive dependencies of some artifacts and builds a dependency graph. Note that this operation is
@@ -70,8 +67,9 @@ public interface DependencyCollector extends Service
      * @see #collect(DependencyCollectorRequest)
      */
     @Nonnull
-    default DependencyCollectorResult collect( @Nonnull Session session,
-                                               @Nonnull DependencyCoordinate root )
+    default DependencyCollectorResult collect( @Nonnull
+    Session session, @Nonnull
+    DependencyCoordinate root )
     {
         return collect( DependencyCollectorRequest.build( session, root ) );
     }
@@ -89,8 +87,9 @@ public interface DependencyCollector extends Service
      * @see #collect(DependencyCollectorRequest)
      */
     @Nonnull
-    default DependencyCollectorResult collect( @Nonnull Session session,
-                                               @Nonnull Project project )
+    default DependencyCollectorResult collect( @Nonnull
+    Session session, @Nonnull
+    Project project )
     {
         return collect( DependencyCollectorRequest.build( session, project ) );
     }
@@ -108,8 +107,9 @@ public interface DependencyCollector extends Service
      * @see #collect(DependencyCollectorRequest)
      */
     @Nonnull
-    default DependencyCollectorResult collect( @Nonnull Session session,
-                                               @Nonnull Artifact artifact )
+    default DependencyCollectorResult collect( @Nonnull
+    Session session, @Nonnull
+    Artifact artifact )
     {
         return collect( DependencyCollectorRequest.build( session, artifact ) );
     }

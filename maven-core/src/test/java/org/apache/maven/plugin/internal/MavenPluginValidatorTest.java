@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,9 @@ package org.apache.maven.plugin.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.internal;
+
+import javax.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,18 +28,16 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugin.internal.MavenPluginValidator;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-
-import javax.inject.Inject;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Michael Simacek
  */
-public class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase
+public class MavenPluginValidatorTest
+    extends AbstractCoreMavenComponentTestCase
 {
     @Inject
     private MavenPluginValidator mavenPluginValidator;
@@ -52,7 +51,7 @@ public class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase
     public void testValidate()
     {
         Artifact plugin = new DefaultArtifact( "org.apache.maven.its.plugins", "maven-it-plugin", "0.1", "compile",
-                "jar", null, new DefaultArtifactHandler( "ignore" ) );
+                                               "jar", null, new DefaultArtifactHandler( "ignore" ) );
         PluginDescriptor descriptor = new PluginDescriptor();
         descriptor.setGroupId( "org.apache.maven.its.plugins" );
         descriptor.setArtifactId( "maven-it-plugin" );
@@ -66,7 +65,7 @@ public class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase
     public void testInvalidGroupId()
     {
         Artifact plugin = new DefaultArtifact( "org.apache.maven.its.plugins", "maven-it-plugin", "0.1", "compile",
-                "jar", null, new DefaultArtifactHandler( "ignore" ) );
+                                               "jar", null, new DefaultArtifactHandler( "ignore" ) );
         PluginDescriptor descriptor = new PluginDescriptor();
         descriptor.setGroupId( "org.apache.maven.its.plugins.invalid" );
         descriptor.setArtifactId( "maven-it-plugin" );
@@ -80,7 +79,7 @@ public class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase
     public void testInvalidArtifactId()
     {
         Artifact plugin = new DefaultArtifact( "org.apache.maven.its.plugins", "maven-it-plugin", "0.1", "compile",
-                "jar", null, new DefaultArtifactHandler( "ignore" ) );
+                                               "jar", null, new DefaultArtifactHandler( "ignore" ) );
         PluginDescriptor descriptor = new PluginDescriptor();
         descriptor.setGroupId( "org.apache.maven.its.plugins" );
         descriptor.setArtifactId( "maven-it-plugin.invalid" );
@@ -94,7 +93,7 @@ public class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase
     public void testInvalidVersion()
     {
         Artifact plugin = new DefaultArtifact( "org.apache.maven.its.plugins", "maven-it-plugin", "0.1", "compile",
-                "jar", null, new DefaultArtifactHandler( "ignore" ) );
+                                               "jar", null, new DefaultArtifactHandler( "ignore" ) );
         PluginDescriptor descriptor = new PluginDescriptor();
         descriptor.setGroupId( "org.apache.maven.its.plugins" );
         descriptor.setArtifactId( "maven-it-plugin" );

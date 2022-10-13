@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -44,8 +43,8 @@ public class PluginParameterException
 
     public PluginParameterException( MojoDescriptor mojo, List<Parameter> parameters )
     {
-        super( mojo.getPluginDescriptor(), "The parameters " + format( parameters ) + " for goal "
-            + mojo.getRoleHint() + " are missing or invalid" );
+        super( mojo.getPluginDescriptor(), "The parameters " + format( parameters ) + " for goal " + mojo.getRoleHint()
+            + " are missing or invalid" );
 
         this.mojo = mojo;
 
@@ -94,7 +93,7 @@ public class PluginParameterException
             {
                 try
                 {
-                    //assuming Type is available in current ClassLoader
+                    // assuming Type is available in current ClassLoader
                     isCollection = Collection.class.isAssignableFrom( Class.forName( param.getType() ) );
                     isMap = Map.class.isAssignableFrom( Class.forName( param.getType() ) );
                     isProperties = Properties.class.isAssignableFrom( Class.forName( param.getType() ) );
@@ -152,8 +151,7 @@ public class PluginParameterException
             {
                 messageBuffer.append( LS ).append( LS ).append( "-OR-" ).append( LS ).append( LS );
                 messageBuffer.append( "<configuration>" ).append( LS ).append( "  ..." ).append( LS );
-                messageBuffer.append( "  <" ).append( alias ).append(
-                    ">VALUE</" ).append( alias ).append( ">" ).append( LS ).append( "</configuration>" ).append( LS );
+                messageBuffer.append( "  <" ).append( alias ).append( ">VALUE</" ).append( alias ).append( ">" ).append( LS ).append( "</configuration>" ).append( LS );
             }
         }
 
@@ -168,7 +166,7 @@ public class PluginParameterException
                 messageBuffer.append( LS ).append( LS ).append( "-OR-" ).append( LS ).append( LS );
             }
 
-            //addParameterUsageInfo( expression, messageBuffer );
+            // addParameterUsageInfo( expression, messageBuffer );
         }
     }
 
@@ -179,9 +177,7 @@ public class PluginParameterException
         List<Parameter> params = getParameters();
         MojoDescriptor mojo = getMojoDescriptor();
 
-        messageBuffer.append( "One or more required plugin parameters are invalid/missing for '" )
-            .append( mojo.getPluginDescriptor().getGoalPrefix() ).append( ':' ).append( mojo.getGoal() )
-            .append( "'" ).append( LS );
+        messageBuffer.append( "One or more required plugin parameters are invalid/missing for '" ).append( mojo.getPluginDescriptor().getGoalPrefix() ).append( ':' ).append( mojo.getGoal() ).append( "'" ).append( LS );
 
         int idx = 0;
         for ( Iterator<Parameter> it = params.iterator(); it.hasNext(); idx++ )

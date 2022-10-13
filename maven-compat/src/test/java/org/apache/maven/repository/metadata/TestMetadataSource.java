@@ -1,5 +1,3 @@
-package org.apache.maven.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,11 @@ package org.apache.maven.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.metadata;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.HashSet;
 import java.util.List;
@@ -32,10 +35,6 @@ import org.apache.maven.repository.legacy.metadata.ArtifactMetadataSource;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 import org.apache.maven.repository.legacy.metadata.ResolutionGroup;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 @Named
 @Singleton
 public class TestMetadataSource
@@ -44,7 +43,8 @@ public class TestMetadataSource
     @Inject
     private ArtifactFactory factory;
 
-    public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
+                                     List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
         Set<Artifact> dependencies = new HashSet<>();
@@ -77,17 +77,19 @@ public class TestMetadataSource
             }
         }
 
-
         return new ResolutionGroup( artifact, dependencies, remoteRepositories );
     }
 
-    public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
+                                                            List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
         throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
     }
 
-    public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository )
+    public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact,
+                                                                                    ArtifactRepository localRepository,
+                                                                                    ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException
     {
         throw new UnsupportedOperationException( "Cannot get available versions in this test case" );

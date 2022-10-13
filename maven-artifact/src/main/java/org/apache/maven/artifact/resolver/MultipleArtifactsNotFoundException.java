@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.resolver;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +25,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
- * Exception caused when one or more artifacts can not be resolved because they are not found in the
- * local or remote repositories.
+ * Exception caused when one or more artifacts can not be resolved because they are not found in the local or remote
+ * repositories.
  */
 public class MultipleArtifactsNotFoundException
     extends ArtifactResolutionException
@@ -35,17 +34,17 @@ public class MultipleArtifactsNotFoundException
     private static final String LS = System.lineSeparator();
 
     private final List<Artifact> resolvedArtifacts;
+
     private final List<Artifact> missingArtifacts;
 
     /**
      * @param originatingArtifact the artifact that was being resolved
-     * @param missingArtifacts    artifacts that could not be resolved
-     * @param remoteRepositories  remote repositories where the missing artifacts were not found
+     * @param missingArtifacts artifacts that could not be resolved
+     * @param remoteRepositories remote repositories where the missing artifacts were not found
      * @deprecated use {@link #MultipleArtifactsNotFoundException(Artifact, List, List, List)}
      */
     @Deprecated
-    public MultipleArtifactsNotFoundException( Artifact originatingArtifact,
-                                               List<Artifact> missingArtifacts,
+    public MultipleArtifactsNotFoundException( Artifact originatingArtifact, List<Artifact> missingArtifacts,
                                                List<ArtifactRepository> remoteRepositories )
     {
         this( originatingArtifact, new ArrayList<>(), missingArtifacts, remoteRepositories );
@@ -55,12 +54,11 @@ public class MultipleArtifactsNotFoundException
      * Create an instance of the exception with all required information.
      *
      * @param originatingArtifact the artifact that was being resolved
-     * @param resolvedArtifacts   artifacts that could be resolved
-     * @param missingArtifacts    artifacts that could not be resolved
-     * @param remoteRepositories  remote repositories where the missing artifacts were not found
+     * @param resolvedArtifacts artifacts that could be resolved
+     * @param missingArtifacts artifacts that could not be resolved
+     * @param remoteRepositories remote repositories where the missing artifacts were not found
      */
-    public MultipleArtifactsNotFoundException( Artifact originatingArtifact,
-                                               List<Artifact> resolvedArtifacts,
+    public MultipleArtifactsNotFoundException( Artifact originatingArtifact, List<Artifact> resolvedArtifacts,
                                                List<Artifact> missingArtifacts,
                                                List<ArtifactRepository> remoteRepositories )
     {
@@ -103,8 +101,10 @@ public class MultipleArtifactsNotFoundException
             String message = ( ++counter ) + ") " + artifact.getId();
 
             buffer.append( constructMissingArtifactMessage( message, "  ", artifact.getGroupId(),
-                    artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getClassifier(),
-                    artifact.getDownloadUrl(), artifact.getDependencyTrail() ) );
+                                                            artifact.getArtifactId(), artifact.getVersion(),
+                                                            artifact.getType(), artifact.getClassifier(),
+                                                            artifact.getDownloadUrl(),
+                                                            artifact.getDependencyTrail() ) );
         }
 
         buffer.append( "----------" ).append( LS );

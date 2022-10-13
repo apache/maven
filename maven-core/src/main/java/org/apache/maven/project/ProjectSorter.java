@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -27,11 +26,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.model.Build;
-import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Extension;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Plugin;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
@@ -53,20 +52,20 @@ public class ProjectSorter
      * Sort a list of projects.
      * <ul>
      * <li>collect all the vertices for the projects that we want to build.</li>
-     * <li>iterate through the deps of each project and if that dep is within
-     * the set of projects we want to build then add an edge, otherwise throw
-     * the edge away because that dependency is not within the set of projects
-     * we are trying to build. we assume a closed set.</li>
+     * <li>iterate through the deps of each project and if that dep is within the set of projects we want to build then
+     * add an edge, otherwise throw the edge away because that dependency is not within the set of projects we are
+     * trying to build. we assume a closed set.</li>
      * <li>do a topo sort on the graph that remains.</li>
      * </ul>
+     * 
      * @throws DuplicateProjectException if any projects are duplicated by id
      */
     // MAVENAPI FIXME: the DAG used is NOT only used to represent the dependency relation,
     // but also for <parent>, <build><plugin>, <reports>. We need multiple DAG's
     // since a DAG can only handle 1 type of relationship properly.
-    // Use case:  This is detected as a cycle:
-    // org.apache.maven:maven-plugin-api                -(PARENT)->
-    // org.apache.maven:maven                           -(inherited REPORTING)->
+    // Use case: This is detected as a cycle:
+    // org.apache.maven:maven-plugin-api -(PARENT)->
+    // org.apache.maven:maven -(inherited REPORTING)->
     // org.apache.maven.plugins:maven-checkstyle-plugin -(DEPENDENCY)->
     // org.apache.maven:maven-plugin-api
     // In this case, both the verify and the report goals are called
@@ -129,8 +128,8 @@ public class ProjectSorter
             {
                 for ( Plugin plugin : build.getPlugins() )
                 {
-                    addEdge( projectMap, vertexMap, project, projectVertex, plugin.getGroupId(),
-                             plugin.getArtifactId(), plugin.getVersion(), false, true );
+                    addEdge( projectMap, vertexMap, project, projectVertex, plugin.getGroupId(), plugin.getArtifactId(),
+                             plugin.getVersion(), false, true );
 
                     for ( Dependency dependency : plugin.getDependencies() )
                     {
@@ -149,13 +148,15 @@ public class ProjectSorter
 
         List<String> sortedProjectLabels = TopologicalSorter.sort( dag );
 
-        this.sortedProjects = sortedProjectLabels.stream().map( id -> projectMap.get( id ) )
-                .collect( Collectors.collectingAndThen( Collectors.toList(), Collections::unmodifiableList ) );
+        this.sortedProjects =
+            sortedProjectLabels.stream().map( id -> projectMap.get( id ) ).collect( Collectors.collectingAndThen( Collectors.toList(),
+                                                                                                                  Collections::unmodifiableList ) );
     }
+
     @SuppressWarnings( "checkstyle:parameternumber" )
     private void addEdge( Map<String, MavenProject> projectMap, Map<String, Map<String, Vertex>> vertexMap,
-                          MavenProject project, Vertex projectVertex, String groupId, String artifactId,
-                          String version, boolean force, boolean safe )
+                          MavenProject project, Vertex projectVertex, String groupId, String artifactId, String version,
+                          boolean force, boolean safe )
         throws CycleDetectedException
     {
         String projectKey = ArtifactUtils.versionlessKey( groupId, artifactId );
@@ -220,11 +221,11 @@ public class ProjectSorter
         return !( StringUtils.isEmpty( version ) || version.startsWith( "[" ) || version.startsWith( "(" ) );
     }
 
-    // TODO !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in weirdness.
+    // TODO !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in
+    // weirdness.
     public MavenProject getTopLevelProject()
     {
-        return sortedProjects.stream().filter( MavenProject::isExecutionRoot ).findFirst()
-                .orElse( null );
+        return sortedProjects.stream().filter( MavenProject::isExecutionRoot ).findFirst().orElse( null );
     }
 
     public List<MavenProject> getSortedProjects()

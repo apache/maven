@@ -1,5 +1,3 @@
-package org.apache.maven.settings.crypto;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,14 @@ package org.apache.maven.settings.crypto;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.util.ArrayList;
-import java.util.List;
+package org.apache.maven.settings.crypto;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -47,7 +46,8 @@ public class DefaultSettingsDecrypter
     private final SecDispatcher securityDispatcher;
 
     @Inject
-    public DefaultSettingsDecrypter( @Named( "maven" ) SecDispatcher securityDispatcher )
+    public DefaultSettingsDecrypter( @Named( "maven" )
+    SecDispatcher securityDispatcher )
     {
         this.securityDispatcher = securityDispatcher;
     }
@@ -96,8 +96,8 @@ public class DefaultSettingsDecrypter
             }
             catch ( SecDispatcherException e )
             {
-                problems.add( new DefaultSettingsProblem( "Failed to decrypt password for proxy " + proxy.getId()
-                    + ": " + e.getMessage(), Severity.ERROR, "proxy: " + proxy.getId(), -1, -1, e ) );
+                problems.add( new DefaultSettingsProblem( "Failed to decrypt password for proxy " + proxy.getId() + ": "
+                    + e.getMessage(), Severity.ERROR, "proxy: " + proxy.getId(), -1, -1, e ) );
             }
 
             proxies.add( proxy );

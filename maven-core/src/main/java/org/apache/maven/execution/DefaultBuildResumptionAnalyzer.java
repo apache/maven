@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,23 +16,26 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Default implementation of {@link BuildResumptionAnalyzer}.
  */
 @Named
 @Singleton
-public class DefaultBuildResumptionAnalyzer implements BuildResumptionAnalyzer
+public class DefaultBuildResumptionAnalyzer
+    implements BuildResumptionAnalyzer
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( DefaultBuildResumptionAnalyzer.class );
 
@@ -48,19 +49,18 @@ public class DefaultBuildResumptionAnalyzer implements BuildResumptionAnalyzer
 
         List<MavenProject> sortedProjects = result.getTopologicallySortedProjects();
 
-        boolean hasNoSuccess = sortedProjects.stream()
-                .noneMatch( project -> result.getBuildSummary( project ) instanceof BuildSuccess );
+        boolean hasNoSuccess =
+            sortedProjects.stream().noneMatch( project -> result.getBuildSummary( project ) instanceof BuildSuccess );
 
         if ( hasNoSuccess )
         {
             return Optional.empty();
         }
 
-        List<String> remainingProjects = sortedProjects.stream()
-                .filter( project -> result.getBuildSummary( project ) == null
-                        || result.getBuildSummary( project ) instanceof BuildFailure )
-                .map( project -> project.getGroupId() + ":" + project.getArtifactId() )
-                .collect( Collectors.toList() );
+        List<String> remainingProjects =
+            sortedProjects.stream().filter( project -> result.getBuildSummary( project ) == null
+                || result.getBuildSummary( project ) instanceof BuildFailure ).map( project -> project.getGroupId()
+                    + ":" + project.getArtifactId() ).collect( Collectors.toList() );
 
         if ( remainingProjects.isEmpty() )
         {

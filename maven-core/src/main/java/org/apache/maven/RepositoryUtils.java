@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -172,21 +171,14 @@ public class RepositoryUtils
 
         Artifact result = toArtifact( artifact );
 
-        List<Exclusion> excl = Optional.ofNullable( exclusions )
-                .orElse( Collections.emptyList() )
-                .stream()
-                .map( RepositoryUtils::toExclusion )
-                .collect( Collectors.toList() );
+        List<Exclusion> excl =
+            Optional.ofNullable( exclusions ).orElse( Collections.emptyList() ).stream().map( RepositoryUtils::toExclusion ).collect( Collectors.toList() );
         return new Dependency( result, artifact.getScope(), artifact.isOptional(), excl );
     }
 
     public static List<RemoteRepository> toRepos( List<ArtifactRepository> repos )
     {
-        return Optional.ofNullable( repos )
-                .orElse( Collections.emptyList() )
-                .stream()
-                .map( RepositoryUtils::toRepo )
-                .collect( Collectors.toList() );
+        return Optional.ofNullable( repos ).orElse( Collections.emptyList() ).stream().map( RepositoryUtils::toRepo ).collect( Collectors.toList() );
     }
 
     public static RemoteRepository toRepo( ArtifactRepository repo )
@@ -270,16 +262,12 @@ public class RepositoryUtils
     public static ArtifactHandler newHandler( Artifact artifact )
     {
         String type = artifact.getProperty( ArtifactProperties.TYPE, artifact.getExtension() );
-        return new DefaultArtifactHandler(
-            type,
-            artifact.getExtension(),
-            null,
-            null,
-            null,
-            Boolean.parseBoolean( artifact.getProperty( ArtifactProperties.INCLUDES_DEPENDENCIES, "" ) ),
-            artifact.getProperty( ArtifactProperties.LANGUAGE, null ),
-            Boolean.parseBoolean( artifact.getProperty( ArtifactProperties.CONSTITUTES_BUILD_PATH, "" ) )
-        );
+        return new DefaultArtifactHandler( type, artifact.getExtension(), null, null, null,
+                                           Boolean.parseBoolean( artifact.getProperty( ArtifactProperties.INCLUDES_DEPENDENCIES,
+                                                                                       "" ) ),
+                                           artifact.getProperty( ArtifactProperties.LANGUAGE, null ),
+                                           Boolean.parseBoolean( artifact.getProperty( ArtifactProperties.CONSTITUTES_BUILD_PATH,
+                                                                                       "" ) ) );
     }
 
     public static ArtifactType newArtifactType( String id, ArtifactHandler handler )
@@ -310,14 +298,10 @@ public class RepositoryUtils
                                  dependency.getVersion(), props, stereotype );
 
         List<Exclusion> exclusions =
-                dependency.getExclusions().stream().map( RepositoryUtils::toExclusion ).collect( Collectors.toList() );
+            dependency.getExclusions().stream().map( RepositoryUtils::toExclusion ).collect( Collectors.toList() );
 
-        return new Dependency( artifact,
-                                            dependency.getScope(),
-                                            dependency.getOptional() != null
-                                                ? dependency.isOptional()
-                                                : null,
-                                            exclusions );
+        return new Dependency( artifact, dependency.getScope(),
+                               dependency.getOptional() != null ? dependency.isOptional() : null, exclusions );
     }
 
     private static Exclusion toExclusion( org.apache.maven.model.Exclusion exclusion )

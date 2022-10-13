@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,8 +46,8 @@ public class RepositorySystemTest
     public void testResolveVersionRange()
         throws Exception
     {
-        //VersionRangeResult resolveVersionRange( RepositorySystemSession session, VersionRangeRequest request )
-        //                throws VersionRangeResolutionException;
+        // VersionRangeResult resolveVersionRange( RepositorySystemSession session, VersionRangeRequest request )
+        // throws VersionRangeResolutionException;
 
     }
 
@@ -56,8 +55,8 @@ public class RepositorySystemTest
     public void testResolveVersion()
         throws Exception
     {
-        //VersionResult resolveVersion( RepositorySystemSession session, VersionRequest request )
-        //                throws VersionResolutionException;
+        // VersionResult resolveVersion( RepositorySystemSession session, VersionRequest request )
+        // throws VersionResolutionException;
     }
 
     @Test
@@ -113,8 +112,10 @@ public class RepositorySystemTest
         assertEquals( "sources", depArtifact.getClassifier() );
         assertEquals( "jar", depArtifact.getExtension() );
         assertEquals( "java", depArtifact.getProperty( "language", null ) );
-        assertEquals( "jar", depArtifact.getProperty( "type", null ) ); // shouldn't it be java-sources given the classifier?
-        assertEquals( "true", depArtifact.getProperty( "constitutesBuildPath", null ) ); // shouldn't it be false given the classifier?
+        assertEquals( "jar", depArtifact.getProperty( "type", null ) ); // shouldn't it be java-sources given the
+                                                                        // classifier?
+        assertEquals( "true", depArtifact.getProperty( "constitutesBuildPath", null ) ); // shouldn't it be false given
+                                                                                         // the classifier?
         assertEquals( "false", depArtifact.getProperty( "includesDependencies", null ) );
         assertEquals( 4, depArtifact.getProperties().size() );
     }
@@ -200,16 +201,16 @@ public class RepositorySystemTest
     public void testResolveMetadata()
         throws Exception
     {
-        //List<MetadataResult> resolveMetadata( RepositorySystemSession session,
-        //                                      Collection<? extends MetadataRequest> requests );
+        // List<MetadataResult> resolveMetadata( RepositorySystemSession session,
+        // Collection<? extends MetadataRequest> requests );
     }
 
     @Test
     public void testInstall()
         throws Exception
     {
-        //InstallResult install( RepositorySystemSession session, InstallRequest request )
-        //                throws InstallationException;
+        // InstallResult install( RepositorySystemSession session, InstallRequest request )
+        // throws InstallationException;
         // release, snapshot unique ou non unique, attachment
     }
 
@@ -217,22 +218,22 @@ public class RepositorySystemTest
     public void testDeploy()
         throws Exception
     {
-        //DeployResult deploy( RepositorySystemSession session, DeployRequest request )
-        //                throws DeploymentException;
+        // DeployResult deploy( RepositorySystemSession session, DeployRequest request )
+        // throws DeploymentException;
     }
 
     @Test
     public void testNewLocalRepositoryManager()
         throws Exception
     {
-        //LocalRepositoryManager newLocalRepositoryManager( LocalRepository localRepository );
+        // LocalRepositoryManager newLocalRepositoryManager( LocalRepository localRepository );
     }
 
     @Test
     public void testNewSyncContext()
         throws Exception
     {
-        //SyncContext newSyncContext( RepositorySystemSession session, boolean shared );
+        // SyncContext newSyncContext( RepositorySystemSession session, boolean shared );
     }
 
 }

@@ -1,5 +1,3 @@
-package org.codehaus.plexus.util.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.codehaus.plexus.util.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.codehaus.plexus.util.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,8 +71,9 @@ public class Xpp3DomBuilder
     public static Xpp3Dom build( Reader reader, boolean trim, InputLocationBuilder locationBuilder )
         throws XmlPullParserException, IOException
     {
-        return new Xpp3Dom( org.apache.maven.internal.xml.Xpp3DomBuilder.build(
-                reader, trim, locationBuilder != null ? locationBuilder::toInputLocation : null ) );
+        return new Xpp3Dom( org.apache.maven.internal.xml.Xpp3DomBuilder.build( reader, trim, locationBuilder != null
+                        ? locationBuilder::toInputLocation
+                        : null ) );
     }
 
     public static Xpp3Dom build( XmlPullParser parser )
@@ -94,8 +94,9 @@ public class Xpp3DomBuilder
     public static Xpp3Dom build( XmlPullParser parser, boolean trim, InputLocationBuilder locationBuilder )
         throws XmlPullParserException, IOException
     {
-        return new Xpp3Dom( org.apache.maven.internal.xml.Xpp3DomBuilder.build(
-                parser, trim, locationBuilder != null ? locationBuilder::toInputLocation : null ) );
+        return new Xpp3Dom( org.apache.maven.internal.xml.Xpp3DomBuilder.build( parser, trim, locationBuilder != null
+                        ? locationBuilder::toInputLocation
+                        : null ) );
     }
 
     /**

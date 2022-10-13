@@ -1,5 +1,3 @@
-package org.apache.maven.project.interpolation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.interpolation;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,16 +16,7 @@ package org.apache.maven.project.interpolation;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.model.Model;
-import org.apache.maven.project.ProjectBuilderConfiguration;
-import org.apache.maven.project.path.PathTranslator;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
-import org.codehaus.plexus.interpolation.Interpolator;
-import org.codehaus.plexus.interpolation.StringSearchInterpolator;
-import org.codehaus.plexus.interpolation.ValueSource;
-import org.codehaus.plexus.logging.Logger;
+package org.apache.maven.project.interpolation;
 
 import java.io.File;
 import java.lang.reflect.Array;
@@ -41,6 +30,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.apache.maven.model.Model;
+import org.apache.maven.project.ProjectBuilderConfiguration;
+import org.apache.maven.project.path.PathTranslator;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
+import org.codehaus.plexus.interpolation.Interpolator;
+import org.codehaus.plexus.interpolation.StringSearchInterpolator;
+import org.codehaus.plexus.interpolation.ValueSource;
+import org.codehaus.plexus.logging.Logger;
+
 /**
  * StringSearchModelInterpolator
  */
@@ -51,6 +50,7 @@ public class StringSearchModelInterpolator
 {
 
     private static final Map<Class<?>, Field[]> FIELDS_BY_CLASS = new WeakHashMap<>();
+
     private static final Map<Class<?>, Boolean> PRIMITIVE_BY_CLASS = new WeakHashMap<>();
 
     public StringSearchModelInterpolator()
@@ -80,8 +80,7 @@ public class StringSearchModelInterpolator
             List<InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
 
             InterpolateObjectAction action =
-                new InterpolateObjectAction( obj, valueSources, postProcessors, debugEnabled,
-                                             this, getLogger() );
+                new InterpolateObjectAction( obj, valueSources, postProcessors, debugEnabled, this, getLogger() );
 
             ModelInterpolationException error = AccessController.doPrivileged( action );
 
@@ -104,19 +103,25 @@ public class StringSearchModelInterpolator
         return interpolator;
     }
 
-    private static final class InterpolateObjectAction implements PrivilegedAction<ModelInterpolationException>
+    private static final class InterpolateObjectAction
+        implements PrivilegedAction<ModelInterpolationException>
     {
 
         private final boolean debugEnabled;
+
         private final LinkedList<Object> interpolationTargets;
+
         private final StringSearchModelInterpolator modelInterpolator;
+
         private final Logger logger;
+
         private final List<ValueSource> valueSources;
+
         private final List<InterpolationPostProcessor> postProcessors;
 
         InterpolateObjectAction( Object target, List<ValueSource> valueSources,
-                                        List<InterpolationPostProcessor> postProcessors, boolean debugEnabled,
-                                        StringSearchModelInterpolator modelInterpolator, Logger logger )
+                                 List<InterpolationPostProcessor> postProcessors, boolean debugEnabled,
+                                 StringSearchModelInterpolator modelInterpolator, Logger logger )
         {
             this.valueSources = valueSources;
             this.postProcessors = postProcessors;
@@ -156,7 +161,6 @@ public class StringSearchModelInterpolator
             {
                 return;
             }
-
 
             if ( cls.isArray() )
             {
@@ -207,8 +211,7 @@ public class StringSearchModelInterpolator
                                             if ( debugEnabled && logger != null )
                                             {
                                                 logger.debug( "Skipping interpolation of field: " + field + " in: "
-                                                                  + cls.getName()
-                                                                  + "; it is an unmodifiable collection." );
+                                                    + cls.getName() + "; it is an unmodifiable collection." );
                                             }
                                             continue;
                                         }
@@ -284,11 +287,10 @@ public class StringSearchModelInterpolator
                                                         {
                                                             if ( debugEnabled && logger != null )
                                                             {
-                                                                logger.debug(
-                                                                    "Skipping interpolation of field: " + field
-                                                                        + " (key: " + entry.getKey() + ") in: "
-                                                                        + cls.getName()
-                                                                        + "; it is an unmodifiable collection." );
+                                                                logger.debug( "Skipping interpolation of field: "
+                                                                    + field + " (key: " + entry.getKey() + ") in: "
+                                                                    + cls.getName()
+                                                                    + "; it is an unmodifiable collection." );
                                                             }
                                                         }
                                                     }
@@ -326,8 +328,8 @@ public class StringSearchModelInterpolator
                             }
                             catch ( IllegalArgumentException | IllegalAccessException e )
                             {
-                                throw new ModelInterpolationException(
-                                    "Failed to interpolate field: " + field + " on class: " + cls.getName(), e );
+                                throw new ModelInterpolationException( "Failed to interpolate field: " + field
+                                    + " on class: " + cls.getName(), e );
                             }
                         }
                         finally
@@ -344,7 +346,7 @@ public class StringSearchModelInterpolator
         private boolean isQualifiedForInterpolation( Class<?> cls )
         {
             return !cls.getPackage().getName().startsWith( "java" )
-                    && !cls.getPackage().getName().startsWith( "sun.nio.fs" );
+                && !cls.getPackage().getName().startsWith( "sun.nio.fs" );
         }
 
         private boolean isQualifiedForInterpolation( Field field, Class<?> fieldType )
@@ -359,10 +361,10 @@ public class StringSearchModelInterpolator
                 return false;
             }
 
-//            if ( fieldType.isPrimitive() )
-//            {
-//                return false;
-//            }
+            // if ( fieldType.isPrimitive() )
+            // {
+            // return false;
+            // }
 
             return !"parent".equals( field.getName() );
         }
@@ -378,9 +380,8 @@ public class StringSearchModelInterpolator
                 {
                     if ( String.class == value.getClass() )
                     {
-                        String interpolated =
-                            modelInterpolator.interpolateInternal( (String) value, valueSources, postProcessors,
-                                                                   debugEnabled );
+                        String interpolated = modelInterpolator.interpolateInternal( (String) value, valueSources,
+                                                                                     postProcessors, debugEnabled );
 
                         if ( !interpolated.equals( value ) )
                         {

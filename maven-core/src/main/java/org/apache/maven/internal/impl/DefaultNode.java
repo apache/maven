@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,16 +31,19 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 
-public class DefaultNode extends AbstractNode
+public class DefaultNode
+    extends AbstractNode
 {
 
     protected final @Nonnull AbstractSession session;
+
     protected final @Nonnull org.eclipse.aether.graph.DependencyNode node;
+
     protected final boolean verbose;
 
-    public DefaultNode( @Nonnull AbstractSession session,
-                        @Nonnull org.eclipse.aether.graph.DependencyNode node,
-                        boolean verbose )
+    public DefaultNode( @Nonnull
+    AbstractSession session, @Nonnull
+    org.eclipse.aether.graph.DependencyNode node, boolean verbose )
     {
         this.session = session;
         this.node = node;
@@ -94,7 +96,7 @@ public class DefaultNode extends AbstractNode
         List<String> details = new ArrayList<>();
 
         org.eclipse.aether.graph.DependencyNode winner =
-                (org.eclipse.aether.graph.DependencyNode) node.getData().get( ConflictResolver.NODE_DATA_WINNER );
+            (org.eclipse.aether.graph.DependencyNode) node.getData().get( ConflictResolver.NODE_DATA_WINNER );
         String winnerVersion = winner != null ? winner.getArtifact().getBaseVersion() : null;
         boolean included = ( winnerVersion == null );
 

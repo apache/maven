@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain.java;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.toolchain.java;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,13 +16,14 @@ package org.apache.maven.toolchain.java;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain.java;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.util.Map.Entry;
 import java.util.Properties;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
 import org.apache.maven.toolchain.RequirementMatcher;
@@ -38,9 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * JDK toolchain factory.
- * This is a <code>ToolchainFactory</code> Plexus component registered with
- * <code>jdk</code> hint.
+ * JDK toolchain factory. This is a <code>ToolchainFactory</code> Plexus component registered with <code>jdk</code>
+ * hint.
  *
  * @author mkleint
  * @since 2.0.9, renamed from <code>DefaultJavaToolchainFactory</code> in 3.2.4
@@ -74,8 +72,8 @@ public class JavaToolchainFactory
 
             if ( value == null )
             {
-                throw new MisconfiguredToolchainException(
-                    "Provides token '" + key + "' doesn't have any value configured." );
+                throw new MisconfiguredToolchainException( "Provides token '" + key
+                    + "' doesn't have any value configured." );
             }
 
             RequirementMatcher matcher;
@@ -92,12 +90,12 @@ public class JavaToolchainFactory
         }
 
         // populate the configuration section
-        Xpp3Dom dom = ( Xpp3Dom ) model.getConfiguration();
+        Xpp3Dom dom = (Xpp3Dom) model.getConfiguration();
         Xpp3Dom javahome = dom != null ? dom.getChild( JavaToolchainImpl.KEY_JAVAHOME ) : null;
         if ( javahome == null )
         {
-            throw new MisconfiguredToolchainException( "Java toolchain without the "
-                + JavaToolchainImpl.KEY_JAVAHOME + " configuration element." );
+            throw new MisconfiguredToolchainException( "Java toolchain without the " + JavaToolchainImpl.KEY_JAVAHOME
+                + " configuration element." );
         }
         File normal = new File( FileUtils.normalize( javahome.getValue() ) );
         if ( normal.exists() )
@@ -115,8 +113,8 @@ public class JavaToolchainFactory
 
     public ToolchainPrivate createDefaultToolchain()
     {
-        //not sure it's necessary to provide a default toolchain here.
-        //only version can be eventually supplied, and
+        // not sure it's necessary to provide a default toolchain here.
+        // only version can be eventually supplied, and
         return null;
     }
 

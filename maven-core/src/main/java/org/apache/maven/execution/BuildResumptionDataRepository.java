@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import org.apache.maven.project.MavenProject;
 
@@ -38,10 +37,11 @@ public interface BuildResumptionDataRepository
      * @throws BuildResumptionPersistenceException When an error occurs while persisting data.
      */
     void persistResumptionData( MavenProject rootProject, BuildResumptionData buildResumptionData )
-            throws BuildResumptionPersistenceException;
+        throws BuildResumptionPersistenceException;
 
     /**
      * Uses previously stored resumption data to enrich an existing execution request.
+     * 
      * @param request The execution request that will be enriched.
      * @param rootProject The root project that is being built.
      */
@@ -49,6 +49,7 @@ public interface BuildResumptionDataRepository
 
     /**
      * Removes previously stored resumption data.
+     * 
      * @param rootProject The root project that is being built.
      */
     void removeResumptionData( MavenProject rootProject );

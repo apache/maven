@@ -1,5 +1,3 @@
-package org.apache.maven.cli.logging;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.cli.logging;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli.logging;
 
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
@@ -26,8 +25,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Use an SLF4J {@link org.slf4j.ILoggerFactory} as a backing for a Plexus
- * {@link org.codehaus.plexus.logging.LoggerManager},
- * ignoring Plexus logger API parts that are not classical and probably not really used.
+ * {@link org.codehaus.plexus.logging.LoggerManager}, ignoring Plexus logger API parts that are not classical and
+ * probably not really used.
  *
  * @author Jason van Zyl
  * @since 3.1
@@ -49,15 +48,14 @@ public class Slf4jLoggerManager
     }
 
     /**
-     * The logger name for a component with a non-null hint is <code>role.hint</code>.
-     * <b>Warning</b>: this does not conform to logger name as class name convention.
-     * (and what about <code>null</code> and <code>default</code> hint equivalence?)
+     * The logger name for a component with a non-null hint is <code>role.hint</code>. <b>Warning</b>: this does not
+     * conform to logger name as class name convention. (and what about <code>null</code> and <code>default</code> hint
+     * equivalence?)
      */
     public Logger getLoggerForComponent( String role, String hint )
     {
-        return ( null == hint
-            ? getLoggerForComponent( role )
-            : new Slf4jLogger( loggerFactory.getLogger( role + '.' + hint ) ) );
+        return ( null == hint ? getLoggerForComponent( role )
+                        : new Slf4jLogger( loggerFactory.getLogger( role + '.' + hint ) ) );
     }
 
     //

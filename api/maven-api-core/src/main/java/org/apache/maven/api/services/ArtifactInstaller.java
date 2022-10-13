@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,13 +16,14 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
-import org.apache.maven.api.Artifact;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
@@ -34,7 +33,8 @@ import org.apache.maven.api.annotations.Experimental;
  * @see Session#withLocalRepository(org.apache.maven.api.LocalRepository)
  */
 @Experimental
-public interface ArtifactInstaller extends Service
+public interface ArtifactInstaller
+    extends Service
 {
     /**
      * @param request {@link ArtifactInstallerRequest}
@@ -48,8 +48,8 @@ public interface ArtifactInstaller extends Service
      * @param artifact the {@link Artifact} to install
      * @throws ArtifactInstallerException In case of an error which can be the a given artifact cannot be found or the
      *             installation has failed.
-     * @throws IllegalArgumentException in case of parameter {@code session} is {@code null} or
-     *          {@code artifact} is {@code null}.
+     * @throws IllegalArgumentException in case of parameter {@code session} is {@code null} or {@code artifact} is
+     *             {@code null}.
      */
     default void install( Session session, Artifact artifact )
     {
@@ -62,9 +62,8 @@ public interface ArtifactInstaller extends Service
      * @throws ArtifactInstallerException In case of an error which can be the a given artifact cannot be found or the
      *             installation has failed.
      * @throws IllegalArgumentException in case of parameter {@code request} is {@code null} or parameter
-     *             {@code localRepository} is {@code null} or {@code localRepository} is not a directory
-     *             or parameter {@code mavenArtifacts} is {@code null} or
-     *             {@code mavenArtifacts.isEmpty()} is {@code true}.
+     *             {@code localRepository} is {@code null} or {@code localRepository} is not a directory or parameter
+     *             {@code mavenArtifacts} is {@code null} or {@code mavenArtifacts.isEmpty()} is {@code true}.
      */
     default void install( Session session, Collection<Artifact> artifacts )
     {

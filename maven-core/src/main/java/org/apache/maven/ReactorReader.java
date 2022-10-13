@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,10 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,9 +51,6 @@ import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
@@ -75,26 +74,26 @@ class ReactorReader
     private static final Logger LOGGER = LoggerFactory.getLogger( ReactorReader.class );
 
     private final MavenSession session;
+
     private final Map<String, MavenProject> projectsByGAV;
+
     private final Map<String, List<MavenProject>> projectsByGA;
+
     private final WorkspaceRepository repository;
 
     private Function<MavenProject, String> projectIntoKey =
-            s -> ArtifactUtils.key( s.getGroupId(), s.getArtifactId(), s.getVersion() );
+        s -> ArtifactUtils.key( s.getGroupId(), s.getArtifactId(), s.getVersion() );
 
     private Function<MavenProject, String> projectIntoVersionlessKey =
-            s -> ArtifactUtils.versionlessKey( s.getGroupId(), s.getArtifactId() );
+        s -> ArtifactUtils.versionlessKey( s.getGroupId(), s.getArtifactId() );
 
     @Inject
     ReactorReader( MavenSession session )
     {
         this.session = session;
-        this.projectsByGAV =
-                session.getAllProjects().stream()
-                        .collect( toMap( projectIntoKey, identity() ) );
+        this.projectsByGAV = session.getAllProjects().stream().collect( toMap( projectIntoKey, identity() ) );
 
-        this.projectsByGA = projectsByGAV.values().stream()
-                .collect( groupingBy( projectIntoVersionlessKey ) );
+        this.projectsByGA = projectsByGAV.values().stream().collect( groupingBy( projectIntoVersionlessKey ) );
 
         repository = new WorkspaceRepository( "reactor", new HashSet<>( projectsByGAV.keySet() ) );
     }
@@ -131,11 +130,9 @@ class ReactorReader
     {
         String key = ArtifactUtils.versionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
 
-        return Optional.ofNullable( projectsByGA.get( key ) )
-                .orElse( Collections.emptyList() ).stream()
-                .filter( s -> Objects.nonNull( find( s, artifact ) ) )
-                .map( MavenProject::getVersion )
-                .collect( Collectors.collectingAndThen( Collectors.toList(), Collections::unmodifiableList ) );
+        return Optional.ofNullable( projectsByGA.get( key ) ).orElse( Collections.emptyList() ).stream().filter( s -> Objects.nonNull( find( s,
+                                                                                                                                             artifact ) ) ).map( MavenProject::getVersion ).collect( Collectors.collectingAndThen( Collectors.toList(),
+                                                                                                                                                                                                                                   Collections::unmodifiableList ) );
     }
 
     @Override
@@ -166,7 +163,7 @@ class ReactorReader
         }
         // Check whether an earlier Maven run might have produced an artifact that is still on disk.
         else if ( packagedArtifactFile != null && packagedArtifactFile.exists()
-                && isPackagedArtifactUpToDate( project, packagedArtifactFile, artifact ) )
+            && isPackagedArtifactUpToDate( project, packagedArtifactFile, artifact ) )
         {
             return packagedArtifactFile;
         }
@@ -198,13 +195,13 @@ class ReactorReader
 
             // Check if the project is being built during this session, and if we can expect any output.
             // There is no need to check if the build has created any outputs, see MNG-2222.
-            boolean projectCompiledDuringThisSession
-                    = project.hasLifecyclePhase( "compile" ) && COMPILE_PHASE_TYPES.contains( type );
+            boolean projectCompiledDuringThisSession =
+                project.hasLifecyclePhase( "compile" ) && COMPILE_PHASE_TYPES.contains( type );
 
             // Check if the project is part of the session (not filtered by -pl, -rf, etc). If so, we check
             // if a possible earlier Maven invocation produced some output for that project which we can use.
-            boolean projectHasOutputFromPreviousSession
-                    = !session.getProjects().contains( project ) && outputDirectory.exists();
+            boolean projectHasOutputFromPreviousSession =
+                !session.getProjects().contains( project ) && outputDirectory.exists();
 
             if ( projectHasOutputFromPreviousSession || projectCompiledDuringThisSession )
             {
@@ -260,7 +257,7 @@ class ReactorReader
             {
                 Path outputFile = iterator.next();
 
-                if ( Files.isDirectory(  outputFile ) )
+                if ( Files.isDirectory( outputFile ) )
                 {
                     continue;
                 }
@@ -272,14 +269,14 @@ class ReactorReader
                     if ( alternative != null )
                     {
                         LOGGER.warn( "File '{}' is more recent than the packaged artifact for '{}'; using '{}' instead",
-                                relativizeOutputFile( outputFile ), project.getArtifactId(),
-                                relativizeOutputFile( alternative.toPath() ) );
+                                     relativizeOutputFile( outputFile ), project.getArtifactId(),
+                                     relativizeOutputFile( alternative.toPath() ) );
                     }
                     else
                     {
                         LOGGER.warn( "File '{}' is more recent than the packaged artifact for '{}'; "
-                                + "cannot use the build output directory for this type of artifact",
-                                relativizeOutputFile( outputFile ), project.getArtifactId() );
+                            + "cannot use the build output directory for this type of artifact",
+                                     relativizeOutputFile( outputFile ), project.getArtifactId() );
                     }
                     return false;
                 }
@@ -290,8 +287,7 @@ class ReactorReader
         catch ( IOException e )
         {
             LOGGER.warn( "An I/O error occurred while checking if the packaged artifact is up-to-date "
-                    + "against the build output directory. "
-                    + "Continuing with the assumption that it is up-to-date.", e );
+                + "against the build output directory. " + "Continuing with the assumption that it is up-to-date.", e );
             return true;
         }
     }
@@ -325,10 +321,7 @@ class ReactorReader
             return mainArtifact;
         }
 
-        return RepositoryUtils.toArtifacts( project.getAttachedArtifacts() ).stream()
-                .filter( isRequestedArtifact( requestedArtifact ) )
-                .findFirst()
-                .orElse( null );
+        return RepositoryUtils.toArtifacts( project.getAttachedArtifacts() ).stream().filter( isRequestedArtifact( requestedArtifact ) ).findFirst().orElse( null );
     }
 
     /**
@@ -341,10 +334,10 @@ class ReactorReader
     private Predicate<Artifact> isRequestedArtifact( Artifact requestArtifact )
     {
         return s -> s.getArtifactId().equals( requestArtifact.getArtifactId() )
-                && s.getGroupId().equals( requestArtifact.getGroupId() )
-                && s.getVersion().equals( requestArtifact.getVersion() )
-                && s.getExtension().equals( requestArtifact.getExtension() )
-                && s.getClassifier().equals( requestArtifact.getClassifier() );
+            && s.getGroupId().equals( requestArtifact.getGroupId() )
+            && s.getVersion().equals( requestArtifact.getVersion() )
+            && s.getExtension().equals( requestArtifact.getExtension() )
+            && s.getClassifier().equals( requestArtifact.getClassifier() );
 
     }
 

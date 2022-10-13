@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.manager;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.manager;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.manager;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.manager;
 
 import java.util.List;
 
@@ -38,8 +37,8 @@ public interface WagonManager
     extends org.apache.maven.repository.legacy.WagonManager
 {
     /**
-     * this method is only here for backward compat (project-info-reports:dependencies)
-     * the default implementation will return an empty AuthenticationInfo
+     * this method is only here for backward compat (project-info-reports:dependencies) the default implementation will
+     * return an empty AuthenticationInfo
      *
      * @param id an id
      * @return corresponding authentication info

@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.io.File;
 import java.net.URI;
@@ -29,7 +28,9 @@ import org.apache.maven.building.FileSource;
  *
  * @author Benjamin Bentmann
  */
-public class FileModelSource extends FileSource implements ModelSource2
+public class FileModelSource
+    extends FileSource
+    implements ModelSource2
 {
 
     /**
@@ -43,9 +44,7 @@ public class FileModelSource extends FileSource implements ModelSource2
     }
 
     /**
-     *
      * @return the file of this source
-     *
      * @deprecated instead use {@link #getFile()}
      */
     @Deprecated
@@ -94,11 +93,11 @@ public class FileModelSource extends FileSource implements ModelSource2
             return false;
         }
 
-        if ( !FileModelSource.class.equals( obj.getClass() )  )
+        if ( !FileModelSource.class.equals( obj.getClass() ) )
         {
             return false;
         }
-        FileModelSource other = ( FileModelSource ) obj;
+        FileModelSource other = (FileModelSource) obj;
         return getFile().equals( other.getFile() );
     }
 

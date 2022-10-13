@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.execution;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,12 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -25,11 +29,6 @@ import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectSorter;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * ReactorManager - unused
@@ -83,16 +82,15 @@ public class ReactorManager
             this.failureBehavior = FAIL_FAST; // default
             return;
         }
-        if ( FAIL_FAST.equals( failureBehavior ) || FAIL_AT_END.equals( failureBehavior ) || FAIL_NEVER.equals(
-            failureBehavior ) )
+        if ( FAIL_FAST.equals( failureBehavior ) || FAIL_AT_END.equals( failureBehavior )
+            || FAIL_NEVER.equals( failureBehavior ) )
         {
             this.failureBehavior = failureBehavior;
         }
         else
         {
-            throw new IllegalArgumentException(
-                    "Invalid failure behavior (must be one of: '" + FAIL_FAST + "', '" + FAIL_AT_END + "', '"
-                    + FAIL_NEVER + "')." );
+            throw new IllegalArgumentException( "Invalid failure behavior (must be one of: '" + FAIL_FAST + "', '"
+                + FAIL_AT_END + "', '" + FAIL_NEVER + "')." );
         }
     }
 
@@ -118,8 +116,8 @@ public class ReactorManager
             {
                 for ( String dependentId : dependents )
                 {
-                    if ( !buildSuccessesByProject.containsKey( dependentId ) && !buildFailuresByProject.containsKey(
-                        dependentId ) )
+                    if ( !buildSuccessesByProject.containsKey( dependentId )
+                        && !buildFailuresByProject.containsKey( dependentId ) )
                     {
                         blackList( dependentId );
                     }

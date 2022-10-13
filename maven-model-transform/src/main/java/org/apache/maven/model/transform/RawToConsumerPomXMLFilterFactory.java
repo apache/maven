@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform;
 
 import java.nio.file.Path;
 
@@ -40,8 +39,7 @@ public class RawToConsumerPomXMLFilterFactory
     public final XmlPullParser get( XmlPullParser orgParser, Path projectPath )
     {
         // Ensure that xs:any elements aren't touched by next filters
-        XmlPullParser parser = orgParser instanceof FastForwardFilter
-                ? orgParser : new FastForwardFilter( orgParser );
+        XmlPullParser parser = orgParser instanceof FastForwardFilter ? orgParser : new FastForwardFilter( orgParser );
 
         parser = buildPomXMLFilterFactory.get( parser, projectPath );
 

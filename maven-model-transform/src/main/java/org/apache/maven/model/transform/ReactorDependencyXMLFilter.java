@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -32,7 +31,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
  * @author Guillaume Nodet
  * @since 4.0.0
  */
-public class ReactorDependencyXMLFilter extends NodeBufferingParser
+public class ReactorDependencyXMLFilter
+    extends NodeBufferingParser
 {
     private final BiFunction<String, String, String> reactorVersionMapper;
 
@@ -79,10 +79,10 @@ public class ReactorDependencyXMLFilter extends NodeBufferingParser
             }
             else if ( event.event == END_TAG && "dependency".equals( event.name ) )
             {
-                String version = reactorVersionMapper.apply( groupId, artifactId  );
+                String version = reactorVersionMapper.apply( groupId, artifactId );
                 if ( !hasVersion && version != null )
                 {
-                    int pos = buffer.get( i - 1 ).event == TEXT ? i - 1  : i;
+                    int pos = buffer.get( i - 1 ).event == TEXT ? i - 1 : i;
                     Event e = new Event();
                     e.event = TEXT;
                     e.text = dependencyWhitespace;

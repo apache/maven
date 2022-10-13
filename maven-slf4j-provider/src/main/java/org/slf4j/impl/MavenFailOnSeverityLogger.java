@@ -1,5 +1,3 @@
-package org.slf4j.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.slf4j.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.slf4j.impl;
 
 import org.apache.maven.logwrapper.LogLevelRecorder;
 import org.slf4j.event.Level;
@@ -26,7 +25,8 @@ import org.slf4j.event.Level;
  * A proxy which enhances the MavenSimpleLogger with functionality to track whether a logging threshold is hit.
  * Currently only support WARN and ERROR states, since it's been used for the --fail-on-severity flag.
  */
-public class MavenFailOnSeverityLogger extends MavenSimpleLogger
+public class MavenFailOnSeverityLogger
+    extends MavenSimpleLogger
 {
     private final LogLevelRecorder logLevelRecorder;
 
@@ -37,8 +37,7 @@ public class MavenFailOnSeverityLogger extends MavenSimpleLogger
     }
 
     /**
-     * A simple implementation which always logs messages of level WARN
-     * according to the format outlined above.
+     * A simple implementation which always logs messages of level WARN according to the format outlined above.
      */
     @Override
     public void warn( String msg )
@@ -48,8 +47,8 @@ public class MavenFailOnSeverityLogger extends MavenSimpleLogger
     }
 
     /**
-     * Perform single parameter substitution before logging the message of level
-     * WARN according to the format outlined above.
+     * Perform single parameter substitution before logging the message of level WARN according to the format outlined
+     * above.
      */
     @Override
     public void warn( String format, Object arg )
@@ -59,8 +58,8 @@ public class MavenFailOnSeverityLogger extends MavenSimpleLogger
     }
 
     /**
-     * Perform double parameter substitution before logging the message of level
-     * WARN according to the format outlined above.
+     * Perform double parameter substitution before logging the message of level WARN according to the format outlined
+     * above.
      */
     @Override
     public void warn( String format, Object arg1, Object arg2 )
@@ -70,8 +69,8 @@ public class MavenFailOnSeverityLogger extends MavenSimpleLogger
     }
 
     /**
-     * Perform double parameter substitution before logging the message of level
-     * WARN according to the format outlined above.
+     * Perform double parameter substitution before logging the message of level WARN according to the format outlined
+     * above.
      */
     @Override
     public void warn( String format, Object... argArray )
@@ -89,8 +88,7 @@ public class MavenFailOnSeverityLogger extends MavenSimpleLogger
     }
 
     /**
-     * A simple implementation which always logs messages of level ERROR
-     * according to the format outlined above.
+     * A simple implementation which always logs messages of level ERROR according to the format outlined above.
      */
     @Override
     public void error( String msg )
@@ -100,8 +98,8 @@ public class MavenFailOnSeverityLogger extends MavenSimpleLogger
     }
 
     /**
-     * Perform single parameter substitution before logging the message of level
-     * ERROR according to the format outlined above.
+     * Perform single parameter substitution before logging the message of level ERROR according to the format outlined
+     * above.
      */
     @Override
     public void error( String format, Object arg )
@@ -111,8 +109,8 @@ public class MavenFailOnSeverityLogger extends MavenSimpleLogger
     }
 
     /**
-     * Perform double parameter substitution before logging the message of level
-     * ERROR according to the format outlined above.
+     * Perform double parameter substitution before logging the message of level ERROR according to the format outlined
+     * above.
      */
     @Override
     public void error( String format, Object arg1, Object arg2 )
@@ -122,8 +120,8 @@ public class MavenFailOnSeverityLogger extends MavenSimpleLogger
     }
 
     /**
-     * Perform double parameter substitution before logging the message of level
-     * ERROR according to the format outlined above.
+     * Perform double parameter substitution before logging the message of level ERROR according to the format outlined
+     * above.
      */
     @Override
     public void error( String format, Object... argArray )

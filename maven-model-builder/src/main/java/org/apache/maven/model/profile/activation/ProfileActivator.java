@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile.activation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.profile.activation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile.activation;
 
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProblemCollector;
@@ -45,8 +44,8 @@ public interface ProfileActivator
 
     /**
      * Determines whether specified activation method is present in configuration or not. It should help to have AND
-     * between activation conditions
-     * Need for solving https://issues.apache.org/jira/browse/MNG-4565
+     * between activation conditions Need for solving https://issues.apache.org/jira/browse/MNG-4565
+     * 
      * @param profile The profile whose activation status should be determined, must not be {@code null}.
      * @param context The environmental context used to determine the activation status of the profile, must not be
      *            {@code null}.

@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,15 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
+
+import java.util.Optional;
 
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -39,7 +38,8 @@ public class DefaultBuildResumptionAnalyzerTest
     private MavenExecutionResult executionResult;
 
     @BeforeEach
-    public void before() {
+    public void before()
+    {
         executionResult = new DefaultMavenExecutionResult();
     }
 
@@ -53,7 +53,7 @@ public class DefaultBuildResumptionAnalyzerTest
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData( executionResult );
 
         assertThat( result.isPresent(), is( true ) );
-        assertThat( result.get().getRemainingProjects(), is( asList ( "test:B" ) ) );
+        assertThat( result.get().getRemainingProjects(), is( asList( "test:B" ) ) );
     }
 
     @Test
@@ -109,7 +109,7 @@ public class DefaultBuildResumptionAnalyzerTest
         Optional<BuildResumptionData> result = analyzer.determineBuildResumptionData( executionResult );
 
         assertThat( result.isPresent(), is( true ) );
-        assertThat( result.get().getRemainingProjects(), is( asList ( "test:B", "test:D" ) ) );
+        assertThat( result.get().getRemainingProjects(), is( asList( "test:B", "test:D" ) ) );
     }
 
     private MavenProject createMavenProject( String artifactId )
@@ -120,7 +120,7 @@ public class DefaultBuildResumptionAnalyzerTest
         return project;
     }
 
-    private Dependency toDependency(MavenProject mavenProject )
+    private Dependency toDependency( MavenProject mavenProject )
     {
         Dependency dependency = new Dependency();
         dependency.setGroupId( mavenProject.getGroupId() );

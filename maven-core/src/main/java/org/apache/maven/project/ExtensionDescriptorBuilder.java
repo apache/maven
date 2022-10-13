@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.api.xml.Dom;
-import org.apache.maven.internal.xml.Xpp3DomBuilder;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+package org.apache.maven.project;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -33,6 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
+
+import org.apache.maven.api.xml.Dom;
+import org.apache.maven.internal.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * Creates an extension descriptor from some XML stream.

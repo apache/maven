@@ -1,5 +1,3 @@
-package org.apache.maven.graph;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.graph;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.graph;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,7 +53,7 @@ class FilteredProjectDependencyGraph
                                     Collection<? extends MavenProject> whiteList )
     {
         this.projectDependencyGraph =
-                Objects.requireNonNull( projectDependencyGraph, "projectDependencyGraph cannot be null" );
+            Objects.requireNonNull( projectDependencyGraph, "projectDependencyGraph cannot be null" );
 
         this.whiteList = new IdentityHashMap<>();
 

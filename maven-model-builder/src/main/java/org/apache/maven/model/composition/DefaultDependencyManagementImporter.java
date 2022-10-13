@@ -1,5 +1,3 @@
-package org.apache.maven.model.composition;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,14 @@ package org.apache.maven.model.composition;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.composition;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
@@ -45,7 +44,7 @@ public class DefaultDependencyManagementImporter
 
     @Override
     public Model importManagement( Model target, List<? extends DependencyManagement> sources,
-                                  ModelBuildingRequest request, ModelProblemCollector problems )
+                                   ModelBuildingRequest request, ModelProblemCollector problems )
     {
         if ( sources != null && !sources.isEmpty() )
         {
@@ -74,8 +73,7 @@ public class DefaultDependencyManagementImporter
                 }
             }
 
-            return target.withDependencyManagement(
-                    depMgmt.withDependencies( dependencies.values() ) );
+            return target.withDependencyManagement( depMgmt.withDependencies( dependencies.values() ) );
         }
         return target;
     }

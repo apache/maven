@@ -1,5 +1,3 @@
-package org.apache.maven.properties.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.properties.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.properties.internal;
 
 import java.util.Properties;
 
@@ -46,6 +45,7 @@ public class SystemProperties
 
     /**
      * Copies the given {@link Properties} object into a new {@link Properties} object, in a thread-safe manner.
+     * 
      * @param properties Properties to copy.
      * @return Copy of the given properties.
      */

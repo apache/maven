@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal.builder.multithreaded;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal.builder.multithreaded;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,11 @@ package org.apache.maven.lifecycle.internal.builder.multithreaded;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal.builder.multithreaded;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.List;
 import java.util.Map;
@@ -31,10 +34,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.BuildThreadFactory;
@@ -59,9 +58,8 @@ import org.slf4j.LoggerFactory;
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
  * @since 3.0
- * @author Kristian Rosenvold
- *         Builds one or more lifecycles for a full module
- *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
+ * @author Kristian Rosenvold Builds one or more lifecycles for a full module NOTE: This class is not part of any public
+ *         api and can be changed or deleted without prior notice.
  */
 @Named( "multithreaded" )
 @Singleton
@@ -104,8 +102,7 @@ public class MultiThreadedBuilder
             try
             {
                 ConcurrencyDependencyGraph analyzer =
-                    new ConcurrencyDependencyGraph( segmentProjectBuilds,
-                                                    session.getProjectDependencyGraph() );
+                    new ConcurrencyDependencyGraph( segmentProjectBuilds, session.getProjectDependencyGraph() );
                 multiThreadedProjectTaskSegmentBuild( analyzer, reactorContext, session, service, taskSegment,
                                                       projectBuildMap, muxer );
                 if ( reactorContext.getReactorBuildStatus().isHalted() )
@@ -133,22 +130,16 @@ public class MultiThreadedBuilder
                                                        ThreadOutputMuxer muxer )
     {
         // gather artifactIds which are not unique so that the respective thread names can be extended with the groupId
-        Set<String> duplicateArtifactIds = projectBuildList.keySet().stream()
-                .map( MavenProject::getArtifactId )
-                .collect( Collectors.groupingBy( Function.identity(), Collectors.counting() ) )
-                .entrySet().stream()
-                .filter( p -> p.getValue() > 1 )
-                .map( Map.Entry::getKey )
-                .collect( Collectors.toSet() );
+        Set<String> duplicateArtifactIds = projectBuildList.keySet().stream().map(
+                                                                                   MavenProject::getArtifactId ).collect( Collectors.groupingBy( Function.identity(), Collectors.counting() ) ).entrySet().stream().filter( p -> p.getValue() > 1 ).map( Map.Entry::getKey ).collect( Collectors.toSet() );
 
         // schedule independent projects
         for ( MavenProject mavenProject : analyzer.getRootSchedulableBuilds() )
         {
             ProjectSegment projectSegment = projectBuildList.get( mavenProject );
             logger.debug( "Scheduling: " + projectSegment.getProject() );
-            Callable<ProjectSegment> cb =
-                createBuildCallable( rootSession, projectSegment, reactorContext, taskSegment, muxer,
-                                     duplicateArtifactIds );
+            Callable<ProjectSegment> cb = createBuildCallable( rootSession, projectSegment, reactorContext, taskSegment,
+                                                               muxer, duplicateArtifactIds );
             service.submit( cb );
         }
 
@@ -196,19 +187,17 @@ public class MultiThreadedBuilder
     private Callable<ProjectSegment> createBuildCallable( final MavenSession rootSession,
                                                           final ProjectSegment projectBuild,
                                                           final ReactorContext reactorContext,
-                                                          final TaskSegment taskSegment,
-                                                          final ThreadOutputMuxer muxer,
+                                                          final TaskSegment taskSegment, final ThreadOutputMuxer muxer,
                                                           final Set<String> duplicateArtifactIds )
     {
-        return () ->
-        {
+        return () -> {
             final Thread currentThread = Thread.currentThread();
             final String originalThreadName = currentThread.getName();
             final MavenProject project = projectBuild.getProject();
 
             final String threadNameSuffix = duplicateArtifactIds.contains( project.getArtifactId() )
-                    ? project.getGroupId() + ":" + project.getArtifactId()
-                    : project.getArtifactId();
+                            ? project.getGroupId() + ":" + project.getArtifactId()
+                            : project.getArtifactId();
             currentThread.setName( "mvn-builder-" + threadNameSuffix );
 
             try
@@ -222,7 +211,7 @@ public class MultiThreadedBuilder
             }
             finally
             {
-                 currentThread.setName( originalThreadName );
+                currentThread.setName( originalThreadName );
             }
         };
     }

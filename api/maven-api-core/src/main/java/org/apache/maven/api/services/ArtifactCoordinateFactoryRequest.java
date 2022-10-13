@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Session;
@@ -54,46 +53,30 @@ public interface ArtifactCoordinateFactoryRequest
     String getType();
 
     @Nonnull
-    static ArtifactCoordinateFactoryRequest build( @Nonnull Session session, String groupId, String artifactId,
-                                                   String version, String extension )
+    static ArtifactCoordinateFactoryRequest build( @Nonnull
+    Session session, String groupId, String artifactId, String version, String extension )
     {
-        return ArtifactCoordinateFactoryRequest.builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .groupId( groupId )
-                .artifactId( artifactId )
-                .version( version )
-                .extension( extension )
-                .build();
+        return ArtifactCoordinateFactoryRequest.builder().session( nonNull( session,
+                                                                            "session cannot be null" ) ).groupId( groupId ).artifactId( artifactId ).version( version ).extension( extension ).build();
     }
 
     @Nonnull
-    static ArtifactCoordinateFactoryRequest build( @Nonnull Session session, String groupId, String artifactId,
-                                                   String version, String classifier, String extension, String type )
+    static ArtifactCoordinateFactoryRequest build( @Nonnull
+    Session session, String groupId, String artifactId, String version, String classifier, String extension,
+                                                   String type )
     {
-        return ArtifactCoordinateFactoryRequest.builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .groupId( groupId )
-                .artifactId( artifactId )
-                .version( version )
-                .classifier( classifier )
-                .extension( extension )
-                .type( type )
-                .build();
+        return ArtifactCoordinateFactoryRequest.builder().session( nonNull( session,
+                                                                            "session cannot be null" ) ).groupId( groupId ).artifactId( artifactId ).version( version ).classifier( classifier ).extension( extension ).type( type ).build();
     }
 
     @Nonnull
-    static ArtifactCoordinateFactoryRequest build( @Nonnull Session session, @Nonnull ArtifactCoordinate coordinate )
+    static ArtifactCoordinateFactoryRequest build( @Nonnull
+    Session session, @Nonnull
+    ArtifactCoordinate coordinate )
     {
-        return ArtifactCoordinateFactoryRequest.builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .groupId( nonNull( coordinate, "coordinate cannot be null" ).getGroupId() )
-                .artifactId( coordinate.getArtifactId() )
-                .classifier( coordinate.getClassifier() )
-                .version( coordinate.getVersion().asString() )
-                .extension( coordinate.getExtension() )
-                .build();
+        return ArtifactCoordinateFactoryRequest.builder().session( nonNull( session,
+                                                                            "session cannot be null" ) ).groupId( nonNull( coordinate, "coordinate cannot be null" ).getGroupId() ).artifactId( coordinate.getArtifactId() ).classifier( coordinate.getClassifier() ).version( coordinate.getVersion().asString() ).extension( coordinate.getExtension() ).build();
     }
-
 
     static ArtifactFactoryRequestBuilder builder()
     {
@@ -104,11 +87,17 @@ public interface ArtifactCoordinateFactoryRequest
     class ArtifactFactoryRequestBuilder
     {
         private Session session;
+
         private String groupId;
+
         private String artifactId;
+
         private String version;
+
         private String classifier;
+
         private String extension;
+
         private String type;
 
         ArtifactFactoryRequestBuilder()
@@ -159,26 +148,28 @@ public interface ArtifactCoordinateFactoryRequest
 
         public ArtifactCoordinateFactoryRequest build()
         {
-            return new DefaultArtifactFactoryRequestArtifact( session, groupId, artifactId, version,
-                                                      classifier, extension, type );
+            return new DefaultArtifactFactoryRequestArtifact( session, groupId, artifactId, version, classifier,
+                                                              extension, type );
         }
 
-        private static class DefaultArtifactFactoryRequestArtifact extends BaseRequest implements
-                                                                                       ArtifactCoordinateFactoryRequest
+        private static class DefaultArtifactFactoryRequestArtifact
+            extends BaseRequest
+            implements ArtifactCoordinateFactoryRequest
         {
             private final String groupId;
+
             private final String artifactId;
+
             private final String version;
+
             private final String classifier;
+
             private final String extension;
+
             private final String type;
 
-            DefaultArtifactFactoryRequestArtifact( @Nonnull Session session,
-                                                   String groupId,
-                                                   String artifactId,
-                                                   String version,
-                                                   String classifier,
-                                                   String extension,
+            DefaultArtifactFactoryRequestArtifact( @Nonnull
+            Session session, String groupId, String artifactId, String version, String classifier, String extension,
                                                    String type )
             {
                 super( session );

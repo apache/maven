@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,17 +16,16 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 
 /**
- * An artifact's{@code Type} represents a known kind of artifacts.
- * Such types are often associated to an extension and possibly
- * a classifier, for example {@code java-source} has a {@code jar}
- * extension and a {@code sources} classifier.
- * It is also used to determine if a given dependency should be
- * included in the classpath or if its transitive dependencies should.
+ * An artifact's{@code Type} represents a known kind of artifacts. Such types are often associated to an extension and
+ * possibly a classifier, for example {@code java-source} has a {@code jar} extension and a {@code sources} classifier.
+ * It is also used to determine if a given dependency should be included in the classpath or if its transitive
+ * dependencies should.
  *
  * @since 4.0
  */
@@ -38,10 +35,15 @@ public interface Type
 {
 
     String POM = "pom";
+
     String JAR = "jar";
+
     String JAVA_SOURCE = "java-source";
+
     String JAVADOC = "javadoc";
+
     String MAVEN_PLUGIN = "maven-plugin";
+
     String TEST_JAR = "test-jar";
 
     /**

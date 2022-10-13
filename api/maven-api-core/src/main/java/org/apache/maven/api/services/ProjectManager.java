@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,7 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.api.Service;
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
+package org.apache.maven.api.services;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -33,7 +28,10 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.ResolutionScope;
+import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Interface to manage the project during its lifecycle.
@@ -41,11 +39,11 @@ import org.apache.maven.api.Session;
  * @since 4.0
  */
 @Experimental
-public interface ProjectManager extends Service
+public interface ProjectManager
+    extends Service
 {
     /**
-     * Returns the path to the resolved file in the local repository
-     * if the artifact has been resolved.
+     * Returns the path to the resolved file in the local repository if the artifact has been resolved.
      *
      * @return the path of the resolved artifact
      */
@@ -60,15 +58,15 @@ public interface ProjectManager extends Service
         String name = path.getFileName().toString();
         int dot = name.lastIndexOf( '.' );
         String ext = dot >= 1 ? name.substring( dot + 1 ) : "";
-        Artifact artifact = session.createArtifact( project.getGroupId(), project.getArtifactId(),
-                project.getVersion(), ext );
+        Artifact artifact =
+            session.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), ext );
         attachArtifact( project, artifact, path );
     }
 
     default void attachArtifact( Session session, Project project, String type, Path path )
     {
-        Artifact artifact = session.createArtifact( project.getGroupId(), project.getArtifactId(),
-                                                    project.getVersion(), null, null, type );
+        Artifact artifact = session.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),
+                                                    null, null, type );
         attachArtifact( project, artifact, path );
     }
 

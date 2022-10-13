@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform.pull;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.transform.pull;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform.pull;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,7 +35,7 @@ public class XmlUtils
 {
 
     public static ByteArrayInputStream writeDocument( XmlStreamReader reader, XmlPullParser parser )
-            throws IOException, XmlPullParserException
+        throws IOException, XmlPullParserException
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Writer writer = newWriter( reader, baos );
@@ -45,7 +44,7 @@ public class XmlUtils
     }
 
     public static void writeDocument( XmlPullParser parser, Writer writer )
-            throws IOException, XmlPullParserException
+        throws IOException, XmlPullParserException
     {
         XmlSerializer serializer = new MXSerializer();
         serializer.setOutput( writer );
@@ -71,8 +70,7 @@ public class XmlUtils
                     serializer.startTag( parser.getNamespace(), parser.getName() );
                     for ( int i = 0; i < parser.getAttributeCount(); i++ )
                     {
-                        serializer.attribute( parser.getAttributeNamespace( i ),
-                                              parser.getAttributeName( i ),
+                        serializer.attribute( parser.getAttributeNamespace( i ), parser.getAttributeName( i ),
                                               parser.getAttributeValue( i ) );
                     }
                     break;
@@ -109,7 +107,7 @@ public class XmlUtils
     }
 
     private static OutputStreamWriter newWriter( XmlStreamReader reader, ByteArrayOutputStream baos )
-            throws UnsupportedEncodingException
+        throws UnsupportedEncodingException
     {
         if ( reader.getEncoding() != null )
         {

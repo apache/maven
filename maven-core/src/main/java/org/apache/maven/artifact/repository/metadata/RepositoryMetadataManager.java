@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.repository.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.repository.metadata;
 
 import java.util.List;
 
@@ -45,8 +44,8 @@ public interface RepositoryMetadataManager
     /**
      * Deploy metadata to the remote repository.
      *
-     * @param metadata             the metadata to deploy
-     * @param localRepository      the local repository to install to first
+     * @param metadata the metadata to deploy
+     * @param localRepository the local repository to install to first
      * @param deploymentRepository the remote repository to deploy to
      * @throws RepositoryMetadataDeploymentException in case of metadata deployment issue
      */
@@ -57,7 +56,7 @@ public interface RepositoryMetadataManager
     /**
      * Install the metadata in the local repository.
      *
-     * @param metadata        the metadata
+     * @param metadata the metadata
      * @param localRepository the local repository
      * @throws RepositoryMetadataInstallationException in case of metadata installation issue
      */

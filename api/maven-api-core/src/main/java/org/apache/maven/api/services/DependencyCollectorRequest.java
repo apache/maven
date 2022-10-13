@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,32 +69,31 @@ public interface DependencyCollectorRequest
     boolean getVerbose();
 
     @Nonnull
-    static DependencyCollectorRequest build( @Nonnull Session session, Artifact root )
+    static DependencyCollectorRequest build( @Nonnull
+    Session session, Artifact root )
     {
-        return builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .rootArtifact( nonNull( root, "root cannot be null" ) )
-                .build();
+        return builder().session( nonNull( session,
+                                           "session cannot be null" ) ).rootArtifact( nonNull( root,
+                                                                                               "root cannot be null" ) ).build();
     }
 
     @Nonnull
-    static DependencyCollectorRequest build( @Nonnull Session session, @Nonnull DependencyCoordinate root )
+    static DependencyCollectorRequest build( @Nonnull
+    Session session, @Nonnull
+    DependencyCoordinate root )
     {
-        return builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .root( nonNull( root, "root cannot be null" ) )
-                .build();
+        return builder().session( nonNull( session,
+                                           "session cannot be null" ) ).root( nonNull( root,
+                                                                                       "root cannot be null" ) ).build();
     }
 
     @Nonnull
-    static DependencyCollectorRequest build( @Nonnull Session session, @Nonnull Project project )
+    static DependencyCollectorRequest build( @Nonnull
+    Session session, @Nonnull
+    Project project )
     {
-        return builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .rootArtifact( nonNull( project, "project cannot be null" ).getArtifact() )
-                .dependencies( project.getDependencies() )
-                .managedDependencies( project.getManagedDependencies() )
-                .build();
+        return builder().session( nonNull( session,
+                                           "session cannot be null" ) ).rootArtifact( nonNull( project, "project cannot be null" ).getArtifact() ).dependencies( project.getDependencies() ).managedDependencies( project.getManagedDependencies() ).build();
     }
 
     @Nonnull
@@ -109,10 +107,15 @@ public interface DependencyCollectorRequest
     {
 
         Session session;
+
         Artifact rootArtifact;
+
         DependencyCoordinate root;
+
         List<DependencyCoordinate> dependencies = Collections.emptyList();
+
         List<DependencyCoordinate> managedDependencies = Collections.emptyList();
+
         boolean verbose;
 
         DependencyCollectorRequestBuilder()
@@ -120,25 +123,27 @@ public interface DependencyCollectorRequest
         }
 
         @Nonnull
-        public DependencyCollectorRequestBuilder session( @Nonnull Session session )
+        public DependencyCollectorRequestBuilder session( @Nonnull
+        Session session )
         {
             this.session = session;
             return this;
         }
 
         /**
-         * Sets the root artifact for the dependency graph.
-         * This must not be confused with {@link #root(DependencyCoordinate)}: The root <em>dependency</em>, like any
-         * other specified dependency, will be subject to dependency collection/resolution, i.e. should have an artifact
-         * descriptor and a corresponding artifact file. The root <em>artifact</em> on the other hand is only used
-         * as a label for the root node of the graph in case no root dependency was specified. As such, the configured
-         * root artifact is ignored if {@link #root(DependencyCoordinate)} has been set.
+         * Sets the root artifact for the dependency graph. This must not be confused with
+         * {@link #root(DependencyCoordinate)}: The root <em>dependency</em>, like any other specified dependency, will
+         * be subject to dependency collection/resolution, i.e. should have an artifact descriptor and a corresponding
+         * artifact file. The root <em>artifact</em> on the other hand is only used as a label for the root node of the
+         * graph in case no root dependency was specified. As such, the configured root artifact is ignored if
+         * {@link #root(DependencyCoordinate)} has been set.
          *
          * @param rootArtifact The root artifact for the dependency graph, may be {@code null}.
          * @return This request for chaining, never {@code null}.
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder rootArtifact( @Nullable Artifact rootArtifact )
+        public DependencyCollectorRequestBuilder rootArtifact( @Nullable
+        Artifact rootArtifact )
         {
             this.rootArtifact = rootArtifact;
             return this;
@@ -149,7 +154,8 @@ public interface DependencyCollectorRequest
          * @return This request for chaining, never {@code null}.
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder root( @Nonnull DependencyCoordinate root )
+        public DependencyCollectorRequestBuilder root( @Nonnull
+        DependencyCoordinate root )
         {
             this.root = root;
             return this;
@@ -164,7 +170,8 @@ public interface DependencyCollectorRequest
          * @return This request for chaining, never {@code null}.
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder dependencies( @Nullable List<DependencyCoordinate> dependencies )
+        public DependencyCollectorRequestBuilder dependencies( @Nullable
+        List<DependencyCoordinate> dependencies )
         {
             this.dependencies = ( dependencies != null ) ? dependencies : Collections.emptyList();
             return this;
@@ -177,7 +184,8 @@ public interface DependencyCollectorRequest
          * @return This request for chaining, never {@code null}.
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder dependency( @Nullable DependencyCoordinate dependency )
+        public DependencyCollectorRequestBuilder dependency( @Nullable
+        DependencyCoordinate dependency )
         {
             if ( dependency != null )
             {
@@ -190,18 +198,16 @@ public interface DependencyCollectorRequest
             return this;
         }
 
-
         /**
          * Sets the dependency management to apply to transitive dependencies. To clarify, this management does not
-         * apply to
-         * the direct dependencies of the root node.
+         * apply to the direct dependencies of the root node.
          *
          * @param managedDependencies The dependency management, may be {@code null}.
          * @return This request for chaining, never {@code null}.
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder managedDependencies(
-                        @Nullable List<DependencyCoordinate> managedDependencies )
+        public DependencyCollectorRequestBuilder managedDependencies( @Nullable
+        List<DependencyCoordinate> managedDependencies )
         {
             this.managedDependencies = ( managedDependencies != null ) ? managedDependencies : Collections.emptyList();
             return this;
@@ -210,12 +216,13 @@ public interface DependencyCollectorRequest
         /**
          * Adds the specified managed dependency.
          *
-         * @param managedDependency The managed dependency to add, may be {@code null} in which case the call
-         *                          will have no effect.
+         * @param managedDependency The managed dependency to add, may be {@code null} in which case the call will have
+         *            no effect.
          * @return This request for chaining, never {@code null}.
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder managedDependency( @Nullable DependencyCoordinate managedDependency )
+        public DependencyCollectorRequestBuilder managedDependency( @Nullable
+        DependencyCoordinate managedDependency )
         {
             if ( managedDependency != null )
             {
@@ -244,46 +251,44 @@ public interface DependencyCollectorRequest
         @Nonnull
         public DependencyCollectorRequest build()
         {
-            return new DefaultDependencyCollectorRequest(
-                    session,
-                    rootArtifact,
-                    root,
-                    dependencies,
-                    managedDependencies,
-                    verbose );
+            return new DefaultDependencyCollectorRequest( session, rootArtifact, root, dependencies,
+                                                          managedDependencies, verbose );
         }
 
-        static class DefaultDependencyCollectorRequest extends BaseRequest
-                implements DependencyCollectorRequest
+        static class DefaultDependencyCollectorRequest
+            extends BaseRequest
+            implements DependencyCollectorRequest
         {
             private final Artifact rootArtifact;
-            private final DependencyCoordinate root;
-            private final Collection<DependencyCoordinate> dependencies;
-            private final Collection<DependencyCoordinate> managedDependencies;
-            private final boolean verbose;
 
+            private final DependencyCoordinate root;
+
+            private final Collection<DependencyCoordinate> dependencies;
+
+            private final Collection<DependencyCoordinate> managedDependencies;
+
+            private final boolean verbose;
 
             /**
              * Creates a request with the specified properties.
              *
-             * @param session      {@link Session}
+             * @param session {@link Session}
              * @param rootArtifact The root dependency whose transitive dependencies should be collected, may be {@code
              *                     null}.
              */
-            DefaultDependencyCollectorRequest(
-                    @Nonnull Session session,
-                    @Nullable Artifact rootArtifact,
-                    @Nullable DependencyCoordinate root,
-                    @Nonnull Collection<DependencyCoordinate> dependencies,
-                    @Nonnull Collection<DependencyCoordinate> managedDependencies,
-                    boolean verbose )
+            DefaultDependencyCollectorRequest( @Nonnull
+            Session session, @Nullable
+            Artifact rootArtifact, @Nullable
+            DependencyCoordinate root, @Nonnull
+            Collection<DependencyCoordinate> dependencies, @Nonnull
+            Collection<DependencyCoordinate> managedDependencies, boolean verbose )
             {
                 super( session );
                 this.rootArtifact = rootArtifact;
                 this.root = root;
                 this.dependencies = unmodifiable( nonNull( dependencies, "dependencies cannot be null" ) );
-                this.managedDependencies = unmodifiable( nonNull( managedDependencies,
-                                                         "managedDependencies cannot be null" ) );
+                this.managedDependencies =
+                    unmodifiable( nonNull( managedDependencies, "managedDependencies cannot be null" ) );
                 this.verbose = verbose;
             }
 

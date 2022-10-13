@@ -1,5 +1,3 @@
-package org.apache.maven.rtinfo.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,15 @@ package org.apache.maven.rtinfo.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.rtinfo.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -28,14 +35,6 @@ import org.eclipse.aether.version.VersionConstraint;
 import org.eclipse.aether.version.VersionScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 /**
  * Provides information about the current Maven runtime.
@@ -78,8 +77,8 @@ public class DefaultRuntimeInformation
             }
             else
             {
-                logger.warn(
-                    "Could not locate " + resource + " on classpath, Maven runtime information not available" );
+                logger.warn( "Could not locate " + resource
+                    + " on classpath, Maven runtime information not available" );
             }
         }
         catch ( IOException e )

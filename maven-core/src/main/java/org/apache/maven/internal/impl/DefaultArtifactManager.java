@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,22 +35,26 @@ import org.apache.maven.project.MavenProject;
 
 @Named
 @SessionScoped
-public class DefaultArtifactManager implements ArtifactManager
+public class DefaultArtifactManager
+    implements ArtifactManager
 {
 
     @Nonnull
     private final DefaultSession session;
+
     private final Map<String, Path> paths = new ConcurrentHashMap<>();
 
     @Inject
-    public DefaultArtifactManager( @Nonnull DefaultSession session )
+    public DefaultArtifactManager( @Nonnull
+    DefaultSession session )
     {
         this.session = session;
     }
 
     @Nonnull
     @Override
-    public Optional<Path> getPath( @Nonnull Artifact artifact )
+    public Optional<Path> getPath( @Nonnull
+    Artifact artifact )
     {
         String id = id( artifact );
         if ( session.getMavenSession().getAllProjects() != null )
@@ -77,7 +80,8 @@ public class DefaultArtifactManager implements ArtifactManager
     }
 
     @Override
-    public void setPath( @Nonnull Artifact artifact, Path path )
+    public void setPath( @Nonnull
+    Artifact artifact, Path path )
     {
         String id = id( artifact );
         if ( session.getMavenSession().getAllProjects() != null )
@@ -103,12 +107,10 @@ public class DefaultArtifactManager implements ArtifactManager
 
     private String id( org.apache.maven.artifact.Artifact artifact )
     {
-        return artifact.getGroupId()
-                + ":" + artifact.getArtifactId()
-                + ":" + artifact.getType()
-                + ( artifact.getClassifier() == null || artifact.getClassifier().isEmpty()
-                        ? "" : ":" + artifact.getClassifier() )
-                + ":" + artifact.getVersion();
+        return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getType()
+            + ( artifact.getClassifier() == null || artifact.getClassifier().isEmpty() ? ""
+                            : ":" + artifact.getClassifier() )
+            + ":" + artifact.getVersion();
     }
 
     private String id( Artifact artifact )

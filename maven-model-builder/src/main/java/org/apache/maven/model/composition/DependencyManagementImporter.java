@@ -1,5 +1,3 @@
-package org.apache.maven.model.composition;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.composition;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.composition;
 
 import java.util.List;
 
@@ -43,6 +42,6 @@ public interface DependencyManagementImporter
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
     Model importManagement( Model target, List<? extends DependencyManagement> sources, ModelBuildingRequest request,
-                           ModelProblemCollector problems );
+                            ModelProblemCollector problems );
 
 }

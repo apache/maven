@@ -1,5 +1,3 @@
-package org.apache.maven.api.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.model;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -32,8 +31,11 @@ public class InputLocation
     implements Serializable, InputLocationTracker
 {
     private final int lineNumber;
+
     private final int columnNumber;
+
     private final InputSource source;
+
     private final Map<Object, InputLocation> locations;
 
     public InputLocation( InputSource source )
@@ -59,8 +61,8 @@ public class InputLocation
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
-            this.locations = selfLocationKey != null
-                ?  Collections.singletonMap( selfLocationKey, this ) : Collections.emptyMap();
+        this.locations =
+            selfLocationKey != null ? Collections.singletonMap( selfLocationKey, this ) : Collections.emptyMap();
     }
 
     public InputLocation( int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations )
@@ -134,11 +136,11 @@ public class InputLocation
         }
 
         return new InputLocation( target.getLineNumber(), target.getColumnNumber(), target.getSource(), locations );
-    } //-- InputLocation merge( InputLocation, InputLocation, boolean )
+    } // -- InputLocation merge( InputLocation, InputLocation, boolean )
 
     /**
-     * Merges the {@code source} location into the {@code target} location.
-     * This method is used when the locations refer to lists and also merges the indices.
+     * Merges the {@code source} location into the {@code target} location. This method is used when the locations refer
+     * to lists and also merges the indices.
      *
      * @param target the target location
      * @param source the source location
@@ -186,7 +188,7 @@ public class InputLocation
         }
 
         return new InputLocation( target.getLineNumber(), target.getColumnNumber(), target.getSource(), locations );
-    } //-- InputLocation merge( InputLocation, InputLocation, java.util.Collection )
+    } // -- InputLocation merge( InputLocation, InputLocation, java.util.Collection )
 
     /**
      * Class StringFormatter.
@@ -196,9 +198,9 @@ public class InputLocation
     public interface StringFormatter
     {
 
-          //-----------/
-         //- Methods -/
-        //-----------/
+        // -----------/
+        // - Methods -/
+        // -----------/
 
         /**
          * Method toString.

@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,20 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.metadata.Versioning;
@@ -46,19 +58,6 @@ import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
 import org.eclipse.aether.version.VersionScheme;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 /**
  * @author Benjamin Bentmann
  */
@@ -71,22 +70,25 @@ public class DefaultVersionRangeResolver
     private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
 
     private final MetadataResolver metadataResolver;
+
     private final SyncContextFactory syncContextFactory;
+
     private final RepositoryEventDispatcher repositoryEventDispatcher;
+
     private final VersionScheme versionScheme;
 
     @Inject
-    public DefaultVersionRangeResolver( MetadataResolver metadataResolver,
-                                        SyncContextFactory syncContextFactory,
+    public DefaultVersionRangeResolver( MetadataResolver metadataResolver, SyncContextFactory syncContextFactory,
                                         RepositoryEventDispatcher repositoryEventDispatcher,
                                         VersionScheme versionScheme )
     {
         this.metadataResolver = Objects.requireNonNull( metadataResolver, "metadataResolver cannot be null" );
         this.syncContextFactory = Objects.requireNonNull( syncContextFactory, "syncContextFactory cannot be null" );
-        this.repositoryEventDispatcher = Objects.requireNonNull( repositoryEventDispatcher,
-                "repositoryEventDispatcher cannot be null" );
+        this.repositoryEventDispatcher =
+            Objects.requireNonNull( repositoryEventDispatcher, "repositoryEventDispatcher cannot be null" );
         this.versionScheme = Objects.requireNonNull( versionScheme, "versionScheme cannot be null" );
     }
+
     public VersionRangeResult resolveVersionRange( RepositorySystemSession session, VersionRangeRequest request )
         throws VersionRangeResolutionException
     {

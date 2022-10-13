@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.toolchain;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,12 +16,7 @@ package org.apache.maven.toolchain;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+package org.apache.maven.toolchain;
 
 import java.util.Collections;
 
@@ -35,13 +28,19 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 public class DefaultToolchainTest
 {
     private final Logger logger = mock( Logger.class );
 
     @BeforeEach
     public void setUp()
-            throws Exception
+        throws Exception
     {
         MockitoAnnotations.initMocks( this );
     }
@@ -109,7 +108,6 @@ public class DefaultToolchainTest
         verify( logger ).debug( "Toolchain type:TYPE{} is missing required property: name" );
     }
 
-
     @Test
     public void testNonMatchingRequirementProperty()
     {
@@ -122,7 +120,6 @@ public class DefaultToolchainTest
         verify( logger ).debug( "Toolchain type:TYPE{name = Jane Doe} doesn't match required property: name" );
     }
 
-
     @Test
     public void testEquals()
     {
@@ -130,9 +127,9 @@ public class DefaultToolchainTest
         tm1.setType( "jdk" );
         tm1.addProvide( "version", "1.5" );
         tm1.addProvide( "vendor", "sun" );
-        Xpp3Dom configuration1 = new Xpp3Dom("configuration");
+        Xpp3Dom configuration1 = new Xpp3Dom( "configuration" );
         Xpp3Dom jdkHome1 = new Xpp3Dom( "jdkHome" );
-        jdkHome1.setValue("${env.JAVA_HOME}");
+        jdkHome1.setValue( "${env.JAVA_HOME}" );
         configuration1.addChild( jdkHome1 );
         tm1.setConfiguration( configuration1 );
 
@@ -140,9 +137,9 @@ public class DefaultToolchainTest
         tm1.setType( "jdk" );
         tm1.addProvide( "version", "1.4" );
         tm1.addProvide( "vendor", "sun" );
-        Xpp3Dom configuration2 = new Xpp3Dom("configuration");
+        Xpp3Dom configuration2 = new Xpp3Dom( "configuration" );
         Xpp3Dom jdkHome2 = new Xpp3Dom( "jdkHome" );
-        jdkHome2.setValue("${env.JAVA_HOME}");
+        jdkHome2.setValue( "${env.JAVA_HOME}" );
         configuration2.addChild( jdkHome2 );
         tm2.setConfiguration( configuration2 );
 

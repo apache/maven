@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,12 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,11 +36,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
@@ -50,8 +49,8 @@ import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoExecutionRunner;
-import org.apache.maven.plugin.MojosExecutionStrategy;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.MojosExecutionStrategy;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.PluginManagerException;
@@ -81,8 +80,11 @@ public class MojoExecutor
     private static final Logger LOGGER = LoggerFactory.getLogger( MojoExecutor.class );
 
     private final BuildPluginManager pluginManager;
+
     private final MavenPluginManager mavenPluginManager;
+
     private final LifecycleDependencyResolver lifeCycleDependencyResolver;
+
     private final ExecutionEventCatapult eventCatapult;
 
     private final OwnerReentrantReadWriteLock aggregatorLock = new OwnerReentrantReadWriteLock();
@@ -92,12 +94,9 @@ public class MojoExecutor
     private final Map<Thread, MojoDescriptor> mojos = new ConcurrentHashMap<>();
 
     @Inject
-    public MojoExecutor(
-            BuildPluginManager pluginManager,
-            MavenPluginManager mavenPluginManager,
-            LifecycleDependencyResolver lifeCycleDependencyResolver,
-            ExecutionEventCatapult eventCatapult,
-            Provider<MojosExecutionStrategy> mojosExecutionStrategy )
+    public MojoExecutor( BuildPluginManager pluginManager, MavenPluginManager mavenPluginManager,
+                         LifecycleDependencyResolver lifeCycleDependencyResolver, ExecutionEventCatapult eventCatapult,
+                         Provider<MojosExecutionStrategy> mojosExecutionStrategy )
     {
         this.pluginManager = pluginManager;
         this.mavenPluginManager = mavenPluginManager;
@@ -161,8 +160,7 @@ public class MojoExecutor
         return Collections.unmodifiableCollection( scopes );
     }
 
-    public void execute( final MavenSession session,
-                         final List<MojoExecution> mojoExecutions,
+    public void execute( final MavenSession session, final List<MojoExecution> mojoExecutions,
                          final ProjectIndex projectIndex )
         throws LifecycleExecutionException
 
@@ -174,7 +172,8 @@ public class MojoExecutor
         mojosExecutionStrategy.get().execute( mojoExecutions, session, new MojoExecutionRunner()
         {
             @Override
-            public void run( MojoExecution mojoExecution ) throws LifecycleExecutionException
+            public void run( MojoExecution mojoExecution )
+                throws LifecycleExecutionException
             {
                 MojoExecutor.this.execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
             }
@@ -182,7 +181,7 @@ public class MojoExecutor
     }
 
     private void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
-                         DependencyContext dependencyContext, PhaseRecorder phaseRecorder )
+                          DependencyContext dependencyContext, PhaseRecorder phaseRecorder )
         throws LifecycleExecutionException
     {
         execute( session, mojoExecution, projectIndex, dependencyContext );
@@ -206,10 +205,9 @@ public class MojoExecutor
 
         if ( mojoDescriptor.isProjectRequired() && !session.getRequest().isProjectPresent() )
         {
-            Throwable cause = new MissingProjectException(
-                "Goal requires a project to execute" + " but there is no POM in this directory ("
-                    + session.getExecutionRootDirectory() + ")."
-                    + " Please verify you invoked Maven from the correct directory." );
+            Throwable cause = new MissingProjectException( "Goal requires a project to execute"
+                + " but there is no POM in this directory (" + session.getExecutionRootDirectory() + ")."
+                + " Please verify you invoked Maven from the correct directory." );
             throw new LifecycleExecutionException( mojoExecution, null, cause );
         }
 
@@ -217,8 +215,8 @@ public class MojoExecutor
         {
             if ( MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) )
             {
-                Throwable cause = new IllegalStateException(
-                    "Goal requires online mode for execution" + " but Maven is currently offline." );
+                Throwable cause = new IllegalStateException( "Goal requires online mode for execution"
+                    + " but Maven is currently offline." );
                 throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), cause );
             }
             else
@@ -233,16 +231,17 @@ public class MojoExecutor
     }
 
     /**
-     * Aggregating mojo executions (possibly) modify all MavenProjects, including those that are currently in use
-     * by concurrently running mojo executions. To prevent race conditions, an aggregating execution will block
-     * all other executions until finished.
-     * We also lock on a given project to forbid a forked lifecycle to be executed concurrently with the project.
-     * TODO: ideally, the builder should take care of the ordering in a smarter way
-     * TODO: and concurrency issues fixed with MNG-7157
+     * Aggregating mojo executions (possibly) modify all MavenProjects, including those that are currently in use by
+     * concurrently running mojo executions. To prevent race conditions, an aggregating execution will block all other
+     * executions until finished. We also lock on a given project to forbid a forked lifecycle to be executed
+     * concurrently with the project. TODO: ideally, the builder should take care of the ordering in a smarter way TODO:
+     * and concurrency issues fixed with MNG-7157
      */
-    private class ProjectLock implements AutoCloseable
+    private class ProjectLock
+        implements AutoCloseable
     {
         final Lock acquiredAggregatorLock;
+
         final OwnerReentrantLock acquiredProjectLock;
 
         ProjectLock( MavenSession session, MojoDescriptor mojoDescriptor )
@@ -259,9 +258,9 @@ public class MojoExecutor
                     MojoDescriptor ownerMojo = owner != null ? mojos.get( owner ) : null;
                     String str = ownerMojo != null ? " The " + ownerMojo.getId() : "An";
                     String msg = str + " aggregator mojo is already being executed "
-                            + "in this parallel build, those kind of mojos require exclusive access to "
-                            + "reactor to prevent race conditions. This mojo execution will be blocked "
-                            + "until the aggregator mojo is done.";
+                        + "in this parallel build, those kind of mojos require exclusive access to "
+                        + "reactor to prevent race conditions. This mojo execution will be blocked "
+                        + "until the aggregator mojo is done.";
                     warn( msg );
                     acquiredAggregatorLock.lock();
                 }
@@ -270,11 +269,9 @@ public class MojoExecutor
                     Thread owner = acquiredProjectLock.getOwner();
                     MojoDescriptor ownerMojo = owner != null ? mojos.get( owner ) : null;
                     String str = ownerMojo != null ? " The " + ownerMojo.getId() : "A";
-                    String msg = str + " mojo is already being executed "
-                            + "on the project " + session.getCurrentProject().getGroupId()
-                            + ":" + session.getCurrentProject().getArtifactId() + ". "
-                            + "This mojo execution will be blocked "
-                            + "until the mojo is done.";
+                    String msg = str + " mojo is already being executed " + "on the project "
+                        + session.getCurrentProject().getGroupId() + ":" + session.getCurrentProject().getArtifactId()
+                        + ". " + "This mojo execution will be blocked " + "until the mojo is done.";
                     warn( msg );
                     acquiredProjectLock.lock();
                 }
@@ -307,20 +304,21 @@ public class MojoExecutor
             SessionData data = session.getRepositorySession().getData();
             // TODO: when resolver 1.7.3 is released, the code below should be changed to
             // TODO: Map<MavenProject, Lock> locks = ( Map ) ((Map) data).computeIfAbsent(
-            // TODO:         ProjectLock.class, l -> new ConcurrentHashMap<>() );
-            Map<MavenProject, OwnerReentrantLock> locks = ( Map ) data.get( ProjectLock.class );
+            // TODO: ProjectLock.class, l -> new ConcurrentHashMap<>() );
+            Map<MavenProject, OwnerReentrantLock> locks = (Map) data.get( ProjectLock.class );
             // initialize the value if not already done (in case of a concurrent access) to the method
             if ( locks == null )
             {
                 // the call to data.set(k, null, v) is effectively a call to data.putIfAbsent(k, v)
                 data.set( ProjectLock.class, null, new ConcurrentHashMap<>() );
-                locks = ( Map ) data.get( ProjectLock.class );
+                locks = (Map) data.get( ProjectLock.class );
             }
             return locks.computeIfAbsent( session.getCurrentProject(), p -> new OwnerReentrantLock() );
         }
     }
 
-    static class OwnerReentrantLock extends ReentrantLock
+    static class OwnerReentrantLock
+        extends ReentrantLock
     {
         @Override
         public Thread getOwner()
@@ -329,7 +327,8 @@ public class MojoExecutor
         }
     }
 
-    static class OwnerReentrantReadWriteLock extends ReentrantReadWriteLock
+    static class OwnerReentrantReadWriteLock
+        extends ReentrantReadWriteLock
     {
         @Override
         public Thread getOwner()
@@ -348,7 +347,7 @@ public class MojoExecutor
 
     private void doExecute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
                             DependencyContext dependencyContext )
-            throws LifecycleExecutionException
+        throws LifecycleExecutionException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
@@ -370,7 +369,7 @@ public class MojoExecutor
     }
 
     private void doExecute2( MavenSession session, MojoExecution mojoExecution )
-            throws LifecycleExecutionException
+        throws LifecycleExecutionException
     {
         eventCatapult.fire( ExecutionEvent.Type.MojoStarted, session, mojoExecution );
         try
@@ -380,7 +379,7 @@ public class MojoExecutor
                 pluginManager.executeMojo( session, mojoExecution );
             }
             catch ( MojoFailureException | PluginManagerException | PluginConfigurationException
-                | MojoExecutionException e )
+                            | MojoExecutionException e )
             {
                 throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), e );
             }

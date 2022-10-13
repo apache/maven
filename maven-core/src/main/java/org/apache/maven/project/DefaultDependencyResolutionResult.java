@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -98,9 +97,7 @@ class DefaultDependencyResolutionResult
     public List<Exception> getResolutionErrors( Dependency dependency )
     {
         List<Exception> errors = resolutionErrors.get( dependency );
-        return ( errors != null )
-                   ? Collections.unmodifiableList( errors )
-                   : Collections.emptyList();
+        return ( errors != null ) ? Collections.unmodifiableList( errors ) : Collections.emptyList();
 
     }
 

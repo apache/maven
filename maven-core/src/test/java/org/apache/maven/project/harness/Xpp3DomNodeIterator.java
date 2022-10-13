@@ -1,5 +1,3 @@
-package org.apache.maven.project.harness;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.harness;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.harness;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.harness;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +66,7 @@ class Xpp3DomNodeIterator
             Xpp3Dom startWithNode = (Xpp3Dom) startWith.getNode();
             for ( ; filteredIndex < children.size(); filteredIndex++ )
             {
-                if ( startWithNode.equals( children.get(filteredIndex) ) )
+                if ( startWithNode.equals( children.get( filteredIndex ) ) )
                 {
                     filteredIndex++;
                     break;
@@ -107,7 +106,7 @@ class Xpp3DomNodeIterator
     {
         for ( ; position > filteredChildren.size() && filteredIndex < children.size(); filteredIndex++ )
         {
-            Dom child = children.get(filteredIndex);
+            Dom child = children.get( filteredIndex );
             if ( testNode( child ) )
             {
                 filteredChildren.add( child );

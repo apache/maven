@@ -1,5 +1,3 @@
-package org.apache.maven.model.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.plugin;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -32,10 +31,10 @@ import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelProblemCollector;
-import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -48,12 +47,12 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 @Named
 @Singleton
 public class DefaultReportingConverter
-        implements ReportingConverter
+    implements ReportingConverter
 {
     private final InputLocation location;
     {
         String modelId = "org.apache.maven:maven-model-builder:"
-                + this.getClass().getPackage().getImplementationVersion() + ":reporting-converter";
+            + this.getClass().getPackage().getImplementationVersion() + ":reporting-converter";
         InputSource inputSource = new InputSource();
         inputSource.setModelId( modelId );
         location = new InputLocation( -1, -1, inputSource );
@@ -109,10 +108,8 @@ public class DefaultReportingConverter
         {
             // new-style report configuration already present: warn since this new style has been deprecated
             // in favor of classical reporting section MSITE-647 / MSITE-684
-            problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.BASE )
-                    .setMessage( "Reporting configuration should be done in <reporting> section, "
-                            + "not in maven-site-plugin <configuration> as reportPlugins parameter." )
-                    .setLocation( sitePlugin.getLocation( "configuration" ) ) );
+            problems.add( new ModelProblemCollectorRequest( Severity.WARNING,
+                                                            Version.BASE ).setMessage( "Reporting configuration should be done in <reporting> section, " + "not in maven-site-plugin <configuration> as reportPlugins parameter." ).setLocation( sitePlugin.getLocation( "configuration" ) ) );
             return;
         }
 
@@ -127,16 +124,13 @@ public class DefaultReportingConverter
 
         boolean hasMavenProjectInfoReportsPlugin = false;
 
-        /* waiting for MSITE-484 before deprecating <reporting> section
-        if ( !reporting.getPlugins().isEmpty()
-            && request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 )
-        {
-
-            problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V31 )
-                    .setMessage( "The <reporting> section is deprecated, please move the reports to the <configuration>"
-                                 + " section of the new Maven Site Plugin." )
-                    .setLocation( reporting.getLocation( "" ) ) );
-        }*/
+        /*
+         * waiting for MSITE-484 before deprecating <reporting> section if ( !reporting.getPlugins().isEmpty() &&
+         * request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 ) { problems.add( new
+         * ModelProblemCollectorRequest( Severity.WARNING, Version.V31 ) .setMessage(
+         * "The <reporting> section is deprecated, please move the reports to the <configuration>" +
+         * " section of the new Maven Site Plugin." ) .setLocation( reporting.getLocation( "" ) ) ); }
+         */
 
         for ( ReportPlugin plugin : reporting.getPlugins() )
         {
@@ -144,8 +138,8 @@ public class DefaultReportingConverter
             reportPlugins.addChild( reportPlugin );
 
             if ( !reporting.isExcludeDefaults() && !hasMavenProjectInfoReportsPlugin
-                    && "org.apache.maven.plugins".equals( plugin.getGroupId() )
-                    && "maven-project-info-reports-plugin".equals( plugin.getArtifactId() ) )
+                && "org.apache.maven.plugins".equals( plugin.getGroupId() )
+                && "maven-project-info-reports-plugin".equals( plugin.getArtifactId() ) )
             {
                 hasMavenProjectInfoReportsPlugin = true;
             }
@@ -190,7 +184,7 @@ public class DefaultReportingConverter
     private boolean isSitePlugin( Plugin plugin )
     {
         return "maven-site-plugin".equals( plugin.getArtifactId() )
-                && "org.apache.maven.plugins".equals( plugin.getGroupId() );
+            && "org.apache.maven.plugins".equals( plugin.getGroupId() );
     }
 
     private Xpp3Dom convert( ReportPlugin plugin )

@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,9 +16,12 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import java.io.File;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,9 +30,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -59,6 +57,7 @@ import org.slf4j.LoggerFactory;
  * Resolves dependencies for the artifacts in context of the lifecycle build
  * </p>
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
+ * 
  * @since 3.0
  * @author Benjamin Bentmann
  * @author Jason van Zyl
@@ -78,11 +77,9 @@ public class LifecycleDependencyResolver
     private final ProjectArtifactsCache projectArtifactsCache;
 
     @Inject
-    public LifecycleDependencyResolver(
-            ProjectDependenciesResolver dependenciesResolver,
-            ProjectArtifactFactory artifactFactory,
-            EventSpyDispatcher eventSpyDispatcher,
-            ProjectArtifactsCache projectArtifactsCache )
+    public LifecycleDependencyResolver( ProjectDependenciesResolver dependenciesResolver,
+                                        ProjectArtifactFactory artifactFactory, EventSpyDispatcher eventSpyDispatcher,
+                                        ProjectArtifactsCache projectArtifactsCache )
     {
         this.dependenciesResolver = dependenciesResolver;
         this.artifactFactory = artifactFactory;
@@ -129,7 +126,7 @@ public class LifecycleDependencyResolver
             }
 
             Set<Artifact> resolvedArtifacts = resolveProjectArtifacts( project, scopesToCollect, scopesToResolve,
-                    session, aggregating, projectArtifacts );
+                                                                       session, aggregating, projectArtifacts );
 
             Map<Artifact, File> reactorProjects = new HashMap<>( session.getProjects().size() );
             for ( MavenProject reactorProject : session.getProjects() )
@@ -142,8 +139,8 @@ public class LifecycleDependencyResolver
             {
                 /**
                  * MNG-6300: resolvedArtifacts can be cache result; this ensures reactor files are always up-to-date
-                 * During lifecycle the Artifact.getFile() can change from target/classes to the actual jar.
-                 * This clearly shows that target/classes should not be abused as artifactFile just for the classpath
+                 * During lifecycle the Artifact.getFile() can change from target/classes to the actual jar. This
+                 * clearly shows that target/classes should not be abused as artifactFile just for the classpath
                  */
                 File reactorProjectFile = reactorProjects.get( artifact );
                 if ( reactorProjectFile != null )
@@ -180,11 +177,12 @@ public class LifecycleDependencyResolver
     public Set<Artifact> resolveProjectArtifacts( MavenProject project, Collection<String> scopesToCollect,
                                                   Collection<String> scopesToResolve, MavenSession session,
                                                   boolean aggregating, Set<Artifact> projectArtifacts )
-            throws LifecycleExecutionException
+        throws LifecycleExecutionException
     {
         Set<Artifact> resolvedArtifacts;
-        ProjectArtifactsCache.Key cacheKey = projectArtifactsCache.createKey( project, scopesToCollect,
-                scopesToResolve, aggregating, session.getRepositorySession() );
+        ProjectArtifactsCache.Key cacheKey =
+            projectArtifactsCache.createKey( project, scopesToCollect, scopesToResolve, aggregating,
+                                             session.getRepositorySession() );
         ProjectArtifactsCache.CacheRecord recordArtifacts;
         recordArtifacts = projectArtifactsCache.get( cacheKey );
 
@@ -196,14 +194,14 @@ public class LifecycleDependencyResolver
         {
             try
             {
-                resolvedArtifacts = getDependencies( project, scopesToCollect, scopesToResolve, session,
-                        aggregating, projectArtifacts );
+                resolvedArtifacts = getDependencies( project, scopesToCollect, scopesToResolve, session, aggregating,
+                                                     projectArtifacts );
                 recordArtifacts = projectArtifactsCache.put( cacheKey, resolvedArtifacts );
             }
             catch ( LifecycleExecutionException e )
             {
-              projectArtifactsCache.put( cacheKey, e );
-              projectArtifactsCache.register( project, cacheKey, recordArtifacts );
+                projectArtifactsCache.put( cacheKey, e );
+                projectArtifactsCache.register( project, cacheKey, recordArtifacts );
                 throw e;
             }
         }
@@ -259,8 +257,8 @@ public class LifecycleDependencyResolver
              * plugins that require dependency resolution although they usually run in phases of the build where project
              * artifacts haven't been assembled yet. The prime example of this is "mvn release:prepare".
              */
-            if ( aggregating && areAllDependenciesInReactor( session.getProjects(),
-                                                             result.getUnresolvedDependencies() ) )
+            if ( aggregating
+                && areAllDependenciesInReactor( session.getProjects(), result.getUnresolvedDependencies() ) )
             {
                 logger.warn( "The following dependencies could not be resolved at this point of the build"
                     + " but seem to be part of the reactor:" );

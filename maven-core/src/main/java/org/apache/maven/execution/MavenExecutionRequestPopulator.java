@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.execution;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import org.apache.maven.settings.Settings;
 import org.apache.maven.toolchain.model.PersistedToolchains;
@@ -53,7 +52,7 @@ public interface MavenExecutionRequestPopulator
     MavenExecutionRequest populateDefaults( MavenExecutionRequest request )
         throws MavenExecutionRequestPopulationException;
 
-    /*if_not[MAVEN4]*/
+    /* if_not[MAVEN4] */
 
     /**
      * Copies the values from the given settings into the specified execution request. This method will replace any
@@ -69,6 +68,6 @@ public interface MavenExecutionRequestPopulator
     MavenExecutionRequest populateFromSettings( MavenExecutionRequest request, Settings settings )
         throws MavenExecutionRequestPopulationException;
 
-    /*end[MAVEN4]*/
+    /* end[MAVEN4] */
 
 }

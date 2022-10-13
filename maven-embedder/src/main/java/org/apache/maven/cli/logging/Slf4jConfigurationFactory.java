@@ -1,5 +1,3 @@
-package org.apache.maven.cli.logging;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.cli.logging;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli.logging;
 
 import java.io.IOException;
 import java.net.URL;
@@ -33,8 +32,8 @@ import org.slf4j.ILoggerFactory;
 
 /**
  * Slf4jConfiguration factory, loading implementations from <code>META-INF/maven/slf4j-configuration.properties</code>
- * configuration files in class loader: key is the class name of the ILoggerFactory, value is the class name of
- * the corresponding Slf4jConfiguration.
+ * configuration files in class loader: key is the class name of the ILoggerFactory, value is the class name of the
+ * corresponding Slf4jConfiguration.
  *
  * @author Hervé Boutemy
  * @since 3.1.0

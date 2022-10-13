@@ -1,5 +1,3 @@
-package org.apache.maven.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.metadata;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,7 +102,7 @@ public class DefaultGraphConflictResolver
                 { // no edges - don't need this vertex anymore
                     if ( entry.equals( v ) )
                     { // unless it's an entry point.
-                        // currently processing the entry point - it should not have any entry incident edges
+                      // currently processing the entry point - it should not have any entry incident edges
                         res.getEntry().getMd().setWhy( "This is a graph entry point. No links." );
                     }
                     else
@@ -124,8 +123,8 @@ public class DefaultGraphConflictResolver
                         new ArtifactMetadata( md.getGroupId(), md.getArtifactId(), edge.getVersion(), md.getType(),
                                               md.getScopeAsEnum(), md.getClassifier(), edge.getArtifactUri(),
                                               edge.getSource() == null ? "" : edge.getSource().getMd().toString(),
-                                              edge.isResolved(), edge.getTarget() == null ? null
-                                                              : edge.getTarget().getMd().getError() );
+                                              edge.isResolved(),
+                                              edge.getTarget() == null ? null : edge.getTarget().getMd().getError() );
                     MetadataGraphVertex newV = res.addVertex( newMd );
                     MetadataGraphVertex sourceV = res.addVertex( edge.getSource().getMd() );
 

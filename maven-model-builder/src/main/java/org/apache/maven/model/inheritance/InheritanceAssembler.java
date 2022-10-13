@@ -1,5 +1,3 @@
-package org.apache.maven.model.inheritance;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.inheritance;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.inheritance;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -43,6 +42,6 @@ public interface InheritanceAssembler
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
     Model assembleModelInheritance( Model child, Model parent, ModelBuildingRequest request,
-                                   ModelProblemCollector problems );
+                                    ModelProblemCollector problems );
 
 }

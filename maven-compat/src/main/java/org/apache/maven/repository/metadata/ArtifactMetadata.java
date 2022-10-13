@@ -1,5 +1,3 @@
-package org.apache.maven.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.metadata;
 
 import java.util.Collection;
 
@@ -35,15 +34,19 @@ public class ArtifactMetadata
      * standard glorified artifact coordinates
      */
     protected String groupId;
+
     protected String artifactId;
+
     protected String version;
+
     protected String type;
+
     protected ArtifactScopeEnum artifactScope;
+
     protected String classifier;
 
     /**
-     * explanation: why this MD was chosen over its siblings
-     * in the resulting structure (classpath for now)
+     * explanation: why this MD was chosen over its siblings in the resulting structure (classpath for now)
      */
     protected String why;
 
@@ -58,13 +61,14 @@ public class ArtifactMetadata
 
     /** does the actual artifact for this metadata exists */
     protected boolean artifactExists = false;
+
     /** artifact URI */
     protected String artifactUri;
 
-    /** error message  */
+    /** error message */
     private String error;
 
-    //------------------------------------------------------------------
+    // ------------------------------------------------------------------
     /**
      *
      */
@@ -149,25 +153,22 @@ public class ArtifactMetadata
     public ArtifactMetadata( Artifact af )
     {
         /*
-        if ( af != null )
-        {
-            init( af );
-        }
-        */
+         * if ( af != null ) { init( af ); }
+         */
     }
-    //------------------------------------------------------------------
-//    public void init( ArtifactMetadata af )
-//    {
-//        setGroupId( af.getGroupId() );
-//        setArtifactId( af.getArtifactId() );
-//        setVersion( af.getVersion() );
-//        setType( af.getType() );
-//        setScope( af.getScope() );
-//        setClassifier( af.getClassifier() );
-//        //setUri( af.getDownloadUrl() );
-//
-//        this.resolved = af.isResolved();
-//    }
+    // ------------------------------------------------------------------
+    // public void init( ArtifactMetadata af )
+    // {
+    // setGroupId( af.getGroupId() );
+    // setArtifactId( af.getArtifactId() );
+    // setVersion( af.getVersion() );
+    // setType( af.getType() );
+    // setScope( af.getScope() );
+    // setClassifier( af.getClassifier() );
+    // //setUri( af.getDownloadUrl() );
+    //
+    // this.resolved = af.isResolved();
+    // }
 
     @Override
     public String toString()
@@ -290,7 +291,6 @@ public class ArtifactMetadata
         this.artifactExists = artifactExists;
     }
 
-
     public Collection<ArtifactMetadata> getDependencies()
     {
         return dependencies;
@@ -310,7 +310,6 @@ public class ArtifactMetadata
     {
         this.artifactUri = artifactUri;
     }
-
 
     public String getWhy()
     {

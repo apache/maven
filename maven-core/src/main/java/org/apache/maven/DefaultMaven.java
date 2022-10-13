@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,8 +16,31 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.Session;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Prerequisites;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.BuildResumptionAnalyzer;
 import org.apache.maven.execution.BuildResumptionDataRepository;
@@ -35,15 +56,12 @@ import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.graph.GraphBuilder;
 import org.apache.maven.graph.ProjectSelector;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
+import org.apache.maven.internal.aether.MavenChainedWorkspaceReader;
 import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.internal.aether.MavenChainedWorkspaceReader;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
-import org.apache.maven.api.model.Model;
-import org.apache.maven.api.model.Prerequisites;
-import org.apache.maven.api.model.Profile;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.Result;
 import org.apache.maven.model.superpom.SuperPomProvider;
@@ -60,24 +78,6 @@ import org.eclipse.aether.repository.WorkspaceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -119,19 +119,12 @@ public class DefaultMaven
 
     @Inject
     @SuppressWarnings( "checkstyle:ParameterNumber" )
-    public DefaultMaven(
-            ProjectBuilder projectBuilder,
-            LifecycleStarter lifecycleStarter,
-            PlexusContainer container,
-            ExecutionEventCatapult eventCatapult,
-            LegacySupport legacySupport,
-            SessionScope sessionScope,
-            DefaultRepositorySystemSessionFactory repositorySessionFactory,
-            @Named( GraphBuilder.HINT ) GraphBuilder graphBuilder,
-            BuildResumptionAnalyzer buildResumptionAnalyzer,
-            BuildResumptionDataRepository buildResumptionDataRepository,
-            SuperPomProvider superPomProvider,
-            DefaultSessionFactory defaultSessionFactory )
+    public DefaultMaven( ProjectBuilder projectBuilder, LifecycleStarter lifecycleStarter, PlexusContainer container,
+                         ExecutionEventCatapult eventCatapult, LegacySupport legacySupport, SessionScope sessionScope,
+                         DefaultRepositorySystemSessionFactory repositorySessionFactory, @Named( GraphBuilder.HINT )
+                         GraphBuilder graphBuilder, BuildResumptionAnalyzer buildResumptionAnalyzer,
+                         BuildResumptionDataRepository buildResumptionDataRepository, SuperPomProvider superPomProvider,
+                         DefaultSessionFactory defaultSessionFactory )
     {
         this.projectBuilder = projectBuilder;
         this.lifecycleStarter = lifecycleStarter;
@@ -351,10 +344,7 @@ public class DefaultMaven
             }
             else
             {
-                session.getAllProjects().stream()
-                        .filter( MavenProject::isExecutionRoot )
-                        .findFirst()
-                        .ifPresent( buildResumptionDataRepository::removeResumptionData );
+                session.getAllProjects().stream().filter( MavenProject::isExecutionRoot ).findFirst().ifPresent( buildResumptionDataRepository::removeResumptionData );
             }
         }
         finally
@@ -456,18 +446,15 @@ public class DefaultMaven
 
     private void persistResumptionData( MavenExecutionResult result, MavenSession session )
     {
-        boolean hasLifecycleExecutionExceptions = result.getExceptions().stream()
-                .anyMatch( LifecycleExecutionException.class::isInstance );
+        boolean hasLifecycleExecutionExceptions =
+            result.getExceptions().stream().anyMatch( LifecycleExecutionException.class::isInstance );
 
         if ( hasLifecycleExecutionExceptions )
         {
-            MavenProject rootProject = session.getAllProjects().stream()
-                    .filter( MavenProject::isExecutionRoot )
-                    .findFirst()
-                    .orElseThrow( () -> new IllegalStateException( "No project in the session is execution root" ) );
+            MavenProject rootProject =
+                session.getAllProjects().stream().filter( MavenProject::isExecutionRoot ).findFirst().orElseThrow( () -> new IllegalStateException( "No project in the session is execution root" ) );
 
-            buildResumptionAnalyzer.determineBuildResumptionData( result ).ifPresent( resumption ->
-            {
+            buildResumptionAnalyzer.determineBuildResumptionData( result ).ifPresent( resumption -> {
                 try
                 {
                     buildResumptionDataRepository.persistResumptionData( rootProject, resumption );
@@ -588,6 +575,7 @@ public class DefaultMaven
 
     /**
      * Get all profiles that are detected in the projects, any parent of the projects, or the settings.
+     * 
      * @param session The Maven session
      * @return A {@link Set} of profile identifiers, never {@code null}.
      */
@@ -606,21 +594,19 @@ public class DefaultMaven
             }
         }
 
-        final Stream<String> projectProfiles = projectsIncludingParents.stream()
-                .flatMap( p -> p.getModel().getDelegate().getProfiles().stream() )
-                .map( Profile::getId );
-        final Stream<String> settingsProfiles = session.getSettings().getProfiles().stream()
-                .map( org.apache.maven.settings.Profile::getId );
-        final Stream<String> superPomProfiles = superPomModel.getProfiles().stream()
-                .map( Profile::getId );
+        final Stream<String> projectProfiles =
+            projectsIncludingParents.stream().flatMap( p -> p.getModel().getDelegate().getProfiles().stream() ).map( Profile::getId );
+        final Stream<String> settingsProfiles =
+            session.getSettings().getProfiles().stream().map( org.apache.maven.settings.Profile::getId );
+        final Stream<String> superPomProfiles = superPomModel.getProfiles().stream().map( Profile::getId );
 
-        return Stream.of( projectProfiles, settingsProfiles, superPomProfiles )
-                .flatMap( Function.identity() )
-                .collect( toSet() );
+        return Stream.of( projectProfiles, settingsProfiles,
+                          superPomProfiles ).flatMap( Function.identity() ).collect( toSet() );
     }
 
     /**
      * Check whether the required profiles were found in any of the projects we're building or the settings.
+     * 
      * @param session the Maven session.
      * @param profileActivation the requested optional and required profiles.
      */
@@ -628,27 +614,27 @@ public class DefaultMaven
     {
         final Set<String> allAvailableProfiles = getAllProfiles( session );
 
-        final Set<String> requiredProfiles = new HashSet<>( );
+        final Set<String> requiredProfiles = new HashSet<>();
         requiredProfiles.addAll( profileActivation.getRequiredActiveProfileIds() );
         requiredProfiles.addAll( profileActivation.getRequiredInactiveProfileIds() );
 
         // Check whether the required profiles were found in any of the projects we're building.
-        final Set<String> notFoundRequiredProfiles = requiredProfiles.stream()
-                .filter( rap -> !allAvailableProfiles.contains( rap ) )
-                .collect( toSet() );
+        final Set<String> notFoundRequiredProfiles =
+            requiredProfiles.stream().filter( rap -> !allAvailableProfiles.contains( rap ) ).collect( toSet() );
 
         if ( !notFoundRequiredProfiles.isEmpty() )
         {
             // Use SLF4J formatter for consistency with warnings reported by logger
-            final String message = MessageFormatter.format(
-                    "The requested profiles {} could not be activated or deactivated because they do not"
-                            + " exist.", notFoundRequiredProfiles ).getMessage();
+            final String message =
+                MessageFormatter.format( "The requested profiles {} could not be activated or deactivated because they do not"
+                    + " exist.", notFoundRequiredProfiles ).getMessage();
             addExceptionToResult( session.getResult(), new MissingProfilesException( message ) );
         }
     }
 
     /**
      * Check whether any of the requested optional projects were not activated or deactivated.
+     * 
      * @param request the {@link MavenExecutionRequest}.
      * @param session the {@link MavenSession}.
      */
@@ -665,6 +651,7 @@ public class DefaultMaven
 
     /**
      * Check whether any of the requested optional profiles were not activated or deactivated.
+     * 
      * @param session the Maven session.
      * @param profileActivation the requested optional and required profiles.
      */
@@ -672,18 +659,17 @@ public class DefaultMaven
     {
         final Set<String> allAvailableProfiles = getAllProfiles( session );
 
-        final Set<String> optionalProfiles = new HashSet<>( );
+        final Set<String> optionalProfiles = new HashSet<>();
         optionalProfiles.addAll( profileActivation.getOptionalActiveProfileIds() );
         optionalProfiles.addAll( profileActivation.getOptionalInactiveProfileIds() );
 
-        final Set<String> notFoundOptionalProfiles = optionalProfiles.stream()
-                .filter( rap -> !allAvailableProfiles.contains( rap ) )
-                .collect( toSet() );
+        final Set<String> notFoundOptionalProfiles =
+            optionalProfiles.stream().filter( rap -> !allAvailableProfiles.contains( rap ) ).collect( toSet() );
 
         if ( !notFoundOptionalProfiles.isEmpty() )
         {
             logger.info( "The requested optional profiles {} could not be activated or deactivated because they do not"
-                            + " exist.", notFoundOptionalProfiles );
+                + " exist.", notFoundOptionalProfiles );
         }
     }
 

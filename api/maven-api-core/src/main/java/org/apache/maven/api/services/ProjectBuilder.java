@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,22 +16,23 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.api.ArtifactCoordinate;
-import org.apache.maven.api.Service;
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
+package org.apache.maven.api.services;
 
 import java.nio.file.Path;
 
-import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.Service;
+import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * @since 4.0
  */
 @Experimental
-public interface ProjectBuilder extends Service
+public interface ProjectBuilder
+    extends Service
 {
 
     /**
@@ -57,7 +56,9 @@ public interface ProjectBuilder extends Service
      * @see #build(ProjectBuilderRequest)
      */
     @Nonnull
-    default ProjectBuilderResult build( @Nonnull Session session, @Nonnull ProjectBuilderSource source )
+    default ProjectBuilderResult build( @Nonnull
+    Session session, @Nonnull
+    ProjectBuilderSource source )
     {
         return build( ProjectBuilderRequest.build( session, source ) );
     }
@@ -72,7 +73,9 @@ public interface ProjectBuilder extends Service
      * @see #build(ProjectBuilderRequest)
      */
     @Nonnull
-    default ProjectBuilderResult build( @Nonnull Session session, @Nonnull Path path )
+    default ProjectBuilderResult build( @Nonnull
+    Session session, @Nonnull
+    Path path )
     {
         return build( ProjectBuilderRequest.build( session, path ) );
     }
@@ -87,7 +90,9 @@ public interface ProjectBuilder extends Service
      * @see #build(ProjectBuilderRequest)
      */
     @Nonnull
-    default ProjectBuilderResult build( @Nonnull Session session, @Nonnull Artifact artifact )
+    default ProjectBuilderResult build( @Nonnull
+    Session session, @Nonnull
+    Artifact artifact )
     {
         return build( ProjectBuilderRequest.build( session, artifact ) );
     }
@@ -102,7 +107,9 @@ public interface ProjectBuilder extends Service
      * @see #build(ProjectBuilderRequest)
      */
     @Nonnull
-    default ProjectBuilderResult build( @Nonnull Session session, @Nonnull ArtifactCoordinate coordinate )
+    default ProjectBuilderResult build( @Nonnull
+    Session session, @Nonnull
+    ArtifactCoordinate coordinate )
     {
         return build( ProjectBuilderRequest.build( session, coordinate ) );
     }

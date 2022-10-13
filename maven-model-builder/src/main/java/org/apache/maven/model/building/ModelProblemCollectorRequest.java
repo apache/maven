@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.util.Objects;
 
@@ -34,13 +33,18 @@ public final class ModelProblemCollectorRequest
 {
 
     private final ModelProblem.Severity severity;
+
     private final ModelProblem.Version version;
+
     private Exception exception;
+
     private String message;
+
     private InputLocation location;
 
     /**
      * Create a new request with mandatory parameters.
+     * 
      * @param severity
      * @param version
      */

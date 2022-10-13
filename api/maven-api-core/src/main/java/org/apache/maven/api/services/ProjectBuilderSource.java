@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +31,8 @@ import org.apache.maven.api.annotations.Experimental;
 @Experimental
 public interface ProjectBuilderSource
 {
-    InputStream getInputStream() throws IOException;
+    InputStream getInputStream()
+        throws IOException;
 
     String getLocation();
 }

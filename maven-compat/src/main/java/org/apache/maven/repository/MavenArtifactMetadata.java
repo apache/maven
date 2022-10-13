@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,22 +16,25 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 /**
- *
- *
  * @author Oleg Gusakov
- *
  */
 public class MavenArtifactMetadata
 {
     public static final String DEFAULT_TYPE = "jar";
 
     String groupId;
+
     String artifactId;
+
     String version;
+
     String classifier;
+
     String type;
+
     String scope;
 
     transient Object datum;

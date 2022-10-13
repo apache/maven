@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,21 +16,22 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.annotations.Immutable;
+package org.apache.maven.api;
 
 import java.util.Collection;
 
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
+
 /**
- *
  * @since 4.0
  */
 @Experimental
 @Immutable
-public interface DependencyCoordinate extends ArtifactCoordinate
+public interface DependencyCoordinate
+    extends ArtifactCoordinate
 {
     /**
      * The type of the artifact.

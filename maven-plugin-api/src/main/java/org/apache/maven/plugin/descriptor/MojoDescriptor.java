@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.descriptor;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.descriptor;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.descriptor;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.descriptor;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -34,10 +33,8 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
  * The bean containing the Mojo descriptor.<br>
  * For more information about the usage tag, have a look to:
  * <a href="https://maven.apache.org/developers/mojo-api-specification.html">
- * https://maven.apache.org/developers/mojo-api-specification.html</a>
- *
- * TODO is there a need for the delegation of MavenMojoDescriptor to this?
- * Why not just extend ComponentDescriptor here?
+ * https://maven.apache.org/developers/mojo-api-specification.html</a> TODO is there a need for the delegation of
+ * MavenMojoDescriptor to this? Why not just extend ComponentDescriptor here?
  */
 public class MojoDescriptor
     extends ComponentDescriptor<Mojo>
@@ -88,8 +85,8 @@ public class MojoDescriptor
     private String executeLifecycle;
 
     /**
-     * Description with reason of Mojo deprecation. Similar to Javadoc {@code @deprecated}.
-     * This will trigger a warning when a user tries to use a Mojo marked as deprecated.
+     * Description with reason of Mojo deprecation. Similar to Javadoc {@code @deprecated}. This will trigger a warning
+     * when a user tries to use a Mojo marked as deprecated.
      */
     private String deprecated;
 
@@ -108,33 +105,35 @@ public class MojoDescriptor
 
     /**
      * The scope of (transitive) dependencies that should be collected but not resolved.
+     * 
      * @since 3.0-alpha-3
      */
     private String dependencyCollectionRequired;
 
-    /**  By default, the Mojo needs a Maven project to be executed */
+    /** By default, the Mojo needs a Maven project to be executed */
     private boolean projectRequired = true;
 
-    /**  By default, the Mojo is assumed to work offline as well */
+    /** By default, the Mojo is assumed to work offline as well */
     private boolean onlineRequired = false;
 
-    /**  Plugin configuration */
+    /** Plugin configuration */
     private PlexusConfiguration mojoConfiguration;
 
-    /**  Plugin descriptor */
+    /** Plugin descriptor */
     private PluginDescriptor pluginDescriptor;
 
-    /**  By default, the Mojo is inherited */
+    /** By default, the Mojo is inherited */
     private boolean inheritedByDefault = true;
 
-    /**  By default, the Mojo cannot be invoked directly */
+    /** By default, the Mojo cannot be invoked directly */
     private boolean directInvocationOnly = false;
 
-    /**  By default, the Mojo don't need reports to run */
+    /** By default, the Mojo don't need reports to run */
     private boolean requiresReports = false;
 
     /**
      * By default, mojos are not threadsafe
+     * 
      * @since 3.0-beta-2
      */
     private boolean threadSafe = false;
@@ -189,11 +188,11 @@ public class MojoDescriptor
 
     /**
      * @return the list of parameters copy. Any change to returned list is NOT reflected on this instance. To add
-     * parameters, use {@link #addParameter(Parameter)} method.
+     *         parameters, use {@link #addParameter(Parameter)} method.
      */
     public List<Parameter> getParameters()
     {
-        return new ArrayList<>( parameters  );
+        return new ArrayList<>( parameters );
     }
 
     /**
@@ -229,8 +228,8 @@ public class MojoDescriptor
 
     /**
      * @return the list parameters as a Map (keyed by {@link Parameter#getName()}) that is built from
-     * {@link #parameters} list on each call. In other words, the map returned is built on fly and is a copy.
-     * Any change to this map is NOT reflected on list and other way around!
+     *         {@link #parameters} list on each call. In other words, the map returned is built on fly and is a copy.
+     *         Any change to this map is NOT reflected on list and other way around!
      */
     public Map<String, Parameter> getParameterMap()
     {
@@ -262,8 +261,7 @@ public class MojoDescriptor
     }
 
     /**
-     * @return the required dependencies in a specified scope
-     * TODO the name is not intelligible
+     * @return the required dependencies in a specified scope TODO the name is not intelligible
      */
     @Deprecated
     public String isDependencyResolutionRequired()
@@ -300,7 +298,7 @@ public class MojoDescriptor
 
     /**
      * @param requiresProject <code>true</code> if the Mojo needs a Maven project to be executed, <code>false</code>
-     * otherwise.
+     *            otherwise.
      */
     public void setProjectRequired( boolean requiresProject )
     {
@@ -535,7 +533,7 @@ public class MojoDescriptor
             MojoDescriptor other = (MojoDescriptor) object;
 
             return Objects.equals( getPluginDescriptor(), other.getPluginDescriptor() )
-                    && Objects.equals( getGoal(), other.getGoal() );
+                && Objects.equals( getGoal(), other.getGoal() );
         }
 
         return false;
@@ -564,8 +562,8 @@ public class MojoDescriptor
     }
 
     /**
-     * @param aggregator <code>true</code> if the Mojo uses the Maven project and its child modules,
-     * <code>false</code> otherwise.
+     * @param aggregator <code>true</code> if the Mojo uses the Maven project and its child modules, <code>false</code>
+     *            otherwise.
      */
     public void setAggregator( boolean aggregator )
     {
@@ -573,8 +571,7 @@ public class MojoDescriptor
     }
 
     /**
-     * @return <code>true</code> if the Mojo uses the Maven project and its child modules,
-     * <code>false</code> otherwise.
+     * @return <code>true</code> if the Mojo uses the Maven project and its child modules, <code>false</code> otherwise.
      */
     public boolean isAggregator()
     {
@@ -590,8 +587,8 @@ public class MojoDescriptor
     }
 
     /**
-     * @param directInvocationOnly <code>true</code> if the Mojo cannot be invoked directly,
-     * <code>false</code> otherwise.
+     * @param directInvocationOnly <code>true</code> if the Mojo cannot be invoked directly, <code>false</code>
+     *            otherwise.
      */
     public void setDirectInvocationOnly( boolean directInvocationOnly )
     {
@@ -629,7 +626,6 @@ public class MojoDescriptor
     {
         return executeGoal;
     }
-
 
     /**
      * @return True if the <code>Mojo</code> is thread-safe and can be run safely in parallel

@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import java.util.List;
 
@@ -36,7 +35,6 @@ public interface ProjectDependencyGraph
      * Gets all collected projects.
      *
      * @return All collected projects.
-     *
      * @since 3.5.0
      */
     List<MavenProject> getAllProjects();

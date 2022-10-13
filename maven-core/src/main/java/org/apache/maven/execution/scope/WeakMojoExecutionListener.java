@@ -1,5 +1,3 @@
-package org.apache.maven.execution.scope;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.execution.scope;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution.scope;
 
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -25,9 +24,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 /**
  * Extension point that allows build extensions observe and possibly veto mojo executions.
  * <p>
- * Unlike {@link org.apache.maven.execution.MojoExecutionListener}, this extension point does not
- * trigger instantiation of the component, hence "weak" class name prefix. Only applies to mojo execution
- * scoped components.
+ * Unlike {@link org.apache.maven.execution.MojoExecutionListener}, this extension point does not trigger instantiation
+ * of the component, hence "weak" class name prefix. Only applies to mojo execution scoped components.
  * </p>
  * <strong>Note:</strong> This interface is part of work in progress and can be changed or removed without notice.
  *

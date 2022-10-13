@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,16 +16,17 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.api.xml.Dom;
 import org.apache.maven.execution.MavenSession;
@@ -71,17 +70,19 @@ import org.slf4j.LoggerFactory;
 public class MojoDescriptorCreator
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     private final PluginVersionResolver pluginVersionResolver;
+
     private final BuildPluginManager pluginManager;
+
     private final PluginPrefixResolver pluginPrefixResolver;
+
     private final LifecyclePluginResolver lifecyclePluginResolver;
 
     @Inject
-    public MojoDescriptorCreator(
-            PluginVersionResolver pluginVersionResolver,
-            BuildPluginManager pluginManager,
-            PluginPrefixResolver pluginPrefixResolver,
-            LifecyclePluginResolver lifecyclePluginResolver )
+    public MojoDescriptorCreator( PluginVersionResolver pluginVersionResolver, BuildPluginManager pluginManager,
+                                  PluginPrefixResolver pluginPrefixResolver,
+                                  LifecyclePluginResolver lifecyclePluginResolver )
     {
         this.pluginVersionResolver = pluginVersionResolver;
         this.pluginManager = pluginManager;
@@ -117,8 +118,10 @@ public class MojoDescriptorCreator
                 if ( value != null || defaultValue != null )
                 {
                     Xpp3Dom e = new Xpp3Dom( ce.getName(), value,
-                            defaultValue != null ? Collections.singletonMap( "default-value", defaultValue ) : null,
-                            null, null );
+                                             defaultValue != null
+                                                             ? Collections.singletonMap( "default-value", defaultValue )
+                                                             : null,
+                                             null, null );
                     children.add( e );
                 }
             }
@@ -280,9 +283,8 @@ public class MojoDescriptorCreator
     private void resolvePluginVersion( Plugin plugin, MavenSession session, MavenProject project )
         throws PluginVersionResolutionException
     {
-        PluginVersionRequest versionRequest =
-            new DefaultPluginVersionRequest( plugin, session.getRepositorySession(),
-                                             project.getRemotePluginRepositories() );
+        PluginVersionRequest versionRequest = new DefaultPluginVersionRequest( plugin, session.getRepositorySession(),
+                                                                               project.getRemotePluginRepositories() );
         plugin.setVersion( pluginVersionResolver.resolve( versionRequest ).getVersion() );
     }
 

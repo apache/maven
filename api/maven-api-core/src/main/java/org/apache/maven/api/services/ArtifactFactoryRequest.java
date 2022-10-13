@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,19 +16,17 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
+import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
-
-import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.NotThreadSafe;
 
 import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
- *
- *
  * @since 4.0
  */
 @Experimental
@@ -53,30 +49,18 @@ public interface ArtifactFactoryRequest
 
     String getType();
 
-    static ArtifactFactoryRequest build( Session session, String groupId, String artifactId,
-                                         String version, String extension )
+    static ArtifactFactoryRequest build( Session session, String groupId, String artifactId, String version,
+                                         String extension )
     {
-        return ArtifactFactoryRequest.builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .groupId( groupId )
-                .artifactId( artifactId )
-                .version( version )
-                .extension( extension )
-                .build();
+        return ArtifactFactoryRequest.builder().session( nonNull( session,
+                                                                  "session cannot be null" ) ).groupId( groupId ).artifactId( artifactId ).version( version ).extension( extension ).build();
     }
 
-    static ArtifactFactoryRequest build( Session session, String groupId, String artifactId,
-                                         String version, String classifier, String extension, String type )
+    static ArtifactFactoryRequest build( Session session, String groupId, String artifactId, String version,
+                                         String classifier, String extension, String type )
     {
-        return ArtifactFactoryRequest.builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .groupId( groupId )
-                .artifactId( artifactId )
-                .version( version )
-                .classifier( classifier )
-                .extension( extension )
-                .type( type )
-                .build();
+        return ArtifactFactoryRequest.builder().session( nonNull( session,
+                                                                  "session cannot be null" ) ).groupId( groupId ).artifactId( artifactId ).version( version ).classifier( classifier ).extension( extension ).type( type ).build();
     }
 
     static ArtifactFactoryRequestBuilder builder()
@@ -88,11 +72,17 @@ public interface ArtifactFactoryRequest
     class ArtifactFactoryRequestBuilder
     {
         private Session session;
+
         private String groupId;
+
         private String artifactId;
+
         private String version;
+
         private String classifier;
+
         private String extension;
+
         private String type;
 
         ArtifactFactoryRequestBuilder()
@@ -143,25 +133,28 @@ public interface ArtifactFactoryRequest
 
         public ArtifactFactoryRequest build()
         {
-            return new DefaultArtifactFactoryRequest( session, groupId, artifactId, version,
-                                                      classifier, extension, type );
+            return new DefaultArtifactFactoryRequest( session, groupId, artifactId, version, classifier, extension,
+                                                      type );
         }
 
-        private static class DefaultArtifactFactoryRequest extends BaseRequest implements ArtifactFactoryRequest
+        private static class DefaultArtifactFactoryRequest
+            extends BaseRequest
+            implements ArtifactFactoryRequest
         {
             private final String groupId;
+
             private final String artifactId;
+
             private final String version;
+
             private final String classifier;
+
             private final String extension;
+
             private final String type;
 
-            DefaultArtifactFactoryRequest( @Nonnull Session session,
-                                           String groupId,
-                                           String artifactId,
-                                           String version,
-                                           String classifier,
-                                           String extension,
+            DefaultArtifactFactoryRequest( @Nonnull
+            Session session, String groupId, String artifactId, String version, String classifier, String extension,
                                            String type )
             {
                 super( session );

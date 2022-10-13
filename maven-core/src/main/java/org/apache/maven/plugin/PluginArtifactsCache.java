@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import java.util.List;
 
@@ -83,7 +82,8 @@ public interface PluginArtifactsCache
     Key createKey( Plugin plugin, DependencyFilter extensionFilter, List<RemoteRepository> repositories,
                    RepositorySystemSession session );
 
-    CacheRecord get( Key key ) throws PluginResolutionException;
+    CacheRecord get( Key key )
+        throws PluginResolutionException;
 
     CacheRecord put( Key key, List<Artifact> pluginArtifacts );
 

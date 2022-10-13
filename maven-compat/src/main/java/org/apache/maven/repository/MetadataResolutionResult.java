@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,10 +31,7 @@ import org.apache.maven.artifact.resolver.CyclicDependencyException;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 
 /**
- *
- *
  * @author Oleg Gusakov
- *
  */
 public class MetadataResolutionResult
 {
@@ -118,9 +114,7 @@ public class MetadataResolutionResult
 
     public List<Artifact> getMissingArtifacts()
     {
-        return missingArtifacts == null
-                   ? Collections.emptyList()
-                   : Collections.unmodifiableList( missingArtifacts );
+        return missingArtifacts == null ? Collections.emptyList() : Collections.unmodifiableList( missingArtifacts );
 
     }
 
@@ -151,9 +145,7 @@ public class MetadataResolutionResult
 
     public List<Exception> getExceptions()
     {
-        return exceptions == null
-                   ? Collections.emptyList()
-                   : Collections.unmodifiableList( exceptions );
+        return exceptions == null ? Collections.emptyList() : Collections.unmodifiableList( exceptions );
 
     }
 
@@ -168,8 +160,8 @@ public class MetadataResolutionResult
 
     /**
      * TODO this needs to accept a {@link OverConstrainedVersionException} as returned by
-     *       {@link #getVersionRangeViolation(int)} but it's not used like that in
-     *       {@link org.apache.maven.repository.legacy.resolver.DefaultLegacyArtifactCollector}
+     * {@link #getVersionRangeViolation(int)} but it's not used like that in
+     * {@link org.apache.maven.repository.legacy.resolver.DefaultLegacyArtifactCollector}
      */
     public MetadataResolutionResult addVersionRangeViolation( Exception e )
     {
@@ -191,9 +183,8 @@ public class MetadataResolutionResult
 
     public List<Exception> getVersionRangeViolations()
     {
-        return versionRangeViolations == null
-                   ? Collections.emptyList()
-                   : Collections.unmodifiableList( versionRangeViolations );
+        return versionRangeViolations == null ? Collections.emptyList()
+                        : Collections.unmodifiableList( versionRangeViolations );
 
     }
 
@@ -226,9 +217,8 @@ public class MetadataResolutionResult
 
     public List<ArtifactResolutionException> getMetadataResolutionExceptions()
     {
-        return metadataResolutionExceptions == null
-                   ? Collections.emptyList()
-                   : Collections.unmodifiableList( metadataResolutionExceptions );
+        return metadataResolutionExceptions == null ? Collections.emptyList()
+                        : Collections.unmodifiableList( metadataResolutionExceptions );
 
     }
 

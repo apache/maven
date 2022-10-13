@@ -1,5 +1,3 @@
-package org.apache.maven.execution.scope;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,15 @@ package org.apache.maven.execution.scope;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+package org.apache.maven.execution.scope;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import com.google.inject.ScopeAnnotation;
+
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Indicates that annotated component should be instantiated before mojo execution starts and discarded after mojo

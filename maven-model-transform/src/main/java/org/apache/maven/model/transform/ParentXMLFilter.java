@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,10 +31,9 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
 /**
  * <p>
- * Transforms relativePath to version.
- * We could decide to simply allow {@code <parent/>}, but let's require the GA for now for checking
- * This filter does NOT remove the relativePath (which is done by {@link RelativePathXMLFilter}, it will only
- * optionally include the version based on the path
+ * Transforms relativePath to version. We could decide to simply allow {@code <parent/>}, but let's require the GA for
+ * now for checking This filter does NOT remove the relativePath (which is done by {@link RelativePathXMLFilter}, it
+ * will only optionally include the version based on the path
  * </p>
  *
  * @author Robert Scholte
@@ -53,8 +51,8 @@ class ParentXMLFilter
     /**
      * @param relativePathMapper
      */
-    ParentXMLFilter( XmlPullParser parser,
-                     Function<Path, Optional<RelativeProject>> relativePathMapper, Path projectPath )
+    ParentXMLFilter( XmlPullParser parser, Function<Path, Optional<RelativeProject>> relativePathMapper,
+                     Path projectPath )
     {
         super( parser, "parent" );
         this.relativePathMapper = relativePathMapper;
@@ -120,7 +118,7 @@ class ParentXMLFilter
                 }
                 if ( !hasVersion && resolvedParent.isPresent() )
                 {
-                    int pos = buffer.get( i - 1 ).event == TEXT ? i - 1  : i;
+                    int pos = buffer.get( i - 1 ).event == TEXT ? i - 1 : i;
                     Event e = new Event();
                     e.event = TEXT;
                     e.text = whitespaceAfterParentStart;
@@ -146,8 +144,7 @@ class ParentXMLFilter
             }
         }
         buffer.forEach( this::pushEvent );
-   }
-
+    }
 
     protected Optional<RelativeProject> resolveRelativePath( Path relativePath, String groupId, String artifactId )
     {

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -27,14 +26,12 @@ import org.codehaus.plexus.component.repository.exception.ComponentRepositoryExc
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 
 /**
- * Exception which occurs to indicate that the plugin cannot be initialized due
- * to some deeper problem with Plexus. Context information includes the groupId,
- * artifactId, and version for the plugin; at times, the goal name for which
- * execution failed; a message detailing the problem; the ClassRealm used to
- * look up the plugin; and the Plexus exception that caused this error.
+ * Exception which occurs to indicate that the plugin cannot be initialized due to some deeper problem with Plexus.
+ * Context information includes the groupId, artifactId, and version for the plugin; at times, the goal name for which
+ * execution failed; a message detailing the problem; the ClassRealm used to look up the plugin; and the Plexus
+ * exception that caused this error.
  *
  * @author jdcasey
- *
  */
 public class PluginContainerException
     extends PluginManagerException

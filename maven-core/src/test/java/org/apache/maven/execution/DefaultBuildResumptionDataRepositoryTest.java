@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,15 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.model.Build;
-import org.apache.maven.project.MavenProject;
-import org.junit.jupiter.api.Test;
+package org.apache.maven.execution;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import org.apache.maven.model.Build;
+import org.apache.maven.project.MavenProject;
+import org.junit.jupiter.api.Test;
 
 import static java.util.Collections.singleton;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -46,7 +45,8 @@ public class DefaultBuildResumptionDataRepositoryTest
 
         repository.applyResumptionProperties( request, properties );
 
-        assertThat( request.getProjectActivation().getOptionalActiveProjectSelectors(), is( singleton( ":module-a" ) ) );
+        assertThat( request.getProjectActivation().getOptionalActiveProjectSelectors(),
+                    is( singleton( ":module-a" ) ) );
     }
 
     @Test
@@ -74,7 +74,8 @@ public class DefaultBuildResumptionDataRepositoryTest
 
         repository.applyResumptionProperties( request, properties );
 
-        assertThat( request.getProjectActivation().getOptionalActiveProjectSelectors(), containsInAnyOrder( ":module-a", ":module-b", ":module-c" ) );
+        assertThat( request.getProjectActivation().getOptionalActiveProjectSelectors(),
+                    containsInAnyOrder( ":module-a", ":module-b", ":module-c" ) );
     }
 
     @Test
@@ -98,8 +99,9 @@ public class DefaultBuildResumptionDataRepositoryTest
         MavenProject rootProject = new MavenProject();
         rootProject.setBuild( build );
 
-        repository.applyResumptionData( request,  rootProject );
+        repository.applyResumptionData( request, rootProject );
 
-        assertThat( request.getProjectActivation().getOptionalActiveProjectSelectors(), containsInAnyOrder( "example:module-c" ) );
+        assertThat( request.getProjectActivation().getOptionalActiveProjectSelectors(),
+                    containsInAnyOrder( "example:module-c" ) );
     }
 }

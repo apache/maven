@@ -1,5 +1,3 @@
-package org.apache.maven.eventspy.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,14 @@ package org.apache.maven.eventspy.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.util.ArrayList;
-import java.util.List;
+package org.apache.maven.eventspy.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.ExecutionListener;
@@ -34,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Dispatches callbacks to all registered EventSpies.
+ * 
  * @since 3.0.2
  */
 @Named

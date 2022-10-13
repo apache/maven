@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -38,7 +37,7 @@ import org.eclipse.aether.util.ConfigUtils;
  * Remote snapshot metadata converts artifact on-the-fly to use timestamped snapshot version, and enlist it accordingly.
  */
 class RemoteSnapshotMetadataGenerator
-        implements MetadataGenerator
+    implements MetadataGenerator
 {
 
     private final Map<Object, RemoteSnapshotMetadata> snapshots;

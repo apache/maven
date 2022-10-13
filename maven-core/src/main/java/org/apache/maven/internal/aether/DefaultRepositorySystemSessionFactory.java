@@ -1,5 +1,3 @@
-package org.apache.maven.internal.aether;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,10 @@ package org.apache.maven.internal.aether;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.aether;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,9 +31,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.xml.Dom;
@@ -120,15 +119,16 @@ public class DefaultRepositorySystemSessionFactory
 
     @SuppressWarnings( "checkstyle:ParameterNumber" )
     @Inject
-    public DefaultRepositorySystemSessionFactory(
-            ArtifactHandlerManager artifactHandlerManager,
-            RepositorySystem repoSystem,
-            @Nullable @Named( "simple" ) LocalRepositoryManagerFactory simpleLocalRepoMgrFactory,
-            @Nullable @Named( "ide" ) WorkspaceReader workspaceRepository,
-            SettingsDecrypter settingsDecrypter,
-            EventSpyDispatcher eventSpyDispatcher,
-            MavenRepositorySystem mavenRepositorySystem,
-            RuntimeInformation runtimeInformation )
+    public DefaultRepositorySystemSessionFactory( ArtifactHandlerManager artifactHandlerManager,
+                                                  RepositorySystem repoSystem, @Nullable
+                                                  @Named( "simple" )
+                                                  LocalRepositoryManagerFactory simpleLocalRepoMgrFactory, @Nullable
+                                                  @Named( "ide" )
+                                                  WorkspaceReader workspaceRepository,
+                                                  SettingsDecrypter settingsDecrypter,
+                                                  EventSpyDispatcher eventSpyDispatcher,
+                                                  MavenRepositorySystem mavenRepositorySystem,
+                                                  RuntimeInformation runtimeInformation )
     {
         this.artifactHandlerManager = artifactHandlerManager;
         this.repoSystem = repoSystem;
@@ -155,17 +155,16 @@ public class DefaultRepositorySystemSessionFactory
 
         session.setOffline( request.isOffline() );
         session.setChecksumPolicy( request.getGlobalChecksumPolicy() );
-        session.setUpdatePolicy( request.isNoSnapshotUpdates()
-                    ? RepositoryPolicy.UPDATE_POLICY_NEVER
-                    : request.isUpdateSnapshots() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null );
+        session.setUpdatePolicy( request.isNoSnapshotUpdates() ? RepositoryPolicy.UPDATE_POLICY_NEVER
+                        : request.isUpdateSnapshots() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null );
 
         int errorPolicy = 0;
-        errorPolicy |= request.isCacheNotFound() ? ResolutionErrorPolicy.CACHE_NOT_FOUND
-            : ResolutionErrorPolicy.CACHE_DISABLED;
+        errorPolicy |=
+            request.isCacheNotFound() ? ResolutionErrorPolicy.CACHE_NOT_FOUND : ResolutionErrorPolicy.CACHE_DISABLED;
         errorPolicy |= request.isCacheTransferError() ? ResolutionErrorPolicy.CACHE_TRANSFER_ERROR
-            : ResolutionErrorPolicy.CACHE_DISABLED;
-        session.setResolutionErrorPolicy(
-            new SimpleResolutionErrorPolicy( errorPolicy, errorPolicy | ResolutionErrorPolicy.CACHE_NOT_FOUND ) );
+                        : ResolutionErrorPolicy.CACHE_DISABLED;
+        session.setResolutionErrorPolicy( new SimpleResolutionErrorPolicy( errorPolicy, errorPolicy
+            | ResolutionErrorPolicy.CACHE_NOT_FOUND ) );
 
         session.setArtifactTypeRegistry( RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager ) );
 
@@ -177,7 +176,7 @@ public class DefaultRepositorySystemSessionFactory
             {
                 session.setLocalRepositoryManager( simpleLocalRepoMgrFactory.newInstance( session, localRepo ) );
                 logger.info( "Disabling enhanced local repository: using legacy is strongly discouraged to ensure"
-                                 + " build reproducibility." );
+                    + " build reproducibility." );
             }
             catch ( NoLocalRepositoryManagerException e )
             {
@@ -190,8 +189,8 @@ public class DefaultRepositorySystemSessionFactory
             session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( session, localRepo ) );
         }
 
-        session.setWorkspaceReader(
-                request.getWorkspaceReader() != null ? request.getWorkspaceReader() : workspaceRepository );
+        session.setWorkspaceReader( request.getWorkspaceReader() != null ? request.getWorkspaceReader()
+                        : workspaceRepository );
 
         DefaultSettingsDecryptionRequest decrypt = new DefaultSettingsDecryptionRequest();
         decrypt.setProxies( request.getProxies() );
@@ -219,9 +218,9 @@ public class DefaultRepositorySystemSessionFactory
         {
             AuthenticationBuilder authBuilder = new AuthenticationBuilder();
             authBuilder.addUsername( proxy.getUsername() ).addPassword( proxy.getPassword() );
-            proxySelector.add(
-                new org.eclipse.aether.repository.Proxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(),
-                                                         authBuilder.build() ), proxy.getNonProxyHosts() );
+            proxySelector.add( new org.eclipse.aether.repository.Proxy( proxy.getProtocol(), proxy.getHost(),
+                                                                        proxy.getPort(), authBuilder.build() ),
+                               proxy.getNonProxyHosts() );
         }
         session.setProxySelector( proxySelector );
 
@@ -235,10 +234,9 @@ public class DefaultRepositorySystemSessionFactory
 
             if ( server.getConfiguration() != null )
             {
-                Dom dom = ( ( org.codehaus.plexus.util.xml.Xpp3Dom ) server.getConfiguration() ).getDom();
-                List<Dom> children = dom.getChildren().stream()
-                        .filter( c -> !"wagonProvider".equals( c.getName() ) )
-                        .collect( Collectors.toList() );
+                Dom dom = ( (org.codehaus.plexus.util.xml.Xpp3Dom) server.getConfiguration() ).getDom();
+                List<Dom> children =
+                    dom.getChildren().stream().filter( c -> !"wagonProvider".equals( c.getName() ) ).collect( Collectors.toList() );
                 dom = new Xpp3Dom( dom.getName(), null, null, children, null );
                 PlexusConfiguration config = XmlPlexusConfiguration.toPlexusConfiguration( dom );
                 configProps.put( "aether.connector.wagon.config." + server.getId(), config );
@@ -284,8 +282,8 @@ public class DefaultRepositorySystemSessionFactory
         else if ( !MAVEN_RESOLVER_TRANSPORT_AUTO.equals( transport ) )
         {
             throw new IllegalArgumentException( "Unknown resolver transport '" + transport
-                    + "'. Supported transports are: " + MAVEN_RESOLVER_TRANSPORT_WAGON + ", "
-                    + MAVEN_RESOLVER_TRANSPORT_NATIVE + ", " + MAVEN_RESOLVER_TRANSPORT_AUTO );
+                + "'. Supported transports are: " + MAVEN_RESOLVER_TRANSPORT_WAGON + ", "
+                + MAVEN_RESOLVER_TRANSPORT_NATIVE + ", " + MAVEN_RESOLVER_TRANSPORT_AUTO );
         }
 
         session.setTransferListener( request.getTransferListener() );

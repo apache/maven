@@ -1,5 +1,3 @@
-package org.apache.maven.model.locator;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,12 @@ package org.apache.maven.model.locator;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.io.File;
+package org.apache.maven.model.locator;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.io.File;
 
 /**
  * Locates a POM file within a project base directory.

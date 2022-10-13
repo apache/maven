@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,7 +32,6 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * Dependencies resolution scopes available before
  * <a href="/ref/current/maven-core/apidocs/org/apache/maven/lifecycle/internal/MojoExecutor.html">mojo execution</a>.
- *
  * Important note: The {@code id} values of this enum correspond to constants of
  * {@code org.apache.maven.artifact.Artifact} class and MUST BE KEPT IN SYNC.
  *
@@ -47,42 +45,41 @@ public enum ResolutionScope
      */
     NONE( null ),
     /**
-     * <code>compile</code> resolution scope
-     * = <code>compile</code> + <code>system</code> + <code>provided</code> dependencies
+     * <code>compile</code> resolution scope = <code>compile</code> + <code>system</code> + <code>provided</code>
+     * dependencies
      */
     COMPILE( "compile", Scope.COMPILE, Scope.SYSTEM, Scope.PROVIDED ),
     /**
-     * <code>compile+runtime</code> resolution scope (Maven 3 only)
-     * = <code>compile</code> + <code>system</code> + <code>provided</code> + <code>runtime</code> dependencies
+     * <code>compile+runtime</code> resolution scope (Maven 3 only) = <code>compile</code> + <code>system</code> +
+     * <code>provided</code> + <code>runtime</code> dependencies
      */
     COMPILE_PLUS_RUNTIME( "compile+runtime", Scope.COMPILE, Scope.SYSTEM, Scope.PROVIDED, Scope.RUNTIME ),
     /**
-     * <code>runtime</code> resolution scope
-     * = <code>compile</code> + <code>runtime</code> dependencies
+     * <code>runtime</code> resolution scope = <code>compile</code> + <code>runtime</code> dependencies
      */
     RUNTIME( "runtime", Scope.COMPILE, Scope.RUNTIME ),
     /**
-     * <code>runtime+system</code> resolution scope (Maven 3 only)
-     * = <code>compile</code> + <code>system</code> + <code>runtime</code> dependencies
+     * <code>runtime+system</code> resolution scope (Maven 3 only) = <code>compile</code> + <code>system</code> +
+     * <code>runtime</code> dependencies
      */
     RUNTIME_PLUS_SYSTEM( "runtime+system", Scope.COMPILE, Scope.SYSTEM, Scope.RUNTIME ),
     /**
-     * <code>test</code> resolution scope
-     * = <code>compile</code> + <code>system</code> + <code>provided</code> + <code>runtime</code> + <code>test</code>
-     * dependencies
+     * <code>test</code> resolution scope = <code>compile</code> + <code>system</code> + <code>provided</code> +
+     * <code>runtime</code> + <code>test</code> dependencies
      */
     TEST( "test", Scope.COMPILE, Scope.SYSTEM, Scope.PROVIDED, Scope.RUNTIME, Scope.TEST );
 
-    private static final Map<String, ResolutionScope> VALUES
-            = Stream.of( ResolutionScope.values() ).collect( Collectors.toMap( ResolutionScope::id, s -> s ) );
+    private static final Map<String, ResolutionScope> VALUES =
+        Stream.of( ResolutionScope.values() ).collect( Collectors.toMap( ResolutionScope::id, s -> s ) );
 
     public static ResolutionScope fromString( String id )
     {
-        return Optional.ofNullable( VALUES.get( id ) )
-                .orElseThrow( () -> new IllegalArgumentException( "Unknown resolution scope " + id ) );
+        return Optional.ofNullable( VALUES.get( id ) ).orElseThrow( () -> new IllegalArgumentException( "Unknown resolution scope "
+            + id ) );
     }
 
     private final String id;
+
     private final Set<Scope> scopes;
 
     ResolutionScope( String id, Scope... scopes )

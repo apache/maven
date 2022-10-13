@@ -1,5 +1,3 @@
-package org.apache.maven.configuration;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.configuration;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.configuration;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.model.Build;
@@ -94,8 +93,8 @@ public class DefaultBeanConfigurationRequest
      *            empty to use the general plugin configuration.
      * @return This request for chaining, never {@code null}.
      */
-    public DefaultBeanConfigurationRequest setConfiguration( Model model, String pluginGroupId,
-                                                             String pluginArtifactId, String pluginExecutionId )
+    public DefaultBeanConfigurationRequest setConfiguration( Model model, String pluginGroupId, String pluginArtifactId,
+                                                             String pluginExecutionId )
     {
         Plugin plugin = findPlugin( model, pluginGroupId, pluginArtifactId );
         if ( plugin != null )

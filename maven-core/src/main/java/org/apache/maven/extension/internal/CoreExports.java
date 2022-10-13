@@ -1,5 +1,3 @@
-package org.apache.maven.extension.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.extension.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.extension.internal;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -50,8 +49,8 @@ public class CoreExports
     public CoreExports( ClassRealm realm, Set<String> exportedArtifacts, Set<String> exportedPackages )
     {
         this.artifacts = Collections.unmodifiableSet( new HashSet<>( exportedArtifacts ) );
-        this.packages = exportedPackages.stream().collect(
-                collectingAndThen( toMap( identity(), v -> realm ), Collections::unmodifiableMap ) );
+        this.packages = exportedPackages.stream().collect( collectingAndThen( toMap( identity(), v -> realm ),
+                                                                              Collections::unmodifiableMap ) );
     }
 
     /**

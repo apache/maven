@@ -1,19 +1,24 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.maven.lifecycle;
 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
- * agreements. See the NOTICE file distributed with this work for additional information regarding
- * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance with the License. You may obtain a
- * copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
- */
+import javax.inject.Inject;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -50,8 +55,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import javax.inject.Inject;
 
 public class LifecycleExecutorTest
     extends AbstractCoreMavenComponentTestCase
@@ -158,16 +161,16 @@ public class LifecycleExecutorTest
         assertEquals( "1.0", session.getCurrentProject().getVersion() );
         List<MojoExecution> executionPlan = getExecutions( calculateExecutionPlan( session, "clean", "install" ) );
 
-        //[01] clean:clean
-        //[02] resources:resources
-        //[03] compiler:compile
-        //[04] it:generate-metadata
-        //[05] resources:testResources
-        //[06] compiler:testCompile
-        //[07] it:generate-test-metadata
-        //[08] surefire:test
-        //[09] jar:jar
-        //[10] install:install
+        // [01] clean:clean
+        // [02] resources:resources
+        // [03] compiler:compile
+        // [04] it:generate-metadata
+        // [05] resources:testResources
+        // [06] compiler:testCompile
+        // [07] it:generate-test-metadata
+        // [08] surefire:test
+        // [09] jar:jar
+        // [10] install:install
         //
         assertEquals( 10, executionPlan.size() );
 
@@ -196,22 +199,22 @@ public class LifecycleExecutorTest
 
         List<MojoExecution> executions = getExecutions( plan );
 
-        //[01] clean:clean
-        //[02] modello:xpp3-writer
-        //[03] modello:java
-        //[04] modello:xpp3-reader
-        //[05] modello:xpp3-writer
-        //[06] modello:java
-        //[07] modello:xpp3-reader
-        //[08] plugin:descriptor
-        //[09] resources:resources
-        //[10] compiler:compile
-        //[11] resources:testResources
-        //[12] compiler:testCompile
-        //[13] surefire:test
-        //[14] jar:jar
-        //[15] plugin:addPluginArtifactMetadata
-        //[16] install:install
+        // [01] clean:clean
+        // [02] modello:xpp3-writer
+        // [03] modello:java
+        // [04] modello:xpp3-reader
+        // [05] modello:xpp3-writer
+        // [06] modello:java
+        // [07] modello:xpp3-reader
+        // [08] plugin:descriptor
+        // [09] resources:resources
+        // [10] compiler:compile
+        // [11] resources:testResources
+        // [12] compiler:testCompile
+        // [13] surefire:test
+        // [14] jar:jar
+        // [15] plugin:addPluginArtifactMetadata
+        // [16] install:install
         //
 
         assertEquals( 16, executions.size() );
@@ -234,11 +237,9 @@ public class LifecycleExecutorTest
         assertEquals( "install:install", executions.get( 15 ).getMojoDescriptor().getFullGoalName() );
 
         assertEquals( "src/main/mdo/remote-resources.mdo",
-                      new MojoExecutionXPathContainer( executions.get( 1 ) ).getValue(
-                          "configuration/models[1]/model" ) );
+                      new MojoExecutionXPathContainer( executions.get( 1 ) ).getValue( "configuration/models[1]/model" ) );
         assertEquals( "src/main/mdo/supplemental-model.mdo",
-                      new MojoExecutionXPathContainer( executions.get( 4 ) ).getValue(
-                          "configuration/models[1]/model" ) );
+                      new MojoExecutionXPathContainer( executions.get( 4 ) ).getValue( "configuration/models[1]/model" ) );
     }
 
     @Test
@@ -251,14 +252,14 @@ public class LifecycleExecutorTest
         assertEquals( "1.0", session.getCurrentProject().getVersion() );
         List<MojoExecution> executionPlan = getExecutions( calculateExecutionPlan( session, "package" ) );
 
-        //[01] resources:resources
-        //[02] compiler:compile
-        //[03] it:generate-metadata
-        //[04] resources:testResources
-        //[05] compiler:testCompile
-        //[06] plexus-component-metadata:generate-test-metadata
-        //[07] surefire:test
-        //[08] jar:jar
+        // [01] resources:resources
+        // [02] compiler:compile
+        // [03] it:generate-metadata
+        // [04] resources:testResources
+        // [05] compiler:testCompile
+        // [06] plexus-component-metadata:generate-test-metadata
+        // [07] surefire:test
+        // [08] jar:jar
         //
         assertEquals( 8, executionPlan.size() );
 
@@ -276,8 +277,7 @@ public class LifecycleExecutorTest
     public void testLifecyclePluginsRetrievalForDefaultLifecycle()
         throws Exception
     {
-        List<Plugin> plugins =
-            new ArrayList<>( lifecycleExecutor.getPluginsBoundByDefaultToAllLifecycles( "jar" ) );
+        List<Plugin> plugins = new ArrayList<>( lifecycleExecutor.getPluginsBoundByDefaultToAllLifecycles( "jar" ) );
 
         assertThat( plugins.toString(), plugins, hasSize( 9 ) );
     }
@@ -318,19 +318,17 @@ public class LifecycleExecutorTest
     {
         File pom = getProject( "project-basic" );
         MavenSession session = createMavenSession( pom );
-        MojoNotFoundException e = assertThrows(
-                MojoNotFoundException.class,
-                () -> getExecutions( calculateExecutionPlan( session, "resources:" ) ),
-                "expected a MojoNotFoundException" );
+        MojoNotFoundException e = assertThrows( MojoNotFoundException.class,
+                                                () -> getExecutions( calculateExecutionPlan( session, "resources:" ) ),
+                                                "expected a MojoNotFoundException" );
         assertEquals( "", e.getGoal() );
 
-        e = assertThrows(
-                MojoNotFoundException.class,
-                () -> getExecutions( calculateExecutionPlan( session, "org.apache.maven.plugins:maven-resources-plugin:0.1:resources:toomany" ) ),
-                "expected a MojoNotFoundException" );
+        e = assertThrows( MojoNotFoundException.class,
+                          () -> getExecutions( calculateExecutionPlan( session,
+                                                                       "org.apache.maven.plugins:maven-resources-plugin:0.1:resources:toomany" ) ),
+                          "expected a MojoNotFoundException" );
         assertEquals( "resources:toomany", e.getGoal() );
     }
-
 
     @Test
     public void testPluginPrefixRetrieval()
@@ -368,14 +366,14 @@ public class LifecycleExecutorTest
             lifeCycleExecutionPlanCalculator.calculateExecutionPlan( session, session.getCurrentProject(),
                                                                      Arrays.asList( (Object) task ), false );
 
-        MojoExecution execution = executionPlan.getMojoExecutions().get(0);
+        MojoExecution execution = executionPlan.getMojoExecutions().get( 0 );
         assertEquals( "maven-it-plugin", execution.getArtifactId(), execution.toString() );
-        assertNull(execution.getConfiguration());
+        assertNull( execution.getConfiguration() );
 
         lifeCycleExecutionPlanCalculator.setupMojoExecution( session, session.getCurrentProject(), execution,
-                new HashSet<>() );
-        assertNotNull(execution.getConfiguration());
-        assertEquals("1.0", execution.getConfiguration().getChild( "version" ).getAttribute( "default-value" ));
+                                                             new HashSet<>() );
+        assertNotNull( execution.getConfiguration() );
+        assertEquals( "1.0", execution.getConfiguration().getChild( "version" ).getAttribute( "default-value" ) );
     }
 
     @Test

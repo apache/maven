@@ -1,5 +1,3 @@
-package org.apache.maven.api.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,9 @@ package org.apache.maven.api.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.model;
 
 public interface InputLocationTracker
 {
     InputLocation getLocation( Object field );
 }
-

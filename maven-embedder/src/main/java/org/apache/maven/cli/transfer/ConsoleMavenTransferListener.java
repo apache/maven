@@ -1,5 +1,3 @@
-package org.apache.maven.cli.transfer;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.cli.transfer;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.cli.transfer;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli.transfer;
 
 import java.io.PrintStream;
 import java.util.Collections;
@@ -40,10 +39,10 @@ public class ConsoleMavenTransferListener
     extends AbstractMavenTransferListener
 {
 
-    private Map<TransferResource, Long> transfers = Collections.synchronizedMap(
-            new LinkedHashMap<>() );
+    private Map<TransferResource, Long> transfers = Collections.synchronizedMap( new LinkedHashMap<>() );
 
     private boolean printResourceNames;
+
     private int lastLength;
 
     public ConsoleMavenTransferListener( PrintStream out, boolean printResourceNames )
@@ -77,7 +76,7 @@ public class ConsoleMavenTransferListener
         transfers.put( resource, event.getTransferredBytes() );
 
         StringBuilder buffer = new StringBuilder( 128 );
-        buffer.append( "Progress (" ).append(  transfers.size() ).append( "): " );
+        buffer.append( "Progress (" ).append( transfers.size() ).append( "): " );
 
         synchronized ( transfers )
         {
@@ -110,7 +109,7 @@ public class ConsoleMavenTransferListener
 
         if ( printResourceNames )
         {
-            status.append( StringUtils.substringAfterLast( resourceName,  "/" ) );
+            status.append( StringUtils.substringAfterLast( resourceName, "/" ) );
             status.append( " (" );
         }
 

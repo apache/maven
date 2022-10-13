@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -134,8 +133,7 @@ class DefaultModelResolver
         }
 
         List<RemoteRepository> newRepositories =
-            Collections.singletonList( ArtifactDescriptorUtils.toRemoteRepository(
-                    new org.apache.maven.model.Repository( repository ) ) );
+            Collections.singletonList( ArtifactDescriptorUtils.toRemoteRepository( new org.apache.maven.model.Repository( repository ) ) );
 
         this.repositories =
             remoteRepositoryManager.aggregateRepositories( session, repositories, newRepositories, true );
@@ -186,8 +184,8 @@ class DefaultModelResolver
     {
         try
         {
-            final Artifact artifact = new DefaultArtifact( parent.getGroupId(), parent.getArtifactId(), "", "pom",
-                                                           parent.getVersion() );
+            final Artifact artifact =
+                new DefaultArtifact( parent.getGroupId(), parent.getArtifactId(), "", "pom", parent.getVersion() );
 
             final VersionRangeRequest versionRangeRequest = new VersionRangeRequest( artifact, repositories, context );
             versionRangeRequest.setTrace( trace );
@@ -197,22 +195,22 @@ class DefaultModelResolver
 
             if ( versionRangeResult.getHighestVersion() == null )
             {
-                throw new UnresolvableModelException(
-                    String.format( "No versions matched the requested parent version range '%s'",
-                                   parent.getVersion() ),
-                    parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
+                throw new UnresolvableModelException( String.format( "No versions matched the requested parent version range '%s'",
+                                                                     parent.getVersion() ),
+                                                      parent.getGroupId(), parent.getArtifactId(),
+                                                      parent.getVersion() );
 
             }
 
             if ( versionRangeResult.getVersionConstraint() != null
-                     && versionRangeResult.getVersionConstraint().getRange() != null
-                     && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null )
+                && versionRangeResult.getVersionConstraint().getRange() != null
+                && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null )
             {
                 // Message below is checked for in the MNG-2199 core IT.
-                throw new UnresolvableModelException(
-                    String.format( "The requested parent version range '%s' does not specify an upper bound",
-                                   parent.getVersion() ),
-                    parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
+                throw new UnresolvableModelException( String.format( "The requested parent version range '%s' does not specify an upper bound",
+                                                                     parent.getVersion() ),
+                                                      parent.getGroupId(), parent.getArtifactId(),
+                                                      parent.getVersion() );
 
             }
 
@@ -249,22 +247,22 @@ class DefaultModelResolver
 
             if ( versionRangeResult.getHighestVersion() == null )
             {
-                throw new UnresolvableModelException(
-                    String.format( "No versions matched the requested dependency version range '%s'",
-                                   dependency.getVersion() ),
-                    dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+                throw new UnresolvableModelException( String.format( "No versions matched the requested dependency version range '%s'",
+                                                                     dependency.getVersion() ),
+                                                      dependency.getGroupId(), dependency.getArtifactId(),
+                                                      dependency.getVersion() );
 
             }
 
             if ( versionRangeResult.getVersionConstraint() != null
-                     && versionRangeResult.getVersionConstraint().getRange() != null
-                     && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null )
+                && versionRangeResult.getVersionConstraint().getRange() != null
+                && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null )
             {
                 // Message below is checked for in the MNG-4463 core IT.
-                throw new UnresolvableModelException(
-                    String.format( "The requested dependency version range '%s' does not specify an upper bound",
-                                   dependency.getVersion() ),
-                    dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+                throw new UnresolvableModelException( String.format( "The requested dependency version range '%s' does not specify an upper bound",
+                                                                     dependency.getVersion() ),
+                                                      dependency.getGroupId(), dependency.getArtifactId(),
+                                                      dependency.getVersion() );
 
             }
 
@@ -285,7 +283,8 @@ class DefaultModelResolver
     }
 
     @Override
-    public ModelSource resolveModel( org.apache.maven.model.Parent parent ) throws UnresolvableModelException
+    public ModelSource resolveModel( org.apache.maven.model.Parent parent )
+        throws UnresolvableModelException
     {
         AtomicReference<org.apache.maven.api.model.Parent> resolvedParent = new AtomicReference<>();
         ModelSource result = resolveModel( parent.getDelegate(), resolvedParent );
@@ -297,7 +296,8 @@ class DefaultModelResolver
     }
 
     @Override
-    public ModelSource resolveModel( org.apache.maven.model.Dependency dependency ) throws UnresolvableModelException
+    public ModelSource resolveModel( org.apache.maven.model.Dependency dependency )
+        throws UnresolvableModelException
     {
         AtomicReference<org.apache.maven.api.model.Dependency> resolvedDependency = new AtomicReference<>();
         ModelSource result = resolveModel( dependency.getDelegate(), resolvedDependency );
@@ -309,14 +309,15 @@ class DefaultModelResolver
     }
 
     @Override
-    public void addRepository( org.apache.maven.model.Repository repository ) throws InvalidRepositoryException
+    public void addRepository( org.apache.maven.model.Repository repository )
+        throws InvalidRepositoryException
     {
         addRepository( repository.getDelegate() );
     }
 
     @Override
     public void addRepository( org.apache.maven.model.Repository repository, boolean replace )
-            throws InvalidRepositoryException
+        throws InvalidRepositoryException
     {
         addRepository( repository.getDelegate(), replace );
     }

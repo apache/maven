@@ -1,5 +1,3 @@
-package org.apache.maven.model.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.io;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.io;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,7 +80,7 @@ public interface ModelWriter
      * @throws IOException If the model could not be serialized.
      */
     void write( File output, Map<String, Object> options, org.apache.maven.model.Model model )
-            throws IOException;
+        throws IOException;
 
     /**
      * Writes the supplied model to the specified character writer. The writer will be automatically closed before the
@@ -93,7 +92,7 @@ public interface ModelWriter
      * @throws IOException If the model could not be serialized.
      */
     void write( Writer output, Map<String, Object> options, org.apache.maven.model.Model model )
-            throws IOException;
+        throws IOException;
 
     /**
      * Writes the supplied model to the specified byte stream. The stream will be automatically closed before the method
@@ -105,6 +104,6 @@ public interface ModelWriter
      * @throws IOException If the model could not be serialized.
      */
     void write( OutputStream output, Map<String, Object> options, org.apache.maven.model.Model model )
-            throws IOException;
+        throws IOException;
 
 }

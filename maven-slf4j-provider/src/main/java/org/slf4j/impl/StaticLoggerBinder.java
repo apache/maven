@@ -1,5 +1,3 @@
-package org.slf4j.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.slf4j.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.slf4j.impl;
 
 import org.slf4j.ILoggerFactory;
 import org.slf4j.spi.LoggerFactoryBinder;
 
 /**
- * SLF4J LoggerFactoryBinder implementation using MavenSimpleLogger.
- * This class is part of the required classes used to specify an
- * SLF4J logger provider implementation.
+ * SLF4J LoggerFactoryBinder implementation using MavenSimpleLogger. This class is part of the required classes used to
+ * specify an SLF4J logger provider implementation.
  *
  * @since 3.5.1
  */
@@ -33,8 +31,8 @@ public final class StaticLoggerBinder
     implements LoggerFactoryBinder
 {
     /**
-     * Declare the version of the SLF4J API this implementation is compiled
-     * against. The value of this field is usually modified with each release.
+     * Declare the version of the SLF4J API this implementation is compiled against. The value of this field is usually
+     * modified with each release.
      */
     // to avoid constant folding by the compiler, this field must *not* be final
     @SuppressWarnings( { "checkstyle:staticvariablename", "checkstyle:visibilitymodifier" } )
@@ -48,8 +46,7 @@ public final class StaticLoggerBinder
     private static final StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
 
     /**
-     * The ILoggerFactory instance returned by the {@link #getLoggerFactory}
-     * method should always be the same object
+     * The ILoggerFactory instance returned by the {@link #getLoggerFactory} method should always be the same object
      */
     private final ILoggerFactory loggerFactory;
 

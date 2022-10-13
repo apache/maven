@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.io.Reader;
 import java.nio.file.Files;
@@ -49,7 +48,7 @@ import org.eclipse.aether.util.ConfigUtils;
  * Plugin metadata contains G level list of "prefix" to A mapping for plugins present under this G.
  */
 class PluginsMetadataGenerator
-        implements MetadataGenerator
+    implements MetadataGenerator
 {
     private static final String PLUGIN_DESCRIPTOR_LOCATION = "META-INF/maven/plugin.xml";
 
@@ -57,20 +56,17 @@ class PluginsMetadataGenerator
 
     private final Date timestamp;
 
-    PluginsMetadataGenerator( RepositorySystemSession session,
-                              InstallRequest request )
+    PluginsMetadataGenerator( RepositorySystemSession session, InstallRequest request )
     {
         this( session, request.getMetadata() );
     }
 
-    PluginsMetadataGenerator( RepositorySystemSession session,
-                              DeployRequest request )
+    PluginsMetadataGenerator( RepositorySystemSession session, DeployRequest request )
     {
         this( session, request.getMetadata() );
     }
 
-    private PluginsMetadataGenerator( RepositorySystemSession session,
-                                      Collection<? extends Metadata> metadatas )
+    private PluginsMetadataGenerator( RepositorySystemSession session, Collection<? extends Metadata> metadatas )
     {
         this.processedPlugins = new LinkedHashMap<>();
         this.timestamp = (Date) ConfigUtils.getObject( session, new Date(), "maven.startTime" );
@@ -132,10 +128,8 @@ class PluginsMetadataGenerator
     private PluginInfo extractPluginInfo( Artifact artifact )
     {
         // sanity: jar, no classifier and file exists
-        if ( artifact != null
-                && "jar".equals( artifact.getExtension() )
-                && "".equals( artifact.getClassifier() )
-                && artifact.getFile() != null )
+        if ( artifact != null && "jar".equals( artifact.getExtension() ) && "".equals( artifact.getClassifier() )
+            && artifact.getFile() != null )
         {
             Path artifactPath = artifact.getFile().toPath();
             if ( Files.isRegularFile( artifactPath ) )
@@ -146,8 +140,8 @@ class PluginsMetadataGenerator
 
                     if ( pluginDescriptorEntry != null )
                     {
-                        try ( Reader reader = ReaderFactory.newXmlReader(
-                                artifactJar.getInputStream( pluginDescriptorEntry ) ) )
+                        try ( Reader reader =
+                            ReaderFactory.newXmlReader( artifactJar.getInputStream( pluginDescriptorEntry ) ) )
                         {
                             // Note: using DOM instead of use of
                             // org.apache.maven.plugin.descriptor.PluginDescriptor

@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,14 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.eclipse.aether.util.version.GenericVersionScheme;
-import org.eclipse.aether.version.VersionScheme;
+package org.apache.maven.repository.internal;
 
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+
+import org.eclipse.aether.util.version.GenericVersionScheme;
+import org.eclipse.aether.version.VersionScheme;
 
 /**
  * Default version scheme provider: provides singleton {@link GenericVersionScheme} instance.
@@ -32,7 +31,7 @@ import javax.inject.Singleton;
 @Singleton
 @Named
 public final class DefaultVersionSchemeProvider
-        implements Provider<VersionScheme>
+    implements Provider<VersionScheme>
 {
     private final GenericVersionScheme genericVersionScheme;
 

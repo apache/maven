@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 
@@ -32,5 +31,6 @@ public interface MojoExecutionRunner
      * @param execution mojo execution
      * @throws LifecycleExecutionException
      */
-    void run( MojoExecution execution ) throws LifecycleExecutionException;
+    void run( MojoExecution execution )
+        throws LifecycleExecutionException;
 }

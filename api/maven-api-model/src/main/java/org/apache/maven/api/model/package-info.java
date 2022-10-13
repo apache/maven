@@ -1,10 +1,3 @@
-// CHECKSTYLE_OFF: RegexpHeader
-/**
- * Maven POM (Project Object Model) classes, generated from <code>maven.mdo</code> model.
- * The root class is {@link org.apache.maven.api.model.Model}.
- */
-package org.apache.maven.api.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,3 +16,8 @@ package org.apache.maven.api.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+/**
+ * Maven POM (Project Object Model) classes, generated from <code>maven.mdo</code> model. The root class is
+ * {@link org.apache.maven.api.model.Model}.
+ */
+package org.apache.maven.api.model;

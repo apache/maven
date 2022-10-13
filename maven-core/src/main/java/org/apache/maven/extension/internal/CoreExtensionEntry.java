@@ -1,5 +1,3 @@
-package org.apache.maven.extension.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,7 @@ package org.apache.maven.extension.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.project.ExtensionDescriptor;
-import org.apache.maven.project.ExtensionDescriptorBuilder;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
+package org.apache.maven.extension.internal;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +28,10 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import org.apache.maven.project.ExtensionDescriptor;
+import org.apache.maven.project.ExtensionDescriptorBuilder;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
  * Provides information about artifacts (identified by groupId:artifactId string key) and classpath elements exported by

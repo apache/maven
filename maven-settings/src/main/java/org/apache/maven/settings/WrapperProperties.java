@@ -1,5 +1,3 @@
-package org.apache.maven.settings;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.settings;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.settings;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,10 +38,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-class WrapperProperties extends Properties
+class WrapperProperties
+    extends Properties
 {
 
     final Supplier<Map<String, String>> getter;
+
     final Consumer<Properties> setter;
 
     WrapperProperties( Supplier<Map<String, String>> getter, Consumer<Properties> setter )
@@ -202,7 +203,7 @@ class WrapperProperties extends Properties
         Properties props = new Properties();
         props.putAll( getter.get() );
         T ret = runner.perform( props );
-        if ( ! props.equals( getter.get() ) )
+        if ( !props.equals( getter.get() ) )
         {
             setter.accept( props );
         }
@@ -214,7 +215,7 @@ class WrapperProperties extends Properties
         Properties props = new Properties();
         props.putAll( getter.get() );
         runner.perform( props );
-        if ( ! props.equals( getter.get() ) )
+        if ( !props.equals( getter.get() ) )
         {
             setter.accept( props );
         }
@@ -307,13 +308,15 @@ class WrapperProperties extends Properties
     }
 
     @Override
-    public synchronized void load( Reader reader ) throws IOException
+    public synchronized void load( Reader reader )
+        throws IOException
     {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public synchronized void load( InputStream inStream ) throws IOException
+    public synchronized void load( InputStream inStream )
+        throws IOException
     {
         throw new UnsupportedOperationException();
     }
@@ -327,7 +330,8 @@ class WrapperProperties extends Properties
     }
 
     @Override
-    public void store( Writer writer, String comments ) throws IOException
+    public void store( Writer writer, String comments )
+        throws IOException
     {
         Properties props = new Properties();
         props.putAll( getter.get() );
@@ -335,7 +339,8 @@ class WrapperProperties extends Properties
     }
 
     @Override
-    public void store( OutputStream out, String comments ) throws IOException
+    public void store( OutputStream out, String comments )
+        throws IOException
     {
         Properties props = new Properties();
         props.putAll( getter.get() );
@@ -343,13 +348,15 @@ class WrapperProperties extends Properties
     }
 
     @Override
-    public synchronized void loadFromXML( InputStream in ) throws IOException, InvalidPropertiesFormatException
+    public synchronized void loadFromXML( InputStream in )
+        throws IOException, InvalidPropertiesFormatException
     {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void storeToXML( OutputStream os, String comment ) throws IOException
+    public void storeToXML( OutputStream os, String comment )
+        throws IOException
     {
         Properties props = new Properties();
         props.putAll( getter.get() );
@@ -357,7 +364,8 @@ class WrapperProperties extends Properties
     }
 
     @Override
-    public void storeToXML( OutputStream os, String comment, String encoding ) throws IOException
+    public void storeToXML( OutputStream os, String comment, String encoding )
+        throws IOException
     {
         Properties props = new Properties();
         props.putAll( getter.get() );

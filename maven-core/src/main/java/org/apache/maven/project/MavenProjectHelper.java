@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.io.File;
 import java.util.List;
@@ -31,6 +30,7 @@ public interface MavenProjectHelper
 
     /**
      * See {@link #attachArtifact(MavenProject, String, String, java.io.File)}, but with type set to null.
+     * 
      * @param project project reference.
      * @param artifactFile artifact file.
      * @param artifactClassifier artifact classifier.
@@ -39,6 +39,7 @@ public interface MavenProjectHelper
 
     /**
      * * See {@link #attachArtifact(MavenProject, String, String, java.io.File)}, but with classifier set to null.
+     * 
      * @param project project reference.
      * @param artifactType artifact type.
      * @param artifactFile artifact file.
@@ -47,6 +48,7 @@ public interface MavenProjectHelper
 
     /**
      * Add or replace an artifact to the current project.
+     * 
      * @param project the project reference.
      * @param artifactType the type (e.g. jar) or null.
      * @param artifactClassifier the classifier or null.
@@ -56,6 +58,7 @@ public interface MavenProjectHelper
 
     /**
      * Add a resource directory to the project.
+     * 
      * @param project project reference.
      * @param resourceDirectory directory.
      * @param includes include patterns.
@@ -65,6 +68,7 @@ public interface MavenProjectHelper
 
     /**
      * Add a test resource directory to the project.
+     * 
      * @param project project reference.
      * @param resourceDirectory directory.
      * @param includes include patterns.

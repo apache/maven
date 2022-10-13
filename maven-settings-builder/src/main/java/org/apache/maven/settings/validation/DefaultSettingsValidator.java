@@ -1,5 +1,3 @@
-package org.apache.maven.settings.validation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.settings.validation;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,18 +16,19 @@ package org.apache.maven.settings.validation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.validation;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.api.settings.Mirror;
 import org.apache.maven.api.settings.Profile;
-import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.Proxy;
+import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.Server;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
@@ -113,9 +112,9 @@ public class DefaultSettingsValidator
 
                 if ( "local".equals( mirror.getId() ) )
                 {
-                    addViolation( problems, Severity.WARNING, "mirrors.mirror.id", null, "must not be 'local'"
-                        + ", this identifier is reserved for the local repository"
-                        + ", using it for other repositories will corrupt your repository metadata." );
+                    addViolation( problems, Severity.WARNING, "mirrors.mirror.id", null,
+                                  "must not be 'local'" + ", this identifier is reserved for the local repository"
+                                      + ", using it for other repositories will corrupt your repository metadata." );
                 }
 
                 validateStringNotEmpty( problems, "mirrors.mirror.url", mirror.getUrl(), mirror.getId() );
@@ -141,8 +140,8 @@ public class DefaultSettingsValidator
                 String prefix = "profiles.profile[" + profile.getId() + "].";
 
                 validateRepositories( problems, profile.getRepositories(), prefix + "repositories.repository" );
-                validateRepositories( problems, profile.getPluginRepositories(), prefix
-                    + "pluginRepositories.pluginRepository" );
+                validateRepositories( problems, profile.getPluginRepositories(),
+                                      prefix + "pluginRepositories.pluginRepository" );
             }
         }
 
@@ -177,9 +176,9 @@ public class DefaultSettingsValidator
 
             if ( "local".equals( repository.getId() ) )
             {
-                addViolation( problems, Severity.WARNING, prefix + ".id", null, "must not be 'local'"
-                    + ", this identifier is reserved for the local repository"
-                    + ", using it for other repositories will corrupt your repository metadata." );
+                addViolation( problems, Severity.WARNING, prefix + ".id", null,
+                              "must not be 'local'" + ", this identifier is reserved for the local repository"
+                                  + ", using it for other repositories will corrupt your repository metadata." );
             }
 
             if ( !repoIds.add( repository.getId() ) )
@@ -211,7 +210,7 @@ public class DefaultSettingsValidator
      * </ul>
      */
     private static boolean validateStringNotEmpty( SettingsProblemCollector problems, String fieldName, String string,
-                                            String sourceHint )
+                                                   String sourceHint )
     {
         if ( !validateNotNull( problems, fieldName, string, sourceHint ) )
         {
@@ -258,9 +257,8 @@ public class DefaultSettingsValidator
             {
                 if ( banned.indexOf( string.charAt( i ) ) >= 0 )
                 {
-                    addViolation( problems, severity, fieldName, sourceHint,
-                                  "must not contain any of these characters " + banned + " but found "
-                                      + string.charAt( i ) );
+                    addViolation( problems, severity, fieldName, sourceHint, "must not contain any of these characters "
+                        + banned + " but found " + string.charAt( i ) );
                     return false;
                 }
             }
@@ -270,7 +268,7 @@ public class DefaultSettingsValidator
     }
 
     private static void addViolation( SettingsProblemCollector problems, Severity severity, String fieldName,
-                               String sourceHint, String message )
+                                      String sourceHint, String message )
     {
         StringBuilder buffer = new StringBuilder( 256 );
         buffer.append( '\'' ).append( fieldName ).append( '\'' );

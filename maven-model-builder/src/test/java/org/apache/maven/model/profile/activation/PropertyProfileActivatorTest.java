@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile.activation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.profile.activation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile.activation;
 
 import java.util.Properties;
 
@@ -38,17 +37,15 @@ public class PropertyProfileActivatorTest
 
     @BeforeEach
     @Override
-    void setUp() throws Exception
+    void setUp()
+        throws Exception
     {
         activator = new PropertyProfileActivator();
     }
 
-    private Profile newProfile(String key, String value )
+    private Profile newProfile( String key, String value )
     {
-        ActivationProperty ap = ActivationProperty.newBuilder()
-                .name( key )
-                .value( value )
-                .build();
+        ActivationProperty ap = ActivationProperty.newBuilder().name( key ).value( value ).build();
 
         Activation a = Activation.newBuilder().property( ap ).build();
 

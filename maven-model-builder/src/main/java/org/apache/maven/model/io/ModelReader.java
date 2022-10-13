@@ -1,5 +1,3 @@
-package org.apache.maven.model.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.io;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.io;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,9 +42,8 @@ public interface ModelReader
     String IS_STRICT = "org.apache.maven.model.io.isStrict";
 
     /**
-     * The key for the option to enable tracking of line/column numbers. This option is of type
-     * {@link InputSource} and defaults to {@code null}. Providing an input source enables
-     * location tracking.
+     * The key for the option to enable tracking of line/column numbers. This option is of type {@link InputSource} and
+     * defaults to {@code null}. Providing an input source enables location tracking.
      */
     String INPUT_SOURCE = "org.apache.maven.model.io.inputSource";
 

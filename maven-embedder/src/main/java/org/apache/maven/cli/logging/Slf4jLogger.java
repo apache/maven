@@ -1,5 +1,3 @@
-package org.apache.maven.cli.logging;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,13 @@ package org.apache.maven.cli.logging;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli.logging;
 
 import org.codehaus.plexus.logging.Logger;
 
 /**
- * Adapt an SLF4J logger to a Plexus logger, ignoring Plexus logger API parts that are not classical and
- * probably not really used.
+ * Adapt an SLF4J logger to a Plexus logger, ignoring Plexus logger API parts that are not classical and probably not
+ * really used.
  *
  * @author Jason van Zyl
  * @since 3.1.0

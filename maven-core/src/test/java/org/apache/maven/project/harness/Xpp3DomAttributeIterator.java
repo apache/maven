@@ -1,5 +1,3 @@
-package org.apache.maven.project.harness;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.harness;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.harness;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.harness;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,7 @@ import org.apache.maven.internal.xml.Xpp3Dom;
  * @author Benjamin Bentmann
  */
 class Xpp3DomAttributeIterator
-        implements NodeIterator
+    implements NodeIterator
 {
 
     private NodePointer parent;
@@ -52,9 +51,9 @@ class Xpp3DomAttributeIterator
         this.parent = parent;
         this.node = (Xpp3Dom) parent.getNode();
 
-        this.attributes = this.node.getAttributes().entrySet().stream()
-                .filter( a -> a.getKey().equals( qname.getName() ) || "*".equals( qname.getName() ) )
-                .collect( Collectors.toList() );
+        this.attributes =
+            this.node.getAttributes().entrySet().stream().filter( a -> a.getKey().equals( qname.getName() )
+                || "*".equals( qname.getName() ) ).collect( Collectors.toList() );
     }
 
     public NodePointer getNodePointer()

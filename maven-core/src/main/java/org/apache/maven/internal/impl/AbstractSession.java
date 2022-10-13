@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -67,20 +66,25 @@ import org.apache.maven.project.MavenProject;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
-public abstract class AbstractSession implements Session
+public abstract class AbstractSession
+    implements Session
 {
 
     private final List<Listener> listeners = new CopyOnWriteArrayList<>();
-    private final Map<org.eclipse.aether.graph.DependencyNode, Node> allNodes
-            = Collections.synchronizedMap( new WeakHashMap<>() );
-    private final Map<org.eclipse.aether.artifact.Artifact, Artifact> allArtifacts
-            = Collections.synchronizedMap( new WeakHashMap<>() );
-    private final Map<org.eclipse.aether.repository.RemoteRepository, RemoteRepository> allRepositories
-            = Collections.synchronizedMap( new WeakHashMap<>() );
-    private final Map<String, Project> allProjects
-            = Collections.synchronizedMap( new WeakHashMap<>() );
-    private final Map<org.eclipse.aether.graph.Dependency, Dependency> allDependencies
-            = Collections.synchronizedMap( new WeakHashMap<>() );
+
+    private final Map<org.eclipse.aether.graph.DependencyNode, Node> allNodes =
+        Collections.synchronizedMap( new WeakHashMap<>() );
+
+    private final Map<org.eclipse.aether.artifact.Artifact, Artifact> allArtifacts =
+        Collections.synchronizedMap( new WeakHashMap<>() );
+
+    private final Map<org.eclipse.aether.repository.RemoteRepository, RemoteRepository> allRepositories =
+        Collections.synchronizedMap( new WeakHashMap<>() );
+
+    private final Map<String, Project> allProjects = Collections.synchronizedMap( new WeakHashMap<>() );
+
+    private final Map<org.eclipse.aether.graph.Dependency, Dependency> allDependencies =
+        Collections.synchronizedMap( new WeakHashMap<>() );
 
     public RemoteRepository getRemoteRepository( org.eclipse.aether.repository.RemoteRepository repository )
     {
@@ -98,22 +102,22 @@ public abstract class AbstractSession implements Session
     }
 
     @Nonnull
-    public Artifact getArtifact( @Nonnull org.eclipse.aether.artifact.Artifact artifact )
+    public Artifact getArtifact( @Nonnull
+    org.eclipse.aether.artifact.Artifact artifact )
     {
         return allArtifacts.computeIfAbsent( artifact, a -> new DefaultArtifact( this, a ) );
     }
 
     @Nonnull
-    public Dependency getDependency( @Nonnull org.eclipse.aether.graph.Dependency dependency )
+    public Dependency getDependency( @Nonnull
+    org.eclipse.aether.graph.Dependency dependency )
     {
         return allDependencies.computeIfAbsent( dependency, d -> new DefaultDependency( this, d ) );
     }
 
     public List<Project> getProjects( List<MavenProject> projects )
     {
-        return projects == null ? null : projects.stream()
-                .map( this::getProject )
-                .collect( Collectors.toList() );
+        return projects == null ? null : projects.stream().map( this::getProject ).collect( Collectors.toList() );
     }
 
     public Project getProject( MavenProject project )
@@ -123,9 +127,8 @@ public abstract class AbstractSession implements Session
 
     public List<org.eclipse.aether.repository.RemoteRepository> toRepositories( List<RemoteRepository> repositories )
     {
-        return repositories == null ? null : repositories.stream()
-                .map( this::toRepository )
-                .collect( Collectors.toList() );
+        return repositories == null ? null
+                        : repositories.stream().map( this::toRepository ).collect( Collectors.toList() );
     }
 
     public org.eclipse.aether.repository.RemoteRepository toRepository( RemoteRepository repository )
@@ -156,27 +159,23 @@ public abstract class AbstractSession implements Session
 
     public List<ArtifactRepository> toArtifactRepositories( List<RemoteRepository> repositories )
     {
-        return repositories == null ? null : repositories.stream()
-                .map( this::toArtifactRepository )
-                .collect( Collectors.toList() );
+        return repositories == null ? null
+                        : repositories.stream().map( this::toArtifactRepository ).collect( Collectors.toList() );
     }
 
     public abstract ArtifactRepository toArtifactRepository( RemoteRepository repository );
 
     public List<org.eclipse.aether.graph.Dependency> toDependencies( Collection<DependencyCoordinate> dependencies )
     {
-        return dependencies == null ? null : dependencies.stream()
-                .map( this::toDependency )
-                .collect( Collectors.toList() );
+        return dependencies == null ? null
+                        : dependencies.stream().map( this::toDependency ).collect( Collectors.toList() );
     }
 
     public abstract org.eclipse.aether.graph.Dependency toDependency( DependencyCoordinate dependency );
 
     public List<org.eclipse.aether.artifact.Artifact> toArtifacts( Collection<Artifact> artifacts )
     {
-        return artifacts == null ? null : artifacts.stream()
-                .map( this::toArtifact )
-                .collect( Collectors.toList() );
+        return artifacts == null ? null : artifacts.stream().map( this::toArtifact ).collect( Collectors.toList() );
     }
 
     public org.eclipse.aether.artifact.Artifact toArtifact( Artifact artifact )
@@ -190,15 +189,9 @@ public abstract class AbstractSession implements Session
                 return a;
             }
         }
-        return new org.eclipse.aether.artifact.DefaultArtifact(
-                artifact.getGroupId(),
-                artifact.getArtifactId(),
-                artifact.getClassifier(),
-                artifact.getExtension(),
-                artifact.getVersion().toString(),
-                null,
-                file
-        );
+        return new org.eclipse.aether.artifact.DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+                                                                artifact.getClassifier(), artifact.getExtension(),
+                                                                artifact.getVersion().toString(), null, file );
     }
 
     public org.eclipse.aether.artifact.Artifact toArtifact( ArtifactCoordinate coord )
@@ -207,25 +200,21 @@ public abstract class AbstractSession implements Session
         {
             return ( (DefaultArtifactCoordinate) coord ).getCoordinate();
         }
-        return new org.eclipse.aether.artifact.DefaultArtifact(
-                coord.getGroupId(),
-                coord.getArtifactId(),
-                coord.getClassifier(),
-                coord.getExtension(),
-                coord.getVersion().toString(),
-                null,
-                (File) null
-        );
+        return new org.eclipse.aether.artifact.DefaultArtifact( coord.getGroupId(), coord.getArtifactId(),
+                                                                coord.getClassifier(), coord.getExtension(),
+                                                                coord.getVersion().toString(), null, (File) null );
     }
 
     @Override
-    public void registerListener( @Nonnull Listener listener )
+    public void registerListener( @Nonnull
+    Listener listener )
     {
         listeners.add( nonNull( listener ) );
     }
 
     @Override
-    public void unregisterListener( @Nonnull Listener listener )
+    public void unregisterListener( @Nonnull
+    Listener listener )
     {
         listeners.remove( nonNull( listener ) );
     }
@@ -259,10 +248,11 @@ public abstract class AbstractSession implements Session
      */
     @Nonnull
     @Override
-    public RemoteRepository createRemoteRepository( @Nonnull String id, @Nonnull String url )
+    public RemoteRepository createRemoteRepository( @Nonnull
+    String id, @Nonnull
+    String url )
     {
-        return getService( RepositoryFactory.class )
-                .createRemote( id, url );
+        return getService( RepositoryFactory.class ).createRemote( id, url );
     }
 
     /**
@@ -272,10 +262,10 @@ public abstract class AbstractSession implements Session
      */
     @Nonnull
     @Override
-    public RemoteRepository createRemoteRepository( @Nonnull Repository repository )
+    public RemoteRepository createRemoteRepository( @Nonnull
+    Repository repository )
     {
-        return getService( RepositoryFactory.class )
-                .createRemote( repository );
+        return getService( RepositoryFactory.class ).createRemote( repository );
     }
 
     /**
@@ -284,11 +274,10 @@ public abstract class AbstractSession implements Session
      * @see ArtifactFactory#create(Session, String, String, String, String)
      */
     @Override
-    public ArtifactCoordinate createArtifactCoordinate( String groupId, String artifactId,
-                                                        String version, String extension )
+    public ArtifactCoordinate createArtifactCoordinate( String groupId, String artifactId, String version,
+                                                        String extension )
     {
-        return getService( ArtifactCoordinateFactory.class )
-                .create( this, groupId, artifactId, version, extension );
+        return getService( ArtifactCoordinateFactory.class ).create( this, groupId, artifactId, version, extension );
     }
 
     /**
@@ -300,8 +289,8 @@ public abstract class AbstractSession implements Session
     public ArtifactCoordinate createArtifactCoordinate( String groupId, String artifactId, String version,
                                                         String classifier, String extension, String type )
     {
-        return getService( ArtifactCoordinateFactory.class )
-                .create( this, groupId, artifactId, version, classifier, extension, type );
+        return getService( ArtifactCoordinateFactory.class ).create( this, groupId, artifactId, version, classifier,
+                                                                     extension, type );
     }
 
     /**
@@ -312,9 +301,11 @@ public abstract class AbstractSession implements Session
     @Override
     public ArtifactCoordinate createArtifactCoordinate( Artifact artifact )
     {
-        return getService( ArtifactCoordinateFactory.class )
-                .create( this, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion().asString(),
-                         artifact.getClassifier(), artifact.getExtension(), null );
+        return getService( ArtifactCoordinateFactory.class ).create( this, artifact.getGroupId(),
+                                                                     artifact.getArtifactId(),
+                                                                     artifact.getVersion().asString(),
+                                                                     artifact.getClassifier(), artifact.getExtension(),
+                                                                     null );
     }
 
     /**
@@ -325,8 +316,7 @@ public abstract class AbstractSession implements Session
     @Override
     public Artifact createArtifact( String groupId, String artifactId, String version, String extension )
     {
-        return getService( ArtifactFactory.class )
-                .create( this, groupId, artifactId, version, extension );
+        return getService( ArtifactFactory.class ).create( this, groupId, artifactId, version, extension );
     }
 
     /**
@@ -338,8 +328,8 @@ public abstract class AbstractSession implements Session
     public Artifact createArtifact( String groupId, String artifactId, String version, String classifier,
                                     String extension, String type )
     {
-        return getService( ArtifactFactory.class )
-                .create( this, groupId, artifactId, version, classifier, extension, type );
+        return getService( ArtifactFactory.class ).create( this, groupId, artifactId, version, classifier, extension,
+                                                           type );
     }
 
     /**
@@ -351,9 +341,8 @@ public abstract class AbstractSession implements Session
     @Override
     public Artifact resolveArtifact( ArtifactCoordinate coordinate )
     {
-        return getService( ArtifactResolver.class )
-                .resolve( this, Collections.singletonList( coordinate ) )
-                .getArtifacts().keySet().iterator().next();
+        return getService( ArtifactResolver.class ).resolve( this,
+                                                             Collections.singletonList( coordinate ) ).getArtifacts().keySet().iterator().next();
     }
 
     /**
@@ -377,9 +366,7 @@ public abstract class AbstractSession implements Session
     @Override
     public Collection<Artifact> resolveArtifacts( Collection<? extends ArtifactCoordinate> coordinates )
     {
-        return getService( ArtifactResolver.class )
-                .resolve( this, coordinates )
-                .getArtifacts().keySet();
+        return getService( ArtifactResolver.class ).resolve( this, coordinates ).getArtifacts().keySet();
     }
 
     /**
@@ -391,8 +378,7 @@ public abstract class AbstractSession implements Session
     @Override
     public Artifact resolveArtifact( Artifact artifact )
     {
-        ArtifactCoordinate coordinate = getService( ArtifactCoordinateFactory.class )
-                .create( this, artifact );
+        ArtifactCoordinate coordinate = getService( ArtifactCoordinateFactory.class ).create( this, artifact );
         return resolveArtifact( coordinate );
     }
 
@@ -400,9 +386,8 @@ public abstract class AbstractSession implements Session
     public Collection<Artifact> resolveArtifacts( Artifact... artifacts )
     {
         ArtifactCoordinateFactory acf = getService( ArtifactCoordinateFactory.class );
-        ArtifactCoordinate[] coords = Stream.of( artifacts )
-                .map( a -> acf.create( this, a ) )
-                .toArray( ArtifactCoordinate[]::new );
+        ArtifactCoordinate[] coords =
+            Stream.of( artifacts ).map( a -> acf.create( this, a ) ).toArray( ArtifactCoordinate[]::new );
         return resolveArtifacts( coords );
     }
 
@@ -427,8 +412,7 @@ public abstract class AbstractSession implements Session
     @Override
     public void installArtifacts( Collection<Artifact> artifacts )
     {
-        getService( ArtifactInstaller.class )
-                .install( this, artifacts );
+        getService( ArtifactInstaller.class ).install( this, artifacts );
     }
 
     /**
@@ -440,8 +424,7 @@ public abstract class AbstractSession implements Session
     @Override
     public void deployArtifact( RemoteRepository repository, Artifact... artifacts )
     {
-        getService( ArtifactDeployer.class )
-                .deploy( this, repository, Arrays.asList( artifacts ) );
+        getService( ArtifactDeployer.class ).deploy( this, repository, Arrays.asList( artifacts ) );
     }
 
     /**
@@ -450,10 +433,11 @@ public abstract class AbstractSession implements Session
      * @see ArtifactManager#setPath(Artifact, Path)
      */
     @Override
-    public void setArtifactPath( @Nonnull Artifact artifact, @Nonnull Path path )
+    public void setArtifactPath( @Nonnull
+    Artifact artifact, @Nonnull
+    Path path )
     {
-        getService( ArtifactManager.class )
-                .setPath( artifact, path );
+        getService( ArtifactManager.class ).setPath( artifact, path );
     }
 
     /**
@@ -463,10 +447,10 @@ public abstract class AbstractSession implements Session
      */
     @Nonnull
     @Override
-    public Optional<Path> getArtifactPath( @Nonnull Artifact artifact )
+    public Optional<Path> getArtifactPath( @Nonnull
+    Artifact artifact )
     {
-        return getService( ArtifactManager.class )
-                .getPath( artifact );
+        return getService( ArtifactManager.class ).getPath( artifact );
     }
 
     /**
@@ -475,10 +459,10 @@ public abstract class AbstractSession implements Session
      * @see VersionParser#isSnapshot(String)
      */
     @Override
-    public boolean isVersionSnapshot( @Nonnull String version )
+    public boolean isVersionSnapshot( @Nonnull
+    String version )
     {
-        return getService( VersionParser.class )
-                .isSnapshot( version );
+        return getService( VersionParser.class ).isSnapshot( version );
     }
 
     /**
@@ -488,10 +472,10 @@ public abstract class AbstractSession implements Session
      */
     @Nonnull
     @Override
-    public DependencyCoordinate createDependencyCoordinate( @Nonnull ArtifactCoordinate coordinate )
+    public DependencyCoordinate createDependencyCoordinate( @Nonnull
+    ArtifactCoordinate coordinate )
     {
-        return getService( DependencyCoordinateFactory.class )
-                .create( this, coordinate );
+        return getService( DependencyCoordinateFactory.class ).create( this, coordinate );
     }
 
     /**
@@ -500,10 +484,10 @@ public abstract class AbstractSession implements Session
      * @see DependencyCoordinateFactory#create(Session, ArtifactCoordinate)
      */
     @Nonnull
-    public DependencyCoordinate createDependencyCoordinate( @Nonnull Dependency dependency )
+    public DependencyCoordinate createDependencyCoordinate( @Nonnull
+    Dependency dependency )
     {
-        return getService( DependencyCoordinateFactory.class )
-                .create( this, dependency );
+        return getService( DependencyCoordinateFactory.class ).create( this, dependency );
     }
 
     /**
@@ -514,11 +498,10 @@ public abstract class AbstractSession implements Session
      */
     @Nonnull
     @Override
-    public Node collectDependencies( @Nonnull Artifact artifact )
+    public Node collectDependencies( @Nonnull
+    Artifact artifact )
     {
-        return getService( DependencyCollector.class )
-                .collect( this, artifact )
-                .getRoot();
+        return getService( DependencyCollector.class ).collect( this, artifact ).getRoot();
     }
 
     /**
@@ -529,11 +512,10 @@ public abstract class AbstractSession implements Session
      */
     @Nonnull
     @Override
-    public Node collectDependencies( @Nonnull Project project )
+    public Node collectDependencies( @Nonnull
+    Project project )
     {
-        return getService( DependencyCollector.class )
-                .collect( this, project )
-                .getRoot();
+        return getService( DependencyCollector.class ).collect( this, project ).getRoot();
     }
 
     /**
@@ -544,38 +526,36 @@ public abstract class AbstractSession implements Session
      */
     @Nonnull
     @Override
-    public Node collectDependencies( @Nonnull DependencyCoordinate dependency )
+    public Node collectDependencies( @Nonnull
+    DependencyCoordinate dependency )
     {
-        return getService( DependencyCollector.class )
-                .collect( this, dependency )
-                .getRoot();
+        return getService( DependencyCollector.class ).collect( this, dependency ).getRoot();
     }
 
     @Override
-    public Path getPathForLocalArtifact( @Nonnull Artifact artifact )
+    public Path getPathForLocalArtifact( @Nonnull
+    Artifact artifact )
     {
-        return getService( LocalRepositoryManager.class )
-                .getPathForLocalArtifact( this, getLocalRepository(), artifact );
+        return getService( LocalRepositoryManager.class ).getPathForLocalArtifact( this, getLocalRepository(),
+                                                                                   artifact );
     }
 
     @Override
     public Path getPathForRemoteArtifact( RemoteRepository remote, Artifact artifact )
     {
-        return getService( LocalRepositoryManager.class )
-                .getPathForRemoteArtifact( this, getLocalRepository(), remote, artifact );
+        return getService( LocalRepositoryManager.class ).getPathForRemoteArtifact( this, getLocalRepository(), remote,
+                                                                                    artifact );
     }
 
     @Override
     public Version parseVersion( String version )
     {
-        return getService( VersionParser.class )
-                .parseVersion( version );
+        return getService( VersionParser.class ).parseVersion( version );
     }
 
     @Override
     public VersionRange parseVersionRange( String versionRange )
     {
-        return getService( VersionParser.class )
-                .parseVersionRange( versionRange );
+        return getService( VersionParser.class ).parseVersionRange( versionRange );
     }
 }

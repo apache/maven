@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model.transform;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.model.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -47,15 +46,13 @@ public class BuildToRawPomXMLFilterFactory
     }
 
     /**
-     *
      * @param projectFile will be used by ConsumerPomXMLFilter to get the right filter
      */
     public final XmlPullParser get( XmlPullParser orgParser, Path projectFile )
 
     {
         // Ensure that xs:any elements aren't touched by next filters
-        XmlPullParser parser = orgParser instanceof FastForwardFilter
-                ? orgParser : new FastForwardFilter( orgParser );
+        XmlPullParser parser = orgParser instanceof FastForwardFilter ? orgParser : new FastForwardFilter( orgParser );
 
         if ( getDependencyKeyToVersionMapper() != null )
         {
@@ -68,7 +65,7 @@ public class BuildToRawPomXMLFilterFactory
         }
 
         CiFriendlyXMLFilter ciFriendlyFilter = new CiFriendlyXMLFilter( parser, consume );
-        getChangelist().ifPresent( ciFriendlyFilter::setChangelist  );
+        getChangelist().ifPresent( ciFriendlyFilter::setChangelist );
         getRevision().ifPresent( ciFriendlyFilter::setRevision );
         getSha1().ifPresent( ciFriendlyFilter::setSha1 );
         parser = ciFriendlyFilter;

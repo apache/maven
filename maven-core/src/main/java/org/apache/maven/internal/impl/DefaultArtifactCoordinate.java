@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import java.util.Objects;
 
@@ -30,13 +29,16 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 /**
  * A wrapper class around a maven resolver artifact.
  */
-public class DefaultArtifactCoordinate implements ArtifactCoordinate
+public class DefaultArtifactCoordinate
+    implements ArtifactCoordinate
 {
     private final @Nonnull AbstractSession session;
+
     private final @Nonnull org.eclipse.aether.artifact.Artifact coordinate;
 
-    public DefaultArtifactCoordinate( @Nonnull AbstractSession session,
-                                      @Nonnull org.eclipse.aether.artifact.Artifact coordinate )
+    public DefaultArtifactCoordinate( @Nonnull
+    AbstractSession session, @Nonnull
+    org.eclipse.aether.artifact.Artifact coordinate )
     {
         this.session = nonNull( session, "session can not be null" );
         this.coordinate = nonNull( coordinate, "coordinate can not be null" );
@@ -94,9 +96,9 @@ public class DefaultArtifactCoordinate implements ArtifactCoordinate
         }
         DefaultArtifactCoordinate that = (DefaultArtifactCoordinate) o;
         return Objects.equals( this.getGroupId(), that.getGroupId() )
-                && Objects.equals( this.getArtifactId(), that.getArtifactId() )
-                && Objects.equals( this.getVersion(), that.getVersion() )
-                && Objects.equals( this.getClassifier(), that.getClassifier() );
+            && Objects.equals( this.getArtifactId(), that.getArtifactId() )
+            && Objects.equals( this.getVersion(), that.getVersion() )
+            && Objects.equals( this.getClassifier(), that.getClassifier() );
     }
 
     @Override

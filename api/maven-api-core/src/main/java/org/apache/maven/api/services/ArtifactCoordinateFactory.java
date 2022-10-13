@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinate;
@@ -32,7 +31,8 @@ import org.apache.maven.api.annotations.Nonnull;
  * @since 4.0
  */
 @Experimental
-public interface ArtifactCoordinateFactory extends Service
+public interface ArtifactCoordinateFactory
+    extends Service
 {
 
     /**
@@ -43,29 +43,33 @@ public interface ArtifactCoordinateFactory extends Service
      * @throws IllegalArgumentException if {@code request} is null or {@code request.session} is null or invalid
      */
     @Nonnull
-    ArtifactCoordinate create( @Nonnull ArtifactCoordinateFactoryRequest request );
+    ArtifactCoordinate create( @Nonnull
+    ArtifactCoordinateFactoryRequest request );
 
     @Nonnull
-    default ArtifactCoordinate create( @Nonnull Session session, String groupId,
-                                       String artifactId, String version, String extension )
+    default ArtifactCoordinate create( @Nonnull
+    Session session, String groupId, String artifactId, String version, String extension )
     {
         return create( ArtifactCoordinateFactoryRequest.build( session, groupId, artifactId, version, extension ) );
     }
 
     @Nonnull
-    default ArtifactCoordinate create( @Nonnull Session session, String groupId, String artifactId, String version,
-                                       String classifier, String extension, String type )
+    default ArtifactCoordinate create( @Nonnull
+    Session session, String groupId, String artifactId, String version, String classifier, String extension,
+                                       String type )
     {
-        return create( ArtifactCoordinateFactoryRequest.build( session, groupId, artifactId,
-                                                     version, classifier, extension, type ) );
+        return create( ArtifactCoordinateFactoryRequest.build( session, groupId, artifactId, version, classifier,
+                                                               extension, type ) );
     }
 
     @Nonnull
-    default ArtifactCoordinate create( @Nonnull Session session, Artifact artifact )
+    default ArtifactCoordinate create( @Nonnull
+    Session session, Artifact artifact )
     {
-        return create( ArtifactCoordinateFactoryRequest.build( session,
-                artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion().asString(),
-                artifact.getClassifier(), artifact.getExtension(), null ) );
+        return create( ArtifactCoordinateFactoryRequest.build( session, artifact.getGroupId(), artifact.getArtifactId(),
+                                                               artifact.getVersion().asString(),
+                                                               artifact.getClassifier(), artifact.getExtension(),
+                                                               null ) );
     }
 
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.toolchain.model;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.toolchain.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain.model;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -27,11 +26,15 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-class WrapperList<T, U> extends AbstractList<T>
+class WrapperList<T, U>
+    extends AbstractList<T>
 {
     private final Supplier<List<U>> getter;
+
     private final Consumer<List<U>> setter;
+
     private final Function<U, T> mapper;
+
     private final Function<T, U> revMapper;
 
     WrapperList( List<U> list, Function<U, T> mapper, Function<T, U> revMapper )
@@ -39,8 +42,7 @@ class WrapperList<T, U> extends AbstractList<T>
         this( () -> list, null, mapper, revMapper );
     }
 
-    WrapperList( Supplier<List<U>> getter, Consumer<List<U>> setter,
-                 Function<U, T> mapper, Function<T, U> revMapper )
+    WrapperList( Supplier<List<U>> getter, Consumer<List<U>> setter, Function<U, T> mapper, Function<T, U> revMapper )
     {
         this.getter = getter;
         this.setter = setter;

@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -38,9 +37,11 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Singleton
-public class DefaultVersionParser implements VersionParser
+public class DefaultVersionParser
+    implements VersionParser
 {
     private static final String SNAPSHOT = "SNAPSHOT";
+
     private static final Pattern SNAPSHOT_TIMESTAMP = Pattern.compile( "^(.*-)?([0-9]{8}\\.[0-9]{6}-[0-9]+)$" );
 
     @Override
@@ -73,7 +74,8 @@ public class DefaultVersionParser implements VersionParser
         return version.endsWith( SNAPSHOT ) || SNAPSHOT_TIMESTAMP.matcher( version ).matches();
     }
 
-    static class DefaultVersion implements Version
+    static class DefaultVersion
+        implements Version
     {
         private final ArtifactVersion delegate;
 
@@ -87,7 +89,7 @@ public class DefaultVersionParser implements VersionParser
         {
             if ( o instanceof DefaultVersion )
             {
-                return delegate.compareTo( ( ( DefaultVersion ) o ).delegate );
+                return delegate.compareTo( ( (DefaultVersion) o ).delegate );
             }
             else
             {
@@ -129,7 +131,8 @@ public class DefaultVersionParser implements VersionParser
         }
     }
 
-    static class DefaultVersionRange implements VersionRange
+    static class DefaultVersionRange
+        implements VersionRange
     {
         private final org.apache.maven.artifact.versioning.VersionRange delegate;
 
@@ -143,7 +146,7 @@ public class DefaultVersionParser implements VersionParser
         {
             if ( version instanceof DefaultVersion )
             {
-                return delegate.containsVersion( ( ( DefaultVersion ) version ).delegate );
+                return delegate.containsVersion( ( (DefaultVersion) version ).delegate );
             }
             else
             {

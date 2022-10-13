@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy.resolver.conflict;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.legacy.resolver.conflict;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.repository.legacy.resolver.conflict;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy.resolver.conflict;
 
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -31,8 +30,8 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 /**
  * A conflict resolver factory that obtains instances from a plexus container.
  *
- * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
- * TODO you don't need the container in here with the active maps (jvz).
+ * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a> TODO you don't need the container in here with the
+ *         active maps (jvz).
  * @since 3.0
  */
 @Component( role = ConflictResolverFactory.class )
@@ -50,8 +49,8 @@ public class DefaultConflictResolverFactory
     // ConflictResolverFactory methods ----------------------------------------
 
     /*
-    * @see org.apache.maven.artifact.resolver.conflict.ConflictResolverFactory#getConflictResolver(java.lang.String)
-    */
+     * @see org.apache.maven.artifact.resolver.conflict.ConflictResolverFactory#getConflictResolver(java.lang.String)
+     */
 
     public ConflictResolver getConflictResolver( String type )
         throws ConflictResolverNotFoundException
@@ -69,7 +68,9 @@ public class DefaultConflictResolverFactory
     // Contextualizable methods -----------------------------------------------
 
     /*
-     * @see org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable#contextualize(org.codehaus.plexus.context.Context)
+     * @see
+     * org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable#contextualize(org.codehaus.plexus.context
+     * .Context)
      */
 
     public void contextualize( Context context )

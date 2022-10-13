@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,10 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-
 /**
  * Test that validate the solution of MNG-6261 issue
- *
  */
 public class FileModelSourceTest
 {
@@ -42,7 +39,7 @@ public class FileModelSourceTest
      */
     @Test
     public void testEquals()
-            throws Exception
+        throws Exception
     {
         File tempFile = createTempFile( "pomTest" );
         FileModelSource instance = new FileModelSource( tempFile );
@@ -55,7 +52,7 @@ public class FileModelSourceTest
 
     @Test
     public void testWindowsPaths()
-            throws Exception
+        throws Exception
     {
         assumeTrue( Os.isFamily( "Windows" ) );
 
@@ -69,7 +66,8 @@ public class FileModelSourceTest
         assertTrue( upperCaseFileSource.equals( lowerCaseFileSource ) );
     }
 
-    private File createTempFile( String name ) throws IOException
+    private File createTempFile( String name )
+        throws IOException
     {
         File tempFile = File.createTempFile( name, ".xml" );
         tempFile.deleteOnExit();

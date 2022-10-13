@@ -1,5 +1,3 @@
-package org.apache.maven.project.collector;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,15 @@ package org.apache.maven.project.collector;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.collector;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.building.ModelProblem;
@@ -31,21 +38,16 @@ import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Utility to select projects for a given set of pom.xml files.
  */
 @Named
 @Singleton
-public class DefaultProjectsSelector implements ProjectsSelector
+public class DefaultProjectsSelector
+    implements ProjectsSelector
 {
     private static final Logger LOGGER = LoggerFactory.getLogger( DefaultProjectsSelector.class );
+
     private final ProjectBuilder projectBuilder;
 
     @Inject
@@ -56,7 +58,7 @@ public class DefaultProjectsSelector implements ProjectsSelector
 
     @Override
     public List<MavenProject> selectProjects( List<File> files, MavenExecutionRequest request )
-            throws ProjectBuildingException
+        throws ProjectBuildingException
     {
         ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
 
@@ -76,7 +78,7 @@ public class DefaultProjectsSelector implements ProjectsSelector
             {
                 LOGGER.warn( "" );
                 LOGGER.warn( "Some problems were encountered while building the effective model for '{}'",
-                        result.getProject().getId() );
+                             result.getProject().getId() );
 
                 for ( ModelProblem problem : result.getProblems() )
                 {
@@ -92,10 +94,10 @@ public class DefaultProjectsSelector implements ProjectsSelector
         {
             LOGGER.warn( "" );
             LOGGER.warn( "It is highly recommended to fix these problems"
-                    + " because they threaten the stability of your build." );
+                + " because they threaten the stability of your build." );
             LOGGER.warn( "" );
             LOGGER.warn( "For this reason, future Maven versions might no"
-                    + " longer support building such malformed projects." );
+                + " longer support building such malformed projects." );
             LOGGER.warn( "" );
         }
 

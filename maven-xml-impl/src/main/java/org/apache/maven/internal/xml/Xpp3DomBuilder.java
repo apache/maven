@@ -1,5 +1,3 @@
-package org.apache.maven.internal.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.internal.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -170,7 +169,7 @@ public class Xpp3DomBuilder
                             String avalue = parser.getAttributeValue( i );
                             attrs.put( aname, avalue );
                             spacePreserve =
-                                    spacePreserve || ( "xml:space".equals( aname ) && "preserve".equals( avalue ) );
+                                spacePreserve || ( "xml:space".equals( aname ) && "preserve".equals( avalue ) );
                         }
                     }
                 }
@@ -195,8 +194,7 @@ public class Xpp3DomBuilder
             }
             else if ( eventType == XmlPullParser.END_TAG )
             {
-                return new Xpp3Dom( name, children == null ? value : null,
-                        attrs, children, location );
+                return new Xpp3Dom( name, children == null ? value : null, attrs, children, location );
             }
             eventType = parser.next();
         }

@@ -1,5 +1,3 @@
-package org.apache.maven.bridge;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,11 @@ package org.apache.maven.bridge;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.bridge;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -30,10 +33,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -77,7 +76,7 @@ public class MavenRepositorySystem
 
     @Inject
     public MavenRepositorySystem( ArtifactHandlerManager artifactHandlerManager,
-            Map<String, ArtifactRepositoryLayout> layouts )
+                                  Map<String, ArtifactRepositoryLayout> layouts )
     {
         this.artifactHandlerManager = artifactHandlerManager;
         this.layouts = layouts;
@@ -113,9 +112,8 @@ public class MavenRepositorySystem
             return null;
         }
 
-        Artifact artifact =
-            createDependencyArtifactX( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(),
-                                                      d.getClassifier(), d.getScope(), d.isOptional() );
+        Artifact artifact = createDependencyArtifactX( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(),
+                                                       d.getClassifier(), d.getScope(), d.isOptional() );
 
         if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) && d.getSystemPath() != null )
         {
@@ -254,9 +252,8 @@ public class MavenRepositorySystem
                 {
                     repo = new RemoteRepository.Builder( repo ).setAuthentication( auth ).build();
                     AuthenticationContext authCtx = AuthenticationContext.forRepository( session, repo );
-                    Authentication result =
-                        new Authentication( authCtx.get( AuthenticationContext.USERNAME ),
-                                            authCtx.get( AuthenticationContext.PASSWORD ) );
+                    Authentication result = new Authentication( authCtx.get( AuthenticationContext.USERNAME ),
+                                                                authCtx.get( AuthenticationContext.PASSWORD ) );
                     result.setPrivateKey( authCtx.get( AuthenticationContext.PRIVATE_KEY_PATH ) );
                     result.setPassphrase( authCtx.get( AuthenticationContext.PRIVATE_KEY_PASSPHRASE ) );
                     authCtx.close();
@@ -326,13 +323,11 @@ public class MavenRepositorySystem
         return layouts.get( id );
     }
 
-
     //
     // Taken from LegacyRepositorySystem
     //
 
-    public static org.apache.maven.model.Repository fromSettingsRepository( org.apache.maven.settings.Repository
-                                                                            settingsRepository )
+    public static org.apache.maven.model.Repository fromSettingsRepository( org.apache.maven.settings.Repository settingsRepository )
     {
         org.apache.maven.model.Repository modelRepository = new org.apache.maven.model.Repository();
         modelRepository.setId( settingsRepository.getId() );
@@ -344,8 +339,7 @@ public class MavenRepositorySystem
         return modelRepository;
     }
 
-    public static org.apache.maven.model.RepositoryPolicy fromSettingsRepositoryPolicy(
-                                                 org.apache.maven.settings.RepositoryPolicy settingsRepositoryPolicy )
+    public static org.apache.maven.model.RepositoryPolicy fromSettingsRepositoryPolicy( org.apache.maven.settings.RepositoryPolicy settingsRepositoryPolicy )
     {
         org.apache.maven.model.RepositoryPolicy modelRepositoryPolicy = new org.apache.maven.model.RepositoryPolicy();
         if ( settingsRepositoryPolicy != null )
@@ -396,8 +390,7 @@ public class MavenRepositorySystem
         }
     }
 
-    public static ArtifactRepositoryPolicy buildArtifactRepositoryPolicy( org.apache.maven.model.RepositoryPolicy
-                                                                          policy )
+    public static ArtifactRepositoryPolicy buildArtifactRepositoryPolicy( org.apache.maven.model.RepositoryPolicy policy )
     {
         boolean enabled = true;
 
@@ -445,9 +438,9 @@ public class MavenRepositorySystem
     }
 
     public static ArtifactRepository createArtifactRepository( String id, String url,
-                                                        ArtifactRepositoryLayout repositoryLayout,
-                                                        ArtifactRepositoryPolicy snapshots,
-                                                        ArtifactRepositoryPolicy releases )
+                                                               ArtifactRepositoryLayout repositoryLayout,
+                                                               ArtifactRepositoryPolicy snapshots,
+                                                               ArtifactRepositoryPolicy releases )
     {
         if ( snapshots == null )
         {
@@ -481,7 +474,7 @@ public class MavenRepositorySystem
     }
 
     private Artifact createDependencyArtifactX( String groupId, String artifactId, VersionRange versionRange,
-                                               String type, String classifier, String scope, boolean optional )
+                                                String type, String classifier, String scope, boolean optional )
     {
         return createArtifactX( groupId, artifactId, versionRange, type, classifier, scope, null, optional );
     }
@@ -512,7 +505,7 @@ public class MavenRepositorySystem
     }
 
     private Artifact createArtifactX( String groupId, String artifactId, String version, String scope, String type,
-                                     String classifier, String inheritedScope )
+                                      String classifier, String inheritedScope )
     {
         VersionRange versionRange = null;
         if ( version != null )
@@ -523,14 +516,14 @@ public class MavenRepositorySystem
     }
 
     private Artifact createArtifactX( String groupId, String artifactId, VersionRange versionRange, String type,
-                                     String classifier, String scope, String inheritedScope )
+                                      String classifier, String scope, String inheritedScope )
     {
         return createArtifactX( groupId, artifactId, versionRange, type, classifier, scope, inheritedScope, false );
     }
 
     @SuppressWarnings( "checkstyle:parameternumber" )
     private Artifact createArtifactX( String groupId, String artifactId, VersionRange versionRange, String type,
-                                     String classifier, String scope, String inheritedScope, boolean optional )
+                                      String classifier, String scope, String inheritedScope, boolean optional )
     {
         String desiredScope = Artifact.SCOPE_RUNTIME;
 
@@ -584,8 +577,9 @@ public class MavenRepositorySystem
     }
 
     public ArtifactRepository createRepository( String url, String repositoryId, boolean releases,
-                                                 String releaseUpdates, boolean snapshots, String snapshotUpdates,
-                                                 String checksumPolicy ) throws Exception
+                                                String releaseUpdates, boolean snapshots, String snapshotUpdates,
+                                                String checksumPolicy )
+        throws Exception
     {
         ArtifactRepositoryPolicy snapshotsPolicy =
             new ArtifactRepositoryPolicy( snapshots, snapshotUpdates, checksumPolicy );
@@ -642,8 +636,7 @@ public class MavenRepositorySystem
         {
             List<ArtifactRepository> mirroredRepos = new ArrayList<>();
 
-            List<ArtifactRepositoryPolicy> releasePolicies =
-                    new ArrayList<>( aliasedRepos.size() );
+            List<ArtifactRepositoryPolicy> releasePolicies = new ArrayList<>( aliasedRepos.size() );
 
             for ( ArtifactRepository aliasedRepo : aliasedRepos )
             {
@@ -653,8 +646,7 @@ public class MavenRepositorySystem
 
             ArtifactRepositoryPolicy releasePolicy = getEffectivePolicy( releasePolicies );
 
-            List<ArtifactRepositoryPolicy> snapshotPolicies =
-                    new ArrayList<>( aliasedRepos.size() );
+            List<ArtifactRepositoryPolicy> snapshotPolicies = new ArrayList<>( aliasedRepos.size() );
 
             for ( ArtifactRepository aliasedRepo : aliasedRepos )
             {
@@ -666,8 +658,8 @@ public class MavenRepositorySystem
             ArtifactRepository aliasedRepo = aliasedRepos.get( 0 );
 
             ArtifactRepository effectiveRepository =
-                    createArtifactRepository( aliasedRepo.getId(), aliasedRepo.getUrl(), aliasedRepo.getLayout(),
-                            snapshotPolicy, releasePolicy );
+                createArtifactRepository( aliasedRepo.getId(), aliasedRepo.getUrl(), aliasedRepo.getLayout(),
+                                          snapshotPolicy, releasePolicy );
 
             effectiveRepository.setAuthentication( aliasedRepo.getAuthentication() );
 

@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal.builder.multithreaded;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal.builder.multithreaded;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.lifecycle.internal.builder.multithreaded;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal.builder.multithreaded;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -34,8 +33,8 @@ import org.apache.maven.lifecycle.internal.ProjectSegment;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
- * This class in particular may spontaneously self-combust and be replaced by a plexus-compliant thread aware
- * logger implementation at any time.
+ * This class in particular may spontaneously self-combust and be replaced by a plexus-compliant thread aware logger
+ * implementation at any time.
  *
  * @since 3.0
  * @author Kristian Rosenvold
@@ -47,8 +46,7 @@ public class ThreadOutputMuxer
 
     private final ThreadLocal<ProjectSegment> projectBuildThreadLocal = new ThreadLocal<>();
 
-    private final Map<ProjectSegment, ByteArrayOutputStream> streams =
-        new HashMap<>();
+    private final Map<ProjectSegment, ByteArrayOutputStream> streams = new HashMap<>();
 
     private final Map<ProjectSegment, PrintStream> printStreams = new HashMap<>();
 
@@ -118,7 +116,7 @@ public class ThreadOutputMuxer
         }
 
         /*
-        Wait until we are sure the print-stream thread is running.
+         * Wait until we are sure the print-stream thread is running.
          */
 
         public void waitUntilRunning( boolean expect )

@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,10 +31,12 @@ import org.codehaus.plexus.PlexusContainer;
 
 @Named
 @Singleton
-public class DefaultPrompter implements Prompter
+public class DefaultPrompter
+    implements Prompter
 {
 
     private static final String PROMPTER_CLASS = "org.codehaus.plexus.components.interactivity.Prompter";
+
     private final PlexusContainer container;
 
     @Inject
@@ -45,7 +46,8 @@ public class DefaultPrompter implements Prompter
     }
 
     @Override
-    public String prompt( String message, List<String> possibleValues, String defaultReply ) throws PrompterException
+    public String prompt( String message, List<String> possibleValues, String defaultReply )
+        throws PrompterException
     {
         try
         {
@@ -61,7 +63,8 @@ public class DefaultPrompter implements Prompter
     }
 
     @Override
-    public String promptForPassword( String message ) throws PrompterException
+    public String promptForPassword( String message )
+        throws PrompterException
     {
         try
         {
@@ -77,7 +80,8 @@ public class DefaultPrompter implements Prompter
     }
 
     @Override
-    public void showMessage( String message ) throws PrompterException
+    public void showMessage( String message )
+        throws PrompterException
     {
         try
         {

@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 import java.util.List;
 import java.util.Map;
@@ -27,10 +26,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
- *
- *
  * @author Oleg Gusakov
- *
  */
 public class MetadataResolutionRequest
 {
@@ -152,13 +148,8 @@ public class MetadataResolutionRequest
 
     public String toString()
     {
-        StringBuilder sb = new StringBuilder()
-                .append( "REQUEST: " ).append(  "\n" )
-                .append( "artifact: " ).append( mad ).append(  "\n" )
-                .append( artifactDependencies ).append(  "\n" )
-                .append( "localRepository: " ).append(  localRepository ).append(  "\n" )
-                .append( "remoteRepositories: " ).append(  remoteRepositories ).append(  "\n" )
-                ;
+        StringBuilder sb =
+            new StringBuilder().append( "REQUEST: " ).append( "\n" ).append( "artifact: " ).append( mad ).append( "\n" ).append( artifactDependencies ).append( "\n" ).append( "localRepository: " ).append( localRepository ).append( "\n" ).append( "remoteRepositories: " ).append( remoteRepositories ).append( "\n" );
 
         return sb.toString();
     }

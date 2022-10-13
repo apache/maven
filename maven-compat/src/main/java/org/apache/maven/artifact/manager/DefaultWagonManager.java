@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.manager;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.manager;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.manager;
 
 import java.util.List;
 
@@ -85,8 +84,8 @@ public class DefaultWagonManager
                     {
                         if ( id.equalsIgnoreCase( server.getId() ) )
                         {
-                            SettingsDecryptionResult result = settingsDecrypter.decrypt(
-                                    new DefaultSettingsDecryptionRequest( server ) );
+                            SettingsDecryptionResult result =
+                                settingsDecrypter.decrypt( new DefaultSettingsDecryptionRequest( server ) );
                             server = result.getServer();
 
                             AuthenticationInfo authInfo = new AuthenticationInfo();
@@ -103,7 +102,7 @@ public class DefaultWagonManager
         }
 
         // empty one to prevent NPE
-       return new AuthenticationInfo();
+        return new AuthenticationInfo();
     }
 
     public ProxyInfo getProxy( String protocol )
@@ -124,8 +123,8 @@ public class DefaultWagonManager
                     {
                         if ( proxy.isActive() && protocol.equalsIgnoreCase( proxy.getProtocol() ) )
                         {
-                            SettingsDecryptionResult result = settingsDecrypter.decrypt(
-                                    new DefaultSettingsDecryptionRequest( proxy ) );
+                            SettingsDecryptionResult result =
+                                settingsDecrypter.decrypt( new DefaultSettingsDecryptionRequest( proxy ) );
                             proxy = result.getProxy();
 
                             ProxyInfo proxyInfo = new ProxyInfo();
@@ -175,9 +174,10 @@ public class DefaultWagonManager
 
             log.debug( "Using mirror: " + mirror.getUrl() + " (id: " + id + ")" );
 
-            repository = artifactRepositoryFactory.createArtifactRepository( id, mirror.getUrl(),
-                                                                     repository.getLayout(), repository.getSnapshots(),
-                                                                     repository.getReleases() );
+            repository =
+                artifactRepositoryFactory.createArtifactRepository( id, mirror.getUrl(), repository.getLayout(),
+                                                                    repository.getSnapshots(),
+                                                                    repository.getReleases() );
         }
         return repository;
     }

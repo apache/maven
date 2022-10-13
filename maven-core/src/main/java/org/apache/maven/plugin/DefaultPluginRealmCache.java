@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,10 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,9 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -93,8 +92,7 @@ public class DefaultPluginRealmCache
                 }
             }
             this.parentRealm = parentRealm;
-            this.foreignImports =
-                ( foreignImports != null ) ? foreignImports : Collections.emptyMap();
+            this.foreignImports = ( foreignImports != null ) ? foreignImports : Collections.emptyMap();
             this.filter = dependencyFilter;
 
             int hash = 17;
@@ -135,13 +133,10 @@ public class DefaultPluginRealmCache
 
             CacheKey that = (CacheKey) o;
 
-            return parentRealm == that.parentRealm
-                && CacheUtils.pluginEquals( plugin, that.plugin )
-                && Objects.equals( workspace, that.workspace )
-                && Objects.equals( localRepo, that.localRepo )
+            return parentRealm == that.parentRealm && CacheUtils.pluginEquals( plugin, that.plugin )
+                && Objects.equals( workspace, that.workspace ) && Objects.equals( localRepo, that.localRepo )
                 && RepositoryUtils.repositoriesEquals( this.repositories, that.repositories )
-                && Objects.equals( filter, that.filter )
-                && Objects.equals( foreignImports, that.foreignImports );
+                && Objects.equals( filter, that.filter ) && Objects.equals( foreignImports, that.foreignImports );
         }
     }
 

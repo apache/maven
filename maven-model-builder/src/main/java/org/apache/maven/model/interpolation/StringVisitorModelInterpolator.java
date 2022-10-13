@@ -1,5 +1,3 @@
-package org.apache.maven.model.interpolation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model.interpolation;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,15 +16,16 @@ package org.apache.maven.model.interpolation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.interpolation;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -34,9 +33,9 @@ import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
-import org.apache.maven.model.v4.MavenTransformer;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.path.UrlNormalizer;
+import org.apache.maven.model.v4.MavenTransformer;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.RecursionInterceptor;
@@ -54,8 +53,7 @@ public class StringVisitorModelInterpolator
     extends AbstractStringBasedModelInterpolator
 {
     @Inject
-    public StringVisitorModelInterpolator( PathTranslator pathTranslator,
-                                           UrlNormalizer urlNormalizer )
+    public StringVisitorModelInterpolator( PathTranslator pathTranslator, UrlNormalizer urlNormalizer )
     {
         super( pathTranslator, urlNormalizer );
     }
@@ -70,8 +68,7 @@ public class StringVisitorModelInterpolator
                                    ModelProblemCollector problems )
     {
         List<? extends ValueSource> valueSources = createValueSources( model, projectDir, config );
-        List<? extends InterpolationPostProcessor> postProcessors =
-            createPostProcessors( model, projectDir, config );
+        List<? extends InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
 
         InnerInterpolator innerInterpolator = createInterpolator( valueSources, postProcessors, problems );
 
@@ -94,8 +91,7 @@ public class StringVisitorModelInterpolator
             interpolator.addPostProcessor( postProcessor );
         }
         final RecursionInterceptor recursionInterceptor = createRecursionInterceptor();
-        return value ->
-        {
+        return value -> {
             if ( value != null && value.contains( "${" ) )
             {
                 String c = cache.get( value );
@@ -107,8 +103,8 @@ public class StringVisitorModelInterpolator
                     }
                     catch ( InterpolationException e )
                     {
-                        problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                                .setMessage( e.getMessage() ).setException( e ) );
+                        problems.add( new ModelProblemCollectorRequest( Severity.ERROR,
+                                                                        Version.BASE ).setMessage( e.getMessage() ).setException( e ) );
                     }
                     cache.put( value, c );
                 }

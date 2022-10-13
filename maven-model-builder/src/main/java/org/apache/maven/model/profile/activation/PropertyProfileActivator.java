@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile.activation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.profile.activation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile.activation;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -25,9 +24,9 @@ import javax.inject.Singleton;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.codehaus.plexus.util.StringUtils;
@@ -72,9 +71,8 @@ public class PropertyProfileActivator
 
         if ( name == null || name.length() <= 0 )
         {
-            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "The property name is required to activate the profile " + profile.getId() )
-                    .setLocation( property.getLocation( "" ) ) );
+            problems.add( new ModelProblemCollectorRequest( Severity.ERROR,
+                                                            Version.BASE ).setMessage( "The property name is required to activate the profile " + profile.getId() ).setLocation( property.getLocation( "" ) ) );
             return false;
         }
 

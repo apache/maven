@@ -1,5 +1,3 @@
-package org.slf4j.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,17 +16,20 @@ package org.slf4j.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.slf4j.impl;
+
+import java.util.Optional;
 
 import org.apache.maven.logwrapper.LogLevelRecorder;
 import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
 import org.slf4j.Logger;
 
-import java.util.Optional;
-
 /**
  * LogFactory for Maven which can create a simple logger or one which, if set, fails the build on a severity threshold.
  */
-public class MavenLoggerFactory extends SimpleLoggerFactory implements MavenSlf4jWrapperFactory
+public class MavenLoggerFactory
+    extends SimpleLoggerFactory
+    implements MavenSlf4jWrapperFactory
 {
     private LogLevelRecorder logLevelRecorder = null;
 

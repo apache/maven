@@ -1,19 +1,24 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.maven.repository;
 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
- * agreements. See the NOTICE file distributed with this work for additional information regarding
- * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance with the License. You may obtain a
- * copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
- */
+import javax.inject.Inject;
 
 import java.io.File;
 import java.util.Arrays;
@@ -32,8 +37,8 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.legacy.LegacyRepositorySystem;
-import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
@@ -43,8 +48,6 @@ import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import javax.inject.Inject;
 
 /**
  * Tests {@link LegacyRepositorySystem}.
@@ -56,8 +59,10 @@ public class LegacyRepositorySystemTest
 {
     @Inject
     private RepositorySystem repositorySystem;
+
     @Inject
     private ResolutionErrorHandler resolutionErrorHandler;
+
     @Inject
     private PlexusContainer container;
 
@@ -102,16 +107,13 @@ public class LegacyRepositorySystemTest
         d.setScope( Artifact.SCOPE_COMPILE );
         Artifact artifact = repositorySystem.createDependencyArtifact( d );
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
-            .setArtifact( artifact )
-            .setResolveRoot( true )
-            .setResolveTransitively( true )
-            .setRemoteRepositories( getRemoteRepositories() )
-            .setLocalRepository( getLocalRepository() );
+        ArtifactResolutionRequest request =
+            new ArtifactResolutionRequest().setArtifact( artifact ).setResolveRoot( true ).setResolveTransitively( true ).setRemoteRepositories( getRemoteRepositories() ).setLocalRepository( getLocalRepository() );
 
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
         LocalRepository localRepo = new LocalRepository( request.getLocalRepository().getBasedir() );
-        session.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( session, localRepo ) );
+        session.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( session,
+                                                                                                  localRepo ) );
         LegacySupport legacySupport = container.lookup( LegacySupport.class );
         legacySupport.setSession( new MavenSession( container, session, new DefaultMavenExecutionRequest(),
                                                     new DefaultMavenExecutionResult() ) );
@@ -131,13 +133,12 @@ public class LegacyRepositorySystemTest
         artifact = repositorySystem.createDependencyArtifact( d );
 
         //
-        // The request has not set any local or remote repositories as the system scoped dependency being resolved should only
+        // The request has not set any local or remote repositories as the system scoped dependency being resolved
+        // should only
         // give us the dependency off the disk and nothing more.
         //
-        request = new ArtifactResolutionRequest()
-            .setArtifact( artifact )
-            .setResolveRoot( true )
-            .setResolveTransitively( true );
+        request =
+            new ArtifactResolutionRequest().setArtifact( artifact ).setResolveRoot( true ).setResolveTransitively( true );
 
         result = repositorySystem.resolve( request );
         resolutionErrorHandler.throwErrors( request, result );
@@ -152,20 +153,19 @@ public class LegacyRepositorySystemTest
         artifact = repositorySystem.createDependencyArtifact( d );
 
         //
-        // The request has not set any local or remote repositories as the system scoped dependency being resolved should only
+        // The request has not set any local or remote repositories as the system scoped dependency being resolved
+        // should only
         // give us the dependency off the disk and nothing more.
         //
-        request = new ArtifactResolutionRequest()
-            .setArtifact( artifact )
-            .setResolveRoot( true )
-            .setResolveTransitively( true );
+        request =
+            new ArtifactResolutionRequest().setArtifact( artifact ).setResolveRoot( true ).setResolveTransitively( true );
 
         try
         {
             result = repositorySystem.resolve( request );
             resolutionErrorHandler.throwErrors( request, result );
         }
-        catch( Exception e )
+        catch ( Exception e )
         {
             assertTrue( result.hasMissingArtifacts() );
         }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,13 @@ package org.apache.maven.plugin.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.util.Map;
+package org.apache.maven.plugin.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.Map;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
@@ -71,18 +70,19 @@ public class DefaultPluginManager
 {
 
     private final PlexusContainer container;
+
     private final MavenPluginManager pluginManager;
+
     private final PluginVersionResolver pluginVersionResolver;
+
     private final PluginPrefixResolver pluginPrefixResolver;
+
     private final LegacySupport legacySupport;
 
     @Inject
-    public DefaultPluginManager(
-            PlexusContainer container,
-            MavenPluginManager pluginManager,
-            PluginVersionResolver pluginVersionResolver,
-            PluginPrefixResolver pluginPrefixResolver,
-            LegacySupport legacySupport )
+    public DefaultPluginManager( PlexusContainer container, MavenPluginManager pluginManager,
+                                 PluginVersionResolver pluginVersionResolver, PluginPrefixResolver pluginPrefixResolver,
+                                 LegacySupport legacySupport )
     {
         this.container = container;
         this.pluginManager = pluginManager;

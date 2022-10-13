@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal.builder;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal.builder;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,16 +16,17 @@ package org.apache.maven.lifecycle.internal.builder;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal.builder;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildFailure;
@@ -65,24 +64,25 @@ import org.slf4j.LoggerFactory;
  * Common code that is shared by the LifecycleModuleBuilder and the LifeCycleWeaveBuilder
  *
  * @since 3.0
- * @author Kristian Rosenvold
- *         Builds one or more lifecycles for a full module
- *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
+ * @author Kristian Rosenvold Builds one or more lifecycles for a full module NOTE: This class is not part of any public
+ *         api and can be changed or deleted without prior notice.
  */
 @Named
 @Singleton
 public class BuilderCommon
 {
     private final Logger logger;
+
     private final LifecycleDebugLogger lifecycleDebugLogger;
+
     private final LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator;
+
     private final ExecutionEventCatapult eventCatapult;
 
     @Inject
-    public BuilderCommon(
-            LifecycleDebugLogger lifecycleDebugLogger,
-            LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
-            ExecutionEventCatapult eventCatapult )
+    public BuilderCommon( LifecycleDebugLogger lifecycleDebugLogger,
+                          LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
+                          ExecutionEventCatapult eventCatapult )
     {
         this.logger = LoggerFactory.getLogger( getClass() );
         this.lifecycleDebugLogger = lifecycleDebugLogger;
@@ -93,11 +93,9 @@ public class BuilderCommon
     /**
      * Ctor needed for UT.
      */
-    BuilderCommon(
-            LifecycleDebugLogger lifecycleDebugLogger,
-            LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
-            ExecutionEventCatapult eventCatapult,
-            Logger logger )
+    BuilderCommon( LifecycleDebugLogger lifecycleDebugLogger,
+                   LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
+                   ExecutionEventCatapult eventCatapult, Logger logger )
     {
         this.lifecycleDebugLogger = lifecycleDebugLogger;
         this.lifeCycleExecutionPlanCalculator = lifeCycleExecutionPlanCalculator;
@@ -123,17 +121,15 @@ public class BuilderCommon
         Properties userProperties = session.getUserProperties();
         if ( Features.buildConsumer( userProperties ).isActive() )
         {
-            Optional<MojoExecution> gpgMojo = executionPlan.getMojoExecutions().stream()
-                            .filter( m -> "maven-gpg-plugin".equals( m.getArtifactId() )
-                                       && "org.apache.maven.plugins".equals( m.getGroupId() ) )
-                            .findAny();
+            Optional<MojoExecution> gpgMojo =
+                executionPlan.getMojoExecutions().stream().filter( m -> "maven-gpg-plugin".equals( m.getArtifactId() )
+                    && "org.apache.maven.plugins".equals( m.getGroupId() ) ).findAny();
 
             if ( gpgMojo.isPresent() )
             {
                 throw new LifecycleExecutionException( "The maven-gpg-plugin is not supported by Maven 4."
-                    + " Verify if there is a compatible signing solution,"
-                    + " add -D" + Features.buildConsumer( userProperties ).propertyName() + "=false"
-                    + " or use Maven 3." );
+                    + " Verify if there is a compatible signing solution," + " add -D"
+                    + Features.buildConsumer( userProperties ).propertyName() + "=false" + " or use Maven 3." );
             }
         }
 
@@ -142,12 +138,11 @@ public class BuilderCommon
             final Set<Plugin> unsafePlugins = executionPlan.getNonThreadSafePlugins();
             if ( !unsafePlugins.isEmpty() )
             {
-                for ( String s : MultilineMessageHelper.format(
-                        "Your build is requesting parallel execution, but this project contains the following "
-                                + "plugin(s) that have goals not marked as thread-safe to support parallel execution.",
-                        "While this /may/ work fine, please look for plugin updates and/or "
-                                + "request plugins be made thread-safe.",
-                        "If reporting an issue, report it against the plugin in question, not against Apache Maven." ) )
+                for ( String s : MultilineMessageHelper.format( "Your build is requesting parallel execution, but this project contains the following "
+                    + "plugin(s) that have goals not marked as thread-safe to support parallel execution.",
+                                                                "While this /may/ work fine, please look for plugin updates and/or "
+                                                                    + "request plugins be made thread-safe.",
+                                                                "If reporting an issue, report it against the plugin in question, not against Apache Maven." ) )
                 {
                     logger.warn( s );
                 }
@@ -169,7 +164,7 @@ public class BuilderCommon
                     }
                     logger.warn( "" );
                     logger.warn( "Enable verbose output (-X) to see precisely which goals are not marked as"
-                            + " thread-safe." );
+                        + " thread-safe." );
                 }
                 logger.warn( MultilineMessageHelper.separatorLine() );
             }
@@ -177,13 +172,16 @@ public class BuilderCommon
 
         final String defaulModelId = DefaultLifecyclePluginAnalyzer.DEFAULTLIFECYCLEBINDINGS_MODELID;
 
-        List<String> unversionedPlugins = executionPlan.getMojoExecutions().stream()
-                         .map( MojoExecution::getPlugin )
-                         .filter( p -> p.getLocation( "version" ) != null
-                                 && p.getLocation( "version" ).getSource() != null
-                                 && defaulModelId.equals( p.getLocation( "version" ).getSource().getModelId() ) )
-                         .distinct()
-                         .map( Plugin::getArtifactId ) // managed by us, groupId is always o.a.m.plugins
+        List<String> unversionedPlugins =
+            executionPlan.getMojoExecutions().stream().map( MojoExecution::getPlugin ).filter( p -> p.getLocation( "version" ) != null
+                && p.getLocation( "version" ).getSource() != null
+                && defaulModelId.equals( p.getLocation( "version" ).getSource().getModelId() ) ).distinct().map( Plugin::getArtifactId ) // managed
+                                                                                                                                         // by
+                                                                                                                                         // us,
+                                                                                                                                         // groupId
+                                                                                                                                         // is
+                                                                                                                                         // always
+                                                                                                                                         // o.a.m.plugins
                          .collect( Collectors.toList() );
 
         if ( !unversionedPlugins.isEmpty() )

@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,9 @@ package org.apache.maven.artifact.resolver;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver;
+
+import javax.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,8 +41,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import javax.inject.Inject;
 
 // It would be cool if there was a hook that I could use to set up a test environment.
 // I want to set up a local/remote repositories for testing but I don't want to have
@@ -113,7 +112,9 @@ public class ArtifactResolverTest
 
         Artifact h = createLocalArtifact( "h", "1.0" );
 
-        ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( g ), projectArtifact, remoteRepositories(), localRepository(), null );
+        ArtifactResolutionResult result =
+            artifactResolver.resolveTransitively( Collections.singleton( g ), projectArtifact, remoteRepositories(),
+                                                  localRepository(), null );
 
         printErrors( result );
 
@@ -138,7 +139,9 @@ public class ArtifactResolverTest
         Artifact j = createRemoteArtifact( "j", "1.0-SNAPSHOT" );
         deleteLocalArtifact( j );
 
-        ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( i ), projectArtifact, remoteRepositories(), localRepository(), null );
+        ArtifactResolutionResult result =
+            artifactResolver.resolveTransitively( Collections.singleton( i ), projectArtifact, remoteRepositories(),
+                                                  localRepository(), null );
 
         printErrors( result );
 
@@ -159,10 +162,9 @@ public class ArtifactResolverTest
     {
         Artifact k = createArtifact( "k", "1.0" );
 
-        assertThrows(
-                ArtifactNotFoundException.class,
-                () -> artifactResolver.resolve( k, remoteRepositories(), localRepository() ),
-                "Resolution succeeded when it should have failed" );
+        assertThrows( ArtifactNotFoundException.class,
+                      () -> artifactResolver.resolve( k, remoteRepositories(), localRepository() ),
+                      "Resolution succeeded when it should have failed" );
     }
 
     @Test
@@ -206,8 +208,7 @@ public class ArtifactResolverTest
                 throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
             }
 
-            public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
-                                                                                            Artifact artifact,
+            public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact,
                                                                                             ArtifactRepository localRepository,
                                                                                             ArtifactRepository remoteRepository )
             {
@@ -221,7 +222,8 @@ public class ArtifactResolverTest
 
             public List<ArtifactVersion> retrieveAvailableVersions( MetadataResolutionRequest request )
             {
-                return retrieveAvailableVersions( request.getArtifact(), request.getLocalRepository(), request.getRemoteRepositories() );
+                return retrieveAvailableVersions( request.getArtifact(), request.getLocalRepository(),
+                                                  request.getRemoteRepositories() );
             }
         };
 

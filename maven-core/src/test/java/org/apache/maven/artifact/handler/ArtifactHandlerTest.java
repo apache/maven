@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.handler;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.handler;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,14 +16,15 @@ package org.apache.maven.artifact.handler;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.handler;
+
+import javax.inject.Inject;
 
 import java.io.File;
 import java.util.List;
 
-import javax.inject.Inject;
-
-import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 
@@ -51,9 +50,8 @@ public class ArtifactHandlerTest
             if ( line.startsWith( "||" ) )
             {
                 String[] cols = line.split( "\\|\\|" );
-                String[] expected =
-                    new String[] { "", "type", "classifier", "extension", "packaging", "language", "added to classpath",
-                        "includesDependencies", "" };
+                String[] expected = new String[] { "", "type", "classifier", "extension", "packaging", "language",
+                    "added to classpath", "includesDependencies", "" };
 
                 int i = 0;
                 for ( String col : cols )
@@ -78,8 +76,10 @@ public class ArtifactHandlerTest
                 assertEquals( handler.getPackaging(), packaging, type + " packaging" );
                 assertEquals( handler.getClassifier(), classifier, type + " classifier" );
                 assertEquals( handler.getLanguage(), language, type + " language" );
-                assertEquals( handler.isAddedToClasspath() ? "true" : null, addedToClasspath, type + " addedToClasspath" );
-                assertEquals( handler.isIncludesDependencies() ? "true" : null, includesDependencies, type + " includesDependencies" );
+                assertEquals( handler.isAddedToClasspath() ? "true" : null, addedToClasspath,
+                              type + " addedToClasspath" );
+                assertEquals( handler.isIncludesDependencies() ? "true" : null, includesDependencies,
+                              type + " includesDependencies" );
             }
         }
     }

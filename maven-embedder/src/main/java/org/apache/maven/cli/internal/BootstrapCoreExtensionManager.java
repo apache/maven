@@ -1,5 +1,3 @@
-package org.apache.maven.cli.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.cli.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,10 @@ package org.apache.maven.cli.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,16 +27,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.model.Plugin;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
-import org.apache.maven.api.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.internal.DefaultPluginDependenciesResolver;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -62,7 +61,9 @@ import org.slf4j.LoggerFactory;
 public class BootstrapCoreExtensionManager
 {
     public static final String STRATEGY_PARENT_FIRST = "parent-first";
+
     public static final String STRATEGY_PLUGIN = "plugin";
+
     public static final String STRATEGY_SELF_FIRST = "self-first";
 
     private final Logger log = LoggerFactory.getLogger( getClass() );
@@ -80,8 +81,7 @@ public class BootstrapCoreExtensionManager
     @Inject
     public BootstrapCoreExtensionManager( DefaultPluginDependenciesResolver pluginDependenciesResolver,
                                           DefaultRepositorySystemSessionFactory repositorySystemSessionFactory,
-                                          CoreExports coreExports,
-                                          PlexusContainer container )
+                                          CoreExports coreExports, PlexusContainer container )
     {
         this.pluginDependenciesResolver = pluginDependenciesResolver;
         this.repositorySystemSessionFactory = repositorySystemSessionFactory;
@@ -114,8 +114,8 @@ public class BootstrapCoreExtensionManager
 
         for ( CoreExtension extension : configuration )
         {
-            List<Artifact> artifacts = resolveExtension( extension, repoSession, repositories,
-                                                         dependencyFilter, interpolator );
+            List<Artifact> artifacts =
+                resolveExtension( extension, repoSession, repositories, dependencyFilter, interpolator );
             if ( !artifacts.isEmpty() )
             {
                 extensions.add( createExtension( extension, artifacts ) );
@@ -148,9 +148,9 @@ public class BootstrapCoreExtensionManager
         }
         else
         {
-            throw new IllegalArgumentException( "Unsupported class-loading strategy '"
-                    + classLoadingStrategy + "'. Supported values are: " + STRATEGY_PARENT_FIRST
-                    + ", " + STRATEGY_PLUGIN + " and " + STRATEGY_SELF_FIRST );
+            throw new IllegalArgumentException( "Unsupported class-loading strategy '" + classLoadingStrategy
+                + "'. Supported values are: " + STRATEGY_PARENT_FIRST + ", " + STRATEGY_PLUGIN + " and "
+                + STRATEGY_SELF_FIRST );
         }
         log.debug( "Populating class realm {}", realm.getId() );
         for ( Artifact artifact : artifacts )
@@ -177,19 +177,16 @@ public class BootstrapCoreExtensionManager
     {
         try
         {
-            /* TODO: Enhance the PluginDependenciesResolver to provide a
-             * resolveCoreExtension method which uses a CoreExtension
-             * object instead of a Plugin as this makes no sense.
+            /*
+             * TODO: Enhance the PluginDependenciesResolver to provide a resolveCoreExtension method which uses a
+             * CoreExtension object instead of a Plugin as this makes no sense.
              */
-            Plugin plugin = Plugin.newBuilder()
-                    .groupId( interpolator.interpolate( extension.getGroupId() ) )
-                    .artifactId( interpolator.interpolate( extension.getArtifactId() ) )
-                    .version( interpolator.interpolate( extension.getVersion() ) )
-                    .build();
+            Plugin plugin =
+                Plugin.newBuilder().groupId( interpolator.interpolate( extension.getGroupId() ) ).artifactId( interpolator.interpolate( extension.getArtifactId() ) ).version( interpolator.interpolate( extension.getVersion() ) ).build();
 
-            DependencyNode root = pluginDependenciesResolver
-                    .resolveCoreExtension( new org.apache.maven.model.Plugin( plugin ),
-                            dependencyFilter, repositories, repoSession );
+            DependencyNode root =
+                pluginDependenciesResolver.resolveCoreExtension( new org.apache.maven.model.Plugin( plugin ),
+                                                                 dependencyFilter, repositories, repoSession );
             PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
             root.accept( nlg );
 

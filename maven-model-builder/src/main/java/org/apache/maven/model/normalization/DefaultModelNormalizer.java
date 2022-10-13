@@ -1,5 +1,3 @@
-package org.apache.maven.model.normalization;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,10 @@ package org.apache.maven.model.normalization;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.normalization;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,9 +27,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Dependency;
@@ -75,9 +74,7 @@ public class DefaultModelNormalizer
 
             if ( plugins.size() != normalized.size() )
             {
-                builder.build( Build.newBuilder( build )
-                            .plugins( normalized.values() )
-                            .build() );
+                builder.build( Build.newBuilder( build ).plugins( normalized.values() ).build() );
             }
         }
 
@@ -127,9 +124,8 @@ public class DefaultModelNormalizer
         Build build = model.getBuild();
         if ( build != null )
         {
-            Build newBuild = Build.newBuilder( build )
-                    .plugins( injectList( build.getPlugins(), this::injectPlugin ) )
-                    .build();
+            Build newBuild =
+                Build.newBuilder( build ).plugins( injectList( build.getPlugins(), this::injectPlugin ) ).build();
             builder.build( newBuild != build ? newBuild : null );
         }
 
@@ -138,9 +134,7 @@ public class DefaultModelNormalizer
 
     private Plugin injectPlugin( Plugin p )
     {
-        return Plugin.newBuilder( p )
-                .dependencies( injectList( p.getDependencies(), this::injectDependency ) )
-                .build();
+        return Plugin.newBuilder( p ).dependencies( injectList( p.getDependencies(), this::injectDependency ) ).build();
     }
 
     private Dependency injectDependency( Dependency d )
@@ -167,7 +161,7 @@ public class DefaultModelNormalizer
                 }
                 newList.set( i, newT );
             }
-       }
+        }
         return newList;
     }
 

@@ -1,5 +1,3 @@
-package org.apache.maven.api.plugin.annotations;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.plugin.annotations;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.plugin.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -34,8 +33,8 @@ import org.apache.maven.api.annotations.Experimental;
  * <code>MavenPluginManager.getConfiguredMojo(...)</code></a>.
  * <p>
  * Beans injected into Mojo parameters are prepared by <a href="https://www.eclipse.org/sisu/">Sisu</a> JSR330-based
- * container: this annotation is only effective on fields of the Mojo class itself, nested bean injection
- * requires Sisu or JSR330 annotations.
+ * container: this annotation is only effective on fields of the Mojo class itself, nested bean injection requires Sisu
+ * or JSR330 annotations.
  *
  * @since 4.0
  */
@@ -48,12 +47,14 @@ public @interface Parameter
 {
     /**
      * name of the bean property used to get/set the field: by default, field name is used.
+     * 
      * @return the name of the bean property
      */
     String name() default "";
 
     /**
      * alias supported to get parameter value.
+     * 
      * @return the alias
      */
     String alias() default "";
@@ -61,21 +62,23 @@ public @interface Parameter
     /**
      * Property to use to retrieve a value. Can come from <code>-D</code> execution, setting properties or pom
      * properties.
+     * 
      * @return property name
      */
     String property() default "";
 
     /**
-     * parameter default value, may contain <code>${...}</code> expressions which will be interpreted at
-     * inject time: see
-     * <a href="/ref/current/maven-core/apidocs/org/apache/maven/plugin/PluginParameterExpressionEvaluator.html">
-     * PluginParameterExpressionEvaluator</a>. 
+     * parameter default value, may contain <code>${...}</code> expressions which will be interpreted at inject time:
+     * see <a href="/ref/current/maven-core/apidocs/org/apache/maven/plugin/PluginParameterExpressionEvaluator.html">
+     * PluginParameterExpressionEvaluator</a>.
+     * 
      * @return the default value
      */
     String defaultValue() default "";
 
     /**
      * is the parameter required?
+     * 
      * @return <code>true</code> if the Mojo should fail when the parameter cannot be injected
      */
     boolean required() default false;

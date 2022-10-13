@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,10 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,9 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -122,8 +121,7 @@ public class DefaultPluginArtifactsCache
 
             CacheKey that = (CacheKey) o;
 
-            return CacheUtils.pluginEquals( plugin, that.plugin )
-                && Objects.equals( workspace, that.workspace )
+            return CacheUtils.pluginEquals( plugin, that.plugin ) && Objects.equals( workspace, that.workspace )
                 && Objects.equals( localRepo, that.localRepo )
                 && RepositoryUtils.repositoriesEquals( repositories, that.repositories )
                 && Objects.equals( filter, that.filter );
@@ -157,8 +155,7 @@ public class DefaultPluginArtifactsCache
 
         assertUniqueKey( key );
 
-        CacheRecord record =
-            new CacheRecord( Collections.unmodifiableList( new ArrayList<>( pluginArtifacts ) ) );
+        CacheRecord record = new CacheRecord( Collections.unmodifiableList( new ArrayList<>( pluginArtifacts ) ) );
 
         cache.put( key, record );
 

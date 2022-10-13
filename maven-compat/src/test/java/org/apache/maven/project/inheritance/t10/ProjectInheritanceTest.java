@@ -1,5 +1,3 @@
-package org.apache.maven.project.inheritance.t10;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.inheritance.t10;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.inheritance.t10;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.inheritance.t10;
 
 import java.io.File;
 import java.util.Map;
@@ -32,14 +31,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Verifies scope inheritance of direct and transitive dependencies.
- *
- * Should show three behaviors:
- *
- * 1. dependencyManagement should override the scope of transitive dependencies.
- * 2. Direct dependencies should override the scope of dependencyManagement.
- * 3. Direct dependencies should inherit scope from dependencyManagement when
- *    they do not explicitly state a scope.
+ * Verifies scope inheritance of direct and transitive dependencies. Should show three behaviors: 1.
+ * dependencyManagement should override the scope of transitive dependencies. 2. Direct dependencies should override the
+ * scope of dependencyManagement. 3. Direct dependencies should inherit scope from dependencyManagement when they do not
+ * explicitly state a scope.
  *
  * @author <a href="mailto:pschneider@gmail.com">Patrick Schneider</a>
  */
@@ -72,29 +67,29 @@ public class ProjectInheritanceTest
         MavenProject project1 = getProjectWithDependencies( pom1 );
 
         assertEquals( pom0Basedir, project1.getParent().getBasedir() );
-        System.out.println("Project " + project1.getId() + " " + project1);
+        System.out.println( "Project " + project1.getId() + " " + project1 );
         Map map = project1.getArtifactMap();
         assertNotNull( map, "No artifacts" );
         assertTrue( map.size() > 0, "No Artifacts" );
         assertTrue( map.size() == 3, "Set size should be 3, is " + map.size() );
 
-        Artifact a = (Artifact) map.get("maven-test:t10-a");
-        Artifact b = (Artifact) map.get("maven-test:t10-b");
-        Artifact c = (Artifact) map.get("maven-test:t10-c");
+        Artifact a = (Artifact) map.get( "maven-test:t10-a" );
+        Artifact b = (Artifact) map.get( "maven-test:t10-b" );
+        Artifact c = (Artifact) map.get( "maven-test:t10-c" );
 
         assertNotNull( a );
         assertNotNull( b );
         assertNotNull( c );
 
         // inherited from depMgmt
-        System.out.println(a.getScope());
-        assertTrue( a.getScope().equals("test"), "Incorrect scope for " + a.getDependencyConflictId() );
+        System.out.println( a.getScope() );
+        assertTrue( a.getScope().equals( "test" ), "Incorrect scope for " + a.getDependencyConflictId() );
 
         // transitive dep, overridden b depMgmt
-        assertTrue( b.getScope().equals("runtime"), "Incorrect scope for " + b.getDependencyConflictId() );
+        assertTrue( b.getScope().equals( "runtime" ), "Incorrect scope for " + b.getDependencyConflictId() );
 
         // direct dep, overrides depMgmt
-        assertTrue( c.getScope().equals("runtime"), "Incorrect scope for " + c.getDependencyConflictId() );
+        assertTrue( c.getScope().equals( "runtime" ), "Incorrect scope for " + c.getDependencyConflictId() );
 
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,17 @@ package org.apache.maven.plugin.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
@@ -116,10 +115,10 @@ public class DefaultPluginDependenciesResolver
                 if ( !result.getRelocations().isEmpty() )
                 {
                     String message = pluginArtifact instanceof org.apache.maven.repository.internal.RelocatedArtifact
-                            ? ( ( org.apache.maven.repository.internal.RelocatedArtifact ) pluginArtifact ).getMessage()
-                            : null;
+                                    ? ( (org.apache.maven.repository.internal.RelocatedArtifact) pluginArtifact ).getMessage()
+                                    : null;
                     logger.warn( "The artifact " + result.getRelocations().get( 0 ) + " has been relocated to "
-                            + pluginArtifact + ( message != null ? ": " + message : "" ) );
+                        + pluginArtifact + ( message != null ? ": " + message : "" ) );
                 }
             }
 
@@ -157,16 +156,14 @@ public class DefaultPluginDependenciesResolver
                                                 List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException
     {
-        return resolveInternal( plugin, null /* pluginArtifact */, dependencyFilter,
-                                repositories, session );
+        return resolveInternal( plugin, null /* pluginArtifact */, dependencyFilter, repositories, session );
     }
 
     public DependencyNode resolve( Plugin plugin, Artifact pluginArtifact, DependencyFilter dependencyFilter,
                                    List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException
     {
-        return resolveInternal( plugin, pluginArtifact, dependencyFilter, repositories,
-                                session );
+        return resolveInternal( plugin, pluginArtifact, dependencyFilter, repositories, session );
     }
 
     private DependencyNode resolveInternal( Plugin plugin, Artifact pluginArtifact, DependencyFilter dependencyFilter,
@@ -261,8 +258,8 @@ public class DefaultPluginDependenciesResolver
                 }
 
                 // TODO We currently cannot tell which <dependencyManagement> section contained the management
-                //      information. When the resolver provides this information, these log messages should be updated
-                //      to contain it.
+                // information. When the resolver provides this information, these log messages should be updated
+                // to contain it.
                 if ( ( node.getManagedBits() & DependencyNode.MANAGED_SCOPE ) == DependencyNode.MANAGED_SCOPE )
                 {
                     final String premanagedScope = DependencyManagerUtils.getPremanagedScope( node );
@@ -287,8 +284,8 @@ public class DefaultPluginDependenciesResolver
                     buffer.append( ')' );
                 }
 
-                if ( ( node.getManagedBits() & DependencyNode.MANAGED_EXCLUSIONS )
-                         == DependencyNode.MANAGED_EXCLUSIONS )
+                if ( ( node.getManagedBits()
+                    & DependencyNode.MANAGED_EXCLUSIONS ) == DependencyNode.MANAGED_EXCLUSIONS )
                 {
                     final Collection<org.eclipse.aether.graph.Exclusion> premanagedExclusions =
                         DependencyManagerUtils.getPremanagedExclusions( node );
@@ -298,8 +295,8 @@ public class DefaultPluginDependenciesResolver
                     buffer.append( ')' );
                 }
 
-                if ( ( node.getManagedBits() & DependencyNode.MANAGED_PROPERTIES )
-                         == DependencyNode.MANAGED_PROPERTIES )
+                if ( ( node.getManagedBits()
+                    & DependencyNode.MANAGED_PROPERTIES ) == DependencyNode.MANAGED_PROPERTIES )
                 {
                     final Map<String, String> premanagedProperties =
                         DependencyManagerUtils.getPremanagedProperties( node );

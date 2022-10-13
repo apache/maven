@@ -1,5 +1,3 @@
-package org.apache.maven.model.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,11 @@ package org.apache.maven.model.io;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.io;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,10 +29,6 @@ import java.io.Reader;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
@@ -111,7 +110,7 @@ public class DefaultModelReader
         Object value = ( options != null ) ? options.get( INPUT_SOURCE ) : null;
         if ( value instanceof org.apache.maven.model.InputSource )
         {
-            org.apache.maven.model.InputSource src = ( org.apache.maven.model.InputSource ) value;
+            org.apache.maven.model.InputSource src = (org.apache.maven.model.InputSource) value;
             return new InputSource( src.getModelId(), src.getLocation() );
         }
         return (InputSource) value;
@@ -132,8 +131,8 @@ public class DefaultModelReader
             parser.setInput( reader );
 
             TransformerContext context = getTransformerContext( options );
-            XmlPullParser transformingParser = context != null
-                    ? transformer.transform( parser, pomFile, context ) : parser;
+            XmlPullParser transformingParser =
+                context != null ? transformer.transform( parser, pomFile, context ) : parser;
 
             InputSource source = getSource( options );
             boolean strict = isStrict( options );
@@ -161,14 +160,14 @@ public class DefaultModelReader
     }
 
     private Model readModel( XmlPullParser parser, boolean strict )
-            throws XmlPullParserException, IOException
+        throws XmlPullParserException, IOException
     {
         MavenXpp3Reader mr = new MavenXpp3Reader();
         return mr.read( parser, strict );
     }
 
     private Model readModelEx( XmlPullParser parser, InputSource source, boolean strict )
-            throws XmlPullParserException, IOException
+        throws XmlPullParserException, IOException
     {
         MavenXpp3ReaderEx mr = new MavenXpp3ReaderEx();
         return mr.read( parser, strict, source );

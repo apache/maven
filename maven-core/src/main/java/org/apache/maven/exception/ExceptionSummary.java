@@ -1,5 +1,3 @@
-package org.apache.maven.exception;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.exception;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,12 +16,14 @@ package org.apache.maven.exception;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.exception;
 
 import java.util.Collections;
 import java.util.List;
 
 /**
- * Provide a summary of the exception, containing:<ul>
+ * Provide a summary of the exception, containing:
+ * <ul>
  * <li>the exception itself,</li>
  * <li>useful end-user message,</li>
  * <li>useful reference to a solution, or set of solutions: this is usually a wiki page url in
@@ -53,9 +53,7 @@ public class ExceptionSummary
         this.exception = exception;
         this.message = ( message != null ) ? message : "";
         this.reference = ( reference != null ) ? reference : "";
-        this.children = ( children != null )
-                            ? Collections.unmodifiableList( children )
-                            : Collections.emptyList();
+        this.children = ( children != null ) ? Collections.unmodifiableList( children ) : Collections.emptyList();
 
     }
 

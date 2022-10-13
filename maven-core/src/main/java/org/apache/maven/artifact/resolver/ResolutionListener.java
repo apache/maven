@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.resolver;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -49,8 +48,8 @@ public interface ResolutionListener
     int OMIT_FOR_CYCLE = 8;
 
     /**
-     * this event means that the artifactScope has NOT been updated to a farther node artifactScope because current
-     * node is in the first level pom
+     * this event means that the artifactScope has NOT been updated to a farther node artifactScope because current node
+     * is in the first level pom
      */
     int UPDATE_SCOPE_CURRENT_POM = 9;
 
@@ -72,38 +71,32 @@ public interface ResolutionListener
 
     void includeArtifact( Artifact artifact );
 
-    void omitForNearer( Artifact omitted,
-                        Artifact kept );
+    void omitForNearer( Artifact omitted, Artifact kept );
 
-    void updateScope( Artifact artifact,
-                      String scope );
+    void updateScope( Artifact artifact, String scope );
 
     @Deprecated
-    void manageArtifact( Artifact artifact,
-                         Artifact replacement );
+    void manageArtifact( Artifact artifact, Artifact replacement );
 
     // TODO Use the following two instead of manageArtifact
     // TODO Remove ResolutionListenerDM interface
 
-    //void manageArtifactVersion( Artifact artifact, Artifact replacement );
+    // void manageArtifactVersion( Artifact artifact, Artifact replacement );
 
-    //void manageArtifactScope( Artifact artifact, Artifact replacement );
+    // void manageArtifactScope( Artifact artifact, Artifact replacement );
 
     void omitForCycle( Artifact artifact );
 
     /**
-     * This event means that the artifactScope has NOT been updated to a farther node artifactScope because current
-     * node is in the first level pom
+     * This event means that the artifactScope has NOT been updated to a farther node artifactScope because current node
+     * is in the first level pom
      *
-     * @param artifact     current node artifact, the one in the first level pom
+     * @param artifact current node artifact, the one in the first level pom
      * @param ignoredScope artifactScope that was ignored because artifact was in first level pom
      */
-    void updateScopeCurrentPom( Artifact artifact,
-                                String ignoredScope );
+    void updateScopeCurrentPom( Artifact artifact, String ignoredScope );
 
     void selectVersionFromRange( Artifact artifact );
 
-    void restrictRange( Artifact artifact,
-                        Artifact replacement,
-                        VersionRange newRange );
+    void restrictRange( Artifact artifact, Artifact replacement, VersionRange newRange );
 }

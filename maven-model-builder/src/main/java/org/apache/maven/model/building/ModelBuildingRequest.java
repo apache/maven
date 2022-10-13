@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.io.File;
 import java.util.Date;
@@ -65,8 +64,7 @@ public interface ModelBuildingRequest
     int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_3_1;
 
     /**
-     * Gets the file model to build (with profile activation).
-     * If not set, model source will be used to load file model.
+     * Gets the file model to build (with profile activation). If not set, model source will be used to load file model.
      *
      * @return The file model to build or {@code null} if not set.
      * @since 4.0.0

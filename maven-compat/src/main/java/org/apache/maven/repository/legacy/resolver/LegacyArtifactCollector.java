@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy.resolver;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.legacy.resolver;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.repository.legacy.resolver;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy.resolver;
 
 import java.util.List;
 import java.util.Map;
@@ -33,8 +32,8 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
 
 /**
- * Artifact collector - takes a set of original artifacts and resolves all of the best versions to use
- * along with their metadata. No artifacts are downloaded.
+ * Artifact collector - takes a set of original artifacts and resolves all of the best versions to use along with their
+ * metadata. No artifacts are downloaded.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
@@ -50,17 +49,16 @@ public interface LegacyArtifactCollector
                                       List<ConflictResolver> conflictResolvers );
 
     ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                      Map<String, Artifact> managedVersions,
-                                      ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
-                                      ArtifactMetadataSource source, ArtifactFilter filter,
-                                      List<ResolutionListener> listeners, List<ConflictResolver> conflictResolvers );
+                                      Map<String, Artifact> managedVersions, ArtifactRepository localRepository,
+                                      List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source,
+                                      ArtifactFilter filter, List<ResolutionListener> listeners,
+                                      List<ConflictResolver> conflictResolvers );
 
     // used by maven-dependency-tree and maven-dependency-plugin
     @Deprecated
     ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                      Map<String, Artifact> managedVersions,
-                                      ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
-                                      ArtifactMetadataSource source, ArtifactFilter filter,
-                                      List<ResolutionListener> listeners );
+                                      Map<String, Artifact> managedVersions, ArtifactRepository localRepository,
+                                      List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source,
+                                      ArtifactFilter filter, List<ResolutionListener> listeners );
 
 }

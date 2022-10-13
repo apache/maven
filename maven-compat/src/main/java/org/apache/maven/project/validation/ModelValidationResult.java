@@ -1,5 +1,3 @@
-package org.apache.maven.project.validation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.validation;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.validation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.validation;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,19 +73,18 @@ public class ModelValidationResult
 
         StringBuilder message = new StringBuilder();
 
-//        if ( messages.size() == 1 )
-//        {
-//            message.append( "There was 1 validation error: " );
-//        }
-//        else
-//        {
-//            message.append( "There was " + messages.size() + " validation errors: " + LS );
-//        }
-//
+        // if ( messages.size() == 1 )
+        // {
+        // message.append( "There was 1 validation error: " );
+        // }
+        // else
+        // {
+        // message.append( "There was " + messages.size() + " validation errors: " + LS );
+        // }
+        //
         for ( int i = 0; i < messages.size(); i++ )
         {
-            message.append( indentation ).append( '[' ).append( i ).append( "]  " ).append( messages.get( i ) ).append(
-                LS );
+            message.append( indentation ).append( '[' ).append( i ).append( "]  " ).append( messages.get( i ) ).append( LS );
         }
 
         return message.toString();

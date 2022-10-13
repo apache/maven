@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.toolchain;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,19 +16,20 @@ package org.apache.maven.toolchain;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Objects;
+import java.util.Properties;
 
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.slf4j.Logger;
 
 /**
- * Default abstract toolchain implementation, to be used as base class for any toolchain implementation
- * to avoid rewriting usual code.
+ * Default abstract toolchain implementation, to be used as base class for any toolchain implementation to avoid
+ * rewriting usual code.
  *
  * @author mkleint
  * @since 2.0.9
@@ -44,12 +43,11 @@ public abstract class DefaultToolchain // should have been AbstractToolchain...
 
     private Map<String, RequirementMatcher> provides = new HashMap<>();
 
-    public static final String KEY_TYPE = "type"; //NOI18N
+    public static final String KEY_TYPE = "type"; // NOI18N
 
     private ToolchainModel model;
 
     /**
-     *
      * @param model the model, must not be {@code null}
      * @param logger the logger, must not be {@code null}
      */
@@ -60,7 +58,6 @@ public abstract class DefaultToolchain // should have been AbstractToolchain...
     }
 
     /**
-     *
      * @param model the model, must not be {@code null}
      * @param type the type
      * @param logger the logger, must not be {@code null}

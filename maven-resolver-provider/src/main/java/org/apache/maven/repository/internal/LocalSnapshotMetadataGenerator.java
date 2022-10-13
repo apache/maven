@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -38,7 +37,7 @@ import org.eclipse.aether.util.ConfigUtils;
  * Local snapshot metadata contains non-transformed snapshot version.
  */
 class LocalSnapshotMetadataGenerator
-        implements MetadataGenerator
+    implements MetadataGenerator
 {
 
     private Map<Object, LocalSnapshotMetadata> snapshots;

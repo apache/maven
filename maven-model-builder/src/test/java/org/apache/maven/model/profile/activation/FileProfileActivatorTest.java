@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile.activation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,11 @@ package org.apache.maven.model.profile.activation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile.activation;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.ActivationFile;
@@ -29,10 +32,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -40,7 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Ravil Galeyev
  */
-public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileActivator>
+public class FileProfileActivatorTest
+    extends AbstractProfileActivatorTest<FileProfileActivator>
 {
 
     @TempDir
@@ -50,9 +50,11 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
 
     @BeforeEach
     @Override
-    void setUp() throws Exception
+    void setUp()
+        throws Exception
     {
-        activator = new FileProfileActivator( new ProfileActivationFilePathInterpolator( new DefaultPathTranslator() ) );
+        activator =
+            new FileProfileActivator( new ProfileActivationFilePathInterpolator( new DefaultPathTranslator() ) );
 
         context.setProjectDirectory( new File( tempDir.toString() ) );
 
@@ -100,22 +102,19 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
 
     private Profile newExistsProfile( String filePath )
     {
-        ActivationFile activationFile = ActivationFile.newBuilder()
-                .exists( filePath ).build();
+        ActivationFile activationFile = ActivationFile.newBuilder().exists( filePath ).build();
         return newProfile( activationFile );
     }
 
     private Profile newMissingProfile( String filePath )
     {
-        ActivationFile activationFile = ActivationFile.newBuilder()
-                .missing( filePath ).build();
+        ActivationFile activationFile = ActivationFile.newBuilder().missing( filePath ).build();
         return newProfile( activationFile );
     }
 
     private Profile newProfile( ActivationFile activationFile )
     {
-        Activation activation = Activation.newBuilder()
-                .file( activationFile ).build();
+        Activation activation = Activation.newBuilder().file( activationFile ).build();
         return Profile.newBuilder().activation( activation ).build();
     }
 }

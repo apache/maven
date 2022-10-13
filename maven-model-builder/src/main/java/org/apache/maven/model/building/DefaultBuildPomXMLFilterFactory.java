@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,7 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
-
+package org.apache.maven.model.building;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -35,17 +33,16 @@ import org.apache.maven.model.transform.RelativeProject;
  * @author Robert Scholte
  * @since 4.0.0
  */
-public class DefaultBuildPomXMLFilterFactory extends BuildToRawPomXMLFilterFactory
+public class DefaultBuildPomXMLFilterFactory
+    extends BuildToRawPomXMLFilterFactory
 {
     private final TransformerContext context;
 
     /**
-     *
      * @param context a set of data to extract values from as required for the build pom
      * @param consume {@code true} if this factory is being used for creating the consumer pom, otherwise {@code false}
      */
-    public DefaultBuildPomXMLFilterFactory( TransformerContext context,
-                                            boolean consume )
+    public DefaultBuildPomXMLFilterFactory( TransformerContext context, boolean consume )
     {
         super( consume );
         this.context = context;
@@ -54,16 +51,15 @@ public class DefaultBuildPomXMLFilterFactory extends BuildToRawPomXMLFilterFacto
     @Override
     protected Function<Path, Optional<RelativeProject>> getRelativePathMapper()
     {
-        return p -> Optional.ofNullable( context.getRawModel( p ) )
-                .map( DefaultBuildPomXMLFilterFactory::toRelativeProject );
+        return p -> Optional.ofNullable( context.getRawModel( p ) ).map( DefaultBuildPomXMLFilterFactory::toRelativeProject );
     }
 
     @Override
     protected BiFunction<String, String, String> getDependencyKeyToVersionMapper()
     {
-        return ( g, a ) -> Optional.ofNullable( context.getRawModel( g, a ) )
-                            .map( DefaultBuildPomXMLFilterFactory::toVersion )
-                            .orElse( null );
+        return ( g,
+                 a ) -> Optional.ofNullable( context.getRawModel( g,
+                                                                  a ) ).map( DefaultBuildPomXMLFilterFactory::toVersion ).orElse( null );
     }
 
     @Override

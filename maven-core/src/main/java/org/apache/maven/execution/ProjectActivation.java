@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.execution;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,6 +60,7 @@ public class ProjectActivation
 
     /**
      * Adds a project activation to the request.
+     * 
      * @param selector The selector of the project.
      * @param active Should the project be activated?
      * @param optional Can the build continue if the project does not exist?
@@ -73,15 +73,12 @@ public class ProjectActivation
 
     private Stream<ProjectActivationSettings> getProjects( final Predicate<ActivationSettings> predicate )
     {
-        return this.activations.stream()
-                .filter( activation -> predicate.test( activation.activationSettings ) );
+        return this.activations.stream().filter( activation -> predicate.test( activation.activationSettings ) );
     }
 
     private Set<String> getProjectSelectors( final Predicate<ActivationSettings> predicate )
     {
-        return getProjects( predicate )
-                .map( activation -> activation.selector )
-                .collect( toSet() );
+        return getProjects( predicate ).map( activation -> activation.selector ).collect( toSet() );
     }
 
     /**
@@ -118,8 +115,9 @@ public class ProjectActivation
 
     /**
      * Mimics the pre-Maven 4 "selected projects" list.
+     * 
      * @deprecated Use {@link #getRequiredActiveProjectSelectors()} and {@link #getOptionalActiveProjectSelectors()}
-     * instead.
+     *             instead.
      */
     @Deprecated
     public List<String> getSelectedProjects()
@@ -129,8 +127,9 @@ public class ProjectActivation
 
     /**
      * Mimics the pre-Maven 4 "excluded projects" list.
+     * 
      * @deprecated Use {@link #getRequiredInactiveProjectSelectors()} and {@link #getOptionalInactiveProjectSelectors()}
-     * instead.
+     *             instead.
      */
     @Deprecated
     public List<String> getExcludedProjects()
@@ -140,6 +139,7 @@ public class ProjectActivation
 
     /**
      * Overwrites the active projects based on a pre-Maven 4 "active projects" list.
+     * 
      * @param activeProjectSelectors A {@link List} of project selectors that must be activated.
      * @deprecated Use {@link #activateOptionalProject(String)} or {@link #activateRequiredProject(String)} instead.
      */
@@ -153,6 +153,7 @@ public class ProjectActivation
 
     /**
      * Overwrites the inactive projects based on a pre-Maven 4 "inactive projects" list.
+     * 
      * @param inactiveProjectSelectors A {@link List} of project selectors that must be deactivated.
      * @deprecated Use {@link #deactivateOptionalProject(String)} or {@link #deactivateRequiredProject(String)} instead.
      */
@@ -166,6 +167,7 @@ public class ProjectActivation
 
     /**
      * Mark a project as required and activated.
+     * 
      * @param selector The selector of the project.
      */
     public void activateRequiredProject( String selector )
@@ -175,6 +177,7 @@ public class ProjectActivation
 
     /**
      * Mark a project as optional and activated.
+     * 
      * @param selector The selector of the project.
      */
     public void activateOptionalProject( String selector )
@@ -184,6 +187,7 @@ public class ProjectActivation
 
     /**
      * Mark a project as required and deactivated.
+     * 
      * @param selector The selector of the project.
      */
     public void deactivateRequiredProject( String selector )
@@ -193,6 +197,7 @@ public class ProjectActivation
 
     /**
      * Mark a project as optional and deactivated.
+     * 
      * @param selector The selector of the project.
      */
     public void deactivateOptionalProject( String selector )

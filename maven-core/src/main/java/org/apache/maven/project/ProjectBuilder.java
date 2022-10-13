@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.io.File;
 import java.util.List;
@@ -74,7 +73,6 @@ public interface ProjectBuilder
      * @param request The project building request that holds further parameters, must not be {@code null}.
      * @return The result of the project building, never {@code null}.
      * @throws ProjectBuildingException If the project descriptor could not be successfully built.
-     *
      * @see org.apache.maven.model.building.ModelSource2
      */
     ProjectBuildingResult build( ModelSource modelSource, ProjectBuildingRequest request )
@@ -84,8 +82,8 @@ public interface ProjectBuilder
      * Builds the projects for the specified POM files and optionally their children.
      *
      * @param pomFiles The POM files to build, must not be {@code null}.
-     * @param recursive {@code true} to recursively build submodules referenced by the POM files, {@code false} to
-     *            build only the specified POM files.
+     * @param recursive {@code true} to recursively build submodules referenced by the POM files, {@code false} to build
+     *            only the specified POM files.
      * @param request The project builder configuration that provides further parameters, must not be {@code null}.
      * @return The results of the project builder where each result corresponds to one project that was built, never
      *         {@code null}.

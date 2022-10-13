@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,11 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -25,10 +28,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -47,7 +46,6 @@ import org.apache.maven.repository.RepositorySystem;
 /**
  * @deprecated As of 3.2.2, and there is no direct replacement. This is an internal class which was not marked as such,
  *             but should have been.
- *
  */
 @Deprecated
 @Named
@@ -61,9 +59,8 @@ public class DefaultProjectDependenciesResolver
     private final ResolutionErrorHandler resolutionErrorHandler;
 
     @Inject
-    public DefaultProjectDependenciesResolver(
-            RepositorySystem repositorySystem,
-            ResolutionErrorHandler resolutionErrorHandler )
+    public DefaultProjectDependenciesResolver( RepositorySystem repositorySystem,
+                                               ResolutionErrorHandler resolutionErrorHandler )
     {
         this.repositorySystem = repositorySystem;
         this.resolutionErrorHandler = resolutionErrorHandler;
@@ -100,7 +97,6 @@ public class DefaultProjectDependenciesResolver
                             getIgnorableArtifacts( ignorableArtifacts ) );
     }
 
-
     private Set<Artifact> resolveImpl( Collection<? extends MavenProject> projects, Collection<String> scopesToCollect,
                                        Collection<String> scopesToResolve, MavenSession session,
                                        Set<String> projectIds )
@@ -120,36 +116,13 @@ public class DefaultProjectDependenciesResolver
         }
 
         /*
-
-        Logic for transitive global exclusions
-
-        List<String> exclusions = new ArrayList<String>();
-
-        for ( Dependency d : project.getDependencies() )
-        {
-            if ( d.getExclusions() != null )
-            {
-                for ( Exclusion e : d.getExclusions() )
-                {
-                    exclusions.add(  e.getGroupId() + ":" + e.getArtifactId() );
-                }
-            }
-        }
-
-        ArtifactFilter scopeFilter = new ScopeArtifactFilter( scope );
-
-        ArtifactFilter filter;
-
-        if ( ! exclusions.isEmpty() )
-        {
-            filter = new AndArtifactFilter( Arrays.asList( new ArtifactFilter[]{
-                new ExcludesArtifactFilter( exclusions ), scopeFilter } ) );
-        }
-        else
-        {
-            filter = scopeFilter;
-        }
-        */
+         * Logic for transitive global exclusions List<String> exclusions = new ArrayList<String>(); for ( Dependency d
+         * : project.getDependencies() ) { if ( d.getExclusions() != null ) { for ( Exclusion e : d.getExclusions() ) {
+         * exclusions.add( e.getGroupId() + ":" + e.getArtifactId() ); } } } ArtifactFilter scopeFilter = new
+         * ScopeArtifactFilter( scope ); ArtifactFilter filter; if ( ! exclusions.isEmpty() ) { filter = new
+         * AndArtifactFilter( Arrays.asList( new ArtifactFilter[]{ new ExcludesArtifactFilter( exclusions ), scopeFilter
+         * } ) ); } else { filter = scopeFilter; }
+         */
 
         CumulativeScopeArtifactFilter resolutionScopeFilter = new CumulativeScopeArtifactFilter( scopesToResolve );
 
@@ -157,10 +130,7 @@ public class DefaultProjectDependenciesResolver
         collectionScopeFilter = new CumulativeScopeArtifactFilter( collectionScopeFilter, resolutionScopeFilter );
 
         ArtifactResolutionRequest request =
-            new ArtifactResolutionRequest().setResolveRoot( false ).setResolveTransitively( true ).setCollectionFilter(
-                collectionScopeFilter ).setResolutionFilter( resolutionScopeFilter ).setLocalRepository(
-                session.getLocalRepository() ).setOffline( session.isOffline() ).setForceUpdate(
-                session.getRequest().isUpdateSnapshots() );
+            new ArtifactResolutionRequest().setResolveRoot( false ).setResolveTransitively( true ).setCollectionFilter( collectionScopeFilter ).setResolutionFilter( resolutionScopeFilter ).setLocalRepository( session.getLocalRepository() ).setOffline( session.isOffline() ).setForceUpdate( session.getRequest().isUpdateSnapshots() );
         request.setServers( session.getRequest().getServers() );
         request.setMirrors( session.getRequest().getMirrors() );
         request.setProxies( session.getRequest().getProxies() );
@@ -203,7 +173,6 @@ public class DefaultProjectDependenciesResolver
 
         return resolved;
     }
-
 
     private Set<String> getIgnorableArtifacts( Collection<? extends MavenProject> projects )
     {

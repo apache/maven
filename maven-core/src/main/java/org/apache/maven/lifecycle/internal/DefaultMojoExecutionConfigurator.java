@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,15 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.api.xml.Dom;
 import org.apache.maven.internal.xml.Xpp3Dom;
@@ -84,8 +83,8 @@ public class DefaultMojoExecutionConfigurator
                 pomConfiguration = plugin.getDelegate().getConfiguration();
             }
 
-            Dom mojoConfiguration = mojoExecution.getConfiguration() != null
-                    ? mojoExecution.getConfiguration().getDom() : null;
+            Dom mojoConfiguration =
+                mojoExecution.getConfiguration() != null ? mojoExecution.getConfiguration().getDom() : null;
 
             Dom mergedConfiguration = Xpp3Dom.merge( mojoConfiguration, pomConfiguration );
 
@@ -134,9 +133,8 @@ public class DefaultMojoExecutionConfigurator
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
         // in first step get parameter names of current goal
-        Set<String> parametersNamesGoal = mojoDescriptor.getParameters().stream()
-            .flatMap( this::getParameterNames )
-            .collect( Collectors.toSet() );
+        Set<String> parametersNamesGoal =
+            mojoDescriptor.getParameters().stream().flatMap( this::getParameterNames ).collect( Collectors.toSet() );
 
         Set<String> unknownParameters = getUnknownParameters( mojoExecution, parametersNamesGoal );
 
@@ -146,35 +144,26 @@ public class DefaultMojoExecutionConfigurator
         }
 
         // second step get parameter names of all plugin goals
-        Set<String> parametersNamesAll = mojoDescriptor.getPluginDescriptor().getMojos().stream()
-            .flatMap( m -> m.getParameters().stream() )
-            .flatMap( this::getParameterNames )
-            .collect( Collectors.toSet() );
+        Set<String> parametersNamesAll =
+            mojoDescriptor.getPluginDescriptor().getMojos().stream().flatMap( m -> m.getParameters().stream() ).flatMap( this::getParameterNames ).collect( Collectors.toSet() );
 
         unknownParameters = getUnknownParameters( mojoExecution, parametersNamesAll );
 
-        unknownParameters.forEach(
-            name ->
+        unknownParameters.forEach( name -> {
+            MessageBuilder messageBuilder =
+                MessageUtils.buffer().warning( "Parameter '" ).warning( name ).warning( "' is unknown for plugin '" ).warning( mojoExecution.getArtifactId() ).warning( ":" ).warning( mojoExecution.getVersion() ).warning( ":" ).warning( mojoExecution.getGoal() );
+
+            if ( mojoExecution.getExecutionId() != null )
             {
-                MessageBuilder messageBuilder = MessageUtils.buffer()
-                    .warning( "Parameter '" )
-                    .warning( name )
-                    .warning( "' is unknown for plugin '" )
-                    .warning( mojoExecution.getArtifactId() ).warning( ":" )
-                    .warning( mojoExecution.getVersion() ).warning( ":" )
-                    .warning( mojoExecution.getGoal() );
+                messageBuilder.warning( " (" );
+                messageBuilder.warning( mojoExecution.getExecutionId() );
+                messageBuilder.warning( ")" );
+            }
 
-                if ( mojoExecution.getExecutionId() != null )
-                {
-                    messageBuilder.warning( " (" );
-                    messageBuilder.warning( mojoExecution.getExecutionId() );
-                    messageBuilder.warning( ")" );
-                }
+            messageBuilder.warning( "'" );
 
-                messageBuilder.warning( "'" );
-
-                logger.warn( messageBuilder.toString() );
-            } );
+            logger.warn( messageBuilder.toString() );
+        } );
     }
 
     private Stream<String> getParameterNames( Parameter parameter )
@@ -191,10 +180,7 @@ public class DefaultMojoExecutionConfigurator
 
     private Set<String> getUnknownParameters( MojoExecution mojoExecution, Set<String> parameters )
     {
-        return stream( mojoExecution.getConfiguration().getChildren() )
-            .map( x -> x.getName() )
-            .filter( name -> !parameters.contains( name ) )
-            .collect( Collectors.toSet() );
+        return stream( mojoExecution.getConfiguration().getChildren() ).map( x -> x.getName() ).filter( name -> !parameters.contains( name ) ).collect( Collectors.toSet() );
     }
 
 }

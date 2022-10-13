@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.repository.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,11 +16,12 @@ package org.apache.maven.artifact.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.artifact.repository.ArtifactRepository;
+package org.apache.maven.artifact.repository.metadata;
 
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  * Metadata for the group directory of the repository.
@@ -65,15 +64,12 @@ public class GroupRepositoryMetadata
         return null;
     }
 
-    public void addPluginMapping( String goalPrefix,
-                                  String artifactId )
+    public void addPluginMapping( String goalPrefix, String artifactId )
     {
         addPluginMapping( goalPrefix, artifactId, artifactId );
     }
 
-    public void addPluginMapping( String goalPrefix,
-                                  String artifactId,
-                                  String name )
+    public void addPluginMapping( String goalPrefix, String artifactId, String name )
     {
         List<Plugin> plugins = getMetadata().getPlugins();
         boolean found = false;
@@ -91,7 +87,6 @@ public class GroupRepositoryMetadata
             plugin.setPrefix( goalPrefix );
             plugin.setArtifactId( artifactId );
             plugin.setName( name );
-
 
             getMetadata().addPlugin( plugin );
         }

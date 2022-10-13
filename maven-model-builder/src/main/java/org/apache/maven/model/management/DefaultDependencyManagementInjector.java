@@ -1,5 +1,3 @@
-package org.apache.maven.model.management;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,16 @@ package org.apache.maven.model.management;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.management;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
@@ -110,17 +109,15 @@ public class DefaultDependencyManagementInjector
         }
 
         @Override
-        protected void mergeDependency_Optional( Dependency.Builder builder,
-                                                 Dependency target, Dependency source, boolean sourceDominant,
-                                                 Map<Object, Object> context )
+        protected void mergeDependency_Optional( Dependency.Builder builder, Dependency target, Dependency source,
+                                                 boolean sourceDominant, Map<Object, Object> context )
         {
             // optional flag is not managed
         }
 
         @Override
-        protected void mergeDependency_Exclusions( Dependency.Builder builder,
-                                                   Dependency target, Dependency source, boolean sourceDominant,
-                                                   Map<Object, Object> context )
+        protected void mergeDependency_Exclusions( Dependency.Builder builder, Dependency target, Dependency source,
+                                                   boolean sourceDominant, Map<Object, Object> context )
         {
             List<Exclusion> tgt = target.getExclusions();
             if ( tgt.isEmpty() )

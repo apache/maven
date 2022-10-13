@@ -1,5 +1,3 @@
-package org.apache.maven.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,13 +16,13 @@ package org.apache.maven.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact;
 
 /**
- * Type safe reincarnation of Artifact scope. Also supplies the {@code DEFAULT_SCOPE} as well
- * as convenience method to deal with scope relationships.
+ * Type safe reincarnation of Artifact scope. Also supplies the {@code DEFAULT_SCOPE} as well as convenience method to
+ * deal with scope relationships.
  *
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
- *
  */
 
 public enum ArtifactScopeEnum
@@ -46,7 +44,6 @@ public enum ArtifactScopeEnum
         return id;
     }
 
-
     /**
      * Helper method to simplify null processing
      *
@@ -59,7 +56,6 @@ public enum ArtifactScopeEnum
     }
 
     /**
-     *
      * @return unsafe String representation of this scope.
      */
     public String getScope()
@@ -92,12 +88,9 @@ public enum ArtifactScopeEnum
         }
     }
 
-    private static final ArtifactScopeEnum [][][] COMPLIANCY_SETS = {
-          { { compile  }, { compile,                provided, system } }
-        , { { test     }, { compile, test,          provided, system } }
-        , { { runtime  }, { compile,       runtime,           system } }
-        , { { provided }, { compile, test,          provided         } }
-    };
+    private static final ArtifactScopeEnum[][][] COMPLIANCY_SETS =
+        { { { compile }, { compile, provided, system } }, { { test }, { compile, test, provided, system } },
+            { { runtime }, { compile, runtime, system } }, { { provided }, { compile, test, provided } } };
 
     /**
      * scope relationship function. Used by the graph conflict resolution policies

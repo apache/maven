@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.versioning;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.versioning;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.versioning;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.versioning;
 
 import java.util.List;
 
@@ -161,7 +160,8 @@ public class VersionRangeTest
     }
 
     @Test
-    public void testSameUpperAndLowerBoundRoundtrip() throws InvalidVersionSpecificationException
+    public void testSameUpperAndLowerBoundRoundtrip()
+        throws InvalidVersionSpecificationException
     {
         VersionRange range = VersionRange.createFromVersionSpec( "[1.0]" );
         VersionRange range2 = VersionRange.createFromVersionSpec( range.toString() );
@@ -194,8 +194,9 @@ public class VersionRangeTest
         VersionRange range1 = VersionRange.createFromVersionSpec( "1.0" );
         VersionRange range2 = VersionRange.createFromVersionSpec( "1.1" );
         VersionRange mergedRange = range1.restrict( range2 );
-        // TODO current policy is to retain the original version - is this correct, do we need strategies or is that handled elsewhere?
-//        assertEquals( "1.1", mergedRange.getRecommendedVersion().toString(), CHECK_VERSION_RECOMMENDATION );
+        // TODO current policy is to retain the original version - is this correct, do we need strategies or is that
+        // handled elsewhere?
+        // assertEquals( "1.1", mergedRange.getRecommendedVersion().toString(), CHECK_VERSION_RECOMMENDATION );
         assertEquals( "1.0", mergedRange.getRecommendedVersion().toString(), CHECK_VERSION_RECOMMENDATION );
         List<Restriction> restrictions = mergedRange.getRestrictions();
         assertEquals( 1, restrictions.size(), CHECK_NUM_RESTRICTIONS );
@@ -707,14 +708,13 @@ public class VersionRangeTest
 
     private void checkInvalidRange( String version )
     {
-        assertThrows(
-                InvalidVersionSpecificationException.class,
-                () -> VersionRange.createFromVersionSpec( version ),
-                "Version " + version + " should have failed to construct" );
+        assertThrows( InvalidVersionSpecificationException.class, () -> VersionRange.createFromVersionSpec( version ),
+                      "Version " + version + " should have failed to construct" );
     }
 
     @Test
-    public void testContains() throws InvalidVersionSpecificationException
+    public void testContains()
+        throws InvalidVersionSpecificationException
     {
         ArtifactVersion actualVersion = new DefaultArtifactVersion( "2.0.5" );
         assertTrue( enforceVersion( "2.0.5", actualVersion ) );
@@ -741,7 +741,8 @@ public class VersionRangeTest
     @Test
     public void testOrder0()
     {
-        // assertTrue( new DefaultArtifactVersion( "1.0-alpha10" ).compareTo( new DefaultArtifactVersion( "1.0-alpha1" ) ) > 0 );
+        // assertTrue( new DefaultArtifactVersion( "1.0-alpha10" ).compareTo( new DefaultArtifactVersion( "1.0-alpha1" )
+        // ) > 0 );
     }
 
     @Test
@@ -761,6 +762,7 @@ public class VersionRangeTest
         restrictions = version.getRestrictions();
         assertEquals( 0, restrictions.size(), CHECK_NUM_RESTRICTIONS );
 
-        assertFalse( spec.equals( version ), "check !VersionRange.createFromVersionSpec(x).equals(VersionRange.createFromVersion(x))" );
+        assertFalse( spec.equals( version ),
+                     "check !VersionRange.createFromVersionSpec(x).equals(VersionRange.createFromVersion(x))" );
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.settings.merge;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.settings.merge;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.settings.merge;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.merge;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,22 +60,20 @@ public class MavenSettingsMerger
 
         List<String> dominantActiveProfiles = dominant.getActiveProfiles();
         List<String> recessiveActiveProfiles = recessive.getActiveProfiles();
-        List<String> mergedActiveProfiles = Stream.of( dominantActiveProfiles, recessiveActiveProfiles )
-                    .flatMap( Collection::stream )
-                    .distinct()
-                    .collect( Collectors.toList() );
+        List<String> mergedActiveProfiles =
+            Stream.of( dominantActiveProfiles,
+                       recessiveActiveProfiles ).flatMap( Collection::stream ).distinct().collect( Collectors.toList() );
         merged.activeProfiles( mergedActiveProfiles );
 
         List<String> dominantPluginGroupIds = dominant.getPluginGroups();
         List<String> recessivePluginGroupIds = recessive.getPluginGroups();
-        List<String> mergedPluginGroupIds = Stream.of( dominantPluginGroupIds, recessivePluginGroupIds )
-                .flatMap( Collection::stream )
-                .distinct()
-                .collect( Collectors.toList() );
+        List<String> mergedPluginGroupIds =
+            Stream.of( dominantPluginGroupIds,
+                       recessivePluginGroupIds ).flatMap( Collection::stream ).distinct().collect( Collectors.toList() );
         merged.pluginGroups( mergedPluginGroupIds );
 
-        String localRepository = StringUtils.isEmpty( dominant.getLocalRepository() )
-                ? recessive.getLocalRepository() : dominant.getLocalRepository();
+        String localRepository = StringUtils.isEmpty( dominant.getLocalRepository() ) ? recessive.getLocalRepository()
+                        : dominant.getLocalRepository();
         merged.localRepository( localRepository );
 
         merged.mirrors( shallowMergeById( dominant.getMirrors(), recessive.getMirrors(), recessiveSourceLevel ) );
@@ -92,8 +89,8 @@ public class MavenSettingsMerger
      * @param recessive
      * @param recessiveSourceLevel
      */
-    private static <T extends IdentifiableBase> List<T> shallowMergeById(
-            List<T> dominant, List<T> recessive, String recessiveSourceLevel )
+    private static <T extends IdentifiableBase> List<T> shallowMergeById( List<T> dominant, List<T> recessive,
+                                                                          String recessiveSourceLevel )
     {
         Set<String> dominantIds = dominant.stream().map( IdentifiableBase::getId ).collect( Collectors.toSet() );
         final List<T> merged = new ArrayList<>( dominant.size() + recessive.size() );

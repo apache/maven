@@ -1,5 +1,3 @@
-package org.apache.maven.internal.aether;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.aether;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.internal.aether;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.aether;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -34,19 +33,21 @@ public class ConsumerModelSourceTransformerTest
     private ConsumerModelSourceTransformer transformer = new ConsumerModelSourceTransformer();
 
     @Test
-    public void transform() throws Exception
+    public void transform()
+        throws Exception
     {
-        Path beforePomFile = Paths.get( "src/test/resources/projects/transform/before.pom").toAbsolutePath();
-        Path afterPomFile = Paths.get( "src/test/resources/projects/transform/after.pom").toAbsolutePath();
+        Path beforePomFile = Paths.get( "src/test/resources/projects/transform/before.pom" ).toAbsolutePath();
+        Path afterPomFile = Paths.get( "src/test/resources/projects/transform/after.pom" ).toAbsolutePath();
 
-        try( InputStream expected = Files.newInputStream( afterPomFile );
-             InputStream result = transformer.transform( beforePomFile, new NoTransformerContext() ) )
+        try ( InputStream expected = Files.newInputStream( afterPomFile );
+                        InputStream result = transformer.transform( beforePomFile, new NoTransformerContext() ) )
         {
             XmlAssert.assertThat( result ).and( expected ).areIdentical();
         }
     }
 
-    private static class NoTransformerContext implements TransformerContext
+    private static class NoTransformerContext
+        implements TransformerContext
     {
         @Override
         public String getUserProperty( String key )

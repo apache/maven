@@ -1,5 +1,3 @@
-package org.apache.maven.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,36 +16,39 @@ package org.apache.maven.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.metadata;
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
 
 /**
- * metadata graph edge - combination of version, scope and depth define
- * an edge in the graph
+ * metadata graph edge - combination of version, scope and depth define an edge in the graph
  *
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
- *
  */
 
 public class MetadataGraphEdge
 {
-    String            version;
+    String version;
+
     ArtifactScopeEnum scope;
-    int               depth = -1;
-    int               pomOrder = -1;
-    boolean           resolved = true;
-    String            artifactUri;
+
+    int depth = -1;
+
+    int pomOrder = -1;
+
+    boolean resolved = true;
+
+    String artifactUri;
 
     /**
-     * capturing where this link came from
-     * and where it is linked to.
-     *
-     *   In the first implementation only source used for explanatory function
+     * capturing where this link came from and where it is linked to. In the first implementation only source used for
+     * explanatory function
      */
-    MetadataGraphVertex  source;
-    MetadataGraphVertex  target;
+    MetadataGraphVertex source;
 
-    //----------------------------------------------------------------------------
+    MetadataGraphVertex target;
+
+    // ----------------------------------------------------------------------------
     public MetadataGraphEdge( String version, boolean resolved, ArtifactScopeEnum scope, String artifactUri, int depth,
                               int pomOrder )
     {
@@ -59,7 +60,8 @@ public class MetadataGraphEdge
         this.resolved = resolved;
         this.pomOrder = pomOrder;
     }
-    //----------------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------------
     /**
      * helper for equals
      */
@@ -76,7 +78,7 @@ public class MetadataGraphEdge
         return o1.equals( o2 );
     }
 
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     /**
      * used to eliminate exact duplicates in the edge list
      */
@@ -89,14 +91,13 @@ public class MetadataGraphEdge
             MetadataGraphEdge e = (MetadataGraphEdge) o;
 
             return objectsEqual( version, e.version )
-                && ArtifactScopeEnum.checkScope( scope ).getScope().
-                    equals( ArtifactScopeEnum.checkScope( e.scope ).getScope() )
+                && ArtifactScopeEnum.checkScope( scope ).getScope().equals( ArtifactScopeEnum.checkScope( e.scope ).getScope() )
                 && depth == e.depth;
         }
         return false;
     }
 
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     public String getVersion()
     {
         return version;
@@ -186,6 +187,6 @@ public class MetadataGraphEdge
             + ") " + "version=" + version + ", scope=" + ( scope == null ? "null" : scope.getScope() ) + ", depth="
             + depth + "]";
     }
-    //----------------------------------------------------------------------------
-    //----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact;
 
 import java.io.File;
 import java.util.Collection;
@@ -128,25 +127,25 @@ public class DefaultArtifact
         if ( empty( groupId ) )
         {
             throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
-                "The groupId cannot be empty." );
+                                                  "The groupId cannot be empty." );
         }
 
         if ( artifactId == null )
         {
             throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
-                "The artifactId cannot be empty." );
+                                                  "The artifactId cannot be empty." );
         }
 
         if ( type == null )
         {
             throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
-                "The type cannot be empty." );
+                                                  "The type cannot be empty." );
         }
 
         if ( ( version == null ) && ( versionRange == null ) )
         {
             throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
-                "The version cannot be empty." );
+                                                  "The version cannot be empty." );
         }
     }
 
@@ -419,8 +418,8 @@ public class DefaultArtifact
                     if ( result == 0 )
                     {
                         // We don't consider the version range in the comparison, just the resolved version
-                        result = new DefaultArtifactVersion( version ).compareTo(
-                            new DefaultArtifactVersion( a.getVersion() ) );
+                        result =
+                            new DefaultArtifactVersion( version ).compareTo( new DefaultArtifactVersion( a.getVersion() ) );
                     }
                 }
             }

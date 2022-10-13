@@ -1,5 +1,3 @@
-package org.apache.maven.project.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.artifact;
 
 import java.util.Collection;
 import java.util.Set;
@@ -26,6 +25,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
+
 /**
  * Caches project artifacts. <strong>Warning:</strong> This is an internal utility interface that is only public for
  * technical reasons, it is not part of the public API. In particular, this interface can be changed or deleted without
@@ -80,9 +80,10 @@ public interface ProjectArtifactsCache
     }
 
     Key createKey( MavenProject project, Collection<String> scopesToCollect, Collection<String> scopesToResolve,
-        boolean aggregating, RepositorySystemSession session );
+                   boolean aggregating, RepositorySystemSession session );
 
-    CacheRecord get( Key key ) throws LifecycleExecutionException;
+    CacheRecord get( Key key )
+        throws LifecycleExecutionException;
 
     CacheRecord put( Key key, Set<Artifact> pluginArtifacts );
 

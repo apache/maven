@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,14 +26,15 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.services.RepositoryFactory;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.repository.RepositoryPolicy;
 
 @Named
 @Singleton
-public class DefaultRepositoryFactory implements RepositoryFactory
+public class DefaultRepositoryFactory
+    implements RepositoryFactory
 {
 
     private final RepositorySystem repositorySystem;
@@ -54,25 +54,20 @@ public class DefaultRepositoryFactory implements RepositoryFactory
     @Override
     public RemoteRepository createRemote( String id, String url )
     {
-        return new DefaultRemoteRepository(
-                new org.eclipse.aether.repository.RemoteRepository.Builder( id, "default", url )
-                        .build() );
+        return new DefaultRemoteRepository( new org.eclipse.aether.repository.RemoteRepository.Builder( id, "default",
+                                                                                                        url ).build() );
     }
 
     @Override
     public RemoteRepository createRemote( Repository repository )
-            throws IllegalArgumentException
+        throws IllegalArgumentException
     {
-        return new DefaultRemoteRepository(
-                new org.eclipse.aether.repository.RemoteRepository.Builder(
-                        repository.getId(), repository.getLayout(), repository.getUrl() )
-                        .setReleasePolicy( buildRepositoryPolicy( repository.getReleases() ) )
-                        .setSnapshotPolicy( buildRepositoryPolicy( repository.getSnapshots() ) )
-                        .build() );
+        return new DefaultRemoteRepository( new org.eclipse.aether.repository.RemoteRepository.Builder( repository.getId(),
+                                                                                                        repository.getLayout(),
+                                                                                                        repository.getUrl() ).setReleasePolicy( buildRepositoryPolicy( repository.getReleases() ) ).setSnapshotPolicy( buildRepositoryPolicy( repository.getSnapshots() ) ).build() );
     }
 
-    public static org.eclipse.aether.repository.RepositoryPolicy buildRepositoryPolicy(
-            org.apache.maven.api.model.RepositoryPolicy policy )
+    public static org.eclipse.aether.repository.RepositoryPolicy buildRepositoryPolicy( org.apache.maven.api.model.RepositoryPolicy policy )
     {
         boolean enabled = true;
         String updatePolicy = RepositoryPolicy.UPDATE_POLICY_DAILY;
@@ -89,7 +84,6 @@ public class DefaultRepositoryFactory implements RepositoryFactory
                 checksumPolicy = policy.getChecksumPolicy();
             }
         }
-        return new org.eclipse.aether.repository.RepositoryPolicy(
-                enabled, updatePolicy, checksumPolicy );
+        return new org.eclipse.aether.repository.RepositoryPolicy( enabled, updatePolicy, checksumPolicy );
     }
 }

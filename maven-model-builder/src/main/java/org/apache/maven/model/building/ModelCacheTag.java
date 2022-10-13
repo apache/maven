@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
@@ -130,6 +129,7 @@ interface ModelCacheTag<T>
 
     /**
      * The tag used for the file model without profile activation
+     * 
      * @since 4.0.0
      */
     ModelCacheTag<Model> FILE = new ModelCacheTag<Model>()

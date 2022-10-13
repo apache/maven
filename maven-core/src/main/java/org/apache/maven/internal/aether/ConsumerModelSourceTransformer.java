@@ -1,5 +1,3 @@
-package org.apache.maven.internal.aether;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.internal.aether;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.aether;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,13 +37,14 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 class ConsumerModelSourceTransformer
 {
     public InputStream transform( Path pomFile, TransformerContext context )
-            throws IOException, XmlPullParserException
+        throws IOException, XmlPullParserException
     {
         XmlStreamReader reader = ReaderFactory.newXmlReader( Files.newInputStream( pomFile ) );
         XmlPullParser parser = new MXParser( EntityReplacementMap.defaultEntityReplacementMap );
         parser.setInput( reader );
-        parser = new RawToConsumerPomXMLFilterFactory( new DefaultBuildPomXMLFilterFactory( context, true ) )
-                .get( parser, pomFile );
+        parser =
+            new RawToConsumerPomXMLFilterFactory( new DefaultBuildPomXMLFilterFactory( context, true ) ).get( parser,
+                                                                                                              pomFile );
 
         return XmlUtils.writeDocument( reader, parser );
     }

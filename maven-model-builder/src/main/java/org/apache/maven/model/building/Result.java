@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,16 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import static java.util.Collections.singleton;
-import static org.apache.maven.model.building.ModelProblem.Severity.ERROR;
-import static org.apache.maven.model.building.ModelProblem.Severity.FATAL;
+package org.apache.maven.model.building;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import static java.util.Collections.singleton;
+import static org.apache.maven.model.building.ModelProblem.Severity.ERROR;
+import static org.apache.maven.model.building.ModelProblem.Severity.FATAL;
 
 /**
  * There are various forms of results that are represented by this class:
@@ -109,11 +108,11 @@ public class Result<T>
 
     public static <T> Result<T> error( Result<?>... results )
     {
-        final List<ModelProblem> problemsList = new ArrayList<>( );
+        final List<ModelProblem> problemsList = new ArrayList<>();
 
         for ( Result<?> result1 : results )
         {
-            for ( ModelProblem modelProblem : result1.getProblems( ) )
+            for ( ModelProblem modelProblem : result1.getProblems() )
             {
                 problemsList.add( modelProblem );
             }
@@ -182,7 +181,7 @@ public class Result<T>
 
         for ( Result<?> result1 : results )
         {
-            for ( ModelProblem modelProblem : result1.getProblems( ) )
+            for ( ModelProblem modelProblem : result1.getProblems() )
             {
                 problemsList.add( modelProblem );
             }
@@ -215,7 +214,7 @@ public class Result<T>
                 hasErrors = true;
             }
         }
-        return new Result<>( hasErrors, ( Iterable<T> ) modelsList, problemsList );
+        return new Result<>( hasErrors, (Iterable<T>) modelsList, problemsList );
     }
 
     // helper to determine if problems contain error

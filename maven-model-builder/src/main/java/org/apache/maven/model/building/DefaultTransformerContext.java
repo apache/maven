@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model.building;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -28,11 +27,11 @@ import java.util.function.Supplier;
 import org.apache.maven.model.Model;
 
 /**
- *
  * @author Robert Scholte
  * @since 4.0.0
  */
-class DefaultTransformerContext implements TransformerContext
+class DefaultTransformerContext
+    implements TransformerContext
 {
     final Map<String, String> userProperties = new ConcurrentHashMap<>();
 
@@ -43,6 +42,7 @@ class DefaultTransformerContext implements TransformerContext
     public static class Holder
     {
         private volatile boolean set;
+
         private volatile Model model;
 
         Holder()
@@ -116,7 +116,9 @@ class DefaultTransformerContext implements TransformerContext
     static class GAKey
     {
         private final String groupId;
+
         private final String artifactId;
+
         private final int hashCode;
 
         GAKey( String groupId, String artifactId )

@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -35,9 +34,7 @@ import org.eclipse.aether.metadata.Metadata;
 import org.eclipse.aether.util.ConfigUtils;
 
 /**
- * Maven GA level metadata generator.
- *
- * Version metadata contains list of existing baseVersions within this GA.
+ * Maven GA level metadata generator. Version metadata contains list of existing baseVersions within this GA.
  */
 class VersionsMetadataGenerator
     implements MetadataGenerator

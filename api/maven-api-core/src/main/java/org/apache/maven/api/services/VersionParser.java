@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Version;
@@ -31,7 +30,8 @@ import org.apache.maven.api.annotations.Nonnull;
  * @since 4.0
  */
 @Experimental
-public interface VersionParser extends Service
+public interface VersionParser
+    extends Service
 {
     /**
      * Parses the specified version string, for example "1.0".
@@ -39,10 +39,11 @@ public interface VersionParser extends Service
      * @param version The version string to parse, must not be {@code null}.
      * @return The parsed version, never {@code null}.
      * @throws VersionParserException If the string violates the syntax rules of this scheme.
-     * @see org.apache.maven.api.Session#parseVersion(String) 
+     * @see org.apache.maven.api.Session#parseVersion(String)
      */
     @Nonnull
-    Version parseVersion( @Nonnull String version );
+    Version parseVersion( @Nonnull
+    String version );
 
     /**
      * Parses the specified version range specification, for example "[1.0,2.0)".
@@ -52,11 +53,13 @@ public interface VersionParser extends Service
      * @throws VersionParserException If the range specification violates the syntax rules of this scheme.
      */
     @Nonnull
-    VersionRange parseVersionRange( @Nonnull String range );
+    VersionRange parseVersionRange( @Nonnull
+    String range );
 
     /**
      * Checks whether a given artifact version is considered a {@code SNAPSHOT} or not.
      */
-    boolean isSnapshot( @Nonnull String version );
+    boolean isSnapshot( @Nonnull
+    String version );
 
 }

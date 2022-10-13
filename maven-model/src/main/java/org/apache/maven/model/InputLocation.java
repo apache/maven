@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import java.util.stream.Collectors;
 
@@ -31,19 +30,17 @@ public final class InputLocation
     implements java.io.Serializable, Cloneable, InputLocationTracker
 {
 
-      //--------------------------/
-     //- Class/Member Variables -/
-    //--------------------------/
+    // --------------------------/
+    // - Class/Member Variables -/
+    // --------------------------/
 
     /**
-     * The one-based line number. The value will be non-positive if
-     * unknown.
+     * The one-based line number. The value will be non-positive if unknown.
      */
     private int lineNumber = -1;
 
     /**
-     * The one-based column number. The value will be non-positive
-     * if unknown.
+     * The one-based column number. The value will be non-positive if unknown.
      */
     private int columnNumber = -1;
 
@@ -62,10 +59,9 @@ public final class InputLocation
      */
     private InputLocation location;
 
-
-      //----------------/
-     //- Constructors -/
-    //----------------/
+    // ----------------/
+    // - Constructors -/
+    // ----------------/
 
     public InputLocation( org.apache.maven.api.model.InputLocation location )
     {
@@ -73,28 +69,28 @@ public final class InputLocation
         this.columnNumber = location.getColumnNumber();
         this.source = location.getSource() != null ? new InputSource( location.getSource() ) : null;
         this.locations = location.getLocations().isEmpty() ? null
-                : location.getLocations().entrySet().stream().collect(
-                        Collectors.toMap( e -> e.getKey(),
-                                          e -> e.getValue() == location ? this : new InputLocation( e.getValue() ) ) );
+                        : location.getLocations().entrySet().stream().collect( Collectors.toMap( e -> e.getKey(),
+                                                                                                 e -> e.getValue() == location
+                                                                                                                 ? this
+                                                                                                                 : new InputLocation( e.getValue() ) ) );
     }
 
-    public InputLocation( int lineNumber, int columnNumber)
+    public InputLocation( int lineNumber, int columnNumber )
     {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
-    } //-- org.apache.maven.model.InputLocation(int, int)
+    } // -- org.apache.maven.model.InputLocation(int, int)
 
-    public InputLocation(int lineNumber, int columnNumber, InputSource source)
+    public InputLocation( int lineNumber, int columnNumber, InputSource source )
     {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
-    } //-- org.apache.maven.model.InputLocation(int, int, InputSource)
+    } // -- org.apache.maven.model.InputLocation(int, int, InputSource)
 
-
-      //-----------/
-     //- Methods -/
-    //-----------/
+    // -----------/
+    // - Methods -/
+    // -----------/
 
     /**
      * Method clone.
@@ -119,33 +115,29 @@ public final class InputLocation
             throw (RuntimeException) new UnsupportedOperationException( getClass().getName()
                 + " does not support clone()" ).initCause( ex );
         }
-    } //-- InputLocation clone()
+    } // -- InputLocation clone()
 
     /**
-     * Get the one-based column number. The value will be
-     * non-positive if unknown.
+     * Get the one-based column number. The value will be non-positive if unknown.
      * 
      * @return int
      */
     public int getColumnNumber()
     {
         return this.columnNumber;
-    } //-- int getColumnNumber()
+    } // -- int getColumnNumber()
 
     /**
-     * Get the one-based line number. The value will be
-     * non-positive if unknown.
+     * Get the one-based line number. The value will be non-positive if unknown.
      * 
      * @return int
      */
     public int getLineNumber()
     {
         return this.lineNumber;
-    } //-- int getLineNumber()
+    } // -- int getLineNumber()
 
     /**
-     * 
-     * 
      * @param key
      * @return InputLocation
      */
@@ -153,37 +145,33 @@ public final class InputLocation
     {
         if ( key instanceof String )
         {
-            switch ( ( String ) key )
+            switch ( (String) key )
             {
-                case "" :
+                case "":
                 {
                     return this.location;
                 }
-                default :
+                default:
                 {
                     return getOtherLocation( key );
                 }
-                }
             }
-            else
-            {
-                return getOtherLocation( key );
-            }
-    } //-- InputLocation getLocation( Object )
+        }
+        else
+        {
+            return getOtherLocation( key );
+        }
+    } // -- InputLocation getLocation( Object )
 
     /**
-     * 
-     * 
      * @return Map
      */
     public java.util.Map<Object, InputLocation> getLocations()
     {
         return locations;
-    } //-- java.util.Map<Object, InputLocation> getLocations()
+    } // -- java.util.Map<Object, InputLocation> getLocations()
 
     /**
-     * 
-     * 
      * @param key
      * @param location
      */
@@ -191,29 +179,27 @@ public final class InputLocation
     {
         if ( key instanceof String )
         {
-            switch ( ( String ) key )
+            switch ( (String) key )
             {
-                case "" :
+                case "":
                 {
                     this.location = location;
                     return;
                 }
-                default :
+                default:
                 {
                     setOtherLocation( key, location );
                     return;
                 }
-                }
             }
-            else
-            {
-                setOtherLocation( key, location );
-            }
-    } //-- void setLocation( Object, InputLocation )
+        }
+        else
+        {
+            setOtherLocation( key, location );
+        }
+    } // -- void setLocation( Object, InputLocation )
 
     /**
-     * 
-     * 
      * @param key
      * @param location
      */
@@ -227,18 +213,16 @@ public final class InputLocation
             }
             this.locations.put( key, location );
         }
-    } //-- void setOtherLocation( Object, InputLocation )
+    } // -- void setOtherLocation( Object, InputLocation )
 
     /**
-     * 
-     * 
      * @param key
      * @return InputLocation
      */
     private InputLocation getOtherLocation( Object key )
     {
         return ( locations != null ) ? locations.get( key ) : null;
-    } //-- InputLocation getOtherLocation( Object )
+    } // -- InputLocation getOtherLocation( Object )
 
     /**
      * Get the source field.
@@ -248,7 +232,7 @@ public final class InputLocation
     public InputSource getSource()
     {
         return this.source;
-    } //-- InputSource getSource()
+    } // -- InputSource getSource()
 
     /**
      * Method merge.
@@ -292,7 +276,7 @@ public final class InputLocation
         result.setLocations( locations );
 
         return result;
-    } //-- InputLocation merge( InputLocation, InputLocation, boolean )
+    } // -- InputLocation merge( InputLocation, InputLocation, boolean )
 
     /**
      * Method merge.
@@ -302,7 +286,8 @@ public final class InputLocation
      * @param source
      * @return InputLocation
      */
-    public static InputLocation merge( InputLocation target, InputLocation source, java.util.Collection<Integer> indices )
+    public static InputLocation merge( InputLocation target, InputLocation source,
+                                       java.util.Collection<Integer> indices )
     {
         if ( source == null )
         {
@@ -348,18 +333,15 @@ public final class InputLocation
         result.setLocations( locations );
 
         return result;
-    } //-- InputLocation merge( InputLocation, InputLocation, java.util.Collection )
+    } // -- InputLocation merge( InputLocation, InputLocation, java.util.Collection )
 
     /**
-     * 
-     * 
      * @param locations
      */
     public void setLocations( java.util.Map<Object, InputLocation> locations )
     {
         this.locations = locations;
-    } //-- void setLocations( java.util.Map )
-
+    } // -- void setLocations( java.util.Map )
 
     public org.apache.maven.api.model.InputLocation toApiLocation()
     {
@@ -367,32 +349,27 @@ public final class InputLocation
         {
             if ( locations.size() == 1 && locations.values().iterator().next() == this )
             {
-                return new org.apache.maven.api.model.InputLocation(
-                        lineNumber, columnNumber,
-                        source != null ? source.toApiSource() : null,
-                        locations.keySet().iterator().next() );
+                return new org.apache.maven.api.model.InputLocation( lineNumber, columnNumber,
+                                                                     source != null ? source.toApiSource() : null,
+                                                                     locations.keySet().iterator().next() );
             }
             else
             {
-                return new org.apache.maven.api.model.InputLocation(
-                        lineNumber, columnNumber,
-                        source != null ? source.toApiSource() : null );
+                return new org.apache.maven.api.model.InputLocation( lineNumber, columnNumber,
+                                                                     source != null ? source.toApiSource() : null );
             }
         }
         else
         {
-            return new org.apache.maven.api.model.InputLocation(
-                    lineNumber, columnNumber,
-                    source != null ? source.toApiSource() : null,
-                    locations != null ? locations.entrySet().stream().collect(
-                            Collectors.toMap( e -> e.getKey(), e -> e.getValue().toApiLocation() ) ) : null
-            );
+            return new org.apache.maven.api.model.InputLocation( lineNumber, columnNumber, source != null
+                            ? source.toApiSource()
+                            : null, locations != null ? locations.entrySet().stream().collect( Collectors.toMap( e -> e.getKey(), e -> e.getValue().toApiLocation() ) ) : null );
         }
     }
 
-      //-----------------/
-     //- Inner Classes -/
-    //-----------------/
+    // -----------------/
+    // - Inner Classes -/
+    // -----------------/
 
     /**
      * Class StringFormatter.
@@ -402,9 +379,9 @@ public final class InputLocation
     public abstract static class StringFormatter
     {
 
-          //-----------/
-         //- Methods -/
-        //-----------/
+        // -----------/
+        // - Methods -/
+        // -----------/
 
         /**
          * Method toString.
@@ -416,14 +393,10 @@ public final class InputLocation
 
     }
 
-    
-            
-
     @Override
     public String toString()
     {
         return getLineNumber() + " : " + getColumnNumber() + ", " + getSource();
     }
-            
-          
+
 }

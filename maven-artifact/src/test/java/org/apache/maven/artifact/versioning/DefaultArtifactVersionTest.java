@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.versioning;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.versioning;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.versioning;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.versioning;
 
 import org.junit.jupiter.api.Test;
 
@@ -41,10 +40,9 @@ public class DefaultArtifactVersionTest
                                       String qualifier )
     {
         ArtifactVersion artifactVersion = newArtifactVersion( version );
-        String parsed =
-            "'" + version + "' parsed as ('" + artifactVersion.getMajorVersion() + "', '"
-                + artifactVersion.getMinorVersion() + "', '" + artifactVersion.getIncrementalVersion() + "', '"
-                + artifactVersion.getBuildNumber() + "', '" + artifactVersion.getQualifier() + "'), ";
+        String parsed = "'" + version + "' parsed as ('" + artifactVersion.getMajorVersion() + "', '"
+            + artifactVersion.getMinorVersion() + "', '" + artifactVersion.getIncrementalVersion() + "', '"
+            + artifactVersion.getBuildNumber() + "', '" + artifactVersion.getQualifier() + "'), ";
         assertEquals( major, artifactVersion.getMajorVersion(), parsed + "check major version" );
         assertEquals( minor, artifactVersion.getMinorVersion(), parsed + "check minor version" );
         assertEquals( incremental, artifactVersion.getIncrementalVersion(), parsed + "check incremental version" );
@@ -136,7 +134,8 @@ public class DefaultArtifactVersionTest
         assertVersionOlder( "1.2.3-1", "1.2.3-10000000001" );
         assertVersionOlder( "2.3.0-v200706262000", "2.3.0-v200706262130" ); // org.eclipse:emf:2.3.0-v200706262000
         // org.eclipse.wst.common_core.feature_2.0.0.v200706041905-7C78EK9E_EkMNfNOd2d8qq
-        assertVersionOlder( "2.0.0.v200706041905-7C78EK9E_EkMNfNOd2d8qq", "2.0.0.v200706041906-7C78EK9E_EkMNfNOd2d8qq" );
+        assertVersionOlder( "2.0.0.v200706041905-7C78EK9E_EkMNfNOd2d8qq",
+                            "2.0.0.v200706041906-7C78EK9E_EkMNfNOd2d8qq" );
     }
 
     @Test
@@ -205,21 +204,17 @@ public class DefaultArtifactVersionTest
 
     private void assertVersionOlder( String left, String right )
     {
-        assertTrue(
-                newArtifactVersion( left ).compareTo( newArtifactVersion( right ) ) < 0,
-                left + " should be older than " + right );
-        assertTrue(
-                newArtifactVersion( right ).compareTo( newArtifactVersion( left ) ) > 0,
-                right + " should be newer than " + left );
+        assertTrue( newArtifactVersion( left ).compareTo( newArtifactVersion( right ) ) < 0,
+                    left + " should be older than " + right );
+        assertTrue( newArtifactVersion( right ).compareTo( newArtifactVersion( left ) ) > 0,
+                    right + " should be newer than " + left );
     }
 
     private void assertVersionEqual( String left, String right )
     {
-        assertTrue(
-                newArtifactVersion( left ).compareTo( newArtifactVersion( right ) ) == 0,
-                left + " should be equal to " + right );
-        assertTrue(
-                newArtifactVersion( right ).compareTo( newArtifactVersion( left ) ) == 0,
-                right + " should be equal to " + left );
+        assertTrue( newArtifactVersion( left ).compareTo( newArtifactVersion( right ) ) == 0,
+                    left + " should be equal to " + right );
+        assertTrue( newArtifactVersion( right ).compareTo( newArtifactVersion( left ) ) == 0,
+                    right + " should be equal to " + left );
     }
 }

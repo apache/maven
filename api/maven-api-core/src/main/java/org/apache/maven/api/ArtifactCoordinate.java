@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,14 +16,15 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * The {@code Coordinate} object is used to point to an {@link Artifact}
- * but the version may be specified as a range instead of an exact version.
+ * The {@code Coordinate} object is used to point to an {@link Artifact} but the version may be specified as a range
+ * instead of an exact version.
  *
  * @since 4.0
  */
@@ -79,11 +78,8 @@ public interface ArtifactCoordinate
      */
     default String getId()
     {
-        return getGroupId()
-                + ":" + getArtifactId()
-                + ":" + getExtension()
-                + ( getClassifier().isEmpty() ? "" : ":" + getClassifier() )
-                + ":" + getVersion();
+        return getGroupId() + ":" + getArtifactId() + ":" + getExtension()
+            + ( getClassifier().isEmpty() ? "" : ":" + getClassifier() ) + ":" + getVersion();
     }
 
 }

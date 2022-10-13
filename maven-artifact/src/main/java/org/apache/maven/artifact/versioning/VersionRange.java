@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.versioning;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.versioning;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,14 +16,15 @@ package org.apache.maven.artifact.versioning;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.versioning;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.Objects;
+import java.util.WeakHashMap;
 
 import org.apache.maven.artifact.Artifact;
 
@@ -36,18 +35,15 @@ import org.apache.maven.artifact.Artifact;
  */
 public class VersionRange
 {
-    private static final Map<String, VersionRange> CACHE_SPEC =
-        Collections.synchronizedMap( new WeakHashMap<>() );
+    private static final Map<String, VersionRange> CACHE_SPEC = Collections.synchronizedMap( new WeakHashMap<>() );
 
-    private static final Map<String, VersionRange> CACHE_VERSION =
-                    Collections.synchronizedMap( new WeakHashMap<>() );
+    private static final Map<String, VersionRange> CACHE_VERSION = Collections.synchronizedMap( new WeakHashMap<>() );
 
     private final ArtifactVersion recommendedVersion;
 
     private final List<Restriction> restrictions;
 
-    private VersionRange( ArtifactVersion recommendedVersion,
-                          List<Restriction> restrictions )
+    private VersionRange( ArtifactVersion recommendedVersion, List<Restriction> restrictions )
     {
         this.recommendedVersion = recommendedVersion;
         this.restrictions = restrictions;
@@ -169,8 +165,8 @@ public class VersionRange
         {
             if ( restrictions.size() > 0 )
             {
-                throw new InvalidVersionSpecificationException(
-                    "Only fully-qualified sets allowed in multiple set scenario: " + spec );
+                throw new InvalidVersionSpecificationException( "Only fully-qualified sets allowed in multiple set scenario: "
+                    + spec );
             }
             else
             {
@@ -251,32 +247,30 @@ public class VersionRange
     }
 
     /**
-     * Creates and returns a new <code>VersionRange</code> that is a restriction of this
-     * version range and the specified version range.
+     * Creates and returns a new <code>VersionRange</code> that is a restriction of this version range and the specified
+     * version range.
      * <p>
-     * Note: Precedence is given to the recommended version from this version range over the
-     * recommended version from the specified version range.
+     * Note: Precedence is given to the recommended version from this version range over the recommended version from
+     * the specified version range.
      * </p>
      *
-     * @param restriction the <code>VersionRange</code> that will be used to restrict this version
-     *                    range.
-     * @return the <code>VersionRange</code> that is a restriction of this version range and the
-     *         specified version range.
+     * @param restriction the <code>VersionRange</code> that will be used to restrict this version range.
+     * @return the <code>VersionRange</code> that is a restriction of this version range and the specified version
+     *         range.
      *         <p>
-     *         The restrictions of the returned version range will be an intersection of the restrictions
-     *         of this version range and the specified version range if both version ranges have
-     *         restrictions. Otherwise, the restrictions on the returned range will be empty.
+     *         The restrictions of the returned version range will be an intersection of the restrictions of this
+     *         version range and the specified version range if both version ranges have restrictions. Otherwise, the
+     *         restrictions on the returned range will be empty.
      *         </p>
      *         <p>
-     *         The recommended version of the returned version range will be the recommended version of
-     *         this version range, provided that ranges falls within the intersected restrictions. If
-     *         the restrictions are empty, this version range's recommended version is used if it is not
-     *         <code>null</code>. If it is <code>null</code>, the specified version range's recommended
-     *         version is used (provided it is non-<code>null</code>). If no recommended version can be
-     *         obtained, the returned version range's recommended version is set to <code>null</code>.
+     *         The recommended version of the returned version range will be the recommended version of this version
+     *         range, provided that ranges falls within the intersected restrictions. If the restrictions are empty,
+     *         this version range's recommended version is used if it is not <code>null</code>. If it is
+     *         <code>null</code>, the specified version range's recommended version is used (provided it is
+     *         non-<code>null</code>). If no recommended version can be obtained, the returned version range's
+     *         recommended version is set to <code>null</code>.
      *         </p>
-     * @throws NullPointerException if the specified <code>VersionRange</code> is
-     *                              <code>null</code>.
+     * @throws NullPointerException if the specified <code>VersionRange</code> is <code>null</code>.
      */
     public VersionRange restrict( VersionRange restriction )
     {
@@ -324,12 +318,10 @@ public class VersionRange
             // original recommended version
             version = restriction.recommendedVersion;
         }
-/* TODO should throw this immediately, but need artifact
-        else
-        {
-            throw new OverConstrainedVersionException( "Restricting incompatible version ranges" );
-        }
-*/
+        /*
+         * TODO should throw this immediately, but need artifact else { throw new OverConstrainedVersionException(
+         * "Restricting incompatible version ranges" ); }
+         */
 
         return new VersionRange( version, restrictions );
     }
@@ -427,7 +419,7 @@ public class VersionRange
                         restrictions.add( new Restriction( lower, lowerInclusive, upper, upperInclusive ) );
                     }
 
-                    //noinspection ObjectEquality
+                    // noinspection ObjectEquality
                     if ( upper == res2.getUpperBound() )
                     {
                         // advance res2

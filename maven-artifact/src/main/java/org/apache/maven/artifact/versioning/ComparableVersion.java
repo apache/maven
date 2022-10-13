@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.versioning;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.versioning;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.versioning;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.versioning;
 
 import java.math.BigInteger;
 import java.util.ArrayDeque;
@@ -33,26 +32,25 @@ import java.util.Properties;
  * <p>
  * Generic implementation of version comparison.
  * </p>
- *
  * Features:
  * <ul>
  * <li>mixing of '<code>-</code>' (hyphen) and '<code>.</code>' (dot) separators,</li>
  * <li>transition between characters and digits also constitutes a separator:
- *     <code>1.0alpha1 =&gt; [1, 0, alpha, 1]</code></li>
+ * <code>1.0alpha1 =&gt; [1, 0, alpha, 1]</code></li>
  * <li>unlimited number of version components,</li>
  * <li>version components in the text can be digits or strings,</li>
- * <li>strings are checked for well-known qualifiers and the qualifier ordering is used for version ordering.
- *     Well-known qualifiers (case insensitive) are:<ul>
- *     <li><code>alpha</code> or <code>a</code></li>
- *     <li><code>beta</code> or <code>b</code></li>
- *     <li><code>milestone</code> or <code>m</code></li>
- *     <li><code>rc</code> or <code>cr</code></li>
- *     <li><code>snapshot</code></li>
- *     <li><code>(the empty string)</code> or <code>ga</code> or <code>final</code></li>
- *     <li><code>sp</code></li>
- *     </ul>
- *     Unknown qualifiers are considered after known qualifiers, with lexical order (always case insensitive),
- *   </li>
+ * <li>strings are checked for well-known qualifiers and the qualifier ordering is used for version ordering. Well-known
+ * qualifiers (case insensitive) are:
+ * <ul>
+ * <li><code>alpha</code> or <code>a</code></li>
+ * <li><code>beta</code> or <code>b</code></li>
+ * <li><code>milestone</code> or <code>m</code></li>
+ * <li><code>rc</code> or <code>cr</code></li>
+ * <li><code>snapshot</code></li>
+ * <li><code>(the empty string)</code> or <code>ga</code> or <code>final</code></li>
+ * <li><code>sp</code></li>
+ * </ul>
+ * Unknown qualifiers are considered after known qualifiers, with lexical order (always case insensitive),</li>
  * <li>a hyphen usually precedes a qualifier, and is always less important than something preceded with a dot.</li>
  * </ul>
  *
@@ -76,9 +74,13 @@ public class ComparableVersion
     private interface Item
     {
         int INT_ITEM = 3;
+
         int LONG_ITEM = 4;
+
         int BIGINTEGER_ITEM = 0;
+
         int STRING_ITEM = 1;
+
         int LIST_ITEM = 2;
 
         int compareTo( Item item );
@@ -354,7 +356,7 @@ public class ComparableVersion
         implements Item
     {
         private static final List<String> QUALIFIERS =
-                Arrays.asList( "alpha", "beta", "milestone", "rc", "snapshot", "", "sp"  );
+            Arrays.asList( "alpha", "beta", "milestone", "rc", "snapshot", "", "sp" );
 
         private static final Properties ALIASES = new Properties();
         static
@@ -392,7 +394,7 @@ public class ComparableVersion
                     default:
                 }
             }
-            this.value = ALIASES.getProperty( value , value );
+            this.value = ALIASES.getProperty( value, value );
         }
 
         @Override
@@ -408,14 +410,11 @@ public class ComparableVersion
         }
 
         /**
-         * Returns a comparable value for a qualifier.
-         *
-         * This method takes into account the ordering of known qualifiers then unknown qualifiers with lexical
-         * ordering.
-         *
-         * just returning an Integer with the index here is faster, but requires a lot of if/then/else to check for -1
-         * or QUALIFIERS.size and then resort to lexical ordering. Most comparisons are decided by the first character,
-         * so this is still fast. If more characters are needed then it requires a lexical sort anyway.
+         * Returns a comparable value for a qualifier. This method takes into account the ordering of known qualifiers
+         * then unknown qualifiers with lexical ordering. just returning an Integer with the index here is faster, but
+         * requires a lot of if/then/else to check for -1 or QUALIFIERS.size and then resort to lexical ordering. Most
+         * comparisons are decided by the first character, so this is still fast. If more characters are needed then it
+         * requires a lexical sort anyway.
          *
          * @param qualifier
          * @return an equivalent value that can be used with lexical comparison
@@ -606,7 +605,7 @@ public class ComparableVersion
                 }
                 if ( item instanceof ListItem )
                 {
-                    buffer.append( ( (ListItem ) item ).toListString() );
+                    buffer.append( ( (ListItem) item ).toListString() );
                 }
                 else
                 {
@@ -787,8 +786,13 @@ public class ComparableVersion
      * Main to test version parsing and comparison.
      * <p>
      * To check how "1.2.7" compares to "1.2-SNAPSHOT", for example, you can issue
-     * <pre>java -jar ${maven.repo.local}/org/apache/maven/maven-artifact/${maven.version}/maven-artifact-${maven.version}.jar "1.2.7" "1.2-SNAPSHOT"</pre>
+     * 
+     * <pre>
+     * java -jar ${maven.repo.local}/org/apache/maven/maven-artifact/${maven.version}/maven-artifact-${maven.version}.jar "1.2.7" "1.2-SNAPSHOT"
+     * </pre>
+     * 
      * command to command line. Result of given command will be something like this:
+     * 
      * <pre>
      * Display parameters as parsed by Maven (in canonical form) and comparison result:
      * 1. 1.2.7 == 1.2.7
@@ -797,13 +801,13 @@ public class ComparableVersion
      * </pre>
      *
      * @param args the version strings to parse and compare. You can pass arbitrary number of version strings and always
-     * two adjacent will be compared
+     *            two adjacent will be compared
      */
     // CHECKSTYLE_ON: LineLength
     public static void main( String... args )
     {
         System.out.println( "Display parameters as parsed by Maven (in canonical form and as a list of tokens) and"
-                                + " comparison result:" );
+            + " comparison result:" );
         if ( args.length == 0 )
         {
             return;
@@ -822,8 +826,8 @@ public class ComparableVersion
                     + ( ( compare == 0 ) ? "==" : ( ( compare < 0 ) ? "<" : ">" ) ) + ' ' + version );
             }
 
-            System.out.println( ( i++ ) + ". " + version + " -> " + c.getCanonical()
-                                    + "; tokens: " + c.items.toListString() );
+            System.out.println( ( i++ ) + ". " + version + " -> " + c.getCanonical() + "; tokens: "
+                + c.items.toListString() );
 
             prev = c;
         }

@@ -1,5 +1,3 @@
-package org.apache.maven.settings;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.settings;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.settings;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,10 +79,8 @@ public final class SettingsUtils
 
             if ( modelProp != null )
             {
-                ActivationProperty prop = ActivationProperty.newBuilder()
-                                .name( modelProp.getName() )
-                                .value( modelProp.getValue() )
-                                .build();
+                ActivationProperty prop =
+                    ActivationProperty.newBuilder().name( modelProp.getName() ).value( modelProp.getValue() ).build();
                 activation.property( prop );
             }
 
@@ -91,12 +88,8 @@ public final class SettingsUtils
 
             if ( modelOs != null )
             {
-                ActivationOS os = ActivationOS.newBuilder()
-                                .arch( modelOs.getArch() )
-                                .family( modelOs.getFamily() )
-                                .name( modelOs.getName() )
-                                .version( modelOs.getVersion() )
-                                .build();
+                ActivationOS os =
+                    ActivationOS.newBuilder().arch( modelOs.getArch() ).family( modelOs.getFamily() ).name( modelOs.getName() ).version( modelOs.getVersion() ).build();
 
                 activation.os( os );
             }
@@ -105,11 +98,8 @@ public final class SettingsUtils
 
             if ( modelFile != null )
             {
-                org.apache.maven.api.settings.ActivationFile file
-                        = org.apache.maven.api.settings.ActivationFile.newBuilder()
-                                .exists( modelFile.getExists() )
-                                .missing( modelFile.getMissing() )
-                                .build();
+                org.apache.maven.api.settings.ActivationFile file =
+                    org.apache.maven.api.settings.ActivationFile.newBuilder().exists( modelFile.getExists() ).missing( modelFile.getMissing() ).build();
 
                 activation.file( file );
             }
@@ -117,8 +107,8 @@ public final class SettingsUtils
             profile.activation( activation.build() );
         }
 
-        profile.properties( modelProfile.getProperties().entrySet().stream()
-                .collect( Collectors.toMap( e -> e.getKey().toString(), e -> e.getValue().toString() ) ) );
+        profile.properties( modelProfile.getProperties().entrySet().stream().collect( Collectors.toMap( e -> e.getKey().toString(),
+                                                                                                        e -> e.getValue().toString() ) ) );
 
         List<org.apache.maven.model.Repository> repos = modelProfile.getRepositories();
         if ( repos != null )
@@ -159,8 +149,8 @@ public final class SettingsUtils
 
         if ( settingsActivation != null )
         {
-            org.apache.maven.api.model.Activation.Builder activation
-                    = org.apache.maven.api.model.Activation.newBuilder();
+            org.apache.maven.api.model.Activation.Builder activation =
+                org.apache.maven.api.model.Activation.newBuilder();
 
             activation.activeByDefault( settingsActivation.isActiveByDefault() );
 
@@ -169,30 +159,19 @@ public final class SettingsUtils
             ActivationProperty settingsProp = settingsActivation.getProperty();
             if ( settingsProp != null )
             {
-                activation.property( org.apache.maven.api.model.ActivationProperty.newBuilder()
-                        .name( settingsProp.getName() )
-                        .value( settingsProp.getValue() )
-                        .build() );
+                activation.property( org.apache.maven.api.model.ActivationProperty.newBuilder().name( settingsProp.getName() ).value( settingsProp.getValue() ).build() );
             }
 
             ActivationOS settingsOs = settingsActivation.getOs();
             if ( settingsOs != null )
             {
-                activation.os( org.apache.maven.api.model.ActivationOS.newBuilder()
-                        .arch( settingsOs.getArch() )
-                        .family( settingsOs.getFamily() )
-                        .name( settingsOs.getName() )
-                        .version( settingsOs.getVersion() )
-                        .build() );
+                activation.os( org.apache.maven.api.model.ActivationOS.newBuilder().arch( settingsOs.getArch() ).family( settingsOs.getFamily() ).name( settingsOs.getName() ).version( settingsOs.getVersion() ).build() );
             }
 
             org.apache.maven.api.settings.ActivationFile settingsFile = settingsActivation.getFile();
             if ( settingsFile != null )
             {
-                activation.file( ActivationFile.newBuilder()
-                        .exists( settingsFile.getExists() )
-                        .missing( settingsFile.getMissing() )
-                        .build() );
+                activation.file( ActivationFile.newBuilder().exists( settingsFile.getExists() ).missing( settingsFile.getMissing() ).build() );
             }
 
             profile.activation( activation.build() );
@@ -203,17 +182,13 @@ public final class SettingsUtils
         List<Repository> repos = settingsProfile.getRepositories();
         if ( repos != null )
         {
-            profile.repositories( repos.stream()
-                    .map( SettingsUtils::convertFromSettingsRepository )
-                    .collect( Collectors.toList() ) );
+            profile.repositories( repos.stream().map( SettingsUtils::convertFromSettingsRepository ).collect( Collectors.toList() ) );
         }
 
         List<Repository> pluginRepos = settingsProfile.getPluginRepositories();
         if ( pluginRepos != null )
         {
-            profile.pluginRepositories( pluginRepos.stream()
-                    .map( SettingsUtils::convertFromSettingsRepository )
-                    .collect( Collectors.toList() ) );
+            profile.pluginRepositories( pluginRepos.stream().map( SettingsUtils::convertFromSettingsRepository ).collect( Collectors.toList() ) );
         }
 
         org.apache.maven.model.Profile value = new org.apache.maven.model.Profile( profile.build() );
@@ -250,14 +225,10 @@ public final class SettingsUtils
      * @param settingsPolicy
      * @return a RepositoryPolicy
      */
-    private static org.apache.maven.api.model.RepositoryPolicy convertRepositoryPolicy(
-            RepositoryPolicy settingsPolicy )
+    private static org.apache.maven.api.model.RepositoryPolicy convertRepositoryPolicy( RepositoryPolicy settingsPolicy )
     {
-        org.apache.maven.api.model.RepositoryPolicy policy = org.apache.maven.api.model.RepositoryPolicy.newBuilder()
-                .enabled( Boolean.toString( settingsPolicy.isEnabled() ) )
-                .updatePolicy( settingsPolicy.getUpdatePolicy() )
-                .checksumPolicy( settingsPolicy.getChecksumPolicy() )
-                .build();
+        org.apache.maven.api.model.RepositoryPolicy policy =
+            org.apache.maven.api.model.RepositoryPolicy.newBuilder().enabled( Boolean.toString( settingsPolicy.isEnabled() ) ).updatePolicy( settingsPolicy.getUpdatePolicy() ).checksumPolicy( settingsPolicy.getChecksumPolicy() ).build();
         return policy;
     }
 
@@ -267,16 +238,12 @@ public final class SettingsUtils
      */
     private static Repository convertToSettingsRepository( org.apache.maven.model.Repository modelRepo )
     {
-        Repository repo = Repository.newBuilder()
-                        .id( modelRepo.getId() )
-                        .layout( modelRepo.getLayout() )
-                        .name( modelRepo.getName() )
-                        .url( modelRepo.getUrl() )
-                        .snapshots( modelRepo.getSnapshots() != null
-                                ? convertRepositoryPolicy( modelRepo.getSnapshots() ) : null )
-                        .releases( modelRepo.getReleases() != null
-                                ? convertRepositoryPolicy( modelRepo.getReleases() ) : null )
-                        .build();
+        Repository repo =
+            Repository.newBuilder().id( modelRepo.getId() ).layout( modelRepo.getLayout() ).name( modelRepo.getName() ).url( modelRepo.getUrl() ).snapshots( modelRepo.getSnapshots() != null
+                            ? convertRepositoryPolicy( modelRepo.getSnapshots() )
+                            : null ).releases( modelRepo.getReleases() != null
+                                            ? convertRepositoryPolicy( modelRepo.getReleases() )
+                                            : null ).build();
 
         return repo;
     }
@@ -287,11 +254,8 @@ public final class SettingsUtils
      */
     private static RepositoryPolicy convertRepositoryPolicy( org.apache.maven.model.RepositoryPolicy modelPolicy )
     {
-        RepositoryPolicy policy = RepositoryPolicy.newBuilder()
-                        .enabled( modelPolicy.isEnabled() )
-                        .updatePolicy( modelPolicy.getUpdatePolicy() )
-                        .checksumPolicy( modelPolicy.getUpdatePolicy() )
-                        .build();
+        RepositoryPolicy policy =
+            RepositoryPolicy.newBuilder().enabled( modelPolicy.isEnabled() ).updatePolicy( modelPolicy.getUpdatePolicy() ).checksumPolicy( modelPolicy.getUpdatePolicy() ).build();
         return policy;
     }
 

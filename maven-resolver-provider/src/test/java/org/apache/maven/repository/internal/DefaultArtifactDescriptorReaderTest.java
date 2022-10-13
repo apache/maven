@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.lang.reflect.Field;
 
@@ -44,7 +43,8 @@ public class DefaultArtifactDescriptorReaderTest
         throws Exception
     {
         // prepare
-        DefaultArtifactDescriptorReader reader = (DefaultArtifactDescriptorReader) getContainer().lookup( ArtifactDescriptorReader.class );
+        DefaultArtifactDescriptorReader reader =
+            (DefaultArtifactDescriptorReader) getContainer().lookup( ArtifactDescriptorReader.class );
 
         RepositoryEventDispatcher eventDispatcher = mock( RepositoryEventDispatcher.class );
 
@@ -68,15 +68,17 @@ public class DefaultArtifactDescriptorReaderTest
 
         boolean missingArtifactDescriptor = false;
 
-        for( RepositoryEvent evt : event.getAllValues() )
+        for ( RepositoryEvent evt : event.getAllValues() )
         {
             if ( EventType.ARTIFACT_DESCRIPTOR_MISSING.equals( evt.getType() ) )
             {
-                assertEquals( "Could not find artifact org.apache.maven.its:dep-mng5459:pom:0.4.0-20130404.090532-2 in repo (" + newTestRepository().getUrl() + ")", evt.getException().getMessage() );
+                assertEquals( "Could not find artifact org.apache.maven.its:dep-mng5459:pom:0.4.0-20130404.090532-2 in repo ("
+                    + newTestRepository().getUrl() + ")", evt.getException().getMessage() );
                 missingArtifactDescriptor = true;
             }
         }
 
-        assertTrue( missingArtifactDescriptor, "Expected missing artifact descriptor for org.apache.maven.its:dep-mng5459:pom:0.4.0-20130404.090532-2" );
+        assertTrue( missingArtifactDescriptor,
+                    "Expected missing artifact descriptor for org.apache.maven.its:dep-mng5459:pom:0.4.0-20130404.090532-2" );
     }
 }

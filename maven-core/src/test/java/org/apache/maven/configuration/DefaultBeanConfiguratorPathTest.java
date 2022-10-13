@@ -1,5 +1,3 @@
-package org.apache.maven.configuration;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.configuration;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.configuration;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +25,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.maven.configuration.internal.DefaultBeanConfigurator;
-import org.apache.maven.configuration.internal.EnhancedComponentConfigurator;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -94,8 +92,7 @@ public class DefaultBeanConfiguratorPathTest
 
         Xpp3Dom config = toConfig( "<file>${test}</file>" );
 
-        BeanConfigurationValuePreprocessor preprocessor = ( value, type ) ->
-        {
+        BeanConfigurationValuePreprocessor preprocessor = ( value, type ) -> {
             if ( value != null && value.startsWith( "${" ) && value.endsWith( "}" ) )
             {
                 return value.substring( 2, value.length() - 1 );

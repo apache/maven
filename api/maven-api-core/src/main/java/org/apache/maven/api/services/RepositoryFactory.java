@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import java.nio.file.Path;
 
@@ -34,16 +33,21 @@ import org.apache.maven.api.model.Repository;
  * @since 4.0
  */
 @Experimental
-public interface RepositoryFactory extends Service
+public interface RepositoryFactory
+    extends Service
 {
 
     @Nonnull
-    LocalRepository createLocal( @Nonnull Path path );
+    LocalRepository createLocal( @Nonnull
+    Path path );
 
     @Nonnull
-    RemoteRepository createRemote( @Nonnull String id, @Nonnull String url );
+    RemoteRepository createRemote( @Nonnull
+    String id, @Nonnull
+    String url );
 
     @Nonnull
-    RemoteRepository createRemote( @Nonnull Repository repository );
+    RemoteRepository createRemote( @Nonnull
+    Repository repository );
 
 }

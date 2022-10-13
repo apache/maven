@@ -1,5 +1,3 @@
-package org.apache.maven.model.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,10 @@ package org.apache.maven.model.io;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.io;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,9 +28,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
 import java.util.Objects;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.api.model.Model;
 import org.apache.maven.model.v4.MavenXpp3Writer;
@@ -91,21 +90,22 @@ public class DefaultModelWriter
     }
 
     @Override
-    public void write( File output, Map<String, Object> options, org.apache.maven.model.Model model ) throws IOException
+    public void write( File output, Map<String, Object> options, org.apache.maven.model.Model model )
+        throws IOException
     {
         write( output, options, model.getDelegate() );
     }
 
     @Override
     public void write( Writer output, Map<String, Object> options, org.apache.maven.model.Model model )
-            throws IOException
+        throws IOException
     {
         write( output, options, model.getDelegate() );
     }
 
     @Override
     public void write( OutputStream output, Map<String, Object> options, org.apache.maven.model.Model model )
-            throws IOException
+        throws IOException
     {
         write( output, options, model.getDelegate() );
     }

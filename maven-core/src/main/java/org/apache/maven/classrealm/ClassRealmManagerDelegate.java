@@ -1,5 +1,3 @@
-package org.apache.maven.classrealm;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,12 @@ package org.apache.maven.classrealm;
  * specific language governing permissions and limitations
  * under the License.
  */
-
+package org.apache.maven.classrealm;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
- * ClassRealmManagerDelegate is used to perform addition configuration of
- * class realms created by ClassRealmManager.
+ * ClassRealmManagerDelegate is used to perform addition configuration of class realms created by ClassRealmManager.
  *
  * @author igor
  */

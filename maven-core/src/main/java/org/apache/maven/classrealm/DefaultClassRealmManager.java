@@ -1,5 +1,3 @@
-package org.apache.maven.classrealm;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,11 @@ package org.apache.maven.classrealm;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.classrealm;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -30,10 +33,6 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
@@ -92,8 +91,7 @@ public class DefaultClassRealmManager
     private final Set<String> providedArtifacts;
 
     @Inject
-    public DefaultClassRealmManager( PlexusContainer container,
-                                     List<ClassRealmManagerDelegate> delegates,
+    public DefaultClassRealmManager( PlexusContainer container, List<ClassRealmManagerDelegate> delegates,
                                      CoreExports exports )
     {
         this.world = ( (MutablePlexusContainer) container ).getClassWorld();
@@ -102,9 +100,8 @@ public class DefaultClassRealmManager
 
         Map<String, ClassLoader> foreignImports = exports.getExportedPackages();
 
-        this.mavenApiRealm =
-            createRealm( API_REALMID, RealmType.Core, null /* parent */, null /* parentImports */,
-                         foreignImports, null /* artifacts */ );
+        this.mavenApiRealm = createRealm( API_REALMID, RealmType.Core, null /* parent */, null /* parentImports */,
+                                          foreignImports, null /* artifacts */ );
 
         this.providedArtifacts = exports.getExportedArtifacts();
     }
@@ -244,11 +241,10 @@ public class DefaultClassRealmManager
     {
         Objects.requireNonNull( plugin, "plugin cannot be null" );
 
-        Map<String, ClassLoader> foreignImports =
-            Collections.singletonMap( "", getMavenApiRealm() );
+        Map<String, ClassLoader> foreignImports = Collections.singletonMap( "", getMavenApiRealm() );
 
-        return createRealm( getKey( plugin, true ), RealmType.Extension, PARENT_CLASSLOADER, null,
-                foreignImports, artifacts );
+        return createRealm( getKey( plugin, true ), RealmType.Extension, PARENT_CLASSLOADER, null, foreignImports,
+                            artifacts );
     }
 
     private boolean isProvidedArtifact( Artifact artifact )

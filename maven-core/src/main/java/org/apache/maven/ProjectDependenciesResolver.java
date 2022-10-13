@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
 
 import java.util.Collection;
 import java.util.Set;
@@ -32,7 +31,6 @@ import org.apache.maven.project.MavenProject;
  * @deprecated As of 3.2.2, and there is no direct replacement. This is an internal class which was not marked as such,
  *             but should have been.
  * @author jvanzyl
- *
  */
 @Deprecated
 public interface ProjectDependenciesResolver
@@ -41,9 +39,9 @@ public interface ProjectDependenciesResolver
     /**
      * Resolves the transitive dependencies of the specified project.
      *
-     * @param project         The project whose dependencies should be resolved, must not be {@code null}.
+     * @param project The project whose dependencies should be resolved, must not be {@code null}.
      * @param scopesToResolve The dependency scopes that should be resolved, may be {@code null}.
-     * @param session         The current build session, must not be {@code null}.
+     * @param session The current build session, must not be {@code null}.
      * @return The transitive dependencies of the specified project that match the requested scopes, never {@code null}.
      * @throws ArtifactResolutionException in case of resolution issue
      * @throws ArtifactNotFoundException if an artifact is not found
@@ -54,32 +52,32 @@ public interface ProjectDependenciesResolver
     /**
      * Resolves the transitive dependencies of the specified project.
      *
-     * @param project         The project whose dependencies should be resolved, must not be {@code null}.
+     * @param project The project whose dependencies should be resolved, must not be {@code null}.
      * @param scopesToCollect The dependency scopes that should be collected, may be {@code null}.
      * @param scopesToResolve The dependency scopes that should be collected and also resolved, may be {@code null}.
-     * @param session         The current build session, must not be {@code null}.
+     * @param session The current build session, must not be {@code null}.
      * @return The transitive dependencies of the specified project that match the requested scopes, never {@code null}.
      * @throws ArtifactResolutionException in case of resolution issue
      * @throws ArtifactNotFoundException if an artifact is not found
      */
-    Set<Artifact> resolve( MavenProject project, Collection<String> scopesToCollect,
-                           Collection<String> scopesToResolve, MavenSession session )
+    Set<Artifact> resolve( MavenProject project, Collection<String> scopesToCollect, Collection<String> scopesToResolve,
+                           MavenSession session )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
      * Resolves the transitive dependencies of the specified project.
      *
-     * @param project            The project whose dependencies should be resolved, must not be {@code null}.
-     * @param scopesToCollect    The dependency scopes that should be collected, may be {@code null}.
-     * @param scopesToResolve    The dependency scopes that should be collected and also resolved, may be {@code null}.
-     * @param session            The current build session, must not be {@code null}.
+     * @param project The project whose dependencies should be resolved, must not be {@code null}.
+     * @param scopesToCollect The dependency scopes that should be collected, may be {@code null}.
+     * @param scopesToResolve The dependency scopes that should be collected and also resolved, may be {@code null}.
+     * @param session The current build session, must not be {@code null}.
      * @param ignorableArtifacts Artifacts that need not be resolved
      * @return The transitive dependencies of the specified project that match the requested scopes, never {@code null}.
      * @throws ArtifactResolutionException in case of resolution issue
      * @throws ArtifactNotFoundException if an artifact is not found
      */
-    Set<Artifact> resolve( MavenProject project, Collection<String> scopesToCollect,
-                           Collection<String> scopesToResolve, MavenSession session, Set<Artifact> ignorableArtifacts )
+    Set<Artifact> resolve( MavenProject project, Collection<String> scopesToCollect, Collection<String> scopesToResolve,
+                           MavenSession session, Set<Artifact> ignorableArtifacts )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
@@ -89,8 +87,8 @@ public interface ProjectDependenciesResolver
      * artifacts that haven't been build yet.
      *
      * @param projects The projects whose dependencies should be resolved, may be {@code null}.
-     * @param scopes   The dependency scopes that should be resolved, may be {@code null}.
-     * @param session  The current build session, must not be {@code null}.
+     * @param scopes The dependency scopes that should be resolved, may be {@code null}.
+     * @param session The current build session, must not be {@code null}.
      * @return The transitive dependencies of the specified projects that match the requested scopes, never
      *         {@code null}.
      * @throws ArtifactResolutionException in case of resolution issue

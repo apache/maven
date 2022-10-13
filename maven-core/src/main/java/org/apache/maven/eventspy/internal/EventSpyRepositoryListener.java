@@ -1,5 +1,3 @@
-package org.apache.maven.eventspy.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.eventspy.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.eventspy.internal;
 
 import org.eclipse.aether.AbstractRepositoryListener;
 import org.eclipse.aether.RepositoryEvent;
@@ -25,6 +24,7 @@ import org.eclipse.aether.RepositoryListener;
 
 /**
  * Forwards repository events to EventSpies.
+ * 
  * @since 3.0.2
  */
 class EventSpyRepositoryListener

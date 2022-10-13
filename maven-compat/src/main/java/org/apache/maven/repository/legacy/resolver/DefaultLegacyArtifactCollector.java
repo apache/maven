@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy.resolver;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.legacy.resolver;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.repository.legacy.resolver;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy.resolver;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -90,9 +89,8 @@ public class DefaultLegacyArtifactCollector
     @SuppressWarnings( "checkstyle:parameternumber" )
     public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
                                              Map<String, Artifact> managedVersions, ArtifactRepository localRepository,
-                                             List<ArtifactRepository> remoteRepositories,
-                                             ArtifactMetadataSource source, ArtifactFilter filter,
-                                             List<ResolutionListener> listeners,
+                                             List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source,
+                                             ArtifactFilter filter, List<ResolutionListener> listeners,
                                              List<ConflictResolver> conflictResolvers )
     {
         ArtifactResolutionRequest request = new ArtifactResolutionRequest();
@@ -106,9 +104,8 @@ public class DefaultLegacyArtifactCollector
     @SuppressWarnings( "checkstyle:parameternumber" )
     public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
                                              Map<String, Artifact> managedVersions,
-                                             ArtifactResolutionRequest repositoryRequest,
-                                             ArtifactMetadataSource source, ArtifactFilter filter,
-                                             List<ResolutionListener> listeners,
+                                             ArtifactResolutionRequest repositoryRequest, ArtifactMetadataSource source,
+                                             ArtifactFilter filter, List<ResolutionListener> listeners,
                                              List<ConflictResolver> conflictResolvers )
     {
         ArtifactResolutionResult result = new ArtifactResolutionResult();
@@ -292,10 +289,7 @@ public class DefaultLegacyArtifactCollector
                             // Select an appropriate available version from the (now restricted) range
                             // Note this version was selected before to get the appropriate POM
                             // But it was reset by the call to setVersionRange on restricting the version
-                            ResolutionNode[] resetNodes =
-                            {
-                                previous, node
-                            };
+                            ResolutionNode[] resetNodes = { previous, node };
                             for ( int j = 0; j < 2; j++ )
                             {
                                 Artifact resetArtifact = resetNodes[j].getArtifact();
@@ -323,18 +317,16 @@ public class DefaultLegacyArtifactCollector
                                         catch ( ArtifactMetadataRetrievalException e )
                                         {
                                             resetArtifact.setDependencyTrail( node.getDependencyTrail() );
-                                            throw new ArtifactResolutionException(
-                                                "Unable to get dependency information: "
-                                                    + e.getMessage(), resetArtifact, request.getRemoteRepositories(),
-                                                e );
+                                            throw new ArtifactResolutionException( "Unable to get dependency information: "
+                                                + e.getMessage(), resetArtifact, request.getRemoteRepositories(), e );
 
                                         }
                                     }
                                     // end hack
 
                                     // MNG-2861: match version can return null
-                                    ArtifactVersion selectedVersion = resetArtifact.getVersionRange().
-                                        matchVersion( resetArtifact.getAvailableVersions() );
+                                    ArtifactVersion selectedVersion =
+                                        resetArtifact.getVersionRange().matchVersion( resetArtifact.getAvailableVersions() );
 
                                     if ( selectedVersion != null )
                                     {
@@ -342,10 +334,9 @@ public class DefaultLegacyArtifactCollector
                                     }
                                     else
                                     {
-                                        throw new OverConstrainedVersionException(
-                                            "Unable to find a version in " + resetArtifact.getAvailableVersions()
-                                                + " to match the range " + resetArtifact.getVersionRange(),
-                                            resetArtifact );
+                                        throw new OverConstrainedVersionException( "Unable to find a version in "
+                                            + resetArtifact.getAvailableVersions() + " to match the range "
+                                            + resetArtifact.getVersionRange(), resetArtifact );
 
                                     }
 
@@ -356,8 +347,8 @@ public class DefaultLegacyArtifactCollector
 
                         // Conflict Resolution
                         ResolutionNode resolved = null;
-                        for ( Iterator<ConflictResolver> j = conflictResolvers.iterator();
-                              resolved == null && j.hasNext(); )
+                        for ( Iterator<ConflictResolver> j = conflictResolvers.iterator(); resolved == null
+                            && j.hasNext(); )
                         {
                             ConflictResolver conflictResolver = j.next();
 
@@ -369,8 +360,7 @@ public class DefaultLegacyArtifactCollector
                             // TODO add better exception that can detail the two conflicting artifacts
                             ArtifactResolutionException are =
                                 new ArtifactResolutionException( "Cannot resolve artifact version conflict between "
-                                                                     + previous.getArtifact().getVersion() + " and "
-                                                                     + node.getArtifact().getVersion(),
+                                    + previous.getArtifact().getVersion() + " and " + node.getArtifact().getVersion(),
                                                                  previous.getArtifact() );
 
                             result.addVersionRangeViolation( are );
@@ -379,9 +369,8 @@ public class DefaultLegacyArtifactCollector
                         if ( ( resolved != previous ) && ( resolved != node ) )
                         {
                             // TODO add better exception
-                            result.addVersionRangeViolation( new ArtifactResolutionException(
-                                "Conflict resolver returned unknown resolution node: ",
-                                resolved.getArtifact() ) );
+                            result.addVersionRangeViolation( new ArtifactResolutionException( "Conflict resolver returned unknown resolution node: ",
+                                                                                              resolved.getArtifact() ) );
 
                         }
 
@@ -456,8 +445,7 @@ public class DefaultLegacyArtifactCollector
                         artifact.setDependencyTrail( node.getDependencyTrail() );
                         List<ArtifactRepository> childRemoteRepositories = child.getRemoteRepositories();
 
-                        MetadataResolutionRequest metadataRequest =
-                            new DefaultMetadataResolutionRequest( request );
+                        MetadataResolutionRequest metadataRequest = new DefaultMetadataResolutionRequest( request );
                         metadataRequest.setArtifact( artifact );
                         metadataRequest.setRemoteRepositories( childRemoteRepositories );
 
@@ -526,16 +514,15 @@ public class DefaultLegacyArtifactCollector
                                         {
                                             if ( versions.isEmpty() )
                                             {
-                                                throw new OverConstrainedVersionException(
-                                                    "No versions are present in the repository for the artifact"
-                                                        + " with a range " + versionRange, artifact,
-                                                    childRemoteRepositories );
+                                                throw new OverConstrainedVersionException( "No versions are present in the repository for the artifact"
+                                                    + " with a range " + versionRange, artifact,
+                                                                                           childRemoteRepositories );
 
                                             }
 
-                                            throw new OverConstrainedVersionException(
-                                                "Couldn't find a version in " + versions + " to match range "
-                                                    + versionRange, artifact, childRemoteRepositories );
+                                            throw new OverConstrainedVersionException( "Couldn't find a version in "
+                                                + versions + " to match range " + versionRange, artifact,
+                                                                                       childRemoteRepositories );
 
                                         }
                                     }
@@ -558,7 +545,7 @@ public class DefaultLegacyArtifactCollector
                             while ( !childKey.equals( child.getKey() ) );
 
                             if ( parentArtifact != null && parentArtifact.getDependencyFilter() != null
-                                     && !parentArtifact.getDependencyFilter().include( artifact ) )
+                                && !parentArtifact.getDependencyFilter().include( artifact ) )
                             {
                                 // MNG-3769: the [probably relocated] artifact is excluded.
                                 // We could process exclusions on relocated artifact details in the
@@ -593,8 +580,7 @@ public class DefaultLegacyArtifactCollector
                             artifact.setDependencyTrail( node.getDependencyTrail() );
 
                             throw new ArtifactResolutionException( "Unable to get dependency information for "
-                                                                       + artifact.getId() + ": " + e.getMessage(),
-                                                                   artifact, childRemoteRepositories, e );
+                                + artifact.getId() + ": " + e.getMessage(), artifact, childRemoteRepositories, e );
 
                         }
 
@@ -633,7 +619,7 @@ public class DefaultLegacyArtifactCollector
         // provide defaults to children, but should override transitives).
         // We can do this by calling isChildOfRootNode on the current node.
         if ( ( artifact.getVersion() != null )
-                 && ( !node.isChildOfRootNode() || node.getArtifact().getVersion() == null ) )
+            && ( !node.isChildOfRootNode() || node.getArtifact().getVersion() == null ) )
         {
             fireEvent( ResolutionListener.MANAGE_ARTIFACT_VERSION, listeners, node, artifact );
             node.getArtifact().setVersion( artifact.getVersion() );
@@ -646,7 +632,7 @@ public class DefaultLegacyArtifactCollector
         }
 
         if ( Artifact.SCOPE_SYSTEM.equals( node.getArtifact().getScope() ) && ( node.getArtifact().getFile() == null )
-                 && ( artifact.getFile() != null ) )
+            && ( artifact.getFile() != null ) )
         {
             fireEvent( ResolutionListener.MANAGE_ARTIFACT_SYSTEM_PATH, listeners, node, artifact );
             node.getArtifact().setFile( artifact.getFile() );
@@ -654,8 +640,8 @@ public class DefaultLegacyArtifactCollector
     }
 
     /**
-     * Check if the artifactScope needs to be updated. <a
-     * href="http://docs.codehaus.org/x/IGU#DependencyMediationandConflictResolution-Scoperesolution">More info</a>.
+     * Check if the artifactScope needs to be updated.
+     * <a href="http://docs.codehaus.org/x/IGU#DependencyMediationandConflictResolution-Scoperesolution">More info</a>.
      *
      * @param farthest farthest resolution node
      * @param nearest nearest resolution node
@@ -669,15 +655,15 @@ public class DefaultLegacyArtifactCollector
 
         /* farthest is runtime and nearest has lower priority, change to runtime */
         if ( Artifact.SCOPE_RUNTIME.equals( farthestArtifact.getScope() )
-                 && ( Artifact.SCOPE_TEST.equals( nearestArtifact.getScope() )
-                      || Artifact.SCOPE_PROVIDED.equals( nearestArtifact.getScope() ) ) )
+            && ( Artifact.SCOPE_TEST.equals( nearestArtifact.getScope() )
+                || Artifact.SCOPE_PROVIDED.equals( nearestArtifact.getScope() ) ) )
         {
             updateScope = true;
         }
 
         /* farthest is compile and nearest is not (has lower priority), change to compile */
         if ( Artifact.SCOPE_COMPILE.equals( farthestArtifact.getScope() )
-                 && !Artifact.SCOPE_COMPILE.equals( nearestArtifact.getScope() ) )
+            && !Artifact.SCOPE_COMPILE.equals( nearestArtifact.getScope() ) )
         {
             updateScope = true;
         }
@@ -783,7 +769,7 @@ public class DefaultLegacyArtifactCollector
                     break;
                 case ResolutionListener.RESTRICT_RANGE:
                     if ( node.getArtifact().getVersionRange().hasRestrictions()
-                             || replacement.getVersionRange().hasRestrictions() )
+                        || replacement.getVersionRange().hasRestrictions() )
                     {
                         listener.restrictRange( node.getArtifact(), replacement, newRange );
                     }
@@ -797,9 +783,8 @@ public class DefaultLegacyArtifactCollector
     @SuppressWarnings( "checkstyle:parameternumber" )
     public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
                                              Map<String, Artifact> managedVersions, ArtifactRepository localRepository,
-                                             List<ArtifactRepository> remoteRepositories,
-                                             ArtifactMetadataSource source, ArtifactFilter filter,
-                                             List<ResolutionListener> listeners )
+                                             List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source,
+                                             ArtifactFilter filter, List<ResolutionListener> listeners )
     {
         return collect( artifacts, originatingArtifact, managedVersions, localRepository, remoteRepositories, source,
                         filter, listeners, null );
@@ -807,9 +792,8 @@ public class DefaultLegacyArtifactCollector
 
     public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
                                              ArtifactRepository localRepository,
-                                             List<ArtifactRepository> remoteRepositories,
-                                             ArtifactMetadataSource source, ArtifactFilter filter,
-                                             List<ResolutionListener> listeners )
+                                             List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source,
+                                             ArtifactFilter filter, List<ResolutionListener> listeners )
     {
         return collect( artifacts, originatingArtifact, null, localRepository, remoteRepositories, source, filter,
                         listeners );

@@ -1,5 +1,3 @@
-package org.apache.maven.api.services.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.services.xml;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api.services.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services.xml;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -62,9 +61,8 @@ public interface XmlReaderRequest
         /**
          * Interpolate the value read from the xml document
          *
-         * @param source    The source value
-         * @param fieldName A description of the field being interpolated. The implementation may use this to
-         *                  log stuff.
+         * @param source The source value
+         * @param fieldName A description of the field being interpolated. The implementation may use this to log stuff.
          * @return The interpolated value.
          */
         String transform( String source, String fieldName );
@@ -80,13 +78,21 @@ public interface XmlReaderRequest
     class XmlReaderRequestBuilder
     {
         Path path;
+
         URL url;
+
         InputStream inputStream;
+
         Reader reader;
+
         Transformer transformer;
+
         boolean strict;
+
         String modelId;
+
         String location;
+
         boolean addDefaultEntities = true;
 
         public XmlReaderRequestBuilder path( Path path )
@@ -145,26 +151,34 @@ public interface XmlReaderRequest
 
         public XmlReaderRequest build()
         {
-            return new DefaultXmlReaderRequest( path, url, inputStream, reader, transformer, strict,
-                    modelId, location, addDefaultEntities );
+            return new DefaultXmlReaderRequest( path, url, inputStream, reader, transformer, strict, modelId, location,
+                                                addDefaultEntities );
         }
 
-        private static class DefaultXmlReaderRequest implements XmlReaderRequest
+        private static class DefaultXmlReaderRequest
+            implements XmlReaderRequest
         {
             final Path path;
+
             final URL url;
+
             final InputStream inputStream;
+
             final Reader reader;
+
             final Transformer transformer;
+
             final boolean strict;
+
             final String modelId;
+
             final String location;
+
             final boolean addDefaultEntities;
 
             @SuppressWarnings( "checkstyle:ParameterNumber" )
             DefaultXmlReaderRequest( Path path, URL url, InputStream inputStream, Reader reader,
-                                     Transformer transformer, boolean strict,
-                                     String modelId, String location,
+                                     Transformer transformer, boolean strict, String modelId, String location,
                                      boolean addDefaultEntities )
             {
                 this.path = path;

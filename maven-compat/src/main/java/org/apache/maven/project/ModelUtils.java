@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.util.List;
 
@@ -33,11 +32,14 @@ public final class ModelUtils
      * This should be the resulting ordering of plugins after merging:
      * <p>
      * Given:
+     * 
      * <pre>
      * parent: X -&gt; A -&gt; B -&gt; D -&gt; E
      * child: Y -&gt; A -&gt; C -&gt; D -&gt; F
      * </pre>
+     * 
      * Result:
+     * 
      * <pre>
      * X -&gt; Y -&gt; A -&gt; B -&gt; C -&gt; D -&gt; E -&gt; F
      * </pre>
@@ -53,7 +55,6 @@ public final class ModelUtils
     {
         throw new UnsupportedOperationException();
     }
-
 
     public static void mergePluginDefinitions( Plugin child, Plugin parent, boolean handleAsInheritance )
     {

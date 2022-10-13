@@ -1,5 +1,3 @@
-package org.apache.maven.project.collector;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,14 @@ package org.apache.maven.project.collector;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.collector;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.maven.DefaultMaven;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -27,12 +33,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Strategy to collect projects for building when the Maven invocation is not in a directory that contains a pom.xml.
@@ -52,11 +52,11 @@ public class PomlessCollectionStrategy
 
     @Override
     public List<MavenProject> collectProjects( final MavenExecutionRequest request )
-            throws ProjectBuildingException
+        throws ProjectBuildingException
     {
         ProjectBuildingRequest buildingRequest = request.getProjectBuildingRequest();
         ModelSource modelSource = new UrlModelSource( DefaultMaven.class.getResource( "project/standalone.xml" ) );
-        MavenProject project = projectBuilder.build( modelSource,  buildingRequest ).getProject();
+        MavenProject project = projectBuilder.build( modelSource, buildingRequest ).getProject();
         project.setExecutionRoot( true );
         request.setProjectPresent( false );
 

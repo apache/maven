@@ -1,19 +1,22 @@
-package org.apache.maven.lifecycle.internal.builder;
-
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
- * agreements. See the NOTICE file distributed with this work for additional information regarding
- * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance with the License. You may obtain a
- * copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
+package org.apache.maven.lifecycle.internal.builder;
 
 import java.util.HashSet;
 
@@ -50,8 +53,7 @@ public class BuilderCommonTest
 
         final BuilderCommon builderCommon = getBuilderCommon( logger );
         final MavenExecutionPlan plan =
-            builderCommon.resolveBuildPlan( session1, ProjectDependencyGraphStub.A, taskSegment1,
-                    new HashSet<>() );
+            builderCommon.resolveBuildPlan( session1, ProjectDependencyGraphStub.A, taskSegment1, new HashSet<>() );
         assertEquals( LifecycleExecutionPlanCalculatorStub.getProjectAExecutionPlan().size(), plan.size() );
     }
 
@@ -65,18 +67,13 @@ public class BuilderCommonTest
         final MavenSession session1 = original.clone();
         session1.setCurrentProject( ProjectDependencyGraphStub.A );
 
-        getBuilderCommon( logger ).resolveBuildPlan( session1, ProjectDependencyGraphStub.A, taskSegment1, new HashSet<>() );
+        getBuilderCommon( logger ).resolveBuildPlan( session1, ProjectDependencyGraphStub.A, taskSegment1,
+                                                     new HashSet<>() );
 
-        verify( logger ).warn("Version not locked for default bindings plugins ["
-            + "stub-plugin-initialize, "
-            + "stub-plugin-process-resources, "
-            + "stub-plugin-compile, "
-            + "stub-plugin-process-test-resources, "
-            + "stub-plugin-test-compile, "
-            + "stub-plugin-test, "
-            + "stub-plugin-package, "
-            + "stub-plugin-install], "
-            + "you should define versions in pluginManagement section of your pom.xml or parent");
+        verify( logger ).warn( "Version not locked for default bindings plugins [" + "stub-plugin-initialize, "
+            + "stub-plugin-process-resources, " + "stub-plugin-compile, " + "stub-plugin-process-test-resources, "
+            + "stub-plugin-test-compile, " + "stub-plugin-test, " + "stub-plugin-package, " + "stub-plugin-install], "
+            + "you should define versions in pluginManagement section of your pom.xml or parent" );
     }
 
     @Test
@@ -100,8 +97,8 @@ public class BuilderCommonTest
     public BuilderCommon getBuilderCommon( Logger logger )
     {
         final LifecycleDebugLogger debugLogger = new LifecycleDebugLogger();
-        return new BuilderCommon( debugLogger, new LifecycleExecutionPlanCalculatorStub(), mock(
-                ExecutionEventCatapult.class ),  logger );
+        return new BuilderCommon( debugLogger, new LifecycleExecutionPlanCalculatorStub(),
+                                  mock( ExecutionEventCatapult.class ), logger );
     }
 
 }

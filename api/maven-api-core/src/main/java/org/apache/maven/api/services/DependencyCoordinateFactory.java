@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.DependencyCoordinate;
@@ -30,11 +29,11 @@ import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.ReportPlugin;
 
 /**
- *
  * @since 4.0
  */
 @Experimental
-public interface DependencyCoordinateFactory extends Service
+public interface DependencyCoordinateFactory
+    extends Service
 {
 
     /**
@@ -42,48 +41,55 @@ public interface DependencyCoordinateFactory extends Service
      *
      * @param request the request containing the various data
      * @return a new {@link DependencyCoordinate} object.
-     *
-     * @throws IllegalArgumentException if {@code request} is null or
-     *         if {@code request.getSession()} is null or invalid
+     * @throws IllegalArgumentException if {@code request} is null or if {@code request.getSession()} is null or invalid
      */
     @Nonnull
-    DependencyCoordinate create( @Nonnull DependencyCoordinateFactoryRequest request );
+    DependencyCoordinate create( @Nonnull
+    DependencyCoordinateFactoryRequest request );
 
     @Nonnull
-    default DependencyCoordinate create( @Nonnull Session session, @Nonnull ArtifactCoordinate coordinate )
+    default DependencyCoordinate create( @Nonnull
+    Session session, @Nonnull
+    ArtifactCoordinate coordinate )
     {
         return create( DependencyCoordinateFactoryRequest.build( session, coordinate ) );
     }
 
     @Nonnull
-    default DependencyCoordinate create( @Nonnull Session session, @Nonnull org.apache.maven.api.Dependency dependency )
+    default DependencyCoordinate create( @Nonnull
+    Session session, @Nonnull
+    org.apache.maven.api.Dependency dependency )
     {
         return create( DependencyCoordinateFactoryRequest.build( session, dependency ) );
     }
 
     @Nonnull
-    default DependencyCoordinate create( @Nonnull Session session, Dependency dependency )
+    default DependencyCoordinate create( @Nonnull
+    Session session, Dependency dependency )
     {
-        return create( DependencyCoordinateFactoryRequest.build( session,
-                dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),
-                dependency.getClassifier(), null, dependency.getType() ) );
+        return create( DependencyCoordinateFactoryRequest.build( session, dependency.getGroupId(),
+                                                                 dependency.getArtifactId(), dependency.getVersion(),
+                                                                 dependency.getClassifier(), null,
+                                                                 dependency.getType() ) );
     }
 
     @Nonnull
-    default DependencyCoordinate create( @Nonnull Session session, Plugin plugin )
+    default DependencyCoordinate create( @Nonnull
+    Session session, Plugin plugin )
     {
         // TODO: hard coded string
-        return create( DependencyCoordinateFactoryRequest.build( session,
-                plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(),
-                null, null, "maven-plugin" ) );
+        return create( DependencyCoordinateFactoryRequest.build( session, plugin.getGroupId(), plugin.getArtifactId(),
+                                                                 plugin.getVersion(), null, null, "maven-plugin" ) );
     }
 
     @Nonnull
-    default DependencyCoordinate create( @Nonnull Session session, ReportPlugin reportPlugin )
+    default DependencyCoordinate create( @Nonnull
+    Session session, ReportPlugin reportPlugin )
     {
         // TODO: hard coded string
-        return create( DependencyCoordinateFactoryRequest.build( session,
-                reportPlugin.getGroupId(), reportPlugin.getArtifactId(), reportPlugin.getVersion(),
-                null, null, "maven-plugin" ) );
+        return create( DependencyCoordinateFactoryRequest.build( session, reportPlugin.getGroupId(),
+                                                                 reportPlugin.getArtifactId(),
+                                                                 reportPlugin.getVersion(), null, null,
+                                                                 "maven-plugin" ) );
     }
 }

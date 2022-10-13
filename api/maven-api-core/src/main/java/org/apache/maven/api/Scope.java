@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api;
 
 import java.util.Locale;
 
@@ -32,7 +31,7 @@ import org.apache.maven.api.annotations.Experimental;
 public enum Scope
 {
     COMPILE( "compile" ),
-    PROVIDED ( "provided" ),
+    PROVIDED( "provided" ),
     SYSTEM( "system" ),
     RUNTIME( "runtime" ),
     TEST( "test" ),

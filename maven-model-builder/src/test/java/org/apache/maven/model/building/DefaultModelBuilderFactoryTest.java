@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,20 +16,20 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Paths;
 
-import org.apache.maven.api.xml.Dom;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.model.v4.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Benjamin Bentmann
@@ -43,7 +41,7 @@ public class DefaultModelBuilderFactoryTest
 
     private File getPom( String name )
     {
-        return new File( Paths.get( BASE_DIR, name + ".xml"  ).toString() ).getAbsoluteFile();
+        return new File( Paths.get( BASE_DIR, name + ".xml" ).toString() ).getAbsoluteFile();
     }
 
     @Test
@@ -61,14 +59,15 @@ public class DefaultModelBuilderFactoryTest
         assertNotNull( result );
         assertNotNull( result.getEffectiveModel() );
         assertEquals( "activated", result.getEffectiveModel().getProperties().get( "profile.file" ) );
-        Xpp3Dom conf = ( Xpp3Dom ) result.getEffectiveModel().getBuild().getPlugins().get( 0 ).getConfiguration();
+        Xpp3Dom conf = (Xpp3Dom) result.getEffectiveModel().getBuild().getPlugins().get( 0 ).getConfiguration();
         assertNotNull( conf );
         assertEquals( "1.5", conf.getChild( "source" ).getValue() );
         assertEquals( "  1.5  ", conf.getChild( "target" ).getValue() );
     }
 
     @Test
-    public void testPomChanges() throws Exception
+    public void testPomChanges()
+        throws Exception
     {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
         assertNotNull( builder );
@@ -83,11 +82,11 @@ public class DefaultModelBuilderFactoryTest
         String resultExists = result.getRawModel().getProfiles().get( 1 ).getActivation().getFile().getExists();
 
         assertEquals( originalExists, resultExists );
-        assertTrue( result.getEffectiveModel().getProfiles().get( 1 ).getActivation().getFile().getExists()
-                .contains( BASE_DIR ) );
+        assertTrue( result.getEffectiveModel().getProfiles().get( 1 ).getActivation().getFile().getExists().contains( BASE_DIR ) );
     }
 
-    private static Model readPom( File file ) throws Exception
+    private static Model readPom( File file )
+        throws Exception
     {
         MavenXpp3Reader reader = new MavenXpp3Reader();
 

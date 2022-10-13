@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,11 @@ package org.apache.maven.lifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -26,10 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -123,8 +122,7 @@ public class DefaultLifecycles
     {
         List<String> lifecycleIds = Arrays.asList( STANDARD_LIFECYCLES );
 
-        Comparator<String> comparator = ( l, r ) ->
-        {
+        Comparator<String> comparator = ( l, r ) -> {
             int lx = lifecycleIds.indexOf( l );
             int rx = lifecycleIds.indexOf( r );
 
@@ -141,10 +139,9 @@ public class DefaultLifecycles
         Map<String, Lifecycle> lifecyclesMap = lookupLifecycles();
 
         // ensure canonical order of standard lifecycles
-        return lifecyclesMap.values().stream()
-                                .peek( l -> Objects.requireNonNull( l.getId(), "A lifecycle must have an id." ) )
-                                .sorted( Comparator.comparing( Lifecycle::getId, comparator ) )
-                                .collect( Collectors.toList() );
+        return lifecyclesMap.values().stream().peek( l -> Objects.requireNonNull( l.getId(),
+                                                                                  "A lifecycle must have an id." ) ).sorted( Comparator.comparing( Lifecycle::getId,
+                                                                                                                                                   comparator ) ).collect( Collectors.toList() );
     }
 
     private Map<String, Lifecycle> lookupLifecycles()
@@ -169,9 +166,7 @@ public class DefaultLifecycles
 
     public String getLifecyclePhaseList()
     {
-        return getLifeCycles().stream()
-                        .flatMap( l -> l.getPhases().stream() )
-                        .collect( Collectors.joining( ", " ) );
+        return getLifeCycles().stream().flatMap( l -> l.getPhases().stream() ).collect( Collectors.joining( ", " ) );
     }
 
 }

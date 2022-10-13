@@ -1,5 +1,3 @@
-package org.apache.maven.session.scope.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.session.scope.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.session.scope.internal;
 
 import java.util.Collection;
 import java.util.List;
@@ -37,8 +36,7 @@ public class SessionScope
     implements Scope
 {
 
-    private static final Provider<Object> SEEDED_KEY_PROVIDER = () ->
-    {
+    private static final Provider<Object> SEEDED_KEY_PROVIDER = () -> {
         throw new IllegalStateException();
     };
 
@@ -58,7 +56,7 @@ public class SessionScope
         public <T> Provider<T> scope( Key<T> key, Provider<T> unscoped )
         {
             Provider<?> provider = provided.computeIfAbsent( key, k -> new CachingProvider<>( unscoped ) );
-            return ( Provider<T> ) provider;
+            return (Provider<T>) provider;
         }
 
         public Collection<CachingProvider<?>> providers()
@@ -99,7 +97,7 @@ public class SessionScope
 
     public <T> void seed( Class<T> clazz, final T value )
     {
-        seed( clazz, ( Provider<T> ) () -> value );
+        seed( clazz, (Provider<T>) () -> value );
     }
 
     public <T> Provider<T> scope( final Key<T> key, final Provider<T> unscoped )
@@ -110,11 +108,14 @@ public class SessionScope
 
     /**
      * A provider wrapping an existing provider with a cache
+     * 
      * @param <T> the provided type
      */
-    protected static class CachingProvider<T> implements Provider<T>
+    protected static class CachingProvider<T>
+        implements Provider<T>
     {
         private final Provider<T> provider;
+
         private volatile T value;
 
         CachingProvider( Provider<T> provider )

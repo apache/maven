@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,14 +16,15 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.util.List;
+package org.apache.maven.plugin;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.List;
 
 import org.apache.maven.api.Project;
 import org.apache.maven.api.plugin.MojoException;
@@ -59,16 +58,16 @@ public class DefaultBuildPluginManager
 {
 
     private final MavenPluginManager mavenPluginManager;
+
     private final LegacySupport legacySupport;
+
     private final MojoExecutionScope scope;
+
     private final MojoExecutionListener mojoExecutionListener;
 
     @Inject
-    public DefaultBuildPluginManager(
-            MavenPluginManager mavenPluginManager,
-            LegacySupport legacySupport,
-            MojoExecutionScope scope,
-            List<MojoExecutionListener> mojoExecutionListeners )
+    public DefaultBuildPluginManager( MavenPluginManager mavenPluginManager, LegacySupport legacySupport,
+                                      MojoExecutionScope scope, List<MojoExecutionListener> mojoExecutionListeners )
     {
         this.mavenPluginManager = mavenPluginManager;
         this.legacySupport = legacySupport;
@@ -127,15 +126,16 @@ public class DefaultBuildPluginManager
         {
             scope.seed( MavenProject.class, project );
             scope.seed( MojoExecution.class, mojoExecution );
-            scope.seed( org.apache.maven.api.plugin.Log.class, new DefaultLog(
-                    LoggerFactory.getLogger( mojoExecution.getMojoDescriptor().getFullGoalName() ) ) );
-            scope.seed( Project.class, ( ( DefaultSession) session.getSession() ).getProject( project ) );
+            scope.seed( org.apache.maven.api.plugin.Log.class,
+                        new DefaultLog( LoggerFactory.getLogger( mojoExecution.getMojoDescriptor().getFullGoalName() ) ) );
+            scope.seed( Project.class, ( (DefaultSession) session.getSession() ).getProject( project ) );
             scope.seed( org.apache.maven.api.MojoExecution.class, new DefaultMojoExecution( mojoExecution ) );
 
             if ( mojoDescriptor.isV4Api() )
             {
-                org.apache.maven.api.plugin.Mojo mojoV4 = mavenPluginManager.getConfiguredMojo(
-                        org.apache.maven.api.plugin.Mojo.class, session, mojoExecution );
+                org.apache.maven.api.plugin.Mojo mojoV4 =
+                    mavenPluginManager.getConfiguredMojo( org.apache.maven.api.plugin.Mojo.class, session,
+                                                          mojoExecution );
                 mojo = new MojoWrapper( mojoV4 );
             }
             else
@@ -167,14 +167,14 @@ public class DefaultBuildPluginManager
         }
         catch ( PluginContainerException e )
         {
-            mojoExecutionListener.afterExecutionFailure(
-                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
+            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
+                                                                                 e ) );
             throw new PluginExecutionException( mojoExecution, project, e );
         }
         catch ( NoClassDefFoundError e )
         {
-            mojoExecutionListener.afterExecutionFailure(
-                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
+            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
+                                                                                 e ) );
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
             ps.println( "A required class was missing while executing " + mojoDescriptor.getId() + ": "
@@ -185,8 +185,8 @@ public class DefaultBuildPluginManager
         }
         catch ( LinkageError e )
         {
-            mojoExecutionListener.afterExecutionFailure(
-                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
+            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
+                                                                                 e ) );
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
             ps.println( "An API incompatibility was encountered while executing " + mojoDescriptor.getId() + ": "
@@ -197,8 +197,8 @@ public class DefaultBuildPluginManager
         }
         catch ( ClassCastException e )
         {
-            mojoExecutionListener.afterExecutionFailure(
-                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
+            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
+                                                                                 e ) );
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
             ps.println( "A type incompatibility occurred while executing " + mojoDescriptor.getId() + ": "
@@ -208,8 +208,8 @@ public class DefaultBuildPluginManager
         }
         catch ( RuntimeException e )
         {
-            mojoExecutionListener.afterExecutionFailure(
-                    new MojoExecutionEvent( session, project, mojoExecution, mojo, e ) );
+            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
+                                                                                 e ) );
             throw e;
         }
         finally
@@ -222,8 +222,8 @@ public class DefaultBuildPluginManager
     }
 
     /**
-     * TODO pluginDescriptor classRealm and artifacts are set as a side effect of this
-     *      call, which is not nice.
+     * TODO pluginDescriptor classRealm and artifacts are set as a side effect of this call, which is not nice.
+     * 
      * @throws PluginResolutionException
      */
     public ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor )
@@ -248,7 +248,8 @@ public class DefaultBuildPluginManager
         return mavenPluginManager.getMojoDescriptor( plugin, goal, repositories, session );
     }
 
-    private static class MojoWrapper implements Mojo
+    private static class MojoWrapper
+        implements Mojo
     {
         private final org.apache.maven.api.plugin.Mojo mojoV4;
 
@@ -258,7 +259,8 @@ public class DefaultBuildPluginManager
         }
 
         @Override
-        public void execute() throws MojoExecutionException, MojoFailureException
+        public void execute()
+            throws MojoExecutionException, MojoFailureException
         {
             try
             {

@@ -1,5 +1,3 @@
-package org.apache.maven.model.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,11 @@ package org.apache.maven.model.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.plugin;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,21 +30,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.PluginContainer;
 import org.apache.maven.api.model.PluginExecution;
 import org.apache.maven.api.model.PluginManagement;
+import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.merge.MavenModelMerger;
 
@@ -72,28 +71,24 @@ public class DefaultLifecycleBindingsInjector
         String packaging = model.getPackaging();
 
         Collection<org.apache.maven.model.Plugin> defaultPlugins =
-                lifecycle.getPluginsBoundByDefaultToAllLifecycles( packaging );
+            lifecycle.getPluginsBoundByDefaultToAllLifecycles( packaging );
 
         if ( defaultPlugins == null )
         {
-            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Unknown packaging: " + packaging )
-                    .setLocation( model.getLocation( "packaging" ) ) );
+            problems.add( new ModelProblemCollectorRequest( Severity.ERROR,
+                                                            Version.BASE ).setMessage( "Unknown packaging: " + packaging ).setLocation( model.getLocation( "packaging" ) ) );
         }
         else if ( !defaultPlugins.isEmpty() )
         {
-            List<Plugin> plugins = defaultPlugins.stream()
-                    .map( org.apache.maven.model.Plugin::getDelegate )
-                    .collect( Collectors.toList() );
-            Model lifecycleModel = Model.newBuilder()
-                            .build( Build.newBuilder().plugins( plugins ).build() )
-                            .build();
+            List<Plugin> plugins =
+                defaultPlugins.stream().map( org.apache.maven.model.Plugin::getDelegate ).collect( Collectors.toList() );
+            Model lifecycleModel = Model.newBuilder().build( Build.newBuilder().plugins( plugins ).build() ).build();
             model.update( merger.merge( model.getDelegate(), lifecycleModel ) );
         }
     }
 
     /**
-     *  The domain-specific model merger for lifecycle bindings
+     * The domain-specific model merger for lifecycle bindings
      */
     protected static class LifecycleBindingsMerger
         extends MavenModelMerger
@@ -120,9 +115,9 @@ public class DefaultLifecycleBindingsInjector
 
         @SuppressWarnings( { "checkstyle:methodname" } )
         @Override
-        protected void mergePluginContainer_Plugins( PluginContainer.Builder builder,
-                                                     PluginContainer target, PluginContainer source,
-                                                     boolean sourceDominant, Map<Object, Object> context )
+        protected void mergePluginContainer_Plugins( PluginContainer.Builder builder, PluginContainer target,
+                                                     PluginContainer source, boolean sourceDominant,
+                                                     Map<Object, Object> context )
         {
             List<Plugin> src = source.getPlugins();
             if ( !src.isEmpty() )
@@ -165,8 +160,8 @@ public class DefaultLifecycleBindingsInjector
                             Plugin addedPlugin = added.get( key );
                             if ( addedPlugin != null )
                             {
-                                Plugin plugin = mergePlugin( managedPlugin, addedPlugin,
-                                        sourceDominant, Collections.emptyMap() );
+                                Plugin plugin =
+                                    mergePlugin( managedPlugin, addedPlugin, sourceDominant, Collections.emptyMap() );
                                 merged.put( key, plugin );
                             }
                         }
@@ -190,7 +185,7 @@ public class DefaultLifecycleBindingsInjector
                 builder.location( "priority", source.getLocation( "priority" ) );
             }
         }
-        //mergePluginExecution_Priority( builder, target, source, sourceDominant, context );
+        // mergePluginExecution_Priority( builder, target, source, sourceDominant, context );
 
     }
 

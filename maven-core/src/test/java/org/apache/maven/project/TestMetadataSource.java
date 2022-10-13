@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,12 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.util.List;
+package org.apache.maven.project;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -41,7 +40,9 @@ public class TestMetadataSource
     extends MavenMetadataSource
 {
 
-    public TestMetadataSource( RepositoryMetadataManager repositoryMetadataManager, ArtifactFactory repositorySystem, ProjectBuilder projectBuilder, MavenMetadataCache cache, LegacySupport legacySupport) {
+    public TestMetadataSource( RepositoryMetadataManager repositoryMetadataManager, ArtifactFactory repositorySystem,
+                               ProjectBuilder projectBuilder, MavenMetadataCache cache, LegacySupport legacySupport )
+    {
         super( repositoryMetadataManager, repositorySystem, projectBuilder, cache, legacySupport );
     }
 

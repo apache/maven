@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 /**
  * Class InputSource.
@@ -29,34 +28,24 @@ public class InputSource
     implements java.io.Serializable, Cloneable
 {
 
-      //--------------------------/
-     //- Class/Member Variables -/
-    //--------------------------/
+    // --------------------------/
+    // - Class/Member Variables -/
+    // --------------------------/
 
     /**
-     * 
-     *             
-     *             The identifier of the POM in the format {@code
+     * The identifier of the POM in the format {@code
      * <groupId>:<artifactId>:<version>}.
-     *             
-     *           
      */
     private String modelId;
 
     /**
-     * 
-     *             
-     *             The path/URL of the POM or {@code null} if
-     * unknown.
-     *             
-     *           
+     * The path/URL of the POM or {@code null} if unknown.
      */
     private String location;
 
-
-      //----------------/
-     //- Constructors -/
-    //----------------/
+    // ----------------/
+    // - Constructors -/
+    // ----------------/
 
     public InputSource()
     {
@@ -68,9 +57,9 @@ public class InputSource
         this.location = source.getLocation();
     }
 
-      //-----------/
-     //- Methods -/
-    //-----------/
+    // -----------/
+    // - Methods -/
+    // -----------/
 
     /**
      * Method clone.
@@ -90,7 +79,7 @@ public class InputSource
             throw (RuntimeException) new UnsupportedOperationException( getClass().getName()
                 + " does not support clone()" ).initCause( ex );
         }
-    } //-- InputSource clone()
+    } // -- InputSource clone()
 
     /**
      * Get the path/URL of the POM or {@code null} if unknown.
@@ -100,7 +89,7 @@ public class InputSource
     public String getLocation()
     {
         return this.location;
-    } //-- String getLocation()
+    } // -- String getLocation()
 
     /**
      * Get the identifier of the POM in the format {@code
@@ -111,7 +100,7 @@ public class InputSource
     public String getModelId()
     {
         return this.modelId;
-    } //-- String getModelId()
+    } // -- String getModelId()
 
     /**
      * Set the path/URL of the POM or {@code null} if unknown.
@@ -121,7 +110,7 @@ public class InputSource
     public void setLocation( String location )
     {
         this.location = location;
-    } //-- void setLocation( String )
+    } // -- void setLocation( String )
 
     /**
      * Set the identifier of the POM in the format {@code
@@ -132,10 +121,8 @@ public class InputSource
     public void setModelId( String modelId )
     {
         this.modelId = modelId;
-    } //-- void setModelId( String )
+    } // -- void setModelId( String )
 
-    
-            
     @Override
     public String toString()
     {
@@ -146,5 +133,5 @@ public class InputSource
     {
         return new org.apache.maven.api.model.InputSource( modelId, location );
     }
-          
+
 }

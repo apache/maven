@@ -1,5 +1,3 @@
-package org.apache.maven.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +40,8 @@ public class ArtifactUtilsTest
 
     private Artifact newArtifact( String aid )
     {
-        return new DefaultArtifact( "group", aid, VersionRange.createFromVersion( "1.0" ), "test", "jar", "tests", null );
+        return new DefaultArtifact( "group", aid, VersionRange.createFromVersion( "1.0" ), "test", "jar", "tests",
+                                    null );
     }
 
     @Test

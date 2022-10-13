@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.repository;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.repository;
 
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
@@ -40,14 +39,14 @@ public interface ArtifactRepositoryFactory
     @Deprecated
     ArtifactRepository createDeploymentArtifactRepository( String id, String url, String layoutId,
                                                            boolean uniqueVersion )
-                                                               throws UnknownRepositoryLayoutException;
+        throws UnknownRepositoryLayoutException;
 
     ArtifactRepository createDeploymentArtifactRepository( String id, String url, ArtifactRepositoryLayout layout,
                                                            boolean uniqueVersion );
 
     ArtifactRepository createArtifactRepository( String id, String url, String layoutId,
                                                  ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases )
-                                                     throws UnknownRepositoryLayoutException;
+        throws UnknownRepositoryLayoutException;
 
     ArtifactRepository createArtifactRepository( String id, String url, ArtifactRepositoryLayout repositoryLayout,
                                                  ArtifactRepositoryPolicy snapshots,

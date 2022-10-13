@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,11 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,10 +32,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.api.xml.Dom;
 import org.apache.maven.execution.MavenSession;
@@ -63,7 +62,6 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *
@@ -92,14 +90,14 @@ public class DefaultLifecycleExecutionPlanCalculator
     private final Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators;
 
     @Inject
-    public DefaultLifecycleExecutionPlanCalculator(
-            BuildPluginManager pluginManager,
-            DefaultLifecycles defaultLifecycles,
-            MojoDescriptorCreator mojoDescriptorCreator,
-            LifecyclePluginResolver lifecyclePluginResolver,
-            @Named( DefaultLifecycleMappingDelegate.HINT ) LifecycleMappingDelegate standardDelegate,
-            Map<String, LifecycleMappingDelegate> delegates,
-            Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators )
+    public DefaultLifecycleExecutionPlanCalculator( BuildPluginManager pluginManager,
+                                                    DefaultLifecycles defaultLifecycles,
+                                                    MojoDescriptorCreator mojoDescriptorCreator,
+                                                    LifecyclePluginResolver lifecyclePluginResolver,
+                                                    @Named( DefaultLifecycleMappingDelegate.HINT )
+                                                    LifecycleMappingDelegate standardDelegate,
+                                                    Map<String, LifecycleMappingDelegate> delegates,
+                                                    Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators )
     {
         this.pluginManager = pluginManager;
         this.defaultLifecycles = defaultLifecycles;
@@ -122,8 +120,8 @@ public class DefaultLifecycleExecutionPlanCalculator
         this.lifecyclePluginResolver = lifecyclePluginResolver;
         this.standardDelegate = null;
         this.delegates = null;
-        this.mojoExecutionConfigurators = Collections.singletonMap(
-             "default", (MojoExecutionConfigurator) new DefaultMojoExecutionConfigurator() );
+        this.mojoExecutionConfigurators =
+            Collections.singletonMap( "default", (MojoExecutionConfigurator) new DefaultMojoExecutionConfigurator() );
     }
 
     @Override
@@ -170,9 +168,9 @@ public class DefaultLifecycleExecutionPlanCalculator
     }
 
     private Set<MojoDescriptor> fillMojoDescriptors( MavenSession session, MavenProject project,
-                                                    List<MojoExecution> mojoExecutions )
-            throws InvalidPluginDescriptorException, MojoNotFoundException, PluginResolutionException,
-            PluginDescriptorParsingException, PluginNotFoundException
+                                                     List<MojoExecution> mojoExecutions )
+        throws InvalidPluginDescriptorException, MojoNotFoundException, PluginResolutionException,
+        PluginDescriptorParsingException, PluginNotFoundException
     {
         Set<MojoDescriptor> descriptors = new HashSet<>( mojoExecutions.size() );
 
@@ -186,17 +184,16 @@ public class DefaultLifecycleExecutionPlanCalculator
     }
 
     private MojoDescriptor fillMojoDescriptor( MavenSession session, MavenProject project, MojoExecution execution )
-            throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-            MojoNotFoundException, InvalidPluginDescriptorException
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        MojoNotFoundException, InvalidPluginDescriptorException
     {
         MojoDescriptor mojoDescriptor = execution.getMojoDescriptor();
 
         if ( mojoDescriptor == null )
         {
-            mojoDescriptor =
-                    pluginManager.getMojoDescriptor( execution.getPlugin(), execution.getGoal(),
-                            project.getRemotePluginRepositories(),
-                            session.getRepositorySession() );
+            mojoDescriptor = pluginManager.getMojoDescriptor( execution.getPlugin(), execution.getGoal(),
+                                                              project.getRemotePluginRepositories(),
+                                                              session.getRepositorySession() );
 
             execution.setMojoDescriptor( mojoDescriptor );
         }
@@ -213,9 +210,8 @@ public class DefaultLifecycleExecutionPlanCalculator
     {
         fillMojoDescriptor( session, project, mojoExecution );
 
-        mojoExecutionConfigurator( mojoExecution ).configure( project,
-                                                              mojoExecution,
-                                                        MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) );
+        mojoExecutionConfigurator( mojoExecution ).configure( project, mojoExecution,
+                                                              MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) );
 
         finalizeMojoConfiguration( mojoExecution );
 
@@ -244,8 +240,8 @@ public class DefaultLifecycleExecutionPlanCalculator
 
                 MojoDescriptor mojoDescriptor = mojoDescriptorCreator.getMojoDescriptor( pluginGoal, session, project );
 
-                MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, executionId,
-                                                                 MojoExecution.Source.CLI );
+                MojoExecution mojoExecution =
+                    new MojoExecution( mojoDescriptor, executionId, MojoExecution.Source.CLI );
 
                 mojoExecutions.add( mojoExecution );
             }
@@ -358,9 +354,9 @@ public class DefaultLifecycleExecutionPlanCalculator
                         attributes.put( "implementation", parameter.getImplementation() );
                     }
 
-                    parameterConfiguration = new Xpp3Dom( parameter.getName(), parameterConfiguration.getValue(),
-                            attributes, parameterConfiguration.getChildren(),
-                            parameterConfiguration.getInputLocation() );
+                    parameterConfiguration =
+                        new Xpp3Dom( parameter.getName(), parameterConfiguration.getValue(), attributes,
+                                     parameterConfiguration.getChildren(), parameterConfiguration.getInputLocation() );
 
                     children.add( parameterConfiguration );
                 }
@@ -419,8 +415,8 @@ public class DefaultLifecycleExecutionPlanCalculator
             }
             else
             {
-                forkedExecutions = calculateForkedGoal( mojoExecution, session, forkedProject,
-                                                        alreadyPlannedExecutions );
+                forkedExecutions =
+                    calculateForkedGoal( mojoExecution, session, forkedProject, alreadyPlannedExecutions );
             }
 
             // This List can be empty when the executions are already present in the plan
@@ -442,8 +438,8 @@ public class DefaultLifecycleExecutionPlanCalculator
 
         String forkedPhase = mojoDescriptor.getExecutePhase();
 
-        Map<String, List<MojoExecution>> lifecycleMappings = calculateLifecycleMappings( session, project,
-                                                                                         forkedPhase );
+        Map<String, List<MojoExecution>> lifecycleMappings =
+            calculateLifecycleMappings( session, project, forkedPhase );
 
         for ( List<MojoExecution> forkedExecutions : lifecycleMappings.values() )
         {

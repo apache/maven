@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.execution;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import java.io.File;
 import java.util.Arrays;
@@ -65,8 +64,8 @@ public class MavenSession
 
     /**
      * These projects have already been topologically sorted in the {@link org.apache.maven.Maven} component before
-     * being passed into the session. This is also the potentially constrained set of projects by using --projects
-     * on the command line.
+     * being passed into the session. This is also the potentially constrained set of projects by using --projects on
+     * the command line.
      */
     private List<MavenProject> projects;
 
@@ -91,7 +90,6 @@ public class MavenSession
     private final ConcurrentMap<String, ConcurrentMap<String, ConcurrentMap<String, Object>>> pluginContextsByProjectAndPluginKey =
         new ConcurrentHashMap<>();
 
-
     public void setProjects( List<MavenProject> projects )
     {
         if ( !projects.isEmpty() )
@@ -99,8 +97,7 @@ public class MavenSession
             MavenProject first = projects.get( 0 );
             this.currentProject = ThreadLocal.withInitial( () -> first );
             this.topLevelProject =
-                    projects.stream().filter( project -> project.isExecutionRoot() ).findFirst()
-                            .orElse( first );
+                projects.stream().filter( project -> project.isExecutionRoot() ).findFirst().orElse( first );
         }
         else
         {
@@ -200,21 +197,17 @@ public class MavenSession
 
     // Backward compat
 
-
     /**
-     * Returns the plugin context for given key ({@link PluginDescriptor#getPluginLookupKey()} and
-     * {@link MavenProject}, never returns {@code null} as if context not present, creates it.
-     *
-     * <strong>Implementation note:</strong> while this method return type is {@link Map}, the returned map instance
-     * implements {@link ConcurrentMap} as well.
-     *
+     * Returns the plugin context for given key ({@link PluginDescriptor#getPluginLookupKey()} and {@link MavenProject},
+     * never returns {@code null} as if context not present, creates it. <strong>Implementation note:</strong> while
+     * this method return type is {@link Map}, the returned map instance implements {@link ConcurrentMap} as well.
      */
     public Map<String, Object> getPluginContext( PluginDescriptor plugin, MavenProject project )
     {
         String projectKey = project.getId();
 
-        ConcurrentMap<String, ConcurrentMap<String, Object>> pluginContextsByKey = pluginContextsByProjectAndPluginKey
-                .computeIfAbsent( projectKey, k -> new ConcurrentHashMap<>() );
+        ConcurrentMap<String, ConcurrentMap<String, Object>> pluginContextsByKey =
+            pluginContextsByProjectAndPluginKey.computeIfAbsent( projectKey, k -> new ConcurrentHashMap<>() );
 
         String pluginKey = plugin.getPluginLookupKey();
 
@@ -293,7 +286,7 @@ public class MavenSession
         this.allProjects = allProjects;
     }
 
-    /*if_not[MAVEN4]*/
+    /* if_not[MAVEN4] */
 
     //
     // Deprecated
@@ -327,7 +320,7 @@ public class MavenSession
     public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result,
                          MavenProject project )
     {
-        this( container, request, result, Arrays.asList( new MavenProject[]{project} ) );
+        this( container, request, result, Arrays.asList( new MavenProject[] { project } ) );
     }
 
     @Deprecated
@@ -370,26 +363,17 @@ public class MavenSession
     }
 
     /**
-     * Adapt a {@link MavenExecutionRequest} to a {@link Settings} object for use in the Maven core.
-     * We want to make sure that what is ask for in the execution request overrides what is in the settings.
-     * The CLI feeds into an execution request so if a particular value is present in the execution request
-     * then we will take that over the value coming from the user settings.
+     * Adapt a {@link MavenExecutionRequest} to a {@link Settings} object for use in the Maven core. We want to make
+     * sure that what is ask for in the execution request overrides what is in the settings. The CLI feeds into an
+     * execution request so if a particular value is present in the execution request then we will take that over the
+     * value coming from the user settings.
      */
     private static Settings adaptSettings( MavenExecutionRequest request )
     {
         File localRepo = request.getLocalRepositoryPath();
-        return new Settings( org.apache.maven.api.settings.Settings.newBuilder()
-                .localRepository( localRepo != null ? localRepo.getAbsolutePath() : null )
-                .interactiveMode( request.isInteractiveMode() )
-                .offline( request.isOffline() )
-                .proxies( request.getProxies().stream().map( Proxy::getDelegate ).collect( Collectors.toList() ) )
-                .servers( request.getServers().stream().map( Server::getDelegate ).collect( Collectors.toList() ) )
-                .mirrors( request.getMirrors().stream().map( Mirror::getDelegate ).collect( Collectors.toList() ) )
-                .profiles( request.getProfiles().stream()
-                        .map( SettingsUtils::convertToSettingsProfile ).collect( Collectors.toList() ) )
-                .activeProfiles( request.getActiveProfiles() )
-                .pluginGroups( request.getPluginGroups() )
-                .build() );
+        return new Settings( org.apache.maven.api.settings.Settings.newBuilder().localRepository( localRepo != null
+                        ? localRepo.getAbsolutePath()
+                        : null ).interactiveMode( request.isInteractiveMode() ).offline( request.isOffline() ).proxies( request.getProxies().stream().map( Proxy::getDelegate ).collect( Collectors.toList() ) ).servers( request.getServers().stream().map( Server::getDelegate ).collect( Collectors.toList() ) ).mirrors( request.getMirrors().stream().map( Mirror::getDelegate ).collect( Collectors.toList() ) ).profiles( request.getProfiles().stream().map( SettingsUtils::convertToSettingsProfile ).collect( Collectors.toList() ) ).activeProfiles( request.getActiveProfiles() ).pluginGroups( request.getPluginGroups() ).build() );
     }
 
     @Deprecated
@@ -479,5 +463,5 @@ public class MavenSession
     {
         this.session = session;
     }
-    /*end[MAVEN4]*/
+    /* end[MAVEN4] */
 }

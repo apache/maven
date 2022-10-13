@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import org.apache.maven.model.Model;
 
@@ -48,7 +47,6 @@ public class DefaultModelProblem
 
     private final Version version;
 
-
     /**
      * Creates a new problem with the specified message and exception.
      *
@@ -60,7 +58,7 @@ public class DefaultModelProblem
      * @param columnNumber The one-based index of the column containing the error or {@code -1} if unknown.
      * @param exception The exception that caused this problem, may be {@code null}.
      */
-    //mkleint: does this need to be public?
+    // mkleint: does this need to be public?
     public DefaultModelProblem( String message, Severity severity, Version version, Model source, int lineNumber,
                                 int columnNumber, Exception exception )
     {
@@ -81,7 +79,7 @@ public class DefaultModelProblem
      * @param modelId The identifier of the model that exhibits the problem, may be {@code null}.
      * @param exception The exception that caused this problem, may be {@code null}.
      */
-    //mkleint: does this need to be public?
+    // mkleint: does this need to be public?
     @SuppressWarnings( "checkstyle:parameternumber" )
     public DefaultModelProblem( String message, Severity severity, Version version, String source, int lineNumber,
                                 int columnNumber, String modelId, Exception exception )
@@ -159,7 +157,6 @@ public class DefaultModelProblem
     {
         return version;
     }
-
 
     @Override
     public String toString()

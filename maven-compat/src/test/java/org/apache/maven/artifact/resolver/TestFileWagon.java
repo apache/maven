@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.resolver;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver;
 
 import java.io.File;
 import java.io.InputStream;
@@ -36,12 +35,10 @@ public class TestFileWagon
     extends FileWagon
 {
     private TestTransferListener testTransferListener;
+
     private boolean insideGet;
 
-    protected void getTransfer( Resource resource,
-                                File destination,
-                                InputStream input,
-                                boolean closeInput,
+    protected void getTransfer( Resource resource, File destination, InputStream input, boolean closeInput,
                                 int maxSize )
         throws TransferFailedException
     {
@@ -50,9 +47,7 @@ public class TestFileWagon
     }
 
     public void get( String resourceName, File destination )
-        throws TransferFailedException,
-               ResourceDoesNotExistException,
-               AuthorizationException
+        throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException
     {
         addTransfer( "get " + resourceName );
 
@@ -72,9 +67,7 @@ public class TestFileWagon
     }
 
     public boolean getIfNewer( String resourceName, File destination, long timestamp )
-        throws TransferFailedException,
-               ResourceDoesNotExistException,
-               AuthorizationException
+        throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException
     {
         if ( !insideGet )
         {

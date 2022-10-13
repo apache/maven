@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,15 +28,14 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Objects;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
-// remove once createArtifacts() is removed
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -423,7 +421,7 @@ public class MavenProject
         for ( Artifact a : getArtifacts() )
         {
             if ( a.getArtifactHandler().isAddedToClasspath()
-            // TODO let the scope handler deal with this
+                // TODO let the scope handler deal with this
                 && ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) ) )
             {
                 addArtifactPath( a, list );
@@ -1081,8 +1079,7 @@ public class MavenProject
         MavenProject that = (MavenProject) other;
 
         return Objects.equals( getArtifactId(), that.getArtifactId() )
-            && Objects.equals( getGroupId(), that.getGroupId() )
-            && Objects.equals( getVersion(), that.getVersion() );
+            && Objects.equals( getGroupId(), that.getGroupId() ) && Objects.equals( getVersion(), that.getVersion() );
     }
 
     @Override
@@ -1111,7 +1108,8 @@ public class MavenProject
     public void addProjectReference( MavenProject project )
     {
         projectReferences.put( getProjectReferenceId( project.getGroupId(), project.getArtifactId(),
-                                                      project.getVersion() ), project );
+                                                      project.getVersion() ),
+                               project );
     }
 
     public Properties getProperties()
@@ -1557,8 +1555,8 @@ public class MavenProject
                                           ArtifactFilter filter )
         throws InvalidDependencyVersionException
     {
-        return MavenMetadataSource.createArtifacts( artifactFactory, getModel().getDependencies(),
-                inheritedScope, filter, this );
+        return MavenMetadataSource.createArtifacts( artifactFactory, getModel().getDependencies(), inheritedScope,
+                                                    filter, this );
     }
 
     @Deprecated
@@ -1626,7 +1624,7 @@ public class MavenProject
         {
             // TODO let the scope handler deal with this
             if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() )
-                     || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
+                || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
             {
                 Dependency dependency = new Dependency();
 
@@ -1724,11 +1722,11 @@ public class MavenProject
     {
         List<Artifact> list = new ArrayList<>( getArtifacts().size() );
 
-        for ( Artifact a : getArtifacts()  )
+        for ( Artifact a : getArtifacts() )
         {
             // TODO classpath check doesn't belong here - that's the other method
             if ( a.getArtifactHandler().isAddedToClasspath()
-            // TODO let the scope handler deal with this
+                // TODO let the scope handler deal with this
                 && ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) ) )
             {
                 list.add( a );

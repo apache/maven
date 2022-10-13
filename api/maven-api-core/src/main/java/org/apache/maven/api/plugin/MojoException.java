@@ -1,5 +1,3 @@
-package org.apache.maven.api.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.plugin;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.services.MavenException;
@@ -48,8 +47,8 @@ public class MojoException
     }
 
     /**
-     * Construct a new <code>MojoExecutionException</code> exception wrapping an underlying <code>Exception</code>
-     * and providing a <code>message</code>.
+     * Construct a new <code>MojoExecutionException</code> exception wrapping an underlying <code>Exception</code> and
+     * providing a <code>message</code>.
      */
     public MojoException( String message, Exception cause )
     {
@@ -57,8 +56,8 @@ public class MojoException
     }
 
     /**
-     * Construct a new <code>MojoExecutionException</code> exception wrapping an underlying <code>Throwable</code>
-     * and providing a <code>message</code>.
+     * Construct a new <code>MojoExecutionException</code> exception wrapping an underlying <code>Throwable</code> and
+     * providing a <code>message</code>.
      */
     public MojoException( String message, Throwable cause )
     {
@@ -76,8 +75,8 @@ public class MojoException
     /**
      * Constructs a new {@code MojoExecutionException} exception wrapping an underlying {@code Throwable}.
      *
-     * @param cause the cause which is saved for later retrieval by the {@link #getCause()} method.
-     *              A {@code null} value is permitted, and indicates that the cause is nonexistent or unknown.
+     * @param cause the cause which is saved for later retrieval by the {@link #getCause()} method. A {@code null} value
+     *            is permitted, and indicates that the cause is nonexistent or unknown.
      * @since 3.8.3
      */
     public MojoException( Throwable cause )

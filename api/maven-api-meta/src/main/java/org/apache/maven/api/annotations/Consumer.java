@@ -1,5 +1,3 @@
-package org.apache.maven.api.annotations;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.annotations;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api.annotations;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -26,14 +25,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * A type implemented by, or extended by maven plugins or extensions.
- * Maven plugins or extensions may provide implementations of those types which will be used by maven.
+ * A type implemented by, or extended by maven plugins or extensions. Maven plugins or extensions may provide
+ * implementations of those types which will be used by maven.
  * <p>
- * A type can be marked {@link Consumer} or {@link Provider} but not both. A type is assumed to be
- * {@link Consumer} if it is not marked either {@link Consumer} or {@link Provider}.
+ * A type can be marked {@link Consumer} or {@link Provider} but not both. A type is assumed to be {@link Consumer} if
+ * it is not marked either {@link Consumer} or {@link Provider}.
  * <p>
- * A package can be marked {@link Provider}. In this case, all types in the package are considered
- * to be a provider type regardless of whether they are marked {@link Consumer} or {@link Provider}.
+ * A package can be marked {@link Provider}. In this case, all types in the package are considered to be a provider type
+ * regardless of whether they are marked {@link Consumer} or {@link Provider}.
  *
  * @see Provider
  * @since 4.0

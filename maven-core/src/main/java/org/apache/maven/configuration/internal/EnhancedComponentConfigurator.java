@@ -1,5 +1,3 @@
-package org.apache.maven.configuration.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.configuration.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.configuration.internal;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -31,13 +30,13 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 /**
- * A component configurator which can leverage the {@link EnhancedConfigurationConverter}
- * and {@link EnhancedConverterLookup}.
+ * A component configurator which can leverage the {@link EnhancedConfigurationConverter} and
+ * {@link EnhancedConverterLookup}.
  */
 @Singleton
 @Named( "enhanced" )
 public class EnhancedComponentConfigurator
-        extends BasicComponentConfigurator
+    extends BasicComponentConfigurator
 {
 
     public EnhancedComponentConfigurator()
@@ -49,14 +48,14 @@ public class EnhancedComponentConfigurator
     public void configureComponent( final Object component, final PlexusConfiguration configuration,
                                     final ExpressionEvaluator evaluator, final ClassRealm realm,
                                     final ConfigurationListener listener )
-            throws ComponentConfigurationException
+        throws ComponentConfigurationException
     {
         try
         {
             ClassRealmConverter.pushContextRealm( realm );
 
             new EnhancedConfigurationConverter().processConfiguration( converterLookup, component, realm, //
-                    configuration, evaluator, listener );
+                                                                       configuration, evaluator, listener );
         }
         finally
         {

@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,10 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -32,9 +34,6 @@ import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 /**
  * @author Benjamin Bentmann

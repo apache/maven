@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,17 +16,16 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import org.apache.maven.artifact.Artifact;
 
 /**
- * This exception is thrown if an application attempts to attach
- * two of the same artifacts to a single project.
+ * This exception is thrown if an application attempts to attach two of the same artifacts to a single project.
  *
  * @author pgier
- * @author jdcasey
- * TODO Make this a checked exception, and modify the API of MavenProjectHelper.
- * Currently, this modification would create compatibility problems for existing plugins.
+ * @author jdcasey TODO Make this a checked exception, and modify the API of MavenProjectHelper. Currently, this
+ *         modification would create compatibility problems for existing plugins.
  */
 public class DuplicateArtifactAttachmentException
     extends RuntimeException

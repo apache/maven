@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,7 +49,6 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.VersionRangeRequest;
 import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.eclipse.aether.resolution.VersionRangeResult;
-
 
 /**
  * A model resolver to assist building of projects. This resolver gives priority to those repositories that have been
@@ -119,7 +117,7 @@ public class ProjectModelResolver
     public void addRepository( Repository repository )
         throws InvalidRepositoryException
     {
-         addRepository( repository, false );
+        addRepository( repository, false );
     }
 
     @Override
@@ -139,13 +137,12 @@ public class ProjectModelResolver
         }
 
         List<RemoteRepository> newRepositories =
-            Collections.singletonList( ArtifactDescriptorUtils.toRemoteRepository(
-                    new org.apache.maven.model.Repository( repository ) ) );
+            Collections.singletonList( ArtifactDescriptorUtils.toRemoteRepository( new org.apache.maven.model.Repository( repository ) ) );
 
         if ( ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT.equals( repositoryMerging ) )
         {
-            repositories = remoteRepositoryManager.aggregateRepositories( session, repositories, newRepositories,
-                                                                          true );
+            repositories =
+                remoteRepositoryManager.aggregateRepositories( session, repositories, newRepositories, true );
         }
         else
         {
@@ -158,7 +155,7 @@ public class ProjectModelResolver
 
     private static void removeMatchingRepository( Iterable<RemoteRepository> repositories, final String id )
     {
-        Iterator<RemoteRepository> iterator = repositories.iterator( );
+        Iterator<RemoteRepository> iterator = repositories.iterator();
         while ( iterator.hasNext() )
         {
             RemoteRepository next = iterator.next();
@@ -199,8 +196,8 @@ public class ProjectModelResolver
     {
         try
         {
-            final Artifact artifact = new DefaultArtifact( parent.getGroupId(), parent.getArtifactId(), "", "pom",
-                                                           parent.getVersion() );
+            final Artifact artifact =
+                new DefaultArtifact( parent.getGroupId(), parent.getArtifactId(), "", "pom", parent.getVersion() );
 
             final VersionRangeRequest versionRangeRequest = new VersionRangeRequest( artifact, repositories, context );
             versionRangeRequest.setTrace( trace );
@@ -209,22 +206,22 @@ public class ProjectModelResolver
 
             if ( versionRangeResult.getHighestVersion() == null )
             {
-                throw new UnresolvableModelException(
-                    String.format( "No versions matched the requested parent version range '%s'",
-                                   parent.getVersion() ),
-                    parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
+                throw new UnresolvableModelException( String.format( "No versions matched the requested parent version range '%s'",
+                                                                     parent.getVersion() ),
+                                                      parent.getGroupId(), parent.getArtifactId(),
+                                                      parent.getVersion() );
 
             }
 
             if ( versionRangeResult.getVersionConstraint() != null
-                     && versionRangeResult.getVersionConstraint().getRange() != null
-                     && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null )
+                && versionRangeResult.getVersionConstraint().getRange() != null
+                && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null )
             {
                 // Message below is checked for in the MNG-2199 core IT.
-                throw new UnresolvableModelException(
-                    String.format( "The requested parent version range '%s' does not specify an upper bound",
-                                   parent.getVersion() ),
-                    parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
+                throw new UnresolvableModelException( String.format( "The requested parent version range '%s' does not specify an upper bound",
+                                                                     parent.getVersion() ),
+                                                      parent.getGroupId(), parent.getArtifactId(),
+                                                      parent.getVersion() );
 
             }
 
@@ -260,22 +257,22 @@ public class ProjectModelResolver
 
             if ( versionRangeResult.getHighestVersion() == null )
             {
-                throw new UnresolvableModelException(
-                    String.format( "No versions matched the requested dependency version range '%s'",
-                                   dependency.getVersion() ),
-                    dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+                throw new UnresolvableModelException( String.format( "No versions matched the requested dependency version range '%s'",
+                                                                     dependency.getVersion() ),
+                                                      dependency.getGroupId(), dependency.getArtifactId(),
+                                                      dependency.getVersion() );
 
             }
 
             if ( versionRangeResult.getVersionConstraint() != null
-                     && versionRangeResult.getVersionConstraint().getRange() != null
-                     && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null )
+                && versionRangeResult.getVersionConstraint().getRange() != null
+                && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null )
             {
                 // Message below is checked for in the MNG-4463 core IT.
-                throw new UnresolvableModelException(
-                    String.format( "The requested dependency version range '%s' does not specify an upper bound",
-                                   dependency.getVersion() ),
-                    dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+                throw new UnresolvableModelException( String.format( "The requested dependency version range '%s' does not specify an upper bound",
+                                                                     dependency.getVersion() ),
+                                                      dependency.getGroupId(), dependency.getArtifactId(),
+                                                      dependency.getVersion() );
 
             }
 
@@ -287,8 +284,7 @@ public class ProjectModelResolver
 
             if ( modelPool != null )
             {
-                Model model =
-                    modelPool.get( dependency.getGroupId(), dependency.getArtifactId(), newVersion );
+                Model model = modelPool.get( dependency.getGroupId(), dependency.getArtifactId(), newVersion );
 
                 if ( model != null )
                 {
@@ -307,7 +303,8 @@ public class ProjectModelResolver
     }
 
     @Override
-    public ModelSource resolveModel( org.apache.maven.model.Parent parent ) throws UnresolvableModelException
+    public ModelSource resolveModel( org.apache.maven.model.Parent parent )
+        throws UnresolvableModelException
     {
         AtomicReference<org.apache.maven.api.model.Parent> resolvedParent = new AtomicReference<>();
         ModelSource result = resolveModel( parent.getDelegate(), resolvedParent );
@@ -319,7 +316,8 @@ public class ProjectModelResolver
     }
 
     @Override
-    public ModelSource resolveModel( org.apache.maven.model.Dependency dependency ) throws UnresolvableModelException
+    public ModelSource resolveModel( org.apache.maven.model.Dependency dependency )
+        throws UnresolvableModelException
     {
         AtomicReference<org.apache.maven.api.model.Dependency> resolvedDependency = new AtomicReference<>();
         ModelSource result = resolveModel( dependency.getDelegate(), resolvedDependency );
@@ -331,14 +329,15 @@ public class ProjectModelResolver
     }
 
     @Override
-    public void addRepository( org.apache.maven.model.Repository repository ) throws InvalidRepositoryException
+    public void addRepository( org.apache.maven.model.Repository repository )
+        throws InvalidRepositoryException
     {
         addRepository( repository.getDelegate() );
     }
 
     @Override
     public void addRepository( org.apache.maven.model.Repository repository, boolean replace )
-            throws InvalidRepositoryException
+        throws InvalidRepositoryException
     {
         addRepository( repository.getDelegate(), replace );
     }

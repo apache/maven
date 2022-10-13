@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain.java;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.toolchain.java;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,14 +16,15 @@ package org.apache.maven.toolchain.java;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain.java;
 
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.slf4j.Logger;
 
 /**
  * Provides backwards compatibility with Maven 3.2.3 and earlier. Clients that do not require compatibility with Maven
- * 3.2.3 and earlier are encouraged to use {@link JavaToolchainImpl}.
- * <strong>Note:</strong> This is an internal component whose interface can change without prior notice.
+ * 3.2.3 and earlier are encouraged to use {@link JavaToolchainImpl}. <strong>Note:</strong> This is an internal
+ * component whose interface can change without prior notice.
  *
  * @deprecated clients that do not require compatibility with Maven 3.2.3 and earlier should link to
  *             {@link JavaToolchainImpl} instead.

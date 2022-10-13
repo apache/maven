@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile.activation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,19 +16,20 @@ package org.apache.maven.model.profile.activation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile.activation;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.profile.ProfileActivationContext;
 
@@ -67,9 +66,8 @@ public class JdkVersionProfileActivator
 
         if ( version == null || version.length() <= 0 )
         {
-            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Failed to determine Java version for profile " + profile.getId() )
-                    .setLocation( activation.getLocation( "jdk" ) ) );
+            problems.add( new ModelProblemCollectorRequest( Severity.ERROR,
+                                                            Version.BASE ).setMessage( "Failed to determine Java version for profile " + profile.getId() ).setLocation( activation.getLocation( "jdk" ) ) );
             return false;
         }
 

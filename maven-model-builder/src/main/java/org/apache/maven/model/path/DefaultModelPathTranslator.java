@@ -1,5 +1,3 @@
-package org.apache.maven.model.path;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model.path;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,16 +16,17 @@ package org.apache.maven.model.path;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.path;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Model;
@@ -67,33 +66,21 @@ public class DefaultModelPathTranslator
         Build newBuild = null;
         if ( build != null )
         {
-            newBuild = Build.newBuilder( build )
-                    .directory( alignToBaseDirectory( build.getDirectory(), basedir ) )
-                    .sourceDirectory( alignToBaseDirectory( build.getSourceDirectory(), basedir ) )
-                    .testSourceDirectory( alignToBaseDirectory( build.getTestSourceDirectory(), basedir ) )
-                    .scriptSourceDirectory( alignToBaseDirectory( build.getScriptSourceDirectory(), basedir ) )
-                    .resources( map( build.getResources(), r -> alignToBaseDirectory( r, basedir ) ) )
-                    .testResources( map( build.getTestResources(), r -> alignToBaseDirectory( r, basedir ) ) )
-                    .filters( map( build.getFilters(), s -> alignToBaseDirectory( s, basedir ) ) )
-                    .outputDirectory( alignToBaseDirectory( build.getOutputDirectory(), basedir ) )
-                    .testOutputDirectory( alignToBaseDirectory( build.getTestOutputDirectory(), basedir ) )
-                    .build();
+            newBuild = Build.newBuilder(
+                                         build ).directory( alignToBaseDirectory( build.getDirectory(), basedir ) ).sourceDirectory( alignToBaseDirectory( build.getSourceDirectory(), basedir ) ).testSourceDirectory( alignToBaseDirectory( build.getTestSourceDirectory(), basedir ) ).scriptSourceDirectory( alignToBaseDirectory( build.getScriptSourceDirectory(), basedir ) ).resources( map( build.getResources(), r -> alignToBaseDirectory( r, basedir ) ) ).testResources( map( build.getTestResources(), r -> alignToBaseDirectory( r, basedir ) ) ).filters( map( build.getFilters(), s -> alignToBaseDirectory( s, basedir ) ) ).outputDirectory( alignToBaseDirectory( build.getOutputDirectory(), basedir ) ).testOutputDirectory( alignToBaseDirectory( build.getTestOutputDirectory(), basedir ) ).build();
         }
 
         Reporting reporting = model.getReporting();
         Reporting newReporting = null;
         if ( reporting != null )
         {
-            newReporting = Reporting.newBuilder( reporting )
-                    .outputDirectory( alignToBaseDirectory( reporting.getOutputDirectory(), basedir ) )
-                    .build();
+            newReporting =
+                Reporting.newBuilder( reporting ).outputDirectory( alignToBaseDirectory( reporting.getOutputDirectory(),
+                                                                                         basedir ) ).build();
         }
         if ( newBuild != build || newReporting != reporting )
         {
-            modelV3.update( Model.newBuilder( model )
-                    .build( newBuild )
-                    .reporting( newReporting )
-                    .build() );
+            modelV3.update( Model.newBuilder( model ).build( newBuild ).reporting( newReporting ).build() );
         }
     }
 

@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,16 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api;
+
+import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
-import java.util.Optional;
-
 /**
- * Event sent by maven during various phases of the build process.
- * Such events can be listened to using {@link Listener}s objects
- * registered in the {@link Session}.
+ * Event sent by maven during various phases of the build process. Such events can be listened to using
+ * {@link Listener}s objects registered in the {@link Session}.
  *
  * @since 4.0
  */

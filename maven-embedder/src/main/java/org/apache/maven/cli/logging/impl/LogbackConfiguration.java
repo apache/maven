@@ -1,5 +1,3 @@
-package org.apache.maven.cli.logging.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.cli.logging.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli.logging.impl;
 
 import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
 import org.slf4j.Logger;

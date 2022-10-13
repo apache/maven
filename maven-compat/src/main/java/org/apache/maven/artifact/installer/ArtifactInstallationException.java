@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.installer;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.installer;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.installer;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.installer;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -35,8 +34,7 @@ public class ArtifactInstallationException
         super( cause );
     }
 
-    public ArtifactInstallationException( String message,
-                                          Throwable cause )
+    public ArtifactInstallationException( String message, Throwable cause )
     {
         super( message, cause );
     }

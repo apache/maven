@@ -1,5 +1,3 @@
-package org.codehaus.modello.plugin.velocity;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.codehaus.modello.plugin.velocity;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.codehaus.modello.plugin.velocity;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -40,18 +39,19 @@ import org.codehaus.modello.plugin.AbstractModelloGenerator;
 import org.codehaus.plexus.util.io.CachingWriter;
 
 public class VelocityGenerator
-        extends AbstractModelloGenerator
+    extends AbstractModelloGenerator
 {
     public static final String VELOCITY_TEMPLATES = "modello.velocity.template";
 
     public static final String VELOCITY_PARAMETERS = "modello.velocity.parameters";
 
     @Override
-    public void generate( Model model, Properties parameters ) throws ModelloException
+    public void generate( Model model, Properties parameters )
+        throws ModelloException
     {
         try
         {
-            Map<String, String> params = ( Map ) Objects.requireNonNull( parameters.get( VELOCITY_PARAMETERS ) );
+            Map<String, String> params = (Map) Objects.requireNonNull( parameters.get( VELOCITY_PARAMETERS ) );
             String templates = getParameter( parameters, VELOCITY_TEMPLATES );
             String output = getParameter( parameters, ModelloParameterConstants.OUTPUT_DIRECTORY );
 
@@ -91,10 +91,13 @@ public class VelocityGenerator
 
     }
 
-    static class RedirectingWriter extends Writer
+    static class RedirectingWriter
+        extends Writer
     {
         Path dir;
+
         StringBuilder sb = new StringBuilder();
+
         Writer current;
 
         RedirectingWriter( Path dir )
@@ -103,11 +106,12 @@ public class VelocityGenerator
         }
 
         @Override
-        public void write( char[] cbuf, int off, int len ) throws IOException
+        public void write( char[] cbuf, int off, int len )
+            throws IOException
         {
             for ( int i = 0; i < len; i++ )
             {
-                if ( cbuf[ off + i ] == '\n' )
+                if ( cbuf[off + i] == '\n' )
                 {
                     if ( sb.length() > 0 && sb.charAt( sb.length() - 1 ) == '\r' )
                     {
@@ -118,12 +122,13 @@ public class VelocityGenerator
                 }
                 else
                 {
-                    sb.append( cbuf[ off + i ] );
+                    sb.append( cbuf[off + i] );
                 }
             }
         }
 
-        protected void writeLine( String line ) throws IOException
+        protected void writeLine( String line )
+            throws IOException
         {
             if ( line.startsWith( "#MODELLO-VELOCITY#REDIRECT " ) )
             {
@@ -144,7 +149,8 @@ public class VelocityGenerator
         }
 
         @Override
-        public void flush() throws IOException
+        public void flush()
+            throws IOException
         {
             if ( current != null )
             {
@@ -153,7 +159,8 @@ public class VelocityGenerator
         }
 
         @Override
-        public void close() throws IOException
+        public void close()
+            throws IOException
         {
             if ( current != null )
             {

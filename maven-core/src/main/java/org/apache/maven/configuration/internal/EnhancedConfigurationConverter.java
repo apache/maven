@@ -1,5 +1,3 @@
-package org.apache.maven.configuration.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.configuration.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.configuration.internal;
 
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
@@ -30,15 +29,14 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.eclipse.sisu.plexus.CompositeBeanHelper;
 
 /**
- * An enhanced {@link ObjectWithFieldsConverter} leveraging the {@link TypeAwareExpressionEvaluator}
- * interface.
+ * An enhanced {@link ObjectWithFieldsConverter} leveraging the {@link TypeAwareExpressionEvaluator} interface.
  */
 class EnhancedConfigurationConverter
-        extends ObjectWithFieldsConverter
+    extends ObjectWithFieldsConverter
 {
     protected Object fromExpression( final PlexusConfiguration configuration, final ExpressionEvaluator evaluator,
                                      final Class<?> type )
-            throws ComponentConfigurationException
+        throws ComponentConfigurationException
     {
         String value = configuration.getValue();
         try
@@ -75,19 +73,17 @@ class EnhancedConfigurationConverter
         }
         catch ( final ExpressionEvaluationException e )
         {
-            final String reason =
-                    String.format( "Cannot evaluate expression '%s' for configuration entry '%s'", value,
-                            configuration.getName() );
+            final String reason = String.format( "Cannot evaluate expression '%s' for configuration entry '%s'", value,
+                                                 configuration.getName() );
 
             throw new ComponentConfigurationException( configuration, reason, e );
         }
     }
 
-
     public Object fromConfiguration( final ConverterLookup lookup, final PlexusConfiguration configuration,
                                      final Class<?> type, final Class<?> enclosingType, final ClassLoader loader,
                                      final ExpressionEvaluator evaluator, final ConfigurationListener listener )
-            throws ComponentConfigurationException
+        throws ComponentConfigurationException
     {
         final Object value = fromExpression( configuration, evaluator, type );
         if ( type.isInstance( value ) )
@@ -108,8 +104,7 @@ class EnhancedConfigurationConverter
             }
             else
             {
-                new CompositeBeanHelper( lookup, loader, evaluator, listener )
-                        .setDefault( bean, value, configuration );
+                new CompositeBeanHelper( lookup, loader, evaluator, listener ).setDefault( bean, value, configuration );
             }
             return bean;
         }

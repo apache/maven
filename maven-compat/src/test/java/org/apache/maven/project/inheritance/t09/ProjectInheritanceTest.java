@@ -1,5 +1,3 @@
-package org.apache.maven.project.inheritance.t09;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.inheritance.t09;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,8 @@ package org.apache.maven.project.inheritance.t09;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.inheritance.t09;
+
 import java.io.File;
 import java.util.Map;
 
@@ -31,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Verifies exclusions listed in dependencyManagement are valid for
- * transitive dependencies.
+ * Verifies exclusions listed in dependencyManagement are valid for transitive dependencies.
  *
  * @author <a href="mailto:pschneider@gmail.com">Patrick Schneider</a>
  */
@@ -51,16 +50,10 @@ public class ProjectInheritanceTest
     // ----------------------------------------------------------------------
 
     /**
-     * How the test project is set up:
-     *
-     * 1. dependencyManagement lists dependencies on a &amp; b,
-     *    with an exclusion on c in b.
-     * 2. the child project lists a dependency on project a only
-     * 3. a depends on b (which is transitive to the child project),
-     *    and b depends on c.
-     *
-     * We should see that the resulting size of collected artifacts is two:
-     * a &amp; b only.
+     * How the test project is set up: 1. dependencyManagement lists dependencies on a &amp; b, with an exclusion on c
+     * in b. 2. the child project lists a dependency on project a only 3. a depends on b (which is transitive to the
+     * child project), and b depends on c. We should see that the resulting size of collected artifacts is two: a &amp;
+     * b only.
      */
     @Test
     public void testDependencyManagementExclusionsExcludeTransitively()
@@ -90,12 +83,10 @@ public class ProjectInheritanceTest
     }
 
     /**
-     * Setup exactly the same as the above test, except that the child project
-     * now depends upon d, which has a transitive dependency on c.  Even though
-     * we did list an exclusion on c, it was only from within the context of
-     * project b.  We will pick up project c in this case because no
-     * restrictions were placed on d.  This demonstrates that a, b, c, &amp; d will
-     * all be collected.
+     * Setup exactly the same as the above test, except that the child project now depends upon d, which has a
+     * transitive dependency on c. Even though we did list an exclusion on c, it was only from within the context of
+     * project b. We will pick up project c in this case because no restrictions were placed on d. This demonstrates
+     * that a, b, c, &amp; d will all be collected.
      *
      * @throws Exception
      */

@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,25 +16,24 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
+import java.nio.file.Path;
+import java.util.Optional;
+
+import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
 
-import java.nio.file.Path;
-import java.util.Optional;
-
-import org.apache.maven.api.Session;
-import org.apache.maven.api.Artifact;
-
 import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
- * Request used to build a {@link org.apache.maven.api.Project} using
- * the {@link ProjectBuilder} service.
+ * Request used to build a {@link org.apache.maven.api.Project} using the {@link ProjectBuilder} service.
  *
  * @since 4.0
  */
@@ -69,39 +66,43 @@ public interface ProjectBuilderRequest
     boolean isResolveDependencies();
 
     @Nonnull
-    static ProjectBuilderRequest build( @Nonnull Session session, @Nonnull ProjectBuilderSource source )
+    static ProjectBuilderRequest build( @Nonnull
+    Session session, @Nonnull
+    ProjectBuilderSource source )
     {
-        return builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .source( nonNull( source, "source cannot be null" ) )
-                .build();
+        return builder().session( nonNull( session,
+                                           "session cannot be null" ) ).source( nonNull( source,
+                                                                                         "source cannot be null" ) ).build();
     }
 
     @Nonnull
-    static ProjectBuilderRequest build( @Nonnull Session session, @Nonnull Path path )
+    static ProjectBuilderRequest build( @Nonnull
+    Session session, @Nonnull
+    Path path )
     {
-        return builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .path( nonNull( path, "path cannot be null" ) )
-                .build();
+        return builder().session( nonNull( session,
+                                           "session cannot be null" ) ).path( nonNull( path,
+                                                                                       "path cannot be null" ) ).build();
     }
 
     @Nonnull
-    static ProjectBuilderRequest build( @Nonnull Session session, @Nonnull Artifact artifact )
+    static ProjectBuilderRequest build( @Nonnull
+    Session session, @Nonnull
+    Artifact artifact )
     {
-        return builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .artifact( nonNull( artifact, "artifact cannot be null" ) )
-                .build();
+        return builder().session( nonNull( session,
+                                           "session cannot be null" ) ).artifact( nonNull( artifact,
+                                                                                           "artifact cannot be null" ) ).build();
     }
 
     @Nonnull
-    static ProjectBuilderRequest build( @Nonnull Session session, @Nonnull ArtifactCoordinate coordinate )
+    static ProjectBuilderRequest build( @Nonnull
+    Session session, @Nonnull
+    ArtifactCoordinate coordinate )
     {
-        return builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .coordinate( nonNull( coordinate, "coordinate cannot be null" ) )
-                .build();
+        return builder().session( nonNull( session,
+                                           "session cannot be null" ) ).coordinate( nonNull( coordinate,
+                                                                                             "coordinate cannot be null" ) ).build();
     }
 
     @Nonnull
@@ -114,13 +115,21 @@ public interface ProjectBuilderRequest
     class ProjectBuilderRequestBuilder
     {
         Session session;
+
         Path path;
+
         ProjectBuilderSource source;
+
         Artifact artifact;
+
         ArtifactCoordinate coordinate;
+
         boolean allowStubModel;
+
         boolean recursive;
+
         boolean processPlugins = true;
+
         boolean resolveDependencies = true;
 
         ProjectBuilderRequestBuilder()
@@ -171,31 +180,37 @@ public interface ProjectBuilderRequest
 
         public ProjectBuilderRequest build()
         {
-            return new DefaultProjectBuilderRequest( session, path, source, artifact, coordinate,
-                    allowStubModel, recursive, processPlugins, resolveDependencies );
+            return new DefaultProjectBuilderRequest( session, path, source, artifact, coordinate, allowStubModel,
+                                                     recursive, processPlugins, resolveDependencies );
         }
 
-        private static class DefaultProjectBuilderRequest extends BaseRequest
+        private static class DefaultProjectBuilderRequest
+            extends BaseRequest
             implements ProjectBuilderRequest
         {
             private final Path path;
+
             private final ProjectBuilderSource source;
+
             private final Artifact artifact;
+
             private final ArtifactCoordinate coordinate;
+
             private final boolean allowStubModel;
+
             private final boolean recursive;
+
             private final boolean processPlugins;
+
             private final boolean resolveDependencies;
 
             @SuppressWarnings( "checkstyle:ParameterNumber" )
-            DefaultProjectBuilderRequest( @Nonnull Session session,
-                                          @Nullable Path path,
-                                          @Nullable ProjectBuilderSource source,
-                                          @Nullable Artifact artifact,
-                                          @Nullable ArtifactCoordinate coordinate,
-                                          boolean allowStubModel,
-                                          boolean recursive,
-                                          boolean processPlugins,
+            DefaultProjectBuilderRequest( @Nonnull
+            Session session, @Nullable
+            Path path, @Nullable
+            ProjectBuilderSource source, @Nullable
+            Artifact artifact, @Nullable
+            ArtifactCoordinate coordinate, boolean allowStubModel, boolean recursive, boolean processPlugins,
                                           boolean resolveDependencies )
             {
                 super( session );

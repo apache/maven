@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal.builder;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal.builder;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.lifecycle.internal.builder;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal.builder;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -34,6 +33,7 @@ import org.apache.maven.lifecycle.internal.TaskSegment;
  * the the projects serially, but a {@link Builder} can employ any type of concurrency model to build the projects.
  * </p>
  * <strong>Note:</strong> This interface is part of work in progress and can be changed or removed without notice.
+ * 
  * @author jvanzyl
  */
 public interface Builder

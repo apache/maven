@@ -1,5 +1,3 @@
-package org.apache.maven.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact;
 
 import java.io.File;
 import java.util.Collection;
@@ -33,8 +32,8 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 
 /**
- * Maven Artifact interface. Notice that it mixes artifact definition concepts (groupId, artifactId, version)
- * with dependency information (version range, scope).
+ * Maven Artifact interface. Notice that it mixes artifact definition concepts (groupId, artifactId, version) with
+ * dependency information (version range, scope).
  */
 public interface Artifact
     extends Comparable<Artifact>
@@ -64,7 +63,7 @@ public interface Artifact
 
     String SCOPE_SYSTEM = "system";
 
-    String SCOPE_IMPORT = "import";   // Used to import dependencyManagement dependencies
+    String SCOPE_IMPORT = "import"; // Used to import dependencyManagement dependencies
 
     String getGroupId();
 

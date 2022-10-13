@@ -1,5 +1,3 @@
-package org.apache.maven.model.inheritance;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,16 @@ package org.apache.maven.model.inheritance;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.inheritance;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.Model;
@@ -60,7 +59,7 @@ public class DefaultInheritanceAssembler
 
     @Override
     public Model assembleModelInheritance( Model child, Model parent, ModelBuildingRequest request,
-                                          ModelProblemCollector problems )
+                                           ModelProblemCollector problems )
     {
         Map<Object, Object> hints = new HashMap<>();
         String childPath = child.getProperties().getOrDefault( CHILD_DIRECTORY_PROPERTY, child.getArtifactId() );
@@ -72,16 +71,18 @@ public class DefaultInheritanceAssembler
     /**
      * Calculates the relative path from the base directory of the parent to the parent directory of the base directory
      * of the child. The general idea is to adjust inherited URLs to match the project layout (in SCM).
-     *
-     * <p>This calculation is only a heuristic based on our conventions.
-     * In detail, the algo relies on the following assumptions: <ul>
+     * <p>
+     * This calculation is only a heuristic based on our conventions. In detail, the algo relies on the following
+     * assumptions:
+     * <ul>
      * <li>The parent uses aggregation and refers to the child via the modules section</li>
-     * <li>The module path to the child is considered to
-     * point at the POM rather than its base directory if the path ends with ".xml" (ignoring case)</li>
+     * <li>The module path to the child is considered to point at the POM rather than its base directory if the path
+     * ends with ".xml" (ignoring case)</li>
      * <li>The name of the child's base directory matches the artifact id of the child.</li>
      * </ul>
-     * Note that for the sake of independence from the user
-     * environment, the filesystem is intentionally not used for the calculation.</p>
+     * Note that for the sake of independence from the user environment, the filesystem is intentionally not used for
+     * the calculation.
+     * </p>
      *
      * @param child The child model, must not be <code>null</code>.
      * @param parent The parent model, may be <code>null</code>.
@@ -98,10 +99,10 @@ public class DefaultInheritanceAssembler
 
             /*
              * This logic (using filesystem, against wanted independence from the user environment) exists only for the
-             * sake of backward-compat with 2.x (MNG-5000). In general, it is wrong to
-             * base URL inheritance on the module directory names as this information is unavailable for POMs in the
-             * repository. In other words, modules where artifactId != moduleDirName will see different effective URLs
-             * depending on how the model was constructed (from filesystem or from repository).
+             * sake of backward-compat with 2.x (MNG-5000). In general, it is wrong to base URL inheritance on the
+             * module directory names as this information is unavailable for POMs in the repository. In other words,
+             * modules where artifactId != moduleDirName will see different effective URLs depending on how the model
+             * was constructed (from filesystem or from repository).
              */
             if ( child.getProjectDirectory() != null )
             {
@@ -178,7 +179,7 @@ public class DefaultInheritanceAssembler
             if ( path.length() > 0 )
             {
                 boolean initialUrlEndsWithSlash = url.charAt( url.length() - 1 ) == '/';
-                boolean pathStartsWithSlash = path.charAt( 0 ) ==  '/';
+                boolean pathStartsWithSlash = path.charAt( 0 ) == '/';
 
                 if ( pathStartsWithSlash )
                 {
@@ -205,9 +206,8 @@ public class DefaultInheritanceAssembler
         }
 
         @Override
-        protected void mergeModelBase_Properties( ModelBase.Builder builder,
-                                                  ModelBase target, ModelBase source, boolean sourceDominant,
-                                                  Map<Object, Object> context )
+        protected void mergeModelBase_Properties( ModelBase.Builder builder, ModelBase target, ModelBase source,
+                                                  boolean sourceDominant, Map<Object, Object> context )
         {
             Map<String, String> merged = new HashMap<>();
             if ( sourceDominant )
@@ -221,9 +221,8 @@ public class DefaultInheritanceAssembler
                 merged.putAll( target.getProperties() );
             }
             builder.properties( merged );
-            builder.location( "properties",
-                                InputLocation.merge( target.getLocation( "properties" ),
-                                                     source.getLocation( "properties" ), sourceDominant ) );
+            builder.location( "properties", InputLocation.merge( target.getLocation( "properties" ),
+                                                                 source.getLocation( "properties" ), sourceDominant ) );
         }
 
         private void putAll( Map<String, String> s, Map<String, String> t, Object excludeKey )
@@ -238,9 +237,9 @@ public class DefaultInheritanceAssembler
         }
 
         @Override
-        protected void mergePluginContainer_Plugins( PluginContainer.Builder builder,
-                                                     PluginContainer target, PluginContainer source,
-                                                     boolean sourceDominant, Map<Object, Object> context )
+        protected void mergePluginContainer_Plugins( PluginContainer.Builder builder, PluginContainer target,
+                                                     PluginContainer source, boolean sourceDominant,
+                                                     Map<Object, Object> context )
         {
             List<Plugin> src = source.getPlugins();
             if ( !src.isEmpty() )
@@ -303,8 +302,8 @@ public class DefaultInheritanceAssembler
         }
 
         @Override
-        protected Plugin mergePlugin( Plugin target, Plugin source,
-                                      boolean sourceDominant, Map<Object, Object> context )
+        protected Plugin mergePlugin( Plugin target, Plugin source, boolean sourceDominant,
+                                      Map<Object, Object> context )
         {
             Plugin.Builder builder = Plugin.newBuilder( target );
             if ( source.isInherited() )
@@ -321,18 +320,16 @@ public class DefaultInheritanceAssembler
         }
 
         @Override
-        protected void mergeReporting_Plugins( Reporting.Builder builder,
-                                               Reporting target, Reporting source, boolean sourceDominant,
-                                               Map<Object, Object> context )
+        protected void mergeReporting_Plugins( Reporting.Builder builder, Reporting target, Reporting source,
+                                               boolean sourceDominant, Map<Object, Object> context )
         {
             List<ReportPlugin> src = source.getPlugins();
             if ( !src.isEmpty() )
             {
                 List<ReportPlugin> tgt = target.getPlugins();
-                Map<Object, ReportPlugin> merged =
-                    new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
+                Map<Object, ReportPlugin> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
-                for ( ReportPlugin element :  src )
+                for ( ReportPlugin element : src )
                 {
                     if ( element.isInherited() )
                     {

@@ -1,5 +1,3 @@
-package org.apache.maven.settings;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.settings;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,13 +16,14 @@ package org.apache.maven.settings;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.io.File;
-import java.io.IOException;
+package org.apache.maven.settings;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.io.File;
+import java.io.IOException;
 
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.properties.internal.SystemProperties;
@@ -57,9 +56,8 @@ public class DefaultMavenSettingsBuilder
     public Settings buildSettings()
         throws IOException, XmlPullParserException
     {
-        File userSettingsFile =
-            getFile( "${user.home}/.m2/settings.xml", "user.home",
-                     MavenSettingsBuilder.ALT_USER_SETTINGS_XML_LOCATION );
+        File userSettingsFile = getFile( "${user.home}/.m2/settings.xml", "user.home",
+                                         MavenSettingsBuilder.ALT_USER_SETTINGS_XML_LOCATION );
 
         return buildSettings( userSettingsFile );
     }
@@ -73,9 +71,8 @@ public class DefaultMavenSettingsBuilder
     public Settings buildSettings( File userSettingsFile )
         throws IOException, XmlPullParserException
     {
-        File globalSettingsFile =
-            getFile( "${maven.conf}/settings.xml", "maven.conf",
-                     MavenSettingsBuilder.ALT_GLOBAL_SETTINGS_XML_LOCATION );
+        File globalSettingsFile = getFile( "${maven.conf}/settings.xml", "maven.conf",
+                                           MavenSettingsBuilder.ALT_GLOBAL_SETTINGS_XML_LOCATION );
 
         SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
         request.setUserSettingsFile( userSettingsFile );

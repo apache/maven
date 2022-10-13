@@ -1,5 +1,3 @@
-package org.apache.maven.cli.configuration;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,15 @@ package org.apache.maven.cli.configuration;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.List;
+package org.apache.maven.cli.configuration;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -56,7 +55,7 @@ import static org.apache.maven.cli.ResolveFile.resolveFile;
 /**
  * SettingsXmlConfigurationProcessor
  */
-@Named ( SettingsXmlConfigurationProcessor.HINT )
+@Named( SettingsXmlConfigurationProcessor.HINT )
 @Singleton
 public class SettingsXmlConfigurationProcessor
     implements ConfigurationProcessor
@@ -75,12 +74,11 @@ public class SettingsXmlConfigurationProcessor
     private static final Logger LOGGER = LoggerFactory.getLogger( SettingsXmlConfigurationProcessor.class );
 
     private final SettingsBuilder settingsBuilder;
+
     private final SettingsDecrypter settingsDecrypter;
 
     @Inject
-    public SettingsXmlConfigurationProcessor(
-            SettingsBuilder settingsBuilder,
-            SettingsDecrypter settingsDecrypter )
+    public SettingsXmlConfigurationProcessor( SettingsBuilder settingsBuilder, SettingsDecrypter settingsDecrypter )
     {
         this.settingsBuilder = settingsBuilder;
         this.settingsDecrypter = settingsDecrypter;
@@ -144,10 +142,10 @@ public class SettingsXmlConfigurationProcessor
             request.getEventSpyDispatcher().onEvent( settingsRequest );
         }
 
-        LOGGER.debug( "Reading global settings from '{}'",
-            getLocation( settingsRequest.getGlobalSettingsSource(), settingsRequest.getGlobalSettingsFile() ) );
+        LOGGER.debug( "Reading global settings from '{}'", getLocation( settingsRequest.getGlobalSettingsSource(),
+                                                                        settingsRequest.getGlobalSettingsFile() ) );
         LOGGER.debug( "Reading user settings from '{}'",
-            getLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
+                      getLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
 
         SettingsBuildingResult settingsResult = settingsBuilder.build( settingsRequest );
 
@@ -192,17 +190,17 @@ public class SettingsXmlConfigurationProcessor
             request.addServer( server );
         }
 
-        //  <proxies>
-        //    <proxy>
-        //      <active>true</active>
-        //      <protocol>http</protocol>
-        //      <host>proxy.somewhere.com</host>
-        //      <port>8080</port>
-        //      <username>proxyuser</username>
-        //      <password>somepassword</password>
-        //      <nonProxyHosts>www.google.com|*.somewhere.com</nonProxyHosts>
-        //    </proxy>
-        //  </proxies>
+        // <proxies>
+        // <proxy>
+        // <active>true</active>
+        // <protocol>http</protocol>
+        // <host>proxy.somewhere.com</host>
+        // <port>8080</port>
+        // <username>proxyuser</username>
+        // <password>somepassword</password>
+        // <nonProxyHosts>www.google.com|*.somewhere.com</nonProxyHosts>
+        // </proxy>
+        // </proxies>
 
         for ( Proxy proxy : settings.getProxies() )
         {
@@ -215,11 +213,11 @@ public class SettingsXmlConfigurationProcessor
         }
 
         // <mirrors>
-        //   <mirror>
-        //     <id>nexus</id>
-        //     <mirrorOf>*</mirrorOf>
-        //     <url>http://repository.sonatype.org/content/groups/public</url>
-        //   </mirror>
+        // <mirror>
+        // <id>nexus</id>
+        // <mirrorOf>*</mirrorOf>
+        // <url>http://repository.sonatype.org/content/groups/public</url>
+        // </mirror>
         // </mirrors>
 
         for ( Mirror mirror : settings.getMirrors() )
@@ -240,8 +238,7 @@ public class SettingsXmlConfigurationProcessor
                 {
                     try
                     {
-                        request.addRemoteRepository(
-                                    MavenRepositorySystem.buildArtifactRepository( remoteRepository ) );
+                        request.addRemoteRepository( MavenRepositorySystem.buildArtifactRepository( remoteRepository ) );
                     }
                     catch ( InvalidRepositoryException e )
                     {
@@ -254,8 +251,7 @@ public class SettingsXmlConfigurationProcessor
                 {
                     try
                     {
-                        request.addPluginArtifactRepository( MavenRepositorySystem.buildArtifactRepository(
-                                pluginRepository ) );
+                        request.addPluginArtifactRepository( MavenRepositorySystem.buildArtifactRepository( pluginRepository ) );
                     }
                     catch ( InvalidRepositoryException e )
                     {

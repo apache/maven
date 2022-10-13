@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,13 +16,14 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.io.File;
-import java.util.List;
+package org.apache.maven.project;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.io.File;
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -90,9 +89,8 @@ public class DefaultMavenProjectHelper
     {
         Artifact projectArtifact = project.getArtifact();
 
-        Artifact artifact =
-            new AttachedArtifact( projectArtifact, projectArtifact.getType(), artifactClassifier,
-                                  projectArtifact.getArtifactHandler() );
+        Artifact artifact = new AttachedArtifact( projectArtifact, projectArtifact.getType(), artifactClassifier,
+                                                  projectArtifact.getArtifactHandler() );
 
         artifact.setFile( artifactFile );
         artifact.setResolved( true );

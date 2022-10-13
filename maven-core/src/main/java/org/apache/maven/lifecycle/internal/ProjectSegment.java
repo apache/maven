@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,12 +16,13 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal;
+
+import java.util.List;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.project.MavenProject;
-
-import java.util.List;
 
 /**
  * A build context that matches a Maven project to a given task segment, and the session to be used.
@@ -31,22 +30,21 @@ import java.util.List;
  * A note to the reader;
  * </p>
  * <p>
- * There are several issues/discussions regarding how "aggregator" plugins should be handled.
- * Read for instance http://docs.codehaus.org/display/MAVEN/Deterministic+Lifecycle+Planning
+ * There are several issues/discussions regarding how "aggregator" plugins should be handled. Read for instance
+ * http://docs.codehaus.org/display/MAVEN/Deterministic+Lifecycle+Planning
  * </p>
  * <p>
- * In their current implementation they are "bolted" onto the lifecycle by separating them
- * into TaskSegments. This class represents the execution context of one such task segment.
+ * In their current implementation they are "bolted" onto the lifecycle by separating them into TaskSegments. This class
+ * represents the execution context of one such task segment.
  * </p>
  * <p>
- * Wise voices have suggested that maybe aggregators shouldn't be bound to the ordinary
- * lifecycle at all, in which case we wouldn't be needing this class at all ( and
- * ProjectBuildList.getByTaskSegments). Or maybe they should be introduced in the calculation
- * of the execution plan instead, which seems much nicer.
+ * Wise voices have suggested that maybe aggregators shouldn't be bound to the ordinary lifecycle at all, in which case
+ * we wouldn't be needing this class at all ( and ProjectBuildList.getByTaskSegments). Or maybe they should be
+ * introduced in the calculation of the execution plan instead, which seems much nicer.
  * </p>
  * <p>
- * Additionally this class contains a clone of the MavenSession, which is *only* needed
- * because it has as notion of a "current" project.
+ * Additionally this class contains a clone of the MavenSession, which is *only* needed because it has as notion of a
+ * "current" project.
  * </p>
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
  *

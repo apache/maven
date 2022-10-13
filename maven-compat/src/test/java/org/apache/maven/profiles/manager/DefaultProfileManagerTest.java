@@ -1,5 +1,3 @@
-package org.apache.maven.profiles.manager;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.profiles.manager;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,19 +16,20 @@ package org.apache.maven.profiles.manager;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.profiles.manager;
+
+import javax.inject.Inject;
 
 import java.util.List;
 import java.util.Properties;
 
-import javax.inject.Inject;
-
-import org.codehaus.plexus.testing.PlexusTest;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
 import org.apache.maven.profiles.DefaultProfileManager;
 import org.apache.maven.profiles.ProfileManager;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -44,7 +43,8 @@ public class DefaultProfileManagerTest
     @Inject
     PlexusContainer container;
 
-    protected PlexusContainer getContainer() {
+    protected PlexusContainer getContainer()
+    {
         return container;
     }
 
@@ -122,7 +122,6 @@ public class DefaultProfileManagerTest
         assertEquals( 1, active.size() );
         assertEquals( "syspropActivated", ( (Profile) active.get( 0 ) ).getId() );
     }
-
 
     @Test
     public void testShouldNotActivateReversalOfPresentSystemProperty()
@@ -219,31 +218,14 @@ public class DefaultProfileManagerTest
         throws Exception
     {
         /*
-        Profile osActivated = new Profile();
-        osActivated.setId( "os-profile" );
-
-        Activation osActivation = new Activation();
-
-        ActivationOS activationOS = new ActivationOS();
-
-        activationOS.setName( "!dddd" );
-
-        osActivation.setOs( activationOS );
-
-        osActivated.setActivation( osActivation );
-
-        Properties props = System.getProperties();
-        ProfileActivationContext ctx = new ProfileActivationContext( props, false );
-
-        ProfileManager profileManager = new DefaultProfileManager( getContainer(), props );
-
-        profileManager.addProfile( osActivated );
-
-        List active = profileManager.getActiveProfiles( null );
-
-        assertNotNull( active );
-        assertEquals( 1, active.size() );
-        */
+         * Profile osActivated = new Profile(); osActivated.setId( "os-profile" ); Activation osActivation = new
+         * Activation(); ActivationOS activationOS = new ActivationOS(); activationOS.setName( "!dddd" );
+         * osActivation.setOs( activationOS ); osActivated.setActivation( osActivation ); Properties props =
+         * System.getProperties(); ProfileActivationContext ctx = new ProfileActivationContext( props, false );
+         * ProfileManager profileManager = new DefaultProfileManager( getContainer(), props );
+         * profileManager.addProfile( osActivated ); List active = profileManager.getActiveProfiles( null );
+         * assertNotNull( active ); assertEquals( 1, active.size() );
+         */
     }
 
 }

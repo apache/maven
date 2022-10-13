@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.resolver;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver;
 
 import java.util.Iterator;
 import java.util.List;
@@ -55,27 +54,17 @@ public class AbstractArtifactResolutionException
     static final String LS = System.lineSeparator();
 
     @SuppressWarnings( "checkstyle:parameternumber" )
-    protected AbstractArtifactResolutionException( String message,
-                                                   String groupId,
-                                                   String artifactId,
-                                                   String version,
-                                                   String type,
-                                                   String classifier,
-                                                   List<ArtifactRepository> remoteRepositories,
-                                                   List<String> path )
+    protected AbstractArtifactResolutionException( String message, String groupId, String artifactId, String version,
+                                                   String type, String classifier,
+                                                   List<ArtifactRepository> remoteRepositories, List<String> path )
     {
         this( message, groupId, artifactId, version, type, classifier, remoteRepositories, path, null );
     }
 
     @SuppressWarnings( "checkstyle:parameternumber" )
-    protected AbstractArtifactResolutionException( String message,
-                                                   String groupId,
-                                                   String artifactId,
-                                                   String version,
-                                                   String type,
-                                                   String classifier,
-                                                   List<ArtifactRepository> remoteRepositories,
-                                                   List<String> path,
+    protected AbstractArtifactResolutionException( String message, String groupId, String artifactId, String version,
+                                                   String type, String classifier,
+                                                   List<ArtifactRepository> remoteRepositories, List<String> path,
                                                    Throwable t )
     {
         super( constructMessageBase( message, groupId, artifactId, version, type, remoteRepositories, path ), t );
@@ -90,26 +79,22 @@ public class AbstractArtifactResolutionException
         this.path = constructArtifactPath( path, "" );
     }
 
-    protected AbstractArtifactResolutionException( String message,
-                                                   Artifact artifact )
+    protected AbstractArtifactResolutionException( String message, Artifact artifact )
     {
         this( message, artifact, null );
     }
 
-    protected AbstractArtifactResolutionException( String message,
-                                                   Artifact artifact,
+    protected AbstractArtifactResolutionException( String message, Artifact artifact,
                                                    List<ArtifactRepository> remoteRepositories )
     {
         this( message, artifact, remoteRepositories, null );
     }
 
-    protected AbstractArtifactResolutionException( String message,
-                                                   Artifact artifact,
-                                                   List<ArtifactRepository> remoteRepositories,
-                                                   Throwable t )
+    protected AbstractArtifactResolutionException( String message, Artifact artifact,
+                                                   List<ArtifactRepository> remoteRepositories, Throwable t )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
-            artifact.getClassifier(), remoteRepositories, artifact.getDependencyTrail(), t );
+              artifact.getClassifier(), remoteRepositories, artifact.getDependencyTrail(), t );
         this.artifact = artifact;
     }
 
@@ -160,8 +145,7 @@ public class AbstractArtifactResolutionException
         return originalMessage;
     }
 
-    protected static String constructArtifactPath( List<String> path,
-                                                   String indentation )
+    protected static String constructArtifactPath( List<String> path, String indentation )
     {
         StringBuilder sb = new StringBuilder();
 
@@ -186,12 +170,8 @@ public class AbstractArtifactResolutionException
         return sb.toString();
     }
 
-    private static String constructMessageBase( String message,
-                                                String groupId,
-                                                String artifactId,
-                                                String version,
-                                                String type,
-                                                List<ArtifactRepository> remoteRepositories,
+    private static String constructMessageBase( String message, String groupId, String artifactId, String version,
+                                                String type, List<ArtifactRepository> remoteRepositories,
                                                 List<String> path )
     {
         StringBuilder sb = new StringBuilder();
@@ -201,8 +181,7 @@ public class AbstractArtifactResolutionException
         if ( message == null || !message.contains( "from the specified remote repositories:" ) )
         {
             sb.append( LS );
-            sb.append( "  " ).append( groupId ).append( ':' ).append( artifactId ).append( ':' ).append( type ).append(
-                ':' ).append( version );
+            sb.append( "  " ).append( groupId ).append( ':' ).append( artifactId ).append( ':' ).append( type ).append( ':' ).append( version );
             sb.append( LS );
             if ( remoteRepositories != null )
             {
@@ -251,15 +230,9 @@ public class AbstractArtifactResolutionException
     }
 
     @SuppressWarnings( "checkstyle:parameternumber" )
-    protected static String constructMissingArtifactMessage( String message,
-                                                             String indentation,
-                                                             String groupId,
-                                                             String artifactId,
-                                                             String version,
-                                                             String type,
-                                                             String classifier,
-                                                             String downloadUrl,
-                                                             List<String> path )
+    protected static String constructMissingArtifactMessage( String message, String indentation, String groupId,
+                                                             String artifactId, String version, String type,
+                                                             String classifier, String downloadUrl, List<String> path )
     {
         StringBuilder sb = new StringBuilder( message );
 
@@ -297,7 +270,7 @@ public class AbstractArtifactResolutionException
             sb.append( " -Dversion=" );
             sb.append( version );
 
-            //insert classifier only if it was used in the artifact
+            // insert classifier only if it was used in the artifact
             if ( classifier != null && !classifier.equals( "" ) )
             {
                 sb.append( " -Dclassifier=" );
@@ -321,7 +294,7 @@ public class AbstractArtifactResolutionException
             sb.append( " -Dversion=" );
             sb.append( version );
 
-            //insert classifier only if it was used in the artifact
+            // insert classifier only if it was used in the artifact
             if ( classifier != null && !classifier.equals( "" ) )
             {
                 sb.append( " -Dclassifier=" );

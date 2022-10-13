@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -65,8 +64,8 @@ public class RemoteSnapshotMetadataTest
     {
         String dateBefore = gregorianDate();
 
-        RemoteSnapshotMetadata metadata = new RemoteSnapshotMetadata(
-                new DefaultArtifact( "a:b:1-SNAPSHOT" ), false, new Date() );
+        RemoteSnapshotMetadata metadata =
+            new RemoteSnapshotMetadata( new DefaultArtifact( "a:b:1-SNAPSHOT" ), false, new Date() );
         metadata.merge( new Metadata() );
 
         String dateAfter = gregorianDate();

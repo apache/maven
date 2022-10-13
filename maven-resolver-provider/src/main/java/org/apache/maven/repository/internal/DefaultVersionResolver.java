@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,22 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
@@ -49,21 +63,6 @@ import org.eclipse.aether.resolution.VersionResult;
 import org.eclipse.aether.spi.synccontext.SyncContextFactory;
 import org.eclipse.aether.util.ConfigUtils;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 /**
  * @author Benjamin Bentmann
  */
@@ -82,17 +81,19 @@ public class DefaultVersionResolver
     private static final String SNAPSHOT = "SNAPSHOT";
 
     private final MetadataResolver metadataResolver;
+
     private final SyncContextFactory syncContextFactory;
+
     private final RepositoryEventDispatcher repositoryEventDispatcher;
 
     @Inject
     public DefaultVersionResolver( MetadataResolver metadataResolver, SyncContextFactory syncContextFactory,
-                            RepositoryEventDispatcher repositoryEventDispatcher )
+                                   RepositoryEventDispatcher repositoryEventDispatcher )
     {
         this.metadataResolver = Objects.requireNonNull( metadataResolver, "metadataResolver cannot be null" );
         this.syncContextFactory = Objects.requireNonNull( syncContextFactory, "syncContextFactory cannot be null" );
-        this.repositoryEventDispatcher = Objects.requireNonNull( repositoryEventDispatcher,
-                "repositoryEventDispatcher cannot be null" );
+        this.repositoryEventDispatcher =
+            Objects.requireNonNull( repositoryEventDispatcher, "repositoryEventDispatcher cannot be null" );
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
@@ -118,8 +119,8 @@ public class DefaultVersionResolver
             {
                 Record record = (Record) obj;
                 result.setVersion( record.version );
-                result.setRepository(
-                    getRepository( session, request.getRepositories(), record.repoClass, record.repoId ) );
+                result.setRepository( getRepository( session, request.getRepositories(), record.repoClass,
+                                                     record.repoId ) );
                 return result;
             }
         }
@@ -146,9 +147,8 @@ public class DefaultVersionResolver
             }
             else
             {
-                metadata =
-                    new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), version, MAVEN_METADATA_XML,
-                                         Metadata.Nature.SNAPSHOT );
+                metadata = new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), version,
+                                                MAVEN_METADATA_XML, Metadata.Nature.SNAPSHOT );
             }
         }
         else
@@ -281,13 +281,12 @@ public class DefaultVersionResolver
                             versioning = new MetadataXpp3Reader().read( in, false ).getVersioning();
 
                             /*
-                            NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata
-                            of the local repository. This is especially troublesome during snapshot resolution so we try
-                            to handle that gracefully.
+                             * NOTE: Users occasionally misuse the id "local" for remote repos which screws up the
+                             * metadata of the local repository. This is especially troublesome during snapshot
+                             * resolution so we try to handle that gracefully.
                              */
                             if ( versioning != null && repository instanceof LocalRepository
-                                     && versioning.getSnapshot() != null
-                                     && versioning.getSnapshot().getBuildNumber() > 0 )
+                                && versioning.getSnapshot() != null && versioning.getSnapshot().getBuildNumber() > 0 )
                             {
                                 final Versioning repaired = new Versioning();
                                 repaired.setLastUpdated( versioning.getLastUpdated() );
@@ -295,8 +294,8 @@ public class DefaultVersionResolver
                                 repaired.getSnapshot().setLocalCopy( true );
                                 versioning = repaired;
                                 throw new IOException( "Snapshot information corrupted with remote repository data"
-                                                           + ", please verify that no remote repository uses the id '"
-                                                           + repository.getId() + "'" );
+                                    + ", please verify that no remote repository uses the id '" + repository.getId()
+                                    + "'" );
 
                             }
                         }
@@ -394,9 +393,8 @@ public class DefaultVersionResolver
         return StringUtils.clean( classifier ) + ':' + StringUtils.clean( extension );
     }
 
-    private ArtifactRepository getRepository( RepositorySystemSession session,
-                                              List<RemoteRepository> repositories, Class<?> repoClass,
-                                              String repoId )
+    private ArtifactRepository getRepository( RepositorySystemSession session, List<RemoteRepository> repositories,
+                                              Class<?> repoClass, String repoId )
     {
         if ( repoClass != null )
         {
@@ -537,10 +535,11 @@ public class DefaultVersionResolver
             }
 
             Key that = (Key) obj;
-            return artifactId.equals( that.artifactId ) && groupId.equals( that.groupId ) && classifier.equals(
-                that.classifier ) && extension.equals( that.extension ) && version.equals( that.version )
-                && context.equals( that.context ) && localRepo.equals( that.localRepo )
-                && Objects.equals( workspace, that.workspace ) && repositories.equals( that.repositories );
+            return artifactId.equals( that.artifactId ) && groupId.equals( that.groupId )
+                && classifier.equals( that.classifier ) && extension.equals( that.extension )
+                && version.equals( that.version ) && context.equals( that.context )
+                && localRepo.equals( that.localRepo ) && Objects.equals( workspace, that.workspace )
+                && repositories.equals( that.repositories );
         }
 
         @Override

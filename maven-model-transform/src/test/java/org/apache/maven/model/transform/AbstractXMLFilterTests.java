@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -26,13 +25,12 @@ import java.io.StringWriter;
 
 import org.apache.maven.model.transform.pull.XmlUtils;
 import org.codehaus.plexus.util.xml.pull.MXParser;
-import org.codehaus.plexus.util.xml.pull.MXSerializer;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public abstract class AbstractXMLFilterTests
 {
-    protected XmlPullParser getFilter(XmlPullParser parser)
+    protected XmlPullParser getFilter( XmlPullParser parser )
     {
         throw new UnsupportedOperationException( "Override one of the getFilter() methods" );
     }
@@ -44,11 +42,12 @@ public abstract class AbstractXMLFilterTests
     }
 
     protected String transform( Reader input )
-            throws XmlPullParserException, IOException {
+        throws XmlPullParserException, IOException
+    {
 
         MXParser parser = new MXParser();
-        parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
-        parser.setInput(input);
+        parser.setFeature( XmlPullParser.FEATURE_PROCESS_NAMESPACES, true );
+        parser.setInput( input );
         XmlPullParser filter = getFilter( parser );
 
         StringWriter writer = new StringWriter();

@@ -1,5 +1,3 @@
-package org.apache.maven.graph;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,7 @@ package org.apache.maven.graph;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.MavenExecutionException;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.project.MavenProject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.apache.maven.graph;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,6 +25,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import org.apache.maven.MavenExecutionException;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class to extract {@link MavenProject} from the project graph during the execution phase based on optional or
@@ -43,14 +42,14 @@ public final class ProjectSelector
 
     public Set<MavenProject> getRequiredProjectsBySelectors( MavenExecutionRequest request, List<MavenProject> projects,
                                                              Set<String> projectSelectors )
-            throws MavenExecutionException
+        throws MavenExecutionException
     {
         Set<MavenProject> selectedProjects = new LinkedHashSet<>();
         File baseDirectory = getBaseDirectoryFromRequest( request );
         for ( String selector : projectSelectors )
         {
             Optional<MavenProject> optSelectedProject =
-                    findOptionalProjectBySelector( projects, baseDirectory, selector );
+                findOptionalProjectBySelector( projects, baseDirectory, selector );
             if ( !optSelectedProject.isPresent() )
             {
                 String message = "Could not find the selected project in the reactor: " + selector;
@@ -75,7 +74,7 @@ public final class ProjectSelector
         for ( String selector : projectSelectors )
         {
             Optional<MavenProject> optSelectedProject =
-                    findOptionalProjectBySelector( projects, baseDirectory, selector );
+                findOptionalProjectBySelector( projects, baseDirectory, selector );
             if ( optSelectedProject.isPresent() )
             {
                 resolvedOptionalProjects.add( optSelectedProject.get() );
@@ -111,9 +110,8 @@ public final class ProjectSelector
     private Optional<MavenProject> findOptionalProjectBySelector( List<MavenProject> projects, File reactorDirectory,
                                                                   String selector )
     {
-        return projects.stream()
-                .filter( project -> isMatchingProject( project, selector, reactorDirectory ) )
-                .findFirst();
+        return projects.stream().filter( project -> isMatchingProject( project, selector,
+                                                                       reactorDirectory ) ).findFirst();
     }
 
     File getBaseDirectoryFromRequest( MavenExecutionRequest request )

@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.repository;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.repository;
 
 import java.io.File;
 import java.util.Collections;
@@ -30,10 +29,10 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.repository.Proxy;
 
 /**
- * Abstraction of an artifact repository. Artifact repositories can be remote, local, or even build reactor or
- * IDE workspace.
+ * Abstraction of an artifact repository. Artifact repositories can be remote, local, or even build reactor or IDE
+ * workspace.
  */
-//TODO completely separate local and remote artifact repositories
+// TODO completely separate local and remote artifact repositories
 public class MavenArtifactRepository
     implements ArtifactRepository
 {
@@ -68,11 +67,11 @@ public class MavenArtifactRepository
     /**
      * Create a remote download repository.
      *
-     * @param id        the unique identifier of the repository
-     * @param url       the URL of the repository
-     * @param layout    the layout of the repository
+     * @param id the unique identifier of the repository
+     * @param url the URL of the repository
+     * @param layout the layout of the repository
      * @param snapshots the policies to use for snapshots
-     * @param releases  the policies to use for releases
+     * @param releases the policies to use for releases
      */
     public MavenArtifactRepository( String id, String url, ArtifactRepositoryLayout layout,
                                     ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases )
@@ -221,10 +220,8 @@ public class MavenArtifactRepository
     // Path Utils
 
     /**
-     * Return the protocol name.
-     * <br>
-     * E.g: for input
-     * <code>http://www.codehaus.org</code> this method will return <code>http</code>
+     * Return the protocol name. <br>
+     * E.g: for input <code>http://www.codehaus.org</code> this method will return <code>http</code>
      *
      * @param url the url
      * @return the host name
@@ -244,8 +241,7 @@ public class MavenArtifactRepository
      * Derive the path portion of the given URL.
      *
      * @param url the repository URL
-     * @return the basedir of the repository
-     * TODO need to URL decode for spaces?
+     * @return the basedir of the repository TODO need to URL decode for spaces?
      */
     private String basedir( String url )
     {

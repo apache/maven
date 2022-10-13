@@ -1,5 +1,3 @@
-package org.apache.maven.eventspy;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.eventspy;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.eventspy;
 
 import java.util.Map;
 
@@ -27,6 +26,7 @@ import java.util.Map;
  * looks up all implementers of this interface and calls their {@link #init(Context)} method. <em>Note:</em>
  * Implementors are strongly advised to inherit from {@link AbstractEventSpy} instead of directly implementing this
  * interface.
+ * 
  * @since 3.0.2
  */
 public interface EventSpy

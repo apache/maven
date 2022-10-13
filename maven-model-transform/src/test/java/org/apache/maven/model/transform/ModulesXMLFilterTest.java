@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.junit.jupiter.api.Test;
@@ -48,10 +47,7 @@ public class ModulesXMLFilterTest
     public void setOfModules()
         throws Exception
     {
-        String input = "<project><modules>"
-                + "<module>ab</module>"
-                + "<module>../cd</module>"
-                + "</modules></project>";
+        String input = "<project><modules>" + "<module>ab</module>" + "<module>../cd</module>" + "</modules></project>";
         String expected = "<project/>";
         String actual = transform( input );
         assertThat( actual ).and( expected ).areIdentical();
@@ -72,13 +68,8 @@ public class ModulesXMLFilterTest
         throws Exception
     {
 
-        String input = "<project><!--before--><modules>"
-                        + "<!--pre-in-->"
-                        + "<module><!--in-->ab</module>"
-                        + "<module>../cd</module>"
-                        + "<!--post-in-->"
-                        + "</modules>"
-                        + "<!--after--></project>";
+        String input = "<project><!--before--><modules>" + "<!--pre-in-->" + "<module><!--in-->ab</module>"
+            + "<module>../cd</module>" + "<!--post-in-->" + "</modules>" + "<!--after--></project>";
         String expected = "<project><!--before--><!--after--></project>";
         String actual = transform( input );
         assertThat( actual ).and( expected ).areIdentical();
@@ -88,19 +79,9 @@ public class ModulesXMLFilterTest
     public void setOfModulesLF()
         throws Exception
     {
-        String input = "<project>\n"
-            + "\n"
-            + "  <modules>\n"
-            + "    <module>ab</module>\n"
-            + "    <module>../cd</module>\n"
-            + "  </modules>\n"
-            + "\n"
-            + "</project>\n";
-        String expected = "<project>\n"
-            + "\n"
-            + "  \n"
-            + "\n"
-            + "</project>\n";
+        String input = "<project>\n" + "\n" + "  <modules>\n" + "    <module>ab</module>\n"
+            + "    <module>../cd</module>\n" + "  </modules>\n" + "\n" + "</project>\n";
+        String expected = "<project>\n" + "\n" + "  \n" + "\n" + "</project>\n";
         String actual = transform( input );
         assertThat( actual ).and( expected ).areIdentical();
     }

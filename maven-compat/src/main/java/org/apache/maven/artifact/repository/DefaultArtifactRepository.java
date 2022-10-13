@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.repository;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.repository;
 
 import java.io.File;
 import java.util.Collections;
@@ -30,8 +29,7 @@ import org.apache.maven.repository.Proxy;
 import org.apache.maven.wagon.repository.Repository;
 
 /**
- * This class is an abstraction of the location from/to resources can be
- * transferred.
+ * This class is an abstraction of the location from/to resources can be transferred.
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
  */
@@ -59,8 +57,8 @@ public class DefaultArtifactRepository
     /**
      * Create a local repository or a test repository.
      *
-     * @param id     the unique identifier of the repository
-     * @param url    the URL of the repository
+     * @param id the unique identifier of the repository
+     * @param url the URL of the repository
      * @param layout the layout of the repository
      */
     public DefaultArtifactRepository( String id, String url, ArtifactRepositoryLayout layout )
@@ -71,9 +69,9 @@ public class DefaultArtifactRepository
     /**
      * Create a remote deployment repository.
      *
-     * @param id            the unique identifier of the repository
-     * @param url           the URL of the repository
-     * @param layout        the layout of the repository
+     * @param id the unique identifier of the repository
+     * @param url the URL of the repository
+     * @param layout the layout of the repository
      * @param uniqueVersion whether to assign each snapshot a unique version
      */
     public DefaultArtifactRepository( String id, String url, ArtifactRepositoryLayout layout, boolean uniqueVersion )
@@ -85,11 +83,11 @@ public class DefaultArtifactRepository
     /**
      * Create a remote download repository.
      *
-     * @param id        the unique identifier of the repository
-     * @param url       the URL of the repository
-     * @param layout    the layout of the repository
+     * @param id the unique identifier of the repository
+     * @param url the URL of the repository
+     * @param layout the layout of the repository
      * @param snapshots the policies to use for snapshots
-     * @param releases  the policies to use for releases
+     * @param releases the policies to use for releases
      */
     public DefaultArtifactRepository( String id, String url, ArtifactRepositoryLayout layout,
                                       ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases )
@@ -101,7 +99,7 @@ public class DefaultArtifactRepository
         if ( snapshots == null )
         {
             snapshots = new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
-                ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
+                                                      ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
         }
 
         this.snapshots = snapshots;
@@ -109,7 +107,7 @@ public class DefaultArtifactRepository
         if ( releases == null )
         {
             releases = new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
-                ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
+                                                     ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
         }
 
         this.releases = releases;

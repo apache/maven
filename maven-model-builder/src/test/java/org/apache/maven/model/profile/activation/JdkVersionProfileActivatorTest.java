@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile.activation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.profile.activation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile.activation;
 
 import java.util.Properties;
 
@@ -37,12 +36,13 @@ public class JdkVersionProfileActivatorTest
 
     @Override
     @BeforeEach
-    void setUp() throws Exception
+    void setUp()
+        throws Exception
     {
         activator = new JdkVersionProfileActivator();
     }
 
-    private Profile newProfile(String jdkVersion )
+    private Profile newProfile( String jdkVersion )
     {
         Activation a = Activation.newBuilder().jdk( jdkVersion ).build();
 

@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,8 +32,7 @@ import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 
 /**
- * Delegating local artifact repository chains the reactor, IDE workspace
- * and user local repository.
+ * Delegating local artifact repository chains the reactor, IDE workspace and user local repository.
  */
 @Deprecated
 public class DelegatingLocalArtifactRepository
@@ -197,8 +195,7 @@ public class DelegatingLocalArtifactRepository
 
         DelegatingLocalArtifactRepository other = (DelegatingLocalArtifactRepository) obj;
 
-        return eq( buildReactor, other.buildReactor )
-            && eq( ideWorkspace, other.ideWorkspace )
+        return eq( buildReactor, other.buildReactor ) && eq( ideWorkspace, other.ideWorkspace )
             && eq( userLocalArtifactRepository, other.userLocalArtifactRepository );
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.settings.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,11 @@ package org.apache.maven.settings.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.building;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,13 +30,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
+import org.apache.maven.api.settings.Settings;
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;
-import org.apache.maven.api.settings.Settings;
 import org.apache.maven.settings.TrackableBase;
 import org.apache.maven.settings.io.SettingsParseException;
 import org.apache.maven.settings.io.SettingsReader;
@@ -65,8 +64,7 @@ public class DefaultSettingsBuilder
     private final MavenSettingsMerger settingsMerger = new MavenSettingsMerger();
 
     @Inject
-    public DefaultSettingsBuilder( SettingsReader settingsReader,
-                                   SettingsWriter settingsWriter,
+    public DefaultSettingsBuilder( SettingsReader settingsReader, SettingsWriter settingsWriter,
                                    SettingsValidator settingsValidator )
     {
         this.settingsReader = settingsReader;
@@ -102,8 +100,7 @@ public class DefaultSettingsBuilder
             getSettingsSource( request.getGlobalSettingsFile(), request.getGlobalSettingsSource() );
         Settings globalSettings = readSettings( globalSettingsSource, request, problems );
 
-        Source userSettingsSource =
-            getSettingsSource( request.getUserSettingsFile(), request.getUserSettingsSource() );
+        Source userSettingsSource = getSettingsSource( request.getUserSettingsFile(), request.getUserSettingsSource() );
         Settings userSettings = readSettings( userSettingsSource, request, problems );
 
         userSettings = settingsMerger.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
@@ -193,14 +190,15 @@ public class DefaultSettingsBuilder
         }
         catch ( SettingsParseException e )
         {
-            problems.add( SettingsProblem.Severity.FATAL, "Non-parseable settings " + settingsSource.getLocation()
-                + ": " + e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
+            problems.add( SettingsProblem.Severity.FATAL,
+                          "Non-parseable settings " + settingsSource.getLocation() + ": " + e.getMessage(),
+                          e.getLineNumber(), e.getColumnNumber(), e );
             return Settings.newInstance();
         }
         catch ( IOException e )
         {
-            problems.add( SettingsProblem.Severity.FATAL, "Non-readable settings " + settingsSource.getLocation()
-                + ": " + e.getMessage(), -1, -1, e );
+            problems.add( SettingsProblem.Severity.FATAL,
+                          "Non-readable settings " + settingsSource.getLocation() + ": " + e.getMessage(), -1, -1, e );
             return Settings.newInstance();
         }
 
@@ -237,12 +235,11 @@ public class DefaultSettingsBuilder
         }
         catch ( IOException e )
         {
-            problems.add( SettingsProblem.Severity.WARNING, "Failed to use environment variables for interpolation: "
-                + e.getMessage(), -1, -1, e );
+            problems.add( SettingsProblem.Severity.WARNING,
+                          "Failed to use environment variables for interpolation: " + e.getMessage(), -1, -1, e );
         }
 
-        interpolator.addPostProcessor( ( expression, value ) ->
-        {
+        interpolator.addPostProcessor( ( expression, value ) -> {
             if ( value != null )
             {
                 // we're going to parse this back in as XML so we need to escape XML markup

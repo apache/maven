@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,11 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,10 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -56,7 +55,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.building.ArtifactModelSource;
-import org.apache.maven.model.building.TransformerContextBuilder;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
@@ -69,6 +67,7 @@ import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.StringModelSource;
 import org.apache.maven.model.building.TransformerContext;
+import org.apache.maven.model.building.TransformerContextBuilder;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.apache.maven.repository.internal.ModelCacheFactory;
@@ -95,26 +94,29 @@ public class DefaultProjectBuilder
     implements ProjectBuilder
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     private final ModelBuilder modelBuilder;
+
     private final ModelProcessor modelProcessor;
+
     private final ProjectBuildingHelper projectBuildingHelper;
+
     private final MavenRepositorySystem repositorySystem;
+
     private final org.eclipse.aether.RepositorySystem repoSystem;
+
     private final RemoteRepositoryManager repositoryManager;
+
     private final ProjectDependenciesResolver dependencyResolver;
+
     private final ModelCacheFactory modelCacheFactory;
 
     @SuppressWarnings( "checkstyle:ParameterNumber" )
     @Inject
-    public DefaultProjectBuilder(
-            ModelBuilder modelBuilder,
-            ModelProcessor modelProcessor,
-            ProjectBuildingHelper projectBuildingHelper,
-            MavenRepositorySystem repositorySystem,
-            RepositorySystem repoSystem,
-            RemoteRepositoryManager repositoryManager,
-            ProjectDependenciesResolver dependencyResolver,
-            ModelCacheFactory modelCacheFactory )
+    public DefaultProjectBuilder( ModelBuilder modelBuilder, ModelProcessor modelProcessor,
+                                  ProjectBuildingHelper projectBuildingHelper, MavenRepositorySystem repositorySystem,
+                                  RepositorySystem repoSystem, RemoteRepositoryManager repositoryManager,
+                                  ProjectDependenciesResolver dependencyResolver, ModelCacheFactory modelCacheFactory )
     {
         this.modelBuilder = modelBuilder;
         this.modelProcessor = modelProcessor;
@@ -125,7 +127,7 @@ public class DefaultProjectBuilder
         this.dependencyResolver = dependencyResolver;
         this.modelCacheFactory = modelCacheFactory;
     }
-// ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
 
@@ -133,16 +135,14 @@ public class DefaultProjectBuilder
     public ProjectBuildingResult build( File pomFile, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
-        return build( pomFile, new FileModelSource( pomFile ),
-                new InternalConfig( request, null, null ) );
+        return build( pomFile, new FileModelSource( pomFile ), new InternalConfig( request, null, null ) );
     }
 
     @Override
     public ProjectBuildingResult build( ModelSource modelSource, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
-        return build( null, modelSource,
-                 new InternalConfig( request, null, null ) );
+        return build( null, modelSource, new InternalConfig( request, null, null ) );
     }
 
     private ProjectBuildingResult build( File pomFile, ModelSource modelSource, InternalConfig config )
@@ -192,8 +192,7 @@ public class DefaultProjectBuilder
 
                 modelProblems = result.getProblems();
 
-                initProject( project, Collections.emptyMap(), true,
-                             result, new HashMap<>(), projectBuildingRequest );
+                initProject( project, Collections.emptyMap(), true, result, new HashMap<>(), projectBuildingRequest );
             }
             else if ( projectBuildingRequest.isResolveDependencies() )
             {
@@ -311,8 +310,7 @@ public class DefaultProjectBuilder
         org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact( artifact );
         pomArtifact = ArtifactDescriptorUtils.toPomArtifact( pomArtifact );
 
-        InternalConfig config =
-            new InternalConfig( request, null, null );
+        InternalConfig config = new InternalConfig( request, null, null );
 
         boolean localProject;
 
@@ -332,8 +330,8 @@ public class DefaultProjectBuilder
             {
                 return build( null, createStubModelSource( artifact ), config );
             }
-            throw new ProjectBuildingException( artifact.getId(),
-                                                "Error resolving project artifact: " + e.getMessage(), e );
+            throw new ProjectBuildingException( artifact.getId(), "Error resolving project artifact: " + e.getMessage(),
+                                                e );
         }
 
         File pomFile = pomArtifact.getFile();
@@ -384,24 +382,22 @@ public class DefaultProjectBuilder
         ReactorModelPool.Builder poolBuilder = new ReactorModelPool.Builder();
         final ReactorModelPool modelPool = poolBuilder.build();
 
-        InternalConfig config =
-            new InternalConfig( request, modelPool, modelBuilder.newTransformerContextBuilder() );
+        InternalConfig config = new InternalConfig( request, modelPool, modelBuilder.newTransformerContextBuilder() );
 
         Map<File, MavenProject> projectIndex = new HashMap<>( 256 );
 
         // phase 1: get file Models from the reactor.
-        boolean noErrors =
-            build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<>(), true, recursive,
-                   config, poolBuilder );
+        boolean noErrors = build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<>(), true,
+                                  recursive, config, poolBuilder );
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
         try
         {
             // Phase 2: get effective models from the reactor
-            noErrors =
-                build( results, new ArrayList<>(), projectIndex, interimResults, request,
-                        new HashMap<>(), config.session ) && noErrors;
+            noErrors = build( results, new ArrayList<>(), projectIndex, interimResults, request, new HashMap<>(),
+                              config.session )
+                && noErrors;
         }
         finally
         {
@@ -457,10 +453,8 @@ public class DefaultProjectBuilder
         MavenProject project = new MavenProject();
         project.setFile( pomFile );
 
-        ModelBuildingRequest request = getModelBuildingRequest( config )
-                        .setPomFile( pomFile )
-                        .setTwoPhaseBuilding( true )
-                        .setLocationTracking( true );
+        ModelBuildingRequest request =
+            getModelBuildingRequest( config ).setPomFile( pomFile ).setTwoPhaseBuilding( true ).setLocationTracking( true );
 
         DefaultModelBuildingListener listener =
             new DefaultModelBuildingListener( project, projectBuildingHelper, config.request );
@@ -476,9 +470,9 @@ public class DefaultProjectBuilder
             result = e.getResult();
             if ( result == null || result.getFileModel() == null )
             {
-                 results.add( new DefaultProjectBuildingResult( e.getModelId(), pomFile, e.getProblems() ) );
+                results.add( new DefaultProjectBuildingResult( e.getModelId(), pomFile, e.getProblems() ) );
 
-                 return false;
+                return false;
             }
             // validation error, continue project building and delay failing to help IDEs
             // result.getProblems().addAll(e.getProblems()) ?
@@ -487,7 +481,7 @@ public class DefaultProjectBuilder
 
         Model model = result.getFileModel();
 
-        poolBuilder.put( model.getPomFile().toPath(),  model );
+        poolBuilder.put( model.getPomFile().toPath(), model );
 
         InterimResult interimResult = new InterimResult( pomFile, request, result, listener, isRoot );
         interimResults.add( interimResult );
@@ -515,9 +509,9 @@ public class DefaultProjectBuilder
                 if ( !moduleFile.isFile() )
                 {
                     ModelProblem problem =
-                        new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
-                            + " does not exist", ModelProblem.Severity.ERROR, ModelProblem.Version.BASE,
-                                model, -1, -1, null );
+                        new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile + " does not exist",
+                                                 ModelProblem.Severity.ERROR, ModelProblem.Version.BASE, model, -1, -1,
+                                                 null );
                     result.getProblems().add( problem );
 
                     noErrors = false;
@@ -551,10 +545,11 @@ public class DefaultProjectBuilder
                     }
                     buffer.append( moduleFile );
 
-                    ModelProblem problem =
-                        new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
-                            + " forms aggregation cycle " + buffer, ModelProblem.Severity.ERROR,
-                                ModelProblem.Version.BASE, model, -1, -1, null );
+                    ModelProblem problem = new DefaultModelProblem(
+                                                                    "Child module " + moduleFile + " of " + pomFile
+                                                                        + " forms aggregation cycle " + buffer,
+                                                                    ModelProblem.Severity.ERROR,
+                                                                    ModelProblem.Version.BASE, model, -1, -1, null );
                     result.getProblems().add( problem );
 
                     noErrors = false;
@@ -567,8 +562,8 @@ public class DefaultProjectBuilder
 
             interimResult.modules = new ArrayList<>();
 
-            if ( !build( results, interimResult.modules, projectIndex, moduleFiles, aggregatorFiles, false,
-                         recursive, config, poolBuilder ) )
+            if ( !build( results, interimResult.modules, projectIndex, moduleFiles, aggregatorFiles, false, recursive,
+                         config, poolBuilder ) )
             {
                 noErrors = false;
             }
@@ -628,13 +623,13 @@ public class DefaultProjectBuilder
                 catch ( InvalidArtifactRTException iarte )
                 {
                     result.getProblems().add( new DefaultModelProblem( null, ModelProblem.Severity.ERROR, null,
-                            result.getEffectiveModel(), -1, -1, iarte ) );
+                                                                       result.getEffectiveModel(), -1, -1, iarte ) );
                 }
 
                 List<MavenProject> modules = new ArrayList<>();
                 noErrors =
                     build( results, modules, projectIndex, interimResult.modules, request, profilesXmls, session )
-                    && noErrors;
+                        && noErrors;
 
                 projects.addAll( modules );
                 projects.add( project );
@@ -672,9 +667,9 @@ public class DefaultProjectBuilder
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
-    private void initProject( MavenProject project, Map<File, MavenProject> projects,
-                              boolean buildParentIfNotExisting, ModelBuildingResult result,
-                              Map<File, Boolean> profilesXmls, ProjectBuildingRequest projectBuildingRequest )
+    private void initProject( MavenProject project, Map<File, MavenProject> projects, boolean buildParentIfNotExisting,
+                              ModelBuildingResult result, Map<File, Boolean> profilesXmls,
+                              ProjectBuildingRequest projectBuildingRequest )
     {
         project.setModel( result.getEffectiveModel() );
         project.setOriginalModel( result.getFileModel() );
@@ -847,7 +842,7 @@ public class DefaultProjectBuilder
 
         // release artifact repository
         if ( project.getDistributionManagement() != null
-                        && project.getDistributionManagement().getRepository() != null )
+            && project.getDistributionManagement().getRepository() != null )
         {
             try
             {
@@ -898,8 +893,8 @@ public class DefaultProjectBuilder
                              ModelBuildingResult result, ProjectBuildingRequest projectBuildingRequest )
     {
         Model parentModel = result.getModelIds().size() > 1 && !result.getModelIds().get( 1 ).isEmpty()
-                                ? result.getRawModel( result.getModelIds().get( 1 ) )
-                                : null;
+                        ? result.getRawModel( result.getModelIds().get( 1 ) )
+                        : null;
 
         if ( parentModel != null )
         {
@@ -983,9 +978,7 @@ public class DefaultProjectBuilder
         if ( !modelId.isEmpty() )
         {
             final Model model = result.getRawModel( modelId );
-            groupId = model.getGroupId() != null
-                          ? model.getGroupId()
-                          : inheritedGroupId( result, modelIndex + 1 );
+            groupId = model.getGroupId() != null ? model.getGroupId() : inheritedGroupId( result, modelIndex + 1 );
 
         }
 
@@ -1032,9 +1025,8 @@ public class DefaultProjectBuilder
             this.modelPool = modelPool;
             this.transformerContextBuilder = transformerContextBuilder;
 
-            session =
-                LegacyLocalRepositoryManager.overlay( request.getLocalRepository(), request.getRepositorySession(),
-                                                      repoSystem );
+            session = LegacyLocalRepositoryManager.overlay( request.getLocalRepository(),
+                                                            request.getRepositorySession(), repoSystem );
             repositories = RepositoryUtils.toRepos( request.getRemoteRepositories() );
 
         }

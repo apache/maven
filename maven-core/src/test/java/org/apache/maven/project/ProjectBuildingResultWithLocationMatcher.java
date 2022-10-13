@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,8 +16,8 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
-import org.apache.maven.model.building.ModelProblem;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -29,9 +27,11 @@ import static java.util.stream.Collectors.joining;
 /**
  * Hamcrest matcher to help create fluent assertions about {@link ProjectBuildingResult} instances.
  */
-class ProjectBuildingResultWithLocationMatcher extends BaseMatcher<ProjectBuildingResult>
+class ProjectBuildingResultWithLocationMatcher
+    extends BaseMatcher<ProjectBuildingResult>
 {
     private final int columnNumber;
+
     private final int lineNumber;
 
     ProjectBuildingResultWithLocationMatcher( int columnNumber, int lineNumber )
@@ -50,15 +50,15 @@ class ProjectBuildingResultWithLocationMatcher extends BaseMatcher<ProjectBuildi
 
         final ProjectBuildingResult r = (ProjectBuildingResult) o;
 
-        return r.getProblems().stream()
-                .anyMatch( p -> p.getLineNumber() == lineNumber && p.getColumnNumber() == columnNumber );
+        return r.getProblems().stream().anyMatch( p -> p.getLineNumber() == lineNumber
+            && p.getColumnNumber() == columnNumber );
     }
 
     @Override
     public void describeTo( Description description )
     {
-        description.appendText( "a ProjectBuildingResult with location " )
-                .appendText( formatLocation( columnNumber, lineNumber ) );
+        description.appendText( "a ProjectBuildingResult with location " ).appendText( formatLocation( columnNumber,
+                                                                                                       lineNumber ) );
     }
 
     private String formatLocation( int columnNumber, int lineNumber )
@@ -67,7 +67,7 @@ class ProjectBuildingResultWithLocationMatcher extends BaseMatcher<ProjectBuildi
     }
 
     @Override
-    public void describeMismatch(final Object o, final Description description)
+    public void describeMismatch( final Object o, final Description description )
     {
         if ( !( o instanceof ProjectBuildingResult ) )
         {
@@ -77,9 +77,9 @@ class ProjectBuildingResultWithLocationMatcher extends BaseMatcher<ProjectBuildi
         {
             final ProjectBuildingResult r = (ProjectBuildingResult) o;
             description.appendText( "was a ProjectBuildingResult with locations " );
-            String messages = r.getProblems().stream()
-                    .map( p -> formatLocation( p.getColumnNumber(), p.getLineNumber() ) )
-                    .collect( joining( ", ") );
+            String messages =
+                r.getProblems().stream().map( p -> formatLocation( p.getColumnNumber(),
+                                                                   p.getLineNumber() ) ).collect( joining( ", " ) );
             description.appendText( messages );
         }
     }

@@ -1,5 +1,3 @@
-package org.apache.maven.api.services.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.services.xml;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api.services.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services.xml;
 
 import java.io.OutputStream;
 import java.io.Writer;
@@ -51,8 +50,11 @@ public interface XmlWriterRequest<T>
     class XmlWriterRequestBuilder<T>
     {
         Path path;
+
         OutputStream outputStream;
+
         Writer writer;
+
         T content;
 
         public XmlWriterRequestBuilder<T> path( Path path )
@@ -84,11 +86,15 @@ public interface XmlWriterRequest<T>
             return new DefaultXmlWriterRequest<>( path, outputStream, writer, content );
         }
 
-        private static class DefaultXmlWriterRequest<T> implements XmlWriterRequest<T>
+        private static class DefaultXmlWriterRequest<T>
+            implements XmlWriterRequest<T>
         {
             final Path path;
+
             final OutputStream outputStream;
+
             final Writer writer;
+
             final T content;
 
             DefaultXmlWriterRequest( Path path, OutputStream outputStream, Writer writer, T content )

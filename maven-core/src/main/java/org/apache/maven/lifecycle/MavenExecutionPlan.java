@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.lifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,12 +49,9 @@ public class MavenExecutionPlan
 {
 
     /*
-       At the moment, this class is totally immutable, and this is in line with thoughts about the
-       pre-calculated execution plan that stays the same during the execution.
-
-       If deciding to add mutable state to this class, it should be at least considered to
-       separate this into a separate mutable structure.
-
+     * At the moment, this class is totally immutable, and this is in line with thoughts about the pre-calculated
+     * execution plan that stays the same during the execution. If deciding to add mutable state to this class, it
+     * should be at least considered to separate this into a separate mutable structure.
      */
 
     private final List<ExecutionPlanItem> planItem;
@@ -110,11 +106,10 @@ public class MavenExecutionPlan
     }
 
     /**
-     * Returns the last ExecutionPlanItem in the supplied phase. If no items are in the specified phase,
-     * the closest executionPlanItem from an earlier phase item will be returned.
+     * Returns the last ExecutionPlanItem in the supplied phase. If no items are in the specified phase, the closest
+     * executionPlanItem from an earlier phase item will be returned.
      *
-     * @param requestedPhase the requested phase
-     *                       The execution plan item
+     * @param requestedPhase the requested phase The execution plan item
      * @return The ExecutionPlanItem or null if none can be found
      */
     public ExecutionPlanItem findLastInPhase( String requestedPhase )
@@ -127,8 +122,7 @@ public class MavenExecutionPlan
         return planItem;
     }
 
-    private static Iterable<String> getDistinctPhasesInOrderOfExecutionPlanAppearance(
-        List<ExecutionPlanItem> planItems )
+    private static Iterable<String> getDistinctPhasesInOrderOfExecutionPlanAppearance( List<ExecutionPlanItem> planItems )
     {
         LinkedHashSet<String> result = new LinkedHashSet<>();
         for ( ExecutionPlanItem executionPlanItem : planItems )

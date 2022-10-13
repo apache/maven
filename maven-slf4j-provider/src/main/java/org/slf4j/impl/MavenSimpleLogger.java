@@ -1,5 +1,3 @@
-package org.slf4j.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.slf4j.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.slf4j.impl;
 
 import java.io.PrintStream;
 
@@ -30,7 +29,8 @@ import static org.apache.maven.shared.utils.logging.MessageUtils.level;
  *
  * @since 3.5.0
  */
-public class MavenSimpleLogger extends SimpleLogger
+public class MavenSimpleLogger
+    extends SimpleLogger
 {
     MavenSimpleLogger( String name )
     {

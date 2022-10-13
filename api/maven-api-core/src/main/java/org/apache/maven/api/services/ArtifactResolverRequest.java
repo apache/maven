@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import java.util.Collection;
 
@@ -52,19 +51,20 @@ public interface ArtifactResolverRequest
     }
 
     @Nonnull
-    static ArtifactResolverRequest build( @Nonnull Session session,
-                                          @Nonnull Collection<? extends ArtifactCoordinate> coordinates )
+    static ArtifactResolverRequest build( @Nonnull
+    Session session, @Nonnull
+    Collection<? extends ArtifactCoordinate> coordinates )
     {
-        return builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .coordinates( nonNull( coordinates, "coordinates cannot be null" ) )
-                .build();
+        return builder().session( nonNull( session,
+                                           "session cannot be null" ) ).coordinates( nonNull( coordinates,
+                                                                                              "coordinates cannot be null" ) ).build();
     }
 
     @NotThreadSafe
     class ArtifactResolverRequestBuilder
     {
         Session session;
+
         Collection<? extends ArtifactCoordinate> coordinates;
 
         ArtifactResolverRequestBuilder()
@@ -91,13 +91,16 @@ public interface ArtifactResolverRequest
             return new DefaultArtifactResolverRequest( session, coordinates );
         }
 
-        private static class DefaultArtifactResolverRequest extends BaseRequest implements ArtifactResolverRequest
+        private static class DefaultArtifactResolverRequest
+            extends BaseRequest
+            implements ArtifactResolverRequest
         {
             @Nonnull
             private final Collection<? extends ArtifactCoordinate> coordinates;
 
-            DefaultArtifactResolverRequest( @Nonnull Session session,
-                                            @Nonnull Collection<? extends ArtifactCoordinate> coordinates )
+            DefaultArtifactResolverRequest( @Nonnull
+            Session session, @Nonnull
+            Collection<? extends ArtifactCoordinate> coordinates )
             {
                 super( session );
                 this.coordinates = unmodifiable( nonNull( coordinates, "coordinates cannot be null" ) );

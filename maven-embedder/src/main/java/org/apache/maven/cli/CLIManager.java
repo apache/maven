@@ -1,5 +1,3 @@
-package org.apache.maven.cli;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.cli;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.cli;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -110,8 +109,10 @@ public class CLIManager
 
     public static final String COLOR = "color";
 
-    /** This option is deprecated and may be repurposed as Java debug in a future version.
-     * Use {@code -X/--verbose} instead. */
+    /**
+     * This option is deprecated and may be repurposed as Java debug in a future version. Use {@code -X/--verbose}
+     * instead.
+     */
     @Deprecated
     public static final String DEBUG = "debug";
 
@@ -188,10 +189,9 @@ public class CLIManager
             width = HelpFormatter.DEFAULT_WIDTH;
         }
 
-        formatter.printHelp( pw, width, "mvn [args]",
-                             System.lineSeparator() + "Options:", options,
-                             HelpFormatter.DEFAULT_LEFT_PAD, HelpFormatter.DEFAULT_DESC_PAD,
-                             System.lineSeparator(), false );
+        formatter.printHelp( pw, width, "mvn [args]", System.lineSeparator() + "Options:", options,
+                             HelpFormatter.DEFAULT_LEFT_PAD, HelpFormatter.DEFAULT_DESC_PAD, System.lineSeparator(),
+                             false );
 
         pw.flush();
     }

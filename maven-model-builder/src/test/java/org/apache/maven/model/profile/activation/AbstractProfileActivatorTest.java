@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile.activation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.profile.activation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile.activation;
 
 import java.util.Properties;
 
@@ -41,10 +40,12 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator>
     protected T activator;
 
     @BeforeEach
-    abstract void setUp() throws Exception;
+    abstract void setUp()
+        throws Exception;
 
     @AfterEach
-    void tearDown() throws Exception
+    void tearDown()
+        throws Exception
     {
         activator = null;
     }

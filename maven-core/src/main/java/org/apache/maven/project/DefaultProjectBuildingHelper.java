@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,11 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,10 +31,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -69,19 +68,21 @@ public class DefaultProjectBuildingHelper
     implements ProjectBuildingHelper
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     private final PlexusContainer container; // TODO not used? Then remove
+
     private final ClassRealmManager classRealmManager;
+
     private final ProjectRealmCache projectRealmCache;
+
     private final RepositorySystem repositorySystem;
+
     private final MavenPluginManager pluginManager;
 
     @Inject
-    public DefaultProjectBuildingHelper(
-            PlexusContainer container,
-            ClassRealmManager classRealmManager,
-            ProjectRealmCache projectRealmCache,
-            RepositorySystem repositorySystem,
-            MavenPluginManager pluginManager )
+    public DefaultProjectBuildingHelper( PlexusContainer container, ClassRealmManager classRealmManager,
+                                         ProjectRealmCache projectRealmCache, RepositorySystem repositorySystem,
+                                         MavenPluginManager pluginManager )
     {
         this.container = container;
         this.classRealmManager = classRealmManager;

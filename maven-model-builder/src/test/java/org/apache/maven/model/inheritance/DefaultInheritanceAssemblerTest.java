@@ -1,5 +1,3 @@
-package org.apache.maven.model.inheritance;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.inheritance;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.inheritance;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +58,7 @@ public class DefaultInheritanceAssemblerTest
         {
             @Override
             public XmlPullParser transform( XmlPullParser parser, Path pomFile, TransformerContext context )
-                    throws IOException, TransformerException
+                throws IOException, TransformerException
             {
                 return null;
             }
@@ -87,8 +86,9 @@ public class DefaultInheritanceAssemblerTest
     }
 
     /**
-     * Check most classical urls inheritance: directory structure where parent POM in parent directory
-     * and child directory == artifactId
+     * Check most classical urls inheritance: directory structure where parent POM in parent directory and child
+     * directory == artifactId
+     * 
      * @throws IOException Model read problem
      */
     @Test
@@ -100,6 +100,7 @@ public class DefaultInheritanceAssemblerTest
 
     /**
      * Flat directory structure: parent &amp; child POMs in sibling directories, child directory == artifactId.
+     * 
      * @throws IOException Model read problem
      */
     @Test
@@ -111,6 +112,7 @@ public class DefaultInheritanceAssemblerTest
 
     /**
      * MNG-5951 MNG-6059 child.x.y.inherit.append.path="false" test
+     * 
      * @throws Exception
      */
     @Test
@@ -122,6 +124,7 @@ public class DefaultInheritanceAssemblerTest
 
     /**
      * MNG-5951 special case test: inherit with partial override
+     * 
      * @throws Exception
      */
     @Test
@@ -133,6 +136,7 @@ public class DefaultInheritanceAssemblerTest
 
     /**
      * MNG-5951 special case test: child.x.y.inherit.append.path="true" in child should not reset content
+     * 
      * @throws Exception
      */
     @Test
@@ -143,9 +147,10 @@ public class DefaultInheritanceAssemblerTest
     }
 
     /**
-     * Tricky case: flat directory structure, but child directory != artifactId.
-     * Model interpolation does not give same result when calculated from build or from repo...
-     * This is why MNG-5000 fix in code is marked as bad practice (uses file names)
+     * Tricky case: flat directory structure, but child directory != artifactId. Model interpolation does not give same
+     * result when calculated from build or from repo... This is why MNG-5000 fix in code is marked as bad practice
+     * (uses file names)
+     * 
      * @throws IOException Model read problem
      */
     @Test
@@ -158,15 +163,13 @@ public class DefaultInheritanceAssemblerTest
         {
             // build from disk expected to fail
             testInheritance( "tricky-flat-artifactId-urls", false );
-            //fail( "should have failed since module reference == artifactId != directory name" );
+            // fail( "should have failed since module reference == artifactId != directory name" );
         }
         catch ( AssertionError afe )
         {
             // expected failure: wrong relative path calculation
-            assertTrue( afe.getMessage().contains(
-                                "Expected text value 'http://www.apache.org/path/to/parent/child-artifact-id/' but was " +
-                                        "'http://www.apache.org/path/to/parent/../child-artifact-id/'" ),
-                        afe.getMessage() );
+            assertTrue( afe.getMessage().contains( "Expected text value 'http://www.apache.org/path/to/parent/child-artifact-id/' but was "
+                + "'http://www.apache.org/path/to/parent/../child-artifact-id/'" ), afe.getMessage() );
         }
         // but ok from repo: local disk is ignored
         testInheritance( "tricky-flat-artifactId-urls", true );
@@ -175,22 +178,19 @@ public class DefaultInheritanceAssemblerTest
         // then relative path calculation will success during build from disk but fail when calculated from repo
         testInheritance( "tricky-flat-directory-urls", false );
 
-        AssertionError afe = assertThrows(
-                AssertionError.class,
-                () -> testInheritance( "tricky-flat-directory-urls", true ),
-                "should have failed since module reference == directory name != artifactId" );
+        AssertionError afe =
+            assertThrows( AssertionError.class, () -> testInheritance( "tricky-flat-directory-urls", true ),
+                          "should have failed since module reference == directory name != artifactId" );
         // expected failure
-        assertTrue( afe.getMessage().contains(
-                                "Expected text value 'http://www.apache.org/path/to/parent/../child-artifact-id/' but was " +
-                                        "'http://www.apache.org/path/to/parent/child-artifact-id/'" ),
-                    afe.getMessage() );
+        assertTrue( afe.getMessage().contains( "Expected text value 'http://www.apache.org/path/to/parent/../child-artifact-id/' but was "
+            + "'http://www.apache.org/path/to/parent/child-artifact-id/'" ), afe.getMessage() );
     }
 
     @Test
     public void testWithEmptyUrl()
         throws IOException
     {
-            testInheritance( "empty-urls", false );
+        testInheritance( "empty-urls", false );
     }
 
     public void testInheritance( String baseName )
@@ -220,8 +220,8 @@ public class DefaultInheritanceAssemblerTest
         Model assembled = assembler.assembleModelInheritance( child, parent, null, problems );
 
         // write baseName + "-actual"
-        File actual = new File( "target/test-classes/poms/inheritance/" + baseName
-            + ( fromRepo ? "-build" : "-repo" ) + "-actual.xml" );
+        File actual = new File( "target/test-classes/poms/inheritance/" + baseName + ( fromRepo ? "-build" : "-repo" )
+            + "-actual.xml" );
         writer.write( actual, null, assembled );
 
         // check with getPom( baseName + "-expected" )
@@ -249,6 +249,6 @@ public class DefaultInheritanceAssemblerTest
         // check with getPom( "module-path-not-artifactId-effective" )
         File expected = getPom( "module-path-not-artifactId-expected" );
 
-        assertThat( actual, CompareMatcher.isIdenticalTo(expected).ignoreComments().ignoreWhitespace() );
+        assertThat( actual, CompareMatcher.isIdenticalTo( expected ).ignoreComments().ignoreWhitespace() );
     }
 }

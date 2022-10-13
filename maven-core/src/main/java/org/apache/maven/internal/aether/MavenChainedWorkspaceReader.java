@@ -1,5 +1,3 @@
-package org.apache.maven.internal.aether;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.internal.aether;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.aether;
 
 import java.io.File;
 import java.util.Collection;
@@ -89,6 +88,7 @@ public final class MavenChainedWorkspaceReader
 
     /**
      * chains a collection of {@link WorkspaceReader}s
+     * 
      * @param workspaceReaderCollection the collection of readers, might be empty but never <code>null</code>
      * @return if the collection contains only one item returns the single item, otherwise creates a new
      *         {@link MavenChainedWorkspaceReader} chaining all readers in the order of the given collection.

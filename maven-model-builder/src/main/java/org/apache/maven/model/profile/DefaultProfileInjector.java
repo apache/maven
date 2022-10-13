@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.profile;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -57,10 +56,8 @@ public class DefaultProfileInjector
     private ProfileModelMerger merger = new ProfileModelMerger();
 
     @Override
-    public void injectProfile( org.apache.maven.model.Model model,
-                               org.apache.maven.model.Profile profile,
-                               ModelBuildingRequest request,
-                               ModelProblemCollector problems )
+    public void injectProfile( org.apache.maven.model.Model model, org.apache.maven.model.Profile profile,
+                               ModelBuildingRequest request, ModelProblemCollector problems )
     {
         if ( profile != null )
         {
@@ -97,9 +94,9 @@ public class DefaultProfileInjector
         }
 
         @Override
-        protected void mergePluginContainer_Plugins( PluginContainer.Builder builder,
-                                                     PluginContainer target,  PluginContainer source,
-                                                     boolean sourceDominant,  Map<Object, Object> context )
+        protected void mergePluginContainer_Plugins( PluginContainer.Builder builder, PluginContainer target,
+                                                     PluginContainer source, boolean sourceDominant,
+                                                     Map<Object, Object> context )
         {
             List<Plugin> src = source.getPlugins();
             if ( !src.isEmpty() )
@@ -159,8 +156,7 @@ public class DefaultProfileInjector
             if ( !src.isEmpty() )
             {
                 List<PluginExecution> tgt = target.getExecutions();
-                Map<Object, PluginExecution> merged =
-                    new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
+                Map<Object, PluginExecution> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
                 for ( PluginExecution element : tgt )
                 {
@@ -191,8 +187,7 @@ public class DefaultProfileInjector
             if ( !src.isEmpty() )
             {
                 List<ReportPlugin> tgt = target.getPlugins();
-                Map<Object, ReportPlugin> merged =
-                    new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
+                Map<Object, ReportPlugin> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
                 for ( ReportPlugin element : tgt )
                 {

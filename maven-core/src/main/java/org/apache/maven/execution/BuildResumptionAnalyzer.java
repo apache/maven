@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,17 +16,19 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import java.util.Optional;
 
 /**
- * Instances of this class are responsible for determining whether it makes sense to "resume" a build (i.e., using
- * the {@code --resume} flag.
+ * Instances of this class are responsible for determining whether it makes sense to "resume" a build (i.e., using the
+ * {@code --resume} flag.
  */
 public interface BuildResumptionAnalyzer
 {
     /**
      * Construct an instance of {@link BuildResumptionData} based on the outcome of the current Maven build.
+     * 
      * @param result Outcome of the current Maven build.
      * @return A {@link BuildResumptionData} instance or {@link Optional#empty()} if resuming the build is not possible.
      */

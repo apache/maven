@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.repository;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.repository;
 
 import java.util.List;
 
@@ -27,8 +26,8 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.repository.Proxy;
 
 /**
- * Abstraction of an artifact repository. Artifact repositories can be remote, local, or even build reactor or
- * IDE workspace.
+ * Abstraction of an artifact repository. Artifact repositories can be remote, local, or even build reactor or IDE
+ * workspace.
  */
 public interface ArtifactRepository
 {
@@ -89,7 +88,6 @@ public interface ArtifactRepository
     // New interface methods for the repository system.
     //
     /**
-     *
      * @param artifact an artifact
      * @return found artifact
      * @since 3.0-alpha-3

@@ -1,5 +1,3 @@
-package org.apache.maven.settings;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.settings;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,9 @@ package org.apache.maven.settings;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings;
+
+import javax.inject.Inject;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,8 +41,6 @@ import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import javax.inject.Inject;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -119,15 +118,15 @@ public class PomConstructionWithSettingsTest
         String localRepoUrl =
             System.getProperty( "maven.repo.local", System.getProperty( "user.home" ) + "/.m2/repository" );
         localRepoUrl = "file://" + localRepoUrl;
-        config.setLocalRepository(
-            repositorySystem.createArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout(), null,
-                                                       null ) );
+        config.setLocalRepository( repositorySystem.createArtifactRepository( "local", localRepoUrl,
+                                                                              new DefaultRepositoryLayout(), null,
+                                                                              null ) );
         config.setActiveProfileIds( settings.getActiveProfiles() );
 
         DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
         LocalRepository localRepo = new LocalRepository( config.getLocalRepository().getBasedir() );
-        repoSession.setLocalRepositoryManager(
-            new SimpleLocalRepositoryManagerFactory().newInstance( repoSession, localRepo ) );
+        repoSession.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( repoSession,
+                                                                                                      localRepo ) );
         config.setRepositorySession( repoSession );
 
         return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ).getProject() );

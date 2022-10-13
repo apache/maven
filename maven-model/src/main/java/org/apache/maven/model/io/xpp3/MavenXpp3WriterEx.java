@@ -1,5 +1,3 @@
-package org.apache.maven.model.io.xpp3;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model.io.xpp3;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.model.io.xpp3;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.io.xpp3;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -28,9 +27,9 @@ import org.apache.maven.model.Model;
 
 public class MavenXpp3WriterEx
 {
-    //--------------------------/
-    //- Class/Member Variables -/
-    //--------------------------/
+    // --------------------------/
+    // - Class/Member Variables -/
+    // --------------------------/
 
     /**
      * Field fileComment.
@@ -42,10 +41,9 @@ public class MavenXpp3WriterEx
      */
     protected InputLocation.StringFormatter stringFormatter;
 
-
-    //-----------/
-    //- Methods -/
-    //-----------/
+    // -----------/
+    // - Methods -/
+    // -----------/
 
     /**
      * Method setFileComment.
@@ -55,7 +53,7 @@ public class MavenXpp3WriterEx
     public void setFileComment( String fileComment )
     {
         this.fileComment = fileComment;
-    } //-- void setFileComment( String )
+    } // -- void setFileComment( String )
 
     /**
      * Method setStringFormatter.
@@ -65,7 +63,7 @@ public class MavenXpp3WriterEx
     public void setStringFormatter( InputLocation.StringFormatter stringFormatter )
     {
         this.stringFormatter = stringFormatter;
-    } //-- void setStringFormatter( InputLocation.StringFormatter )
+    } // -- void setStringFormatter( InputLocation.StringFormatter )
 
     /**
      * Method write.
@@ -75,7 +73,7 @@ public class MavenXpp3WriterEx
      * @throws IOException java.io.IOException if any.
      */
     public void write( Writer writer, Model model )
-            throws IOException
+        throws IOException
     {
         org.apache.maven.model.v4.MavenXpp3WriterEx xw = new org.apache.maven.model.v4.MavenXpp3WriterEx();
         xw.setFileComment( fileComment );
@@ -88,7 +86,7 @@ public class MavenXpp3WriterEx
             }
         } : null );
         xw.write( writer, model.getDelegate() );
-    } //-- void write( Writer, Model )
+    } // -- void write( Writer, Model )
 
     /**
      * Method write.
@@ -98,11 +96,11 @@ public class MavenXpp3WriterEx
      * @throws IOException java.io.IOException if any.
      */
     public void write( OutputStream stream, Model model )
-            throws IOException
+        throws IOException
     {
         org.apache.maven.model.v4.MavenXpp3WriterEx xw = new org.apache.maven.model.v4.MavenXpp3WriterEx();
         xw.setFileComment( fileComment );
         xw.write( stream, model.getDelegate() );
-    } //-- void write( OutputStream, Model )
+    } // -- void write( OutputStream, Model )
 
 }

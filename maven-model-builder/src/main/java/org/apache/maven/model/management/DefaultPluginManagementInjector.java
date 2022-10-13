@@ -1,5 +1,3 @@
-package org.apache.maven.model.management;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,16 @@ package org.apache.maven.model.management;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.management;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Model;
@@ -54,7 +53,7 @@ public class DefaultPluginManagementInjector
 
     @Override
     public void injectManagement( org.apache.maven.model.Model model, ModelBuildingRequest request,
-                                   ModelProblemCollector problems )
+                                  ModelProblemCollector problems )
     {
         model.update( merger.mergeManagedBuildPlugins( model.getDelegate() ) );
     }
@@ -120,8 +119,7 @@ public class DefaultPluginManagementInjector
             {
                 List<PluginExecution> tgt = target.getExecutions();
 
-                Map<Object, PluginExecution> merged =
-                    new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
+                Map<Object, PluginExecution> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
                 for ( PluginExecution element : src )
                 {

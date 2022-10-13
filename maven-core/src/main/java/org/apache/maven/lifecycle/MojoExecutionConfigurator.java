@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.lifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle;
 
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
@@ -28,14 +27,15 @@ import org.apache.maven.project.MavenProject;
  * in the MavenProject and the default configuration for the Mojo from the containing plugin's plugin.xml descriptor.
  * </p>
  * <strong>Note:</strong> This interface is part of work in progress and can be changed or removed without notice.
+ * 
  * @author Jason van Zyl
  * @since 3.3.1, MNG-5753
  */
 public interface MojoExecutionConfigurator
 {
     /**
-     * Create the MojoExecution configuration based on configuration for a Mojo in the MavenProject and the
-     * default configuration for the Mojo from the containing plugin's plugin.xml descriptor.
+     * Create the MojoExecution configuration based on configuration for a Mojo in the MavenProject and the default
+     * configuration for the Mojo from the containing plugin's plugin.xml descriptor.
      *
      * @param project
      * @param mojoExecution

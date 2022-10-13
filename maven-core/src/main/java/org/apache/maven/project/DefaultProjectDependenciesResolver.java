@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,17 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -63,13 +62,14 @@ public class DefaultProjectDependenciesResolver
     implements ProjectDependenciesResolver
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     private final RepositorySystem repoSystem;
+
     private final List<RepositorySessionDecorator> decorators;
 
     @Inject
-    public DefaultProjectDependenciesResolver(
-            RepositorySystem repoSystem,
-            List<RepositorySessionDecorator> decorators )
+    public DefaultProjectDependenciesResolver( RepositorySystem repoSystem,
+                                               List<RepositorySessionDecorator> decorators )
     {
         this.repoSystem = repoSystem;
         this.decorators = decorators;
@@ -136,9 +136,8 @@ public class DefaultProjectDependenciesResolver
                         classifier = type.getClassifier();
                     }
                 }
-                String key =
-                    ArtifactIdUtils.toVersionlessId( dependency.getGroupId(), dependency.getArtifactId(),
-                                                    dependency.getType(), classifier );
+                String key = ArtifactIdUtils.toVersionlessId( dependency.getGroupId(), dependency.getArtifactId(),
+                                                              dependency.getType(), classifier );
                 dependencies.put( key, dependency );
             }
             for ( Artifact artifact : project.getDependencyArtifacts() )
@@ -196,8 +195,8 @@ public class DefaultProjectDependenciesResolver
                 {
                     org.eclipse.aether.artifact.Artifact relocated = child.getDependency().getArtifact();
                     String message = relocated instanceof org.apache.maven.repository.internal.RelocatedArtifact
-                            ? ( ( org.apache.maven.repository.internal.RelocatedArtifact ) relocated ).getMessage()
-                            : null;
+                                    ? ( (org.apache.maven.repository.internal.RelocatedArtifact) relocated ).getMessage()
+                                    : null;
                     logger.warn( "The artifact " + child.getRelocations().get( 0 ) + " has been relocated to "
                         + relocated + ( message != null ? ": " + message : "" ) );
                 }
@@ -275,8 +274,8 @@ public class DefaultProjectDependenciesResolver
                 }
 
                 // TODO We currently cannot tell which <dependencyManagement> section contained the management
-                //      information. When the resolver provides this information, these log messages should be updated
-                //      to contain it.
+                // information. When the resolver provides this information, these log messages should be updated
+                // to contain it.
                 if ( ( node.getManagedBits() & DependencyNode.MANAGED_SCOPE ) == DependencyNode.MANAGED_SCOPE )
                 {
                     final String premanagedScope = DependencyManagerUtils.getPremanagedScope( node );
@@ -301,8 +300,8 @@ public class DefaultProjectDependenciesResolver
                     buffer.append( ')' );
                 }
 
-                if ( ( node.getManagedBits() & DependencyNode.MANAGED_EXCLUSIONS )
-                         == DependencyNode.MANAGED_EXCLUSIONS )
+                if ( ( node.getManagedBits()
+                    & DependencyNode.MANAGED_EXCLUSIONS ) == DependencyNode.MANAGED_EXCLUSIONS )
                 {
                     final Collection<org.eclipse.aether.graph.Exclusion> premanagedExclusions =
                         DependencyManagerUtils.getPremanagedExclusions( node );
@@ -312,8 +311,8 @@ public class DefaultProjectDependenciesResolver
                     buffer.append( ')' );
                 }
 
-                if ( ( node.getManagedBits() & DependencyNode.MANAGED_PROPERTIES )
-                         == DependencyNode.MANAGED_PROPERTIES )
+                if ( ( node.getManagedBits()
+                    & DependencyNode.MANAGED_PROPERTIES ) == DependencyNode.MANAGED_PROPERTIES )
                 {
                     final Map<String, String> premanagedProperties =
                         DependencyManagerUtils.getPremanagedProperties( node );

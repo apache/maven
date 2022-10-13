@@ -1,5 +1,3 @@
-package org.apache.maven.configuration;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.configuration;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.configuration;
 
 /**
  * A request to configure a bean from some configuration in the POM or similar.
@@ -51,8 +50,8 @@ public interface BeanConfigurationRequest
 
     /**
      * Sets the configuration to unmarshal into the bean. The configuration should be taken from
-     * {@link org.apache.maven.model.ConfigurationContainer#getConfiguration()} or a similar source.
-     * Fully equivalent to {@code setConfiguration(configuration, null)}.
+     * {@link org.apache.maven.model.ConfigurationContainer#getConfiguration()} or a similar source. Fully equivalent to
+     * {@code setConfiguration(configuration, null)}.
      *
      * @param configuration The configuration to unmarshal, may be {@code null}.
      * @return This request for chaining, never {@code null}.
@@ -61,9 +60,8 @@ public interface BeanConfigurationRequest
 
     /**
      * Sets the configuration to unmarshal into the bean. The configuration should be taken from
-     * {@link org.apache.maven.model.ConfigurationContainer#getConfiguration()} or a similar source.
-     * If {@code element} is not {@code null}, child configuration element with the specified name will
-     * be unmarshalled.
+     * {@link org.apache.maven.model.ConfigurationContainer#getConfiguration()} or a similar source. If {@code element}
+     * is not {@code null}, child configuration element with the specified name will be unmarshalled.
      *
      * @param configuration The configuration to unmarshal, may be {@code null}.
      * @param element Configuration element name to unmarshal or {@code null} to unmarshal entire configuration.
@@ -75,7 +73,6 @@ public interface BeanConfigurationRequest
      * Returns configuration element name or {@code null}.
      *
      * @see #setConfiguration(Object, String)
-     *
      * @return Configuration element name or {@code null}
      */
     String getConfigurationElement();

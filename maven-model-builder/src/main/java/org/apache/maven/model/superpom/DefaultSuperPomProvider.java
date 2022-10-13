@@ -1,5 +1,3 @@
-package org.apache.maven.model.superpom;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,16 @@ package org.apache.maven.model.superpom;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.superpom;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
@@ -78,8 +77,8 @@ public class DefaultSuperPomProvider
 
                 String modelId = "org.apache.maven:maven-model-builder:"
                     + this.getClass().getPackage().getImplementationVersion() + ":super-pom";
-                InputSource inputSource = new InputSource(
-                        modelId, getClass().getResource( resource ).toExternalForm() );
+                InputSource inputSource =
+                    new InputSource( modelId, getClass().getResource( resource ).toExternalForm() );
                 options.put( ModelProcessor.INPUT_SOURCE, inputSource );
 
                 superModel = modelProcessor.read( is, options );

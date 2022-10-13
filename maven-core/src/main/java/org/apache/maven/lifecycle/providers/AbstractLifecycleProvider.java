@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.providers;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.providers;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,13 +16,14 @@ package org.apache.maven.lifecycle.providers;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.providers;
+
+import javax.inject.Provider;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-
-import javax.inject.Provider;
 
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
@@ -57,11 +56,9 @@ public abstract class AbstractLifecycleProvider
             }
         }
 
-        this.lifecycle = new Lifecycle(
-            id,
-            Collections.unmodifiableList( Arrays.asList( phases ) ),
-            defaultBindings == null ? null : Collections.unmodifiableMap( defaultBindings )
-        );
+        this.lifecycle =
+            new Lifecycle( id, Collections.unmodifiableList( Arrays.asList( phases ) ),
+                           defaultBindings == null ? null : Collections.unmodifiableMap( defaultBindings ) );
     }
 
     @Override

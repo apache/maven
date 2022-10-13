@@ -1,5 +1,3 @@
-package org.apache.maven.usability.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.usability.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,10 +16,7 @@ package org.apache.maven.usability.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.usability.plugin.io.xpp3.ParamdocXpp3Reader;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+package org.apache.maven.usability.plugin;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,16 +30,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.usability.plugin.io.xpp3.ParamdocXpp3Reader;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
 /**
  * ExpressionDocumenter
  */
 public class ExpressionDocumenter
 {
 
-    private static final String[] EXPRESSION_ROOTS =
-    {
-        "project", "settings", "session", "plugin", "rootless"
-    };
+    private static final String[] EXPRESSION_ROOTS = { "project", "settings", "session", "plugin", "rootless" };
 
     private static final String EXPRESSION_DOCO_ROOTPATH = "META-INF/maven/plugin-expressions/";
 
@@ -61,8 +57,8 @@ public class ExpressionDocumenter
 
             for ( String root : EXPRESSION_ROOTS )
             {
-                try ( InputStream docStream = docLoader.getResourceAsStream(
-                    EXPRESSION_DOCO_ROOTPATH + root + ".paramdoc.xml" ) )
+                try ( InputStream docStream =
+                    docLoader.getResourceAsStream( EXPRESSION_DOCO_ROOTPATH + root + ".paramdoc.xml" ) )
                 {
                     if ( docStream != null )
                     {
@@ -73,13 +69,13 @@ public class ExpressionDocumenter
                 }
                 catch ( IOException e )
                 {
-                    throw new ExpressionDocumentationException(
-                        "Failed to read documentation for expression root: " + root, e );
+                    throw new ExpressionDocumentationException( "Failed to read documentation for expression root: "
+                        + root, e );
                 }
                 catch ( XmlPullParserException e )
                 {
-                    throw new ExpressionDocumentationException(
-                        "Failed to parse documentation for expression root: " + root, e );
+                    throw new ExpressionDocumentationException( "Failed to parse documentation for expression root: "
+                        + root, e );
                 }
 
             }
@@ -89,27 +85,11 @@ public class ExpressionDocumenter
     }
 
     /**
-     * <expressions>
-     * <expression>
-     * <syntax>project.distributionManagementArtifactRepository</syntax>
-     * <origin><![CDATA[
-     * <distributionManagement>
-     * <repository>
-     * <id>some-repo</id>
-     * <url>scp://host/path</url>
-     * </repository>
-     * <snapshotRepository>
-     * <id>some-snap-repo</id>
-     * <url>scp://host/snapshot-path</url>
-     * </snapshotRepository>
-     * </distributionManagement>
-     * ]]></origin>
-     * <usage><![CDATA[
-     * The repositories onto which artifacts should be deployed.
-     * One is for releases, the other for snapshots.
-     * ]]></usage>
-     * </expression>
-     * <expressions>
+     * <expressions> <expression> <syntax>project.distributionManagementArtifactRepository</syntax> <origin><![CDATA[
+     * <distributionManagement> <repository> <id>some-repo</id> <url>scp://host/path</url> </repository>
+     * <snapshotRepository> <id>some-snap-repo</id> <url>scp://host/snapshot-path</url> </snapshotRepository>
+     * </distributionManagement> ]]></origin> <usage><![CDATA[ The repositories onto which artifacts should be deployed.
+     * One is for releases, the other for snapshots. ]]></usage> </expression> <expressions>
      *
      * @throws IOException
      * @throws XmlPullParserException
@@ -163,14 +143,11 @@ public class ExpressionDocumenter
         }
         catch ( MalformedURLException e )
         {
-            throw new ExpressionDocumentationException(
-                "Cannot construct expression documentation classpath" + " resource base.", e );
+            throw new ExpressionDocumentationException( "Cannot construct expression documentation classpath"
+                + " resource base.", e );
         }
 
-        return new URLClassLoader( new URL[]
-        {
-            docResource
-        } );
+        return new URLClassLoader( new URL[] { docResource } );
     }
 
 }

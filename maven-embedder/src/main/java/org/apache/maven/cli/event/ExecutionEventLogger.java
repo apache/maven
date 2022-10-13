@@ -1,5 +1,3 @@
-package org.apache.maven.cli.event;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,7 @@ package org.apache.maven.cli.event;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import static org.apache.maven.cli.CLIReportingUtils.formatDuration;
-import static org.apache.maven.cli.CLIReportingUtils.formatTimestamp;
-import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
+package org.apache.maven.cli.event;
 
 import java.io.File;
 import java.util.List;
@@ -46,26 +41,40 @@ import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.maven.cli.CLIReportingUtils.formatDuration;
+import static org.apache.maven.cli.CLIReportingUtils.formatTimestamp;
+import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
+
 /**
  * Logs execution events to logger, eventually user-supplied.
  *
  * @author Benjamin Bentmann
  */
-public class ExecutionEventLogger extends AbstractExecutionListener
+public class ExecutionEventLogger
+    extends AbstractExecutionListener
 {
     private final Logger logger;
 
     private static final int MAX_LOG_PREFIX_SIZE = 8; // "[ERROR] "
-    private static final int PROJECT_STATUS_SUFFIX_SIZE = 20; // "SUCCESS [  0.000 s]"
+
+    private static final int PROJECT_STATUS_SUFFIX_SIZE = 20; // "SUCCESS [ 0.000 s]"
+
     private static final int MIN_TERMINAL_WIDTH = 60;
+
     private static final int DEFAULT_TERMINAL_WIDTH = 80;
+
     private static final int MAX_TERMINAL_WIDTH = 130;
+
     private static final int MAX_PADDED_BUILD_TIME_DURATION_LENGTH = 9;
 
     private final int terminalWidth;
+
     private final int lineLength;
+
     private final int maxProjectNameLength;
+
     private int totalProjects;
+
     private volatile int currentVisitedProjectCount;
 
     public ExecutionEventLogger()
@@ -86,9 +95,9 @@ public class ExecutionEventLogger extends AbstractExecutionListener
     public ExecutionEventLogger( Logger logger, int terminalWidth )
     {
         this.logger = Objects.requireNonNull( logger, "logger cannot be null" );
-        this.terminalWidth = Math.min( MAX_TERMINAL_WIDTH,
-                                       Math.max( terminalWidth < 0 ? DEFAULT_TERMINAL_WIDTH : terminalWidth,
-                                                 MIN_TERMINAL_WIDTH ) );
+        this.terminalWidth =
+            Math.min( MAX_TERMINAL_WIDTH,
+                      Math.max( terminalWidth < 0 ? DEFAULT_TERMINAL_WIDTH : terminalWidth, MIN_TERMINAL_WIDTH ) );
         this.lineLength = this.terminalWidth - MAX_LOG_PREFIX_SIZE;
         this.maxProjectNameLength = this.lineLength - PROJECT_STATUS_SUFFIX_SIZE;
     }
@@ -139,8 +148,8 @@ public class ExecutionEventLogger extends AbstractExecutionListener
             for ( MavenProject project : projects )
             {
                 int len = lineLength - project.getName().length() - project.getPackaging().length() - 2;
-                logger.info( "{}{}[{}]",
-                        project.getName(), chars( ' ', ( len > 0 ) ? len : 1 ), project.getPackaging() );
+                logger.info( "{}{}[{}]", project.getName(), chars( ' ', ( len > 0 ) ? len : 1 ),
+                             project.getPackaging() );
             }
 
             final List<MavenProject> allProjects = event.getSession().getAllProjects();
@@ -166,13 +175,8 @@ public class ExecutionEventLogger extends AbstractExecutionListener
             if ( iLoggerFactory instanceof MavenSlf4jWrapperFactory )
             {
                 MavenSlf4jWrapperFactory loggerFactory = (MavenSlf4jWrapperFactory) iLoggerFactory;
-                loggerFactory.getLogLevelRecorder()
-                        .filter( LogLevelRecorder::metThreshold )
-                        .ifPresent( recorder ->
-                                event.getSession().getResult().addException( new Exception(
-                                        "Build failed due to log statements with a higher severity than allowed. "
-                                        + "Fix the logged issues or remove flag --fail-on-severity (-fos)." ) )
-                );
+                loggerFactory.getLogLevelRecorder().filter( LogLevelRecorder::metThreshold ).ifPresent( recorder -> event.getSession().getResult().addException( new Exception( "Build failed due to log statements with a higher severity than allowed. "
+                    + "Fix the logged issues or remove flag --fail-on-severity (-fos)." ) ) );
             }
 
             logResult( event.getSession() );
@@ -348,12 +352,12 @@ public class ExecutionEventLogger extends AbstractExecutionListener
 
             String prefix = chars( '-', Math.max( 0, ( lineLength - headerLen ) / 2 ) ) + preHeader;
 
-            String suffix = postHeader + chars( '-',
-                    Math.max( 0, lineLength - headerLen - prefix.length() + preHeader.length() ) );
+            String suffix =
+                postHeader + chars( '-', Math.max( 0, lineLength - headerLen - prefix.length() + preHeader.length() ) );
 
             logger.info( buffer().strong( prefix ).project( projectKey ).strong( suffix ).toString() );
 
-            // Building Project Name Version    [i/n]
+            // Building Project Name Version [i/n]
             String building = "Building " + event.getProject().getName() + " " + event.getProject().getVersion();
 
             if ( totalProjects <= 1 )
@@ -397,12 +401,14 @@ public class ExecutionEventLogger extends AbstractExecutionListener
         if ( logger.isWarnEnabled() )
         {
             logger.warn( "Goal '{}' requires online mode for execution but Maven is currently offline, skipping",
-                    event.getMojoExecution().getGoal() );
+                         event.getMojoExecution().getGoal() );
         }
     }
 
     /**
-     * <pre>--- mojo-artifactId:version:goal (mojo-executionId) @ project-artifactId ---</pre>
+     * <pre>
+     * --- mojo-artifactId:version:goal (mojo-executionId) @ project-artifactId ---
+     * </pre>
      */
     @Override
     public void mojoStarted( ExecutionEvent event )
@@ -422,8 +428,13 @@ public class ExecutionEventLogger extends AbstractExecutionListener
 
     // CHECKSTYLE_OFF: LineLength
     /**
-     * <pre>&gt;&gt;&gt; mojo-artifactId:version:goal (mojo-executionId) &gt; :forked-goal @ project-artifactId &gt;&gt;&gt;</pre>
-     * <pre>&gt;&gt;&gt; mojo-artifactId:version:goal (mojo-executionId) &gt; [lifecycle]phase @ project-artifactId &gt;&gt;&gt;</pre>
+     * <pre>
+     * &gt;&gt;&gt; mojo-artifactId:version:goal (mojo-executionId) &gt; :forked-goal @ project-artifactId &gt;&gt;&gt;
+     * </pre>
+     * 
+     * <pre>
+     * &gt;&gt;&gt; mojo-artifactId:version:goal (mojo-executionId) &gt; [lifecycle]phase @ project-artifactId &gt;&gt;&gt;
+     * </pre>
      */
     // CHECKSTYLE_ON: LineLength
     @Override
@@ -446,8 +457,13 @@ public class ExecutionEventLogger extends AbstractExecutionListener
 
     // CHECKSTYLE_OFF: LineLength
     /**
-     * <pre>&lt;&lt;&lt; mojo-artifactId:version:goal (mojo-executionId) &lt; :forked-goal @ project-artifactId &lt;&lt;&lt;</pre>
-     * <pre>&lt;&lt;&lt; mojo-artifactId:version:goal (mojo-executionId) &lt; [lifecycle]phase @ project-artifactId &lt;&lt;&lt;</pre>
+     * <pre>
+     * &lt;&lt;&lt; mojo-artifactId:version:goal (mojo-executionId) &lt; :forked-goal @ project-artifactId &lt;&lt;&lt;
+     * </pre>
+     * 
+     * <pre>
+     * &lt;&lt;&lt; mojo-artifactId:version:goal (mojo-executionId) &lt; [lifecycle]phase @ project-artifactId &lt;&lt;&lt;
+     * </pre>
      */
     // CHECKSTYLE_ON: LineLength
     @Override

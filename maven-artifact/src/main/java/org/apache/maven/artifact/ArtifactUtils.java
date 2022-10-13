@@ -1,5 +1,3 @@
-package org.apache.maven.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -136,13 +135,13 @@ public final class ArtifactUtils
         // something like the following:
         //
         // <dependencyManagement>
-        //     <dependencies>
-        //         <!--  Yoko modules -->
-        //         <dependency>
-        //             <groupId>org.apache.yoko</groupId>
-        //             <artifactId>yoko-core</artifactId>
-        //             <version>${version}</version>
-        //         </dependency>
+        // <dependencies>
+        // <!-- Yoko modules -->
+        // <dependency>
+        // <groupId>org.apache.yoko</groupId>
+        // <artifactId>yoko-core</artifactId>
+        // <version>${version}</version>
+        // </dependency>
         // ...
         //
         // And the range is not set so we'll check here and set it. jvz.
@@ -153,8 +152,8 @@ public final class ArtifactUtils
         }
 
         DefaultArtifact clone = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(), range,
-            artifact.getScope(), artifact.getType(), artifact.getClassifier(),
-            artifact.getArtifactHandler(), artifact.isOptional() );
+                                                     artifact.getScope(), artifact.getType(), artifact.getClassifier(),
+                                                     artifact.getArtifactHandler(), artifact.isOptional() );
         clone.setRelease( artifact.isRelease() );
         clone.setResolvedVersion( artifact.getVersion() );
         clone.setResolved( artifact.isResolved() );

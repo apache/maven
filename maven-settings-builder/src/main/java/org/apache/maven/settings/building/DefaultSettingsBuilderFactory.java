@@ -1,5 +1,3 @@
-package org.apache.maven.settings.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.settings.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.building;
 
 import org.apache.maven.settings.io.DefaultSettingsReader;
 import org.apache.maven.settings.io.DefaultSettingsWriter;
@@ -59,9 +58,7 @@ public class DefaultSettingsBuilderFactory
      */
     public DefaultSettingsBuilder newInstance()
     {
-        return new DefaultSettingsBuilder( newSettingsReader(),
-                                           newSettingsWriter(),
-                                           newSettingsValidator() );
+        return new DefaultSettingsBuilder( newSettingsReader(), newSettingsWriter(), newSettingsValidator() );
     }
 
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy.resolver.conflict;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.legacy.resolver.conflict;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.repository.legacy.resolver.conflict;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy.resolver.conflict;
 
 import org.apache.maven.artifact.resolver.ResolutionNode;
 import org.junit.jupiter.api.Test;
@@ -36,13 +35,14 @@ public class NearestConflictResolverTest
     public NearestConflictResolverTest()
         throws Exception
     {
-        super("nearest");
+        super( "nearest" );
     }
 
     // tests ------------------------------------------------------------------
 
     /**
      * Tests that <code>a:1.0</code> wins in the scenario:
+     * 
      * <pre>
      * a:1.0
      * b:1.0 -&gt; a:2.0
@@ -51,8 +51,8 @@ public class NearestConflictResolverTest
     @Test
     public void testDepth()
     {
-        ResolutionNode a1n = createResolutionNode( a1);
-        ResolutionNode b1n = createResolutionNode( b1);
+        ResolutionNode a1n = createResolutionNode( a1 );
+        ResolutionNode b1n = createResolutionNode( b1 );
         ResolutionNode a2n = createResolutionNode( a2, b1n );
 
         assertResolveConflict( a1n, a1n, a2n );
@@ -60,6 +60,7 @@ public class NearestConflictResolverTest
 
     /**
      * Tests that <code>a:1.0</code> wins in the scenario:
+     * 
      * <pre>
      * b:1.0 -&gt; a:2.0
      * a:1.0
@@ -77,6 +78,7 @@ public class NearestConflictResolverTest
 
     /**
      * Tests that <code>a:1.0</code> wins in the scenario:
+     * 
      * <pre>
      * a:1.0
      * a:2.0
@@ -93,6 +95,7 @@ public class NearestConflictResolverTest
 
     /**
      * Tests that <code>a:2.0</code> wins in the scenario:
+     * 
      * <pre>
      * a:2.0
      * a:1.0
@@ -101,7 +104,7 @@ public class NearestConflictResolverTest
     @Test
     public void testEqualReversed()
     {
-        ResolutionNode a2n = createResolutionNode( a2);
+        ResolutionNode a2n = createResolutionNode( a2 );
         ResolutionNode a1n = createResolutionNode( a1 );
 
         assertResolveConflict( a2n, a2n, a1n );

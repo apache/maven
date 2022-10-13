@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.providers;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.providers;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.lifecycle.providers;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.providers;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,14 +33,10 @@ public final class WrapperLifecycleProvider
     protected static final String LIFECYCLE_ID = "wrapper";
 
     // START SNIPPET: wrapper
-    private static final String[] PHASES =
-    {
-        "wrapper"
-    };
+    private static final String[] PHASES = { "wrapper" };
 
-    private static final String[] BINDINGS = {
-        "wrapper", "org.apache.maven.plugins:maven-wrapper-plugin:3.1.0:wrapper"
-    };
+    private static final String[] BINDINGS =
+        { "wrapper", "org.apache.maven.plugins:maven-wrapper-plugin:3.1.0:wrapper" };
     // END SNIPPET: wrapper
 
     @Inject

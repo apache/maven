@@ -1,5 +1,3 @@
-package org.apache.maven.internal.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.internal.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.xml;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -41,7 +40,7 @@ import org.codehaus.plexus.util.xml.XMLWriter;
 import org.codehaus.plexus.util.xml.pull.XmlSerializer;
 
 /**
- *  NOTE: remove all the util code in here when separated, this class should be pure data.
+ * NOTE: remove all the util code in here when separated, this class should be pure data.
  */
 public class Xpp3Dom
     implements Serializable, Dom
@@ -58,7 +57,6 @@ public class Xpp3Dom
 
     protected final Object location;
 
-
     public Xpp3Dom( String name )
     {
         this( name, null, null, null, null );
@@ -71,23 +69,17 @@ public class Xpp3Dom
 
     public Xpp3Dom( Dom from, String name )
     {
-        this( name, from.getValue(), from.getAttributes(),
-                from.getChildren(), from.getInputLocation() );
+        this( name, from.getValue(), from.getAttributes(), from.getChildren(), from.getInputLocation() );
     }
 
-    public Xpp3Dom( String name, String value,
-                    Map<String, String> attributes,
-                    List<Dom> children,
-                    Object location )
+    public Xpp3Dom( String name, String value, Map<String, String> attributes, List<Dom> children, Object location )
     {
         this.name = Objects.requireNonNull( name );
         this.value = value;
-        this.attributes = attributes != null
-                ? Collections.unmodifiableMap( new HashMap<>( attributes ) )
-                : Collections.emptyMap();
-        this.children = children != null
-                ? Collections.unmodifiableList( new ArrayList<>( children ) )
-                : Collections.emptyList();
+        this.attributes =
+            attributes != null ? Collections.unmodifiableMap( new HashMap<>( attributes ) ) : Collections.emptyMap();
+        this.children =
+            children != null ? Collections.unmodifiableList( new ArrayList<>( children ) ) : Collections.emptyList();
         this.location = location;
     }
 
@@ -197,40 +189,43 @@ public class Xpp3Dom
     }
 
     /**
-     * Merges one DOM into another, given a specific algorithm and possible override points for that algorithm.<p>
+     * Merges one DOM into another, given a specific algorithm and possible override points for that algorithm.
+     * <p>
      * The algorithm is as follows:
      * <ol>
-     * <li> if the recessive DOM is null, there is nothing to do... return.</li>
-     * <li> Determine whether the dominant node will suppress the recessive one (flag=mergeSelf).
-     *   <ol type="A">
-     *   <li> retrieve the 'combine.self' attribute on the dominant node, and try to match against 'override'...
-     *        if it matches 'override', then set mergeSelf == false...the dominant node suppresses the recessive one
-     *        completely.</li>
-     *   <li> otherwise, use the default value for mergeSelf, which is true...this is the same as specifying
-     *        'combine.self' == 'merge' as an attribute of the dominant root node.</li>
-     *   </ol></li>
-     * <li> If mergeSelf == true
-     *   <ol type="A">
-     *   <li> if the dominant root node's value is empty, set it to the recessive root node's value</li>
-     *   <li> For each attribute in the recessive root node which is not set in the dominant root node, set it.</li>
-     *   <li> Determine whether children from the recessive DOM will be merged or appended to the dominant DOM as
-     *        siblings (flag=mergeChildren).
-     *     <ol type="i">
-     *     <li> if childMergeOverride is set (non-null), use that value (true/false)</li>
-     *     <li> retrieve the 'combine.children' attribute on the dominant node, and try to match against
-     *          'append'...</li>
-     *     <li> if it matches 'append', then set mergeChildren == false...the recessive children will be appended as
-     *          siblings of the dominant children.</li>
-     *     <li> otherwise, use the default value for mergeChildren, which is true...this is the same as specifying
-     *         'combine.children' == 'merge' as an attribute on the dominant root node.</li>
-     *     </ol></li>
-     *   <li> Iterate through the recessive children, and:
-     *     <ol type="i">
-     *     <li> if mergeChildren == true and there is a corresponding dominant child (matched by element name),
-     *          merge the two.</li>
-     *     <li> otherwise, add the recessive child as a new child on the dominant root node.</li>
-     *     </ol></li>
-     *   </ol></li>
+     * <li>if the recessive DOM is null, there is nothing to do... return.</li>
+     * <li>Determine whether the dominant node will suppress the recessive one (flag=mergeSelf).
+     * <ol type="A">
+     * <li>retrieve the 'combine.self' attribute on the dominant node, and try to match against 'override'... if it
+     * matches 'override', then set mergeSelf == false...the dominant node suppresses the recessive one completely.</li>
+     * <li>otherwise, use the default value for mergeSelf, which is true...this is the same as specifying 'combine.self'
+     * == 'merge' as an attribute of the dominant root node.</li>
+     * </ol>
+     * </li>
+     * <li>If mergeSelf == true
+     * <ol type="A">
+     * <li>if the dominant root node's value is empty, set it to the recessive root node's value</li>
+     * <li>For each attribute in the recessive root node which is not set in the dominant root node, set it.</li>
+     * <li>Determine whether children from the recessive DOM will be merged or appended to the dominant DOM as siblings
+     * (flag=mergeChildren).
+     * <ol type="i">
+     * <li>if childMergeOverride is set (non-null), use that value (true/false)</li>
+     * <li>retrieve the 'combine.children' attribute on the dominant node, and try to match against 'append'...</li>
+     * <li>if it matches 'append', then set mergeChildren == false...the recessive children will be appended as siblings
+     * of the dominant children.</li>
+     * <li>otherwise, use the default value for mergeChildren, which is true...this is the same as specifying
+     * 'combine.children' == 'merge' as an attribute on the dominant root node.</li>
+     * </ol>
+     * </li>
+     * <li>Iterate through the recessive children, and:
+     * <ol type="i">
+     * <li>if mergeChildren == true and there is a corresponding dominant child (matched by element name), merge the
+     * two.</li>
+     * <li>otherwise, add the recessive child as a new child on the dominant root node.</li>
+     * </ol>
+     * </li>
+     * </ol>
+     * </li>
      * </ol>
      */
     @SuppressWarnings( "checkstyle:MethodLength" )
@@ -307,13 +302,12 @@ public class Xpp3Dom
                 else
                 {
                     Map<String, Iterator<Dom>> commonChildren = new HashMap<>();
-                    Set<String> names = recessive.getChildren().stream()
-                            .map( Dom::getName ).collect( Collectors.toSet() );
+                    Set<String> names =
+                        recessive.getChildren().stream().map( Dom::getName ).collect( Collectors.toSet() );
                     for ( String name : names )
                     {
-                        List<Dom> dominantChildren = dominant.getChildren().stream()
-                                .filter( n -> n.getName().equals( name ) )
-                                .collect( Collectors.toList() );
+                        List<Dom> dominantChildren =
+                            dominant.getChildren().stream().filter( n -> n.getName().equals( name ) ).collect( Collectors.toList() );
                         if ( dominantChildren.size() > 0 )
                         {
                             commonChildren.put( name, dominantChildren.iterator() );
@@ -323,14 +317,9 @@ public class Xpp3Dom
                     for ( Dom recessiveChild : recessive.getChildren() )
                     {
                         String name = recessiveChild.getName();
-                        Iterator<Dom> it = commonChildren.computeIfAbsent( name,
-                                n1 -> Stream.of( dominant.getChildren().stream()
-                                            .filter( n2 -> n2.getName().equals( n1 ) )
-                                            .collect( Collectors.toList() ) )
-                                        .filter( l -> !l.isEmpty() )
-                                        .map( List::iterator )
-                                        .findFirst()
-                                        .orElse( null ) );
+                        Iterator<Dom> it =
+                            commonChildren.computeIfAbsent( name,
+                                                            n1 -> Stream.of( dominant.getChildren().stream().filter( n2 -> n2.getName().equals( n1 ) ).collect( Collectors.toList() ) ).filter( l -> !l.isEmpty() ).map( List::iterator ).findFirst().orElse( null ) );
                         if ( it == null )
                         {
                             if ( children == null )
@@ -344,7 +333,7 @@ public class Xpp3Dom
                             Dom dominantChild = it.next();
 
                             String dominantChildCombinationMode =
-                                    dominantChild.getAttribute( SELF_COMBINATION_MODE_ATTRIBUTE );
+                                dominantChild.getAttribute( SELF_COMBINATION_MODE_ATTRIBUTE );
                             if ( SELF_COMBINATION_REMOVE.equals( dominantChildCombinationMode ) )
                             {
                                 if ( children == null )
@@ -355,8 +344,8 @@ public class Xpp3Dom
                             }
                             else
                             {
-                                int idx = ( children != null ? children : dominant.getChildren() )
-                                        .indexOf( dominantChild );
+                                int idx =
+                                    ( children != null ? children : dominant.getChildren() ).indexOf( dominantChild );
                                 Dom merged = merge( dominantChild, recessiveChild, childMergeOverride );
                                 if ( merged != dominantChild )
                                 {
@@ -388,8 +377,8 @@ public class Xpp3Dom
                 {
                     children = dominant.getChildren();
                 }
-                return new Xpp3Dom( dominant.getName(), value != null ? value : dominant.getValue(),
-                                    attrs, children, location );
+                return new Xpp3Dom( dominant.getName(), value != null ? value : dominant.getValue(), attrs, children,
+                                    location );
             }
         }
         return dominant;
@@ -414,7 +403,6 @@ public class Xpp3Dom
     // Standard object handling
     // ----------------------------------------------------------------------
 
-
     @Override
     public boolean equals( Object o )
     {
@@ -427,8 +415,8 @@ public class Xpp3Dom
             return false;
         }
         Xpp3Dom xpp3Dom = (Xpp3Dom) o;
-        return name.equals( xpp3Dom.name ) && Objects.equals( value, xpp3Dom.value ) && attributes.equals(
-                xpp3Dom.attributes ) && children.equals( xpp3Dom.children );
+        return name.equals( xpp3Dom.name ) && Objects.equals( value, xpp3Dom.value )
+            && attributes.equals( xpp3Dom.attributes ) && children.equals( xpp3Dom.children );
     }
 
     @Override

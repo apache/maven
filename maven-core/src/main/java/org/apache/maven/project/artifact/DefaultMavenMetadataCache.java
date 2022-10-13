@@ -1,5 +1,3 @@
-package org.apache.maven.project.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,10 @@ package org.apache.maven.project.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.artifact;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,12 +28,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -56,9 +55,13 @@ public class DefaultMavenMetadataCache
     public static class CacheKey
     {
         private final Artifact artifact;
+
         private final long pomHash;
+
         private final boolean resolveManagedVersions;
+
         private final List<ArtifactRepository> repositories = new ArrayList<>();
+
         private final int hashCode;
 
         public CacheKey( Artifact artifact, boolean resolveManagedVersions, ArtifactRepository localRepository,
@@ -137,8 +140,7 @@ public class DefaultMavenMetadataCache
         }
 
         return Objects.equals( a1.getGroupId(), a2.getGroupId() )
-            && Objects.equals( a1.getArtifactId(), a2.getArtifactId() )
-            && Objects.equals( a1.getType(), a2.getType() )
+            && Objects.equals( a1.getArtifactId(), a2.getArtifactId() ) && Objects.equals( a1.getType(), a2.getType() )
             && Objects.equals( a1.getVersion(), a2.getVersion() )
             && Objects.equals( a1.getClassifier(), a2.getClassifier() )
             && Objects.equals( a1.getScope(), a2.getScope() )
@@ -170,8 +172,7 @@ public class DefaultMavenMetadataCache
             return true;
         }
 
-        return Objects.equals( r1.getId(), r2.getId() )
-            && Objects.equals( r1.getUrl(), r2.getUrl() )
+        return Objects.equals( r1.getId(), r2.getId() ) && Objects.equals( r1.getUrl(), r2.getUrl() )
             && repositoryPolicyEquals( r1.getReleases(), r2.getReleases() )
             && repositoryPolicyEquals( r1.getSnapshots(), r2.getSnapshots() );
     }
@@ -210,12 +211,17 @@ public class DefaultMavenMetadataCache
     public class CacheRecord
     {
         private Artifact pomArtifact;
+
         private Artifact relocatedArtifact;
+
         private List<Artifact> artifacts;
+
         private Map<String, Artifact> managedVersions;
+
         private List<ArtifactRepository> remoteRepositories;
 
         private long length;
+
         private long timestamp;
 
         CacheRecord( Artifact pomArtifact, Artifact relocatedArtifact, Set<Artifact> artifacts,
@@ -229,8 +235,7 @@ public class DefaultMavenMetadataCache
             this.managedVersions = managedVersions;
             if ( managedVersions != null )
             {
-                this.managedVersions =
-                    ArtifactUtils.copyArtifacts( managedVersions, new LinkedHashMap<>() );
+                this.managedVersions = ArtifactUtils.copyArtifacts( managedVersions, new LinkedHashMap<>() );
             }
 
             File pomFile = pomArtifact.getFile();
@@ -300,7 +305,6 @@ public class DefaultMavenMetadataCache
         }
     }
 
-
     public ResolutionGroup get( Artifact artifact, boolean resolveManagedVersions, ArtifactRepository localRepository,
                                 List<ArtifactRepository> remoteRepositories )
     {
@@ -312,8 +316,7 @@ public class DefaultMavenMetadataCache
         {
             Artifact pomArtifact = ArtifactUtils.copyArtifact( cacheRecord.getArtifact() );
             Artifact relocatedArtifact = ArtifactUtils.copyArtifactSafe( cacheRecord.getRelocatedArtifact() );
-            Set<Artifact> artifacts =
-                ArtifactUtils.copyArtifacts( cacheRecord.getArtifacts(), new LinkedHashSet<>() );
+            Set<Artifact> artifacts = ArtifactUtils.copyArtifacts( cacheRecord.getArtifacts(), new LinkedHashSet<>() );
             Map<String, Artifact> managedVersions = cacheRecord.getManagedVersions();
             if ( managedVersions != null )
             {

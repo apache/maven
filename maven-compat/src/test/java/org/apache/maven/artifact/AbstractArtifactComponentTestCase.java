@@ -1,5 +1,3 @@
-package org.apache.maven.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,10 @@ package org.apache.maven.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,10 +31,6 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.codehaus.plexus.testing.PlexusTest;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -43,6 +41,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
@@ -75,7 +74,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  */
 @PlexusTest
-public abstract class AbstractArtifactComponentTestCase //extends PlexusTestCase
+public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCase
 {
     @Inject
     protected ArtifactFactory artifactFactory;
@@ -86,13 +85,15 @@ public abstract class AbstractArtifactComponentTestCase //extends PlexusTestCase
     @Inject
     LegacySupport legacySupport;
 
-    @Inject @Named( "default" )
+    @Inject
+    @Named( "default" )
     ArtifactRepositoryLayout repoLayout;
 
     @Inject
     PlexusContainer container;
 
-    public PlexusContainer getContainer() {
+    public PlexusContainer getContainer()
+    {
         return container;
     }
 
@@ -271,7 +272,8 @@ public abstract class AbstractArtifactComponentTestCase //extends PlexusTestCase
         {
             artifactFile.getParentFile().mkdirs();
         }
-        try ( Writer writer = new OutputStreamWriter( new FileOutputStream( artifactFile ), StandardCharsets.ISO_8859_1) )
+        try ( Writer writer =
+            new OutputStreamWriter( new FileOutputStream( artifactFile ), StandardCharsets.ISO_8859_1 ) )
         {
             writer.write( artifact.getId() );
         }
@@ -282,7 +284,8 @@ public abstract class AbstractArtifactComponentTestCase //extends PlexusTestCase
 
         String md5path = repository.pathOf( artifact ) + ".md5";
         File md5artifactFile = new File( repository.getBasedir(), md5path );
-        try ( Writer writer = new OutputStreamWriter( new FileOutputStream( md5artifactFile ), StandardCharsets.ISO_8859_1) )
+        try ( Writer writer =
+            new OutputStreamWriter( new FileOutputStream( md5artifactFile ), StandardCharsets.ISO_8859_1 ) )
         {
             writer.append( printHexBinary( digest ) );
         }
@@ -341,9 +344,9 @@ public abstract class AbstractArtifactComponentTestCase //extends PlexusTestCase
         DependencyManager depManager = new ClassicDependencyManager();
         session.setDependencyManager( depManager );
 
-        DependencySelector depFilter = new AndDependencySelector( new ScopeDependencySelector( "test", "provided" ),
-                                                                  new OptionalDependencySelector(),
-                                                                  new ExclusionDependencySelector() );
+        DependencySelector depFilter =
+            new AndDependencySelector( new ScopeDependencySelector( "test", "provided" ),
+                                       new OptionalDependencySelector(), new ExclusionDependencySelector() );
         session.setDependencySelector( depFilter );
 
         DependencyGraphTransformer transformer =
@@ -353,8 +356,8 @@ public abstract class AbstractArtifactComponentTestCase //extends PlexusTestCase
         session.setDependencyGraphTransformer( transformer );
 
         LocalRepository localRepo = new LocalRepository( localRepository().getBasedir() );
-        session.setLocalRepositoryManager(
-            new SimpleLocalRepositoryManagerFactory().newInstance( session, localRepo ) );
+        session.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( session,
+                                                                                                  localRepo ) );
 
         return session;
     }

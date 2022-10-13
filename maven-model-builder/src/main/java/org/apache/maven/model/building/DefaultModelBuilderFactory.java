@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.util.Arrays;
 
@@ -84,23 +83,41 @@ public class DefaultModelBuilderFactory
 {
 
     private ModelProcessor modelProcessor;
+
     private ModelValidator modelValidator;
+
     private ModelNormalizer modelNormalizer;
+
     private ModelInterpolator modelInterpolator;
+
     private ModelPathTranslator modelPathTranslator;
+
     private ModelUrlNormalizer modelUrlNormalizer;
+
     private SuperPomProvider superPomProvider;
+
     private InheritanceAssembler inheritanceAssembler;
+
     private ProfileSelector profileSelector;
+
     private ProfileInjector profileInjector;
+
     private PluginManagementInjector pluginManagementInjector;
+
     private DependencyManagementInjector dependencyManagementInjector;
+
     private DependencyManagementImporter dependencyManagementImporter;
+
     private LifecycleBindingsInjector lifecycleBindingsInjector;
+
     private PluginConfigurationExpander pluginConfigurationExpander;
+
     private ReportConfigurationExpander reportConfigurationExpander;
+
     private ReportingConverter reportingConverter;
+
     private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
+
     private ModelVersionProcessor versionProcessor;
 
     public DefaultModelBuilderFactory setModelProcessor( ModelProcessor modelProcessor )
@@ -169,36 +186,31 @@ public class DefaultModelBuilderFactory
         return this;
     }
 
-    public DefaultModelBuilderFactory setDependencyManagementInjector(
-            DependencyManagementInjector dependencyManagementInjector )
+    public DefaultModelBuilderFactory setDependencyManagementInjector( DependencyManagementInjector dependencyManagementInjector )
     {
         this.dependencyManagementInjector = dependencyManagementInjector;
         return this;
     }
 
-    public DefaultModelBuilderFactory setDependencyManagementImporter(
-            DependencyManagementImporter dependencyManagementImporter )
+    public DefaultModelBuilderFactory setDependencyManagementImporter( DependencyManagementImporter dependencyManagementImporter )
     {
         this.dependencyManagementImporter = dependencyManagementImporter;
         return this;
     }
 
-    public DefaultModelBuilderFactory setLifecycleBindingsInjector(
-            LifecycleBindingsInjector lifecycleBindingsInjector )
+    public DefaultModelBuilderFactory setLifecycleBindingsInjector( LifecycleBindingsInjector lifecycleBindingsInjector )
     {
         this.lifecycleBindingsInjector = lifecycleBindingsInjector;
         return this;
     }
 
-    public DefaultModelBuilderFactory setPluginConfigurationExpander(
-            PluginConfigurationExpander pluginConfigurationExpander )
+    public DefaultModelBuilderFactory setPluginConfigurationExpander( PluginConfigurationExpander pluginConfigurationExpander )
     {
         this.pluginConfigurationExpander = pluginConfigurationExpander;
         return this;
     }
 
-    public DefaultModelBuilderFactory setReportConfigurationExpander(
-            ReportConfigurationExpander reportConfigurationExpander )
+    public DefaultModelBuilderFactory setReportConfigurationExpander( ReportConfigurationExpander reportConfigurationExpander )
     {
         this.reportConfigurationExpander = reportConfigurationExpander;
         return this;
@@ -210,8 +222,7 @@ public class DefaultModelBuilderFactory
         return this;
     }
 
-    public DefaultModelBuilderFactory setProfileActivationFilePathInterpolator(
-            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator )
+    public DefaultModelBuilderFactory setProfileActivationFilePathInterpolator( ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator )
     {
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
         return this;
@@ -359,28 +370,34 @@ public class DefaultModelBuilderFactory
      */
     public DefaultModelBuilder newInstance()
     {
-        return new DefaultModelBuilder(
-                modelProcessor != null ? modelProcessor : newModelProcessor(),
-                modelValidator != null ? modelValidator : newModelValidator(),
-                modelNormalizer != null ? modelNormalizer : newModelNormalizer(),
-                modelInterpolator != null ? modelInterpolator : newModelInterpolator(),
-                modelPathTranslator != null ? modelPathTranslator : newModelPathTranslator(),
-                modelUrlNormalizer != null ? modelUrlNormalizer : newModelUrlNormalizer(),
-                superPomProvider != null ? superPomProvider : newSuperPomProvider(),
-                inheritanceAssembler != null ? inheritanceAssembler : newInheritanceAssembler(),
-                profileSelector != null ? profileSelector : newProfileSelector(),
-                profileInjector != null ? profileInjector : newProfileInjector(),
-                pluginManagementInjector != null ? pluginManagementInjector : newPluginManagementInjector(),
-                dependencyManagementInjector != null ? dependencyManagementInjector : newDependencyManagementInjector(),
-                dependencyManagementImporter != null ? dependencyManagementImporter : newDependencyManagementImporter(),
-                lifecycleBindingsInjector != null ? lifecycleBindingsInjector : newLifecycleBindingsInjector(),
-                pluginConfigurationExpander != null ? pluginConfigurationExpander : newPluginConfigurationExpander(),
-                reportConfigurationExpander != null ? reportConfigurationExpander : newReportConfigurationExpander(),
-                reportingConverter != null ? reportingConverter : newReportingConverter(),
-                profileActivationFilePathInterpolator != null
-                        ? profileActivationFilePathInterpolator : newProfileActivationFilePathInterpolator(),
-                versionProcessor != null ? versionProcessor : newModelVersionPropertiesProcessor()
-        );
+        return new DefaultModelBuilder( modelProcessor != null ? modelProcessor : newModelProcessor(),
+                                        modelValidator != null ? modelValidator : newModelValidator(),
+                                        modelNormalizer != null ? modelNormalizer : newModelNormalizer(),
+                                        modelInterpolator != null ? modelInterpolator : newModelInterpolator(),
+                                        modelPathTranslator != null ? modelPathTranslator : newModelPathTranslator(),
+                                        modelUrlNormalizer != null ? modelUrlNormalizer : newModelUrlNormalizer(),
+                                        superPomProvider != null ? superPomProvider : newSuperPomProvider(),
+                                        inheritanceAssembler != null ? inheritanceAssembler : newInheritanceAssembler(),
+                                        profileSelector != null ? profileSelector : newProfileSelector(),
+                                        profileInjector != null ? profileInjector : newProfileInjector(),
+                                        pluginManagementInjector != null ? pluginManagementInjector
+                                                        : newPluginManagementInjector(),
+                                        dependencyManagementInjector != null ? dependencyManagementInjector
+                                                        : newDependencyManagementInjector(),
+                                        dependencyManagementImporter != null ? dependencyManagementImporter
+                                                        : newDependencyManagementImporter(),
+                                        lifecycleBindingsInjector != null ? lifecycleBindingsInjector
+                                                        : newLifecycleBindingsInjector(),
+                                        pluginConfigurationExpander != null ? pluginConfigurationExpander
+                                                        : newPluginConfigurationExpander(),
+                                        reportConfigurationExpander != null ? reportConfigurationExpander
+                                                        : newReportConfigurationExpander(),
+                                        reportingConverter != null ? reportingConverter : newReportingConverter(),
+                                        profileActivationFilePathInterpolator != null
+                                                        ? profileActivationFilePathInterpolator
+                                                        : newProfileActivationFilePathInterpolator(),
+                                        versionProcessor != null ? versionProcessor
+                                                        : newModelVersionPropertiesProcessor() );
     }
 
     private static class StubLifecycleBindingsInjector
@@ -388,9 +405,7 @@ public class DefaultModelBuilderFactory
     {
 
         @Override
-        public void injectLifecycleBindings( Model model,
-                                             ModelBuildingRequest request,
-                                             ModelProblemCollector problems )
+        public void injectLifecycleBindings( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
         {
         }
 

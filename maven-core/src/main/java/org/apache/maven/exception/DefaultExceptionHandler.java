@@ -1,5 +1,3 @@
-package org.apache.maven.exception;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.exception;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,15 +16,16 @@ package org.apache.maven.exception;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.exception;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.building.ModelProblem;
@@ -148,10 +147,9 @@ public class DefaultExceptionHandler
             return null;
         }
 
-        String message = System.lineSeparator()
-            + "The project " + ( result.getProjectId().isEmpty() ? "" : result.getProjectId() + " " )
-            + "(" + result.getPomFile() + ") has "
-            + children.size() + " error" + ( children.size() == 1 ? "" : "s" );
+        String message = System.lineSeparator() + "The project "
+            + ( result.getProjectId().isEmpty() ? "" : result.getProjectId() + " " ) + "(" + result.getPomFile()
+            + ") has " + children.size() + " error" + ( children.size() == 1 ? "" : "s" );
 
         return new ExceptionSummary( null, message, null, children );
     }

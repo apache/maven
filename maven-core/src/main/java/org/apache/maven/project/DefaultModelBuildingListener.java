@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.util.List;
 import java.util.Objects;
@@ -87,9 +86,8 @@ public class DefaultModelBuildingListener
         }
         catch ( Exception e )
         {
-            event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Invalid plugin repository: " + e.getMessage() )
-                    .setException( e ) );
+            event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR,
+                                                                       Version.BASE ).setMessage( "Invalid plugin repository: " + e.getMessage() ).setException( e ) );
         }
         project.setPluginArtifactRepositories( pluginRepositories );
 
@@ -105,9 +103,8 @@ public class DefaultModelBuildingListener
             }
             catch ( PluginResolutionException | PluginManagerException | PluginVersionResolutionException e )
             {
-                event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                        .setMessage( "Unresolvable build extension: " + e.getMessage() )
-                        .setException( e ) );
+                event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR,
+                                                                           Version.BASE ).setMessage( "Unresolvable build extension: " + e.getMessage() ).setException( e ) );
             }
 
             projectBuildingHelper.selectProjectRealm( project );
@@ -122,9 +119,8 @@ public class DefaultModelBuildingListener
         }
         catch ( Exception e )
         {
-            event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Invalid artifact repository: " + e.getMessage() )
-                    .setException( e ) );
+            event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR,
+                                                                       Version.BASE ).setMessage( "Invalid artifact repository: " + e.getMessage() ).setException( e ) );
         }
         project.setRemoteArtifactRepositories( remoteRepositories );
     }

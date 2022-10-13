@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.legacy;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy;
 
 import java.io.File;
 import java.util.List;
@@ -52,8 +51,8 @@ public interface WagonManager
                       boolean force )
         throws TransferFailedException, ResourceDoesNotExistException;
 
-    void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories,
-                      TransferListener transferListener, boolean force )
+    void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories, TransferListener transferListener,
+                      boolean force )
         throws TransferFailedException, ResourceDoesNotExistException;
 
     void getRemoteFile( ArtifactRepository repository, File destination, String remotePath,

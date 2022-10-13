@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.versioning;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.versioning;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.versioning;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.versioning;
 
 import java.util.Locale;
 
@@ -42,19 +41,18 @@ public class ComparableVersionTest
 
         System.out.println( "canonical( " + version + " ) = " + canonical );
         assertEquals( canonical, parsedCanonical,
-                "canonical( " + version + " ) = " + canonical + " -> canonical: " + parsedCanonical );
+                      "canonical( " + version + " ) = " + canonical + " -> canonical: " + parsedCanonical );
 
         return ret;
     }
 
-    private static final String[] VERSIONS_QUALIFIER =
-        { "1-alpha2snapshot", "1-alpha2", "1-alpha-123", "1-beta-2", "1-beta123", "1-m2", "1-m11", "1-rc", "1-cr2",
-            "1-rc123", "1-SNAPSHOT", "1", "1-sp", "1-sp2", "1-sp123", "1-abc", "1-def", "1-pom-1", "1-1-snapshot",
-            "1-1", "1-2", "1-123" };
+    private static final String[] VERSIONS_QUALIFIER = { "1-alpha2snapshot", "1-alpha2", "1-alpha-123", "1-beta-2",
+        "1-beta123", "1-m2", "1-m11", "1-rc", "1-cr2", "1-rc123", "1-SNAPSHOT", "1", "1-sp", "1-sp2", "1-sp123",
+        "1-abc", "1-def", "1-pom-1", "1-1-snapshot", "1-1", "1-2", "1-123" };
 
-    private static final String[] VERSIONS_NUMBER =
-        { "2.0", "2-1", "2.0.a", "2.0.0.a", "2.0.2", "2.0.123", "2.1.0", "2.1-a", "2.1b", "2.1-c", "2.1-1", "2.1.0.1",
-            "2.2", "2.123", "11.a2", "11.a11", "11.b2", "11.b11", "11.m2", "11.m11", "11", "11.a", "11b", "11c", "11m" };
+    private static final String[] VERSIONS_NUMBER = { "2.0", "2-1", "2.0.a", "2.0.0.a", "2.0.2", "2.0.123", "2.1.0",
+        "2.1-a", "2.1b", "2.1-c", "2.1-1", "2.1.0.1", "2.2", "2.123", "11.a2", "11.a11", "11.b2", "11.b11", "11.m2",
+        "11.m11", "11", "11.a", "11b", "11c", "11m" };
 
     private void checkVersionsOrder( String[] versions )
     {
@@ -202,10 +200,10 @@ public class ComparableVersionTest
     }
 
     /**
-     * Test <a href="https://issues.apache.org/jira/browse/MNG-5568">MNG-5568</a> edge case
-     * which was showing transitive inconsistency: since A &gt; B and B &gt; C then we should have A &gt; C
-     * otherwise sorting a list of ComparableVersions() will in some cases throw runtime exception;
-     * see Netbeans issues <a href="https://netbeans.org/bugzilla/show_bug.cgi?id=240845">240845</a> and
+     * Test <a href="https://issues.apache.org/jira/browse/MNG-5568">MNG-5568</a> edge case which was showing transitive
+     * inconsistency: since A &gt; B and B &gt; C then we should have A &gt; C otherwise sorting a list of
+     * ComparableVersions() will in some cases throw runtime exception; see Netbeans issues
+     * <a href="https://netbeans.org/bugzilla/show_bug.cgi?id=240845">240845</a> and
      * <a href="https://netbeans.org/bugzilla/show_bug.cgi?id=226100">226100</a>
      */
     @Test
@@ -240,74 +238,38 @@ public class ComparableVersionTest
     }
 
     /**
-     * Test all versions are equal when starting with many leading zeroes regardless of string length
-     * (related to MNG-6572 optimization)
+     * Test all versions are equal when starting with many leading zeroes regardless of string length (related to
+     * MNG-6572 optimization)
      */
     @Test
     public void testVersionEqualWithLeadingZeroes()
     {
         // versions with string lengths from 1 to 19
-        String[] arr = new String[] {
-            "0000000000000000001",
-            "000000000000000001",
-            "00000000000000001",
-            "0000000000000001",
-            "000000000000001",
-            "00000000000001",
-            "0000000000001",
-            "000000000001",
-            "00000000001",
-            "0000000001",
-            "000000001",
-            "00000001",
-            "0000001",
-            "000001",
-            "00001",
-            "0001",
-            "001",
-            "01",
-            "1"
-        };
+        String[] arr = new String[] { "0000000000000000001", "000000000000000001", "00000000000000001",
+            "0000000000000001", "000000000000001", "00000000000001", "0000000000001", "000000000001", "00000000001",
+            "0000000001", "000000001", "00000001", "0000001", "000001", "00001", "0001", "001", "01", "1" };
 
         checkVersionsArrayEqual( arr );
     }
 
     /**
-     * Test all "0" versions are equal when starting with many leading zeroes regardless of string length
-     * (related to MNG-6572 optimization)
+     * Test all "0" versions are equal when starting with many leading zeroes regardless of string length (related to
+     * MNG-6572 optimization)
      */
     @Test
     public void testVersionZeroEqualWithLeadingZeroes()
     {
         // versions with string lengths from 1 to 19
-        String[] arr = new String[] {
-            "0000000000000000000",
-            "000000000000000000",
-            "00000000000000000",
-            "0000000000000000",
-            "000000000000000",
-            "00000000000000",
-            "0000000000000",
-            "000000000000",
-            "00000000000",
-            "0000000000",
-            "000000000",
-            "00000000",
-            "0000000",
-            "000000",
-            "00000",
-            "0000",
-            "000",
-            "00",
-            "0"
-        };
+        String[] arr = new String[] { "0000000000000000000", "000000000000000000", "00000000000000000",
+            "0000000000000000", "000000000000000", "00000000000000", "0000000000000", "000000000000", "00000000000",
+            "0000000000", "000000000", "00000000", "0000000", "000000", "00000", "0000", "000", "00", "0" };
 
         checkVersionsArrayEqual( arr );
     }
 
     /**
-     * Test <a href="https://issues.apache.org/jira/browse/MNG-6964">MNG-6964</a> edge cases
-     * for qualifiers that start with "-0.", which was showing A == C and B == C but A &lt; B.
+     * Test <a href="https://issues.apache.org/jira/browse/MNG-6964">MNG-6964</a> edge cases for qualifiers that start
+     * with "-0.", which was showing A == C and B == C but A &lt; B.
      */
     @Test
     public void testMng6964()

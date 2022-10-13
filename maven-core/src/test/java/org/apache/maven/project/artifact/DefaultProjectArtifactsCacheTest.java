@@ -1,5 +1,3 @@
-package org.apache.maven.project.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.artifact;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -28,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+
 public class DefaultProjectArtifactsCacheTest
 {
 
@@ -41,9 +41,12 @@ public class DefaultProjectArtifactsCacheTest
     }
 
     @Test
-    public void testProjectDependencyOrder() throws Exception
+    public void testProjectDependencyOrder()
+        throws Exception
     {
-        ProjectArtifactsCache.Key project1 = new ProjectArtifactsCache.Key(){};
+        ProjectArtifactsCache.Key project1 = new ProjectArtifactsCache.Key()
+        {
+        };
 
         Set<Artifact> artifacts = new LinkedHashSet<>( 4 );
         artifacts.add( new DefaultArtifact( "g", "a1", "v", "compile", "jar", "", null ) );
@@ -56,7 +59,9 @@ public class DefaultProjectArtifactsCacheTest
         assertArrayEquals( artifacts.toArray( new Artifact[0] ),
                            cache.get( project1 ).getArtifacts().toArray( new Artifact[0] ) );
 
-        ProjectArtifactsCache.Key project2 = new ProjectArtifactsCache.Key(){};
+        ProjectArtifactsCache.Key project2 = new ProjectArtifactsCache.Key()
+        {
+        };
 
         Set<Artifact> reversedArtifacts = new LinkedHashSet<>( 4 );
         artifacts.add( new DefaultArtifact( "g", "a4", "v", "compile", "jar", "", null ) );

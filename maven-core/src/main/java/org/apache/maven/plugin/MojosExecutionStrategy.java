@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,12 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
+
+import java.util.List;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
-
-import java.util.List;
 
 /**
  * Interface allows overriding default mojo execution strategy For example it is possible wrap some mojo execution to
@@ -34,12 +33,12 @@ public interface MojosExecutionStrategy
     /**
      * Entry point to the execution strategy
      *
-     * @param mojos             list of mojos representing a project build
-     * @param session           current session
+     * @param mojos list of mojos representing a project build
+     * @param session current session
      * @param mojoExecutionRunner mojo execution task which must be invoked by a strategy to actually run it
      * @throws LifecycleExecutionException
      */
     void execute( List<MojoExecution> mojos, MavenSession session, MojoExecutionRunner mojoExecutionRunner )
-            throws LifecycleExecutionException;
+        throws LifecycleExecutionException;
 
 }

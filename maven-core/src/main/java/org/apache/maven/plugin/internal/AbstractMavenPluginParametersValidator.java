@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.internal;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,38 +34,24 @@ import org.slf4j.Logger;
  *
  * @author Slawomir Jaranowski
  */
-abstract class AbstractMavenPluginParametersValidator implements MavenPluginConfigurationValidator
+abstract class AbstractMavenPluginParametersValidator
+    implements MavenPluginConfigurationValidator
 {
 
     // plugin author can provide @Parameter( property = "session" ) in this case property will always evaluate
     // so, we need ignore those
 
     // source org.apache.maven.plugin.PluginParameterExpressionEvaluator
-    private static final List<String> IGNORED_PROPERTY_VALUES = Arrays.asList(
-        "basedir",
-        "executedProject",
-        "localRepository",
-        "mojo",
-        "mojoExecution",
-        "plugin",
-        "project",
-        "reactorProjects",
-        "session",
-        "settings"
-    );
+    private static final List<String> IGNORED_PROPERTY_VALUES =
+        Arrays.asList( "basedir", "executedProject", "localRepository", "mojo", "mojoExecution", "plugin", "project",
+                       "reactorProjects", "session", "settings" );
 
-    private static final List<String> IGNORED_PROPERTY_PREFIX = Arrays.asList(
-        "mojo.",
-        "plugin.",
-        "project.",
-        "session.",
-        "settings."
-    );
+    private static final List<String> IGNORED_PROPERTY_PREFIX =
+        Arrays.asList( "mojo.", "plugin.", "project.", "session.", "settings." );
 
     protected abstract Logger getLogger();
 
-    protected static boolean isValueSet( PlexusConfiguration config,
-                                         ExpressionEvaluator expressionEvaluator )
+    protected static boolean isValueSet( PlexusConfiguration config, ExpressionEvaluator expressionEvaluator )
     {
         if ( config == null )
         {
@@ -129,23 +114,16 @@ abstract class AbstractMavenPluginParametersValidator implements MavenPluginConf
 
     protected void logParameter( Parameter parameter )
     {
-        MessageBuilder messageBuilder = MessageUtils.buffer()
-            .warning( "Parameter '" )
-            .warning( parameter.getName() )
-            .warning( '\'' );
+        MessageBuilder messageBuilder =
+            MessageUtils.buffer().warning( "Parameter '" ).warning( parameter.getName() ).warning( '\'' );
 
         if ( parameter.getExpression() != null )
         {
             String userProperty = parameter.getExpression().replace( "${", "'" ).replace( '}', '\'' );
-            messageBuilder
-                .warning( " (user property " )
-                .warning( userProperty )
-                .warning( ")" );
+            messageBuilder.warning( " (user property " ).warning( userProperty ).warning( ")" );
         }
 
-        messageBuilder
-            .warning( " " )
-            .warning( getParameterLogReason( parameter ) );
+        messageBuilder.warning( " " ).warning( getParameterLogReason( parameter ) );
 
         getLogger().warn( messageBuilder.toString() );
     }

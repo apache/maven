@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.mapping;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.mapping;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.lifecycle.mapping;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.mapping;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,7 +63,7 @@ public class LifecyclePhase
         {
             String[] mojoGoals = StringUtils.split( goals, "," );
 
-            for ( String mojoGoal: mojoGoals )
+            for ( String mojoGoal : mojoGoals )
             {
                 LifecycleMojo lifecycleMojo = new LifecycleMojo();
                 lifecycleMojo.setGoal( mojoGoal.trim() );
@@ -81,7 +80,7 @@ public class LifecyclePhase
         List<LifecycleMojo> mojos = getMojos();
         if ( mojos != null )
         {
-            for ( LifecycleMojo mojo: mojos )
+            for ( LifecycleMojo mojo : mojos )
             {
                 if ( first )
                 {
@@ -111,7 +110,7 @@ public class LifecyclePhase
         }
 
         Map<String, String> phases = new LinkedHashMap<>();
-        for ( Map.Entry<String, LifecyclePhase> e: lifecyclePhases.entrySet() )
+        for ( Map.Entry<String, LifecyclePhase> e : lifecyclePhases.entrySet() )
         {
             phases.put( e.getKey(), e.getValue().toString() );
         }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -63,8 +62,8 @@ public class MojoExecution
     private Source source = Source.LIFECYCLE;
 
     /**
-     * The phase may or may not have been bound to a phase but once the plan has been calculated we know what phase
-     * this mojo execution is going to run in.
+     * The phase may or may not have been bound to a phase but once the plan has been calculated we know what phase this
+     * mojo execution is going to run in.
      */
     private String lifecyclePhase;
 

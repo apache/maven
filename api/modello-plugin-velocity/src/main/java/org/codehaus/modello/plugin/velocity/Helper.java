@@ -1,5 +1,3 @@
-package org.codehaus.modello.plugin.velocity;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.codehaus.modello.plugin.velocity;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.codehaus.modello.plugin.velocity;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -62,8 +61,8 @@ public class Helper
     public List<ModelClass> ancestors( ModelClass clazz )
     {
         List<ModelClass> ancestors = new ArrayList<>();
-        for ( ModelClass cl = clazz; cl != null; cl = cl.getSuperClass() != null
-                ? cl.getModel().getClass( cl.getSuperClass(), version ) : null )
+        for ( ModelClass cl = clazz; cl != null; cl =
+            cl.getSuperClass() != null ? cl.getModel().getClass( cl.getSuperClass(), version ) : null )
         {
             ancestors.add( 0, cl );
         }
@@ -82,8 +81,7 @@ public class Helper
 
     public XmlAssociationMetadata xmAssociationMetadata( ModelField field )
     {
-        return (XmlAssociationMetadata) ( (ModelAssociation) field )
-                .getAssociationMetadata( XmlAssociationMetadata.ID );
+        return (XmlAssociationMetadata) ( (ModelAssociation) field ).getAssociationMetadata( XmlAssociationMetadata.ID );
     }
 
     public boolean isFlatItems( ModelField field )
@@ -136,9 +134,8 @@ public class Helper
                     if ( !found )
                     {
                         // interParentFieldsUpTo not found
-                        throw new ModelloRuntimeException( "parent field not found: class "
-                                + modelClass.getName() + " xml.insertParentFieldUpTo='"
-                                + xmlFieldMetadata.getInsertParentFieldsUpTo() + "'" );
+                        throw new ModelloRuntimeException( "parent field not found: class " + modelClass.getName()
+                            + " xml.insertParentFieldUpTo='" + xmlFieldMetadata.getInsertParentFieldsUpTo() + "'" );
                     }
                 }
                 fields.add( field );

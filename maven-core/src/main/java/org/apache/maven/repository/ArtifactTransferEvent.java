@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,13 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
-
+package org.apache.maven.repository;
 
 import java.io.File;
 import java.util.EventObject;
 
 /**
- * TransferEvent is used to notify TransferListeners about progress
- * in transfer of resources form/to the repository
+ * TransferEvent is used to notify TransferListeners about progress in transfer of resources form/to the repository
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  */
@@ -58,7 +55,7 @@ public class ArtifactTransferEvent
     public static final int TRANSFER_ERROR = 4;
 
     /**
-     * Indicates GET transfer  (from the repository)
+     * Indicates GET transfer (from the repository)
      */
     public static final int REQUEST_GET = 5;
 
@@ -121,8 +118,8 @@ public class ArtifactTransferEvent
     /**
      * Returns the request type.
      *
-     * @return Returns the request type. The Request type is one of
-     *         <code>TransferEvent.REQUEST_GET</code> or <code>TransferEvent.REQUEST_PUT</code>
+     * @return Returns the request type. The Request type is one of <code>TransferEvent.REQUEST_GET</code> or
+     *         <code>TransferEvent.REQUEST_PUT</code>
      */
     public int getRequestType()
     {
@@ -132,9 +129,8 @@ public class ArtifactTransferEvent
     /**
      * Sets the request type
      *
-     * @param requestType The requestType to set.
-     *                    The Request type value should be either
-     *                    <code>TransferEvent.REQUEST_GET</code> or <code>TransferEvent.REQUEST_PUT</code>.
+     * @param requestType The requestType to set. The Request type value should be either
+     *            <code>TransferEvent.REQUEST_GET</code> or <code>TransferEvent.REQUEST_PUT</code>.
      * @throws IllegalArgumentException when
      */
     public void setRequestType( final int requestType )
@@ -145,7 +141,7 @@ public class ArtifactTransferEvent
                 break;
             case REQUEST_GET:
                 break;
-            default :
+            default:
                 throw new IllegalArgumentException( "Illegal request type: " + requestType );
         }
 
@@ -177,7 +173,7 @@ public class ArtifactTransferEvent
                 break;
             case TRANSFER_ERROR:
                 break;
-            default :
+            default:
                 throw new IllegalArgumentException( "Illegal event type: " + eventType );
         }
 
