@@ -27,7 +27,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.profile.activation.JdkVersionProfileActivator;
 import org.apache.maven.plugin.ContextEnabled;
 import org.apache.maven.plugin.DebugConfigurationListener;
 import org.apache.maven.plugin.ExtensionRealmCache;
@@ -148,6 +147,7 @@ public class DefaultMavenPluginManager
     private PluginArtifactsCache pluginArtifactsCache;
     private MavenPluginValidator pluginValidator;
     private List<MavenPluginConfigurationValidator> configurationValidators;
+    private List<MavenPluginPrerequisiteChecker> prerequisiteCheckers;
 
     private final ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
     private final PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
@@ -165,7 +165,8 @@ public class DefaultMavenPluginManager
             PluginVersionResolver pluginVersionResolver,
             PluginArtifactsCache pluginArtifactsCache,
             MavenPluginValidator pluginValidator,
-            List<MavenPluginConfigurationValidator> configurationValidators )
+            List<MavenPluginConfigurationValidator> configurationValidators,
+            List<MavenPluginPrerequisiteChecker> prerequisiteCheckers )
     {
         this.container = container;
         this.classRealmManager = classRealmManager;
@@ -178,6 +179,7 @@ public class DefaultMavenPluginManager
         this.pluginArtifactsCache = pluginArtifactsCache;
         this.pluginValidator = pluginValidator;
         this.configurationValidators = configurationValidators;
+        this.prerequisiteCheckers = prerequisiteCheckers;
     }
 
     public synchronized PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories,
@@ -304,45 +306,17 @@ public class DefaultMavenPluginManager
         return mojoDescriptor;
     }
 
-    public void checkRequiredMavenVersion( PluginDescriptor pluginDescriptor )
+    
+    @Override
+    public void checkPrerequisites( PluginDescriptor pluginDescriptor )
         throws PluginIncompatibleException
     {
-        String requiredMavenVersion = pluginDescriptor.getRequiredMavenVersion();
-        if ( StringUtils.isNotBlank( requiredMavenVersion ) )
+        for ( MavenPluginPrerequisiteChecker prerequisiteChecker : prerequisiteCheckers )
         {
-            try
-            {
-                if ( !runtimeInformation.isMavenVersion( requiredMavenVersion ) )
-                {
-                    throw new PluginIncompatibleException( pluginDescriptor.getPlugin(),
-                                                           "The plugin " + pluginDescriptor.getId()
-                                                               + " requires Maven version " + requiredMavenVersion );
-                }
-            }
-            catch ( RuntimeException e )
-            {
-                logger.warn( "Could not verify plugin's Maven prerequisite: " + e.getMessage() );
-            }
+            prerequisiteChecker.accept( pluginDescriptor );
         }
     }
 
-    @Override
-    public void checkRequiredJavaVersion( PluginDescriptor pluginDescriptor )
-        throws PluginIncompatibleException
-    {
-        String requiredJavaVersion = pluginDescriptor.getRequiredJavaVersion();
-        if ( StringUtils.isNotBlank( requiredJavaVersion ) )
-        {
-            if ( JdkVersionProfileActivator.isJavaVersionCompatible( requiredJavaVersion, 
-                                                                     System.getProperty( "java.version" ) ) )
-            {
-                throw new PluginIncompatibleException( pluginDescriptor.getPlugin(),
-                                                       "The plugin " + pluginDescriptor.getId()
-                                                           + " requires Java version " + requiredJavaVersion );
-            }
-        }
-    }
-    
     public synchronized void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session,
                                                ClassLoader parent, List<String> imports, DependencyFilter filter )
         throws PluginResolutionException, PluginContainerException
