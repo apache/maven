@@ -154,6 +154,13 @@ public class VersionRangeTest
         assertTrue( range.containsVersion( new DefaultArtifactVersion( "5.0.9.0" ) ) );
     }
 
+    public void testSameUpperAndLowerBoundRoundtrip() throws InvalidVersionSpecificationException
+    {
+        VersionRange range = VersionRange.createFromVersionSpec( "[1.0]" );
+        VersionRange range2 = VersionRange.createFromVersionSpec( range.toString() );
+        assertEquals( range, range2 );
+    }
+
     public void testInvalidRanges()
     {
         checkInvalidRange( "(1.0)" );
