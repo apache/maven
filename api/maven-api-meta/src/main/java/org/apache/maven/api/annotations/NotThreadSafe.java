@@ -26,7 +26,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation indicates that the annotated type is <bold>not</bold> threadsafe
+ * This annotation indicates that the annotated type is <strong>not</strong> threadsafe
  * and should only be used by a single thread.
  *
  * @see ThreadSafe

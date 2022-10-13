@@ -629,7 +629,7 @@
 
     /**
      * @return a Map of plugins field with {@code Plugins#getKey()} as key
-     * @see org.apache.maven.model.Plugin#getKey()
+     * @see Plugin#getKey()
      */
     public synchronized Map<String, Plugin> getPluginsAsMap()
     {
@@ -2281,7 +2281,7 @@
     }
     /**
      * @return a Map of executions field with {@code PluginExecution#getId()} as key
-     * @see org.apache.maven.model.PluginExecution#getId()
+     * @see PluginExecution#getId()
      */
     public java.util.Map<String, PluginExecution> getExecutionsAsMap()
     {
@@ -2884,7 +2884,7 @@
 
     /**
      * @return a Map of reportSets field with {@code ReportSet#getId()} as key
-     * @see org.apache.maven.model.ReportSet#getId()
+     * @see ReportSet#getId()
      */
     public java.util.Map<String, ReportSet> getReportSetsAsMap()
     {

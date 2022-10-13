@@ -39,6 +39,8 @@ public class InputSource
 
     /**
      * Get the path/URL of the POM or {@code null} if unknown.
+     *
+     * @return the location
      */
     public String getLocation()
     {
@@ -47,6 +49,8 @@ public class InputSource
 
     /**
      * Get the identifier of the POM in the format {@code <groupId>:<artifactId>:<version>}.
+     *
+     * @return the model id
      */
     public String getModelId()
     {

@@ -97,7 +97,12 @@ public class InputLocation
     }
 
     /**
-     * Method merge.
+     * Merges the {@code source} location into the {@code target} location.
+     *
+     * @param target the target location
+     * @param source the source location
+     * @param sourceDominant the boolean indicating of {@code source} is dominant compared to {@code target}
+     * @return the merged location
      */
     public static InputLocation merge( InputLocation target, InputLocation source, boolean sourceDominant )
     {
@@ -132,7 +137,13 @@ public class InputLocation
     } //-- InputLocation merge( InputLocation, InputLocation, boolean )
 
     /**
-     * Method merge.
+     * Merges the {@code source} location into the {@code target} location.
+     * This method is used when the locations refer to lists and also merges the indices.
+     *
+     * @param target the target location
+     * @param source the source location
+     * @param indices the list of integers for the indices
+     * @return the merged location
      */
     public static InputLocation merge( InputLocation target, InputLocation source, Collection<Integer> indices )
     {
