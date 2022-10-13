@@ -198,6 +198,7 @@ public class MojoExecutor
         try
         {
             mavenPluginManager.checkRequiredMavenVersion( mojoDescriptor.getPluginDescriptor() );
+            mavenPluginManager.checkRequiredJavaVersion( mojoDescriptor.getPluginDescriptor() );
         }
         catch ( PluginIncompatibleException e )
         {
