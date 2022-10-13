@@ -161,6 +161,14 @@ public class VersionRangeTest
     }
 
     @Test
+    public void testSameUpperAndLowerBoundRoundtrip() throws InvalidVersionSpecificationException
+    {
+        VersionRange range = VersionRange.createFromVersionSpec( "[1.0]" );
+        VersionRange range2 = VersionRange.createFromVersionSpec( range.toString() );
+        assertEquals( range, range2 );
+    }
+
+    @Test
     public void testInvalidRanges()
     {
         checkInvalidRange( "(1.0)" );
