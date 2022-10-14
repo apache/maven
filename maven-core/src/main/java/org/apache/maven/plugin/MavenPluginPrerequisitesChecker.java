@@ -34,5 +34,5 @@ interface MavenPluginPrerequisitesChecker extends Consumer<PluginDescriptor>
      * @param pluginDescriptor
      * @throws IllegalStateException in case the checked prerequisites are not met
      */
-    void accept( PluginDescriptor pluginDescriptor ) throws IllegalStateException;
+    void accept( PluginDescriptor pluginDescriptor );
 }
