@@ -81,7 +81,6 @@ under the License.
       <plugin>
         <groupId>org.apache.maven</groupId>
         <artifactId>modello-plugin-velocity</artifactId>
-        <version>4.0.0-alpha-1-SNAPSHOT</version>
         <executions>
           <execution>
             <id>velocity</id>
