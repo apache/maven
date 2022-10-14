@@ -23,14 +23,14 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.model.profile.activation.JdkVersionProfileActivator;
-import org.apache.maven.plugin.MavenPluginPrerequisiteChecker;
+import org.apache.maven.plugin.MavenPluginPrerequisitesChecker;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.util.StringUtils;
 
 @Named
 @Singleton
 public class MavenPluginJavaPrerequisiteChecker
-    implements MavenPluginPrerequisiteChecker
+    implements MavenPluginPrerequisitesChecker
 {
 
     @Override

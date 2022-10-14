@@ -27,12 +27,12 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
  * Service responsible for checking if plugin's prerequisites are met.
  */
 @FunctionalInterface
-public interface MavenPluginPrerequisiteChecker extends Consumer<PluginDescriptor>
+interface MavenPluginPrerequisitesChecker extends Consumer<PluginDescriptor>
 {
     /**
      * 
      * @param pluginDescriptor
-     * @throws IllegalStateException in case the checked prerequisite is not met
+     * @throws IllegalStateException in case the checked prerequisites are not met
      */
     void accept( PluginDescriptor pluginDescriptor ) throws IllegalStateException;
 }

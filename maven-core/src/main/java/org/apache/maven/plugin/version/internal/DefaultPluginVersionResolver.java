@@ -297,7 +297,7 @@ public class DefaultPluginVersionResolver
         }
         catch ( Exception e )
         {
-            logger.debug( "Ignoring incompatible plugin version " + version + ": " + e.getMessage() );
+            logger.warn( "Ignoring incompatible plugin version " + version, e );
             return false;
         }
 

@@ -32,7 +32,7 @@ import org.apache.maven.plugin.DebugConfigurationListener;
 import org.apache.maven.plugin.ExtensionRealmCache;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MavenPluginManager;
-import org.apache.maven.plugin.MavenPluginPrerequisiteChecker;
+import org.apache.maven.plugin.MavenPluginPrerequisitesChecker;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
@@ -149,7 +149,7 @@ public class DefaultMavenPluginManager
     private PluginArtifactsCache pluginArtifactsCache;
     private MavenPluginValidator pluginValidator;
     private List<MavenPluginConfigurationValidator> configurationValidators;
-    private List<MavenPluginPrerequisiteChecker> prerequisiteCheckers;
+    private List<MavenPluginPrerequisitesChecker> prerequisiteCheckers;
 
     private final ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
     private final PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
@@ -168,7 +168,7 @@ public class DefaultMavenPluginManager
             PluginArtifactsCache pluginArtifactsCache,
             MavenPluginValidator pluginValidator,
             List<MavenPluginConfigurationValidator> configurationValidators,
-            List<MavenPluginPrerequisiteChecker> prerequisiteCheckers )
+            List<MavenPluginPrerequisitesChecker> prerequisiteCheckers )
     {
         this.container = container;
         this.classRealmManager = classRealmManager;
@@ -333,7 +333,7 @@ public class DefaultMavenPluginManager
                             .collect( Collectors.joining( ", " ) );
             PluginIncompatibleException pie  = new PluginIncompatibleException( pluginDescriptor.getPlugin(),
                                                    "The plugin " + pluginDescriptor.getId()
-                                                       + " has unmet requirements: " 
+                                                       + " has unmet prerequisites: " 
                                                        + messages, prerequisiteExceptions.get( 0 ) );
             // the first exception is added as cause, all other ones as suppressed exceptions
             prerequisiteExceptions.stream().skip( 1 ).forEach( pie::addSuppressed );

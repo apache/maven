@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.plugin.MavenPluginPrerequisiteChecker;
+import org.apache.maven.plugin.MavenPluginPrerequisitesChecker;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.codehaus.plexus.util.StringUtils;
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 @Named
 @Singleton
 public class MavenPluginMavenPrerequisiteChecker
-    implements MavenPluginPrerequisiteChecker
+    implements MavenPluginPrerequisitesChecker
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
     private final RuntimeInformation runtimeInformation;
@@ -56,9 +56,9 @@ public class MavenPluginMavenPrerequisiteChecker
             {
                 isRequirementMet = runtimeInformation.isMavenVersion( requiredMavenVersion );
             }
-            catch ( RuntimeException e )
+            catch ( IllegalArgumentException e )
             {
-                logger.warn( "Could not verify plugin's Maven prerequisite", e );
+                logger.warn( "Could not verify plugin's Maven prerequisite as an invalid version is given in " + requiredMavenVersion, e );
                 return;
             }
             if ( !isRequirementMet )
