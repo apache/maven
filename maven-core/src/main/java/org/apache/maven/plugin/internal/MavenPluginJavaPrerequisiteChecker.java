@@ -40,7 +40,7 @@ public class MavenPluginJavaPrerequisiteChecker
         if ( StringUtils.isNotBlank( requiredJavaVersion ) )
         {
             String currentJavaVersion = System.getProperty( "java.version" );
-            if ( JdkVersionProfileActivator.isJavaVersionCompatible( requiredJavaVersion, 
+            if ( !JdkVersionProfileActivator.isJavaVersionCompatible( requiredJavaVersion, 
                                                                      currentJavaVersion ) )
             {
                 throw new IllegalStateException( "Required Java version " + requiredJavaVersion 

@@ -51,18 +51,21 @@ public class MavenPluginMavenPrerequisiteChecker
         String requiredMavenVersion = pluginDescriptor.getRequiredMavenVersion();
         if ( StringUtils.isNotBlank( requiredMavenVersion ) )
         {
+            boolean isRequirementMet = false;
             try
             {
-                if ( !runtimeInformation.isMavenVersion( requiredMavenVersion ) )
-                {
-                    throw new IllegalStateException(
-                               "Required Maven version " + requiredMavenVersion 
-                               + " is not met by current version " + runtimeInformation.getMavenVersion() + ")" );
-                }
+                isRequirementMet = runtimeInformation.isMavenVersion( requiredMavenVersion );
             }
             catch ( RuntimeException e )
             {
-                logger.warn( "Could not verify plugin's Maven prerequisite: {}", e );
+                logger.warn( "Could not verify plugin's Maven prerequisite", e );
+                return;
+            }
+            if ( !isRequirementMet )
+            {
+                throw new IllegalStateException( 
+                          "Required Maven version " + requiredMavenVersion 
+                          + " is not met by current version " + runtimeInformation.getMavenVersion() + ")" );
             }
         }
     }
