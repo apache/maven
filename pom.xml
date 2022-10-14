@@ -30,7 +30,7 @@ under the License.
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>4.0.0-alpha-2</version>
+  <version>4.0.0-alpha-3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -55,7 +55,7 @@ under the License.
     <mockitoVersion>3.2.0</mockitoVersion>
     <plexusVersion>2.1.0</plexusVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
-    <plexusUtilsVersion>4.0.0-alpha-2</plexusUtilsVersion>
+    <plexusUtilsVersion>4.0.0-alpha-3-SNAPSHOT</plexusUtilsVersion>
     <plexusUtilsVersionEmbedded>3.4.2</plexusUtilsVersionEmbedded>
     <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>30.1-jre</guavaVersion>
@@ -73,7 +73,7 @@ under the License.
     <distributionShortName>Maven</distributionShortName>
     <distributionName>Apache Maven</distributionName>
     <maven.site.path>ref/4-LATEST</maven.site.path>
-    <project.build.outputTimestamp>2022-10-14T23:39:57Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2022-10-14T23:41:39Z</project.build.outputTimestamp>
   </properties>
 
   <modules>
@@ -105,7 +105,7 @@ under the License.
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
     <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
-    <tag>maven-4.0.0-alpha-2</tag>
+    <tag>maven-4.0.0-alpha-1</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
