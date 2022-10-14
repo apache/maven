@@ -360,7 +360,7 @@
 
     /**
      * @return a Map of profiles field with <code>Profile#getId()</code> as key
-     * @see org.apache.maven.settings.Profile#getId()
+     * @see Profile#getId()
      */
     public java.util.Map<String, Profile> getProfilesAsMap()
     {
@@ -924,7 +924,7 @@
           <code>
             <![CDATA[
     /**
-     * @see org.apache.maven.settings.RepositoryBase#equals(java.lang.Object)
+     * @see RepositoryBase#equals(java.lang.Object)
      */
     public boolean equals( Object obj )
     {

@@ -62,17 +62,12 @@ under the License.
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <version>2.0.0</version>
-        <!--
         <configuration>
           <models>
             <model>src/main/mdo/lifecycle.mdo</model>
           </models>
           <version>1.0.0</version>
-          <domAsCustom>true</domAsCustom>
-          <domAsCustomInterface>org.apache.maven.api.xml.Dom</domAsCustomInterface>
-          <domAsCustomBuilder>org.apache.maven.internal.xml.DomBuilder</domAsCustomBuilder>
         </configuration>
-        -->
         <executions>
           <execution>
             <id>modello</id>

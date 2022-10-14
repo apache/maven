@@ -34,7 +34,7 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class MetadataTest
+public class MetadataTest
 {
 
     Artifact artifact;

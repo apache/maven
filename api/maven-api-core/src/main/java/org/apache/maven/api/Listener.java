@@ -25,7 +25,7 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * A listener for session events.
- * TODO: open this to other events like {@link org.apache.maven.eventspy.EventSpy}
+ * TODO: open this to other events like similar to {@code org.apache.maven.eventspy.EventSpy}
  *
  * @since 4.0
  */

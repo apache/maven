@@ -37,10 +37,9 @@ public interface Dependency extends Artifact
     boolean isOptional();
 
     /**
-     * Shortcut for {@code session.createDependencyCoordinate(dependency)}
+     * Creates a {@code DependencyCoordinate} based on this {@code Dependency}.
      *
-     * @return an {@link DependencyCoordinate}
-     * @see org.apache.maven.api.Session#createDependencyCoordinate(Dependency)
+     * @return a {@link DependencyCoordinate}
      */
     @Nonnull
     DependencyCoordinate toCoordinate();

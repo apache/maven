@@ -70,4 +70,4 @@ jobs:
         run: |
           set +e
           export PATH=${{ env.TEMP_MAVEN_BIN_DIR }}:$PATH
-          mvn verify -e -B -V -DdistributionFileName=apache-maven
+          mvn verify site -e -B -V -DdistributionFileName=apache-maven -Preporting
