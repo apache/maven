@@ -110,7 +110,7 @@ under the License.
       <artifactId>javax.annotation-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
+      <groupId>org.apache.maven</groupId>
       <artifactId>plexus-utils</artifactId>
     </dependency>
     <dependency>
