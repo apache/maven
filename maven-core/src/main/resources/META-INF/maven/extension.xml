@@ -84,6 +84,7 @@ under the License.
 
     <!-- plexus-utils (for DOM-type fields in maven-model) -->
     <exportedPackage>org.codehaus.plexus.util.xml.Xpp3Dom</exportedPackage>
+    <exportedPackage>org.codehaus.plexus.util.xml.Xpp3DomBuilder</exportedPackage>
     <exportedPackage>org.codehaus.plexus.util.xml.pull.XmlPullParser</exportedPackage>
     <exportedPackage>org.codehaus.plexus.util.xml.pull.XmlPullParserException</exportedPackage>
     <exportedPackage>org.codehaus.plexus.util.xml.pull.XmlSerializer</exportedPackage>

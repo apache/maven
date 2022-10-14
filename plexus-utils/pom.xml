@@ -27,7 +27,7 @@ under the License.
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.codehaus.plexus</groupId>
+    <groupId>org.apache.maven</groupId>
     <artifactId>plexus-utils</artifactId>
     <version>4.0.0-alpha-2-SNAPSHOT</version>
 
