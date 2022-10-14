@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 
 import org.apache.maven.model.profile.activation.JdkVersionProfileActivator;
 import org.apache.maven.plugin.MavenPluginPrerequisiteChecker;
-import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -35,18 +34,17 @@ public class MavenPluginJavaPrerequisiteChecker
 {
 
     @Override
-    public void accept( PluginDescriptor pluginDescriptor ) throws PluginIncompatibleException
+    public void accept( PluginDescriptor pluginDescriptor )
     {
         String requiredJavaVersion = pluginDescriptor.getRequiredJavaVersion();
         if ( StringUtils.isNotBlank( requiredJavaVersion ) )
         {
-            String actualJavaVersion = System.getProperty( "java.version" );
+            String currentJavaVersion = System.getProperty( "java.version" );
             if ( JdkVersionProfileActivator.isJavaVersionCompatible( requiredJavaVersion, 
-                                                                     System.getProperty( "java.version" ) ) )
+                                                                     currentJavaVersion ) )
             {
-                throw new PluginIncompatibleException( pluginDescriptor.getPlugin(),
-                                                       "Java version " + requiredJavaVersion 
-                                                       + " (actual version: " + actualJavaVersion + ")" );
+                throw new IllegalStateException( "Required Java version " + requiredJavaVersion 
+                                                 + " is not met by current version: " + currentJavaVersion + ")" );
             }
         }
     }

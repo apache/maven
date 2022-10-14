@@ -24,7 +24,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.plugin.MavenPluginPrerequisiteChecker;
-import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.codehaus.plexus.util.StringUtils;
@@ -47,7 +46,7 @@ public class MavenPluginMavenPrerequisiteChecker
     }
 
     @Override
-    public void accept( PluginDescriptor pluginDescriptor ) throws PluginIncompatibleException
+    public void accept( PluginDescriptor pluginDescriptor )
     {
         String requiredMavenVersion = pluginDescriptor.getRequiredMavenVersion();
         if ( StringUtils.isNotBlank( requiredMavenVersion ) )
@@ -56,10 +55,9 @@ public class MavenPluginMavenPrerequisiteChecker
             {
                 if ( !runtimeInformation.isMavenVersion( requiredMavenVersion ) )
                 {
-                    throw new PluginIncompatibleException( 
-                               pluginDescriptor.getPlugin(),
-                               "Maven version " + requiredMavenVersion 
-                               + " (actual version: " + runtimeInformation.getMavenVersion() + ")" );
+                    throw new IllegalStateException(
+                               "Required Maven version " + requiredMavenVersion 
+                               + " is not met by current version " + runtimeInformation.getMavenVersion() + ")" );
                 }
             }
             catch ( RuntimeException e )

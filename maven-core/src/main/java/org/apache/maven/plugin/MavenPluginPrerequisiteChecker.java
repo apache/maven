@@ -19,13 +19,20 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
+import java.util.function.Consumer;
+
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
 /**
  * Service responsible for checking if plugin's prerequisites are met.
  */
 @FunctionalInterface
-public interface MavenPluginPrerequisiteChecker
+public interface MavenPluginPrerequisiteChecker extends Consumer<PluginDescriptor>
 {
-    void accept( PluginDescriptor pluginDescriptor ) throws PluginIncompatibleException;
+    /**
+     * 
+     * @param pluginDescriptor
+     * @throws IllegalStateException in case the checked prerequisite is not met
+     */
+    void accept( PluginDescriptor pluginDescriptor ) throws IllegalStateException;
 }
