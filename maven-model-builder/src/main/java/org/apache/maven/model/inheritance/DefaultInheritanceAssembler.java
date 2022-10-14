@@ -337,7 +337,7 @@ public class DefaultInheritanceAssembler
                     if ( element.isInherited() )
                     {
                         // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions as well
-                        ReportPlugin plugin = ReportPlugin.newInstance();
+                        ReportPlugin plugin = ReportPlugin.newInstance( false );
                         plugin = mergeReportPlugin( plugin, element, sourceDominant, context );
 
                         merged.put( getReportPluginKey().apply( element ), plugin );
