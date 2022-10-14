@@ -295,4 +295,16 @@ public final class SettingsUtils
         return policy;
     }
 
+    /**
+     * @param settings could be null
+     * @return a new instance of settings or null if settings was null.
+     */
+    public static org.apache.maven.settings.Settings copySettings( org.apache.maven.settings.Settings settings )
+    {
+        if ( settings == null )
+        {
+            return null;
+        }
+        return new org.apache.maven.settings.Settings( settings.getDelegate() );
+    }
 }
