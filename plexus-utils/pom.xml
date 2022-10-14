@@ -23,13 +23,13 @@ under the License.
     <parent>
         <artifactId>maven</artifactId>
         <groupId>org.apache.maven</groupId>
-        <version>4.0.0-alpha-2-SNAPSHOT</version>
+        <version>4.0.0-alpha-2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.apache.maven</groupId>
     <artifactId>plexus-utils</artifactId>
-    <version>4.0.0-alpha-2-SNAPSHOT</version>
+    <version>4.0.0-alpha-2</version>
 
     <dependencies>
         <dependency>

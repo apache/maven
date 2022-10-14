@@ -23,7 +23,7 @@ under the License.
     <parent>
         <artifactId>maven</artifactId>
         <groupId>org.apache.maven</groupId>
-        <version>4.0.0-alpha-2-SNAPSHOT</version>
+        <version>4.0.0-alpha-2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -35,7 +35,7 @@ under the License.
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-api-xml</artifactId>
-            <version>4.0.0-alpha-2-SNAPSHOT</version>
+            <version>4.0.0-alpha-2</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.sisu</groupId>
