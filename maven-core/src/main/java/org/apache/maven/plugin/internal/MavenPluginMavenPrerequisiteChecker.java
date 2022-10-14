@@ -58,7 +58,8 @@ public class MavenPluginMavenPrerequisiteChecker
             }
             catch ( IllegalArgumentException e )
             {
-                logger.warn( "Could not verify plugin's Maven prerequisite as an invalid version is given in " + requiredMavenVersion, e );
+                logger.warn( "Could not verify plugin's Maven prerequisite as an invalid version is given in "
+                             + requiredMavenVersion, e );
                 return;
             }
             if ( !isRequirementMet )
