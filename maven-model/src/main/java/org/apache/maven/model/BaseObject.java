@@ -24,7 +24,8 @@ import java.io.Serializable;
 public abstract class BaseObject
         implements Serializable, Cloneable, InputLocationTracker
 {
-    protected ChildrenTracking childrenTracking;
+    protected transient ChildrenTracking childrenTracking;
+
     protected Object delegate;
 
     public BaseObject()

@@ -19,6 +19,7 @@ package org.apache.maven.api.toolchain;
  * under the License.
  */
 
+import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -251,7 +252,9 @@ class ImmutableCollections
         }
     }
 
-    private abstract static class AbstractImmutableList<E> extends AbstractList<E> implements RandomAccess
+    private abstract static class AbstractImmutableList<E>
+        extends AbstractList<E>
+        implements RandomAccess, Serializable
     {
         @Override
         public boolean add( E e )
@@ -634,7 +637,9 @@ class ImmutableCollections
         }
     }
 
-    private abstract static class AbstractImmutableMap<K, V> extends AbstractMap<K, V>
+    private abstract static class AbstractImmutableMap<K, V>
+        extends AbstractMap<K, V>
+        implements Serializable
     {
         @Override
         public void replaceAll( BiFunction<? super K, ? super V, ? extends V> function )
@@ -691,7 +696,9 @@ class ImmutableCollections
         }
     }
 
-    private abstract static class AbstractImmutableSet<E> extends AbstractSet<E>
+    private abstract static class AbstractImmutableSet<E>
+        extends AbstractSet<E>
+        implements Serializable
     {
         @Override
         public boolean removeAll( Collection<?> c )
