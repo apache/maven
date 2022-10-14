@@ -56,9 +56,10 @@ public class MavenPluginMavenPrerequisiteChecker
             {
                 if ( !runtimeInformation.isMavenVersion( requiredMavenVersion ) )
                 {
-                    throw new PluginIncompatibleException( pluginDescriptor.getPlugin(),
-                                                           "The plugin " + pluginDescriptor.getId()
-                                                               + " requires Maven version " + requiredMavenVersion );
+                    throw new PluginIncompatibleException( 
+                               pluginDescriptor.getPlugin(),
+                               "Maven version " + requiredMavenVersion 
+                               + " (actual version: " + runtimeInformation.getMavenVersion() + ")" );
                 }
             }
             catch ( RuntimeException e )

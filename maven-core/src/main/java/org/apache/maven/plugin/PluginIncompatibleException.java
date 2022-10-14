@@ -30,7 +30,11 @@ public class PluginIncompatibleException
 
     public PluginIncompatibleException( Plugin plugin, String message )
     {
-        super( plugin, message, (Throwable) null );
+        this( plugin, message, null );
     }
 
+    public PluginIncompatibleException( Plugin plugin, String message, Throwable cause )
+    {
+        super( plugin, message, cause );
+    }
 }

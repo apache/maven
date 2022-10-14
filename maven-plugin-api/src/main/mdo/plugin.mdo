@@ -18,7 +18,9 @@ under the License.
 -->
 
 <model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd">
+  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
+  xml.namespace="http://maven.apache.org/PLUGIN/${version}"
+  xml.schemaLocation="https://maven.apache.org/xsd/plugin-${version}.xsd">
   <id>plugin</id>
   <name>PluginDescriptor</name>
   <description><![CDATA[
@@ -37,69 +39,69 @@ under the License.
   <classes>
     <class rootElement="true" xml.tagName="plugin">
       <name>PluginDescriptor</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description><![CDATA[Root element of the <code>plugin.xml</code> file.]]></description>
       <!-- see o.a.m.plugin.descriptor.PluginDescriptor -->
       <fields>
         <field>
           <name>name</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>Name of the plugin.</description>
           <type>String</type>
         </field>
         <field>
           <name>description</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>Description of the plugin.</description>
           <type>String</type>
         </field>
         <field>
           <name>groupId</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>The group id of the plugin.</description>
           <type>String</type>
         </field>
         <field>
           <name>artifactId</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>The artifact id of the plugin.</description>
           <type>String</type>
         </field>
         <field>
           <name>version</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>The version of the plugin.</description>
           <type>String</type>
         </field>
         <field>
           <name>goalPrefix</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description></description>
           <type>String</type>
         </field>
         <field>
           <name>isolatedRealm</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description></description>
           <type>boolean</type>
           <defaultValue>false</defaultValue>
         </field>
         <field>
           <name>inheritedByDefault</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description></description>
           <type>boolean</type>
           <defaultValue>true</defaultValue>
         </field>
         <field>
           <name>requiredJavaVersion</name>
-          <version>1.1.0</version>
-          <description>A version range which specifies the supported Java versions.</description>
+          <version>1.1.0+</version>
+          <description>A version range which specifies the supported Java versions. The same values as for POM profile activation element 'jdk' are allowed, i.e. version ranges, version prefixes and negated version prefixes (starting with '!').</description>
           <type>String</type>
         </field>
         <field xdoc.separator="blank">
           <name>mojos</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <association>
             <type>MojoDescriptor</type>
             <multiplicity>*</multiplicity>
@@ -108,7 +110,7 @@ under the License.
         </field>
         <field xdoc.separator="blank">
           <name>dependencies</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <association>
             <type>Dependency</type>
             <multiplicity>*</multiplicity>
@@ -123,7 +125,7 @@ under the License.
 
     <class>
       <name>MojoDescriptor</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description><![CDATA[
         A Mojo description.
       ]]></description>
@@ -132,7 +134,7 @@ under the License.
         <field>
           <name>goal</name>
           <required>true</required>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>
             The goal name for the Mojo, that users will reference from the command line to execute the Mojo directly,
@@ -141,13 +143,13 @@ under the License.
         </field>
         <field>
           <name>description</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>The description of this Mojo's functionality.</description>
         </field>
         <field>
           <name>implementation</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>
             The Mojo's fully-qualified class name (or script path in the case of non-Java Mojos).
@@ -155,14 +157,14 @@ under the License.
         </field>
         <field>
           <name>language</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <defaultValue>java</defaultValue>
           <description>The implementation language for this Mojo (java, beanshell, etc.).</description>
         </field>
         <field>
           <name>phase</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description><![CDATA[
             Defines a default phase to bind a mojo execution to if the user does not explicitly set a phase in the POM.
@@ -173,25 +175,25 @@ under the License.
         </field>
         <field>
           <name>executePhase</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>Reference the invocation phase of the Mojo.</description>
         </field>
         <field>
           <name>executeGoal</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>Reference the invocation goal of the Mojo.</description>
         </field>
         <field>
           <name>executeLifecycle</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description></description>
         </field>
         <field>
           <name>requiresDependencyResolution</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <defaultValue>runtime</defaultValue>
           <description><![CDATA[
@@ -202,7 +204,7 @@ under the License.
         </field>
         <field>
           <name>requiresDependencyCollection</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description><![CDATA[
             Flags this mojo as requiring information about the dependencies that would make up the specified class
@@ -215,35 +217,35 @@ under the License.
         </field>
         <field>
           <name>requiresDirectInvocation</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>boolean</type>
           <description>Flags this Mojo to be invoked directly only.</description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
           <name>requiresProject</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>boolean</type>
           <description>Flags this Mojo to require running inside of a project.</description>
           <defaultValue>true</defaultValue>
         </field>
         <field>
           <name>requiresReports</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>boolean</type>
           <description>Flags this Mojo to require running inside of a reports context. Unsupported since Maven 3.0.</description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
           <name>requiresOnline</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>boolean</type>
           <description>Flags this Mojo to require online mode for its operation.</description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
           <name>aggregator</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>boolean</type>
           <description>
             Flags this Mojo to run it in a multi-module way, i.e. aggregate the build with the set of projects
@@ -253,14 +255,14 @@ under the License.
         </field>
         <field>
           <name>inheritedByDefault</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>boolean</type>
           <description>Specify that the Mojo is inherited.</description>
           <defaultValue>true</defaultValue>
         </field>
         <field>
           <name>threadSafe</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>boolean</type>
           <description>
             Marks this mojo as being thread-safe, i.e. the mojo safely supports concurrent execution during parallel
@@ -271,14 +273,14 @@ under the License.
         </field>
         <field>
           <name>instantiationStrategy</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <defaultValue>per-lookup</defaultValue>
           <description>Specify the instantiation strategy.</description>
         </field>
         <field>
           <name>executionStrategy</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description><![CDATA[
             Specify the execution strategy: <code>once-per-session</code>, <code>always</code>.
@@ -287,13 +289,13 @@ under the License.
         </field>
         <field>
           <name>since</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>Specify the version when the Mojo was added to the API. Similar to Javadoc since.</description>
         </field>
         <field>
           <name>deprecated</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description><![CDATA[
             Description with the reason of Mojo deprecation. Similar to Javadoc <code>@deprecated</code>
@@ -302,7 +304,7 @@ under the License.
         </field>
         <field>
           <name>configurator</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>
             The configurator type to use when injecting parameter values into this Mojo. The value is normally deduced
@@ -312,13 +314,13 @@ under the License.
         </field>
         <field>
           <name>composer</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description></description>
         </field>
         <field xdoc.separator="blank">
           <name>parameters</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description></description>
           <association>
             <type>Parameter</type>
@@ -327,7 +329,7 @@ under the License.
         </field>
         <field>
           <name>configuration</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description></description>
           <association xml.tagName="paramName">
             <type>Configuration</type>
@@ -336,7 +338,7 @@ under the License.
         </field>
         <field xdoc.separator="blank">
           <name>requirements</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description></description>
           <association>
             <type>Requirement</type>
@@ -348,13 +350,13 @@ under the License.
 
     <class>
       <name>Parameter</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description>A phase mapping definition.</description>
       <!-- see o.a.m.plugin.descriptor.Parameter -->
       <fields>
         <field>
           <name>name</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
           <description>
@@ -364,7 +366,7 @@ under the License.
         </field>
         <field>
           <name>alias</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>
             Specifies an alias which can be used to configure this parameter from the POM.
@@ -374,7 +376,7 @@ under the License.
         </field>
         <field>
           <name>type</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
           <description>
@@ -384,7 +386,7 @@ under the License.
         </field>
         <field>
           <name>required</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>boolean</type>
           <description>
             Whether this parameter is required for the Mojo to function. This is used to validate the configuration
@@ -393,7 +395,7 @@ under the License.
         </field>
         <field>
           <name>editable</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>boolean</type>
           <defaultValue>true</defaultValue>
           <description><![CDATA[
@@ -408,25 +410,25 @@ under the License.
         </field>
         <field>
           <name>implementation</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description></description>
         </field>
         <field>
           <name>description</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>The description of this parameter's use inside the Mojo.</description>
         </field>
         <field>
           <name>since</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>Specify the version when the parameter was added to the API. Similar to Javadoc since.</description>
         </field>
         <field>
           <name>deprecated</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description><![CDATA[
             Description with the reason of parameter deprecation. Similar to Javadoc <code>@deprecated</code>
@@ -438,26 +440,26 @@ under the License.
 
     <class>
       <name>Configuration</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description>A parameter configuration.</description>
       <!-- see o.a.m.plugin.descriptor.Parameter -->
       <fields>
         <field xml.content="true">
           <name>expression</name>
           <required>true</required>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>Parameter expression, to let user override default value with a system property, pom property or settings property.</description>
         </field>
         <field xml.attribute="true" xml.tagName="implementation">
           <name>implementation</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description></description>
         </field>
         <field xml.attribute="true" xml.tagName="default-value">
           <name>defaultValue</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>The default value, as an expression that will be evaluated at injection or run-time.</description>
         </field>
@@ -466,27 +468,27 @@ under the License.
 
     <class>
       <name>Requirement</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description>Describes a component requirement.</description>
       <!-- see o.a.m.plugin.descriptor.Requirement -->
       <fields>
         <field>
           <name>role</name>
           <required>true</required>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description></description>
         </field>
         <field xml.tagName="role-hint">
           <name>roleHint</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description></description>
         </field>
         <field xml.tagName="field-name">
           <name>fieldName</name>
           <required>true</required>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>The field name which has this requirement.</description>
         </field>
@@ -495,32 +497,32 @@ under the License.
 
     <class>
       <name>Dependency</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description>Definition of a dependency, needed by the plugin at runtime.</description>
       <fields>
         <field>
           <name>groupId</name>
           <required>true</required>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>The group id of the dependency.</description>
         </field>
         <field>
           <name>artifactId</name>
           <required>true</required>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>The artifact id of the dependency.</description>
         </field>
         <field>
           <name>version</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>The version of the dependency.</description>
         </field>
         <field>
           <name>type</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <defaultValue>jar</defaultValue>
           <description>The type of dependency.</description>
