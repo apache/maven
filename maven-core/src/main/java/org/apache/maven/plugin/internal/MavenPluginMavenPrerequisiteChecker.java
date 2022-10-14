@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.plugin.MavenPluginPrerequisiteChecker;
 import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.rtinfo.RuntimeInformation;
@@ -32,14 +33,14 @@ import org.slf4j.LoggerFactory;
 
 @Named
 @Singleton
-public class JavaPrerequisiteChecker
+public class MavenPluginMavenPrerequisiteChecker
     implements MavenPluginPrerequisiteChecker
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
     private final RuntimeInformation runtimeInformation;
 
     @Inject
-    public JavaPrerequisiteChecker( RuntimeInformation runtimeInformation )
+    public MavenPluginMavenPrerequisiteChecker( RuntimeInformation runtimeInformation )
     {
         super();
         this.runtimeInformation = runtimeInformation;
@@ -62,9 +63,10 @@ public class JavaPrerequisiteChecker
             }
             catch ( RuntimeException e )
             {
-                logger.warn( "Could not verify plugin's Maven prerequisite: " + e.getMessage() );
+                logger.warn( "Could not verify plugin's Maven prerequisite: {}", e );
             }
         }
     }
+    
 
 }
