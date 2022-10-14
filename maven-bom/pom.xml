@@ -29,7 +29,7 @@ under the License.
   </parent>
 
   <artifactId>maven-bom</artifactId>
-  <version>4.0.0-alpha-1</version>
+  <version>4.0.0-alpha-2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Maven Dependencies BOM</name>

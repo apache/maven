@@ -23,7 +23,7 @@ under the License.
     <parent>
         <artifactId>maven</artifactId>
         <groupId>org.apache.maven</groupId>
-        <version>4.0.0-alpha-1</version>
+        <version>4.0.0-alpha-2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -36,12 +36,12 @@ under the License.
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-api-toolchain</artifactId>
-            <version>4.0.0-alpha-1</version>
+            <version>4.0.0-alpha-2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-xml-impl</artifactId>
-            <version>4.0.0-alpha-1</version>
+            <version>4.0.0-alpha-2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
