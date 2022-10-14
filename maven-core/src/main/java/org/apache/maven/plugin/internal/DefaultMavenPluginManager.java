@@ -337,6 +337,7 @@ public class DefaultMavenPluginManager
                                                        + messages, prerequisiteExceptions.get( 0 ) );
             // the first exception is added as cause, all other ones as suppressed exceptions
             prerequisiteExceptions.stream().skip( 1 ).forEach( pie::addSuppressed );
+            throw pie;
         }
     }
 
