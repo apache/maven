@@ -44,7 +44,7 @@ public class MavenPluginJavaPrerequisiteChecker
                                                                      currentJavaVersion ) )
             {
                 throw new IllegalStateException( "Required Java version " + requiredJavaVersion 
-                                                 + " is not met by current version: " + currentJavaVersion + ")" );
+                                                 + " is not met by current version: " + currentJavaVersion );
             }
         }
     }
