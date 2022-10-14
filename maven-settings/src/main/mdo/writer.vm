@@ -96,9 +96,9 @@ public class ${className}
     /**
      * Method write.
      *
-     * @param writer a writer object.
-     * @param model a model object.
-     * @throws java.io.IOException java.io.IOException if any.
+     * @param writer a writer object
+     * @param ${rootLcapName} a ${root.name} object
+     * @throws java.io.IOException java.io.IOException if any
      */
     public void write( Writer writer, ${root.name} ${rootLcapName} )
         throws java.io.IOException
@@ -115,9 +115,9 @@ public class ${className}
     /**
      * Method write.
      *
-     * @param stream a stream object.
-     * @param model a model object.
-     * @throws java.io.IOException java.io.IOException if any.
+     * @param stream a stream object
+     * @param ${rootLcapName} a ${root.name} object
+     * @throws java.io.IOException java.io.IOException if any
      */
     public void write( OutputStream stream, ${root.name} ${rootLcapName} )
         throws java.io.IOException
