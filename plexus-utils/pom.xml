@@ -28,6 +28,8 @@ under the License.
   <groupId>org.apache.maven</groupId>
   <artifactId>plexus-utils</artifactId>
   <version>4.0.0-alpha-4-SNAPSHOT</version>
+  <name>Apache Maven Plexus-Utils</name>
+  <description>Apache Maven repackaging of Plexus Utils with immutable Dom interface and its replacement implementation.</description>
 
   <dependencies>
     <dependency>
@@ -51,7 +53,7 @@ under the License.
         <version>3.1.1</version>
         <executions>
           <execution>
-            <id>unpack-sourcs</id>
+            <id>unpack-sources</id>
             <goals>
               <goal>unpack</goal>
             </goals>
