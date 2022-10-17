@@ -64,7 +64,7 @@ under the License.
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <cipherVersion>2.0</cipherVersion>
     <jxpathVersion>1.3</jxpathVersion>
-    <resolverVersion>1.8.2</resolverVersion>
+    <resolverVersion>1.9.0</resolverVersion>
     <slf4jVersion>1.7.36</slf4jVersion>
     <xmlunitVersion>2.2.1</xmlunitVersion>
     <powermockVersion>1.7.4</powermockVersion>
