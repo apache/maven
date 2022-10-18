@@ -149,7 +149,7 @@ public class DefaultMavenPluginManager
     private PluginArtifactsCache pluginArtifactsCache;
     private MavenPluginValidator pluginValidator;
     private List<MavenPluginConfigurationValidator> configurationValidators;
-    private List<MavenPluginPrerequisitesChecker> prerequisiteCheckers;
+    private List<MavenPluginPrerequisitesChecker> prerequisitesCheckers;
 
     private final ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
     private final PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
@@ -168,7 +168,7 @@ public class DefaultMavenPluginManager
             PluginArtifactsCache pluginArtifactsCache,
             MavenPluginValidator pluginValidator,
             List<MavenPluginConfigurationValidator> configurationValidators,
-            List<MavenPluginPrerequisitesChecker> prerequisiteCheckers )
+            List<MavenPluginPrerequisitesChecker> prerequisitesCheckers )
     {
         this.container = container;
         this.classRealmManager = classRealmManager;
@@ -181,7 +181,7 @@ public class DefaultMavenPluginManager
         this.pluginArtifactsCache = pluginArtifactsCache;
         this.pluginValidator = pluginValidator;
         this.configurationValidators = configurationValidators;
-        this.prerequisiteCheckers = prerequisiteCheckers;
+        this.prerequisitesCheckers = prerequisitesCheckers;
     }
 
     public synchronized PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories,
@@ -314,7 +314,7 @@ public class DefaultMavenPluginManager
         throws PluginIncompatibleException
     {
         List<IllegalStateException> prerequisiteExceptions = new ArrayList<>();
-        prerequisiteCheckers.forEach( c -> 
+        prerequisitesCheckers.forEach( c -> 
         {
             try 
             { 
