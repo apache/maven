@@ -74,11 +74,8 @@ under the License.
             <phase>none</phase>
           </execution>
           <execution>
-            <id>modello-site-doc</id>
+            <id>modello-site-docs</id>
             <phase>pre-site</phase>
-            <goals>
-              <goal>xdoc</goal>
-            </goals>
             <configuration>
               <models>
                 <model>src/main/mdo/plugin.mdo</model>

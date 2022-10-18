@@ -70,11 +70,11 @@ public interface MavenPluginManager
         InvalidPluginDescriptorException;
 
     /**
-     * Verifies the specified plugin is compatible with the current Maven runtime.
+     * Verifies that the specified plugin's prerequisites are met.
      *
      * @param pluginDescriptor The descriptor of the plugin to check, must not be {@code null}.
      */
-    void checkRequiredMavenVersion( PluginDescriptor pluginDescriptor )
+    void checkPrerequisites( PluginDescriptor pluginDescriptor )
         throws PluginIncompatibleException;
 
     /**

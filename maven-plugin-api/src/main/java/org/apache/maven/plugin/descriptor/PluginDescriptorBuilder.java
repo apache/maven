@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.internal.xml.Xpp3DomBuilder;
@@ -65,6 +66,7 @@ public class PluginDescriptorBuilder
 
         pluginDescriptor.setIsolatedRealm( extractIsolatedRealm( c ) );
         pluginDescriptor.setInheritedByDefault( extractInheritedByDefault( c ) );
+        pluginDescriptor.setRequiredJavaVersion( extractRequiredJavaVersion( c ).orElse( null ) );
 
         pluginDescriptor.addMojos( extractMojos( c, pluginDescriptor ) );
 
@@ -138,6 +140,11 @@ public class PluginDescriptorBuilder
             return Boolean.parseBoolean( isolatedRealm );
         }
         return false;
+    }
+
+    private Optional<String> extractRequiredJavaVersion( PlexusConfiguration c )
+    {
+        return Optional.ofNullable( c.getChild( "requiredJavaVersion" ) ).map( PlexusConfiguration::getValue );
     }
 
     private List<ComponentDependency> extractComponentDependencies( PlexusConfiguration c )

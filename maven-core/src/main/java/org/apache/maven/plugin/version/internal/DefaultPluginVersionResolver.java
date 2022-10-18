@@ -293,11 +293,11 @@ public class DefaultPluginVersionResolver
 
         try
         {
-            pluginManager.checkRequiredMavenVersion( pluginDescriptor );
+            pluginManager.checkPrerequisites( pluginDescriptor );
         }
         catch ( Exception e )
         {
-            logger.debug( "Ignoring incompatible plugin version " + version + ": " + e.getMessage() );
+            logger.warn( "Ignoring incompatible plugin version " + version, e );
             return false;
         }
 
