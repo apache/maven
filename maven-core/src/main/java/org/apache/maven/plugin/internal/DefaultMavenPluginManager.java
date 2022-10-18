@@ -201,7 +201,11 @@ public class DefaultMavenPluginManager
 
             pluginDescriptor = extractPluginDescriptor( pluginArtifact, plugin );
 
-            pluginDescriptor.setRequiredMavenVersion( artifact.getProperty( "requiredMavenVersion", null ) );
+            if ( StringUtils.isBlank( pluginDescriptor.getRequiredMavenVersion() ) )
+            {
+                // only take value from underlying POM if plugin descriptor has no explicit Maven requirement
+                pluginDescriptor.setRequiredMavenVersion( artifact.getProperty( "requiredMavenVersion", null ) );
+            }
 
             pluginDescriptorCache.put( cacheKey, pluginDescriptor );
         }
