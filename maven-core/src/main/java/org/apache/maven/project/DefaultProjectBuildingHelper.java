@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -168,27 +169,19 @@ public class DefaultProjectBuildingHelper
                 plugin.setGroupId( extension.getGroupId() );
                 plugin.setArtifactId( extension.getArtifactId() );
                 plugin.setVersion( extension.getVersion() );
+                // abuse string type of extensions in order to distinguish regular plugin from build extensions
+                plugin.setExtensions( "build" );
                 extensionPlugins.add( plugin );
             }
 
             for ( Plugin plugin : build.getPlugins() )
             {
-                if ( plugin.isExtensions() )
-                {
-                    extensionPlugins.add( plugin );
-                }
+                // potentially all plugins may carry extensions, filtering happens in 
+                // MavenPluginManager#setupExtensionsRealms as this requires evaluation of plugin descriptor
+                extensionPlugins.add( plugin );
             }
         }
 
-        if ( extensionPlugins.isEmpty() )
-        {
-            if ( logger.isDebugEnabled() )
-            {
-                logger.debug( "Extension realms for project " + model.getId() + ": (none)" );
-            }
-
-            return new ProjectRealmCache.CacheRecord( null, null );
-        }
 
         List<ClassRealm> extensionRealms = new ArrayList<>();
 
@@ -200,31 +193,45 @@ public class DefaultProjectBuildingHelper
 
         for ( Plugin plugin : extensionPlugins )
         {
-            ExtensionRealmCache.CacheRecord recordRealm =
-                pluginManager.setupExtensionsRealm( project, plugin, request.getRepositorySession() );
+            Optional<ExtensionRealmCache.CacheRecord> recordRealm =
+                pluginManager.setupExtensionsRealm( project, plugin, request.getRepositorySession(),
+                        "build".equals( plugin.getExtensions() ) );
 
-            final ClassRealm extensionRealm = recordRealm.getRealm();
-            final ExtensionDescriptor extensionDescriptor = recordRealm.getDescriptor();
-            final List<Artifact> artifacts = recordRealm.getArtifacts();
-
-            extensionRealms.add( extensionRealm );
-            if ( extensionDescriptor != null )
+            if ( recordRealm.isPresent() )
             {
-                exportedPackages.put( extensionRealm, extensionDescriptor.getExportedPackages() );
-                exportedArtifacts.put( extensionRealm, extensionDescriptor.getExportedArtifacts() );
-            }
-
-            if ( !plugin.isExtensions() && artifacts.size() == 1 && artifacts.get( 0 ).getFile() != null )
-            {
-                /*
-                 * This is purely for backward-compat with 2.x where <extensions> consisting of a single artifact where
-                 * loaded into the core and hence available to plugins, in contrast to bigger extensions that were
-                 * loaded into a dedicated realm which is invisible to plugins (MNG-2749).
-                 */
-                publicArtifacts.addAll( artifacts );
+                final ClassRealm extensionRealm = recordRealm.get().getRealm();
+                final ExtensionDescriptor extensionDescriptor = recordRealm.get().getDescriptor();
+                final List<Artifact> artifacts = recordRealm.get().getArtifacts();
+                
+                extensionRealms.add( extensionRealm );
+                if ( extensionDescriptor != null )
+                {
+                    exportedPackages.put( extensionRealm, extensionDescriptor.getExportedPackages() );
+                    exportedArtifacts.put( extensionRealm, extensionDescriptor.getExportedArtifacts() );
+                }
+                
+                if ( !plugin.isExtensions() && artifacts.size() == 1 && artifacts.get( 0 ).getFile() != null )
+                {
+                    /*
+                     * This is purely for backward-compat with 2.x where <extensions> consisting of a single artifact
+                     * were loaded into the core and hence available to plugins, in contrast to bigger extensions that
+                     * were loaded into a dedicated realm which is invisible to plugins (MNG-2749).
+                     */
+                    publicArtifacts.addAll( artifacts );
+                }
             }
         }
 
+        if ( extensionRealms.isEmpty() )
+        {
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Extension realms for project " + model.getId() + ": (none)" );
+            }
+
+            return new ProjectRealmCache.CacheRecord( null, null );
+        }
+       
         if ( logger.isDebugEnabled() )
         {
             logger.debug( "Extension realms for project " + model.getId() + ": " + extensionRealms );

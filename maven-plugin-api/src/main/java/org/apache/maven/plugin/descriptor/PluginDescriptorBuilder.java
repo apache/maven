@@ -66,6 +66,7 @@ public class PluginDescriptorBuilder
 
         pluginDescriptor.setIsolatedRealm( extractIsolatedRealm( c ) );
         pluginDescriptor.setInheritedByDefault( extractInheritedByDefault( c ) );
+        pluginDescriptor.setHasExtensions( extractHasExtensions( c ) );
         pluginDescriptor.setRequiredJavaVersion( extractRequiredJavaVersion( c ).orElse( null ) );
 
         pluginDescriptor.addMojos( extractMojos( c, pluginDescriptor ) );
@@ -141,6 +142,18 @@ public class PluginDescriptorBuilder
         }
         return false;
     }
+
+    private boolean extractHasExtensions( PlexusConfiguration c )
+    {
+        String hasExtensions = c.getChild( "hasExtensions" ).getValue();
+
+        if ( hasExtensions != null )
+        {
+            return Boolean.parseBoolean( hasExtensions );
+        }
+        return false;
+    }
+
 
     private Optional<String> extractRequiredJavaVersion( PlexusConfiguration c )
     {

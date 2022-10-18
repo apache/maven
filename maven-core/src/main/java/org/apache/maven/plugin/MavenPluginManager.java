@@ -20,6 +20,7 @@ package org.apache.maven.plugin;
  */
 
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
@@ -94,12 +95,30 @@ public interface MavenPluginManager
         throws PluginResolutionException, PluginContainerException;
 
     /**
-     * Sets up class realm for the specified build extensions plugin.
+     * Sets up class realm for the specified build extensions plugin
+     * or regular plugin containing extensions.
      *
      * @since 3.3.0
+     * 
+     * @deprecated Use {@link #setupExtensionsRealm(MavenProject, Plugin, RepositorySystemSession, Boolean)} instead.
      */
-    ExtensionRealmCache.CacheRecord setupExtensionsRealm( MavenProject project, Plugin plugin,
+    @Deprecated
+    default ExtensionRealmCache.CacheRecord setupExtensionsRealm( MavenProject project, Plugin plugin,
                                                           RepositorySystemSession session )
+        throws PluginManagerException
+    {
+        return setupExtensionsRealm( project, plugin, session, null ).get();
+    }
+    
+
+    /**
+     * Sets up class realm for the specified build extensions plugin
+     * or regular plugin containing extensions.
+     * 
+     * @since 4.0.0
+     */
+    Optional<ExtensionRealmCache.CacheRecord> setupExtensionsRealm( MavenProject project, Plugin plugin,
+                                                          RepositorySystemSession session, Boolean isBuildExtension )
         throws PluginManagerException;
 
     /**

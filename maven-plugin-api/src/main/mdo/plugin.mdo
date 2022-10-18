@@ -94,6 +94,13 @@ under the License.
           <defaultValue>true</defaultValue>
         </field>
         <field>
+          <name>hasExtensions</name>
+          <version>1.1.0+</version>
+          <description>If set to true this plugin carries Maven extensions which need to be loaded via the Core Classloader.</description>
+          <type>boolean</type>
+          <defaultValue>false</defaultValue>
+        </field>
+        <field>
           <name>requiredJavaVersion</name>
           <version>1.1.0+</version>
           <description>A version range which specifies the supported Java versions. The same values as for POM profile activation element 'jdk' are allowed, i.e. version ranges, version prefixes and negated version prefixes (starting with '!').</description>

@@ -103,6 +103,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -348,13 +349,13 @@ public class DefaultMavenPluginManager
         Plugin plugin = pluginDescriptor.getPlugin();
         MavenProject project = session.getCurrentProject();
 
-        if ( plugin.isExtensions() )
+        if ( plugin.isExtensions() || pluginDescriptor.isHasExtensions() )
         {
             ExtensionRealmCache.CacheRecord extensionRecord;
             try
             {
                 RepositorySystemSession repositorySession = session.getRepositorySession();
-                extensionRecord = setupExtensionsRealm( project, plugin, repositorySession );
+                extensionRecord = setupExtensionsRealm( project, plugin, repositorySession, false ).get();
             }
             catch ( PluginManagerException e )
             {
@@ -834,8 +835,10 @@ public class DefaultMavenPluginManager
         }
     }
 
-    public ExtensionRealmCache.CacheRecord setupExtensionsRealm( MavenProject project, Plugin plugin,
-                                                                 RepositorySystemSession session )
+    @Override
+    public Optional<ExtensionRealmCache.CacheRecord> setupExtensionsRealm( MavenProject project, Plugin plugin,
+                                                                           RepositorySystemSession session,
+                                                                           Boolean isBuildExtension )
         throws PluginManagerException
     {
         @SuppressWarnings( "unchecked" ) Map<String, ExtensionRealmCache.CacheRecord> pluginRealms =
@@ -851,7 +854,7 @@ public class DefaultMavenPluginManager
         ExtensionRealmCache.CacheRecord extensionRecord = pluginRealms.get( pluginKey );
         if ( extensionRecord != null )
         {
-            return extensionRecord;
+            return Optional.of( extensionRecord );
         }
 
         final List<RemoteRepository> repositories = project.getRemotePluginRepositories();
@@ -915,7 +918,9 @@ public class DefaultMavenPluginManager
             // TODO figure out how to use the same PluginDescriptor when running mojos
 
             PluginDescriptor pluginDescriptor = null;
-            if ( plugin.isExtensions() && !artifacts.isEmpty() )
+            
+            boolean requirePluginDescriptor = plugin.isExtensions() || isBuildExtension == Boolean.FALSE;
+            if ( requirePluginDescriptor && !artifacts.isEmpty() )
             {
                 // ignore plugin descriptor parsing errors at this point
                 // these errors will reported during calculation of project build execution plan
@@ -926,6 +931,11 @@ public class DefaultMavenPluginManager
                 catch ( PluginDescriptorParsingException | InvalidPluginDescriptorException e )
                 {
                     // ignore, see above
+                }
+                // for backwards compatibility reason never return empty when isBuildExtension == null
+                if ( isBuildExtension != null && !plugin.isExtensions() && !pluginDescriptor.isHasExtensions() )
+                {
+                    return Optional.empty();
                 }
             }
 
@@ -954,7 +964,7 @@ public class DefaultMavenPluginManager
         extensionRealmCache.register( project, extensionKey, extensionRecord );
         pluginRealms.put( pluginKey, extensionRecord );
 
-        return extensionRecord;
+        return Optional.of( extensionRecord );
     }
 
     private List<Artifact> resolveExtensionArtifacts( Plugin extensionPlugin, List<RemoteRepository> repositories,
