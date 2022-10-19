@@ -67,6 +67,7 @@ public class PluginDescriptorBuilder
         pluginDescriptor.setIsolatedRealm( extractIsolatedRealm( c ) );
         pluginDescriptor.setInheritedByDefault( extractInheritedByDefault( c ) );
         pluginDescriptor.setRequiredJavaVersion( extractRequiredJavaVersion( c ).orElse( null ) );
+        pluginDescriptor.setRequiredMavenVersion( extractRequiredMavenVersion( c ).orElse( null ) );
 
         pluginDescriptor.addMojos( extractMojos( c, pluginDescriptor ) );
 
@@ -145,6 +146,11 @@ public class PluginDescriptorBuilder
     private Optional<String> extractRequiredJavaVersion( PlexusConfiguration c )
     {
         return Optional.ofNullable( c.getChild( "requiredJavaVersion" ) ).map( PlexusConfiguration::getValue );
+    }
+
+    private Optional<String> extractRequiredMavenVersion( PlexusConfiguration c )
+    {
+        return Optional.ofNullable( c.getChild( "requiredMavenVersion" ) ).map( PlexusConfiguration::getValue );
     }
 
     private List<ComponentDependency> extractComponentDependencies( PlexusConfiguration c )
