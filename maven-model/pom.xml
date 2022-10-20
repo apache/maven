@@ -37,16 +37,22 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-model</artifactId>
-      <version>4.0.0-alpha-3-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-xml-impl</artifactId>
-      <version>4.0.0-alpha-3-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 
   <build>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -64,7 +70,7 @@ under the License.
                 <artifactItem>
                   <groupId>org.apache.maven</groupId>
                   <artifactId>maven-api-model</artifactId>
-                  <version>4.0.0-alpha-1-SNAPSHOT</version>
+                  <version>${project.version}</version>
                   <type>mdo</type>
                   <outputDirectory>target/mdo/</outputDirectory>
                   <destFileName>maven.mdo</destFileName>
