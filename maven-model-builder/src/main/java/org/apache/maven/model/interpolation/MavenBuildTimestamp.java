@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TimeZone;
 
 /**
@@ -52,6 +53,11 @@ public class MavenBuildTimestamp
     public MavenBuildTimestamp( Date time, Map<String, String> properties )
     {
         this( time, properties != null ? properties.get( BUILD_TIMESTAMP_FORMAT_PROPERTY ) : null );
+    }
+
+    public MavenBuildTimestamp( Date time, Properties properties )
+    {
+        this( time, properties != null ? properties.getProperty( BUILD_TIMESTAMP_FORMAT_PROPERTY ) : null );
     }
 
     public MavenBuildTimestamp( Date time, String timestampFormat )
