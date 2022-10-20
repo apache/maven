@@ -55,6 +55,12 @@ public class MavenBuildTimestamp
         this( time, properties != null ? properties.get( BUILD_TIMESTAMP_FORMAT_PROPERTY ) : null );
     }
 
+    /**
+     *
+     * @deprecated Use {@link #MavenBuildTimestamp(Date, Map)} or extract the format and pass it
+     *             to {@link #MavenBuildTimestamp(Date, String)} instead.
+     */
+    @Deprecated
     public MavenBuildTimestamp( Date time, Properties properties )
     {
         this( time, properties != null ? properties.getProperty( BUILD_TIMESTAMP_FORMAT_PROPERTY ) : null );
