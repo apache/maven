@@ -77,8 +77,14 @@ public class DefaultMavenSettingsBuilder
             getFile( "${maven.conf}/settings.xml", "maven.conf",
                      MavenSettingsBuilder.ALT_GLOBAL_SETTINGS_XML_LOCATION );
 
+        File projectSettingsFile =
+            getFile( "${maven.multiModuleProjectDirectory}/.mvn/settings.xml",
+                     "maven.multiModuleProjectDirectory",
+                     MavenSettingsBuilder.ALT_PROJECT_SETTINGS_XML_LOCATION );
+
         SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
         request.setUserSettingsFile( userSettingsFile );
+        request.setProjectSettingsFile( projectSettingsFile );
         request.setGlobalSettingsFile( globalSettingsFile );
         request.setSystemProperties( SystemProperties.getSystemProperties() );
         return build( request );
@@ -109,6 +115,7 @@ public class DefaultMavenSettingsBuilder
     {
         SettingsBuildingRequest settingsRequest = new DefaultSettingsBuildingRequest();
         settingsRequest.setUserSettingsFile( request.getUserSettingsFile() );
+        settingsRequest.setProjectSettingsFile( request.getProjectSettingsFile() );
         settingsRequest.setGlobalSettingsFile( request.getGlobalSettingsFile() );
         settingsRequest.setUserProperties( request.getUserProperties() );
         settingsRequest.setSystemProperties( request.getSystemProperties() );

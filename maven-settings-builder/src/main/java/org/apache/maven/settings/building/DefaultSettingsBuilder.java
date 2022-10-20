@@ -102,11 +102,16 @@ public class DefaultSettingsBuilder
             getSettingsSource( request.getGlobalSettingsFile(), request.getGlobalSettingsSource() );
         Settings globalSettings = readSettings( globalSettingsSource, request, problems );
 
+        Source projectSettingsSource =
+                getSettingsSource( request.getProjectSettingsFile(), request.getProjectSettingsSource() );
+        Settings projectSettings = readSettings( projectSettingsSource, request, problems );
+
         Source userSettingsSource =
             getSettingsSource( request.getUserSettingsFile(), request.getUserSettingsSource() );
         Settings userSettings = readSettings( userSettingsSource, request, problems );
 
         userSettings = settingsMerger.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
+        userSettings = settingsMerger.merge( userSettings, projectSettings, TrackableBase.PROJECT_LEVEL );
 
         problems.setSource( "" );
 

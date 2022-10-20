@@ -91,6 +91,8 @@ public class DefaultMavenExecutionRequest
 
     private File userSettingsFile;
 
+    private File projectSettingsFile;
+
     private File globalSettingsFile;
 
     private File userToolchainsFile;
@@ -978,6 +980,20 @@ public class DefaultMavenExecutionRequest
     public MavenExecutionRequest setUserSettingsFile( File userSettingsFile )
     {
         this.userSettingsFile = userSettingsFile;
+
+        return this;
+    }
+
+    @Override
+    public File getProjectSettingsFile()
+    {
+        return projectSettingsFile;
+    }
+
+    @Override
+    public MavenExecutionRequest setProjectSettingsFile( File projectSettingsFile )
+    {
+        this.projectSettingsFile = projectSettingsFile;
 
         return this;
     }

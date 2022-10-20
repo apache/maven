@@ -69,6 +69,13 @@ public class SettingsXmlConfigurationProcessor
 
     public static final File DEFAULT_USER_SETTINGS_FILE = new File( USER_MAVEN_CONFIGURATION_HOME, "settings.xml" );
 
+    public static final String PROJECT_BASEDIR = System.getProperty( "maven.multiModuleProjectDirectory" );
+
+    public static final File PROJECT_MAVEN_CONFIGURATION_HOME = new File( PROJECT_BASEDIR, ".mvn" );
+
+    public static final File DEFAULT_PROJECT_SETTINGS_FILE =
+        new File( PROJECT_MAVEN_CONFIGURATION_HOME, "settings.xml" );
+
     public static final File DEFAULT_GLOBAL_SETTINGS_FILE =
         new File( System.getProperty( "maven.conf" ), "settings.xml" );
 
@@ -112,6 +119,24 @@ public class SettingsXmlConfigurationProcessor
             userSettingsFile = DEFAULT_USER_SETTINGS_FILE;
         }
 
+        File projectSettingsFile;
+
+        if ( commandLine.hasOption( CLIManager.ALTERNATE_PROJECT_SETTINGS ) )
+        {
+            projectSettingsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_PROJECT_SETTINGS ) );
+            projectSettingsFile = resolveFile( projectSettingsFile, workingDirectory );
+
+            if ( !projectSettingsFile.isFile() )
+            {
+                throw new FileNotFoundException( "The specified project settings file does not exist: "
+                    + projectSettingsFile );
+            }
+        }
+        else
+        {
+            projectSettingsFile = DEFAULT_PROJECT_SETTINGS_FILE;
+        }
+
         File globalSettingsFile;
 
         if ( commandLine.hasOption( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) )
@@ -131,10 +156,12 @@ public class SettingsXmlConfigurationProcessor
         }
 
         request.setGlobalSettingsFile( globalSettingsFile );
+        request.setProjectSettingsFile( projectSettingsFile );
         request.setUserSettingsFile( userSettingsFile );
 
         SettingsBuildingRequest settingsRequest = new DefaultSettingsBuildingRequest();
         settingsRequest.setGlobalSettingsFile( globalSettingsFile );
+        settingsRequest.setProjectSettingsFile( projectSettingsFile );
         settingsRequest.setUserSettingsFile( userSettingsFile );
         settingsRequest.setSystemProperties( cliRequest.getSystemProperties() );
         settingsRequest.setUserProperties( cliRequest.getUserProperties() );
@@ -146,6 +173,8 @@ public class SettingsXmlConfigurationProcessor
 
         LOGGER.debug( "Reading global settings from '{}'",
             getLocation( settingsRequest.getGlobalSettingsSource(), settingsRequest.getGlobalSettingsFile() ) );
+        LOGGER.debug( "Reading project settings from '{}'",
+            getLocation( settingsRequest.getProjectSettingsSource(), settingsRequest.getProjectSettingsFile() ) );
         LOGGER.debug( "Reading user settings from '{}'",
             getLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
 

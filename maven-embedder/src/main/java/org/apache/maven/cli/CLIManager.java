@@ -70,6 +70,8 @@ public class CLIManager
 
     public static final char ALTERNATE_USER_SETTINGS = 's';
 
+    public static final String ALTERNATE_PROJECT_SETTINGS = "ps";
+
     public static final String ALTERNATE_GLOBAL_SETTINGS = "gs";
 
     public static final char ALTERNATE_USER_TOOLCHAINS = 't';
@@ -137,6 +139,7 @@ public class CLIManager
         options.addOption( Option.builder( Character.toString( CHECKSUM_FAILURE_POLICY ) ).longOpt( "strict-checksums" ).desc( "Fail the build if checksums don't match" ).build() );
         options.addOption( Option.builder( Character.toString( CHECKSUM_WARNING_POLICY ) ).longOpt( "lax-checksums" ).desc( "Warn if checksums don't match" ).build() );
         options.addOption( Option.builder( Character.toString( ALTERNATE_USER_SETTINGS ) ).longOpt( "settings" ).desc( "Alternate path for the user settings file" ).hasArg().build() );
+        options.addOption( Option.builder( ALTERNATE_PROJECT_SETTINGS ).longOpt( "project-settings" ).desc( "Alternate path for the project settings file" ).hasArg().build() );
         options.addOption( Option.builder( ALTERNATE_GLOBAL_SETTINGS ).longOpt( "global-settings" ).desc( "Alternate path for the global settings file" ).hasArg().build() );
         options.addOption( Option.builder( Character.toString( ALTERNATE_USER_TOOLCHAINS ) ).longOpt( "toolchains" ).desc( "Alternate path for the user toolchains file" ).hasArg().build() );
         options.addOption( Option.builder( ALTERNATE_GLOBAL_TOOLCHAINS ).longOpt( "global-toolchains" ).desc( "Alternate path for the global toolchains file" ).hasArg().build() );

@@ -45,14 +45,15 @@
       <version>1.0.0+</version>
       <description>
         common base class that contains code to track the source for
-        this instance (USER|GLOBAL)
+        this instance (USER|PROJECT|GLOBAL)
       </description>
       <codeSegments>
         <codeSegment>
-          <version>1.0.0+</version>
+          <version>1.1.0+</version>
           <code>
             <![CDATA[
     public static final String USER_LEVEL = "user-level";
+    public static final String PROJECT_LEVEL = "project-level";
     public static final String GLOBAL_LEVEL = "global-level";
 
     private String sourceLevel = USER_LEVEL;
@@ -64,9 +65,9 @@
         {
             throw new IllegalStateException( "Cannot reset sourceLevel attribute; it is already set to: " + sourceLevel );
         }
-        else if ( !( USER_LEVEL.equals( sourceLevel ) || GLOBAL_LEVEL.equals( sourceLevel ) ) )
+        else if ( !( USER_LEVEL.equals( sourceLevel ) ||  PROJECT_LEVEL.equals( sourceLevel ) || GLOBAL_LEVEL.equals( sourceLevel ) ) )
         {
-            throw new IllegalArgumentException( "sourceLevel must be one of: {" + USER_LEVEL + "," + GLOBAL_LEVEL + "}" );
+            throw new IllegalArgumentException( "sourceLevel must be one of: {" + USER_LEVEL + "," + PROJECT_LEVEL + "," + GLOBAL_LEVEL + "}" );
         }
         else
         {
