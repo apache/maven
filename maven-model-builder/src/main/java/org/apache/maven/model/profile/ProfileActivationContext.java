@@ -35,7 +35,7 @@ public interface ProfileActivationContext
      * Available in {@link #getUserProperties()}.
      * @since 4.0 
      */
-    String PROPERTY_NAME_PACKAGING = "project.packaging";
+    String PROPERTY_NAME_PACKAGING = "packaging";
 
     /**
      * Gets the identifiers of those profiles that should be activated by explicit demand.
