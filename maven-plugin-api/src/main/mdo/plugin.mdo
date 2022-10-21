@@ -176,8 +176,8 @@ under the License.
           <version>1.0.0+</version>
           <type>String</type>
           <description><![CDATA[
-            Defines a default phase to bind a mojo execution to if the user does not explicitly set a phase in the POM.
-            <i>Note:</i> This will not automagically make a mojo run when the plugin declaration is added
+            Defines a default phase to bind a Mojo execution to if the user does not explicitly set a phase in the POM.
+            <i>Note:</i> This will not automagically make a Mojo run when the plugin declaration is added
             to the POM. It merely enables the user to omit the <code>&lt;phase&gt;</code> element from the
             surrounding <code>&lt;execution&gt;</code> element.
           ]]></description>
@@ -216,10 +216,10 @@ under the License.
           <version>1.0.0+</version>
           <type>String</type>
           <description><![CDATA[
-            Flags this mojo as requiring information about the dependencies that would make up the specified class
+            Flags this Mojo as requiring information about the dependencies that would make up the specified class
             path. As the name suggests, this is similar to requiresDependencyResolution and supports the same values.
             The important difference is this will not resolve the files for the dependencies, i.e. the artifacts
-            associated with a Maven project can lack a file. As such, this annotation is meant for mojos that only
+            associated with a Maven project can lack a file. As such, this annotation is meant for Mojos that only
             want to analyze the set of transitive dependencies, in particular during early lifecycle phases where
             full dependency resolution might fail due to projects which haven't been built yet.
           ]]></description>
@@ -274,7 +274,7 @@ under the License.
           <version>1.0.0+</version>
           <type>boolean</type>
           <description>
-            Marks this mojo as being thread-safe, i.e. the mojo safely supports concurrent execution during parallel
+            Marks this Mojo as being thread-safe, i.e. the Mojo safely supports concurrent execution during parallel
             builds. Mojos without this annotation will make Maven output a warning when used during a parallel build
             session. Since Maven 3.0.
           </description>
@@ -284,7 +284,7 @@ under the License.
           <name>v4Api</name>
           <version>1.1.0+</version>
           <type>boolean</type>
-          <description>Marks this mojo as using Maven 4 API. This makes the plugin implicitly incompatible with earlier Maven versions. Only evaluated since Maven 4.</description>
+          <description>Marks this Mojo as using Maven 4 API. This makes the plugin implicitly incompatible with earlier Maven versions. Only evaluated since Maven 4.</description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
