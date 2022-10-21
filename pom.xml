@@ -676,7 +676,7 @@ under the License.
         <configuration>
           <violationSeverity>info</violationSeverity>
           <violationIgnore>JavadocVariable,JavadocMethod,HiddenField</violationIgnore>
-<!--          <suppressionsLocation>${maven.multiModuleProjectDirectory}/build/checkstyle-suppressions.xml</suppressionsLocation>-->
+<!--          <suppressionsLocation>${project.topdir}/build/checkstyle-suppressions.xml</suppressionsLocation>-->
         </configuration>
       </plugin>
     </plugins>

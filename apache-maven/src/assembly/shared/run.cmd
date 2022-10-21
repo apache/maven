@@ -6,6 +6,7 @@
   "-Dmaven.home=%MAVEN_HOME%" ^
   "-Dlibrary.jansi.path=%MAVEN_HOME%\lib\jansi-native" ^
   "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
+  "-Dproject.topdir=%MAVEN_PROJECTBASEDIR%" ^
   %LAUNCHER_CLASS% ^
   %MAVEN_ARGS% ^
   %*

@@ -176,6 +176,8 @@ Maven Model Builder
  | | <<<$\{project.artifactId\}>>>\
  | | <<<$\{project.build.directory\}>>> |
 *----+------+------+
+| <<<project.topdir>>> | the directory containing the top level <<<pom.xml>>> file of a multi module project, in a single module project this is the same as <<<project.basedir>>> | <<<$\{project.topdir\}>>> |
+*----+------+------+
 | <<<project.basedir>>>\
 <<<pom.basedir>>> (<deprecated>)\
 <<<basedir>>> (<deprecated>) | the directory containing the <<<pom.xml>>> file | <<<$\{project.basedir\}>>> |

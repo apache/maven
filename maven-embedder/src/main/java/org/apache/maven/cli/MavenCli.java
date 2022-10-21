@@ -134,7 +134,7 @@ public class MavenCli
 {
     public static final String LOCAL_REPO_PROPERTY = "maven.repo.local";
 
-    public static final String MULTIMODULE_PROJECT_DIRECTORY = "maven.multiModuleProjectDirectory";
+    public static final String MULTIMODULE_PROJECT_DIRECTORY = "project.topdir";
 
     public static final String USER_HOME = System.getProperty( "user.home" );
 
