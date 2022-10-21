@@ -82,7 +82,7 @@ public class DefaultSuperPomProvider
                         modelId, getClass().getResource( resource ).toExternalForm() );
                 options.put( ModelProcessor.INPUT_SOURCE, inputSource );
 
-                superModel = modelProcessor.read( is, options );
+                superModel = modelProcessor.read( is, options ).getDelegate();
             }
             catch ( IOException e )
             {

@@ -251,7 +251,7 @@ public class TestRepositorySystem
 
                 try
                 {
-                    Model model = modelReader.read( pomFile, null );
+                    Model model = modelReader.read( pomFile, null ).getDelegate();
 
                     dependencies = Dependency.dependencyToApiV3( model.getDependencies() );
                 }

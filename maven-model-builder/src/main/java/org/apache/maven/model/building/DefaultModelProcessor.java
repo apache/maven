@@ -29,7 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.api.model.Model;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.locator.ModelLocator;
 import org.eclipse.sisu.Typed;

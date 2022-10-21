@@ -76,7 +76,7 @@ public class DefaultInheritanceAssemblerTest
     private Model getModel( String name )
         throws IOException
     {
-        return reader.read( getPom( name ), null );
+        return reader.read( getPom( name ), null ).getDelegate();
     }
 
     @Test
