@@ -850,7 +850,7 @@ public class DefaultModelBuilder
             if ( request.isLocationTracking() )
             {
                 source = new InputSource( null, modelSource.getLocation() );
-                options.put( ModelProcessor.INPUT_SOURCE, source );
+                options.put( ModelProcessor.INPUT_SOURCE, new org.apache.maven.model.InputSource( source ) );
             }
             else
             {
