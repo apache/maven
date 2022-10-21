@@ -78,12 +78,13 @@ under the License.
 
   <modules>
     <module>maven-bom</module>
+    <module>modello-plugin-velocity</module>
+    <module>api</module>
     <module>maven-plugin-api</module>
     <module>maven-builder-support</module>
     <module>maven-model</module>
     <module>maven-model-builder</module>
     <module>maven-model-transform</module>
-    <module>api</module>
     <module>maven-xml-impl</module>
     <module>plexus-utils</module>
     <module>maven-core</module>
