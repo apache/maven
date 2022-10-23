@@ -135,7 +135,7 @@ public class MojoDescriptorCreator
         MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
         PluginVersionResolutionException
     {
-        String goal = null;
+        StringBuilder goal = null;
 
         Plugin plugin = null;
 
@@ -158,12 +158,12 @@ public class MojoDescriptorCreator
             plugin.setGroupId( tok.nextToken() );
             plugin.setArtifactId( tok.nextToken() );
             plugin.setVersion( tok.nextToken() );
-            goal = tok.nextToken();
+            goal = new StringBuilder(tok.nextToken());
 
             // This won't be valid, but it constructs something easy to read in the error message
             while ( tok.hasMoreTokens() )
             {
-                goal += ":" + tok.nextToken();
+                goal.append(":").append(tok.nextToken());
             }
         }
         else if ( numTokens == 3 )
@@ -193,7 +193,7 @@ public class MojoDescriptorCreator
                 plugin = findPluginForPrefix( firstToken, session );
                 plugin.setVersion( tok.nextToken() );
             }
-            goal = tok.nextToken();
+            goal = new StringBuilder(tok.nextToken());
         }
         else
         {
@@ -205,12 +205,12 @@ public class MojoDescriptorCreator
 
             if ( numTokens == 2 )
             {
-                goal = tok.nextToken();
+                goal = new StringBuilder(tok.nextToken());
             }
             else
             {
                 // goal was missing - pass through to MojoNotFoundException
-                goal = "";
+                goal = new StringBuilder();
             }
 
             // This is the case where someone has executed a single goal from the command line
@@ -225,10 +225,10 @@ public class MojoDescriptorCreator
             plugin = findPluginForPrefix( prefix, session );
         }
 
-        int executionIdx = goal.indexOf( '@' );
+        int executionIdx = goal.toString().indexOf( '@' );
         if ( executionIdx > 0 )
         {
-            goal = goal.substring( 0, executionIdx );
+            goal = new StringBuilder(goal.substring(0, executionIdx));
         }
 
         injectPluginDeclarationFromProject( plugin, project );
@@ -241,7 +241,7 @@ public class MojoDescriptorCreator
             resolvePluginVersion( plugin, session, project );
         }
 
-        return pluginManager.getMojoDescriptor( plugin, goal.toString(), project.getRemotePluginRepositories(),
+        return pluginManager.getMojoDescriptor( plugin, goal.toString().toString(), project.getRemotePluginRepositories(),
                                                 session.getRepositorySession() );
     }
 
