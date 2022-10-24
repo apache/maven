@@ -1046,7 +1046,14 @@ public class DefaultModelBuilder
         context.setActiveProfileIds( request.getActiveProfileIds() );
         context.setInactiveProfileIds( request.getInactiveProfileIds() );
         context.setSystemProperties( request.getSystemProperties() );
-        context.setUserProperties( request.getUserProperties() );
+        // enrich user properties with project packaging
+        Properties userProperties = request.getUserProperties();
+        if ( !userProperties.containsKey( ProfileActivationContext.PROPERTY_NAME_PACKAGING ) )
+        {
+            userProperties.put( ProfileActivationContext.PROPERTY_NAME_PACKAGING,
+                                request.getFileModel().getPackaging() );
+        }
+        context.setUserProperties( userProperties );
         context.setProjectDirectory( ( request.getPomFile() != null ) ? request.getPomFile().getParentFile() : null );
 
         return context;
