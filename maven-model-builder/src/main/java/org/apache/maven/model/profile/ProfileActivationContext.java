@@ -30,6 +30,12 @@ import java.util.Map;
  */
 public interface ProfileActivationContext
 {
+    /**
+     * Key of the property containing the project's packaging.
+     * Available in {@link #getUserProperties()}.
+     * @since 3.9
+     */
+    String PROPERTY_NAME_PACKAGING = "packaging";
 
     /**
      * Gets the identifiers of those profiles that should be activated by explicit demand.
