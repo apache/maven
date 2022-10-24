@@ -890,9 +890,11 @@ public class DefaultModelBuilder
             {
                 try
                 {
+                    org.apache.maven.api.model.InputSource v4src
+                            = model.getLocation( "" ).getSource();
                     Field field = InputSource.class.getDeclaredField( "modelId" );
                     field.setAccessible( true );
-                    field.set( source, ModelProblemUtils.toId( model ) );
+                    field.set( v4src, ModelProblemUtils.toId( model ) );
                 }
                 catch ( Throwable t )
                 {
