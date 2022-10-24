@@ -32,18 +32,14 @@ public class MojoDescriptorTest
     public void getParameterMap() throws DuplicateParameterException
     {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
-        Parameter param1 = new Parameter();
-        param1.setName( "param1" );
-        param1.setDefaultValue( "value1" );
+        Parameter param1 = Parameter.newBuilder().name( "param1" ).build();
         mojoDescriptor.addParameter( param1 );
 
         assertEquals( 1, mojoDescriptor.getParameters().size() );
 
         assertEquals( mojoDescriptor.getParameters().size(), mojoDescriptor.getParameterMap().size() );
 
-        Parameter param2 = new Parameter();
-        param2.setName( "param2" );
-        param2.setDefaultValue( "value2" );
+        Parameter param2 = Parameter.newBuilder().name( "param2" ).build();
         mojoDescriptor.addParameter( param2 );
 
         assertEquals( 2, mojoDescriptor.getParameters().size() );

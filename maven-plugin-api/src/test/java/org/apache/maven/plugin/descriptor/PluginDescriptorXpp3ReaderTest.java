@@ -20,13 +20,14 @@ package org.apache.maven.plugin.descriptor;
  */
 
 import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStream;
+import java.util.Objects;
 
 import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
-import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,15 +41,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
-public class PluginDescriptorBuilderTest
+public class PluginDescriptorXpp3ReaderTest
 {
 
     private PluginDescriptor build( String resource )
-        throws IOException, PlexusConfigurationException
+        throws IOException, PlexusConfigurationException, XmlPullParserException
     {
-        Reader reader = ReaderFactory.newXmlReader( getClass().getResourceAsStream( resource ) );
-
-        return new PluginDescriptorBuilder().build( reader );
+        try (InputStream input = Objects.requireNonNull( getClass().getResourceAsStream( resource ) ) )
+        {
+            // must not be strict in order to disregard no longer supported elements
+            return new org.apache.maven.plugin.descriptor.io.xpp3.PluginDescriptorXpp3Reader().read( input, false ); 
+        }
     }
 
     @Test

@@ -19,18 +19,19 @@ package org.apache.maven.plugin.descriptor;
  * under the License.
  */
 
-import org.codehaus.plexus.configuration.PlexusConfigurationException;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * InvalidPluginDescriptorException
  */
 public class InvalidPluginDescriptorException
-    extends PlexusConfigurationException
+    extends XmlPullParserException
 {
 
     public InvalidPluginDescriptorException( String message, Throwable cause )
     {
-        super( message, cause );
+        super( message );
+        this.initCause( cause );
     }
 
     public InvalidPluginDescriptorException( String message )

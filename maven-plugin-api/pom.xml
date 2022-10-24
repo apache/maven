@@ -61,26 +61,31 @@ under the License.
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
-        <version>2.0.0</version>
-        <configuration>
-          <models>
-            <model>src/main/mdo/lifecycle.mdo</model>
-          </models>
-          <version>1.0.0</version>
-        </configuration>
         <executions>
           <execution>
             <id>modello</id>
-            <phase>none</phase>
+            <phase>none</phase><!-- java beans and readers/writers are generated with modello-plugin-velocity -->
           </execution>
           <execution>
-            <id>modello-site-docs</id>
+            <id>modello-site-docs-plugin-1.1</id>
             <phase>pre-site</phase>
             <configuration>
               <models>
                 <model>src/main/mdo/plugin.mdo</model>
               </models>
               <version>1.1.0</version>
+            </configuration>
+          </execution>
+          <execution>
+            <id>modello-site-docs-lifecycle</id>
+            <phase>pre-site</phase>
+            <configuration>
+              <configuration>
+                <models>
+                  <model>src/main/mdo/lifecycle.mdo</model>
+                </models>
+                <version>1.0.0</version>
+              </configuration>
             </configuration>
           </execution>
         </executions>
@@ -90,7 +95,7 @@ under the License.
         <artifactId>modello-plugin-velocity</artifactId>
         <executions>
           <execution>
-            <id>velocity</id>
+            <id>velocity-lifecycle</id>
             <phase>generate-sources</phase>
             <goals>
               <goal>velocity</goal>
@@ -110,6 +115,53 @@ under the License.
                 <param>packageModelV4=org.apache.maven.plugin.lifecycle</param>
                 <param>packageToolV4=org.apache.maven.plugin.lifecycle.io.xpp3</param>
               </params>
+            </configuration>
+          </execution>
+          <execution>
+            <id>velocity-plugin</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>velocity</goal>
+            </goals>
+            <configuration>
+              <version>1.1.0</version>
+              <models>
+                <model>src/main/mdo/plugin.mdo</model>
+              </models>
+              <templates>
+                <template>src/main/mdo/model.vm</template>
+                <template>src/main/mdo/reader.vm</template>
+              </templates>
+              <params>
+                <param>packageModelV3=org.apache.maven.plugin.descriptor</param>
+                <param>packageModelV4=org.apache.maven.plugin.descriptor</param>
+                <param>packageToolV4=org.apache.maven.plugin.descriptor.io.xpp3</param>
+              </params>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>remove-superfluous-generated-classes</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+            <configuration>
+              <excludeDefaultDirectories>true</excludeDefaultDirectories>
+              <filesets>
+                <fileset>
+                  <directory>target/generated-sources/modello/org/apache/maven/plugin/descriptor</directory>
+                  <!-- remove those classes which need to ba maintained manually -->
+                  <includes>
+                    <include>MojoDescriptor.java</include>
+                    <include>PluginDescriptor.java</include>
+                  </includes>
+                </fileset>
+              </filesets>
             </configuration>
           </execution>
         </executions>
