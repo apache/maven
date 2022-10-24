@@ -500,9 +500,9 @@ under the License.
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>modello-plugin-velocity</artifactId>
-          <version>${project.version}</version>
+          <groupId>org.codehaus.modello</groupId>
+          <artifactId>modello-maven-plugin</artifactId>
+          <version>2.1.0-SNAPSHOT</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -561,14 +561,6 @@ under the License.
               <goals>
                 <goal>xdoc</goal>
                 <goal>xsd</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>modello</id>
-              <goals>
-                <goal>java</goal>
-                <goal>xpp3-reader</goal>
-                <goal>xpp3-writer</goal>
               </goals>
             </execution>
           </executions>

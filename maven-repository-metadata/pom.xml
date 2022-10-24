@@ -56,6 +56,16 @@ under the License.
             <model>src/main/mdo/metadata.mdo</model>
           </models>
         </configuration>
+        <executions>
+          <execution>
+            <id>modello</id>
+            <goals>
+              <goal>java</goal>
+              <goal>xpp3-reader</goal>
+              <goal>xpp3-writer</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
