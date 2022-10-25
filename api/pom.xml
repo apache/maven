@@ -31,7 +31,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>modello-plugin-velocity</module>
     <module>maven-api-meta</module>
     <module>maven-api-xml</module>
     <module>maven-api-model</module>
