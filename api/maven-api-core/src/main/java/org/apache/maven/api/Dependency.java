@@ -32,6 +32,7 @@ public interface Dependency extends Artifact
     @Nonnull
     Type getType();
 
+    @Nonnull
     Scope getScope();
 
     boolean isOptional();

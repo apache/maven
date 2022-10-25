@@ -48,15 +48,6 @@ public class MojoException
     }
 
     /**
-     * Construct a new <code>MojoExecutionException</code> exception wrapping an underlying <code>Exception</code>
-     * and providing a <code>message</code>.
-     */
-    public MojoException( String message, Exception cause )
-    {
-        super( message, cause );
-    }
-
-    /**
      * Construct a new <code>MojoExecutionException</code> exception wrapping an underlying <code>Throwable</code>
      * and providing a <code>message</code>.
      */
@@ -78,7 +69,6 @@ public class MojoException
      *
      * @param cause the cause which is saved for later retrieval by the {@link #getCause()} method.
      *              A {@code null} value is permitted, and indicates that the cause is nonexistent or unknown.
-     * @since 3.8.3
      */
     public MojoException( Throwable cause )
     {
