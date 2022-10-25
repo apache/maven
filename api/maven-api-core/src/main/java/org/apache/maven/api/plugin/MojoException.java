@@ -37,7 +37,7 @@ public class MojoException
     protected String longMessage;
 
     /**
-     * Construct a new <code>MojoExecutionException</code> exception providing the source and a short and long message:
+     * Construct a new <code>MojoException</code> exception providing the source and a short and long message:
      * these messages are used to improve the message written at the end of Maven build.
      */
     public MojoException( Object source, String shortMessage, String longMessage )

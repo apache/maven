@@ -37,7 +37,7 @@ public interface ArtifactCoordinate
     /**
      * The groupId of the artifact.
      *
-     * @return The groupId.
+     * @return the groupId
      */
     @Nonnull
     String getGroupId();
@@ -45,7 +45,7 @@ public interface ArtifactCoordinate
     /**
      * The artifactId of the artifact.
      *
-     * @return The artifactId.
+     * @return the artifactId
      */
     @Nonnull
     String getArtifactId();
@@ -53,7 +53,7 @@ public interface ArtifactCoordinate
     /**
      * The classifier of the artifact.
      *
-     * @return The classifier or an empty string if none, never {@code null}.
+     * @return the classifier or an empty string if none, never {@code null}
      */
     @Nonnull
     String getClassifier();
@@ -61,7 +61,7 @@ public interface ArtifactCoordinate
     /**
      * The version of the artifact.
      *
-     * @return The version.
+     * @return the version
      */
     @Nonnull
     VersionRange getVersion();
@@ -69,7 +69,7 @@ public interface ArtifactCoordinate
     /**
      * The extension of the artifact.
      *
-     * @return The extension or an empty string if none, never {@code null}.
+     * @return the extension or an empty string if none, never {@code null}
      */
     @Nonnull
     String getExtension();

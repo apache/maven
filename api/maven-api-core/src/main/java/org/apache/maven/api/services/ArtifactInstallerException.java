@@ -35,7 +35,7 @@ public class ArtifactInstallerException
     private static final long serialVersionUID = 3652561971360586373L;
 
     /**
-     * @param message The message of the error.
+     * @param message the message of the error
      * @param e {@link Exception}
      */
     public ArtifactInstallerException( String message, Exception e )
