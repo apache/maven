@@ -2846,7 +2846,7 @@
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            The version of the reporting plugin to be used. Starting with Maven 3, if no version is defined explicitely,
+            The version of the reporting plugin to be used. Starting with Maven 3, if no version is defined explicitly,
             version is searched in {@code build/plugins} then in {@code build/pluginManagement}.
             ]]>
           </description>
