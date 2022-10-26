@@ -27,11 +27,12 @@ public interface Dependency extends Artifact
     /**
      * The artifact type.
      *
-     * @return The artifact type, never {@code null}.
+     * @return the artifact type, never {@code null}
      */
     @Nonnull
     Type getType();
 
+    @Nonnull
     Scope getScope();
 
     boolean isOptional();

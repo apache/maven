@@ -2304,7 +2304,7 @@
     /**
      * Gets the identifier of the plugin.
      *
-     * @return The plugin id in the form {@code <groupId>:<artifactId>:<version>}, never {@code null}.
+     * @return the plugin id in the form {@code <groupId>:<artifactId>:<version>}, never {@code null}
      */
     public String getId()
     {

@@ -38,7 +38,7 @@ public interface Repository
     /**
      * Gets the identifier of this repository.
      *
-     * @return The (case-sensitive) identifier, never {@code null}.
+     * @return the (case-sensitive) identifier, never {@code null}
      */
     @Nonnull
     String getId();
@@ -46,7 +46,7 @@ public interface Repository
     /**
      * Gets the type of the repository, for example "default".
      *
-     * @return The (case-sensitive) type of the repository, never {@code null}.
+     * @return the (case-sensitive) type of the repository, never {@code null}
      */
     @Nonnull
     String getType();

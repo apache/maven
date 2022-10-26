@@ -37,8 +37,8 @@ public class DependencyCollectorException
     private static final long serialVersionUID = -3134726259840210686L;
 
     /**
-     * @param message The message you would give for the exception.
-     * @param cause The cause which is related to the message.
+     * @param message the message you would give for the exception
+     * @param cause the cause which is related to the message
      */
     public DependencyCollectorException( String message, Throwable cause )
     {

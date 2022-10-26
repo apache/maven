@@ -36,14 +36,14 @@ public interface DependencyCollectorResult
   /**
    * Gets the exceptions that occurred while building the dependency graph.
    *
-   * @return The exceptions that occurred, never {@code null}.
+   * @return the exceptions that occurred, never {@code null}
    */
   List<Exception> getExceptions();
 
   /**
    * Gets the root node of the dependency graph.
    *
-   * @return The root node of the dependency graph or {@code null} if none.
+   * @return the root node of the dependency graph or {@code null} if none
    */
   Node getRoot();
 

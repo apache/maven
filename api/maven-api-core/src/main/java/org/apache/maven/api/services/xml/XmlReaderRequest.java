@@ -65,7 +65,7 @@ public interface XmlReaderRequest
          * @param source    The source value
          * @param fieldName A description of the field being interpolated. The implementation may use this to
          *                  log stuff.
-         * @return The interpolated value.
+         * @return the interpolated value
          */
         String transform( String source, String fieldName );
     }

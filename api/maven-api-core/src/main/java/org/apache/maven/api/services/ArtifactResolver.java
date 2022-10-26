@@ -38,9 +38,9 @@ public interface ArtifactResolver extends Service
     /**
      * @param request {@link ArtifactResolverRequest}
      * @return {@link ArtifactResolverResult}
-     * @throws ArtifactResolverException in case of an error.
+     * @throws ArtifactResolverException in case of an error
      * @throws IllegalArgumentException in case of parameter {@code buildingRequest} is {@code null} or
-     *             parameter {@code mavenArtifact} is {@code null} or invalid.
+     *             parameter {@code mavenArtifact} is {@code null} or invalid
      */
     ArtifactResolverResult resolve( ArtifactResolverRequest request );
 
@@ -50,7 +50,7 @@ public interface ArtifactResolver extends Service
      * @return {@link ArtifactResolverResult}
      * @throws ArtifactResolverException in case of an error.
      * @throws IllegalArgumentException in case of parameter {@code buildingRequest} is {@code null} or
-     *             parameter {@code coordinate} is {@code null} or invalid.
+     *             parameter {@code coordinate} is {@code null} or invalid
      */
     default ArtifactResolverResult resolve( Session session,
                                             Collection<? extends ArtifactCoordinate> coordinates )
