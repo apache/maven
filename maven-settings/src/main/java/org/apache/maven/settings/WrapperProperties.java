@@ -19,8 +19,9 @@ package org.apache.maven.settings;
  * under the License.
  */
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.IOError;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
