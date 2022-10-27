@@ -163,8 +163,9 @@ public class DefaultPluginRealmCache
     public CacheRecord get( Key key, PluginRealmSupplier supplier )
             throws PluginResolutionException, PluginContainerException
     {
-        try {
-            return cache.computeIfAbsent(key, k ->
+        try
+        {
+            return cache.computeIfAbsent( key, k ->
             {
                 try
                 {
@@ -172,7 +173,7 @@ public class DefaultPluginRealmCache
                 }
                 catch ( PluginResolutionException | PluginContainerException e )
                 {
-                    throw new RuntimeException(e);
+                    throw new RuntimeException( e );
                 }
             } );
         }
@@ -190,7 +191,7 @@ public class DefaultPluginRealmCache
         }
     }
 
-    public CacheRecord put(Key key, ClassRealm pluginRealm, List<Artifact> pluginArtifacts )
+    public CacheRecord put( Key key, ClassRealm pluginRealm, List<Artifact> pluginArtifacts )
     {
         Objects.requireNonNull( pluginRealm, "pluginRealm cannot be null" );
         Objects.requireNonNull( pluginArtifacts, "pluginArtifacts cannot be null" );

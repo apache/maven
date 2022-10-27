@@ -20,7 +20,6 @@ package org.apache.maven.plugin;
  */
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -74,10 +73,12 @@ public class DefaultPluginDescriptorCache
     }
 
     @Override
-    public PluginDescriptor get(Key key, PluginDescriptorSupplier supplier)
-            throws PluginDescriptorParsingException, PluginResolutionException, InvalidPluginDescriptorException {
-        try {
-            return clone( descriptors.computeIfAbsent(key, k ->
+    public PluginDescriptor get( Key key, PluginDescriptorSupplier supplier )
+            throws PluginDescriptorParsingException, PluginResolutionException, InvalidPluginDescriptorException
+    {
+        try
+        {
+            return clone( descriptors.computeIfAbsent( key, k ->
             {
                 try
                 {
@@ -86,7 +87,7 @@ public class DefaultPluginDescriptorCache
                 catch ( PluginDescriptorParsingException | PluginResolutionException
                         | InvalidPluginDescriptorException e )
                 {
-                    throw new RuntimeException(e);
+                    throw new RuntimeException( e );
                 }
             } ) );
         }
@@ -108,7 +109,7 @@ public class DefaultPluginDescriptorCache
         }
     }
 
-    public void put(Key cacheKey, PluginDescriptor pluginDescriptor )
+    public void put( Key cacheKey, PluginDescriptor pluginDescriptor )
     {
         descriptors.put( cacheKey, clone( pluginDescriptor ) );
     }
