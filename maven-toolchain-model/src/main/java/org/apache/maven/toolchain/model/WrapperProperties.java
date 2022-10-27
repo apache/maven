@@ -309,13 +309,47 @@ class WrapperProperties extends Properties
     @Override
     public synchronized void load( Reader reader ) throws IOException
     {
-        throw new UnsupportedOperationException();
+        try
+        {
+            writeOperationVoid( p ->
+            {
+                try
+                {
+                    p.load( reader );
+                }
+                catch ( IOException e )
+                {
+                    throw new IOError( e );
+                }
+            } );
+        }
+        catch ( IOError e )
+        {
+            throw (IOException) e.getCause();
+        }
     }
 
     @Override
     public synchronized void load( InputStream inStream ) throws IOException
     {
-        throw new UnsupportedOperationException();
+        try
+        {
+            writeOperationVoid( p ->
+            {
+                try
+                {
+                    p.load( inStream );
+                }
+                catch ( IOException e )
+                {
+                    throw new IOError( e );
+                }
+            } );
+        }
+        catch ( IOError e )
+        {
+            throw (IOException) e.getCause();
+        }
     }
 
     @Override
