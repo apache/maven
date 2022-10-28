@@ -204,18 +204,25 @@ public class MavenMetadataSource
             DependencyManagement dependencyManagement = model.getDependencyManagement();
             managedDependencies = dependencyManagement == null ? null : dependencyManagement.getDependencies();
             MavenSession session = legacySupport.getSession();
-            Map<String, MavenProject> projectMap = session.getProjectMap();
-            MavenProject project = projectMap == null ? null
-                            : projectMap.get( ArtifactUtils.key( artifact.getGroupId(), artifact.getArtifactId(),
-                                                                 artifact.getVersion() ) );
-            if ( project == null )
+            if ( session != null )
             {
-                // if the project is not on the project map, read the repositories from the model itself!
-                pomRepositories = getRepositoriesFromModel( repositorySession, model );
+                Map<String, MavenProject> projectMap = session.getProjectMap();
+                MavenProject project = projectMap == null ? null
+                                : projectMap.get( ArtifactUtils.key( artifact.getGroupId(), artifact.getArtifactId(),
+                                                                     artifact.getVersion() ) );
+                if ( project == null )
+                {
+                    // if the project is not on the project map, read the repositories from the model itself!
+                    pomRepositories = getRepositoriesFromModel( repositorySession, model );
+                }
+                else
+                {
+                    pomRepositories = project.getRemoteArtifactRepositories();
+                }
             }
             else
             {
-                pomRepositories = project.getRemoteArtifactRepositories();
+                pomRepositories = new ArrayList<>();
             }
         }
         else if ( artifact instanceof ArtifactWithDependencies )
