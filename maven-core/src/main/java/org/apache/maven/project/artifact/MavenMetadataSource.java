@@ -195,9 +195,16 @@ public class MavenMetadataSource
             DependencyManagement dependencyManagement = model.getDependencyManagement();
             managedDependencies = dependencyManagement == null ? null : dependencyManagement.getDependencies();
             MavenSession session = legacySupport.getSession();
-            MavenProject project = session.getProjectMap().get(
-                ArtifactUtils.key( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() ) );
-            pomRepositories = project.getRemoteArtifactRepositories();
+            if ( session != null )
+            {
+                MavenProject project = session.getProjectMap().get(
+                        ArtifactUtils.key( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() ) );
+                pomRepositories = project.getRemoteArtifactRepositories();
+            }
+            else
+            {
+                pomRepositories = new ArrayList<>();
+            }
         }
         else if ( artifact instanceof ArtifactWithDependencies )
         {
