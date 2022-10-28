@@ -31,6 +31,11 @@ Maven Core Integration Tests Suite
   This module provides the {{{./testapidocs/org/apache/maven/it/package-summary.html}effective Core Integration Tests suite}},
   starting with {{{./bootstrap.html}bootstrap}}.
 
+* Running Core ITs Suite
+
+  Follow the steps that are described in the {{{https://github.com/apache/maven-integration-testing/blob/master/README.md}README.md}} 
+  of the official {{{https://github.com/apache/maven-integration-testing}Core ITs Suite}} repository.
+
 * Core ITs Suite Results
 
   ITs results are displayed on the console and can be published in the site through Surefire Report.
