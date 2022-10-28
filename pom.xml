@@ -67,6 +67,7 @@ under the License.
     <resolverVersion>1.8.2</resolverVersion>
     <slf4jVersion>1.7.36</slf4jVersion>
     <xmlunitVersion>2.6.4</xmlunitVersion>
+    <sonatypeVersion>3.2.0</sonatypeVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <!-- Control the name of the distribution and information output by mvn -->
     <distributionId>apache-maven</distributionId>
@@ -678,6 +679,24 @@ under the License.
           <violationIgnore>JavadocVariable,JavadocMethod,HiddenField</violationIgnore>
 <!--          <suppressionsLocation>${maven.multiModuleProjectDirectory}/build/checkstyle-suppressions.xml</suppressionsLocation>-->
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.ossindex.maven</groupId>
+        <artifactId>ossindex-maven-plugin</artifactId>
+        <version>${sonatypeVersion}</version>
+        <configuration>
+          <scope>compile</scope>
+          <cvssScoreThreshold>7.0</cvssScoreThreshold>
+        </configuration>
+        <executions>
+          <execution>
+            <id>audit-dependencies</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>audit-aggregate</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
