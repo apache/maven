@@ -19,12 +19,13 @@ package org.apache.maven.model;
  * under the License.
  */
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.IOError;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.Collections;
@@ -309,13 +310,47 @@ class WrapperProperties extends Properties
     @Override
     public synchronized void load( Reader reader ) throws IOException
     {
-        throw new UnsupportedOperationException();
+        try
+        {
+            writeOperationVoid( p ->
+            {
+                try
+                {
+                    p.load( reader );
+                }
+                catch ( IOException e )
+                {
+                    throw new IOError( e );
+                }
+            } );
+        }
+        catch ( IOError e )
+        {
+            throw (IOException) e.getCause();
+        }
     }
 
     @Override
     public synchronized void load( InputStream inStream ) throws IOException
     {
-        throw new UnsupportedOperationException();
+        try
+        {
+            writeOperationVoid( p ->
+            {
+                try
+                {
+                    p.load( inStream );
+                }
+                catch ( IOException e )
+                {
+                    throw new IOError( e );
+                }
+            } );
+        }
+        catch ( IOError e )
+        {
+            throw (IOException) e.getCause();
+        }
     }
 
     @Override
