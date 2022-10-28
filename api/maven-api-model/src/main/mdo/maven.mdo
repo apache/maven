@@ -80,7 +80,7 @@
 
         <field xml.transient="true">
           <name>pomFile</name>
-          <version>4.2.0</version>
+          <version>4.2.0+</version>
           <required>false</required>
           <description>Originating POM file</description>
           <type>DOM</type> <!-- This is transformed to a File/Path in the template -->
@@ -434,7 +434,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>4.2.0</version>
+          <version>4.2.0+</version>
           <code>
             <![CDATA[
     /**
@@ -2618,7 +2618,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>4.2.0</version>
+          <version>4.2.0+</version>
           <code>
             <![CDATA[
     public static final String SOURCE_POM = "pom";
