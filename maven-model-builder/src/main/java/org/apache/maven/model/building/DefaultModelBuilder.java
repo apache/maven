@@ -276,6 +276,14 @@ public class DefaultModelBuilder
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
 
+        // read and validate raw model
+        Model inputModel = request.getRawModel();
+        if ( inputModel == null )
+        {
+            inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
+            request.setRawModel( inputModel );
+        }
+
         // profile activation
         DefaultProfileActivationContext profileActivationContext = getProfileActivationContext( request );
 
@@ -294,13 +302,6 @@ public class DefaultModelBuilder
             }
             profileProps.putAll( profileActivationContext.getUserProperties() );
             profileActivationContext.setUserProperties( profileProps );
-        }
-
-        // read and validate raw model
-        Model inputModel = request.getRawModel();
-        if ( inputModel == null )
-        {
-            inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
         }
 
         problems.setRootModel( inputModel );
@@ -709,12 +710,8 @@ public class DefaultModelBuilder
         context.setSystemProperties( request.getSystemProperties() );
         // enrich user properties with project packaging
         Properties userProperties = request.getUserProperties();
-        if ( !userProperties.containsKey( ProfileActivationContext.PROPERTY_NAME_PACKAGING )
-             && request.getRawModel() != null )
-        {
-            userProperties.put( ProfileActivationContext.PROPERTY_NAME_PACKAGING,
-                                request.getRawModel().getPackaging() );
-        }
+        userProperties.computeIfAbsent( (Object) ProfileActivationContext.PROPERTY_NAME_PACKAGING,
+                                        ( p ) -> (Object) request.getRawModel().getPackaging() );
         context.setUserProperties( userProperties );
         context.setProjectDirectory( ( request.getPomFile() != null ) ? request.getPomFile().getParentFile() : null );
 
