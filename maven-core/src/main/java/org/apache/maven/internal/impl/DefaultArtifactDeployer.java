@@ -68,7 +68,7 @@ public class DefaultArtifactDeployer implements ArtifactDeployer
                     .setRepository( session.toRepository( repository ) )
                     .setArtifacts( session.toArtifacts( artifacts ) );
 
-            DeployResult result = repositorySystem.deploy( session.getSession(), deployRequest );
+            repositorySystem.deploy( session.getSession(), deployRequest );
         }
         catch ( DeploymentException e )
         {

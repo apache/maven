@@ -59,7 +59,7 @@ public class DefaultArtifactInstaller implements ArtifactInstaller
             InstallRequest installRequest = new InstallRequest()
                     .setArtifacts( session.toArtifacts( request.getArtifacts() ) );
 
-            InstallResult result = repositorySystem.install( session.getSession(), installRequest );
+            repositorySystem.install( session.getSession(), installRequest );
         }
         catch ( InstallationException e )
         {
