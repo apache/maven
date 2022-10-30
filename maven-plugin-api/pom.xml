@@ -80,6 +80,7 @@ under the License.
               <models>
                 <model>src/main/mdo/plugin.mdo</model>
               </models>
+              <version>1.1.0</version>
             </configuration>
           </execution>
         </executions>
