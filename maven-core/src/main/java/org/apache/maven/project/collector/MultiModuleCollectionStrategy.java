@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -64,11 +65,23 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
     @Override
     public List<MavenProject> collectProjects( MavenExecutionRequest request ) throws ProjectBuildingException
     {
-        File moduleProjectPomFile = getMultiModuleProjectPomFile( request );
-        List<File> files = Collections.singletonList( moduleProjectPomFile.getAbsoluteFile() );
+        Optional<File> moduleProjectPomFile = getMultiModuleProjectPomFile( request );
+        File absoluteFile = moduleProjectPomFile.orElse( request.getPom() ).getAbsoluteFile();
+        List<File> files = Collections.singletonList( absoluteFile );
         try
         {
             List<MavenProject> projects = projectsSelector.selectProjects( files, request );
+            if ( moduleProjectPomFile.isPresent()
+                    && projects.stream()
+                    .filter( MavenProject::hasParent )
+                    .noneMatch( p -> p.getParent().getBasedir() == null ) )
+            {
+                LOGGER.info( "Maven detected that the requested POM file is part of a multi-module project, "
+                                + "but could not find a pom.xml file in the multi-module root directory '{}'.",
+                        request.getMultiModuleProjectDirectory() );
+                LOGGER.info( "The reactor is limited to all projects under: " + request.getPom().getParent() );
+            }
+
             boolean isRequestedProjectCollected = isRequestedProjectCollected( request, projects );
             if ( isRequestedProjectCollected )
             {
@@ -76,11 +89,12 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
             }
             else
             {
-                LOGGER.debug( "Multi module project collection failed:{}"
-                        + "Detected a POM file next to a .mvn directory in a parent directory ({}). "
-                        + "Maven assumed that POM file to be the parent of the requested project ({}), but it turned "
-                        + "out that it was not. Another project collection strategy will be executed as result.",
-                        System.lineSeparator(), moduleProjectPomFile.getAbsolutePath(),
+                LOGGER.debug(
+                        "Multi module project collection failed:{}"
+                         + "Detected a POM file next to a .mvn directory in a parent directory ({}). "
+                         + "Maven assumed that POM file to be the parent of the requested project ({}), but it turned "
+                         + "out that it was not. Another project collection strategy will be executed as result.",
+                        System.lineSeparator(), absoluteFile,
                         request.getPom().getAbsolutePath() );
                 return Collections.emptyList();
             }
@@ -91,7 +105,8 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
 
             if ( fallThrough )
             {
-                LOGGER.debug( "Multi module project collection failed:{}"
+                LOGGER.debug(
+                        "Multi module project collection failed:{}"
                         + "Detected that one of the modules of this multi-module project uses another module as "
                         + "plugin extension which still needed to be built. This is not possible within the same "
                         + "reactor build. Another project collection strategy will be executed as result.",
@@ -103,25 +118,20 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy
         }
     }
 
-    private File getMultiModuleProjectPomFile( MavenExecutionRequest request )
+    private Optional<File> getMultiModuleProjectPomFile( MavenExecutionRequest request ) // return Optional<File>
     {
         if ( request.getPom().getParentFile().equals( request.getMultiModuleProjectDirectory() ) )
         {
-            return request.getPom();
+            return Optional.of( request.getPom() );
         }
         else
         {
             File multiModuleProjectPom = modelLocator.locatePom( request.getMultiModuleProjectDirectory() );
             if ( !multiModuleProjectPom.exists() )
             {
-                LOGGER.info( "Maven detected that the requested POM file is part of a multi-module project, "
-                        + "but could not find a pom.xml file in the multi-module root directory '{}'.",
-                        request.getMultiModuleProjectDirectory() );
-                LOGGER.info( "The reactor is limited to all projects under: " + request.getPom().getParent() );
-                return request.getPom();
+                return Optional.empty();
             }
-
-            return multiModuleProjectPom;
+            return Optional.of( multiModuleProjectPom );
         }
     }
 
