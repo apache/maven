@@ -29,7 +29,6 @@ import org.apache.maven.api.services.ArtifactInstallerException;
 import org.apache.maven.api.services.ArtifactInstallerRequest;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.installation.InstallRequest;
-import org.eclipse.aether.installation.InstallResult;
 import org.eclipse.aether.installation.InstallationException;
 
 import static org.apache.maven.internal.impl.Utils.cast;
