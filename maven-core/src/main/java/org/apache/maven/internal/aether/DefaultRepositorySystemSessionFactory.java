@@ -24,6 +24,7 @@ import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.model.Profile;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
@@ -54,7 +55,10 @@ import org.eclipse.sisu.Nullable;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -104,6 +108,9 @@ public class DefaultRepositorySystemSessionFactory
         configProps.put( ConfigurationProperties.USER_AGENT, getUserAgent() );
         configProps.put( ConfigurationProperties.INTERACTIVE, request.isInteractiveMode() );
         configProps.put( "maven.startTime", request.getStartTime() );
+        // First add properties populated from settings.xml
+        configProps.putAll( getPropertiesFromRequestedProfiles( request ) );
+        // Resolver's ConfigUtils solely rely on config properties, that is why we need to add both here as well.
         configProps.putAll( request.getSystemProperties() );
         configProps.putAll( request.getUserProperties() );
 
@@ -245,6 +252,20 @@ public class DefaultRepositorySystemSessionFactory
         {
             session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( session, localRepo ) );
         }
+    }
+
+    private Map<?, ?> getPropertiesFromRequestedProfiles( MavenExecutionRequest request )
+    {
+        List<String> activeProfileId =  request.getActiveProfiles();
+        Map<Object, Object> result = new HashMap<>();
+        for ( Profile profile: request.getProfiles() )
+        {
+            if ( activeProfileId.contains( profile.getId() ) )
+            {
+                result.putAll( profile.getProperties() );
+            }
+        }
+        return result;
     }
 
     private String getUserAgent()
