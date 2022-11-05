@@ -24,6 +24,7 @@ import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.model.ModelBase;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
@@ -54,8 +55,11 @@ import org.eclipse.sisu.Nullable;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @since 3.3.0
@@ -123,6 +127,8 @@ public class DefaultRepositorySystemSessionFactory
         configProps.put( ConfigurationProperties.USER_AGENT, getUserAgent() );
         configProps.put( ConfigurationProperties.INTERACTIVE, request.isInteractiveMode() );
         configProps.put( "maven.startTime", request.getStartTime() );
+        // First add properties populated from settings.xml
+        configProps.putAll( getPropertiesFromRequestedProfiles( request ) );
         // Resolver's ConfigUtils solely rely on config properties, that is why we need to add both here as well.
         configProps.putAll( request.getSystemProperties() );
         configProps.putAll( request.getUserProperties() );
@@ -300,6 +306,19 @@ public class DefaultRepositorySystemSessionFactory
         mavenRepositorySystem.injectAuthentication( session, request.getPluginArtifactRepositories() );
 
         return session;
+    }
+
+    private Map<?, ?> getPropertiesFromRequestedProfiles( MavenExecutionRequest request )
+    {
+
+        List<String> activeProfileId =  request.getActiveProfiles();
+
+        return request.getProfiles().stream()
+            .filter( profile -> activeProfileId.contains( profile.getId() ) )
+            .map( ModelBase::getProperties )
+            .flatMap( properties -> properties.entrySet().stream() )
+            .collect(
+                Collectors.toMap( Map.Entry::getKey, Map.Entry::getValue, ( k1, k2 ) -> k2  ) );
     }
 
     private String getUserAgent()
