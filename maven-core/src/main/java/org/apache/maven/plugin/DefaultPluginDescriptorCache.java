@@ -20,10 +20,10 @@ package org.apache.maven.plugin;
  */
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -55,7 +55,7 @@ public class DefaultPluginDescriptorCache
     implements PluginDescriptorCache
 {
 
-    private Map<Key, PluginDescriptor> descriptors = new HashMap<>( 128 );
+    private Map<Key, PluginDescriptor> descriptors = new ConcurrentHashMap<>( 128 );
 
     public void flush()
     {
@@ -70,6 +70,43 @@ public class DefaultPluginDescriptorCache
     public PluginDescriptor get( Key cacheKey )
     {
         return clone( descriptors.get( cacheKey ) );
+    }
+
+    @Override
+    public PluginDescriptor get( Key key, PluginDescriptorSupplier supplier )
+            throws PluginDescriptorParsingException, PluginResolutionException, InvalidPluginDescriptorException
+    {
+        try
+        {
+            return clone( descriptors.computeIfAbsent( key, k ->
+            {
+                try
+                {
+                    return clone( supplier.load() );
+                }
+                catch ( PluginDescriptorParsingException | PluginResolutionException
+                        | InvalidPluginDescriptorException e )
+                {
+                    throw new RuntimeException( e );
+                }
+            } ) );
+        }
+        catch ( RuntimeException e )
+        {
+            if ( e.getCause() instanceof PluginDescriptorParsingException )
+            {
+                throw (PluginDescriptorParsingException) e.getCause();
+            }
+            if ( e.getCause() instanceof PluginResolutionException )
+            {
+                throw (PluginResolutionException) e.getCause();
+            }
+            if ( e.getCause() instanceof InvalidPluginDescriptorException )
+            {
+                throw (InvalidPluginDescriptorException) e.getCause();
+            }
+            throw e;
+        }
     }
 
     public void put( Key cacheKey, PluginDescriptor pluginDescriptor )
