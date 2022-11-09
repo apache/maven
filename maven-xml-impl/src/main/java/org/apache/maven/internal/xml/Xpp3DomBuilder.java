@@ -129,8 +129,10 @@ public class Xpp3DomBuilder {
         Map<String, String> attrs = null;
         List<Dom> children = null;
         int eventType = parser.getEventType();
+        boolean emptyTag = false;
         while (eventType != XmlPullParser.END_DOCUMENT) {
             if (eventType == XmlPullParser.START_TAG) {
+                emptyTag = parser.isEmptyElementTag();
                 if (name == null) {
                     name = parser.getName();
                     location = locationBuilder != null ? locationBuilder.toInputLocation(parser) : null;
@@ -158,7 +160,12 @@ public class Xpp3DomBuilder {
                 }
                 value = value != null ? value + text : text;
             } else if (eventType == XmlPullParser.END_TAG) {
-                return new Xpp3Dom(name, children == null ? value : null, attrs, children, location);
+                return new Xpp3Dom(
+                        name,
+                        children == null ? (value != null ? value : emptyTag ? null : "") : null,
+                        attrs,
+                        children,
+                        location);
             }
             eventType = parser.next();
         }

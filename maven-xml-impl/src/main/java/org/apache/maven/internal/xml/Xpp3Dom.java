@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -180,8 +181,6 @@ public class Xpp3Dom implements Serializable, Dom {
      *   </ol></li>
      * <li> If mergeSelf == true
      *   <ol type="A">
-     *   <li> if the dominant root node's value is empty, set it to the recessive root node's value</li>
-     *   <li> For each attribute in the recessive root node which is not set in the dominant root node, set it.</li>
      *   <li> Determine whether children from the recessive DOM will be merged or appended to the dominant DOM as
      *        siblings (flag=mergeChildren).
      *     <ol type="i">
@@ -222,15 +221,10 @@ public class Xpp3Dom implements Serializable, Dom {
 
         if (mergeSelf) {
 
-            String value = null;
-            Object location = null;
+            String value = dominant.getValue();
+            Object location = dominant.getInputLocation();
             Map<String, String> attrs = null;
             List<Dom> children = null;
-
-            if (isEmpty(dominant.getValue()) && !isEmpty(recessive.getValue())) {
-                value = recessive.getValue();
-                location = recessive.getInputLocation();
-            }
 
             for (Map.Entry<String, String> attr : recessive.getAttributes().entrySet()) {
                 String key = attr.getKey();
@@ -253,25 +247,55 @@ public class Xpp3Dom implements Serializable, Dom {
                     }
                 }
 
-                if (!mergeChildren) {
-                    children = new ArrayList<>(recessive.getChildren().size()
-                            + dominant.getChildren().size());
-                    children.addAll(recessive.getChildren());
-                    children.addAll(dominant.getChildren());
-                } else {
-                    Map<String, Iterator<Dom>> commonChildren = new HashMap<>();
-                    Set<String> names =
-                            recessive.getChildren().stream().map(Dom::getName).collect(Collectors.toSet());
-                    for (String name : names) {
-                        List<Dom> dominantChildren = dominant.getChildren().stream()
-                                .filter(n -> n.getName().equals(name))
-                                .collect(Collectors.toList());
-                        if (dominantChildren.size() > 0) {
-                            commonChildren.put(name, dominantChildren.iterator());
+                String keysValue = recessive.getAttribute(KEYS_COMBINATION_MODE_ATTRIBUTE);
+
+                for (Dom recessiveChild : recessive.getChildren()) {
+                    String idValue = recessiveChild.getAttribute(ID_COMBINATION_MODE_ATTRIBUTE);
+
+                    Dom childDom = null;
+                    if (isNotEmpty(idValue)) {
+                        for (Dom dominantChild : dominant.getChildren()) {
+                            if (idValue.equals(dominantChild.getAttribute(ID_COMBINATION_MODE_ATTRIBUTE))) {
+                                childDom = dominantChild;
+                                // we have a match, so don't append but merge
+                                mergeChildren = true;
+                            }
                         }
+                    } else if (isNotEmpty(keysValue)) {
+                        String[] keys = keysValue.split(",");
+                        Map<String, Optional<String>> recessiveKeyValues = Stream.of(keys)
+                                .collect(Collectors.toMap(
+                                        k -> k, k -> Optional.ofNullable(recessiveChild.getAttribute(k))));
+
+                        for (Dom dominantChild : dominant.getChildren()) {
+                            Map<String, Optional<String>> dominantKeyValues = Stream.of(keys)
+                                    .collect(Collectors.toMap(
+                                            k -> k, k -> Optional.ofNullable(dominantChild.getAttribute(k))));
+
+                            if (recessiveKeyValues.equals(dominantKeyValues)) {
+                                childDom = dominantChild;
+                                // we have a match, so don't append but merge
+                                mergeChildren = true;
+                            }
+                        }
+                    } else {
+                        childDom = dominant.getChild(recessiveChild.getName());
                     }
 
-                    for (Dom recessiveChild : recessive.getChildren()) {
+                    if (mergeChildren && childDom != null) {
+                        Map<String, Iterator<Dom>> commonChildren = new HashMap<>();
+                        Set<String> names = recessive.getChildren().stream()
+                                .map(Dom::getName)
+                                .collect(Collectors.toSet());
+                        for (String name : names) {
+                            List<Dom> dominantChildren = dominant.getChildren().stream()
+                                    .filter(n -> n.getName().equals(name))
+                                    .collect(Collectors.toList());
+                            if (dominantChildren.size() > 0) {
+                                commonChildren.put(name, dominantChildren.iterator());
+                            }
+                        }
+
                         String name = recessiveChild.getName();
                         Iterator<Dom> it =
                                 commonChildren.computeIfAbsent(name, n1 -> Stream.of(dominant.getChildren().stream()
@@ -297,7 +321,7 @@ public class Xpp3Dom implements Serializable, Dom {
                                 }
                                 children.remove(dominantChild);
                             } else {
-                                int idx = (children != null ? children : dominant.getChildren()).indexOf(dominantChild);
+                                int idx = dominant.getChildren().indexOf(dominantChild);
                                 Dom merged = merge(dominantChild, recessiveChild, childMergeOverride);
                                 if (merged != dominantChild) {
                                     if (children == null) {
@@ -307,6 +331,14 @@ public class Xpp3Dom implements Serializable, Dom {
                                 }
                             }
                         }
+                    } else {
+                        if (children == null) {
+                            children = new ArrayList<>(dominant.getChildren());
+                        }
+                        int idx = mergeChildren
+                                ? children.size()
+                                : recessive.getChildren().indexOf(recessiveChild);
+                        children.add(idx, recessiveChild);
                     }
                 }
             }
@@ -381,11 +413,11 @@ public class Xpp3Dom implements Serializable, Dom {
         return writer.toString();
     }
 
-    public static boolean isNotEmpty(String str) {
+    private static boolean isNotEmpty(String str) {
         return ((str != null) && (str.length() > 0));
     }
 
-    public static boolean isEmpty(String str) {
-        return ((str == null) || (str.trim().length() == 0));
+    private static boolean isEmpty(String str) {
+        return ((str == null) || (str.length() == 0));
     }
 }
