@@ -67,6 +67,11 @@ public interface PluginRealmCache {
         // marker interface for cache keys
     }
 
+    @FunctionalInterface
+    interface PluginRealmSupplier {
+        CacheRecord load() throws PluginResolutionException, PluginContainerException;
+    }
+
     Key createKey(
             Plugin plugin,
             ClassLoader parentRealm,
@@ -76,6 +81,8 @@ public interface PluginRealmCache {
             RepositorySystemSession session);
 
     CacheRecord get(Key key);
+
+    CacheRecord get(Key key, PluginRealmSupplier supplier) throws PluginResolutionException, PluginContainerException;
 
     CacheRecord put(Key key, ClassRealm pluginRealm, List<Artifact> pluginArtifacts);
 
