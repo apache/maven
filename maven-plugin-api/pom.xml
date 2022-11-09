@@ -133,35 +133,10 @@ under the License.
                 <template>src/main/mdo/reader.vm</template>
               </templates>
               <params>
-                <param>packageModelV3=org.apache.maven.plugin.descriptor</param>
-                <param>packageModelV4=org.apache.maven.plugin.descriptor</param>
-                <param>packageToolV4=org.apache.maven.plugin.descriptor.io.xpp3</param>
+                <param>packageModelV3=org.apache.maven.plugin.immutabledescriptor</param>
+                <param>packageModelV4=org.apache.maven.plugin.immutabledescriptor</param>
+                <param>packageToolV4=org.apache.maven.plugin.immutabledescriptor.io.xpp3</param>
               </params>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-clean-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>remove-superfluous-generated-classes</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>clean</goal>
-            </goals>
-            <configuration>
-              <excludeDefaultDirectories>true</excludeDefaultDirectories>
-              <filesets>
-                <fileset>
-                  <directory>target/generated-sources/modello/org/apache/maven/plugin/descriptor</directory>
-                  <!-- remove those classes which need to ba maintained manually -->
-                  <includes>
-                    <include>MojoDescriptor.java</include>
-                    <include>PluginDescriptor.java</include>
-                  </includes>
-                </fileset>
-              </filesets>
             </configuration>
           </execution>
         </executions>

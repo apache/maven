@@ -20,20 +20,15 @@ package org.apache.maven.plugin.descriptor;
  */
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.NotThreadSafe;
-import org.apache.maven.api.xml.Dom;
 import org.apache.maven.plugin.Mojo;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * The bean containing the Mojo descriptor.<br>
@@ -41,9 +36,10 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * <a href="https://maven.apache.org/developers/mojo-api-specification.html">
  * https://maven.apache.org/developers/mojo-api-specification.html</a>
  *
- * This file is not generated from the underlying Modello model as it needs to extend {@link ComponentDescriptor}
- * which is not based on a model.
+ * TODO is there a need for the delegation of MavenMojoDescriptor to this?
+ * Why not just extend ComponentDescriptor here?
  */
+@Deprecated
 public class MojoDescriptor
     extends ComponentDescriptor<Mojo>
     implements Cloneable
@@ -205,13 +201,12 @@ public class MojoDescriptor
      * @param parameters the new list of parameters
      * @throws DuplicateParameterException if any
      */
-    public void setParameters( Collection<Parameter> parameters )
+    public void setParameters( List<Parameter> parameters )
         throws DuplicateParameterException
     {
         this.parameters.clear();
         for ( Parameter parameter : parameters )
         {
-            // enrich parameter with information from configuration (already available?)
             addParameter( parameter );
         }
     }
@@ -229,24 +224,10 @@ public class MojoDescriptor
                 + " has been declared multiple times in mojo with goal: " + getGoal() + " (implementation: "
                 + getImplementation() + ")" );
         }
-        if ( mojoConfiguration != null )
-        {
-            setParameterValuesFromMojoConfiguration( parameter );
-        }
+
         parameters.add( parameter );
     }
 
-    private boolean setParameterValuesFromMojoConfiguration( Parameter parameter )
-    {
-        PlexusConfiguration paramConfig = mojoConfiguration.getChild( parameter.getName(), false );
-        if ( paramConfig != null )
-        {
-            parameter.setExpression( paramConfig.getValue( null ) );
-            parameter.setDefaultValue( paramConfig.getAttribute( "default-value" ) );
-            return true;
-        }
-        return false;
-    }
     /**
      * @return the list parameters as a Map (keyed by {@link Parameter#getName()}) that is built from
      * {@link #parameters} list on each call. In other words, the map returned is built on fly and is a copy.
@@ -472,10 +453,6 @@ public class MojoDescriptor
     public void setMojoConfiguration( PlexusConfiguration mojoConfiguration )
     {
         this.mojoConfiguration = mojoConfiguration;
-        for ( Parameter parameter : parameters )
-        {
-            setParameterValuesFromMojoConfiguration( parameter );
-        }
     }
 
     /** {@inheritDoc} */
@@ -692,17 +669,6 @@ public class MojoDescriptor
         this.v4Api = v4Api;
     }
 
-    public final void setMojoConfiguration( final Xpp3Dom configuration )
-    {
-        setMojoConfiguration( new XmlPlexusConfiguration( configuration ) );
-    }
-
-
-    public void setRequirements( Collection<Requirement> requirements )
-    {
-        requirements.stream().map( Requirement::toComponentRequirement ).forEach( this::addRequirement );
-    }
-
     /**
      * Creates a shallow copy of this mojo descriptor.
      */
@@ -716,339 +682,6 @@ public class MojoDescriptor
         catch ( CloneNotSupportedException e )
         {
             throw new UnsupportedOperationException( e );
-        }
-    }
-
-
-    /**
-     * Creates a new MojoDescriptor instance.
-     * Equivalent to {@code newInstance( true )}.
-     * @throws DuplicateParameterException 
-     * @see #newInstance(boolean)
-     */
-    @Nonnull
-    public static MojoDescriptor newInstance() throws DuplicateParameterException
-    {
-        return newInstance( true );
-    }
-
-    /**
-     * Creates a new MojoDescriptor instance using default values or not.
-     * Equivalent to {@code newBuilder( withDefaults ).build()}.
-     * @throws DuplicateParameterException 
-     */
-    @Nonnull
-    public static MojoDescriptor newInstance( boolean withDefaults ) throws DuplicateParameterException
-    {
-        return newBuilder( withDefaults ).build();
-    }
-
-    /**
-     * Creates a new MojoDescriptor builder instance.
-     * Equivalent to {@code newBuilder( true )}.
-     * @see #newBuilder(boolean)
-     */
-    @Nonnull
-    public static Builder newBuilder()
-    {
-        return newBuilder( true );
-    }
-
-    /**
-     * Creates a new MojoDescriptor builder instance using default values or not.
-     */
-    @Nonnull
-    public static Builder newBuilder( boolean withDefaults )
-    {
-        return new Builder( withDefaults );
-    }
-
-    /**
-     * Builder class used to create MojoDescriptor instances.
-     * @see #with()
-     * @see #newBuilder()
-     */
-    @NotThreadSafe
-    public static class Builder
-    {
-        String goal;
-        String description;
-        String implementation;
-        String language;
-        String phase;
-        String executePhase;
-        String executeGoal;
-        String executeLifecycle;
-        String requiresDependencyResolution;
-        String requiresDependencyCollection;
-        Boolean requiresDirectInvocation;
-        Boolean requiresProject;
-        Boolean requiresReports;
-        Boolean requiresOnline;
-        Boolean aggregator;
-        Boolean inheritedByDefault;
-        Boolean threadSafe;
-        Boolean v4Api;
-        String instantiationStrategy;
-        String executionStrategy;
-        String since;
-        String deprecated;
-        String configurator;
-        String composer;
-        Collection<Parameter> parameters;
-        Dom configuration;
-        Collection<Requirement> requirements;
-
-        Builder( boolean withDefaults )
-        {
-            if ( withDefaults )
-            {
-                this.language = "java";
-                this.requiresDependencyResolution = "runtime";
-                this.requiresDirectInvocation = false;
-                this.requiresProject = true;
-                this.requiresReports = false;
-                this.requiresOnline = false;
-                this.aggregator = false;
-                this.inheritedByDefault = true;
-                this.threadSafe = false;
-                this.v4Api = false;
-                this.instantiationStrategy = "per-lookup";
-                this.executionStrategy = "once-per-session";
-            }
-        }
-
-        @Nonnull
-        public Builder goal( String goal )
-        {
-            this.goal = goal;
-            return this;
-        }
-
-        @Nonnull
-        public Builder description( String description )
-        {
-            this.description = description;
-            return this;
-        }
-
-        @Nonnull
-        public Builder implementation( String implementation )
-        {
-            this.implementation = implementation;
-            return this;
-        }
-
-        @Nonnull
-        public Builder language( String language )
-        {
-            this.language = language;
-            return this;
-        }
-
-        @Nonnull
-        public Builder phase( String phase )
-        {
-            this.phase = phase;
-            return this;
-        }
-
-        @Nonnull
-        public Builder executePhase( String executePhase )
-        {
-            this.executePhase = executePhase;
-            return this;
-        }
-
-        @Nonnull
-        public Builder executeGoal( String executeGoal )
-        {
-            this.executeGoal = executeGoal;
-            return this;
-        }
-
-        @Nonnull
-        public Builder executeLifecycle( String executeLifecycle )
-        {
-            this.executeLifecycle = executeLifecycle;
-            return this;
-        }
-
-        @Nonnull
-        public Builder requiresDependencyResolution( String requiresDependencyResolution )
-        {
-            this.requiresDependencyResolution = requiresDependencyResolution;
-            return this;
-        }
-
-        @Nonnull
-        public Builder requiresDependencyCollection( String requiresDependencyCollection )
-        {
-            this.requiresDependencyCollection = requiresDependencyCollection;
-            return this;
-        }
-
-        @Nonnull
-        public Builder requiresDirectInvocation( boolean requiresDirectInvocation )
-        {
-            this.requiresDirectInvocation = requiresDirectInvocation;
-            return this;
-        }
-
-        @Nonnull
-        public Builder requiresProject( boolean requiresProject )
-        {
-            this.requiresProject = requiresProject;
-            return this;
-        }
-
-        @Nonnull
-        public Builder requiresReports( boolean requiresReports )
-        {
-            this.requiresReports = requiresReports;
-            return this;
-        }
-
-        @Nonnull
-        public Builder requiresOnline( boolean requiresOnline )
-        {
-            this.requiresOnline = requiresOnline;
-            return this;
-        }
-
-        @Nonnull
-        public Builder aggregator( boolean aggregator )
-        {
-            this.aggregator = aggregator;
-            return this;
-        }
-
-        @Nonnull
-        public Builder inheritedByDefault( boolean inheritedByDefault )
-        {
-            this.inheritedByDefault = inheritedByDefault;
-            return this;
-        }
-
-        @Nonnull
-        public Builder threadSafe( boolean threadSafe )
-        {
-            this.threadSafe = threadSafe;
-            return this;
-        }
-
-        @Nonnull
-        public Builder v4Api( boolean v4Api )
-        {
-            this.v4Api = v4Api;
-            return this;
-        }
-
-        @Nonnull
-        public Builder instantiationStrategy( String instantiationStrategy )
-        {
-            this.instantiationStrategy = instantiationStrategy;
-            return this;
-        }
-
-        @Nonnull
-        public Builder executionStrategy( String executionStrategy )
-        {
-            this.executionStrategy = executionStrategy;
-            return this;
-        }
-
-        @Nonnull
-        public Builder since( String since )
-        {
-            this.since = since;
-            return this;
-        }
-
-        @Nonnull
-        public Builder deprecated( String deprecated )
-        {
-            this.deprecated = deprecated;
-            return this;
-        }
-
-        @Nonnull
-        public Builder configurator( String configurator )
-        {
-            this.configurator = configurator;
-            return this;
-        }
-
-        @Nonnull
-        public Builder composer( String composer )
-        {
-            this.composer = composer;
-            return this;
-        }
-
-        @Nonnull
-        public Builder parameters( Collection<Parameter> parameters )
-        {
-            this.parameters = parameters;
-            return this;
-        }
-
-        @Nonnull
-        public Builder configuration( Dom configuration )
-        {
-            this.configuration = configuration;
-            return this;
-        }
-
-        @Nonnull
-        public Builder requirements( Collection<Requirement> requirements )
-        {
-            this.requirements = requirements;
-            return this;
-        }
-
-        @Nonnull
-        public MojoDescriptor build() throws DuplicateParameterException
-        {
-            MojoDescriptor mojoDescriptor = new MojoDescriptor();
-            mojoDescriptor.setGoal( goal );
-            mojoDescriptor.setDescription( description );
-            mojoDescriptor.setImplementation( implementation );
-            mojoDescriptor.setLanguage( language );
-            mojoDescriptor.setPhase( phase );
-            mojoDescriptor.setExecutePhase( executePhase );
-            mojoDescriptor.setExecuteGoal( executeGoal );
-            mojoDescriptor.setExecuteLifecycle( executeLifecycle );
-            mojoDescriptor.setDependencyResolutionRequired( requiresDependencyResolution );
-            mojoDescriptor.setDependencyCollectionRequired( requiresDependencyCollection );
-            mojoDescriptor.setDirectInvocationOnly( requiresDirectInvocation );
-            mojoDescriptor.setProjectRequired( requiresProject );
-            mojoDescriptor.setRequiresReports( requiresReports );
-            mojoDescriptor.setOnlineRequired( requiresOnline );
-            mojoDescriptor.setAggregator( aggregator );
-            mojoDescriptor.setInheritedByDefault( inheritedByDefault );
-            mojoDescriptor.setThreadSafe( threadSafe );
-            mojoDescriptor.setV4Api( v4Api );
-            mojoDescriptor.setInstantiationStrategy( instantiationStrategy );
-            mojoDescriptor.setExecutionStrategy( executionStrategy );
-            mojoDescriptor.setSince( since );
-            mojoDescriptor.setDeprecated( deprecated );
-            mojoDescriptor.setComponentConfigurator( configurator );
-            mojoDescriptor.setComponentComposer( composer );
-            if ( parameters != null )
-            {
-                mojoDescriptor.setParameters( parameters );
-            }
-            if ( configuration != null )
-            {
-                mojoDescriptor.setMojoConfiguration( new Xpp3Dom( configuration ) );
-            }
-            if ( requirements != null )
-            {
-                mojoDescriptor.setRequirements( requirements );
-            }
-            return mojoDescriptor;
-            
         }
     }
 

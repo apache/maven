@@ -19,9 +19,6 @@ package org.apache.maven.plugin.descriptor;
  * under the License.
  */
 
-
-import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.model.Plugin;
@@ -29,7 +26,6 @@ import org.apache.maven.plugin.lifecycle.Lifecycle;
 import org.apache.maven.plugin.lifecycle.LifecycleConfiguration;
 import org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Reader;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.component.repository.ComponentSetDescriptor;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -41,20 +37,16 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
- * This file is not generated from the underlying Modello model as it needs to extend {@link ComponentSetDescriptor}
- * which is not based on a model.
- * 
  * @author Jason van Zyl
  */
+@Deprecated
 public class PluginDescriptor
     extends ComponentSetDescriptor
     implements Cloneable
@@ -97,7 +89,6 @@ public class PluginDescriptor
 
     private Map<String, Lifecycle> lifecycleMappings;
 
-    private List<Dependency> dependencies;
     // ----------------------------------------------------------------------
     //
     // ----------------------------------------------------------------------
@@ -458,7 +449,7 @@ public class PluginDescriptor
         }
     }
 
-    public void setMojos( Collection<MojoDescriptor> mojos )
+    public void addMojos( List<MojoDescriptor> mojos )
         throws DuplicateMojoDescriptorException
     {
         for ( MojoDescriptor mojoDescriptor : mojos )
@@ -468,208 +459,4 @@ public class PluginDescriptor
 
     }
 
-
-    public void setModelEncoding( String inputEncoding )
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public void setDependencies2( Collection<Dependency> dependencies2 )
-    {
-        dependencies2.stream().map( Dependency::toComponentDependency ).forEach( this::addDependency );
-    }
-
-    public final List<ComponentDependency> getDependencies2()
-    {
-        return dependencies.stream().map( Dependency::toComponentDependency ).collect( Collectors.toList() );
-    }
-
-
-    /**
-     * Creates a new PluginDescriptor instance.
-     * Equivalent to {@code newInstance( true )}.
-     * @throws DuplicateMojoDescriptorException 
-     * @see #newInstance(boolean)
-     */
-    @Nonnull
-    public static PluginDescriptor newInstance() throws DuplicateMojoDescriptorException
-    {
-        return newInstance( true );
-    }
-
-    /**
-     * Creates a new PluginDescriptor instance using default values or not.
-     * Equivalent to {@code newBuilder( withDefaults ).build()}.
-     * @throws DuplicateMojoDescriptorException 
-     */
-    @Nonnull
-    public static PluginDescriptor newInstance( boolean withDefaults ) throws DuplicateMojoDescriptorException
-    {
-        return newBuilder( withDefaults ).build();
-    }
-
-    /**
-     * Creates a new PluginDescriptor builder instance.
-     * Equivalent to {@code newBuilder( true )}.
-     * @see #newBuilder(boolean)
-     */
-    @Nonnull
-    public static Builder newBuilder()
-    {
-        return newBuilder( true );
-    }
-
-    /**
-     * Creates a new PluginDescriptor builder instance using default values or not.
-     */
-    @Nonnull
-    public static Builder newBuilder( boolean withDefaults )
-    {
-        return new Builder( withDefaults );
-    }
-
-
-    /**
-     * Builder class used to create PluginDescriptor instances.
-     * @see #with()
-     * @see #newBuilder()
-     */
-    @NotThreadSafe
-    public static class Builder
-    {
-        String modelEncoding;
-        String name;
-        String description;
-        String groupId;
-        String artifactId;
-        String version;
-        String goalPrefix;
-        Boolean isolatedRealm;
-        Boolean inheritedByDefault;
-        String requiredJavaVersion;
-        String requiredMavenVersion;
-        Collection<MojoDescriptor> mojos;
-        Collection<Dependency> dependencies;
-
-        Builder( boolean withDefaults )
-        {
-            if ( withDefaults )
-            {
-                this.isolatedRealm = false;
-                this.inheritedByDefault = true;
-            }
-        }
-
-        @Nonnull
-        public Builder modelEncoding( String modelEncoding )
-        {
-            this.modelEncoding = modelEncoding;
-            return this;
-        }
-
-        @Nonnull
-        public Builder name( String name )
-        {
-            this.name = name;
-            return this;
-        }
-
-        @Nonnull
-        public Builder description( String description )
-        {
-            this.description = description;
-            return this;
-        }
-
-        @Nonnull
-        public Builder groupId( String groupId )
-        {
-            this.groupId = groupId;
-            return this;
-        }
-
-        @Nonnull
-        public Builder artifactId( String artifactId )
-        {
-            this.artifactId = artifactId;
-            return this;
-        }
-
-        @Nonnull
-        public Builder version( String version )
-        {
-            this.version = version;
-            return this;
-        }
-
-        @Nonnull
-        public Builder goalPrefix( String goalPrefix )
-        {
-            this.goalPrefix = goalPrefix;
-            return this;
-        }
-
-        @Nonnull
-        public Builder isolatedRealm( boolean isolatedRealm )
-        {
-            this.isolatedRealm = isolatedRealm;
-            return this;
-        }
-
-        @Nonnull
-        public Builder inheritedByDefault( boolean inheritedByDefault )
-        {
-            this.inheritedByDefault = inheritedByDefault;
-            return this;
-        }
-
-        @Nonnull
-        public Builder requiredJavaVersion( String requiredJavaVersion )
-        {
-            this.requiredJavaVersion = requiredJavaVersion;
-            return this;
-        }
-
-        @Nonnull
-        public Builder requiredMavenVersion( String requiredMavenVersion )
-        {
-            this.requiredMavenVersion = requiredMavenVersion;
-            return this;
-        }
-
-        @Nonnull
-        public Builder mojos( Collection<MojoDescriptor> mojos )
-        {
-            this.mojos = mojos;
-            return this;
-        }
-
-        @Nonnull
-        public Builder dependencies( Collection<Dependency> dependencies2 )
-        {
-            this.dependencies = dependencies2;
-            return this;
-        }
-
-
-        @Nonnull
-        public PluginDescriptor build() throws DuplicateMojoDescriptorException
-        {
-            PluginDescriptor pluginDescriptor = new PluginDescriptor();
-            pluginDescriptor.setName( name );
-            pluginDescriptor.setDescription( description );
-            pluginDescriptor.setGroupId( groupId );
-            pluginDescriptor.setArtifactId( artifactId );
-            pluginDescriptor.setVersion( version );
-            pluginDescriptor.setGoalPrefix( goalPrefix );
-            pluginDescriptor.setIsolatedRealm( isolatedRealm );
-            pluginDescriptor.setInheritedByDefault( inheritedByDefault );
-            pluginDescriptor.setRequiredJavaVersion( requiredJavaVersion );
-            pluginDescriptor.setRequiredMavenVersion( requiredMavenVersion );
-            pluginDescriptor.setMojos( mojos );
-            pluginDescriptor.setDependencies2( dependencies );
-            return pluginDescriptor;
-        }
-    }
 }

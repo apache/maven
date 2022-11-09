@@ -21,13 +21,19 @@ package org.apache.maven.plugin.descriptor;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-import org.apache.maven.plugin.descriptor.io.xpp3.PluginDescriptorXpp3Reader;
+import org.apache.maven.internal.xml.XmlPlexusConfiguration;
+import org.apache.maven.internal.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.component.repository.ComponentDependency;
+import org.codehaus.plexus.component.repository.ComponentRequirement;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- * @deprecated Use {@link PluginDescriptorXpp3Reader} instead.
  * @author Jason van Zyl
  */
 @Deprecated
@@ -42,17 +48,140 @@ public class PluginDescriptorBuilder
     public PluginDescriptor build( Reader reader, String source )
         throws PlexusConfigurationException
     {
-        try
-        {
-            return new PluginDescriptorXpp3Reader().read( reader, false );
-        }
-        catch ( IOException | XmlPullParserException e )
-        {
-            throw new PlexusConfigurationException( "Error reading plugin descriptor", e );
-        }
+        return build( source, buildConfiguration( reader ) );
     }
 
-/*
+    private PluginDescriptor build( String source, PlexusConfiguration c )
+        throws PlexusConfigurationException
+    {
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+
+        pluginDescriptor.setSource( source );
+        pluginDescriptor.setGroupId( extractGroupId( c ) );
+        pluginDescriptor.setArtifactId( extractArtifactId( c ) );
+        pluginDescriptor.setVersion( extractVersion( c ) );
+        pluginDescriptor.setGoalPrefix( extractGoalPrefix( c ) );
+
+        pluginDescriptor.setName( extractName( c ) );
+        pluginDescriptor.setDescription( extractDescription( c ) );
+
+        pluginDescriptor.setIsolatedRealm( extractIsolatedRealm( c ) );
+        pluginDescriptor.setInheritedByDefault( extractInheritedByDefault( c ) );
+        pluginDescriptor.setRequiredJavaVersion( extractRequiredJavaVersion( c ).orElse( null ) );
+        pluginDescriptor.setRequiredMavenVersion( extractRequiredMavenVersion( c ).orElse( null ) );
+
+        pluginDescriptor.addMojos( extractMojos( c, pluginDescriptor ) );
+
+        pluginDescriptor.setDependencies( extractComponentDependencies( c ) );
+
+        return pluginDescriptor;
+    }
+
+    private String extractGroupId( PlexusConfiguration c )
+    {
+        return c.getChild( "groupId" ).getValue();
+    }
+
+    private String extractArtifactId( PlexusConfiguration c )
+    {
+        return c.getChild( "artifactId" ).getValue();
+    }
+
+    private String extractVersion( PlexusConfiguration c )
+    {
+        return c.getChild( "version" ).getValue();
+    }
+
+    private String extractGoalPrefix( PlexusConfiguration c )
+    {
+        return c.getChild( "goalPrefix" ).getValue();
+    }
+
+    private String extractName( PlexusConfiguration c )
+    {
+        return c.getChild( "name" ).getValue();
+    }
+
+    private String extractDescription( PlexusConfiguration c )
+    {
+        return c.getChild( "description" ).getValue();
+    }
+
+    private List<MojoDescriptor> extractMojos( PlexusConfiguration c, PluginDescriptor pluginDescriptor )
+        throws PlexusConfigurationException
+    {
+        List<MojoDescriptor> mojos = new ArrayList<>();
+
+        PlexusConfiguration[] mojoConfigurations = c.getChild( "mojos" ).getChildren( "mojo" );
+
+        for ( PlexusConfiguration component : mojoConfigurations )
+        {
+            mojos.add( buildComponentDescriptor( component, pluginDescriptor ) );
+
+        }
+        return mojos;
+    }
+
+    private boolean extractInheritedByDefault( PlexusConfiguration c )
+    {
+        String inheritedByDefault = c.getChild( "inheritedByDefault" ).getValue();
+
+        if ( inheritedByDefault != null )
+        {
+            return Boolean.parseBoolean( inheritedByDefault );
+        }
+        return false;
+    }
+
+    private boolean extractIsolatedRealm( PlexusConfiguration c )
+    {
+        String isolatedRealm = c.getChild( "isolatedRealm" ).getValue();
+
+        if ( isolatedRealm != null )
+        {
+            return Boolean.parseBoolean( isolatedRealm );
+        }
+        return false;
+    }
+
+    private Optional<String> extractRequiredJavaVersion( PlexusConfiguration c )
+    {
+        return Optional.ofNullable( c.getChild( "requiredJavaVersion" ) ).map( PlexusConfiguration::getValue );
+    }
+
+    private Optional<String> extractRequiredMavenVersion( PlexusConfiguration c )
+    {
+        return Optional.ofNullable( c.getChild( "requiredMavenVersion" ) ).map( PlexusConfiguration::getValue );
+    }
+
+    private List<ComponentDependency> extractComponentDependencies( PlexusConfiguration c )
+    {
+
+        PlexusConfiguration[] dependencyConfigurations = c.getChild( "dependencies" ).getChildren( "dependency" );
+
+        List<ComponentDependency> dependencies = new ArrayList<>();
+
+        for ( PlexusConfiguration d : dependencyConfigurations )
+        {
+            dependencies.add( extractComponentDependency( d ) );
+        }
+        return dependencies;
+    }
+
+    private ComponentDependency extractComponentDependency( PlexusConfiguration d )
+    {
+        ComponentDependency cd = new ComponentDependency();
+
+        cd.setArtifactId( extractArtifactId( d ) );
+
+        cd.setGroupId( extractGroupId( d ) );
+
+        cd.setType( d.getChild( "type" ).getValue() );
+
+        cd.setVersion( extractVersion( d ) );
+        return cd;
+    }
+
     @SuppressWarnings( "checkstyle:methodlength" )
     public MojoDescriptor buildComponentDescriptor( PlexusConfiguration c, PluginDescriptor pluginDescriptor )
         throws PlexusConfigurationException
@@ -299,5 +428,5 @@ public class PluginDescriptorBuilder
         {
             throw new PlexusConfigurationException( e.getMessage(), e );
         }
-    }*/
+    }
 }

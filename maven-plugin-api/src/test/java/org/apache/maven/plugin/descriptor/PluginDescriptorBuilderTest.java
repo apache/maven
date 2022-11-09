@@ -131,7 +131,7 @@ public class PluginDescriptorBuilderTest
         md = pd.getMojos().get( 1 );
 
         assertEquals( "war", md.getGoal() );
-        assertEquals( "runtime", md.getDependencyResolutionRequired() ); // default
+        assertNull( md.getDependencyResolutionRequired() );
         assertNull( md.getDependencyCollectionRequired() );
         assertTrue( md.isThreadSafe() );
     }

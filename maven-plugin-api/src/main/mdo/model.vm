@@ -44,6 +44,7 @@
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Nonnull" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.NotThreadSafe" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.ThreadSafe" ) )
+    #set ( $dummy = $imports.add( "org.apache.maven.plugin.ImmutableCollections" ) )
     #foreach ( $field in $allFields )
       #if ( $field.type == "java.util.List" )
           #set ( $dummy = $imports.add( "java.util.ArrayList" ) )

@@ -19,23 +19,54 @@ package org.apache.maven.plugin.descriptor;
  * under the License.
  */
 
-import org.codehaus.plexus.configuration.PlexusConfigurationException;
-
 /**
- * InvalidPluginDescriptorException
+ * Describes a component requirement.
+ *
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-public class InvalidPluginDescriptorException
-    extends PlexusConfigurationException
+public class Requirement
+    implements Cloneable
 {
+    private final String role;
 
-    public InvalidPluginDescriptorException( String message, Throwable cause )
+    private final String roleHint;
+
+    public Requirement( String role )
     {
-        super( message, cause );
+        this.role = role;
+        this.roleHint = null;
     }
 
-    public InvalidPluginDescriptorException( String message )
+    public Requirement( String role, String roleHint )
     {
-        super( message );
+        this.role = role;
+        this.roleHint = roleHint;
+    }
+
+    public String getRole()
+    {
+        return role;
+    }
+
+    public String getRoleHint()
+    {
+        return roleHint;
+    }
+
+    /**
+     * Creates a shallow copy of this requirement.
+     */
+    @Override
+    public Requirement clone()
+    {
+        try
+        {
+            return (Requirement) super.clone();
+        }
+        catch ( CloneNotSupportedException e )
+        {
+            throw new UnsupportedOperationException( e );
+        }
     }
 
 }
