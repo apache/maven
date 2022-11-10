@@ -196,11 +196,18 @@ public class MavenMetadataSource
             DependencyManagement dependencyManagement = model.getDependencyManagement();
             managedDependencies = dependencyManagement == null ? null : dependencyManagement.getDependencies();
             MavenSession session = legacySupport.getSession();
-            pomRepositories = session.getProjects().stream()
-                    .filter( p -> artifact.equals( p.getArtifact() ) )
-                    .map( MavenProject::getRemoteArtifactRepositories )
-                    .findFirst()
-                    .orElseGet( ArrayList::new );
+            if ( session != null )
+            {
+                pomRepositories = session.getProjects().stream()
+                        .filter( p -> artifact.equals( p.getArtifact() ) )
+                        .map( MavenProject::getRemoteArtifactRepositories )
+                        .findFirst()
+                        .orElseGet( ArrayList::new );
+            }
+            else
+            {
+                pomRepositories = new ArrayList<>();
+            }
         }
         else if ( artifact instanceof ArtifactWithDependencies )
         {
@@ -569,8 +576,17 @@ public class MavenMetadataSource
                     configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
                     configuration.setProcessPlugins( false );
                     configuration.setRepositoryMerging( ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT );
-                    configuration.setSystemProperties( getSystemProperties() );
-                    configuration.setUserProperties( new Properties() );
+                    MavenSession session = legacySupport.getSession();
+                    if ( session != null )
+                    {
+                        configuration.setSystemProperties( session.getSystemProperties() );
+                        configuration.setUserProperties( session.getUserProperties() );
+                    }
+                    else
+                    {
+                        configuration.setSystemProperties( getSystemProperties() );
+                        configuration.setUserProperties( new Properties() );
+                    }
                     configuration.setRepositorySession( legacySupport.getRepositorySession() );
 
                     project = projectBuilder.build( pomArtifact, configuration ).getProject();

@@ -2304,7 +2304,7 @@
     /**
      * Gets the identifier of the plugin.
      *
-     * @return The plugin id in the form {@code <groupId>:<artifactId>:<version>}, never {@code null}.
+     * @return the plugin id in the form {@code <groupId>:<artifactId>:<version>}, never {@code null}
      */
     public String getId()
     {
@@ -2672,7 +2672,7 @@
         <field>
           <name>property</name>
           <version>4.0.0+</version>
-          <description>Specifies that this profile will be activated when this system property is
+          <description>Specifies that this profile will be activated when this property is
             specified.</description>
           <association>
             <type>ActivationProperty</type>
@@ -2774,7 +2774,7 @@
         activated. On the other hand, {@code exists} will test for the existence of the file and if it is
         there, the profile will be activated.<br>
         Variable interpolation for these file specifications is limited to {@code ${basedir}},
-        System properties and request properties.]]></description>
+        system properties and user properties.]]></description>
       <fields>
         <field>
           <name>missing</name>
@@ -2846,7 +2846,7 @@
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            The version of the reporting plugin to be used. Starting with Maven 3, if no version is defined explicitely,
+            The version of the reporting plugin to be used. Starting with Maven 3, if no version is defined explicitly,
             version is searched in {@code build/plugins} then in {@code build/pluginManagement}.
             ]]>
           </description>

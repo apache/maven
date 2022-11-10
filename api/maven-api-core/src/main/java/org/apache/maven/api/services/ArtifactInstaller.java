@@ -38,8 +38,8 @@ public interface ArtifactInstaller extends Service
 {
     /**
      * @param request {@link ArtifactInstallerRequest}
-     * @throws ArtifactInstallerException in case of an error.
-     * @throws IllegalArgumentException in case {@code request} is {@code null}.
+     * @throws ArtifactInstallerException in case of an error
+     * @throws IllegalArgumentException in case {@code request} is {@code null}
      */
     void install( ArtifactInstallerRequest request );
 

@@ -159,6 +159,38 @@ public class DefaultPluginRealmCache
         return cache.get( key );
     }
 
+    @Override
+    public CacheRecord get( Key key, PluginRealmSupplier supplier )
+            throws PluginResolutionException, PluginContainerException
+    {
+        try
+        {
+            return cache.computeIfAbsent( key, k ->
+            {
+                try
+                {
+                    return supplier.load();
+                }
+                catch ( PluginResolutionException | PluginContainerException e )
+                {
+                    throw new RuntimeException( e );
+                }
+            } );
+        }
+        catch ( RuntimeException e )
+        {
+            if ( e.getCause() instanceof PluginResolutionException )
+            {
+                throw (PluginResolutionException) e.getCause();
+            }
+            if ( e.getCause() instanceof PluginContainerException )
+            {
+                throw (PluginContainerException) e.getCause();
+            }
+            throw e;
+        }
+    }
+
     public CacheRecord put( Key key, ClassRealm pluginRealm, List<Artifact> pluginArtifacts )
     {
         Objects.requireNonNull( pluginRealm, "pluginRealm cannot be null" );

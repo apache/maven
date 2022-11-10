@@ -33,8 +33,8 @@ public class XmlReaderException
 {
 
     /**
-     * @param message The message for the exception.
-     * @param e The exception itself.
+     * @param message the message for the exception
+     * @param e the exception itself
      */
     public XmlReaderException( String message, Exception e )
     {

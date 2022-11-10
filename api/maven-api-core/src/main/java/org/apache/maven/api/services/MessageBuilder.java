@@ -141,7 +141,7 @@ public interface MessageBuilder
      * Append formatted content to the buffer.
      * @see String#format(String, Object...)
      * @param pattern a <a href="../util/Formatter.html#syntax">format string</a>
-     * @param args arguments referenced by the format specifiers in the format string.
+     * @param args arguments referenced by the format specifiers in the format string
      * @return the current builder
      */
     @Nonnull

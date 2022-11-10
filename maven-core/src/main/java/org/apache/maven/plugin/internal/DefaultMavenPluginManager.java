@@ -184,31 +184,29 @@ public class DefaultMavenPluginManager
         this.prerequisitesCheckers = prerequisitesCheckers;
     }
 
-    public synchronized PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories,
-                                                             RepositorySystemSession session )
+    public PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories,
+                                                 RepositorySystemSession session )
         throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException
     {
         PluginDescriptorCache.Key cacheKey = pluginDescriptorCache.createKey( plugin, repositories, session );
 
-        PluginDescriptor pluginDescriptor = pluginDescriptorCache.get( cacheKey );
-
-        if ( pluginDescriptor == null )
+        PluginDescriptor pluginDescriptor = pluginDescriptorCache.get( cacheKey, () ->
         {
             org.eclipse.aether.artifact.Artifact artifact =
                 pluginDependenciesResolver.resolve( plugin, repositories, session );
 
             Artifact pluginArtifact = RepositoryUtils.toArtifact( artifact );
 
-            pluginDescriptor = extractPluginDescriptor( pluginArtifact, plugin );
+            PluginDescriptor descriptor = extractPluginDescriptor( pluginArtifact, plugin );
 
-            if ( StringUtils.isBlank( pluginDescriptor.getRequiredMavenVersion() ) )
+            if ( StringUtils.isBlank( descriptor.getRequiredMavenVersion() ) )
             {
                 // only take value from underlying POM if plugin descriptor has no explicit Maven requirement
-                pluginDescriptor.setRequiredMavenVersion( artifact.getProperty( "requiredMavenVersion", null ) );
+                descriptor.setRequiredMavenVersion( artifact.getProperty( "requiredMavenVersion", null ) );
             }
 
-            pluginDescriptorCache.put( cacheKey, pluginDescriptor );
-        }
+            return descriptor;
+        } );
 
         pluginDescriptor.setPlugin( plugin );
 
@@ -345,8 +343,8 @@ public class DefaultMavenPluginManager
         }
     }
 
-    public synchronized void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session,
-                                               ClassLoader parent, List<String> imports, DependencyFilter filter )
+    public void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session,
+                                  ClassLoader parent, List<String> imports, DependencyFilter filter )
         throws PluginResolutionException, PluginContainerException
     {
         Plugin plugin = pluginDescriptor.getPlugin();
@@ -386,23 +384,19 @@ public class DefaultMavenPluginManager
                                                                         project.getRemotePluginRepositories(),
                                                                         session.getRepositorySession() );
 
-            PluginRealmCache.CacheRecord cacheRecord = pluginRealmCache.get( cacheKey );
-
-            if ( cacheRecord != null )
-            {
-                pluginDescriptor.setClassRealm( cacheRecord.getRealm() );
-                pluginDescriptor.setArtifacts( new ArrayList<>( cacheRecord.getArtifacts() ) );
-                for ( ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents() )
-                {
-                    componentDescriptor.setRealm( cacheRecord.getRealm() );
-                }
-            }
-            else
+            PluginRealmCache.CacheRecord cacheRecord = pluginRealmCache.get( cacheKey, () ->
             {
                 createPluginRealm( pluginDescriptor, session, parent, foreignImports, filter );
 
-                cacheRecord =
-                    pluginRealmCache.put( cacheKey, pluginDescriptor.getClassRealm(), pluginDescriptor.getArtifacts() );
+                return new PluginRealmCache.CacheRecord(
+                        pluginDescriptor.getClassRealm(), pluginDescriptor.getArtifacts() );
+            } );
+
+            pluginDescriptor.setClassRealm( cacheRecord.getRealm() );
+            pluginDescriptor.setArtifacts( new ArrayList<>( cacheRecord.getArtifacts() ) );
+            for ( ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents() )
+            {
+                componentDescriptor.setRealm( cacheRecord.getRealm() );
             }
 
             pluginRealmCache.register( project, cacheKey, cacheRecord );

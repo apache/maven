@@ -477,7 +477,7 @@ public class MavenCli
         List<Option> setPropertyOptions = new ArrayList<>();
         for ( Option opt : mavenArgs.getOptions() )
         {
-            if ( String.valueOf( CLIManager.SET_SYSTEM_PROPERTY ).equals( opt.getOpt() ) )
+            if ( String.valueOf( CLIManager.SET_USER_PROPERTY ).equals( opt.getOpt() ) )
             {
                 setPropertyOptions.add( opt );
             }
@@ -490,7 +490,7 @@ public class MavenCli
         {
             commandLineBuilder.addOption( opt );
         }
-        // finally add the CLI system properties
+        // finally add the CLI user properties
         for ( Option opt : setPropertyOptions )
         {
             commandLineBuilder.addOption( opt );
@@ -1745,7 +1745,7 @@ public class MavenCli
     }
 
     // ----------------------------------------------------------------------
-    // System properties handling
+    // Properties handling
     // ----------------------------------------------------------------------
 
     static void populateProperties( CommandLine commandLine, Properties systemProperties, Properties userProperties )
@@ -1759,7 +1759,7 @@ public class MavenCli
         // ----------------------------------------------------------------------
 
         final Properties userSpecifiedProperties = commandLine.getOptionProperties(
-                String.valueOf( CLIManager.SET_SYSTEM_PROPERTY ) );
+                String.valueOf( CLIManager.SET_USER_PROPERTY ) );
         userSpecifiedProperties.forEach(
                 ( prop, value ) -> setCliProperty( (String) prop, (String) value, userProperties )
         );

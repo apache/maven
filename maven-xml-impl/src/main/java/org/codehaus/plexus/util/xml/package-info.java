@@ -1,4 +1,13 @@
-package org.apache.maven.api;
+// CHECKSTYLE_OFF: RegexpHeader
+/**
+ * Contains modified versions of the
+ * {@link org.codehaus.plexus.util.xml.Xpp3Dom} and
+ * {@link org.codehaus.plexus.util.xml.Xpp3DomBuilder}
+ * classes.
+ * The modified {@link org.codehaus.plexus.util.xml.Xpp3Dom} wraps
+ * an immutable {@link org.apache.maven.api.xml.Dom} instance.
+ */
+package org.codehaus.plexus.util.xml;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +18,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,31 +27,3 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.api.annotations.Nonnull;
-
-public interface Dependency extends Artifact
-{
-
-    /**
-     * The artifact type.
-     *
-     * @return the artifact type, never {@code null}
-     */
-    @Nonnull
-    Type getType();
-
-    @Nonnull
-    Scope getScope();
-
-    boolean isOptional();
-
-    /**
-     * Creates a {@code DependencyCoordinate} based on this {@code Dependency}.
-     *
-     * @return a {@link DependencyCoordinate}
-     */
-    @Nonnull
-    DependencyCoordinate toCoordinate();
-
-}

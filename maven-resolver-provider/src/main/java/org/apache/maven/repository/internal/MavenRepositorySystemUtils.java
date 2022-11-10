@@ -19,8 +19,6 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import java.util.Properties;
-
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.artifact.DefaultArtifactType;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
@@ -103,19 +101,6 @@ public final class MavenRepositorySystemUtils
         session.setArtifactTypeRegistry( stereotypes );
 
         session.setArtifactDescriptorPolicy( new SimpleArtifactDescriptorPolicy( true, true ) );
-
-        final Properties systemProperties = new Properties();
-
-        // MNG-5670 guard against ConcurrentModificationException
-        // MNG-6053 guard against key without value
-        Properties sysProp = System.getProperties();
-        synchronized ( sysProp )
-        {
-            systemProperties.putAll( sysProp );
-        }
-
-        session.setSystemProperties( systemProperties );
-        session.setConfigProperties( systemProperties );
 
         return session;
     }

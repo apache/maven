@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.feature.Features;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.internal.xml.Xpp3Dom;
+import org.apache.maven.model.ModelBase;
 import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.rtinfo.RuntimeInformation;
@@ -150,6 +152,9 @@ public class DefaultRepositorySystemSessionFactory
         configProps.put( ConfigurationProperties.USER_AGENT, getUserAgent() );
         configProps.put( ConfigurationProperties.INTERACTIVE, request.isInteractiveMode() );
         configProps.put( "maven.startTime", request.getStartTime() );
+        // First add properties populated from settings.xml
+        configProps.putAll( getPropertiesFromRequestedProfiles( request ) );
+        // Resolver's ConfigUtils solely rely on config properties, that is why we need to add both here as well.
         configProps.putAll( request.getSystemProperties() );
         configProps.putAll( request.getUserProperties() );
 
@@ -288,13 +293,13 @@ public class DefaultRepositorySystemSessionFactory
                     + MAVEN_RESOLVER_TRANSPORT_NATIVE + ", " + MAVEN_RESOLVER_TRANSPORT_AUTO );
         }
 
-        session.setTransferListener( request.getTransferListener() );
-
-        session.setRepositoryListener( eventSpyDispatcher.chainListener( new LoggingRepositoryListener( logger ) ) );
-
         session.setUserProperties( request.getUserProperties() );
         session.setSystemProperties( request.getSystemProperties() );
         session.setConfigProperties( configProps );
+
+        session.setTransferListener( request.getTransferListener() );
+
+        session.setRepositoryListener( eventSpyDispatcher.chainListener( new LoggingRepositoryListener( logger ) ) );
 
         mavenRepositorySystem.injectMirror( request.getRemoteRepositories(), request.getMirrors() );
         mavenRepositorySystem.injectProxy( session, request.getRemoteRepositories() );
@@ -310,6 +315,20 @@ public class DefaultRepositorySystemSessionFactory
         }
 
         return session;
+    }
+
+    private Map<?, ?> getPropertiesFromRequestedProfiles( MavenExecutionRequest request )
+    {
+
+        HashSet<String> activeProfileId = new HashSet<>( request.getProfileActivation().getRequiredActiveProfileIds() );
+        activeProfileId.addAll( request.getProfileActivation().getOptionalActiveProfileIds() );
+
+        return request.getProfiles().stream()
+            .filter( profile -> activeProfileId.contains( profile.getId() ) )
+            .map( ModelBase::getProperties )
+            .flatMap( properties -> properties.entrySet().stream() )
+            .collect(
+                Collectors.toMap( Map.Entry::getKey, Map.Entry::getValue, ( k1, k2 ) -> k2  ) );
     }
 
     private String getUserAgent()
