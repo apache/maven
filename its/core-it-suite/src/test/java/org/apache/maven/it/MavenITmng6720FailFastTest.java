@@ -19,14 +19,12 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-import org.apache.maven.shared.verifier.VerificationException;
-
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 
+import org.apache.maven.shared.verifier.VerificationException;
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -36,7 +34,7 @@ import org.junit.jupiter.api.Test;
  * <a href="https://issues.apache.org/jira/browse/MNG-6720">MNG-6720</a>.
  *
  */
-public class MavenITmng6720FailFastTest
+class MavenITmng6720FailFastTest
     extends AbstractMavenIntegrationTestCase
 {
 
@@ -46,35 +44,34 @@ public class MavenITmng6720FailFastTest
     }
 
     @Test
-    public void testItShouldWaitForConcurrentModulesToFinish()
+    void testItShouldWaitForConcurrentModulesToFinish()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6720-fail-fast" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
-        verifier.setMavenDebug( false );
         verifier.setAutoclean( false );
-        verifier.addCliOption( "-T" );
-        verifier.addCliOption( "2" );
-        verifier.addCliOption( "-Dmaven.test.redirectTestOutputToFile=true" );
+        verifier.addCliArguments( "-T", "2" );
+        verifier.addCliArgument( "-Dmaven.test.redirectTestOutputToFile=true" );
+        verifier.addCliArguments( "clean", "test" );
 
         try
         {
-            verifier.executeGoals( Arrays.asList( "clean", "test" ) );
-        } catch ( VerificationException e )
+            verifier.execute();
+        }
+        catch ( VerificationException e)
         {
             //expected
         }
-        verifier.resetStreams();
 
         List<String> module1Lines = verifier.loadFile(
             new File( testDir, "module-1/target/surefire-reports/Module1Test-output.txt" ), false );
-        assertTrue( module1Lines.contains( "Module1" ) );
+        assertTrue( "module-1 should be executed", module1Lines.contains( "Module1" ) );
         List<String> module2Lines = verifier.loadFile(
             new File( testDir, "module-2/target/surefire-reports/Module2Test-output.txt" ), false );
-        assertTrue(module2Lines.contains( "Module2" ) );
+        assertTrue("module-2 should be executed", module2Lines.contains( "Module2" ) );
         List<String> module3Lines = verifier.loadFile(
             new File( testDir, "module-3/target/surefire-reports/Module3Test-output.txt" ), false );
-        assertTrue( module3Lines.isEmpty() );
+        assertTrue( "module-3 should be skipped", module3Lines.isEmpty() );
     }
 }

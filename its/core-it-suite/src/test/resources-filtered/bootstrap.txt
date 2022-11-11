@@ -103,6 +103,7 @@ org.apache.maven.plugins:maven-resources-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-resources-plugin:2.6
 org.apache.maven.plugins:maven-resources-plugin:2.7
 org.apache.maven.plugins:maven-resources-plugin:3.2.0
+org.apache.maven.plugins:maven-resources-plugin:3.3.0
 org.apache.maven.plugins:maven-site-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-site-plugin:3.2
 org.apache.maven.plugins:maven-site-plugin:3.3
