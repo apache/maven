@@ -481,6 +481,9 @@ public class DefaultMaven
         }
     }
 
+    /**
+     * TODO: why is this method public?
+     */
     public RepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
         return repositorySessionFactory.newRepositorySession( request );
