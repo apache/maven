@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.maven.shared.verifier.Verifier;
-import org.codehaus.plexus.util.IOUtil;
 import org.junit.jupiter.api.ClassDescriptor;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.ClassOrdererContext;
@@ -51,36 +50,26 @@ public class TestSuiteOrdering implements ClassOrderer
     {
         try
         {
-            PrintStream info = null;
-            Verifier verifier = null;
-            try
+            Verifier verifier = new Verifier( "" );
+            String mavenVersion = verifier.getMavenVersion();
+            String executable = verifier.getExecutable();
+
+            out.println( "Running integration tests for Maven " + mavenVersion + System.lineSeparator()
+                             + "\tusing Maven executable: " + executable + System.lineSeparator()
+                             + "\twith verifier.forkMode: " + System.getProperty( "verifier.forkMode",
+                                                                                  "not defined == fork" ) );
+
+            System.setProperty( "maven.version", mavenVersion );
+
+            String basedir = System.getProperty( "basedir", "." );
+
+            try ( PrintStream info = new PrintStream(
+                Files.newOutputStream( Paths.get( basedir, "target/info.txt" ) ) ) )
             {
-                verifier = new Verifier( "" );
-                String mavenVersion = verifier.getMavenVersion();
-
-                String executable = verifier.getExecutable();
-
-                out.println( "Running integration tests for Maven " + mavenVersion + System.lineSeparator()
-                        + "\tusing Maven executable: " + executable + System.lineSeparator()
-                        + "\twith verifier.forkMode: " + System.getProperty( "verifier.forkMode", "not defined == fork" ) );
-
-                System.setProperty( "maven.version", mavenVersion );
-
-                String basedir = System.getProperty( "basedir" );
-                info = new PrintStream( Files.newOutputStream( Paths.get( basedir, "target/info.txt" ) ) );
-
                 infoProperty( info, "maven.version" );
                 infoProperty( info, "java.version" );
                 infoProperty( info, "os.name" );
                 infoProperty( info, "os.version" );
-            }
-            finally
-            {
-                if ( verifier != null )
-                {
-                    verifier.resetStreams();
-                }
-                IOUtil.close( info );
             }
         }
         catch ( Exception e )
