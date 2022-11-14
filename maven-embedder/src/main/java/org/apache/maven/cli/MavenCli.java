@@ -103,7 +103,6 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -638,8 +637,7 @@ public class MavenCli
 
         ContainerConfiguration cc = new DefaultContainerConfiguration().setClassWorld( cliRequest.classWorld )
             .setRealm( containerRealm ).setClassPathScanning( PlexusConstants.SCANNING_INDEX ).setAutoWiring( true )
-            .setJSR250Lifecycle( true ).setName( "maven" )
-            .setContext( plexusContext( cliRequest ) );
+            .setJSR250Lifecycle( true ).setName( "maven" );
 
         Set<String> exportedArtifacts = new HashSet<>( coreEntry.getExportedArtifacts() );
         Set<String> exportedPackages = new HashSet<>( coreEntry.getExportedPackages() );
@@ -733,8 +731,7 @@ public class MavenCli
             .setClassPathScanning( PlexusConstants.SCANNING_INDEX ) //
             .setAutoWiring( true ) //
             .setJSR250Lifecycle( true ) //
-            .setName( "maven" )
-            .setContext( plexusContext( cliRequest ) );
+            .setName( "maven" );
 
         DefaultPlexusContainer container = new DefaultPlexusContainer( cc, new AbstractModule()
         {
@@ -791,23 +788,6 @@ public class MavenCli
             return parser.read( is ).getExtensions();
         }
 
-    }
-
-    /**
-     * Sets up Plexus context map, that makes possible named parameters injection into components managed by the
-     * container.
-     *
-     * @param cliRequest The CLI request to source system and user properties from.
-     * @return The "context" map to be used with Plexus Container.
-     * @see <a href="https://www.eclipse.org/sisu/docs/api/org.eclipse.sisu.inject/reference/org/eclipse/sisu/Parameters.html">Sisu Parameters</a>
-     * @see <a href="https://github.com/eclipse/sisu.plexus/wiki/Plexus-to-JSR330#configuration">Configuration</a>
-     */
-    private Map<Object, Object> plexusContext( CliRequest cliRequest )
-    {
-        HashMap<Object, Object> result = new HashMap<>();
-        result.putAll( cliRequest.systemProperties );
-        result.putAll( cliRequest.userProperties );
-        return result;
     }
 
     private ClassRealm setupContainerRealm( ClassWorld classWorld, ClassRealm coreRealm, List<File> extClassPath,
