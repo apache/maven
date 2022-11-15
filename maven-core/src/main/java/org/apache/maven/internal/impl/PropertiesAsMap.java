@@ -71,6 +71,8 @@ class PropertiesAsMap extends AbstractMap<String, String>
                         {
                             throw new NoSuchElementException();
                         }
+                        Entry<Object, Object> next = this.next;
+                        this.next = null;
                         return new Entry<String, String>()
                         {
                             @Override
