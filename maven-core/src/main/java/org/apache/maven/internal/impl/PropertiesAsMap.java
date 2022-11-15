@@ -67,30 +67,30 @@ class PropertiesAsMap extends AbstractMap<String, String>
                     @Override
                     public Entry<String, String> next()
                     {
-                        if ( next == null )
+                        if ( !hasNext() )
                         {
                             throw new NoSuchElementException();
                         }
-                        Entry<Object, Object> next = this.next;
-                        this.next = null;
+                        Entry<Object, Object> ret = next;
+                        next = null;
                         return new Entry<String, String>()
                         {
                             @Override
                             public String getKey()
                             {
-                                return (String) next.getKey();
+                                return (String) ret.getKey();
                             }
 
                             @Override
                             public String getValue()
                             {
-                                return (String) next.getValue();
+                                return (String) ret.getValue();
                             }
 
                             @Override
                             public String setValue( String value )
                             {
-                                return (String) next.setValue( value );
+                                return (String) ret.setValue( value );
                             }
                         };
                     }
