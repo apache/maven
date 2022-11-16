@@ -279,6 +279,30 @@ under the License.
       <plugin>
         <groupId>com.github.siom79.japicmp</groupId>
         <artifactId>japicmp-maven-plugin</artifactId>
+        <configuration>
+          <parameter>
+            <!-- allowed non-binary backwards compatible changes -->
+            <excludes>
+              <!-- START default constructor on Plexus/JSR 330 components -->
+              <exclude>org.apache.maven.lifecycle.DefaultLifecycleExecutor#DefaultLifecycleExecutor()</exclude>
+              <exclude>org.apache.maven.plugin.DefaultBuildPluginManager#DefaultBuildPluginManager()</exclude>
+              <exclude>org.apache.maven.project.DefaultMavenProjectHelper#DefaultMavenProjectHelper()</exclude>
+              <exclude>org.apache.maven.project.DefaultProjectBuilder#DefaultProjectBuilder()</exclude>
+              <exclude>org.apache.maven.project.DefaultProjectBuildingHelper#DefaultProjectBuildingHelper()</exclude>
+              <exclude>org.apache.maven.project.DefaultProjectDependenciesResolver#DefaultProjectDependenciesResolver()</exclude>
+              <exclude>org.apache.maven.rtinfo.internal.DefaultRuntimeInformation#DefaultRuntimeInformation()</exclude>
+              <exclude>org.apache.maven.settings.DefaultMavenSettingsBuilder#DefaultMavenSettingsBuilder()</exclude>
+              <exclude>org.apache.maven.toolchain.DefaultToolchainManagerPrivate#DefaultToolchainManagerPrivate()</exclude>
+              <!-- END default constructor on Plexus/JSR 330 components -->
+              <!-- system property with that name no longer evaluated -->
+              <exclude>org.apache.maven.project.DefaultProjectBuilder#DISABLE_GLOBAL_MODEL_CACHE_SYSTEM_PROPERTY</exclude>
+              <!-- was only a workaround for Plexus Container, hopefully never used by anyone else -->
+              <exclude>org.apache.maven.plugin.DefaultBuildPluginManager#setMojoExecutionListeners(java.util.List)</exclude>
+              <!-- could have never been used due to usage of non-export class (CoreExportsProvider) -->
+              <exclude>org.apache.maven.classrealm.DefaultClassRealmManager#DefaultClassRealmManager(org.codehaus.plexus.logging.Logger,org.codehaus.plexus.PlexusContainer,java.util.List,org.apache.maven.extension.internal.CoreExportsProvider)</exclude>
+            </excludes>
+          </parameter>
+        </configuration>
       </plugin>
     </plugins>
   </build>

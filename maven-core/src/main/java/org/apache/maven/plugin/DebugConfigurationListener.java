@@ -23,6 +23,7 @@ import java.lang.reflect.Array;
 
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Log at debug level the mojo configuration.
@@ -34,6 +35,15 @@ public class DebugConfigurationListener
     implements ConfigurationListener
 {
     private final Logger logger;
+
+    /**
+     * @deprecated Use {@link #DebugConfigurationListener(Logger)} instead.
+     */
+    @Deprecated
+    public DebugConfigurationListener( org.codehaus.plexus.logging.Logger logger )
+    {
+        this( LoggerFactory.getLogger( logger.getName() ) );
+    }
 
     public DebugConfigurationListener( Logger logger )
     {

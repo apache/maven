@@ -343,6 +343,13 @@ public class DefaultMavenPluginManager
         }
     }
 
+    @Override
+    @Deprecated
+    public void checkRequiredMavenVersion( PluginDescriptor pluginDescriptor ) throws PluginIncompatibleException
+    {
+        checkPrerequisites( pluginDescriptor );
+    }
+
     public void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session,
                                   ClassLoader parent, List<String> imports, DependencyFilter filter )
         throws PluginResolutionException, PluginContainerException
