@@ -68,6 +68,7 @@ under the License.
       <includes>
         <include>*.cmd</include>
         <include>*.conf</include>
+        <include>*.ps1</include>
       </includes>
       <lineEnding>dos</lineEnding>
     </fileSet>
@@ -110,6 +111,19 @@ under the License.
         <source>src/assembly/shared/run.cmd</source>
       </sources>
       <destName>mvn.cmd</destName>
+      <outputDirectory>bin</outputDirectory>
+      <lineEnding>dos</lineEnding>
+      <filtered>true</filtered>
+    </file>
+    <file>
+      <sources>
+        <source>src/assembly/shared/validate.ps1</source>
+        <source>src/assembly/shared/mvnvalidate.ps1</source>
+        <source>src/assembly/shared/init.ps1</source>
+        <source>src/assembly/shared/mvnlauncher.ps1</source>
+        <source>src/assembly/shared/run.ps1</source>
+      </sources>
+      <destName>mvn.ps1</destName>
       <outputDirectory>bin</outputDirectory>
       <lineEnding>dos</lineEnding>
       <filtered>true</filtered>
