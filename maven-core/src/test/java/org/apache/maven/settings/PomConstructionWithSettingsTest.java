@@ -22,12 +22,15 @@ package org.apache.maven.settings;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Arrays;
 
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.model.Profile;
+import org.apache.maven.project.AbstractMavenProjectTestCase;
 import org.apache.maven.project.DefaultProjectBuilder;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.ProjectBuildingRequest.RepositoryMerging;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
@@ -47,7 +50,7 @@ import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @PlexusTest
-public class PomConstructionWithSettingsTest
+public class PomConstructionWithSettingsTest extends AbstractMavenProjectTestCase
 {
     private static final String BASE_DIR = "src/test";
 
@@ -108,6 +111,7 @@ public class PomConstructionWithSettingsTest
         File settingsFile = new File( testDirectory + File.separator + pomPath, "settings.xml" );
         Settings settings = readSettingsFile( settingsFile );
 
+        
         ProjectBuildingRequest config = new DefaultProjectBuildingRequest();
 
         for ( org.apache.maven.settings.Profile rawProfile : settings.getProfiles() )
@@ -116,19 +120,14 @@ public class PomConstructionWithSettingsTest
             config.addProfile( profile );
         }
 
-        String localRepoUrl =
-            System.getProperty( "maven.repo.local", System.getProperty( "user.home" ) + "/.m2/repository" );
-        localRepoUrl = "file://" + localRepoUrl;
-        config.setLocalRepository(
-            repositorySystem.createArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout(), null,
-                                                       null ) );
-        config.setActiveProfileIds( settings.getActiveProfiles() );
+        config.setLocalRepository( this.getLocalRepository() );
+        config.setRemoteRepositories( Arrays.asList( this.repositorySystem.createDefaultRemoteRepository() ) );
+        config.setPluginArtifactRepositories( Arrays.asList( this.repositorySystem.createDefaultRemoteRepository() ) );
+        // make sure to always resolve from test remote repo (and not from repo from super pom) due to usage of TestRepositoryConnector
+        config.setRepositoryMerging( RepositoryMerging.REQUEST_DOMINANT );
+        initRepoSession( config );
 
-        DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
-        LocalRepository localRepo = new LocalRepository( config.getLocalRepository().getBasedir() );
-        repoSession.setLocalRepositoryManager(
-            new SimpleLocalRepositoryManagerFactory().newInstance( repoSession, localRepo ) );
-        config.setRepositorySession( repoSession );
+        config.setActiveProfileIds( settings.getActiveProfiles() );
 
         return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ).getProject() );
     }
