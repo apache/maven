@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -62,6 +63,7 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.SessionData;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.NoLocalRepositoryManagerException;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
@@ -70,6 +72,7 @@ import org.eclipse.aether.spi.localrepo.LocalRepositoryManagerFactory;
 import org.eclipse.aether.transform.FileTransformer;
 import org.eclipse.aether.transform.TransformException;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
+import org.eclipse.aether.util.repository.ChainedLocalRepositoryManager;
 import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
 import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
@@ -192,7 +195,27 @@ public class DefaultRepositorySystemSessionFactory
         }
         else
         {
-            session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( session, localRepo ) );
+            // TODO: this is just hacked up to make it work
+            String localRepoTail = (String) configProps.getOrDefault( "maven.repo.local.tail", null );
+            if ( localRepoTail != null )
+            {
+                LocalRepositoryManager head = repoSystem.newLocalRepositoryManager( session, localRepo );
+                List<LocalRepositoryManager> tail = new ArrayList<>();
+
+                List<String> paths = Arrays.stream( localRepoTail.split( File.pathSeparator ) )
+                        .collect( Collectors.toList() );
+                for ( String path : paths )
+                {
+                    tail.add( repoSystem.newLocalRepositoryManager( session, new LocalRepository( path ) ) );
+                }
+
+                // TODO: make ignoreTailAvailability configurable
+                session.setLocalRepositoryManager( new ChainedLocalRepositoryManager( head, tail, true ) );
+            }
+            else
+            {
+                session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( session, localRepo ) );
+            }
         }
 
         session.setWorkspaceReader(
