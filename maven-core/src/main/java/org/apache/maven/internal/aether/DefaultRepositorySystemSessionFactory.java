@@ -132,28 +132,6 @@ public class DefaultRepositorySystemSessionFactory
 
         session.setArtifactTypeRegistry( RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager ) );
 
-        LocalRepository localRepo = new LocalRepository( request.getLocalRepository().getBasedir() );
-
-        if ( request.isUseLegacyLocalRepository() )
-        {
-            try
-            {
-                session.setLocalRepositoryManager( simpleLocalRepoMgrFactory.newInstance( session, localRepo ) );
-                logger.info( "Disabling enhanced local repository: using legacy is strongly discouraged to ensure"
-                                 + " build reproducibility." );
-
-            }
-            catch ( NoLocalRepositoryManagerException e )
-            {
-                logger.error( "Failed to configure legacy local repository: falling back to default" );
-                session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( session, localRepo ) );
-            }
-        }
-        else
-        {
-            session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( session, localRepo ) );
-        }
-
         if ( request.getWorkspaceReader() != null )
         {
             session.setWorkspaceReader( request.getWorkspaceReader() );
@@ -240,7 +218,33 @@ public class DefaultRepositorySystemSessionFactory
         mavenRepositorySystem.injectProxy( session, request.getPluginArtifactRepositories() );
         mavenRepositorySystem.injectAuthentication( session, request.getPluginArtifactRepositories() );
 
+        setUpLocalRepositoryManager( request, session );
+
         return session;
+    }
+
+    private void setUpLocalRepositoryManager( MavenExecutionRequest request, DefaultRepositorySystemSession session )
+    {
+        LocalRepository localRepo = new LocalRepository( request.getLocalRepository().getBasedir() );
+
+        if ( request.isUseLegacyLocalRepository() )
+        {
+            try
+            {
+                session.setLocalRepositoryManager( simpleLocalRepoMgrFactory.newInstance( session, localRepo ) );
+                logger.info( "Disabling enhanced local repository: using legacy is strongly discouraged to ensure"
+                                 + " build reproducibility." );
+            }
+            catch ( NoLocalRepositoryManagerException e )
+            {
+                logger.error( "Failed to configure legacy local repository: falling back to default" );
+                session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( session, localRepo ) );
+            }
+        }
+        else
+        {
+            session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( session, localRepo ) );
+        }
     }
 
     private String getUserAgent()
