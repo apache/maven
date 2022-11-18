@@ -25,6 +25,7 @@ import java.util.Arrays;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
+import org.apache.maven.project.ProjectBuildingRequest.RepositoryMerging;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.testing.PlexusTest;
@@ -153,6 +154,9 @@ public abstract class AbstractMavenProjectTestCase
         final ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setLocalRepository( this.getLocalRepository() );
         configuration.setRemoteRepositories( Arrays.asList( this.repositorySystem.createDefaultRemoteRepository() ) );
+        configuration.setPluginArtifactRepositories( Arrays.asList( this.repositorySystem.createDefaultRemoteRepository() ) );
+        // make sure to always resolve from test remote repo (and not from repo from super pom) due to usage of TestRepositoryConnector
+        configuration.setRepositoryMerging( RepositoryMerging.REQUEST_DOMINANT );
         initRepoSession( configuration );
 
         return projectBuilder.build( pom, configuration ).getProject();

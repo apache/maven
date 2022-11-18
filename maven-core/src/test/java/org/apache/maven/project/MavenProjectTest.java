@@ -105,7 +105,7 @@ public class MavenProjectTest
         throws Exception
     {
         File f = getFileForClasspathResource( "canonical-pom.xml" );
-        MavenProject projectToClone = getProject( f );
+        MavenProject projectToClone = getProjectFromRemoteRepository( f );
 
         MavenProject clonedProject = projectToClone.clone();
         assertEquals( "maven-core", clonedProject.getArtifactId() );

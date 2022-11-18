@@ -32,8 +32,9 @@ under the License.
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-plexus-plugin</artifactId>
-        <version>1.0</version>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-maven-plugin</artifactId>
+        <version>1.1</version>
         <configuration>
           <plexusConfiguration>src/conf/plexus.conf</plexusConfiguration>
           <plexusConfigurationPropertiesFile>src/conf/plexus.properties</plexusConfigurationPropertiesFile>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.maven.its</groupId>
+    <artifactId>core-it-support</artifactId>
+    <version>2.1-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.apache.maven.its.plugins</groupId>
+  <artifactId>maven-it-plugins</artifactId>
+  <packaging>pom</packaging>
+
+  <name>Maven IT :: Plugins</name>
+  <description>Maven Integration Tests Plugins, to completely decouple ITs from production plugins.</description>
+
+  <modules>
+    <module>maven-it-plugin-active-collection</module>
+    <module>maven-it-plugin-ant-based</module>
+    <module>maven-it-plugin-artifact</module>
+    <module>maven-it-plugin-class-loader</module>
+    <module>maven-it-plugin-configuration</module>
+    <module>maven-it-plugin-context-passing</module>
+    <module>maven-it-plugin-core-stubs</module>
+    <module>maven-it-plugin-dependency-collection</module>
+    <module>maven-it-plugin-dependency-resolution</module>
+    <module>maven-it-plugin-expression</module>
+    <module>maven-it-plugin-error</module>
+    <module>maven-it-plugin-extension-consumer</module>
+    <module>maven-it-plugin-extension-provider</module>
+    <module>maven-it-plugin-fork</module>
+    <module>maven-it-plugin-invalid-descriptor</module>
+    <module>maven-it-plugin-log-file</module>
+    <module>maven-it-plugin-model-interpolation</module>
+    <module>maven-it-plugin-no-default-comp</module>
+    <module>maven-it-plugin-no-project</module>
+    <module>maven-it-plugin-online</module>
+    <module>maven-it-plugin-optional-mojos</module>
+    <module>maven-it-plugin-packaging</module>
+    <module>maven-it-plugin-parameter-implementation</module>
+    <module>maven-it-plugin-plugin-dependency</module>
+    <module>maven-it-plugin-project</module>
+    <module>maven-it-plugin-project-interpolation</module>
+    <module>maven-it-plugin-setter</module>
+    <module>maven-it-plugin-singleton-component</module>
+    <module>maven-it-plugin-site</module>
+    <module>maven-it-plugin-toolchain</module>
+    <module>maven-it-plugin-touch</module>
+    <module>maven-it-plugin-uses-properties</module>
+    <module>maven-it-plugin-uses-wagon</module>
+    <module>maven-it-plugin-all</module>
+    <module>maven-it-plugin-plexus-utils-11</module>
+    <module>maven-it-plugin-plexus-utils-new</module>
+    <module>maven-it-plugin-plexus-component-api</module>
+    <module>maven-it-plugin-log4j</module>
+    <module>maven-it-plugin-extension1</module>
+    <module>maven-it-plugin-extension2</module>
+    <module>maven-it-plugin-plexus-lifecycle</module>
+    <module>maven-it-plugin-settings</module>
+    <module>mng5805-extension</module>
+    <module>mng5805-extension2</module>
+    <module>mng5805-plugin</module>
+    <module>mng5805-plugin-dep</module>
+    <module>mng5958-extension</module>
+    <module>mng6759-plugin-resolves-project-dependencies</module>
+    <module>mng7529-plugin</module>
+  </modules>
+
+  <distributionManagement>
+    <repository>
+      <id>maven.it</id>
+      <name>Apache Maven IT Repository</name>
+      <url>https://repository.apache.org/content/repositories/snapshots</url>
+    </repository>
+    <snapshotRepository>
+      <id>maven.it</id>
+      <name>${distMgmtSnapshotsName}</name>
+      <url>${distMgmtSnapshotsUrl}</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <properties>
+    <distMgmtSnapshotsName>Apache Maven IT Snapshot Repository</distMgmtSnapshotsName>
+    <distMgmtSnapshotsUrl>https://repository.apache.org/content/repositories/snapshots</distMgmtSnapshotsUrl>
+  </properties>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
+</project>
