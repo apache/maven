@@ -56,12 +56,12 @@ if (-not (Test-Path $JAVACMD)) {
 $MAVEN_HOME = (Get-Item $PSScriptRoot"\..")
 
 # check if maven command exists
-if (-not (Test-path $MAVEN_HOME"\bin\mvn.ps1")) {
+if (-not (Test-path "$MAVEN_HOME\bin\mvn.ps1")) {
     Write-Error -Message "maven command (\bin\mvn.ps1) cannot be found" -ErrorAction Stop
 }
 # ==== END VALIDATION ====
 
-$CLASSWORLDS_CONF = $MAVEN_HOME + "\bin\m2.conf"
+$CLASSWORLDS_CONF = "$MAVEN_HOME\bin\m2.conf"
 
 # Find the project basedir, i.e., the directory that contains the directory ".mvn".
 # Fallback to current working directory if not found.
@@ -74,7 +74,7 @@ $WDIR = Get-Location
 $i = 0
 $file_flag_found = $false
 foreach ($arg in $args) {
-  if (($arg -ceq "-f") || ($arg -ceq "--file")) {
+  if (($arg -ceq "-f") -or ($arg -ceq "--file")) {
     $file_flag_found = $true
     break
   }
@@ -124,7 +124,7 @@ else {
   $basedir = $WDIR
 
   while (IsNotRoot($WDIR.Path)) {
-    if (Test-Path $WDIR"\.mvn") {
+    if (Test-Path "$WDIR\.mvn") {
       $basedir = $WDIR
       break
     }
