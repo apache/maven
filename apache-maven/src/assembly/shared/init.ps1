@@ -1,6 +1,6 @@
 # ==== END VALIDATION ====
 
-$CLASSWORLDS_CONF = $env:MAVEN_HOME + "\bin\m2.conf"
+$CLASSWORLDS_CONF = $MAVEN_HOME + "\bin\m2.conf"
 
 # Find the project basedir, i.e., the directory that contains the directory ".mvn".
 # Fallback to current working directory if not found.
