@@ -983,8 +983,8 @@ public class DefaultMavenPluginManager
             RepositorySystemSession session )
                     throws PluginResolutionException
     {
-        return RepositoryUtils.toArtifact( pluginDependenciesResolver.resolve( extensionPlugin, repositories,
-                session ) );
+        return RepositoryUtils.toArtifact( pluginDependenciesResolver.resolveArtifactOnly( extensionPlugin,
+                repositories, session ) );
     }
 
     private List<Artifact> resolveExtensionArtifacts( Plugin extensionPlugin, List<RemoteRepository> repositories,

@@ -68,4 +68,17 @@ public interface PluginDependenciesResolver
                             List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException;
 
+    /**
+     * Resolves the main artifact of the specified plugin only (without getting the artifact descriptor,
+     * i.e. getting the effective pom.xml).
+     * @param plugin
+     * @param repositories
+     * @param session
+     * @return
+     * @throws PluginResolutionException
+     * @since 4.0.0
+     */
+    Artifact resolveArtifactOnly( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
+            throws PluginResolutionException;
+
 }
