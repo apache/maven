@@ -53,17 +53,15 @@ if (-not (Test-Path $JAVACMD)) {
 }
 
 # check mvn home
-if (-not $env:MAVEN_HOME) {
-    $env:MAVEN_HOME = (Get-Item $PSScriptRoot"\..")
-}
+$MAVEN_HOME = (Get-Item $PSScriptRoot"\..")
 
 # check if maven command exists
-if (-not (Test-path $env:MAVEN_HOME"\bin\mvn.ps1")) {
+if (-not (Test-path $MAVEN_HOME"\bin\mvn.ps1")) {
     Write-Error -Message "maven command (\bin\mvn.ps1) cannot be found" -ErrorAction Stop
 }
 # ==== END VALIDATION ====
 
-$CLASSWORLDS_CONF = $env:MAVEN_HOME + "\bin\m2.conf"
+$CLASSWORLDS_CONF = $MAVEN_HOME + "\bin\m2.conf"
 
 # Find the project basedir, i.e., the directory that contains the directory ".mvn".
 # Fallback to current working directory if not found.
@@ -142,7 +140,7 @@ else {
 
 $MAVEN_OPTS = (RetrieveContentsJvmConfig $basedir)
 
-$LAUNCHER_JAR = Get-Item $env:MAVEN_HOME"\boot\plexus-classworlds*.jar"
+$LAUNCHER_JAR = Get-Item $MAVEN_HOME"\boot\plexus-classworlds*.jar"
 $LAUNCHER_CLASS = "org.codehaus.plexus.classworlds.launcher.Launcher"
 
 & $JAVACMD `
@@ -150,8 +148,8 @@ $LAUNCHER_CLASS = "org.codehaus.plexus.classworlds.launcher.Launcher"
   $MAVEN_DEBUG_OPTS `
   -classpath $LAUNCHER_JAR `
   "-Dclassworlds.conf=$CLASSWORLDS_CONF" `
-  "-Dmaven.home=$env:MAVEN_HOME" `
-  "-Dlibrary.jansi.path=$env:MAVEN_HOME\lib\jansi-native" `
+  "-Dmaven.home=$MAVEN_HOME" `
+  "-Dlibrary.jansi.path=$MAVEN_HOME\lib\jansi-native" `
   "-Dmaven.multiModuleProjectDirectory=$basedir" `
   $LAUNCHER_CLASS `
   $MAVEN_ARGS `
