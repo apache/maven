@@ -933,7 +933,7 @@ public class DefaultMavenPluginManager
         if ( extensionRecord == null )
         {
             boolean requirePluginDescriptor = plugin.isExtensions() || isBuildExtension == Boolean.FALSE;
-            if ( requirePluginDescriptor && !artifacts.isEmpty() && pluginDescriptor != null )
+            if ( requirePluginDescriptor && !artifacts.isEmpty() && pluginDescriptor == null )
             {
                 // ignore plugin descriptor parsing errors at this point
                 // these errors will reported during calculation of project build execution plan
