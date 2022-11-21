@@ -231,7 +231,7 @@ public class SettingsXmlConfigurationProcessor
 
         for ( Profile rawProfile : settings.getProfiles() )
         {
-            request.addProfile( SettingsUtils.convertFromSettingsProfile( rawProfile.getDelegate() ) );
+            request.addProfile( SettingsUtils.convertFromSettingsProfile( rawProfile ) );
 
             if ( settings.getActiveProfiles().contains( rawProfile.getId() ) )
             {

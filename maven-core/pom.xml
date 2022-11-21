@@ -292,6 +292,7 @@ under the License.
               <exclude>org.apache.maven.project.DefaultProjectDependenciesResolver#DefaultProjectDependenciesResolver()</exclude>
               <exclude>org.apache.maven.rtinfo.internal.DefaultRuntimeInformation#DefaultRuntimeInformation()</exclude>
               <exclude>org.apache.maven.settings.DefaultMavenSettingsBuilder#DefaultMavenSettingsBuilder()</exclude>
+              <exclude>org.apache.maven.toolchain.DefaultToolchainManager#DefaultToolchainManager():CONSTRUCTOR_REMOVED</exclude>
               <exclude>org.apache.maven.toolchain.DefaultToolchainManagerPrivate#DefaultToolchainManagerPrivate()</exclude>
               <!-- END default constructor on Plexus/JSR 330 components -->
               <!-- system property with that name no longer evaluated -->
@@ -300,6 +301,16 @@ under the License.
               <exclude>org.apache.maven.plugin.DefaultBuildPluginManager#setMojoExecutionListeners(java.util.List)</exclude>
               <!-- could have never been used due to usage of non-export class (CoreExportsProvider) -->
               <exclude>org.apache.maven.classrealm.DefaultClassRealmManager#DefaultClassRealmManager(org.codehaus.plexus.logging.Logger,org.codehaus.plexus.PlexusContainer,java.util.List,org.apache.maven.extension.internal.CoreExportsProvider)</exclude>
+              <!-- internal field removed -->
+              <exclude>org.apache.maven.graph.DefaultGraphBuilder#projectBuilder</exclude>
+              <!-- MavenPluginValidator has been transformed into an interface -->
+              <exclude>org.apache.maven.plugin.MavenPluginValidator</exclude>
+              <!-- Remove plexus logger -->
+              <exclude>org.apache.maven.plugin.PluginParameterExpressionEvaluator#PluginParameterExpressionEvaluator(org.apache.maven.execution.MavenSession,org.apache.maven.plugin.MojoExecution,org.apache.maven.project.path.PathTranslator,org.codehaus.plexus.logging.Logger,org.apache.maven.project.MavenProject,java.util.Properties):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.toolchain.DefaultToolchain#getLog():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.toolchain.DefaultToolchain#DefaultToolchain(org.apache.maven.toolchain.model.ToolchainModel,org.codehaus.plexus.logging.Logger):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.toolchain.DefaultToolchain#DefaultToolchain(org.apache.maven.toolchain.model.ToolchainModel,java.lang.String,org.codehaus.plexus.logging.Logger):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.toolchain.DefaultToolchainManager#logger</exclude>
             </excludes>
           </parameter>
         </configuration>
