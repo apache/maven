@@ -47,50 +47,61 @@ class PropertiesAsMap extends AbstractMap<String, String>
                 Iterator<Entry<Object, Object>> iterator = properties.entrySet().iterator();
                 return new Iterator<Entry<String, String>>()
                 {
-                    Entry<Object, Object> next;
+                    Entry<String, String> next;
 
-                    @Override
-                    public boolean hasNext()
                     {
-                        while ( next == null && iterator.hasNext() )
+                        advance();
+                    }
+
+                    private void advance()
+                    {
+                        next = null;
+                        while ( iterator.hasNext() )
                         {
                             Entry<Object, Object> e = iterator.next();
                             if ( PropertiesAsMap.matches( e ) )
                             {
-                                next = e;
+                                next = new Entry<String, String>()
+                                {
+                                    @Override
+                                    public String getKey()
+                                    {
+                                        return (String) e.getKey();
+                                    }
+
+                                    @Override
+                                    public String getValue()
+                                    {
+                                        return (String) e.getValue();
+                                    }
+
+                                    @Override
+                                    public String setValue( String value )
+                                    {
+                                        return (String) e.setValue( value );
+                                    }
+                                };
                                 break;
                             }
                         }
+                    }
+
+                    @Override
+                    public boolean hasNext()
+                    {
                         return next != null;
                     }
 
                     @Override
                     public Entry<String, String> next()
                     {
-                        if ( next == null )
+                        Entry<String, String> item = next;
+                        if ( item == null )
                         {
                             throw new NoSuchElementException();
                         }
-                        return new Entry<String, String>()
-                        {
-                            @Override
-                            public String getKey()
-                            {
-                                return (String) next.getKey();
-                            }
-
-                            @Override
-                            public String getValue()
-                            {
-                                return (String) next.getValue();
-                            }
-
-                            @Override
-                            public String setValue( String value )
-                            {
-                                return (String) next.setValue( value );
-                            }
-                        };
+                        advance();
+                        return item;
                     }
                 };
             }
