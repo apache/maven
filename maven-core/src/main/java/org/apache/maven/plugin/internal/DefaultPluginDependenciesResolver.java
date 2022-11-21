@@ -130,23 +130,38 @@ public class DefaultPluginDependenciesResolver
                 props.put( "requiredMavenVersion", requiredMavenVersion );
                 pluginArtifact = pluginArtifact.setProperties( props );
             }
+            return internalResolveArtifactOnly( trace, pluginArtifact, repositories, session );
         }
-        catch ( ArtifactDescriptorException e )
+        catch ( ArtifactDescriptorException | ArtifactResolutionException e )
         {
             throw new PluginResolutionException( plugin, e );
         }
 
-        try
+    }
+
+    @Override
+    public Artifact resolveArtifactOnly( Plugin plugin, List<RemoteRepository> repositories,
+            RepositorySystemSession session ) throws PluginResolutionException
+    {
+        RequestTrace trace = RequestTrace.newChild( null, plugin );
+
+        Artifact pluginArtifact = toArtifact( plugin, session );
+        try 
         {
-            ArtifactRequest request = new ArtifactRequest( pluginArtifact, repositories, REPOSITORY_CONTEXT );
-            request.setTrace( trace );
-            pluginArtifact = repoSystem.resolveArtifact( session, request ).getArtifact();
+            return internalResolveArtifactOnly( trace, pluginArtifact, repositories, session );
         }
         catch ( ArtifactResolutionException e )
         {
             throw new PluginResolutionException( plugin, e );
         }
+    }
 
+    private Artifact internalResolveArtifactOnly( RequestTrace trace, Artifact pluginArtifact, 
+            List<RemoteRepository> repositories, RepositorySystemSession session ) throws ArtifactResolutionException
+    {
+        ArtifactRequest request = new ArtifactRequest( pluginArtifact, repositories, REPOSITORY_CONTEXT );
+        request.setTrace( trace );
+        pluginArtifact = repoSystem.resolveArtifact( session, request ).getArtifact();
         return pluginArtifact;
     }
 

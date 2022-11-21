@@ -45,6 +45,7 @@ import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.ProjectBuildingRequest.RepositoryMerging;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.PlexusContainer;
@@ -131,9 +132,12 @@ public abstract class AbstractCoreMavenComponentTestCase
             .setLocalRepository( request.getLocalRepository() )
             .setRemoteRepositories( request.getRemoteRepositories() )
             .setPluginArtifactRepositories( request.getPluginArtifactRepositories() )
+            // make sure to always resolve from test remote repo (and not from repo from super pom) due to usage of TestRepositoryConnector
+            .setRepositoryMerging( RepositoryMerging.REQUEST_DOMINANT )
             .setSystemProperties( executionProperties )
             .setUserProperties( new Properties() );
 
+        initRepoSession( configuration );
         List<MavenProject> projects = new ArrayList<>();
 
         if ( pom != null )
@@ -161,8 +165,6 @@ public abstract class AbstractCoreMavenComponentTestCase
             project.setPluginArtifactRepositories( request.getPluginArtifactRepositories() );
             projects.add( project );
         }
-
-        initRepoSession( configuration );
 
         MavenSession session =
             new MavenSession( getContainer(), configuration.getRepositorySession(), request,

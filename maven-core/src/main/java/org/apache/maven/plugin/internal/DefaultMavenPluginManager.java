@@ -103,6 +103,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -350,13 +351,13 @@ public class DefaultMavenPluginManager
         Plugin plugin = pluginDescriptor.getPlugin();
         MavenProject project = session.getCurrentProject();
 
-        if ( plugin.isExtensions() )
+        if ( plugin.isExtensions() || pluginDescriptor.isHasExtensions() )
         {
             ExtensionRealmCache.CacheRecord extensionRecord;
             try
             {
                 RepositorySystemSession repositorySession = session.getRepositorySession();
-                extensionRecord = setupExtensionsRealm( project, plugin, repositorySession );
+                extensionRecord = setupExtensionsRealm( project, plugin, repositorySession, false ).get();
             }
             catch ( PluginManagerException e )
             {
@@ -832,8 +833,10 @@ public class DefaultMavenPluginManager
         }
     }
 
-    public ExtensionRealmCache.CacheRecord setupExtensionsRealm( MavenProject project, Plugin plugin,
-                                                                 RepositorySystemSession session )
+    @Override
+    public Optional<ExtensionRealmCache.CacheRecord> setupExtensionsRealm( MavenProject project, Plugin plugin,
+                                                                           RepositorySystemSession session,
+                                                                           Boolean isBuildExtension )
         throws PluginManagerException
     {
         @SuppressWarnings( "unchecked" ) Map<String, ExtensionRealmCache.CacheRecord> pluginRealms =
@@ -849,7 +852,7 @@ public class DefaultMavenPluginManager
         ExtensionRealmCache.CacheRecord extensionRecord = pluginRealms.get( pluginKey );
         if ( extensionRecord != null )
         {
-            return extensionRecord;
+            return Optional.of( extensionRecord );
         }
 
         final List<RemoteRepository> repositories = project.getRemotePluginRepositories();
@@ -874,6 +877,7 @@ public class DefaultMavenPluginManager
         List<Artifact> artifacts;
         PluginArtifactsCache.Key cacheKey = pluginArtifactsCache.createKey( plugin, null, repositories, session );
         PluginArtifactsCache.CacheRecord recordArtifacts;
+        PluginDescriptor pluginDescriptor = null;
         try
         {
             recordArtifacts = pluginArtifactsCache.get( cacheKey );
@@ -890,6 +894,25 @@ public class DefaultMavenPluginManager
         {
             try
             {
+                // potentially a plugin with extensions?
+                if ( !plugin.isExtensions() && isBuildExtension == Boolean.FALSE )
+                {
+                    Artifact pluginMainArtifact = resolveExtensionMainArtifact( plugin, repositories, session );
+                    try
+                    {
+                        pluginDescriptor = extractPluginDescriptor( pluginMainArtifact, plugin );
+                        // for backwards compatibility reason never return empty when isBuildExtension == null
+                        if ( isBuildExtension != null && !plugin.isExtensions() && !pluginDescriptor.isHasExtensions() )
+                        {
+                            return Optional.empty();
+                        }
+                    }
+                    catch ( PluginDescriptorParsingException | InvalidPluginDescriptorException e )
+                    {
+                        throw new PluginManagerException( plugin, e.getMessage(), e );
+                    }
+                }
+                
                 artifacts = resolveExtensionArtifacts( plugin, repositories, session );
                 recordArtifacts = pluginArtifactsCache.put( cacheKey, artifacts );
             }
@@ -907,13 +930,8 @@ public class DefaultMavenPluginManager
         extensionRecord = extensionRealmCache.get( extensionKey );
         if ( extensionRecord == null )
         {
-            ClassRealm extensionRealm =
-                classRealmManager.createExtensionRealm( plugin, toAetherArtifacts( artifacts ) );
-
-            // TODO figure out how to use the same PluginDescriptor when running mojos
-
-            PluginDescriptor pluginDescriptor = null;
-            if ( plugin.isExtensions() && !artifacts.isEmpty() )
+            boolean requirePluginDescriptor = plugin.isExtensions() || isBuildExtension == Boolean.FALSE;
+            if ( requirePluginDescriptor && !artifacts.isEmpty() && pluginDescriptor == null )
             {
                 // ignore plugin descriptor parsing errors at this point
                 // these errors will reported during calculation of project build execution plan
@@ -926,7 +944,11 @@ public class DefaultMavenPluginManager
                     // ignore, see above
                 }
             }
+            
+            ClassRealm extensionRealm =
+                classRealmManager.createExtensionRealm( plugin, toAetherArtifacts( artifacts ) );
 
+            // TODO figure out how to use the same PluginDescriptor when running mojos
             discoverPluginComponents( extensionRealm, plugin, pluginDescriptor );
 
             ExtensionDescriptor extensionDescriptor = null;
@@ -952,7 +974,15 @@ public class DefaultMavenPluginManager
         extensionRealmCache.register( project, extensionKey, extensionRecord );
         pluginRealms.put( pluginKey, extensionRecord );
 
-        return extensionRecord;
+        return Optional.of( extensionRecord );
+    }
+
+    private Artifact resolveExtensionMainArtifact( Plugin extensionPlugin, List<RemoteRepository> repositories,
+            RepositorySystemSession session )
+                    throws PluginResolutionException
+    {
+        return RepositoryUtils.toArtifact( pluginDependenciesResolver.resolveArtifactOnly( extensionPlugin,
+                repositories, session ) );
     }
 
     private List<Artifact> resolveExtensionArtifacts( Plugin extensionPlugin, List<RemoteRepository> repositories,

@@ -78,6 +78,8 @@ public class PluginDescriptor
 
     private String description;
 
+    private boolean hasExtensions;
+
     private String requiredMavenVersion;
 
     private String requiredJavaVersion;
@@ -341,6 +343,16 @@ public class PluginDescriptor
     public String getDescription()
     {
         return description;
+    }
+
+    public boolean isHasExtensions()
+    {
+        return hasExtensions;
+    }
+
+    public void setHasExtensions( boolean hasExtensions )
+    {
+        this.hasExtensions = hasExtensions;
     }
 
     public void setRequiredMavenVersion( String requiredMavenVersion )

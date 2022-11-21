@@ -45,7 +45,7 @@ public class CanonicalProjectBuilderTest
     {
         File f = getFileForClasspathResource( "canonical-pom.xml" );
 
-        MavenProject project = getProject( f );
+        MavenProject project = getProjectFromRemoteRepository( f );
 
         // ----------------------------------------------------------------------
         // Top-level elements
@@ -61,7 +61,7 @@ public class CanonicalProjectBuilderTest
 
         // Plugin0 [plexus]
 
-        String key = "org.apache.maven.plugins:maven-plexus-plugin";
+        String key = "org.codehaus.plexus:plexus-maven-plugin";
 
         Plugin plugin = null;
         for ( Plugin check : plugins )
@@ -75,7 +75,7 @@ public class CanonicalProjectBuilderTest
 
         assertNotNull( plugin );
 
-        assertEquals( "1.0", plugin.getVersion() );
+        assertEquals( "1.1", plugin.getVersion() );
 
         Dom configuration = plugin.getDelegate().getConfiguration();
 
