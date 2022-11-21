@@ -25,8 +25,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 
-import org.apache.maven.api.model.InputSource;
-import org.apache.maven.api.model.Model;
+import org.apache.maven.model.Model;
 
 /**
  * Handles deserialization of a model from some kind of textual format like XML.
@@ -44,7 +43,7 @@ public interface ModelReader
 
     /**
      * The key for the option to enable tracking of line/column numbers. This option is of type
-     * {@link InputSource} and defaults to {@code null}. Providing an input source enables
+     * {@link org.apache.maven.model.InputSource} and defaults to {@code null}. Providing an input source enables
      * location tracking.
      */
     String INPUT_SOURCE = "org.apache.maven.model.io.inputSource";

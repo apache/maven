@@ -248,7 +248,7 @@ public class TestRepositorySystem
 
                 try
                 {
-                    Model model = modelReader.read( pomFile, null );
+                    Model model = modelReader.read( pomFile, null ).getDelegate();
 
                     dependencies = model.getDependencies().stream().map( Dependency::new ).collect( Collectors.toList() );
                 }

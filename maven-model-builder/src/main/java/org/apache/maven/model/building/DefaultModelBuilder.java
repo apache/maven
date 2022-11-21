@@ -850,7 +850,7 @@ public class DefaultModelBuilder
             if ( request.isLocationTracking() )
             {
                 source = new InputSource( null, modelSource.getLocation() );
-                options.put( ModelProcessor.INPUT_SOURCE, source );
+                options.put( ModelProcessor.INPUT_SOURCE, new org.apache.maven.model.InputSource( source ) );
             }
             else
             {
@@ -859,7 +859,7 @@ public class DefaultModelBuilder
 
             try
             {
-                model = modelProcessor.read( modelSource.getInputStream(), options );
+                model = modelProcessor.read( modelSource.getInputStream(), options ).getDelegate();
             }
             catch ( ModelParseException e )
             {
@@ -872,7 +872,7 @@ public class DefaultModelBuilder
 
                 try
                 {
-                    model = modelProcessor.read( modelSource.getInputStream(), options );
+                    model = modelProcessor.read( modelSource.getInputStream(), options ).getDelegate();
                 }
                 catch ( ModelParseException ne )
                 {
@@ -890,9 +890,11 @@ public class DefaultModelBuilder
             {
                 try
                 {
+                    org.apache.maven.api.model.InputSource v4src
+                            = model.getLocation( "" ).getSource();
                     Field field = InputSource.class.getDeclaredField( "modelId" );
                     field.setAccessible( true );
-                    field.set( source, ModelProblemUtils.toId( model ) );
+                    field.set( v4src, ModelProblemUtils.toId( model ) );
                 }
                 catch ( Throwable t )
                 {
@@ -974,14 +976,14 @@ public class DefaultModelBuilder
             try
             {
                 // must implement TransformContext, but should use request to access properties/model cache
-                org.apache.maven.api.model.Model transformedFileModel = modelProcessor.read( pomFile,
+                Model transformedFileModel = modelProcessor.read( pomFile,
                         Collections.singletonMap( ModelReader.TRANSFORMER_CONTEXT, context ) );
 
                 // rawModel with locationTrackers, required for proper feedback during validations
 
                 // Apply enriched data
                 rawModel = new Model( modelMerger.merge( rawModel.getDelegate(),
-                        transformedFileModel, false, null ) );
+                        transformedFileModel.getDelegate(), false, null ) );
             }
             catch ( IOException e )
             {

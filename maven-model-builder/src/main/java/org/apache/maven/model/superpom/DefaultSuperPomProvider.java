@@ -80,9 +80,9 @@ public class DefaultSuperPomProvider
                     + this.getClass().getPackage().getImplementationVersion() + ":super-pom";
                 InputSource inputSource = new InputSource(
                         modelId, getClass().getResource( resource ).toExternalForm() );
-                options.put( ModelProcessor.INPUT_SOURCE, inputSource );
+                options.put( ModelProcessor.INPUT_SOURCE, new org.apache.maven.model.InputSource( inputSource ) );
 
-                superModel = modelProcessor.read( is, options );
+                superModel = modelProcessor.read( is, options ).getDelegate();
             }
             catch ( IOException e )
             {

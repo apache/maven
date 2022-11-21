@@ -31,8 +31,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.api.model.InputSource;
-import org.apache.maven.api.model.Model;
+import org.apache.maven.model.InputSource;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelSourceTransformer;
 import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.v4.MavenXpp3Reader;
@@ -72,7 +72,9 @@ public class DefaultModelReader
         {
             Model model = read( in, input.toPath(), options );
 
-            return model.withPomFile( input.toPath() );
+            model.setPomFile( input );
+
+            return model;
         }
     }
 
@@ -109,11 +111,6 @@ public class DefaultModelReader
     private InputSource getSource( Map<String, ?> options )
     {
         Object value = ( options != null ) ? options.get( INPUT_SOURCE ) : null;
-        if ( value instanceof org.apache.maven.model.InputSource )
-        {
-            org.apache.maven.model.InputSource src = ( org.apache.maven.model.InputSource ) value;
-            return new InputSource( src.getModelId(), src.getLocation() );
-        }
         return (InputSource) value;
     }
 
@@ -164,14 +161,15 @@ public class DefaultModelReader
             throws XmlPullParserException, IOException
     {
         MavenXpp3Reader mr = new MavenXpp3Reader();
-        return mr.read( parser, strict );
+        return new Model( mr.read( parser, strict ) );
     }
 
     private Model readModelEx( XmlPullParser parser, InputSource source, boolean strict )
             throws XmlPullParserException, IOException
     {
         MavenXpp3ReaderEx mr = new MavenXpp3ReaderEx();
-        return mr.read( parser, strict, source );
+        return new Model( mr.read( parser, strict,
+                new org.apache.maven.api.model.InputSource( source.getModelId(), source.getLocation() ) ) );
     }
 
 }
