@@ -9,7 +9,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -22,16 +22,22 @@ package org.apache.maven.api.services;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * The different severity levels for a problem, in decreasing order.
+ * The Exception class throw by the {@link ToolchainsBuilder}.
  *
  * @since 4.0
  */
 @Experimental
-public enum ProjectBuilderProblemSeverity
+public class ToolchainsBuilderException
+    extends MavenException
 {
+    /**
+     * @param message the message to give
+     * @param e the {@link Exception}
+     */
+    public ToolchainsBuilderException( String message, Exception e )
+    {
+        super( message, e );
+    }
 
-    FATAL, //
-    ERROR, //
-    WARNING //
-
+    // TODO: add ToolchainsBuilderResult
 }

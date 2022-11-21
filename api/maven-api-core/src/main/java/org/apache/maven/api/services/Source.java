@@ -30,7 +30,7 @@ import org.apache.maven.api.annotations.Experimental;
  * @since 4.0
  */
 @Experimental
-public interface ProjectBuilderSource
+public interface Source
 {
     InputStream getInputStream() throws IOException;
 

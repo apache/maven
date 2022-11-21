@@ -32,6 +32,7 @@ import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.ProjectBuilder;
 import org.apache.maven.api.services.ProjectBuilderRequest;
+import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -86,6 +87,12 @@ public class TestApi
 
     @Inject
     SessionScope sessionScope;
+
+    @Inject
+    SettingsBuilder settingsBuilder;
+
+    @Inject
+    ToolchainsBuilder toolchainsBuilder;
 
     @BeforeEach
     void setup()
