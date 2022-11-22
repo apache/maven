@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.repository.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,102 +16,81 @@ package org.apache.maven.artifact.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.artifact.repository.ArtifactRepository;
+package org.apache.maven.artifact.repository.metadata;
 
 import java.util.Iterator;
 import java.util.List;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  * Metadata for the group directory of the repository.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-public class GroupRepositoryMetadata
-    extends AbstractRepositoryMetadata
-{
+public class GroupRepositoryMetadata extends AbstractRepositoryMetadata {
     private final String groupId;
 
-    public GroupRepositoryMetadata( String groupId )
-    {
-        super( new Metadata() );
+    public GroupRepositoryMetadata(String groupId) {
+        super(new Metadata());
         this.groupId = groupId;
     }
 
-    public boolean storedInGroupDirectory()
-    {
+    public boolean storedInGroupDirectory() {
         return true;
     }
 
-    public boolean storedInArtifactVersionDirectory()
-    {
+    public boolean storedInArtifactVersionDirectory() {
         return false;
     }
 
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return groupId;
     }
 
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return null;
     }
 
-    public String getBaseVersion()
-    {
+    public String getBaseVersion() {
         return null;
     }
 
-    public void addPluginMapping( String goalPrefix,
-                                  String artifactId )
-    {
-        addPluginMapping( goalPrefix, artifactId, artifactId );
+    public void addPluginMapping(String goalPrefix, String artifactId) {
+        addPluginMapping(goalPrefix, artifactId, artifactId);
     }
 
-    public void addPluginMapping( String goalPrefix,
-                                  String artifactId,
-                                  String name )
-    {
+    public void addPluginMapping(String goalPrefix, String artifactId, String name) {
         List<Plugin> plugins = getMetadata().getPlugins();
         boolean found = false;
-        for ( Iterator<Plugin> i = plugins.iterator(); i.hasNext() && !found; )
-        {
+        for (Iterator<Plugin> i = plugins.iterator(); i.hasNext() && !found; ) {
             Plugin plugin = i.next();
-            if ( plugin.getPrefix().equals( goalPrefix ) )
-            {
+            if (plugin.getPrefix().equals(goalPrefix)) {
                 found = true;
             }
         }
-        if ( !found )
-        {
+        if (!found) {
             Plugin plugin = new Plugin();
-            plugin.setPrefix( goalPrefix );
-            plugin.setArtifactId( artifactId );
-            plugin.setName( name );
+            plugin.setPrefix(goalPrefix);
+            plugin.setArtifactId(artifactId);
+            plugin.setName(name);
 
-
-            getMetadata().addPlugin( plugin );
+            getMetadata().addPlugin(plugin);
         }
     }
 
-    public Object getKey()
-    {
+    public Object getKey() {
         return groupId;
     }
 
-    public boolean isSnapshot()
-    {
+    public boolean isSnapshot() {
         return false;
     }
 
-    public ArtifactRepository getRepository()
-    {
+    public ArtifactRepository getRepository() {
         return null;
     }
 
-    public void setRepository( ArtifactRepository remoteRepository )
-    {
+    public void setRepository(ArtifactRepository remoteRepository) {
         // intentionally blank
     }
 }

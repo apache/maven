@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,9 +16,9 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,7 +27,8 @@ import java.io.Writer;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
@@ -42,87 +41,61 @@ import org.apache.maven.model.v4.MavenXpp3ReaderEx;
 import org.apache.maven.model.v4.MavenXpp3WriterEx;
 import org.codehaus.plexus.util.ReaderFactory;
 
-import static org.apache.maven.internal.impl.Utils.nonNull;
-
 @Named
 @Singleton
-public class DefaultModelXmlFactory
-        implements ModelXmlFactory
-{
+public class DefaultModelXmlFactory implements ModelXmlFactory {
     @Override
-    public Model read( @Nonnull XmlReaderRequest request ) throws XmlReaderException
-    {
-        nonNull( request, "request can not be null" );
+    public Model read(@Nonnull XmlReaderRequest request) throws XmlReaderException {
+        nonNull(request, "request can not be null");
         Path path = request.getPath();
         URL url = request.getURL();
         Reader reader = request.getReader();
         InputStream inputStream = request.getInputStream();
-        if ( path == null && url == null && reader == null && inputStream == null )
-        {
-            throw new IllegalArgumentException( "path, url, reader or inputStream must be non null" );
+        if (path == null && url == null && reader == null && inputStream == null) {
+            throw new IllegalArgumentException("path, url, reader or inputStream must be non null");
         }
-        try
-        {
+        try {
             InputSource source = null;
-            if ( request.getModelId() != null || request.getLocation() != null )
-            {
-                source = new InputSource( request.getModelId(), request.getLocation() );
+            if (request.getModelId() != null || request.getLocation() != null) {
+                source = new InputSource(request.getModelId(), request.getLocation());
             }
             MavenXpp3ReaderEx xml = new MavenXpp3ReaderEx();
-            xml.setAddDefaultEntities( request.isAddDefaultEntities() );
-            if ( path != null )
-            {
-                reader = ReaderFactory.newXmlReader( path.toFile() );
+            xml.setAddDefaultEntities(request.isAddDefaultEntities());
+            if (path != null) {
+                reader = ReaderFactory.newXmlReader(path.toFile());
+            } else if (url != null) {
+                reader = ReaderFactory.newXmlReader(url);
+            } else if (inputStream != null) {
+                reader = ReaderFactory.newXmlReader(inputStream);
             }
-            else if ( url != null )
-            {
-                reader = ReaderFactory.newXmlReader( url );
-            }
-            else if ( inputStream != null )
-            {
-                reader = ReaderFactory.newXmlReader( inputStream );
-            }
-            return xml.read( reader, request.isStrict(), source );
-        }
-        catch ( Exception e )
-        {
-            throw new XmlReaderException( "Unable to read model", e );
+            return xml.read(reader, request.isStrict(), source);
+        } catch (Exception e) {
+            throw new XmlReaderException("Unable to read model", e);
         }
     }
 
     @Override
-    public void write( XmlWriterRequest<Model> request ) throws XmlWriterException
-    {
-        nonNull( request, "request can not be null" );
-        Model content = nonNull( request.getContent(), "content can not be null" );
+    public void write(XmlWriterRequest<Model> request) throws XmlWriterException {
+        nonNull(request, "request can not be null");
+        Model content = nonNull(request.getContent(), "content can not be null");
         Path path = request.getPath();
         OutputStream outputStream = request.getOutputStream();
         Writer writer = request.getWriter();
-        if ( writer == null && outputStream == null && path == null )
-        {
-            throw new IllegalArgumentException( "writer, outputStream or path must be non null" );
+        if (writer == null && outputStream == null && path == null) {
+            throw new IllegalArgumentException("writer, outputStream or path must be non null");
         }
-        try
-        {
-            if ( writer != null )
-            {
-                new MavenXpp3WriterEx().write( writer, content );
-            }
-            else if ( outputStream != null )
-            {
-                new MavenXpp3WriterEx().write( outputStream, content );
-            }
-            else
-            {
-                try ( OutputStream os = Files.newOutputStream( path ) )
-                {
-                    new MavenXpp3WriterEx().write( outputStream, content );
+        try {
+            if (writer != null) {
+                new MavenXpp3WriterEx().write(writer, content);
+            } else if (outputStream != null) {
+                new MavenXpp3WriterEx().write(outputStream, content);
+            } else {
+                try (OutputStream os = Files.newOutputStream(path)) {
+                    new MavenXpp3WriterEx().write(outputStream, content);
                 }
             }
-        }
-        catch ( Exception e )
-        {
-            throw new XmlWriterException( "Unable to write model", e );
+        } catch (Exception e) {
+            throw new XmlWriterException("Unable to write model", e);
         }
     }
 
@@ -134,9 +107,8 @@ public class DefaultModelXmlFactory
      * @throws XmlReaderException if an error occurs during the parsing
      * @see #toXmlString(Object)
      */
-    public static Model fromXml( @Nonnull String xml ) throws XmlReaderException
-    {
-        return new DefaultModelXmlFactory().fromXmlString( xml );
+    public static Model fromXml(@Nonnull String xml) throws XmlReaderException {
+        return new DefaultModelXmlFactory().fromXmlString(xml);
     }
 
     /**
@@ -147,9 +119,7 @@ public class DefaultModelXmlFactory
      * @throws XmlWriterException if an error occurs during the transformation
      * @see #fromXmlString(String)
      */
-    public static String toXml( @Nonnull Model content ) throws XmlWriterException
-    {
-        return new DefaultModelXmlFactory().toXmlString( content );
+    public static String toXml(@Nonnull Model content) throws XmlWriterException {
+        return new DefaultModelXmlFactory().toXmlString(content);
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.cli.logging;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.cli.logging;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli.logging;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,18 +27,14 @@ import org.slf4j.LoggerFactory;
  * @author Hervé Boutemy
  * @since 3.1.0
  */
-public class BaseSlf4jConfiguration
-    implements Slf4jConfiguration
-{
-    private static final Logger LOGGER = LoggerFactory.getLogger( BaseSlf4jConfiguration.class );
+public class BaseSlf4jConfiguration implements Slf4jConfiguration {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseSlf4jConfiguration.class);
 
-    public void setRootLoggerLevel( Level level )
-    {
-        LOGGER.warn( "setRootLoggerLevel: operation not supported" );
+    public void setRootLoggerLevel(Level level) {
+        LOGGER.warn("setRootLoggerLevel: operation not supported");
     }
 
-    public void activate()
-    {
-        LOGGER.warn( "reset(): operation not supported" );
+    public void activate() {
+        LOGGER.warn("reset(): operation not supported");
     }
 }

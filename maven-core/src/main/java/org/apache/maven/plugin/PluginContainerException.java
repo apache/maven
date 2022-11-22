@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -36,53 +35,45 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
  * @author jdcasey
  *
  */
-public class PluginContainerException
-    extends PluginManagerException
-{
+public class PluginContainerException extends PluginManagerException {
 
     private ClassRealm pluginRealm;
 
-    public PluginContainerException( MojoDescriptor mojoDescriptor, ClassRealm pluginRealm, String message,
-                                     Throwable e )
-    {
-        super( mojoDescriptor, message, e );
+    public PluginContainerException(
+            MojoDescriptor mojoDescriptor, ClassRealm pluginRealm, String message, Throwable e) {
+        super(mojoDescriptor, message, e);
 
         this.pluginRealm = pluginRealm;
     }
 
-    public PluginContainerException( MojoDescriptor mojoDescriptor, ClassRealm pluginRealm, String message,
-                                     ComponentLookupException e )
-    {
-        super( mojoDescriptor, message, e );
+    public PluginContainerException(
+            MojoDescriptor mojoDescriptor, ClassRealm pluginRealm, String message, ComponentLookupException e) {
+        super(mojoDescriptor, message, e);
 
         this.pluginRealm = pluginRealm;
     }
 
-    public PluginContainerException( Plugin plugin, ClassRealm pluginRealm, String message, Throwable e )
-    {
-        super( plugin, message, e );
+    public PluginContainerException(Plugin plugin, ClassRealm pluginRealm, String message, Throwable e) {
+        super(plugin, message, e);
 
         this.pluginRealm = pluginRealm;
     }
 
-    public PluginContainerException( Plugin plugin, ClassRealm pluginRealm, String message,
-                                     PlexusConfigurationException e )
-    {
-        super( plugin, message, e );
+    public PluginContainerException(
+            Plugin plugin, ClassRealm pluginRealm, String message, PlexusConfigurationException e) {
+        super(plugin, message, e);
 
         this.pluginRealm = pluginRealm;
     }
 
-    public PluginContainerException( Plugin plugin, ClassRealm pluginRealm, String message,
-                                     ComponentRepositoryException e )
-    {
-        super( plugin, message, e );
+    public PluginContainerException(
+            Plugin plugin, ClassRealm pluginRealm, String message, ComponentRepositoryException e) {
+        super(plugin, message, e);
 
         this.pluginRealm = pluginRealm;
     }
 
-    public ClassRealm getPluginRealm()
-    {
+    public ClassRealm getPluginRealm() {
         return pluginRealm;
     }
 }

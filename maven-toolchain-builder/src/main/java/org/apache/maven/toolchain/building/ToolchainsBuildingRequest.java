@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.toolchain.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain.building;
 
 import org.apache.maven.building.Source;
 
@@ -27,8 +26,7 @@ import org.apache.maven.building.Source;
  * @author Robert Scholte
  * @since 3.3.0
  */
-public interface ToolchainsBuildingRequest
-{
+public interface ToolchainsBuildingRequest {
 
     /**
      * Gets the global toolchains source.
@@ -44,7 +42,7 @@ public interface ToolchainsBuildingRequest
      * @param globalToolchainsSource The global toolchains source, may be {@code null} to disable global toolchains.
      * @return This request, never {@code null}.
      */
-    ToolchainsBuildingRequest setGlobalToolchainsSource( Source globalToolchainsSource );
+    ToolchainsBuildingRequest setGlobalToolchainsSource(Source globalToolchainsSource);
 
     /**
      * Gets the user toolchains source.
@@ -60,5 +58,5 @@ public interface ToolchainsBuildingRequest
      * @param userToolchainsSource The user toolchains source, may be {@code null} to disable user toolchains.
      * @return This request, never {@code null}.
      */
-    ToolchainsBuildingRequest setUserToolchainsSource( Source userToolchainsSource );
+    ToolchainsBuildingRequest setUserToolchainsSource(Source userToolchainsSource);
 }

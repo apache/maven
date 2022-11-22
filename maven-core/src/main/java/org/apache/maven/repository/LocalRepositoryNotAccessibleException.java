@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 import java.io.IOException;
 
@@ -26,19 +25,14 @@ import java.io.IOException;
  *
  * @author Benjamin Bentmann
  */
-public class LocalRepositoryNotAccessibleException
-    extends IOException
-{
+public class LocalRepositoryNotAccessibleException extends IOException {
 
-    public LocalRepositoryNotAccessibleException( String message, Throwable cause )
-    {
-        super( message );
-        initCause( cause );
+    public LocalRepositoryNotAccessibleException(String message, Throwable cause) {
+        super(message);
+        initCause(cause);
     }
 
-    public LocalRepositoryNotAccessibleException( String message )
-    {
-        super( message );
+    public LocalRepositoryNotAccessibleException(String message) {
+        super(message);
     }
-
 }

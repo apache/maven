@@ -1,5 +1,3 @@
-package org.apache.maven.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,61 +16,59 @@ package org.apache.maven.building;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.building.Problem.Severity;
-import org.junit.jupiter.api.Test;
+package org.apache.maven.building;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class DefaultProblemCollectorTest
-{
+import org.apache.maven.building.Problem.Severity;
+import org.junit.jupiter.api.Test;
+
+public class DefaultProblemCollectorTest {
 
     @Test
-    public void testGetProblems()
-    {
-        DefaultProblemCollector collector = new DefaultProblemCollector( null );
-        assertNotNull( collector.getProblems() );
-        assertEquals( 0, collector.getProblems().size() );
+    public void testGetProblems() {
+        DefaultProblemCollector collector = new DefaultProblemCollector(null);
+        assertNotNull(collector.getProblems());
+        assertEquals(0, collector.getProblems().size());
 
-        collector.add( null, "MESSAGE1", -1, -1, null );
+        collector.add(null, "MESSAGE1", -1, -1, null);
 
         Exception e2 = new Exception();
-        collector.add( Severity.WARNING, null, 42, 127, e2 );
+        collector.add(Severity.WARNING, null, 42, 127, e2);
 
-        assertEquals( 2, collector.getProblems().size() );
+        assertEquals(2, collector.getProblems().size());
 
         Problem p1 = collector.getProblems().get(0);
-        assertEquals( Severity.ERROR, p1.getSeverity() );
-        assertEquals( "MESSAGE1",p1.getMessage() );
-        assertEquals( -1, p1.getLineNumber() );
-        assertEquals( -1, p1.getColumnNumber() );
-        assertNull( p1.getException() );
+        assertEquals(Severity.ERROR, p1.getSeverity());
+        assertEquals("MESSAGE1", p1.getMessage());
+        assertEquals(-1, p1.getLineNumber());
+        assertEquals(-1, p1.getColumnNumber());
+        assertNull(p1.getException());
 
         Problem p2 = collector.getProblems().get(1);
-        assertEquals( Severity.WARNING, p2.getSeverity() );
-        assertEquals( "",p2.getMessage() );
-        assertEquals( 42, p2.getLineNumber() );
-        assertEquals( 127, p2.getColumnNumber() );
-        assertEquals( e2, p2.getException() );
+        assertEquals(Severity.WARNING, p2.getSeverity());
+        assertEquals("", p2.getMessage());
+        assertEquals(42, p2.getLineNumber());
+        assertEquals(127, p2.getColumnNumber());
+        assertEquals(e2, p2.getException());
     }
 
     @Test
-    public void testSetSource()
-    {
-        DefaultProblemCollector collector = new DefaultProblemCollector( null );
+    public void testSetSource() {
+        DefaultProblemCollector collector = new DefaultProblemCollector(null);
 
-        collector.add( null, "PROBLEM1", -1, -1, null );
+        collector.add(null, "PROBLEM1", -1, -1, null);
 
-        collector.setSource( "SOURCE_PROBLEM2" );
-        collector.add( null, "PROBLEM2", -1, -1, null );
+        collector.setSource("SOURCE_PROBLEM2");
+        collector.add(null, "PROBLEM2", -1, -1, null);
 
-        collector.setSource( "SOURCE_PROBLEM3" );
-        collector.add( null, "PROBLEM3", -1, -1, null );
+        collector.setSource("SOURCE_PROBLEM3");
+        collector.add(null, "PROBLEM3", -1, -1, null);
 
-        assertEquals( "", collector.getProblems().get( 0 ).getSource() );
-        assertEquals( "SOURCE_PROBLEM2", collector.getProblems().get( 1 ).getSource() );
-        assertEquals( "SOURCE_PROBLEM3", collector.getProblems().get( 2 ).getSource() );
+        assertEquals("", collector.getProblems().get(0).getSource());
+        assertEquals("SOURCE_PROBLEM2", collector.getProblems().get(1).getSource());
+        assertEquals("SOURCE_PROBLEM3", collector.getProblems().get(2).getSource());
     }
 }

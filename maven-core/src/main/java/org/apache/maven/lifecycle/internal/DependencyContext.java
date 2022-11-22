@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,13 +16,13 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.project.MavenProject;
+package org.apache.maven.lifecycle.internal;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
+import org.apache.maven.project.MavenProject;
 
 /**
  * <p>
@@ -37,8 +35,7 @@ import java.util.TreeSet;
  * @author Kristian Rosenvold (class extract only)
  */
 // TODO From a concurrency perspective, this class is not good. The combination of mutable/immutable state is not nice
-public class DependencyContext
-{
+public class DependencyContext {
 
     private static final Collection<?> UNRESOLVED = Arrays.asList();
 
@@ -56,58 +53,48 @@ public class DependencyContext
 
     private volatile int lastDependencyArtifactCount = -1;
 
-    public DependencyContext( MavenProject project, Collection<String> scopesToCollect,
-                              Collection<String> scopesToResolve )
-    {
+    public DependencyContext(
+            MavenProject project, Collection<String> scopesToCollect, Collection<String> scopesToResolve) {
         this.project = project;
         scopesToCollectForCurrentProject = scopesToCollect;
         scopesToResolveForCurrentProject = scopesToResolve;
-        scopesToCollectForAggregatedProjects = Collections.synchronizedSet( new TreeSet<>() );
-        scopesToResolveForAggregatedProjects = Collections.synchronizedSet( new TreeSet<>() );
+        scopesToCollectForAggregatedProjects = Collections.synchronizedSet(new TreeSet<>());
+        scopesToResolveForAggregatedProjects = Collections.synchronizedSet(new TreeSet<>());
     }
 
-    public MavenProject getProject()
-    {
+    public MavenProject getProject() {
         return project;
     }
 
-    public Collection<String> getScopesToCollectForCurrentProject()
-    {
+    public Collection<String> getScopesToCollectForCurrentProject() {
         return scopesToCollectForCurrentProject;
     }
 
-    public Collection<String> getScopesToResolveForCurrentProject()
-    {
+    public Collection<String> getScopesToResolveForCurrentProject() {
         return scopesToResolveForCurrentProject;
     }
 
-    public Collection<String> getScopesToCollectForAggregatedProjects()
-    {
+    public Collection<String> getScopesToCollectForAggregatedProjects() {
         return scopesToCollectForAggregatedProjects;
     }
 
-    public Collection<String> getScopesToResolveForAggregatedProjects()
-    {
+    public Collection<String> getScopesToResolveForAggregatedProjects() {
         return scopesToResolveForAggregatedProjects;
     }
 
-    public boolean isResolutionRequiredForCurrentProject()
-    {
-        return lastDependencyArtifacts != project.getDependencyArtifacts() || ( lastDependencyArtifacts != null
-            && lastDependencyArtifactCount != lastDependencyArtifacts.size() );
+    public boolean isResolutionRequiredForCurrentProject() {
+        return lastDependencyArtifacts != project.getDependencyArtifacts()
+                || (lastDependencyArtifacts != null && lastDependencyArtifactCount != lastDependencyArtifacts.size());
     }
 
-    public boolean isResolutionRequiredForAggregatedProjects( Collection<String> scopesToCollect,
-                                                              Collection<String> scopesToResolve )
-    {
-        return scopesToCollectForAggregatedProjects.addAll( scopesToCollect )
-            || scopesToResolveForAggregatedProjects.addAll( scopesToResolve );
+    public boolean isResolutionRequiredForAggregatedProjects(
+            Collection<String> scopesToCollect, Collection<String> scopesToResolve) {
+        return scopesToCollectForAggregatedProjects.addAll(scopesToCollect)
+                || scopesToResolveForAggregatedProjects.addAll(scopesToResolve);
     }
 
-    public void synchronizeWithProjectState()
-    {
+    public void synchronizeWithProjectState() {
         lastDependencyArtifacts = project.getDependencyArtifacts();
-        lastDependencyArtifactCount = ( lastDependencyArtifacts != null ) ? lastDependencyArtifacts.size() : 0;
+        lastDependencyArtifactCount = (lastDependencyArtifacts != null) ? lastDependencyArtifacts.size() : 0;
     }
-
 }

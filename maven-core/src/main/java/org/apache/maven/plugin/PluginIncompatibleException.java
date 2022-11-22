@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,23 +16,20 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import org.apache.maven.model.Plugin;
 
 /**
  * Signals a plugin which is not compatible with the current Maven runtime.
  */
-public class PluginIncompatibleException
-    extends PluginManagerException
-{
+public class PluginIncompatibleException extends PluginManagerException {
 
-    public PluginIncompatibleException( Plugin plugin, String message )
-    {
-        this( plugin, message, null );
+    public PluginIncompatibleException(Plugin plugin, String message) {
+        this(plugin, message, null);
     }
 
-    public PluginIncompatibleException( Plugin plugin, String message, Throwable cause )
-    {
-        super( plugin, message, cause );
+    public PluginIncompatibleException(Plugin plugin, String message, Throwable cause) {
+        super(plugin, message, cause);
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.internal.aether;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,9 @@ package org.apache.maven.internal.aether;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.aether;
 
 import java.io.FileNotFoundException;
-
 import org.eclipse.aether.AbstractRepositoryListener;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.transfer.MetadataNotFoundException;
@@ -29,113 +27,84 @@ import org.slf4j.Logger;
 /**
  * @author Benjamin Bentmann
  */
-class LoggingRepositoryListener
-    extends AbstractRepositoryListener
-{
+class LoggingRepositoryListener extends AbstractRepositoryListener {
 
     private final Logger logger;
 
-    LoggingRepositoryListener( Logger logger )
-    {
+    LoggingRepositoryListener(Logger logger) {
         this.logger = logger;
     }
 
     @Override
-    public void artifactInstalling( RepositoryEvent event )
-    {
-        logger.info( "Installing " + event.getArtifact().getFile() + " to " + event.getFile() );
+    public void artifactInstalling(RepositoryEvent event) {
+        logger.info("Installing " + event.getArtifact().getFile() + " to " + event.getFile());
     }
 
     @Override
-    public void metadataInstalling( RepositoryEvent event )
-    {
-        logger.debug( "Installing " + event.getMetadata() + " to " + event.getFile() );
+    public void metadataInstalling(RepositoryEvent event) {
+        logger.debug("Installing " + event.getMetadata() + " to " + event.getFile());
     }
 
     @Override
-    public void metadataResolved( RepositoryEvent event )
-    {
+    public void metadataResolved(RepositoryEvent event) {
         Exception e = event.getException();
-        if ( e != null )
-        {
-            if ( e instanceof MetadataNotFoundException )
-            {
-                logger.debug( e.getMessage() );
-            }
-            else if ( logger.isDebugEnabled() )
-            {
-                logger.warn( e.getMessage(), e );
-            }
-            else
-            {
-                logger.warn( e.getMessage() );
+        if (e != null) {
+            if (e instanceof MetadataNotFoundException) {
+                logger.debug(e.getMessage());
+            } else if (logger.isDebugEnabled()) {
+                logger.warn(e.getMessage(), e);
+            } else {
+                logger.warn(e.getMessage());
             }
         }
     }
 
     @Override
-    public void metadataInvalid( RepositoryEvent event )
-    {
+    public void metadataInvalid(RepositoryEvent event) {
         Exception exception = event.getException();
 
-        StringBuilder buffer = new StringBuilder( 256 );
-        buffer.append( "The metadata " );
-        if ( event.getMetadata().getFile() != null )
-        {
-            buffer.append( event.getMetadata().getFile() );
-        }
-        else
-        {
-            buffer.append( event.getMetadata() );
+        StringBuilder buffer = new StringBuilder(256);
+        buffer.append("The metadata ");
+        if (event.getMetadata().getFile() != null) {
+            buffer.append(event.getMetadata().getFile());
+        } else {
+            buffer.append(event.getMetadata());
         }
 
-        if ( exception instanceof FileNotFoundException )
-        {
-            buffer.append( " is inaccessible" );
-        }
-        else
-        {
-            buffer.append( " is invalid" );
+        if (exception instanceof FileNotFoundException) {
+            buffer.append(" is inaccessible");
+        } else {
+            buffer.append(" is invalid");
         }
 
-        if ( exception != null )
-        {
-            buffer.append( ": " );
-            buffer.append( exception.getMessage() );
+        if (exception != null) {
+            buffer.append(": ");
+            buffer.append(exception.getMessage());
         }
 
-        if ( logger.isDebugEnabled() )
-        {
-            logger.warn( buffer.toString(), exception );
-        }
-        else
-        {
-            logger.warn( buffer.toString() );
+        if (logger.isDebugEnabled()) {
+            logger.warn(buffer.toString(), exception);
+        } else {
+            logger.warn(buffer.toString());
         }
     }
 
     @Override
-    public void artifactDescriptorInvalid( RepositoryEvent event )
-    {
-        StringBuilder buffer = new StringBuilder( 256 );
-        buffer.append( "The POM for " );
-        buffer.append( event.getArtifact() );
-        buffer.append( " is invalid, transitive dependencies (if any) will not be available" );
+    public void artifactDescriptorInvalid(RepositoryEvent event) {
+        StringBuilder buffer = new StringBuilder(256);
+        buffer.append("The POM for ");
+        buffer.append(event.getArtifact());
+        buffer.append(" is invalid, transitive dependencies (if any) will not be available");
 
-        if ( logger.isDebugEnabled() )
-        {
-            logger.warn( buffer + ": " + event.getException().getMessage() );
-        }
-        else
-        {
-            logger.warn( buffer + ", enable verbose output (-X) for more details" );
+        if (logger.isDebugEnabled()) {
+            logger.warn(buffer + ": " + event.getException().getMessage());
+        } else {
+            logger.warn(buffer + ", enable verbose output (-X) for more details");
         }
     }
 
     @Override
-    public void artifactDescriptorMissing( RepositoryEvent event )
-    {
-        logger.warn( "The POM for " + event.getArtifact() + " is missing, no dependency information available" );
+    public void artifactDescriptorMissing(RepositoryEvent event) {
+        logger.warn("The POM for " + event.getArtifact() + " is missing, no dependency information available");
     }
-
 }

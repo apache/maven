@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 
@@ -26,58 +25,46 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
  *
  * @author Benjamin Bentmann
  */
-class TestArtifactHandler
-    implements ArtifactHandler
-{
+class TestArtifactHandler implements ArtifactHandler {
 
     private String type;
 
     private String extension;
 
-    public TestArtifactHandler( String type )
-    {
-        this( type, type );
+    public TestArtifactHandler(String type) {
+        this(type, type);
     }
 
-    public TestArtifactHandler( String type, String extension )
-    {
+    public TestArtifactHandler(String type, String extension) {
         this.type = type;
         this.extension = extension;
     }
 
-    public String getClassifier()
-    {
+    public String getClassifier() {
         return null;
     }
 
-    public String getDirectory()
-    {
+    public String getDirectory() {
         return getPackaging() + "s";
     }
 
-    public String getExtension()
-    {
+    public String getExtension() {
         return extension;
     }
 
-    public String getLanguage()
-    {
+    public String getLanguage() {
         return "java";
     }
 
-    public String getPackaging()
-    {
+    public String getPackaging() {
         return type;
     }
 
-    public boolean isAddedToClasspath()
-    {
+    public boolean isAddedToClasspath() {
         return true;
     }
 
-    public boolean isIncludesDependencies()
-    {
+    public boolean isIncludesDependencies() {
         return false;
     }
-
 }

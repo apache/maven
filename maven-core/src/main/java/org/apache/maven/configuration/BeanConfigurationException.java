@@ -1,5 +1,3 @@
-package org.apache.maven.configuration;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,24 +16,20 @@ package org.apache.maven.configuration;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.configuration;
 
 /**
  * Thrown when a bean couldn't be configured.
  *
  * @author Benjamin Bentmann
  */
-public class BeanConfigurationException
-    extends Exception
-{
+public class BeanConfigurationException extends Exception {
 
-    public BeanConfigurationException( String message )
-    {
-        super( message );
+    public BeanConfigurationException(String message) {
+        super(message);
     }
 
-    public BeanConfigurationException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public BeanConfigurationException(String message, Throwable cause) {
+        super(message, cause);
     }
-
 }

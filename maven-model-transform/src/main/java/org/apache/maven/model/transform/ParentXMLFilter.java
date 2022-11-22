@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,7 +25,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-
 import org.apache.maven.model.transform.pull.NodeBufferingParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
@@ -42,9 +40,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
  * @author Guillaume Nodet
  * @since 4.0.0
  */
-class ParentXMLFilter
-    extends NodeBufferingParser
-{
+class ParentXMLFilter extends NodeBufferingParser {
 
     private final Function<Path, Optional<RelativeProject>> relativePathMapper;
 
@@ -53,16 +49,14 @@ class ParentXMLFilter
     /**
      * @param relativePathMapper
      */
-    ParentXMLFilter( XmlPullParser parser,
-                     Function<Path, Optional<RelativeProject>> relativePathMapper, Path projectPath )
-    {
-        super( parser, "parent" );
+    ParentXMLFilter(
+            XmlPullParser parser, Function<Path, Optional<RelativeProject>> relativePathMapper, Path projectPath) {
+        super(parser, "parent");
         this.relativePathMapper = relativePathMapper;
         this.projectPath = projectPath;
     }
 
-    protected void process( List<Event> buffer )
-    {
+    protected void process(List<Event> buffer) {
         String tagName = null;
         String groupId = null;
         String artifactId = null;
@@ -71,105 +65,78 @@ class ParentXMLFilter
         String whitespaceAfterParentStart = "";
         boolean hasVersion = false;
         boolean hasRelativePath = false;
-        for ( int i = 0; i < buffer.size(); i++ )
-        {
-            Event event = buffer.get( i );
-            if ( event.event == START_TAG )
-            {
+        for (int i = 0; i < buffer.size(); i++) {
+            Event event = buffer.get(i);
+            if (event.event == START_TAG) {
                 tagName = event.name;
-                hasVersion |= "version".equals( tagName );
-                hasRelativePath |= "relativePath".equals( tagName );
-            }
-            else if ( event.event == TEXT )
-            {
-                if ( event.text.matches( "\\s+" ) )
-                {
-                    if ( whitespaceAfterParentStart.isEmpty() )
-                    {
+                hasVersion |= "version".equals(tagName);
+                hasRelativePath |= "relativePath".equals(tagName);
+            } else if (event.event == TEXT) {
+                if (event.text.matches("\\s+")) {
+                    if (whitespaceAfterParentStart.isEmpty()) {
                         whitespaceAfterParentStart = event.text;
                     }
+                } else if ("groupId".equals(tagName)) {
+                    groupId = nullSafeAppend(groupId, event.text);
+                } else if ("artifactId".equals(tagName)) {
+                    artifactId = nullSafeAppend(artifactId, event.text);
+                } else if ("relativePath".equals(tagName)) {
+                    relativePath = nullSafeAppend(relativePath, event.text);
+                } else if ("version".equals(tagName)) {
+                    version = nullSafeAppend(version, event.text);
                 }
-                else if ( "groupId".equals( tagName ) )
-                {
-                    groupId = nullSafeAppend( groupId, event.text );
-                }
-                else if ( "artifactId".equals( tagName ) )
-                {
-                    artifactId = nullSafeAppend( artifactId, event.text );
-                }
-                else if ( "relativePath".equals( tagName ) )
-                {
-                    relativePath = nullSafeAppend( relativePath, event.text );
-                }
-                else if ( "version".equals( tagName ) )
-                {
-                    version = nullSafeAppend( version, event.text );
-                }
-            }
-            else if ( event.event == END_TAG && "parent".equals( event.name ) )
-            {
+            } else if (event.event == END_TAG && "parent".equals(event.name)) {
                 Optional<RelativeProject> resolvedParent;
-                if ( !hasVersion && ( !hasRelativePath || relativePath != null ) )
-                {
-                    Path relPath = Paths.get( Objects.toString( relativePath, "../pom.xml" ) );
-                    resolvedParent = resolveRelativePath( relPath, groupId, artifactId );
-                }
-                else
-                {
+                if (!hasVersion && (!hasRelativePath || relativePath != null)) {
+                    Path relPath = Paths.get(Objects.toString(relativePath, "../pom.xml"));
+                    resolvedParent = resolveRelativePath(relPath, groupId, artifactId);
+                } else {
                     resolvedParent = Optional.empty();
                 }
-                if ( !hasVersion && resolvedParent.isPresent() )
-                {
-                    int pos = buffer.get( i - 1 ).event == TEXT ? i - 1  : i;
+                if (!hasVersion && resolvedParent.isPresent()) {
+                    int pos = buffer.get(i - 1).event == TEXT ? i - 1 : i;
                     Event e = new Event();
                     e.event = TEXT;
                     e.text = whitespaceAfterParentStart;
-                    buffer.add( pos++, e );
+                    buffer.add(pos++, e);
                     e = new Event();
                     e.event = START_TAG;
-                    e.namespace = buffer.get( 0 ).namespace;
-                    e.prefix = buffer.get( 0 ).prefix;
+                    e.namespace = buffer.get(0).namespace;
+                    e.prefix = buffer.get(0).prefix;
                     e.name = "version";
-                    buffer.add( pos++, e );
+                    buffer.add(pos++, e);
                     e = new Event();
                     e.event = TEXT;
                     e.text = resolvedParent.get().getVersion();
-                    buffer.add( pos++, e );
+                    buffer.add(pos++, e);
                     e = new Event();
                     e.event = END_TAG;
                     e.name = "version";
-                    e.namespace = buffer.get( 0 ).namespace;
-                    e.prefix = buffer.get( 0 ).prefix;
-                    buffer.add( pos++, e );
+                    e.namespace = buffer.get(0).namespace;
+                    e.prefix = buffer.get(0).prefix;
+                    buffer.add(pos++, e);
                 }
                 break;
             }
         }
-        buffer.forEach( this::pushEvent );
-   }
+        buffer.forEach(this::pushEvent);
+    }
 
-
-    protected Optional<RelativeProject> resolveRelativePath( Path relativePath, String groupId, String artifactId )
-    {
-        Path pomPath = projectPath.resolve( relativePath );
-        if ( Files.isDirectory( pomPath ) )
-        {
-            pomPath = pomPath.resolve( "pom.xml" );
+    protected Optional<RelativeProject> resolveRelativePath(Path relativePath, String groupId, String artifactId) {
+        Path pomPath = projectPath.resolve(relativePath);
+        if (Files.isDirectory(pomPath)) {
+            pomPath = pomPath.resolve("pom.xml");
         }
 
-        Optional<RelativeProject> mappedProject = relativePathMapper.apply( pomPath.normalize() );
+        Optional<RelativeProject> mappedProject = relativePathMapper.apply(pomPath.normalize());
 
-        if ( mappedProject.isPresent() )
-        {
+        if (mappedProject.isPresent()) {
             RelativeProject project = mappedProject.get();
 
-            if ( Objects.equals( groupId, project.getGroupId() )
-                && Objects.equals( artifactId, project.getArtifactId() ) )
-            {
+            if (Objects.equals(groupId, project.getGroupId()) && Objects.equals(artifactId, project.getArtifactId())) {
                 return mappedProject;
             }
         }
         return Optional.empty();
     }
-
 }

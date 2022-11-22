@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -37,8 +35,7 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
  * @author Oleg Gusakov
  *
  */
-public class MetadataResolutionResult
-{
+public class MetadataResolutionResult {
     private Artifact originatingArtifact;
 
     private List<Artifact> missingArtifacts;
@@ -69,72 +66,57 @@ public class MetadataResolutionResult
 
     private MetadataGraph resolvedGraph;
 
-    public Artifact getOriginatingArtifact()
-    {
+    public Artifact getOriginatingArtifact() {
         return originatingArtifact;
     }
 
-    public MetadataResolutionResult listOriginatingArtifact( final Artifact originatingArtifact )
-    {
+    public MetadataResolutionResult listOriginatingArtifact(final Artifact originatingArtifact) {
         this.originatingArtifact = originatingArtifact;
 
         return this;
     }
 
-    public void addArtifact( Artifact artifact )
-    {
-        if ( artifacts == null )
-        {
+    public void addArtifact(Artifact artifact) {
+        if (artifacts == null) {
             artifacts = new LinkedHashSet<>();
         }
 
-        artifacts.add( artifact );
+        artifacts.add(artifact);
     }
 
-    public Set<Artifact> getArtifacts()
-    {
+    public Set<Artifact> getArtifacts() {
         return artifacts;
     }
 
-    public void addRequestedArtifact( Artifact artifact )
-    {
-        if ( requestedArtifacts == null )
-        {
+    public void addRequestedArtifact(Artifact artifact) {
+        if (requestedArtifacts == null) {
             requestedArtifacts = new LinkedHashSet<>();
         }
 
-        requestedArtifacts.add( artifact );
+        requestedArtifacts.add(artifact);
     }
 
-    public Set<Artifact> getRequestedArtifacts()
-    {
+    public Set<Artifact> getRequestedArtifacts() {
         return requestedArtifacts;
     }
 
-    public boolean hasMissingArtifacts()
-    {
+    public boolean hasMissingArtifacts() {
         return missingArtifacts != null && !missingArtifacts.isEmpty();
     }
 
-    public List<Artifact> getMissingArtifacts()
-    {
-        return missingArtifacts == null
-                   ? Collections.emptyList()
-                   : Collections.unmodifiableList( missingArtifacts );
-
+    public List<Artifact> getMissingArtifacts() {
+        return missingArtifacts == null ? Collections.emptyList() : Collections.unmodifiableList(missingArtifacts);
     }
 
-    public MetadataResolutionResult addMissingArtifact( Artifact artifact )
-    {
-        missingArtifacts = initList( missingArtifacts );
+    public MetadataResolutionResult addMissingArtifact(Artifact artifact) {
+        missingArtifacts = initList(missingArtifacts);
 
-        missingArtifacts.add( artifact );
+        missingArtifacts.add(artifact);
 
         return this;
     }
 
-    public MetadataResolutionResult setUnresolvedArtifacts( final List<Artifact> unresolvedArtifacts )
-    {
+    public MetadataResolutionResult setUnresolvedArtifacts(final List<Artifact> unresolvedArtifacts) {
         this.missingArtifacts = unresolvedArtifacts;
 
         return this;
@@ -144,25 +126,19 @@ public class MetadataResolutionResult
     // Exceptions
     // ------------------------------------------------------------------------
 
-    public boolean hasExceptions()
-    {
+    public boolean hasExceptions() {
         return exceptions != null && !exceptions.isEmpty();
     }
 
-    public List<Exception> getExceptions()
-    {
-        return exceptions == null
-                   ? Collections.emptyList()
-                   : Collections.unmodifiableList( exceptions );
-
+    public List<Exception> getExceptions() {
+        return exceptions == null ? Collections.emptyList() : Collections.unmodifiableList(exceptions);
     }
 
     // ------------------------------------------------------------------------
     // Version Range Violations
     // ------------------------------------------------------------------------
 
-    public boolean hasVersionRangeViolations()
-    {
+    public boolean hasVersionRangeViolations() {
         return versionRangeViolations != null;
     }
 
@@ -171,148 +147,127 @@ public class MetadataResolutionResult
      *       {@link #getVersionRangeViolation(int)} but it's not used like that in
      *       {@link org.apache.maven.repository.legacy.resolver.DefaultLegacyArtifactCollector}
      */
-    public MetadataResolutionResult addVersionRangeViolation( Exception e )
-    {
-        versionRangeViolations = initList( versionRangeViolations );
+    public MetadataResolutionResult addVersionRangeViolation(Exception e) {
+        versionRangeViolations = initList(versionRangeViolations);
 
-        versionRangeViolations.add( e );
+        versionRangeViolations.add(e);
 
-        exceptions = initList( exceptions );
+        exceptions = initList(exceptions);
 
-        exceptions.add( e );
+        exceptions.add(e);
 
         return this;
     }
 
-    public OverConstrainedVersionException getVersionRangeViolation( int i )
-    {
-        return (OverConstrainedVersionException) versionRangeViolations.get( i );
+    public OverConstrainedVersionException getVersionRangeViolation(int i) {
+        return (OverConstrainedVersionException) versionRangeViolations.get(i);
     }
 
-    public List<Exception> getVersionRangeViolations()
-    {
+    public List<Exception> getVersionRangeViolations() {
         return versionRangeViolations == null
-                   ? Collections.emptyList()
-                   : Collections.unmodifiableList( versionRangeViolations );
-
+                ? Collections.emptyList()
+                : Collections.unmodifiableList(versionRangeViolations);
     }
 
     // ------------------------------------------------------------------------
     // Metadata Resolution Exceptions: ArtifactResolutionExceptions
     // ------------------------------------------------------------------------
 
-    public boolean hasMetadataResolutionExceptions()
-    {
+    public boolean hasMetadataResolutionExceptions() {
         return metadataResolutionExceptions != null;
     }
 
-    public MetadataResolutionResult addMetadataResolutionException( ArtifactResolutionException e )
-    {
-        metadataResolutionExceptions = initList( metadataResolutionExceptions );
+    public MetadataResolutionResult addMetadataResolutionException(ArtifactResolutionException e) {
+        metadataResolutionExceptions = initList(metadataResolutionExceptions);
 
-        metadataResolutionExceptions.add( e );
+        metadataResolutionExceptions.add(e);
 
-        exceptions = initList( exceptions );
+        exceptions = initList(exceptions);
 
-        exceptions.add( e );
+        exceptions.add(e);
 
         return this;
     }
 
-    public ArtifactResolutionException getMetadataResolutionException( int i )
-    {
-        return metadataResolutionExceptions.get( i );
+    public ArtifactResolutionException getMetadataResolutionException(int i) {
+        return metadataResolutionExceptions.get(i);
     }
 
-    public List<ArtifactResolutionException> getMetadataResolutionExceptions()
-    {
+    public List<ArtifactResolutionException> getMetadataResolutionExceptions() {
         return metadataResolutionExceptions == null
-                   ? Collections.emptyList()
-                   : Collections.unmodifiableList( metadataResolutionExceptions );
-
+                ? Collections.emptyList()
+                : Collections.unmodifiableList(metadataResolutionExceptions);
     }
 
     // ------------------------------------------------------------------------
     // ErrorArtifactExceptions: ArtifactResolutionExceptions
     // ------------------------------------------------------------------------
 
-    public boolean hasErrorArtifactExceptions()
-    {
+    public boolean hasErrorArtifactExceptions() {
         return errorArtifactExceptions != null;
     }
 
-    public MetadataResolutionResult addError( Exception e )
-    {
-        exceptions = initList( exceptions );
+    public MetadataResolutionResult addError(Exception e) {
+        exceptions = initList(exceptions);
 
-        exceptions.add( e );
+        exceptions.add(e);
 
         return this;
     }
 
-    public List<ArtifactResolutionException> getErrorArtifactExceptions()
-    {
-        if ( errorArtifactExceptions == null )
-        {
+    public List<ArtifactResolutionException> getErrorArtifactExceptions() {
+        if (errorArtifactExceptions == null) {
             return Collections.emptyList();
         }
 
-        return Collections.unmodifiableList( errorArtifactExceptions );
+        return Collections.unmodifiableList(errorArtifactExceptions);
     }
 
     // ------------------------------------------------------------------------
     // Circular Dependency Exceptions
     // ------------------------------------------------------------------------
 
-    public boolean hasCircularDependencyExceptions()
-    {
+    public boolean hasCircularDependencyExceptions() {
         return circularDependencyExceptions != null;
     }
 
-    public MetadataResolutionResult addCircularDependencyException( CyclicDependencyException e )
-    {
-        circularDependencyExceptions = initList( circularDependencyExceptions );
+    public MetadataResolutionResult addCircularDependencyException(CyclicDependencyException e) {
+        circularDependencyExceptions = initList(circularDependencyExceptions);
 
-        circularDependencyExceptions.add( e );
+        circularDependencyExceptions.add(e);
 
-        exceptions = initList( exceptions );
+        exceptions = initList(exceptions);
 
-        exceptions.add( e );
+        exceptions.add(e);
 
         return this;
     }
 
-    public CyclicDependencyException getCircularDependencyException( int i )
-    {
-        return circularDependencyExceptions.get( i );
+    public CyclicDependencyException getCircularDependencyException(int i) {
+        return circularDependencyExceptions.get(i);
     }
 
-    public List<CyclicDependencyException> getCircularDependencyExceptions()
-    {
-        if ( circularDependencyExceptions == null )
-        {
+    public List<CyclicDependencyException> getCircularDependencyExceptions() {
+        if (circularDependencyExceptions == null) {
             return Collections.emptyList();
         }
 
-        return Collections.unmodifiableList( circularDependencyExceptions );
+        return Collections.unmodifiableList(circularDependencyExceptions);
     }
 
     // ------------------------------------------------------------------------
     // Repositories
     // ------------------------------------------------------------------------
 
-    public List<ArtifactRepository> getRepositories()
-    {
-        if ( repositories == null )
-        {
+    public List<ArtifactRepository> getRepositories() {
+        if (repositories == null) {
             return Collections.emptyList();
         }
 
-        return Collections.unmodifiableList( repositories );
+        return Collections.unmodifiableList(repositories);
     }
 
-    public MetadataResolutionResult setRepositories( final List<ArtifactRepository> repositories )
-    {
+    public MetadataResolutionResult setRepositories(final List<ArtifactRepository> repositories) {
         this.repositories = repositories;
 
         return this;
@@ -322,42 +277,34 @@ public class MetadataResolutionResult
     // Internal
     //
 
-    private <T> List<T> initList( final List<T> l )
-    {
-        if ( l == null )
-        {
+    private <T> List<T> initList(final List<T> l) {
+        if (l == null) {
             return new ArrayList<>();
         }
         return l;
     }
 
-    public String toString()
-    {
-        if ( artifacts == null )
-        {
+    public String toString() {
+        if (artifacts == null) {
             return "";
         }
-        StringBuilder sb = new StringBuilder( 256 );
+        StringBuilder sb = new StringBuilder(256);
         int i = 1;
-        sb.append( "---------\n" );
-        sb.append( artifacts.size() ).append( '\n' );
-        for ( Artifact a : artifacts )
-        {
-            sb.append( i ).append( ' ' ).append( a ).append( '\n' );
+        sb.append("---------\n");
+        sb.append(artifacts.size()).append('\n');
+        for (Artifact a : artifacts) {
+            sb.append(i).append(' ').append(a).append('\n');
             i++;
         }
-        sb.append( "---------\n" );
+        sb.append("---------\n");
         return sb.toString();
     }
 
-    public MetadataGraph getResolvedTree()
-    {
+    public MetadataGraph getResolvedTree() {
         return resolvedTree;
     }
 
-    public void setResolvedTree( MetadataGraph resolvedTree )
-    {
+    public void setResolvedTree(MetadataGraph resolvedTree) {
         this.resolvedTree = resolvedTree;
     }
-
 }

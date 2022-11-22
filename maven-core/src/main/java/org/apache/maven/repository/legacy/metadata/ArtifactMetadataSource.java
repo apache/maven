@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.legacy.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,9 +16,9 @@ package org.apache.maven.repository.legacy.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy.metadata;
 
 import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
@@ -31,15 +29,13 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  */
-public interface ArtifactMetadataSource
-{
+public interface ArtifactMetadataSource {
 
-    ResolutionGroup retrieve( MetadataResolutionRequest request )
-        throws ArtifactMetadataRetrievalException;
+    ResolutionGroup retrieve(MetadataResolutionRequest request) throws ArtifactMetadataRetrievalException;
 
-    ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
-                              List<ArtifactRepository> remoteRepositories )
-        throws ArtifactMetadataRetrievalException;
+    ResolutionGroup retrieve(
+            Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
+            throws ArtifactMetadataRetrievalException;
 
     /**
      * Get a list of available versions for an artifact in the remote repository
@@ -53,9 +49,9 @@ public interface ArtifactMetadataSource
      * @throws ArtifactMetadataRetrievalException
      *          in case of error while retrieving repository metadata from the repository.
      */
-    List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
-                                                     List<ArtifactRepository> remoteRepositories )
-        throws ArtifactMetadataRetrievalException;
+    List<ArtifactVersion> retrieveAvailableVersions(
+            Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
+            throws ArtifactMetadataRetrievalException;
 
     /**
      * Get a list of available versions for an artifact in the remote deployment repository. This ignores any update
@@ -70,9 +66,7 @@ public interface ArtifactMetadataSource
      * @throws ArtifactMetadataRetrievalException
      *          in case of error while retrieving repository metadata from the repository.
      */
-    List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact,
-                                                                             ArtifactRepository localRepository,
-                                                                             ArtifactRepository remoteRepository )
-        throws ArtifactMetadataRetrievalException;
-
+    List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
+            Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository)
+            throws ArtifactMetadataRetrievalException;
 }

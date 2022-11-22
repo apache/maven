@@ -1,5 +1,3 @@
-package org.apache.maven.internal.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.internal.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.maven.api.xml.Dom;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.MXParser;
@@ -36,14 +34,11 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 /**
  *
  */
-public class Xpp3DomBuilder
-{
+public class Xpp3DomBuilder {
     private static final boolean DEFAULT_TRIM = true;
 
-    public static Xpp3Dom build( Reader reader )
-        throws XmlPullParserException, IOException
-    {
-        return build( reader, null );
+    public static Xpp3Dom build(Reader reader) throws XmlPullParserException, IOException {
+        return build(reader, null);
     }
 
     /**
@@ -54,42 +49,33 @@ public class Xpp3DomBuilder
      * @throws XmlPullParserException xml exception
      * @throws IOException io
      */
-    public static Xpp3Dom build( Reader reader, InputLocationBuilder locationBuilder )
-        throws XmlPullParserException, IOException
-    {
-        return build( reader, DEFAULT_TRIM, locationBuilder );
+    public static Xpp3Dom build(Reader reader, InputLocationBuilder locationBuilder)
+            throws XmlPullParserException, IOException {
+        return build(reader, DEFAULT_TRIM, locationBuilder);
     }
 
-    public static Xpp3Dom build( InputStream is, String encoding )
-        throws XmlPullParserException, IOException
-    {
-        return build( is, encoding, DEFAULT_TRIM );
+    public static Xpp3Dom build(InputStream is, String encoding) throws XmlPullParserException, IOException {
+        return build(is, encoding, DEFAULT_TRIM);
     }
 
-    public static Xpp3Dom build( InputStream is, String encoding, boolean trim )
-        throws XmlPullParserException, IOException
-    {
-        try
-        {
+    public static Xpp3Dom build(InputStream is, String encoding, boolean trim)
+            throws XmlPullParserException, IOException {
+        try {
             final XmlPullParser parser = new MXParser();
-            parser.setInput( is, encoding );
+            parser.setInput(is, encoding);
 
-            final Xpp3Dom xpp3Dom = build( parser, trim );
+            final Xpp3Dom xpp3Dom = build(parser, trim);
             is.close();
             is = null;
 
             return xpp3Dom;
-        }
-        finally
-        {
-            IOUtil.close( is );
+        } finally {
+            IOUtil.close(is);
         }
     }
 
-    public static Xpp3Dom build( Reader reader, boolean trim )
-        throws XmlPullParserException, IOException
-    {
-        return build( reader, trim, null );
+    public static Xpp3Dom build(Reader reader, boolean trim) throws XmlPullParserException, IOException {
+        return build(reader, trim, null);
     }
 
     /**
@@ -101,36 +87,28 @@ public class Xpp3DomBuilder
      * @throws XmlPullParserException xml exception
      * @throws IOException io
      */
-    public static Xpp3Dom build( Reader reader, boolean trim, InputLocationBuilder locationBuilder )
-        throws XmlPullParserException, IOException
-    {
-        try
-        {
+    public static Xpp3Dom build(Reader reader, boolean trim, InputLocationBuilder locationBuilder)
+            throws XmlPullParserException, IOException {
+        try {
             final XmlPullParser parser = new MXParser();
-            parser.setInput( reader );
+            parser.setInput(reader);
 
-            final Xpp3Dom xpp3Dom = build( parser, trim, locationBuilder );
+            final Xpp3Dom xpp3Dom = build(parser, trim, locationBuilder);
             reader.close();
             reader = null;
 
             return xpp3Dom;
-        }
-        finally
-        {
-            IOUtil.close( reader );
+        } finally {
+            IOUtil.close(reader);
         }
     }
 
-    public static Xpp3Dom build( XmlPullParser parser )
-        throws XmlPullParserException, IOException
-    {
-        return build( parser, DEFAULT_TRIM );
+    public static Xpp3Dom build(XmlPullParser parser) throws XmlPullParserException, IOException {
+        return build(parser, DEFAULT_TRIM);
     }
 
-    public static Xpp3Dom build( XmlPullParser parser, boolean trim )
-        throws XmlPullParserException, IOException
-    {
-        return build( parser, trim, null );
+    public static Xpp3Dom build(XmlPullParser parser, boolean trim) throws XmlPullParserException, IOException {
+        return build(parser, trim, null);
     }
 
     /**
@@ -142,9 +120,8 @@ public class Xpp3DomBuilder
      * @throws XmlPullParserException xml exception
      * @throws IOException io
      */
-    public static Xpp3Dom build( XmlPullParser parser, boolean trim, InputLocationBuilder locationBuilder )
-        throws XmlPullParserException, IOException
-    {
+    public static Xpp3Dom build(XmlPullParser parser, boolean trim, InputLocationBuilder locationBuilder)
+            throws XmlPullParserException, IOException {
         boolean spacePreserve = false;
         String name = null;
         String value = null;
@@ -152,55 +129,40 @@ public class Xpp3DomBuilder
         Map<String, String> attrs = null;
         List<Dom> children = null;
         int eventType = parser.getEventType();
-        while ( eventType != XmlPullParser.END_DOCUMENT )
-        {
-            if ( eventType == XmlPullParser.START_TAG )
-            {
-                if ( name == null )
-                {
+        while (eventType != XmlPullParser.END_DOCUMENT) {
+            if (eventType == XmlPullParser.START_TAG) {
+                if (name == null) {
                     name = parser.getName();
-                    location = locationBuilder != null ? locationBuilder.toInputLocation( parser ) : null;
+                    location = locationBuilder != null ? locationBuilder.toInputLocation(parser) : null;
                     int attributesSize = parser.getAttributeCount();
-                    if ( attributesSize > 0 )
-                    {
+                    if (attributesSize > 0) {
                         attrs = new HashMap<>();
-                        for ( int i = 0; i < attributesSize; i++ )
-                        {
-                            String aname = parser.getAttributeName( i );
-                            String avalue = parser.getAttributeValue( i );
-                            attrs.put( aname, avalue );
-                            spacePreserve =
-                                    spacePreserve || ( "xml:space".equals( aname ) && "preserve".equals( avalue ) );
+                        for (int i = 0; i < attributesSize; i++) {
+                            String aname = parser.getAttributeName(i);
+                            String avalue = parser.getAttributeValue(i);
+                            attrs.put(aname, avalue);
+                            spacePreserve = spacePreserve || ("xml:space".equals(aname) && "preserve".equals(avalue));
                         }
                     }
-                }
-                else
-                {
-                    if ( children == null )
-                    {
+                } else {
+                    if (children == null) {
                         children = new ArrayList<>();
                     }
-                    Dom child = build( parser, trim, locationBuilder );
-                    children.add( child );
+                    Dom child = build(parser, trim, locationBuilder);
+                    children.add(child);
                 }
-            }
-            else if ( eventType == XmlPullParser.TEXT )
-            {
+            } else if (eventType == XmlPullParser.TEXT) {
                 String text = parser.getText();
-                if ( trim && !spacePreserve )
-                {
+                if (trim && !spacePreserve) {
                     text = text.trim();
                 }
                 value = value != null ? value + text : text;
-            }
-            else if ( eventType == XmlPullParser.END_TAG )
-            {
-                return new Xpp3Dom( name, children == null ? value : null,
-                        attrs, children, location );
+            } else if (eventType == XmlPullParser.END_TAG) {
+                return new Xpp3Dom(name, children == null ? value : null, attrs, children, location);
             }
             eventType = parser.next();
         }
-        throw new IllegalStateException( "End of document found before returning to 0 depth" );
+        throw new IllegalStateException("End of document found before returning to 0 depth");
     }
 
     /**
@@ -208,8 +170,7 @@ public class Xpp3DomBuilder
      *
      * @since 3.2.0
      */
-    public interface InputLocationBuilder
-    {
-        Object toInputLocation( XmlPullParser parser );
+    public interface InputLocationBuilder {
+        Object toInputLocation(XmlPullParser parser);
     }
 }

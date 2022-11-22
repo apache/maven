@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,14 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
+package org.apache.maven.api.services;
 
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Optional;
-
 import org.apache.maven.api.Project;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Result of a project build call.
@@ -34,15 +31,14 @@ import org.apache.maven.api.Project;
  * @since 4.0
  */
 @Experimental
-public interface ProjectBuilderResult
-{
+public interface ProjectBuilderResult {
 
     /**
      * Gets the identifier of the project that could not be built. The general format of the identifier is {@code
      * <groupId>:<artifactId>:<version>} but some of these coordinates may still be unknown at the point the exception
      * is thrown so this information is merely meant to assist the user.
      *
-     * @return The identifier of the project or an empty string if not known, never {@code null}.
+     * @return the identifier of the project or an empty string if not known, never {@code null}
      */
     @Nonnull
     String getProjectId();
@@ -50,7 +46,7 @@ public interface ProjectBuilderResult
     /**
      * Gets the POM file from which the project was built.
      *
-     * @return The optional POM file.
+     * @return the optional POM file
      */
     @Nonnull
     Optional<Path> getPomFile();
@@ -67,17 +63,16 @@ public interface ProjectBuilderResult
     /**
      * Gets the problems that were encountered during the project building.
      *
-     * @return The problems that were encountered during the project building, can be empty but never {@code null}.
+     * @return the problems that were encountered during the project building, can be empty but never {@code null}
      */
     @Nonnull
-    Collection<ProjectBuilderProblem> getProblems();
+    Collection<BuilderProblem> getProblems();
 
     /**
      * Gets the result of the dependency resolution for the project.
      *
-     * @return The result of the dependency resolution for the project.
+     * @return the result of the dependency resolution for the project
      */
     @Nonnull
     Optional<DependencyCollectorResult> getDependencyResolverResult();
-
 }

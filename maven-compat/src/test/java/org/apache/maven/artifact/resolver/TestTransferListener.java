@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,26 +16,21 @@ package org.apache.maven.artifact.resolver;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.maven.wagon.observers.AbstractTransferListener;
 
-public class TestTransferListener
-    extends AbstractTransferListener
-{
+public class TestTransferListener extends AbstractTransferListener {
 
     private final List<String> transfers = new ArrayList<>();
 
-    public List<String> getTransfers()
-    {
+    public List<String> getTransfers() {
         return transfers;
     }
 
-    public void addTransfer( String name )
-    {
-        transfers.add( name );
+    public void addTransfer(String name) {
+        transfers.add(name);
     }
-
 }

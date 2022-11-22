@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.version.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.version.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.version.internal;
 
 import org.apache.maven.plugin.version.PluginVersionResult;
 import org.eclipse.aether.repository.ArtifactRepository;
@@ -28,42 +27,33 @@ import org.eclipse.aether.repository.ArtifactRepository;
  * @since 3.0
  * @author Benjamin Bentmann
  */
-class DefaultPluginVersionResult
-    implements PluginVersionResult
-{
+class DefaultPluginVersionResult implements PluginVersionResult {
 
     private String version;
 
     private ArtifactRepository repository;
 
-    DefaultPluginVersionResult()
-    {
+    DefaultPluginVersionResult() {
         // does nothing
     }
 
-    DefaultPluginVersionResult( String version )
-    {
+    DefaultPluginVersionResult(String version) {
         this.version = version;
     }
 
-    public String getVersion()
-    {
+    public String getVersion() {
         return version;
     }
 
-    public void setVersion( String version )
-    {
+    public void setVersion(String version) {
         this.version = version;
     }
 
-    public ArtifactRepository getRepository()
-    {
+    public ArtifactRepository getRepository() {
         return repository;
     }
 
-    public void setRepository( ArtifactRepository repository )
-    {
+    public void setRepository(ArtifactRepository repository) {
         this.repository = repository;
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import org.apache.maven.api.annotations.Experimental;
 
@@ -25,22 +24,18 @@ import org.apache.maven.api.annotations.Experimental;
  * @since 4.0
  */
 @Experimental
-public class ArtifactInstallerException
-    extends MavenException
-{
+public class ArtifactInstallerException extends MavenException {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 3652561971360586373L;
 
     /**
-     * @param message The message of the error.
+     * @param message the message of the error
      * @param e {@link Exception}
      */
-    public ArtifactInstallerException( String message, Exception e )
-    {
-        super( message, e );
+    public ArtifactInstallerException(String message, Exception e) {
+        super(message, e);
     }
-
 }

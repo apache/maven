@@ -1,5 +1,3 @@
-package org.apache.maven.rtinfo.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,7 @@ package org.apache.maven.rtinfo.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.rtinfo.RuntimeInformation;
-import org.codehaus.plexus.testing.PlexusTest;
-import org.junit.jupiter.api.Test;
+package org.apache.maven.rtinfo.internal;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -29,44 +24,39 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.inject.Inject;
+import org.apache.maven.rtinfo.RuntimeInformation;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
 
 @PlexusTest
-public class DefaultRuntimeInformationTest
-{
+public class DefaultRuntimeInformationTest {
     @Inject
     RuntimeInformation rtInfo;
 
     @Test
-    public void testGetMavenVersion()
-    {
+    public void testGetMavenVersion() {
         String mavenVersion = rtInfo.getMavenVersion();
-        assertNotNull( mavenVersion );
-        assertTrue( mavenVersion.length() > 0 );
+        assertNotNull(mavenVersion);
+        assertTrue(mavenVersion.length() > 0);
     }
 
     @Test
-    public void testIsMavenVersion()
-    {
-        assertTrue( rtInfo.isMavenVersion( "2.0" ) );
-        assertFalse( rtInfo.isMavenVersion( "9.9" ) );
+    public void testIsMavenVersion() {
+        assertTrue(rtInfo.isMavenVersion("2.0"));
+        assertFalse(rtInfo.isMavenVersion("9.9"));
 
-        assertTrue( rtInfo.isMavenVersion( "[2.0.11,2.1.0),[3.0,)" ) );
-        assertFalse( rtInfo.isMavenVersion( "[9.0,)" ) );
-
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> rtInfo.isMavenVersion( "[3.0," ),
-                "Bad version range wasn't rejected" );
+        assertTrue(rtInfo.isMavenVersion("[2.0.11,2.1.0),[3.0,)"));
+        assertFalse(rtInfo.isMavenVersion("[9.0,)"));
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> rtInfo.isMavenVersion( "" ),
-                "Bad version range wasn't rejected" );
+                () -> rtInfo.isMavenVersion("[3.0,"),
+                "Bad version range wasn't rejected");
 
         assertThrows(
-                NullPointerException.class,
-                () -> rtInfo.isMavenVersion( null ),
-                "Bad version range wasn't rejected" );
+                IllegalArgumentException.class, () -> rtInfo.isMavenVersion(""), "Bad version range wasn't rejected");
+
+        assertThrows(
+                NullPointerException.class, () -> rtInfo.isMavenVersion(null), "Bad version range wasn't rejected");
     }
-
 }

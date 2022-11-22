@@ -1,5 +1,3 @@
-package org.slf4j.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.slf4j.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.slf4j.impl;
 
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
@@ -26,15 +25,12 @@ import org.slf4j.LoggerFactory;
  * Utility for Maven to access Slf4j-Simple internals through package access.
  * Use with precaution, since this is not normally intended for production use.
  */
-public class MavenSlf4jSimpleFriend
-{
-    public static void init()
-    {
+public class MavenSlf4jSimpleFriend {
+    public static void init() {
         SimpleLogger.init();
         ILoggerFactory loggerFactory = LoggerFactory.getILoggerFactory();
-        if ( loggerFactory instanceof SimpleLoggerFactory )
-        {
-            ( (SimpleLoggerFactory) loggerFactory ).reset();
+        if (loggerFactory instanceof SimpleLoggerFactory) {
+            ((SimpleLoggerFactory) loggerFactory).reset();
         }
     }
 }

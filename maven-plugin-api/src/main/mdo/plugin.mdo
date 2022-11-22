@@ -17,8 +17,8 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
+<model xmlns="http://codehaus-plexus.github.io/MODELLO/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/2.0.0 https://codehaus-plexus.github.io/modello/xsd/modello-2.0.0.xsd"
   xml.namespace="http://maven.apache.org/PLUGIN/${version}"
   xml.schemaLocation="https://maven.apache.org/xsd/plugin-${version}.xsd">
   <id>plugin</id>
@@ -29,6 +29,7 @@ under the License.
     <a href="/plugins/maven-plugin-plugin/">maven-plugin-plugin</a>.
     <p><i>Notice:</i> this documentation is generated from a Modello model but the code executed is not generated
     from this descriptor. Please report if you find anything wrong.</p>
+    <p>An XSD is available at:<a href="https://maven.apache.org/xsd/plugin-1.1.0.xsd">https://maven.apache.org/xsd/plugin-1.1.0.xsd</a></p>
   ]]></description>
   <defaults>
     <default>
@@ -37,7 +38,7 @@ under the License.
     </default>
   </defaults>
   <classes>
-    <class rootElement="true" xml.tagName="plugin">
+    <class rootElement="true" xml.tagName="plugin" xdoc.anchorName="plugin">
       <name>PluginDescriptor</name>
       <version>1.0.0+</version>
       <description><![CDATA[Root element of the <code>plugin.xml</code> file.]]></description>
@@ -60,6 +61,7 @@ under the License.
           <version>1.0.0+</version>
           <description>The group id of the plugin.</description>
           <type>String</type>
+          <required>true</required>
         </field>
         <field>
           <name>artifactId</name>
@@ -72,6 +74,7 @@ under the License.
           <version>1.0.0+</version>
           <description>The version of the plugin.</description>
           <type>String</type>
+          <required>true</required>
         </field>
         <field>
           <name>goalPrefix</name>
@@ -129,7 +132,7 @@ under the License.
       </fields>
     </class>
 
-    <class>
+    <class xdoc.anchorName="mojo">
       <name>MojoDescriptor</name>
       <version>1.0.0+</version>
       <description><![CDATA[
@@ -173,8 +176,8 @@ under the License.
           <version>1.0.0+</version>
           <type>String</type>
           <description><![CDATA[
-            Defines a default phase to bind a mojo execution to if the user does not explicitly set a phase in the POM.
-            <i>Note:</i> This will not automagically make a mojo run when the plugin declaration is added
+            Defines a default phase to bind a Mojo execution to if the user does not explicitly set a phase in the POM.
+            <i>Note:</i> This will not automagically make a Mojo run when the plugin declaration is added
             to the POM. It merely enables the user to omit the <code>&lt;phase&gt;</code> element from the
             surrounding <code>&lt;execution&gt;</code> element.
           ]]></description>
@@ -213,10 +216,10 @@ under the License.
           <version>1.0.0+</version>
           <type>String</type>
           <description><![CDATA[
-            Flags this mojo as requiring information about the dependencies that would make up the specified class
+            Flags this Mojo as requiring information about the dependencies that would make up the specified class
             path. As the name suggests, this is similar to requiresDependencyResolution and supports the same values.
             The important difference is this will not resolve the files for the dependencies, i.e. the artifacts
-            associated with a Maven project can lack a file. As such, this annotation is meant for mojos that only
+            associated with a Maven project can lack a file. As such, this annotation is meant for Mojos that only
             want to analyze the set of transitive dependencies, in particular during early lifecycle phases where
             full dependency resolution might fail due to projects which haven't been built yet.
           ]]></description>
@@ -237,7 +240,7 @@ under the License.
         </field>
         <field>
           <name>requiresReports</name>
-          <version>1.0.0+</version>
+          <version>1.0.0</version><!-- no longer part of 1.1.0 -->
           <type>boolean</type>
           <description>Flags this Mojo to require running inside of a reports context. Unsupported since Maven 3.0.</description>
           <defaultValue>false</defaultValue>
@@ -271,10 +274,17 @@ under the License.
           <version>1.0.0+</version>
           <type>boolean</type>
           <description>
-            Marks this mojo as being thread-safe, i.e. the mojo safely supports concurrent execution during parallel
+            Marks this Mojo as being thread-safe, i.e. the Mojo safely supports concurrent execution during parallel
             builds. Mojos without this annotation will make Maven output a warning when used during a parallel build
             session. Since Maven 3.0.
           </description>
+          <defaultValue>false</defaultValue>
+        </field>
+        <field>
+          <name>v4Api</name>
+          <version>1.1.0+</version>
+          <type>boolean</type>
+          <description>Marks this Mojo as using Maven 4 API. This makes the plugin implicitly incompatible with earlier Maven versions. Only evaluated since Maven 4.</description>
           <defaultValue>false</defaultValue>
         </field>
         <field>
@@ -336,11 +346,14 @@ under the License.
         <field>
           <name>configuration</name>
           <version>1.0.0+</version>
-          <description></description>
+          <description>Specifies default values of parameters (with attribute "default-value") as well as how they can be overwritten by Maven properties (in the element content).</description>
+          <!-- https://github.com/codehaus-plexus/modello/issues/264 -->
+          <type>DOM</type>
+          <!--
           <association xml.tagName="paramName">
             <type>Configuration</type>
             <multiplicity>*</multiplicity>
-          </association>
+          </association> -->
         </field>
         <field xdoc.separator="blank">
           <name>requirements</name>
@@ -354,7 +367,7 @@ under the License.
       </fields>
     </class>
 
-    <class>
+    <class xdoc.anchorName="parameter">
       <name>Parameter</name>
       <version>1.0.0+</version>
       <description>A phase mapping definition.</description>
@@ -455,7 +468,7 @@ under the License.
           <required>true</required>
           <version>1.0.0+</version>
           <type>String</type>
-          <description>Parameter expression, to let user override default value with a system property, pom property or settings property.</description>
+          <description>Parameter expression, to let user override default value with a user property, system property or project property.</description>
         </field>
         <field xml.attribute="true" xml.tagName="implementation">
           <name>implementation</name>
@@ -472,7 +485,7 @@ under the License.
       </fields>
     </class>
 
-    <class>
+    <class xdoc.anchorName="requirement">
       <name>Requirement</name>
       <version>1.0.0+</version>
       <description>Describes a component requirement.</description>
@@ -501,7 +514,7 @@ under the License.
       </fields>
     </class>
 
-    <class>
+    <class xdoc.anchorName="dependency">
       <name>Dependency</name>
       <version>1.0.0+</version>
       <description>Definition of a dependency, needed by the plugin at runtime.</description>

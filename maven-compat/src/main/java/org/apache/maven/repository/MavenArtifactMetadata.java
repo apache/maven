@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 /**
  *
@@ -25,8 +24,7 @@ package org.apache.maven.repository;
  * @author Oleg Gusakov
  *
  */
-public class MavenArtifactMetadata
-{
+public class MavenArtifactMetadata {
     public static final String DEFAULT_TYPE = "jar";
 
     String groupId;
@@ -38,82 +36,66 @@ public class MavenArtifactMetadata
 
     transient Object datum;
 
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return groupId;
     }
 
-    public void setGroupId( String groupId )
-    {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return artifactId;
     }
 
-    public void setArtifactId( String artifactId )
-    {
+    public void setArtifactId(String artifactId) {
         this.artifactId = artifactId;
     }
 
-    public String getVersion()
-    {
+    public String getVersion() {
         return version;
     }
 
-    public void setVersion( String version )
-    {
+    public void setVersion(String version) {
         this.version = version;
     }
 
-    public String getClassifier()
-    {
+    public String getClassifier() {
         return classifier;
     }
 
-    public void setClassifier( String classifier )
-    {
+    public void setClassifier(String classifier) {
         this.classifier = classifier;
     }
 
-    public String getType()
-    {
+    public String getType() {
         return type;
     }
 
-    public void setType( String type )
-    {
+    public void setType(String type) {
         this.type = type;
     }
 
-    public Object getDatum()
-    {
+    public Object getDatum() {
         return datum;
     }
 
-    public void setDatum( Object datum )
-    {
+    public void setDatum(Object datum) {
         this.datum = datum;
     }
 
-    public String getScope()
-    {
+    public String getScope() {
         return scope;
     }
 
-    public void setScope( String scope )
-    {
+    public void setScope(String scope) {
         this.scope = scope;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getGroupId() + ":" + getArtifactId() + ":" + getVersion() + ":"
-            + ( getClassifier() == null ? "" : getClassifier() ) + ":"
-            + ( getType() == null ? DEFAULT_TYPE : getType() );
+                + (getClassifier() == null ? "" : getClassifier()) + ":"
+                + (getType() == null ? DEFAULT_TYPE : getType());
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.repository;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,9 +16,9 @@ package org.apache.maven.artifact.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.repository;
 
 import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
@@ -30,17 +28,16 @@ import org.apache.maven.repository.Proxy;
  * Abstraction of an artifact repository. Artifact repositories can be remote, local, or even build reactor or
  * IDE workspace.
  */
-public interface ArtifactRepository
-{
-    String pathOf( Artifact artifact );
+public interface ArtifactRepository {
+    String pathOf(Artifact artifact);
 
-    String pathOfRemoteRepositoryMetadata( ArtifactMetadata artifactMetadata );
+    String pathOfRemoteRepositoryMetadata(ArtifactMetadata artifactMetadata);
 
-    String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository );
+    String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository);
 
     String getUrl();
 
-    void setUrl( String url );
+    void setUrl(String url);
 
     String getBasedir();
 
@@ -48,19 +45,19 @@ public interface ArtifactRepository
 
     String getId();
 
-    void setId( String id );
+    void setId(String id);
 
     ArtifactRepositoryPolicy getSnapshots();
 
-    void setSnapshotUpdatePolicy( ArtifactRepositoryPolicy policy );
+    void setSnapshotUpdatePolicy(ArtifactRepositoryPolicy policy);
 
     ArtifactRepositoryPolicy getReleases();
 
-    void setReleaseUpdatePolicy( ArtifactRepositoryPolicy policy );
+    void setReleaseUpdatePolicy(ArtifactRepositoryPolicy policy);
 
     ArtifactRepositoryLayout getLayout();
 
-    void setLayout( ArtifactRepositoryLayout layout );
+    void setLayout(ArtifactRepositoryLayout layout);
 
     String getKey();
 
@@ -71,7 +68,7 @@ public interface ArtifactRepository
     boolean isBlacklisted();
 
     @Deprecated
-    void setBlacklisted( boolean blackListed );
+    void setBlacklisted(boolean blackListed);
 
     /**
      * @return whether the repository is blocked
@@ -83,7 +80,7 @@ public interface ArtifactRepository
      * @param blocked block the repository?
      * @since 3.8.1
      **/
-    void setBlocked( boolean blocked );
+    void setBlocked(boolean blocked);
 
     //
     // New interface methods for the repository system.
@@ -94,7 +91,7 @@ public interface ArtifactRepository
      * @return found artifact
      * @since 3.0-alpha-3
      */
-    Artifact find( Artifact artifact );
+    Artifact find(Artifact artifact);
 
     /**
      * Finds the versions of the specified artifact that are available in this repository.
@@ -103,7 +100,7 @@ public interface ArtifactRepository
      * @return The available versions of the artifact or an empty list if none, never {@code null}.
      * @since 3.0-alpha-3
      */
-    List<String> findVersions( Artifact artifact );
+    List<String> findVersions(Artifact artifact);
 
     /**
      * Indicates whether this repository is backed by actual projects. For instance, the build reactor or IDE workspace
@@ -118,7 +115,7 @@ public interface ArtifactRepository
      * @param authentication authentication
      * @since 3.0-alpha-3
      */
-    void setAuthentication( Authentication authentication );
+    void setAuthentication(Authentication authentication);
 
     /**
      * @return repository authentication
@@ -130,7 +127,7 @@ public interface ArtifactRepository
      * @param proxy proxy
      * @since 3.0-alpha-3
      */
-    void setProxy( Proxy proxy );
+    void setProxy(Proxy proxy);
 
     /**
      * @since 3.0-alpha-3
@@ -148,6 +145,5 @@ public interface ArtifactRepository
      * @since 3.0.3
      * @param mirroredRepositories the repositories that the actual one mirrors
      */
-    void setMirroredRepositories( List<ArtifactRepository> mirroredRepositories );
-
+    void setMirroredRepositories(List<ArtifactRepository> mirroredRepositories);
 }

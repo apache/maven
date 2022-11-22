@@ -1,5 +1,3 @@
-package org.apache.maven.api.plugin.annotations;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.plugin.annotations;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.plugin.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -25,7 +24,6 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
 import org.apache.maven.api.annotations.Experimental;
 
 /**
@@ -35,26 +33,35 @@ import org.apache.maven.api.annotations.Experimental;
  */
 @Experimental
 @Documented
-@Retention( RetentionPolicy.CLASS )
-@Target( ElementType.TYPE )
+@Retention(RetentionPolicy.CLASS)
+@Target(ElementType.TYPE)
 @Inherited
-public @interface Execute
-{
+public @interface Execute {
     /**
-     * lifecycle phase to fork. Note that specifying a phase overrides specifying a goal.
+     * Lifecycle phase to fork. Note that specifying a phase overrides specifying a goal.
+     * For custom lifecycle phase ids use {@link #customPhase()} instead.
+     * Only one of {@link #customPhase()} and {@link #phase()} must be set.
      * @return the phase
      */
     LifecyclePhase phase() default LifecyclePhase.NONE;
 
     /**
-     * goal to fork. Note that specifying a phase overrides specifying a goal. The specified <code>goal</code> must be
+     * Custom lifecycle phase to fork. Note that specifying a phase overrides specifying a goal.
+     * This element should only be used for non-standard phases. For standard phases rather use {@link #phase()}.
+     * Only one of {@link #customPhase()} and {@link #phase()} must be set.
+     * @return the custom phase id
+     */
+    String customPhase() default "";
+
+    /**
+     * Goal to fork. Note that specifying a phase overrides specifying a goal. The specified <code>goal</code> must be
      * another goal of the same plugin.
      * @return the goal
      */
     String goal() default "";
 
     /**
-     * lifecycle id of the lifecycle that defines {@link #phase()}. Only valid in combination with {@link #phase()}. If
+     * Lifecycle id of the lifecycle that defines {@link #phase()}. Only valid in combination with {@link #phase()}. If
      * not specified, Maven will use the lifecycle of the current build.
      *
      * @see <a href="https://maven.apache.org/maven-plugin-api/lifecycle-mappings.html">Lifecycle Mappings</a>

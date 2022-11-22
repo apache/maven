@@ -1,5 +1,3 @@
-package org.apache.maven.project.inheritance;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.inheritance;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.inheritance;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.inheritance;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
@@ -27,15 +26,14 @@ import org.apache.maven.model.Model;
  * @deprecated
  */
 @Deprecated
-public interface ModelInheritanceAssembler
-{
+public interface ModelInheritanceAssembler {
     String ROLE = ModelInheritanceAssembler.class.getName();
 
-    void assembleModelInheritance( Model child, Model parent, String childPathAdjustment );
+    void assembleModelInheritance(Model child, Model parent, String childPathAdjustment);
 
-    void assembleModelInheritance( Model child, Model parent );
+    void assembleModelInheritance(Model child, Model parent);
 
-    void assembleBuildInheritance( Build childBuild, Build parentBuild, boolean handleAsInheritance );
+    void assembleBuildInheritance(Build childBuild, Build parentBuild, boolean handleAsInheritance);
 
-    void copyModel( Model dest, Model source );
+    void copyModel(Model dest, Model source);
 }

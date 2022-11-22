@@ -1,5 +1,3 @@
-package org.apache.maven.api.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,21 +16,19 @@ package org.apache.maven.api.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.model;
 
 import java.io.Serializable;
 
 /**
  * Class InputSource.
  */
-public class InputSource
-    implements Serializable
-{
+public class InputSource implements Serializable {
 
     private final String modelId;
     private final String location;
 
-    public InputSource( String modelId, String location )
-    {
+    public InputSource(String modelId, String location) {
         this.modelId = modelId;
         this.location = location;
     }
@@ -42,8 +38,7 @@ public class InputSource
      *
      * @return the location
      */
-    public String getLocation()
-    {
+    public String getLocation() {
         return this.location;
     }
 
@@ -52,14 +47,12 @@ public class InputSource
      *
      * @return the model id
      */
-    public String getModelId()
-    {
+    public String getModelId() {
         return this.modelId;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getModelId() + " " + getLocation();
     }
 }

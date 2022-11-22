@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.providers;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.providers;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.lifecycle.providers;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.providers;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,11 +25,9 @@ import javax.inject.Singleton;
 /**
  * {@code default} lifecycle provider.
  */
-@Named( DefaultLifecycleProvider.LIFECYCLE_ID )
+@Named(DefaultLifecycleProvider.LIFECYCLE_ID)
 @Singleton
-public final class DefaultLifecycleProvider
-    extends AbstractLifecycleProvider
-{
+public final class DefaultLifecycleProvider extends AbstractLifecycleProvider {
     protected static final String LIFECYCLE_ID = "default";
 
     // START SNIPPET: default
@@ -62,10 +59,12 @@ public final class DefaultLifecycleProvider
     // END SNIPPET: default
 
     @Inject
-    public DefaultLifecycleProvider()
-    {
-      super( LIFECYCLE_ID, PHASES,
-          null // no global plugin bindings for default lifecycle: they are defined per-packaging in separate providers
-      );
+    public DefaultLifecycleProvider() {
+        super(
+                LIFECYCLE_ID,
+                PHASES,
+                null // no global plugin bindings for default lifecycle: they are defined per-packaging in separate
+                // providers
+                );
     }
 }

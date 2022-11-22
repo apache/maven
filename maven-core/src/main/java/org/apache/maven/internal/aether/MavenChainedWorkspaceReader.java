@@ -1,5 +1,3 @@
-package org.apache.maven.internal.aether;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,11 @@ package org.apache.maven.internal.aether;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.aether;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
-
 import org.apache.maven.model.Model;
 import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.eclipse.aether.artifact.Artifact;
@@ -33,9 +31,7 @@ import org.eclipse.aether.util.repository.ChainedWorkspaceReader;
 /**
  * A maven workspace reader that delegates to a chain of other readers, effectively aggregating their contents.
  */
-public final class MavenChainedWorkspaceReader
-    implements MavenWorkspaceReader
-{
+public final class MavenChainedWorkspaceReader implements MavenWorkspaceReader {
 
     private ChainedWorkspaceReader delegate;
 
@@ -43,25 +39,20 @@ public final class MavenChainedWorkspaceReader
 
     /**
      * Creates a new workspace reader by chaining the specified readers.
-     * 
+     *
      * @param readers The readers to chain must not be {@code null}.
      */
-    private MavenChainedWorkspaceReader( WorkspaceReader... readers )
-    {
-        this.delegate = new ChainedWorkspaceReader( readers );
+    private MavenChainedWorkspaceReader(WorkspaceReader... readers) {
+        this.delegate = new ChainedWorkspaceReader(readers);
         this.readers = readers;
     }
 
     @Override
-    public Model findModel( Artifact artifact )
-    {
-        for ( WorkspaceReader workspaceReader : readers )
-        {
-            if ( workspaceReader instanceof MavenWorkspaceReader )
-            {
-                Model model = ( (MavenWorkspaceReader) workspaceReader ).findModel( artifact );
-                if ( model != null )
-                {
+    public Model findModel(Artifact artifact) {
+        for (WorkspaceReader workspaceReader : readers) {
+            if (workspaceReader instanceof MavenWorkspaceReader) {
+                Model model = ((MavenWorkspaceReader) workspaceReader).findModel(artifact);
+                if (model != null) {
                     return model;
                 }
             }
@@ -70,21 +61,18 @@ public final class MavenChainedWorkspaceReader
     }
 
     @Override
-    public WorkspaceRepository getRepository()
-    {
+    public WorkspaceRepository getRepository() {
         return delegate.getRepository();
     }
 
     @Override
-    public File findArtifact( Artifact artifact )
-    {
-        return delegate.findArtifact( artifact );
+    public File findArtifact(Artifact artifact) {
+        return delegate.findArtifact(artifact);
     }
 
     @Override
-    public List<String> findVersions( Artifact artifact )
-    {
-        return delegate.findVersions( artifact );
+    public List<String> findVersions(Artifact artifact) {
+        return delegate.findVersions(artifact);
     }
 
     /**
@@ -93,14 +81,11 @@ public final class MavenChainedWorkspaceReader
      * @return if the collection contains only one item returns the single item, otherwise creates a new
      *         {@link MavenChainedWorkspaceReader} chaining all readers in the order of the given collection.
      */
-    public static WorkspaceReader of( Collection<WorkspaceReader> workspaceReaderCollection )
-    {
-        WorkspaceReader[] readers = workspaceReaderCollection.toArray( new WorkspaceReader[0] );
-        if ( readers.length == 1 )
-        {
+    public static WorkspaceReader of(Collection<WorkspaceReader> workspaceReaderCollection) {
+        WorkspaceReader[] readers = workspaceReaderCollection.toArray(new WorkspaceReader[0]);
+        if (readers.length == 1) {
             return readers[0];
         }
-        return new MavenChainedWorkspaceReader( readers );
+        return new MavenChainedWorkspaceReader(readers);
     }
-
 }

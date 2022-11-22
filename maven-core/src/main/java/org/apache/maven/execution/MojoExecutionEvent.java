@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
@@ -34,8 +33,7 @@ import org.apache.maven.project.MavenProject;
  * @see org.apache.maven.execution.scope.WeakMojoExecutionListener
  * @since 3.1.2
  */
-public class MojoExecutionEvent
-{
+public class MojoExecutionEvent {
     private final MavenSession session;
 
     private final MavenProject project;
@@ -46,14 +44,12 @@ public class MojoExecutionEvent
 
     private final Throwable cause;
 
-    public MojoExecutionEvent( MavenSession session, MavenProject project, MojoExecution mojoExecution, Mojo mojo )
-    {
-        this( session, project, mojoExecution, mojo, null );
+    public MojoExecutionEvent(MavenSession session, MavenProject project, MojoExecution mojoExecution, Mojo mojo) {
+        this(session, project, mojoExecution, mojo, null);
     }
 
-    public MojoExecutionEvent( MavenSession session, MavenProject project, MojoExecution mojoExecution, Mojo mojo,
-                               Throwable cause )
-    {
+    public MojoExecutionEvent(
+            MavenSession session, MavenProject project, MojoExecution mojoExecution, Mojo mojo, Throwable cause) {
         this.session = session;
         this.project = project;
         this.mojoExecution = mojoExecution;
@@ -61,28 +57,23 @@ public class MojoExecutionEvent
         this.cause = cause;
     }
 
-    public MavenSession getSession()
-    {
+    public MavenSession getSession() {
         return session;
     }
 
-    public MavenProject getProject()
-    {
+    public MavenProject getProject() {
         return project;
     }
 
-    public MojoExecution getExecution()
-    {
+    public MojoExecution getExecution() {
         return mojoExecution;
     }
 
-    public Mojo getMojo()
-    {
+    public Mojo getMojo() {
         return mojo;
     }
 
-    public Throwable getCause()
-    {
+    public Throwable getCause() {
         return cause;
     }
 }

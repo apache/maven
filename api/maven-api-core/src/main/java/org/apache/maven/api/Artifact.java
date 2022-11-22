@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
@@ -30,27 +29,29 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 @Immutable
-public interface Artifact
-{
+public interface Artifact {
 
     /**
      * Returns a unique identifier for this artifact.
-     * The identifier is composed of groupId, artifactId, version, classifier, extension
+     * The identifier is composed of groupId, artifactId, version, classifier, extension.
+     *
      * @return the unique identifier
      */
-    default String key()
-    {
+    default String key() {
         return getGroupId()
-                + ':' + getArtifactId()
-                + ':' + getExtension()
-                + ( getClassifier().length() > 0 ? ":" + getClassifier() : "" )
-                + ':' + getVersion();
+                + ':'
+                + getArtifactId()
+                + ':'
+                + getExtension()
+                + (getClassifier().length() > 0 ? ":" + getClassifier() : "")
+                + ':'
+                + getVersion();
     }
 
     /**
      * The groupId of the artifact.
      *
-     * @return The groupId.
+     * @return the groupId
      */
     @Nonnull
     String getGroupId();
@@ -58,7 +59,7 @@ public interface Artifact
     /**
      * The artifactId of the artifact.
      *
-     * @return The artifactId.
+     * @return the artifactId
      */
     @Nonnull
     String getArtifactId();
@@ -66,7 +67,7 @@ public interface Artifact
     /**
      * The version of the artifact.
      *
-     * @return The version.
+     * @return the version
      */
     @Nonnull
     Version getVersion();
@@ -74,7 +75,7 @@ public interface Artifact
     /**
      * The classifier of the artifact.
      *
-     * @return The classifier or an empty string if none, never {@code null}.
+     * @return the classifier or an empty string if none, never {@code null}
      */
     @Nonnull
     String getClassifier();
@@ -82,7 +83,7 @@ public interface Artifact
     /**
      * The file extension of the artifact.
      *
-     * @return The extension.
+     * @return the extension
      */
     @Nonnull
     String getExtension();
@@ -90,7 +91,7 @@ public interface Artifact
     /**
      * Determines whether this artifact uses a snapshot version.
      *
-     * @return {@code true} if the artifact is a snapshot, {@code false} otherwise.
+     * @return {@code true} if the artifact is a snapshot, {@code false} otherwise
      * @see org.apache.maven.api.Session#isVersionSnapshot(String)
      */
     boolean isSnapshot();
@@ -103,5 +104,4 @@ public interface Artifact
      */
     @Nonnull
     ArtifactCoordinate toCoordinate();
-
 }

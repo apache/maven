@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,10 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.impl.MetadataGenerator;
@@ -31,27 +29,22 @@ import org.eclipse.aether.installation.InstallRequest;
 /**
  * Maven G level metadata generator factory.
  */
-@Named( "plugins" )
+@Named("plugins")
 @Singleton
-public class PluginsMetadataGeneratorFactory
-    implements MetadataGeneratorFactory
-{
+public class PluginsMetadataGeneratorFactory implements MetadataGeneratorFactory {
     @Override
-    public MetadataGenerator newInstance( RepositorySystemSession session, InstallRequest request )
-    {
-        return new PluginsMetadataGenerator( session, request );
+    public MetadataGenerator newInstance(RepositorySystemSession session, InstallRequest request) {
+        return new PluginsMetadataGenerator(session, request);
     }
 
     @Override
-    public MetadataGenerator newInstance( RepositorySystemSession session, DeployRequest request )
-    {
-        return new PluginsMetadataGenerator( session, request );
+    public MetadataGenerator newInstance(RepositorySystemSession session, DeployRequest request) {
+        return new PluginsMetadataGenerator(session, request);
     }
 
-    @SuppressWarnings( "checkstyle:magicnumber" )
+    @SuppressWarnings("checkstyle:magicnumber")
     @Override
-    public float getPriority()
-    {
+    public float getPriority() {
         return 10; // G level MD should be deployed as 3rd MD
     }
 }

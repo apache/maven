@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,11 +16,11 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api;
 
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Build;
@@ -35,8 +33,7 @@ import org.apache.maven.api.model.Model;
  * @since 4.0
  */
 @Experimental
-public interface Project
-{
+public interface Project {
 
     @Nonnull
     String getGroupId();
@@ -57,8 +54,7 @@ public interface Project
     Model getModel();
 
     @Nonnull
-    default Build getBuild()
-    {
+    default Build getBuild() {
         Build build = getModel().getBuild();
         return build != null ? build : Build.newInstance();
     }
@@ -74,9 +70,8 @@ public interface Project
     Optional<Path> getPomPath();
 
     @Nonnull
-    default Optional<Path> getBasedir()
-    {
-        return getPomPath().map( Path::getParent );
+    default Optional<Path> getBasedir() {
+        return getPomPath().map(Path::getParent);
     }
 
     @Nonnull
@@ -86,8 +81,7 @@ public interface Project
     List<DependencyCoordinate> getManagedDependencies();
 
     @Nonnull
-    default String getId()
-    {
+    default String getId() {
         return getModel().getId();
     }
 
@@ -101,5 +95,4 @@ public interface Project
 
     @Nonnull
     List<RemoteRepository> getRemotePluginRepositories();
-
 }

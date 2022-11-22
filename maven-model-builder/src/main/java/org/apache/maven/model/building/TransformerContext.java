@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,9 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.nio.file.Path;
-
 import org.apache.maven.model.Model;
 
 /**
@@ -30,8 +28,7 @@ import org.apache.maven.model.Model;
  * @author Robert Scholte
  * @since 4.0.0
  */
-public interface TransformerContext
-{
+public interface TransformerContext {
     /**
      * Key to get the TransformerContext from the SessionData
      */
@@ -42,7 +39,7 @@ public interface TransformerContext
      * @param key
      * @return
      */
-    String getUserProperty( String key );
+    String getUserProperty(String key);
 
     /**
      * Get the model based on the path, will be used to resolve the parent based on relativePath
@@ -50,7 +47,7 @@ public interface TransformerContext
      * @param pomFile the path to the pomFile
      * @return the model, otherwise {@code null}
      */
-    Model getRawModel( Path pomFile );
+    Model getRawModel(Path pomFile);
 
     /**
      * Get the model from the reactor based on the groupId and artifactId, will be used for reactor dependencies
@@ -60,5 +57,5 @@ public interface TransformerContext
      * @return the model, otherwise {@code null}
      * @throws IllegalStateException if multiple versions of the same GA are part of the reactor
      */
-    Model getRawModel( String groupId, String artifactId );
+    Model getRawModel(String groupId, String artifactId);
 }
