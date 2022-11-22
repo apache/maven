@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.toolchain;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,22 +16,19 @@ package org.apache.maven.toolchain;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain;
 
 /**
  *
  * @author mkleint
  */
-public class MisconfiguredToolchainException
-    extends Exception
-{
+public class MisconfiguredToolchainException extends Exception {
 
-    public MisconfiguredToolchainException( String message )
-    {
-        super( message );
+    public MisconfiguredToolchainException(String message) {
+        super(message);
     }
 
-    public MisconfiguredToolchainException( String message, Throwable orig )
-    {
-        super( message, orig );
+    public MisconfiguredToolchainException(String message, Throwable orig) {
+        super(message, orig);
     }
 }

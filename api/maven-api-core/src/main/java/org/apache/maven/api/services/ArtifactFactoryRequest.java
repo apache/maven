@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,15 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
+import static org.apache.maven.api.services.BaseRequest.nonNull;
+
+import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
-
-import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.NotThreadSafe;
-
-import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
  *
@@ -35,8 +33,7 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
  */
 @Experimental
 @Immutable
-public interface ArtifactFactoryRequest
-{
+public interface ArtifactFactoryRequest {
 
     @Nonnull
     Session getSession();
@@ -53,40 +50,42 @@ public interface ArtifactFactoryRequest
 
     String getType();
 
-    static ArtifactFactoryRequest build( Session session, String groupId, String artifactId,
-                                         String version, String extension )
-    {
+    static ArtifactFactoryRequest build(
+            Session session, String groupId, String artifactId, String version, String extension) {
         return ArtifactFactoryRequest.builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .groupId( groupId )
-                .artifactId( artifactId )
-                .version( version )
-                .extension( extension )
+                .session(nonNull(session, "session cannot be null"))
+                .groupId(groupId)
+                .artifactId(artifactId)
+                .version(version)
+                .extension(extension)
                 .build();
     }
 
-    static ArtifactFactoryRequest build( Session session, String groupId, String artifactId,
-                                         String version, String classifier, String extension, String type )
-    {
+    static ArtifactFactoryRequest build(
+            Session session,
+            String groupId,
+            String artifactId,
+            String version,
+            String classifier,
+            String extension,
+            String type) {
         return ArtifactFactoryRequest.builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .groupId( groupId )
-                .artifactId( artifactId )
-                .version( version )
-                .classifier( classifier )
-                .extension( extension )
-                .type( type )
+                .session(nonNull(session, "session cannot be null"))
+                .groupId(groupId)
+                .artifactId(artifactId)
+                .version(version)
+                .classifier(classifier)
+                .extension(extension)
+                .type(type)
                 .build();
     }
 
-    static ArtifactFactoryRequestBuilder builder()
-    {
+    static ArtifactFactoryRequestBuilder builder() {
         return new ArtifactFactoryRequestBuilder();
     }
 
     @NotThreadSafe
-    class ArtifactFactoryRequestBuilder
-    {
+    class ArtifactFactoryRequestBuilder {
         private Session session;
         private String groupId;
         private String artifactId;
@@ -95,60 +94,49 @@ public interface ArtifactFactoryRequest
         private String extension;
         private String type;
 
-        ArtifactFactoryRequestBuilder()
-        {
-        }
+        ArtifactFactoryRequestBuilder() {}
 
-        public ArtifactFactoryRequestBuilder session( Session session )
-        {
+        public ArtifactFactoryRequestBuilder session(Session session) {
             this.session = session;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder groupId( String groupId )
-        {
+        public ArtifactFactoryRequestBuilder groupId(String groupId) {
             this.groupId = groupId;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder artifactId( String artifactId )
-        {
+        public ArtifactFactoryRequestBuilder artifactId(String artifactId) {
             this.artifactId = artifactId;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder version( String version )
-        {
+        public ArtifactFactoryRequestBuilder version(String version) {
             this.version = version;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder classifier( String classifier )
-        {
+        public ArtifactFactoryRequestBuilder classifier(String classifier) {
             this.classifier = classifier;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder extension( String extension )
-        {
+        public ArtifactFactoryRequestBuilder extension(String extension) {
             this.extension = extension;
             return this;
         }
 
-        public ArtifactFactoryRequestBuilder type( String type )
-        {
+        public ArtifactFactoryRequestBuilder type(String type) {
             this.type = type;
             return this;
         }
 
-        public ArtifactFactoryRequest build()
-        {
-            return new DefaultArtifactFactoryRequest( session, groupId, artifactId, version,
-                                                      classifier, extension, type );
+        public ArtifactFactoryRequest build() {
+            return new DefaultArtifactFactoryRequest(
+                    session, groupId, artifactId, version, classifier, extension, type);
         }
 
-        private static class DefaultArtifactFactoryRequest extends BaseRequest implements ArtifactFactoryRequest
-        {
+        private static class DefaultArtifactFactoryRequest extends BaseRequest implements ArtifactFactoryRequest {
             private final String groupId;
             private final String artifactId;
             private final String version;
@@ -156,15 +144,15 @@ public interface ArtifactFactoryRequest
             private final String extension;
             private final String type;
 
-            DefaultArtifactFactoryRequest( @Nonnull Session session,
-                                           String groupId,
-                                           String artifactId,
-                                           String version,
-                                           String classifier,
-                                           String extension,
-                                           String type )
-            {
-                super( session );
+            DefaultArtifactFactoryRequest(
+                    @Nonnull Session session,
+                    String groupId,
+                    String artifactId,
+                    String version,
+                    String classifier,
+                    String extension,
+                    String type) {
+                super(session);
                 this.groupId = groupId;
                 this.artifactId = artifactId;
                 this.version = version;
@@ -174,41 +162,34 @@ public interface ArtifactFactoryRequest
             }
 
             @Override
-            public String getGroupId()
-            {
+            public String getGroupId() {
                 return groupId;
             }
 
             @Override
-            public String getArtifactId()
-            {
+            public String getArtifactId() {
                 return artifactId;
             }
 
             @Override
-            public String getVersion()
-            {
+            public String getVersion() {
                 return version;
             }
 
             @Override
-            public String getClassifier()
-            {
+            public String getClassifier() {
                 return classifier;
             }
 
             @Override
-            public String getExtension()
-            {
+            public String getExtension() {
                 return extension;
             }
 
             @Override
-            public String getType()
-            {
+            public String getType() {
                 return type;
             }
         }
     }
-
 }

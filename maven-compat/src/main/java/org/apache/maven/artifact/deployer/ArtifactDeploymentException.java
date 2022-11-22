@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.deployer;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.deployer;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,26 +16,21 @@ package org.apache.maven.artifact.deployer;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.deployer;
 
 /**
  * @author Jason van Zyl
  */
-public class ArtifactDeploymentException
-    extends Exception
-{
-    public ArtifactDeploymentException( String message )
-    {
-        super( message );
+public class ArtifactDeploymentException extends Exception {
+    public ArtifactDeploymentException(String message) {
+        super(message);
     }
 
-    public ArtifactDeploymentException( Throwable cause )
-    {
-        super( cause );
+    public ArtifactDeploymentException(Throwable cause) {
+        super(cause);
     }
 
-    public ArtifactDeploymentException( String message,
-                                        Throwable cause )
-    {
-        super( message, cause );
+    public ArtifactDeploymentException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

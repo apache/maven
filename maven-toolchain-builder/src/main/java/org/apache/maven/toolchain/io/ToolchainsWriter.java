@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.toolchain.io;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,12 +16,12 @@ package org.apache.maven.toolchain.io;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.api.toolchain.PersistedToolchains;
+package org.apache.maven.toolchain.io;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
+import org.apache.maven.api.toolchain.PersistedToolchains;
 
 /**
  * Handles serialization of toolchains into some kind of textual format like XML.
@@ -31,8 +29,7 @@ import java.util.Map;
  * @author Mike Mol
  * @author Martin Kanters
  */
-public interface ToolchainsWriter
-{
+public interface ToolchainsWriter {
 
     /**
      * Writes the supplied toolchains to the specified character writer. The writer will be automatically closed before
@@ -43,6 +40,5 @@ public interface ToolchainsWriter
      * @param toolchains The toolchains to serialize, must not be {@code null}.
      * @throws IOException If the toolchains could not be serialized.
      */
-    void write( Writer output, Map<String, Object> options, PersistedToolchains toolchains )
-            throws IOException;
+    void write(Writer output, Map<String, Object> options, PersistedToolchains toolchains) throws IOException;
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import org.apache.maven.project.MavenProject;
 
@@ -26,9 +25,7 @@ import org.apache.maven.project.MavenProject;
  *
  * @author Benjamin Bentmann
  */
-public class BuildSuccess
-    extends BuildSummary
-{
+public class BuildSuccess extends BuildSummary {
 
     /**
      * Creates a new build summary for the specified project.
@@ -36,9 +33,7 @@ public class BuildSuccess
      * @param project The project being summarized, must not be {@code null}.
      * @param time The build time of the project in milliseconds.
      */
-    public BuildSuccess( MavenProject project, long time )
-    {
-        super( project, time );
+    public BuildSuccess(MavenProject project, long time) {
+        super(project, time);
     }
-
 }

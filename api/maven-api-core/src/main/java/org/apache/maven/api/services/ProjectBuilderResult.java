@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,14 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
+package org.apache.maven.api.services;
 
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Optional;
-
 import org.apache.maven.api.Project;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Result of a project build call.
@@ -34,8 +31,7 @@ import org.apache.maven.api.Project;
  * @since 4.0
  */
 @Experimental
-public interface ProjectBuilderResult
-{
+public interface ProjectBuilderResult {
 
     /**
      * Gets the identifier of the project that could not be built. The general format of the identifier is {@code
@@ -79,5 +75,4 @@ public interface ProjectBuilderResult
      */
     @Nonnull
     Optional<DependencyCollectorResult> getDependencyResolverResult();
-
 }

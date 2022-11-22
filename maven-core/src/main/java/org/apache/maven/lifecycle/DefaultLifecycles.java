@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.lifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -26,11 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.slf4j.Logger;
@@ -45,24 +42,21 @@ import org.slf4j.LoggerFactory;
 // wiring and reference and external source for the lifecycle configuration.
 @Named
 @Singleton
-public class DefaultLifecycles
-{
-    public static final String[] STANDARD_LIFECYCLES = { "clean", "default", "site", "wrapper" };
+public class DefaultLifecycles {
+    public static final String[] STANDARD_LIFECYCLES = {"clean", "default", "site", "wrapper"};
 
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     // @Configuration(source="org/apache/maven/lifecycle/lifecycles.xml")
 
     private final PlexusContainer plexusContainer;
 
-    public DefaultLifecycles()
-    {
+    public DefaultLifecycles() {
         this.plexusContainer = null;
     }
 
     @Inject
-    public DefaultLifecycles( PlexusContainer plexusContainer )
-    {
+    public DefaultLifecycles(PlexusContainer plexusContainer) {
         this.plexusContainer = plexusContainer;
     }
 
@@ -72,9 +66,8 @@ public class DefaultLifecycles
      * @param phase
      * @return
      */
-    public Lifecycle get( String phase )
-    {
-        return getPhaseToLifecycleMap().get( phase );
+    public Lifecycle get(String phase) {
+        return getPhaseToLifecycleMap().get(phase);
     }
 
     /**
@@ -83,32 +76,25 @@ public class DefaultLifecycles
      *
      * @return A map of lifecycles, indexed on id
      */
-    public Map<String, Lifecycle> getPhaseToLifecycleMap()
-    {
+    public Map<String, Lifecycle> getPhaseToLifecycleMap() {
         // If people are going to make their own lifecycles then we need to tell people how to namespace them correctly
         // so that they don't interfere with internally defined lifecycles.
 
         Map<String, Lifecycle> phaseToLifecycleMap = new HashMap<>();
 
-        for ( Lifecycle lifecycle : getLifeCycles() )
-        {
-            if ( logger.isDebugEnabled() )
-            {
-                logger.debug( "Lifecycle " + lifecycle );
+        for (Lifecycle lifecycle : getLifeCycles()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Lifecycle " + lifecycle);
             }
 
-            for ( String phase : lifecycle.getPhases() )
-            {
+            for (String phase : lifecycle.getPhases()) {
                 // The first definition wins.
-                if ( !phaseToLifecycleMap.containsKey( phase ) )
-                {
-                    phaseToLifecycleMap.put( phase, lifecycle );
-                }
-                else
-                {
-                    Lifecycle original = phaseToLifecycleMap.get( phase );
-                    logger.warn( "Duplicated lifecycle phase " + phase + ". Defined in " + original.getId()
-                        + " but also in " + lifecycle.getId() );
+                if (!phaseToLifecycleMap.containsKey(phase)) {
+                    phaseToLifecycleMap.put(phase, lifecycle);
+                } else {
+                    Lifecycle original = phaseToLifecycleMap.get(phase);
+                    logger.warn("Duplicated lifecycle phase " + phase + ". Defined in " + original.getId()
+                            + " but also in " + lifecycle.getId());
                 }
             }
         }
@@ -119,21 +105,16 @@ public class DefaultLifecycles
     /**
      * Returns an ordered list of lifecycles
      */
-    public List<Lifecycle> getLifeCycles()
-    {
-        List<String> lifecycleIds = Arrays.asList( STANDARD_LIFECYCLES );
+    public List<Lifecycle> getLifeCycles() {
+        List<String> lifecycleIds = Arrays.asList(STANDARD_LIFECYCLES);
 
-        Comparator<String> comparator = ( l, r ) ->
-        {
-            int lx = lifecycleIds.indexOf( l );
-            int rx = lifecycleIds.indexOf( r );
+        Comparator<String> comparator = (l, r) -> {
+            int lx = lifecycleIds.indexOf(l);
+            int rx = lifecycleIds.indexOf(r);
 
-            if ( lx < 0 || rx < 0 )
-            {
+            if (lx < 0 || rx < 0) {
                 return rx - lx;
-            }
-            else
-            {
+            } else {
                 return lx - rx;
             }
         };
@@ -142,36 +123,27 @@ public class DefaultLifecycles
 
         // ensure canonical order of standard lifecycles
         return lifecyclesMap.values().stream()
-                                .peek( l -> Objects.requireNonNull( l.getId(), "A lifecycle must have an id." ) )
-                                .sorted( Comparator.comparing( Lifecycle::getId, comparator ) )
-                                .collect( Collectors.toList() );
+                .peek(l -> Objects.requireNonNull(l.getId(), "A lifecycle must have an id."))
+                .sorted(Comparator.comparing(Lifecycle::getId, comparator))
+                .collect(Collectors.toList());
     }
 
-    private Map<String, Lifecycle> lookupLifecycles()
-    {
+    private Map<String, Lifecycle> lookupLifecycles() {
         // TODO: Remove the following code when maven-compat is gone
         // This code is here to ensure maven-compat's EmptyLifecycleExecutor keeps on working.
-        if ( plexusContainer == null )
-        {
+        if (plexusContainer == null) {
             return new HashMap<>();
         }
 
         // Lifecycles cannot be cached as extensions might add custom lifecycles later in the execution.
-        try
-        {
-            return plexusContainer.lookupMap( Lifecycle.class );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new IllegalStateException( "Unable to lookup lifecycles from the plexus container", e );
+        try {
+            return plexusContainer.lookupMap(Lifecycle.class);
+        } catch (ComponentLookupException e) {
+            throw new IllegalStateException("Unable to lookup lifecycles from the plexus container", e);
         }
     }
 
-    public String getLifecyclePhaseList()
-    {
-        return getLifeCycles().stream()
-                        .flatMap( l -> l.getPhases().stream() )
-                        .collect( Collectors.joining( ", " ) );
+    public String getLifecyclePhaseList() {
+        return getLifeCycles().stream().flatMap(l -> l.getPhases().stream()).collect(Collectors.joining(", "));
     }
-
 }

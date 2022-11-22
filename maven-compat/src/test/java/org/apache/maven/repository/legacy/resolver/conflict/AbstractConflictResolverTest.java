@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy.resolver.conflict;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.legacy.resolver.conflict;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,23 +16,22 @@ package org.apache.maven.repository.legacy.resolver.conflict;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy.resolver.conflict;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Collections;
-
+import javax.inject.Inject;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ResolutionNode;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.BeforeEach;
-
-import javax.inject.Inject;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Provides a basis for testing conflict resolvers.
@@ -42,8 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  */
 @PlexusTest
-public abstract class AbstractConflictResolverTest
-{
+public abstract class AbstractConflictResolverTest {
     // constants --------------------------------------------------------------
 
     private static final String GROUP_ID = "test";
@@ -68,9 +64,7 @@ public abstract class AbstractConflictResolverTest
 
     // constructors -----------------------------------------------------------
 
-    public AbstractConflictResolverTest( String roleHint )
-        throws Exception
-    {
+    public AbstractConflictResolverTest(String roleHint) throws Exception {
         this.roleHint = roleHint;
     }
 
@@ -80,58 +74,50 @@ public abstract class AbstractConflictResolverTest
      * @see junit.framework.TestCase#setUp()
      */
     @BeforeEach
-    public void setUp()
-            throws Exception
-    {
-        conflictResolver = (ConflictResolver) container.lookup( ConflictResolver.ROLE, roleHint );
+    public void setUp() throws Exception {
+        conflictResolver = (ConflictResolver) container.lookup(ConflictResolver.ROLE, roleHint);
 
-        a1 = createArtifact( "a", "1.0" );
-        a2 = createArtifact( "a", "2.0" );
-        b1 = createArtifact( "b", "1.0" );
+        a1 = createArtifact("a", "1.0");
+        a2 = createArtifact("a", "2.0");
+        b1 = createArtifact("b", "1.0");
     }
 
     // protected methods ------------------------------------------------------
 
-    protected ConflictResolver getConflictResolver()
-    {
+    protected ConflictResolver getConflictResolver() {
         return conflictResolver;
     }
 
-    protected void assertResolveConflict( ResolutionNode expectedNode, ResolutionNode actualNode1, ResolutionNode actualNode2 )
-    {
-        ResolutionNode resolvedNode = getConflictResolver().resolveConflict( actualNode1, actualNode2 );
+    protected void assertResolveConflict(
+            ResolutionNode expectedNode, ResolutionNode actualNode1, ResolutionNode actualNode2) {
+        ResolutionNode resolvedNode = getConflictResolver().resolveConflict(actualNode1, actualNode2);
 
-        assertNotNull( resolvedNode, "Expected resolvable" );
-        assertEquals( expectedNode, resolvedNode, "Resolution node" );
+        assertNotNull(resolvedNode, "Expected resolvable");
+        assertEquals(expectedNode, resolvedNode, "Resolution node");
     }
 
-    protected Artifact createArtifact( String id, String version ) throws InvalidVersionSpecificationException
-    {
-        return createArtifact( id, version, Artifact.SCOPE_COMPILE );
+    protected Artifact createArtifact(String id, String version) throws InvalidVersionSpecificationException {
+        return createArtifact(id, version, Artifact.SCOPE_COMPILE);
     }
 
-    protected Artifact createArtifact( String id, String version, String scope )
-        throws InvalidVersionSpecificationException
-    {
-        return createArtifact( id, version, scope, null, false );
+    protected Artifact createArtifact(String id, String version, String scope)
+            throws InvalidVersionSpecificationException {
+        return createArtifact(id, version, scope, null, false);
     }
 
-    protected Artifact createArtifact( String id, String version, String scope, String inheritedScope, boolean optional )
-        throws InvalidVersionSpecificationException
-    {
-        VersionRange versionRange = VersionRange.createFromVersionSpec( version );
+    protected Artifact createArtifact(String id, String version, String scope, String inheritedScope, boolean optional)
+            throws InvalidVersionSpecificationException {
+        VersionRange versionRange = VersionRange.createFromVersionSpec(version);
 
-        return artifactFactory.createDependencyArtifact( GROUP_ID, id, versionRange, "jar", null, scope,
-                                                         inheritedScope, optional );
+        return artifactFactory.createDependencyArtifact(
+                GROUP_ID, id, versionRange, "jar", null, scope, inheritedScope, optional);
     }
 
-    protected ResolutionNode createResolutionNode( Artifact Artifact )
-    {
-        return new ResolutionNode( Artifact, Collections.<ArtifactRepository>emptyList() );
-    }
-    protected ResolutionNode createResolutionNode( Artifact Artifact, ResolutionNode parent )
-    {
-        return new ResolutionNode( Artifact, Collections.<ArtifactRepository>emptyList(), parent );
+    protected ResolutionNode createResolutionNode(Artifact Artifact) {
+        return new ResolutionNode(Artifact, Collections.<ArtifactRepository>emptyList());
     }
 
+    protected ResolutionNode createResolutionNode(Artifact Artifact, ResolutionNode parent) {
+        return new ResolutionNode(Artifact, Collections.<ArtifactRepository>emptyList(), parent);
+    }
 }

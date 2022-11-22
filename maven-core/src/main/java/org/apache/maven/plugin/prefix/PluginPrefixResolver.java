@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.prefix;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.prefix;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.prefix;
 
 /**
  * Resolves a plugin prefix.
@@ -25,8 +24,7 @@ package org.apache.maven.plugin.prefix;
  * @since 3.0
  * @author Benjamin Bentmann
  */
-public interface PluginPrefixResolver
-{
+public interface PluginPrefixResolver {
 
     /**
      * Resolves the plugin prefix for the specified request.
@@ -36,7 +34,5 @@ public interface PluginPrefixResolver
      * @return The result of the prefix resolution, never {@code null}.
      * @throws NoPluginFoundForPrefixException If the plugin prefix could not be resolved.
      */
-    PluginPrefixResult resolve( PluginPrefixRequest request )
-        throws NoPluginFoundForPrefixException;
-
+    PluginPrefixResult resolve(PluginPrefixRequest request) throws NoPluginFoundForPrefixException;
 }

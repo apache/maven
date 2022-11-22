@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.repository.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.repository.metadata;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -28,9 +27,7 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * TODO not happy about the store method - they use "this"
  */
-public interface RepositoryMetadata
-    extends org.apache.maven.artifact.metadata.ArtifactMetadata
-{
+public interface RepositoryMetadata extends org.apache.maven.artifact.metadata.ArtifactMetadata {
 
     int RELEASE = 1;
 
@@ -50,7 +47,7 @@ public interface RepositoryMetadata
      *
      * @param remoteRepository the repository
      */
-    void setRepository( ArtifactRepository remoteRepository );
+    void setRepository(ArtifactRepository remoteRepository);
 
     /**
      * Get the repository metadata associated with this marker.
@@ -64,7 +61,7 @@ public interface RepositoryMetadata
      *
      * @param metadata the metadata
      */
-    void setMetadata( Metadata metadata );
+    void setMetadata(Metadata metadata);
 
     /**
      * Whether this represents a snapshot.
@@ -87,6 +84,5 @@ public interface RepositoryMetadata
      * @param repository The repository for which to determine the policy, must not be {@code null}.
      * @return The policy, never {@code null}.
      */
-    ArtifactRepositoryPolicy getPolicy( ArtifactRepository repository );
-
+    ArtifactRepositoryPolicy getPolicy(ArtifactRepository repository);
 }

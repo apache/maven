@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver.filter;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver.filter;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,49 +16,41 @@ package org.apache.maven.artifact.resolver.filter;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver.filter;
 
 import org.apache.maven.artifact.Artifact;
 
 /** Artifact Filter which filters on artifact type */
-public class TypeArtifactFilter
-    implements ArtifactFilter
-{
+public class TypeArtifactFilter implements ArtifactFilter {
     private String type = "jar";
 
-    public TypeArtifactFilter( String type )
-    {
+    public TypeArtifactFilter(String type) {
         this.type = type;
     }
 
-    public boolean include( Artifact artifact )
-    {
-        return type.equals( artifact.getType() );
+    public boolean include(Artifact artifact) {
+        return type.equals(artifact.getType());
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int hash = 17;
         hash = hash * 31 + type.hashCode();
         return hash;
     }
 
     @Override
-    public boolean equals( Object obj )
-    {
-        if ( this == obj )
-        {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
 
-        if ( !( obj instanceof TypeArtifactFilter ) )
-        {
+        if (!(obj instanceof TypeArtifactFilter)) {
             return false;
         }
 
         TypeArtifactFilter other = (TypeArtifactFilter) obj;
 
-        return type.equals( other.type );
+        return type.equals(other.type);
     }
-
 }

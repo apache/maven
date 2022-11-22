@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,15 +16,17 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
-import org.apache.maven.api.annotations.Nonnull;
+import static org.apache.maven.internal.impl.Utils.cast;
+import static org.apache.maven.internal.impl.Utils.nonNull;
+
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
-import java.util.List;
-
 import org.apache.maven.api.Node;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.DependencyCollector;
 import org.apache.maven.api.services.DependencyCollectorException;
 import org.apache.maven.api.services.DependencyCollectorRequest;
@@ -42,71 +42,57 @@ import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 
-import static org.apache.maven.internal.impl.Utils.cast;
-import static org.apache.maven.internal.impl.Utils.nonNull;
-
 @Named
 @Singleton
-public class DefaultDependencyCollector implements DependencyCollector
-{
+public class DefaultDependencyCollector implements DependencyCollector {
 
     private final RepositorySystem repositorySystem;
 
     @Inject
-    DefaultDependencyCollector( @Nonnull RepositorySystem repositorySystem )
-    {
+    DefaultDependencyCollector(@Nonnull RepositorySystem repositorySystem) {
         this.repositorySystem = repositorySystem;
     }
 
     @Nonnull
     @Override
-    public DependencyCollectorResult collect( @Nonnull DependencyCollectorRequest request )
-            throws DependencyCollectorException, IllegalArgumentException
-    {
-        nonNull( request, "request can not be null" );
-        DefaultSession session = cast( DefaultSession.class, request.getSession(),
-                "request.session should be a " + DefaultSession.class );
+    public DependencyCollectorResult collect(@Nonnull DependencyCollectorRequest request)
+            throws DependencyCollectorException, IllegalArgumentException {
+        nonNull(request, "request can not be null");
+        DefaultSession session =
+                cast(DefaultSession.class, request.getSession(), "request.session should be a " + DefaultSession.class);
 
-        Artifact rootArtifact = request.getRootArtifact().map( session::toArtifact ).orElse( null );
-        Dependency root = request.getRoot().map( session::toDependency ).orElse( null );
+        Artifact rootArtifact =
+                request.getRootArtifact().map(session::toArtifact).orElse(null);
+        Dependency root = request.getRoot().map(session::toDependency).orElse(null);
         CollectRequest collectRequest = new CollectRequest()
-                .setRootArtifact( rootArtifact )
-                .setRoot( root )
-                .setDependencies( session.toDependencies( request.getDependencies() ) )
-                .setManagedDependencies( session.toDependencies( request.getManagedDependencies() ) )
-                .setRepositories( session.toRepositories( session.getRemoteRepositories() ) );
+                .setRootArtifact(rootArtifact)
+                .setRoot(root)
+                .setDependencies(session.toDependencies(request.getDependencies()))
+                .setManagedDependencies(session.toDependencies(request.getManagedDependencies()))
+                .setRepositories(session.toRepositories(session.getRemoteRepositories()));
 
         RepositorySystemSession systemSession = session.getSession();
-        if ( request.getVerbose() )
-        {
-            systemSession = new DefaultRepositorySystemSession( systemSession )
-                    .setConfigProperty( ConflictResolver.CONFIG_PROP_VERBOSE, true )
-                    .setConfigProperty( DependencyManagerUtils.CONFIG_PROP_VERBOSE, true );
+        if (request.getVerbose()) {
+            systemSession = new DefaultRepositorySystemSession(systemSession)
+                    .setConfigProperty(ConflictResolver.CONFIG_PROP_VERBOSE, true)
+                    .setConfigProperty(DependencyManagerUtils.CONFIG_PROP_VERBOSE, true);
         }
 
-        try
-        {
-            final CollectResult
-                    result = repositorySystem.collectDependencies( systemSession, collectRequest );
-            return new DependencyCollectorResult()
-            {
+        try {
+            final CollectResult result = repositorySystem.collectDependencies(systemSession, collectRequest);
+            return new DependencyCollectorResult() {
                 @Override
-                public List<Exception> getExceptions()
-                {
+                public List<Exception> getExceptions() {
                     return result.getExceptions();
                 }
 
                 @Override
-                public Node getRoot()
-                {
-                    return session.getNode( result.getRoot(), request.getVerbose() );
+                public Node getRoot() {
+                    return session.getNode(result.getRoot(), request.getVerbose());
                 }
             };
-        }
-        catch ( DependencyCollectionException e )
-        {
-            throw new DependencyCollectorException( "Unable to collect dependencies", e );
+        } catch (DependencyCollectionException e) {
+            throw new DependencyCollectorException("Unable to collect dependencies", e);
         }
     }
-
 }

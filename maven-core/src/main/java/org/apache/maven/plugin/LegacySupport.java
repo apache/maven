@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import org.apache.maven.execution.MavenSession;
 import org.eclipse.aether.RepositorySystemSession;
@@ -30,8 +29,7 @@ import org.eclipse.aether.RepositorySystemSession;
  * @since 3.0
  * @author Benjamin Bentmann
  */
-public interface LegacySupport
-{
+public interface LegacySupport {
 
     /**
      * Sets the currently active session. Some legacy components are basically stateful and their API is missing
@@ -40,7 +38,7 @@ public interface LegacySupport
      *
      * @param session The currently active session, may be {@code null}.
      */
-    void setSession( MavenSession session );
+    void setSession(MavenSession session);
 
     /**
      * Gets the currently active session.
@@ -55,5 +53,4 @@ public interface LegacySupport
      * @return The currently active repository session or {@code null} if none.
      */
     RepositorySystemSession getRepositorySession();
-
 }

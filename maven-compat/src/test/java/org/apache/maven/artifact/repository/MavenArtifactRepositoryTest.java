@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,45 +16,40 @@ package org.apache.maven.artifact.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-
-import org.junit.jupiter.api.Test;
+package org.apache.maven.artifact.repository;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MavenArtifactRepositoryTest
-{
-    private static class MavenArtifactRepositorySubclass extends MavenArtifactRepository
-    {
+import org.junit.jupiter.api.Test;
+
+public class MavenArtifactRepositoryTest {
+    private static class MavenArtifactRepositorySubclass extends MavenArtifactRepository {
         String id;
 
-        public MavenArtifactRepositorySubclass(String id)
-        {
+        public MavenArtifactRepositorySubclass(String id) {
             this.id = id;
         }
 
         @Override
-        public String getId()
-        {
+        public String getId() {
             return id;
         }
     }
 
     @Test
-    public void testHashCodeEquals()
-    {
-        MavenArtifactRepositorySubclass r1 = new MavenArtifactRepositorySubclass( "foo" );
-        MavenArtifactRepositorySubclass r2 = new MavenArtifactRepositorySubclass( "foo" );
-        MavenArtifactRepositorySubclass r3 = new MavenArtifactRepositorySubclass( "bar" );
+    public void testHashCodeEquals() {
+        MavenArtifactRepositorySubclass r1 = new MavenArtifactRepositorySubclass("foo");
+        MavenArtifactRepositorySubclass r2 = new MavenArtifactRepositorySubclass("foo");
+        MavenArtifactRepositorySubclass r3 = new MavenArtifactRepositorySubclass("bar");
 
-        assertTrue( r1.hashCode() == r2.hashCode() );
-        assertFalse( r1.hashCode() == r3.hashCode() );
+        assertTrue(r1.hashCode() == r2.hashCode());
+        assertFalse(r1.hashCode() == r3.hashCode());
 
-        assertTrue( r1.equals( r2 ) );
-        assertTrue( r2.equals( r1 ) );
+        assertTrue(r1.equals(r2));
+        assertTrue(r2.equals(r1));
 
-        assertFalse( r1.equals( r3 ) );
-        assertFalse( r3.equals( r1 ) );
+        assertFalse(r1.equals(r3));
+        assertFalse(r3.equals(r1));
     }
 }

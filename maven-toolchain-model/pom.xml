@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,96 +17,95 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>maven</artifactId>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven</groupId>
+    <artifactId>maven</artifactId>
+    <version>4.0.0-alpha-3-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>maven-toolchain-model</artifactId>
+
+  <name>Maven Toolchain Model</name>
+  <description>Maven Toolchain model.</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-toolchain</artifactId>
+      <version>4.0.0-alpha-3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-xml-impl</artifactId>
+      <version>4.0.0-alpha-3-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>plexus-utils</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.2.0</version>
+        <executions>
+          <execution>
+            <id>copy-model</id>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>maven-api-toolchain</artifactId>
+                  <version>${project.version}</version>
+                  <type>mdo</type>
+                  <outputDirectory>target/mdo/</outputDirectory>
+                  <destFileName>toolchains.mdo</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven</groupId>
-        <version>4.0.0-alpha-3-SNAPSHOT</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>maven-toolchain-model</artifactId>
-
-    <name>Maven Toolchain Model</name>
-    <description>Maven Toolchain model.</description>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-api-toolchain</artifactId>
-            <version>4.0.0-alpha-3-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-xml-impl</artifactId>
-            <version>4.0.0-alpha-3-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>plexus-utils</artifactId>
-        </dependency>
-    </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-model</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.apache.maven</groupId>
-                                    <artifactId>maven-api-toolchain</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>mdo</type>
-                                    <outputDirectory>target/mdo/</outputDirectory>
-                                    <destFileName>toolchains.mdo</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven</groupId>
-                <artifactId>modello-plugin-velocity</artifactId>
-                <executions>
-                    <execution>
-                        <id>velocity</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>velocity</goal>
-                        </goals>
-                        <configuration>
-                            <version>4.0.0</version>
-                            <models>
-                                <model>target/mdo/toolchains.mdo</model>
-                            </models>
-                            <templates>
-                                <template>src/main/mdo/model-v3.vm</template>
-                                <template>src/main/mdo/merger.vm</template>
-                                <template>src/main/mdo/reader.vm</template>
-                                <template>src/main/mdo/writer.vm</template>
-                            </templates>
-                            <params>
-                                <param>packageModelV3=org.apache.maven.toolchain.model</param>
-                                <param>packageModelV4=org.apache.maven.api.toolchain</param>
-                                <param>packageToolV4=org.apache.maven.toolchain.v4</param>
-                            </params>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+        <artifactId>modello-plugin-velocity</artifactId>
+        <executions>
+          <execution>
+            <id>velocity</id>
+            <goals>
+              <goal>velocity</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <version>4.0.0</version>
+              <models>
+                <model>target/mdo/toolchains.mdo</model>
+              </models>
+              <templates>
+                <template>src/main/mdo/model-v3.vm</template>
+                <template>src/main/mdo/merger.vm</template>
+                <template>src/main/mdo/reader.vm</template>
+                <template>src/main/mdo/writer.vm</template>
+              </templates>
+              <params>
+                <param>packageModelV3=org.apache.maven.toolchain.model</param>
+                <param>packageModelV4=org.apache.maven.api.toolchain</param>
+                <param>packageToolV4=org.apache.maven.toolchain.v4</param>
+              </params>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

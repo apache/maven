@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,88 +16,104 @@ package org.apache.maven.plugin.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.internal;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import javax.inject.Inject;
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugin.internal.MavenPluginValidator;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
-import javax.inject.Inject;
 
 /**
  * @author Michael Simacek
  */
-public class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase
-{
+public class MavenPluginValidatorTest extends AbstractCoreMavenComponentTestCase {
     @Inject
     private MavenPluginValidator mavenPluginValidator;
 
-    protected String getProjectsDirectory()
-    {
+    protected String getProjectsDirectory() {
         return "src/test/projects/default-maven";
     }
 
     @Test
-    public void testValidate()
-    {
-        Artifact plugin = new DefaultArtifact( "org.apache.maven.its.plugins", "maven-it-plugin", "0.1", "compile",
-                "jar", null, new DefaultArtifactHandler( "ignore" ) );
+    public void testValidate() {
+        Artifact plugin = new DefaultArtifact(
+                "org.apache.maven.its.plugins",
+                "maven-it-plugin",
+                "0.1",
+                "compile",
+                "jar",
+                null,
+                new DefaultArtifactHandler("ignore"));
         PluginDescriptor descriptor = new PluginDescriptor();
-        descriptor.setGroupId( "org.apache.maven.its.plugins" );
-        descriptor.setArtifactId( "maven-it-plugin" );
-        descriptor.setVersion( "0.1" );
+        descriptor.setGroupId("org.apache.maven.its.plugins");
+        descriptor.setArtifactId("maven-it-plugin");
+        descriptor.setVersion("0.1");
         List<String> errors = new ArrayList<>();
-        mavenPluginValidator.validate( plugin, descriptor, errors );
-        assertTrue( errors.isEmpty() );
+        mavenPluginValidator.validate(plugin, descriptor, errors);
+        assertTrue(errors.isEmpty());
     }
 
     @Test
-    public void testInvalidGroupId()
-    {
-        Artifact plugin = new DefaultArtifact( "org.apache.maven.its.plugins", "maven-it-plugin", "0.1", "compile",
-                "jar", null, new DefaultArtifactHandler( "ignore" ) );
+    public void testInvalidGroupId() {
+        Artifact plugin = new DefaultArtifact(
+                "org.apache.maven.its.plugins",
+                "maven-it-plugin",
+                "0.1",
+                "compile",
+                "jar",
+                null,
+                new DefaultArtifactHandler("ignore"));
         PluginDescriptor descriptor = new PluginDescriptor();
-        descriptor.setGroupId( "org.apache.maven.its.plugins.invalid" );
-        descriptor.setArtifactId( "maven-it-plugin" );
-        descriptor.setVersion( "0.1" );
+        descriptor.setGroupId("org.apache.maven.its.plugins.invalid");
+        descriptor.setArtifactId("maven-it-plugin");
+        descriptor.setVersion("0.1");
         List<String> errors = new ArrayList<>();
-        mavenPluginValidator.validate( plugin, descriptor, errors );
-        assertFalse( errors.isEmpty() );
+        mavenPluginValidator.validate(plugin, descriptor, errors);
+        assertFalse(errors.isEmpty());
     }
 
     @Test
-    public void testInvalidArtifactId()
-    {
-        Artifact plugin = new DefaultArtifact( "org.apache.maven.its.plugins", "maven-it-plugin", "0.1", "compile",
-                "jar", null, new DefaultArtifactHandler( "ignore" ) );
+    public void testInvalidArtifactId() {
+        Artifact plugin = new DefaultArtifact(
+                "org.apache.maven.its.plugins",
+                "maven-it-plugin",
+                "0.1",
+                "compile",
+                "jar",
+                null,
+                new DefaultArtifactHandler("ignore"));
         PluginDescriptor descriptor = new PluginDescriptor();
-        descriptor.setGroupId( "org.apache.maven.its.plugins" );
-        descriptor.setArtifactId( "maven-it-plugin.invalid" );
-        descriptor.setVersion( "0.1" );
+        descriptor.setGroupId("org.apache.maven.its.plugins");
+        descriptor.setArtifactId("maven-it-plugin.invalid");
+        descriptor.setVersion("0.1");
         List<String> errors = new ArrayList<>();
-        mavenPluginValidator.validate( plugin, descriptor, errors );
-        assertFalse( errors.isEmpty() );
+        mavenPluginValidator.validate(plugin, descriptor, errors);
+        assertFalse(errors.isEmpty());
     }
 
     @Test
-    public void testInvalidVersion()
-    {
-        Artifact plugin = new DefaultArtifact( "org.apache.maven.its.plugins", "maven-it-plugin", "0.1", "compile",
-                "jar", null, new DefaultArtifactHandler( "ignore" ) );
+    public void testInvalidVersion() {
+        Artifact plugin = new DefaultArtifact(
+                "org.apache.maven.its.plugins",
+                "maven-it-plugin",
+                "0.1",
+                "compile",
+                "jar",
+                null,
+                new DefaultArtifactHandler("ignore"));
         PluginDescriptor descriptor = new PluginDescriptor();
-        descriptor.setGroupId( "org.apache.maven.its.plugins" );
-        descriptor.setArtifactId( "maven-it-plugin" );
+        descriptor.setGroupId("org.apache.maven.its.plugins");
+        descriptor.setArtifactId("maven-it-plugin");
         List<String> errors = new ArrayList<>();
-        mavenPluginValidator.validate( plugin, descriptor, errors );
-        assertFalse( errors.isEmpty() );
+        mavenPluginValidator.validate(plugin, descriptor, errors);
+        assertFalse(errors.isEmpty());
     }
 }

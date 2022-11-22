@@ -1,5 +1,3 @@
-package org.apache.maven.configuration.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.configuration.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.configuration.internal;
 
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.converters.ConfigurationConverter;
@@ -25,26 +24,23 @@ import org.codehaus.plexus.component.configurator.converters.composite.ObjectWit
 import org.codehaus.plexus.component.configurator.converters.lookup.ConverterLookup;
 import org.codehaus.plexus.component.configurator.converters.lookup.DefaultConverterLookup;
 
-class EnhancedConverterLookup implements ConverterLookup
-{
+class EnhancedConverterLookup implements ConverterLookup {
     private final ConverterLookup delegate = new DefaultConverterLookup();
 
-    EnhancedConverterLookup()
-    {
-        registerConverter( new DefaultBeanConfigurator.PathConverter() );
+    EnhancedConverterLookup() {
+        registerConverter(new DefaultBeanConfigurator.PathConverter());
     }
 
     @Override
-    public void registerConverter( ConfigurationConverter converter )
-    {
-        delegate.registerConverter( converter );
+    public void registerConverter(ConfigurationConverter converter) {
+        delegate.registerConverter(converter);
     }
 
     @Override
-    public ConfigurationConverter lookupConverterForType( Class<?> type ) throws ComponentConfigurationException
-    {
-        ConfigurationConverter converter = delegate.lookupConverterForType( type );
-        return converter.getClass().equals( ObjectWithFieldsConverter.class )
-                ? new EnhancedConfigurationConverter() : converter;
+    public ConfigurationConverter lookupConverterForType(Class<?> type) throws ComponentConfigurationException {
+        ConfigurationConverter converter = delegate.lookupConverterForType(type);
+        return converter.getClass().equals(ObjectWithFieldsConverter.class)
+                ? new EnhancedConfigurationConverter()
+                : converter;
     }
 }

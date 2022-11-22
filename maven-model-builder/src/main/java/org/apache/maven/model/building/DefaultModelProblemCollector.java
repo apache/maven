@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,11 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.ModelParseException;
 
@@ -35,9 +33,7 @@ import org.apache.maven.model.io.ModelParseException;
  *
  * @author Benjamin Bentmann
  */
-class DefaultModelProblemCollector
-    implements ModelProblemCollectorExt
-{
+class DefaultModelProblemCollector implements ModelProblemCollectorExt {
 
     private final ModelBuildingResult result;
 
@@ -49,152 +45,133 @@ class DefaultModelProblemCollector
 
     private Model rootModel;
 
-    private Set<ModelProblem.Severity> severities = EnumSet.noneOf( ModelProblem.Severity.class );
+    private Set<ModelProblem.Severity> severities = EnumSet.noneOf(ModelProblem.Severity.class);
 
-    DefaultModelProblemCollector( ModelBuildingResult result )
-    {
+    DefaultModelProblemCollector(ModelBuildingResult result) {
         this.result = result;
         this.problems = result.getProblems();
 
-        for ( ModelProblem problem : this.problems )
-        {
-            severities.add( problem.getSeverity() );
+        for (ModelProblem problem : this.problems) {
+            severities.add(problem.getSeverity());
         }
     }
 
-    public boolean hasFatalErrors()
-    {
-        return severities.contains( ModelProblem.Severity.FATAL );
+    public boolean hasFatalErrors() {
+        return severities.contains(ModelProblem.Severity.FATAL);
     }
 
-    public boolean hasErrors()
-    {
-        return severities.contains( ModelProblem.Severity.ERROR ) || severities.contains( ModelProblem.Severity.FATAL );
+    public boolean hasErrors() {
+        return severities.contains(ModelProblem.Severity.ERROR) || severities.contains(ModelProblem.Severity.FATAL);
     }
 
     @Override
-    public List<ModelProblem> getProblems()
-    {
+    public List<ModelProblem> getProblems() {
         return problems;
     }
 
-    public void setSource( String source )
-    {
+    public void setSource(String source) {
         this.source = source;
         this.sourceModel = null;
     }
 
-    public void setSource( Model source )
-    {
+    public void setSource(Model source) {
         this.sourceModel = source;
         this.source = null;
 
-        if ( rootModel == null )
-        {
+        if (rootModel == null) {
             rootModel = source;
         }
     }
 
-    private String getSource()
-    {
-        if ( source == null && sourceModel != null )
-        {
-            source = ModelProblemUtils.toPath( sourceModel );
+    private String getSource() {
+        if (source == null && sourceModel != null) {
+            source = ModelProblemUtils.toPath(sourceModel);
         }
         return source;
     }
 
-    private String getModelId()
-    {
-        return ModelProblemUtils.toId( sourceModel );
+    private String getModelId() {
+        return ModelProblemUtils.toId(sourceModel);
     }
 
-    public void setRootModel( Model rootModel )
-    {
+    public void setRootModel(Model rootModel) {
         this.rootModel = rootModel;
     }
 
-    public Model getRootModel()
-    {
+    public Model getRootModel() {
         return rootModel;
     }
 
-    public String getRootModelId()
-    {
-        return ModelProblemUtils.toId( rootModel );
+    public String getRootModelId() {
+        return ModelProblemUtils.toId(rootModel);
     }
 
-    public void add( ModelProblem problem )
-    {
-        problems.add( problem );
+    public void add(ModelProblem problem) {
+        problems.add(problem);
 
-        severities.add( problem.getSeverity() );
+        severities.add(problem.getSeverity());
     }
 
-    public void addAll( List<ModelProblem> problems )
-    {
-        this.problems.addAll( problems );
+    public void addAll(List<ModelProblem> problems) {
+        this.problems.addAll(problems);
 
-        for ( ModelProblem problem : problems )
-        {
-            severities.add( problem.getSeverity() );
+        for (ModelProblem problem : problems) {
+            severities.add(problem.getSeverity());
         }
     }
 
     @Override
-    public void add( ModelProblemCollectorRequest req )
-    {
+    public void add(ModelProblemCollectorRequest req) {
         int line = -1;
         int column = -1;
         String source = null;
         String modelId = null;
 
-        if ( req.getLocation() != null )
-        {
+        if (req.getLocation() != null) {
             line = req.getLocation().getLineNumber();
             column = req.getLocation().getColumnNumber();
-            if ( req.getLocation().getSource() != null )
-            {
+            if (req.getLocation().getSource() != null) {
                 modelId = req.getLocation().getSource().getModelId();
                 source = req.getLocation().getSource().getLocation();
             }
         }
 
-        if ( modelId == null )
-        {
+        if (modelId == null) {
             modelId = getModelId();
             source = getSource();
         }
 
-        if ( line <= 0 && column <= 0 && req.getException() instanceof ModelParseException )
-        {
+        if (line <= 0 && column <= 0 && req.getException() instanceof ModelParseException) {
             ModelParseException e = (ModelParseException) req.getException();
             line = e.getLineNumber();
             column = e.getColumnNumber();
         }
 
-        ModelProblem problem =
-            new DefaultModelProblem( req.getMessage(), req.getSeverity(), req.getVersion(), source, line, column,
-                                     modelId, req.getException() );
+        ModelProblem problem = new DefaultModelProblem(
+                req.getMessage(),
+                req.getSeverity(),
+                req.getVersion(),
+                source,
+                line,
+                column,
+                modelId,
+                req.getException());
 
-        add( problem );
+        add(problem);
     }
 
-    public ModelBuildingException newModelBuildingException()
-    {
+    public ModelBuildingException newModelBuildingException() {
         ModelBuildingResult result = this.result;
-        if ( result.getModelIds().isEmpty() )
-        {
+        if (result.getModelIds().isEmpty()) {
             DefaultModelBuildingResult tmp = new DefaultModelBuildingResult();
-            tmp.setEffectiveModel( result.getEffectiveModel() );
-            tmp.setProblems( getProblems() );
-            tmp.setActiveExternalProfiles( result.getActiveExternalProfiles() );
+            tmp.setEffectiveModel(result.getEffectiveModel());
+            tmp.setProblems(getProblems());
+            tmp.setActiveExternalProfiles(result.getActiveExternalProfiles());
             String id = getRootModelId();
-            tmp.addModelId( id );
-            tmp.setRawModel( id, getRootModel() );
+            tmp.addModelId(id);
+            tmp.setRawModel(id, getRootModel());
             result = tmp;
         }
-        return new ModelBuildingException( result );
+        return new ModelBuildingException(result);
     }
-
 }

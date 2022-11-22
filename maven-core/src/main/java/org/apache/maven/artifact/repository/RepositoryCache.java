@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.repository;
 
 /**
  * Caches auxiliary data used during repository access like already processed metadata. The data in the cache is meant
@@ -30,8 +29,7 @@ package org.apache.maven.artifact.repository;
 // Used by Tycho and will break users and force them to upgrade to Maven 3.1 so we should really leave
 // this here, possibly indefinitely.
 //
-public interface RepositoryCache
-{
+public interface RepositoryCache {
 
     /**
      * Puts the specified data into the cache. <strong>Warning:</strong> The cache will directly save the provided
@@ -42,7 +40,7 @@ public interface RepositoryCache
      * @param key The key to use associate the data with, must not be {@code null}.
      * @param data The data to store in the cache, may be {@code null}.
      */
-    void put( RepositoryRequest request, Object key, Object data );
+    void put(RepositoryRequest request, Object key, Object data);
 
     /**
      * Gets the specified data from the cache. <strong>Warning:</strong> The cache will directly return the saved
@@ -53,6 +51,5 @@ public interface RepositoryCache
      * @param key The key to use for lookup of the data, must not be {@code null}.
      * @return The requested data or {@code null} if none was present in the cache.
      */
-    Object get( RepositoryRequest request, Object key );
-
+    Object get(RepositoryRequest request, Object key);
 }

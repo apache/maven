@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 /**
  * Collects problems that are encountered during model building. The primary purpose of this component is to account for
@@ -28,14 +27,12 @@ package org.apache.maven.model.building;
  *
  * @author Benjamin Bentmann
  */
-public interface ModelProblemCollector
-{
+public interface ModelProblemCollector {
 
     /**
      * Adds the specified problem.
      *
      * @param req must not be null
      */
-    void add( ModelProblemCollectorRequest req );
-
+    void add(ModelProblemCollectorRequest req);
 }

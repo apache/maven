@@ -1,5 +1,3 @@
-package org.apache.maven.api.services.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.services.xml;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api.services.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services.xml;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.services.MavenException;
@@ -28,17 +27,13 @@ import org.apache.maven.api.services.MavenException;
  * @since 4.0
  */
 @Experimental
-public class XmlWriterException
-        extends MavenException
-{
+public class XmlWriterException extends MavenException {
 
     /**
      * @param message the message for the exception
      * @param e the exception itself
      */
-    public XmlWriterException( String message, Exception e )
-    {
-        super( message, e );
+    public XmlWriterException(String message, Exception e) {
+        super(message, e);
     }
-
 }

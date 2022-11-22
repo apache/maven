@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 /**
  * Resolves the transitive dependencies of a project.
  *
  * @author Benjamin Bentmann
  */
-public interface ProjectDependenciesResolver
-{
+public interface ProjectDependenciesResolver {
 
     /**
      * Resolves the transitive dependencies of a project.
@@ -34,7 +32,5 @@ public interface ProjectDependenciesResolver
      * @return The resolution result, never {@code null}.
      * @throws DependencyResolutionException If any project dependency could not be resolved.
      */
-    DependencyResolutionResult resolve( DependencyResolutionRequest request )
-        throws DependencyResolutionException;
-
+    DependencyResolutionResult resolve(DependencyResolutionRequest request) throws DependencyResolutionException;
 }

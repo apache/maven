@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.NoSuchElementException;
-import java.util.Properties;
-import java.util.Set;
-
-import org.junit.jupiter.api.Test;
+package org.apache.maven.internal.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -33,29 +24,34 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PropertiesAsMapTest
-{
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.Properties;
+import java.util.Set;
+import org.junit.jupiter.api.Test;
+
+public class PropertiesAsMapTest {
 
     @Test
-    public void testPropertiesAsMap()
-    {
+    public void testPropertiesAsMap() {
         Properties props = new Properties();
-        props.setProperty( "foo1", "bar1" );
-        props.setProperty( "foo2", "bar2" );
-        PropertiesAsMap pam = new PropertiesAsMap( props );
-        assertEquals( 2, pam.size() );
+        props.setProperty("foo1", "bar1");
+        props.setProperty("foo2", "bar2");
+        PropertiesAsMap pam = new PropertiesAsMap(props);
+        assertEquals(2, pam.size());
         Set<Entry<String, String>> set = pam.entrySet();
-        assertNotNull( set );
-        assertEquals( 2, set.size() );
+        assertNotNull(set);
+        assertEquals(2, set.size());
         Iterator<Entry<String, String>> iterator = set.iterator();
-        assertNotNull( iterator );
-        assertTrue( iterator.hasNext() );
-        assertTrue( iterator.hasNext() );
+        assertNotNull(iterator);
+        assertTrue(iterator.hasNext());
+        assertTrue(iterator.hasNext());
         Entry<String, String> entry = iterator.next();
-        assertNotNull( entry );
+        assertNotNull(entry);
         entry = iterator.next();
-        assertNotNull( entry );
-        assertThrows(NoSuchElementException.class, () -> iterator.next() );
-        assertFalse( iterator.hasNext() );
+        assertNotNull(entry);
+        assertThrows(NoSuchElementException.class, () -> iterator.next());
+        assertFalse(iterator.hasNext());
     }
 }

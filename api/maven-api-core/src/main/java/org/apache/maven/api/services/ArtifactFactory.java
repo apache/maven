@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,11 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
+import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
-import org.apache.maven.api.Artifact;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
@@ -31,8 +30,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * @since 4.0
  */
 @Experimental
-public interface ArtifactFactory extends Service
-{
+public interface ArtifactFactory extends Service {
 
     /**
      * Creates an artifact.
@@ -42,20 +40,23 @@ public interface ArtifactFactory extends Service
      * @throws IllegalArgumentException if {@code request} is null or {@code request.session} is null or invalid
      */
     @Nonnull
-    Artifact create( @Nonnull ArtifactFactoryRequest request );
+    Artifact create(@Nonnull ArtifactFactoryRequest request);
 
     @Nonnull
-    default Artifact create( @Nonnull Session session, String groupId,
-                             String artifactId, String version, String extension )
-    {
-        return create( ArtifactFactoryRequest.build( session, groupId, artifactId, version, extension ) );
+    default Artifact create(
+            @Nonnull Session session, String groupId, String artifactId, String version, String extension) {
+        return create(ArtifactFactoryRequest.build(session, groupId, artifactId, version, extension));
     }
 
     @Nonnull
-    default Artifact create( @Nonnull Session session, String groupId, String artifactId, String version,
-                             String classifier, String extension, String type )
-    {
-        return create( ArtifactFactoryRequest.build( session, groupId, artifactId,
-                                                     version, classifier, extension, type ) );
+    default Artifact create(
+            @Nonnull Session session,
+            String groupId,
+            String artifactId,
+            String version,
+            String classifier,
+            String extension,
+            String type) {
+        return create(ArtifactFactoryRequest.build(session, groupId, artifactId, version, classifier, extension, type));
     }
 }

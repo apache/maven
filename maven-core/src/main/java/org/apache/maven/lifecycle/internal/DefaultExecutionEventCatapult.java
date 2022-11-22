@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,10 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenSession;
@@ -36,87 +34,80 @@ import org.apache.maven.plugin.MojoExecution;
  */
 @Named
 @Singleton
-public class DefaultExecutionEventCatapult
-    implements ExecutionEventCatapult
-{
+public class DefaultExecutionEventCatapult implements ExecutionEventCatapult {
 
-    public void fire( ExecutionEvent.Type eventType, MavenSession session, MojoExecution mojoExecution )
-    {
-        fire( eventType, session, mojoExecution, null );
+    public void fire(ExecutionEvent.Type eventType, MavenSession session, MojoExecution mojoExecution) {
+        fire(eventType, session, mojoExecution, null);
     }
 
-    public void fire( ExecutionEvent.Type eventType, MavenSession session, MojoExecution mojoExecution,
-                      Exception exception )
-    {
+    public void fire(
+            ExecutionEvent.Type eventType, MavenSession session, MojoExecution mojoExecution, Exception exception) {
         ExecutionListener listener = session.getRequest().getExecutionListener();
 
-        if ( listener != null )
-        {
-            ExecutionEvent event = new DefaultExecutionEvent( eventType, session, mojoExecution, exception );
+        if (listener != null) {
+            ExecutionEvent event = new DefaultExecutionEvent(eventType, session, mojoExecution, exception);
 
-            switch ( eventType )
-            {
+            switch (eventType) {
                 case ProjectDiscoveryStarted:
-                    listener.projectDiscoveryStarted( event );
+                    listener.projectDiscoveryStarted(event);
                     break;
 
                 case SessionStarted:
-                    listener.sessionStarted( event );
+                    listener.sessionStarted(event);
                     break;
                 case SessionEnded:
-                    listener.sessionEnded( event );
+                    listener.sessionEnded(event);
                     break;
 
                 case ProjectSkipped:
-                    listener.projectSkipped( event );
+                    listener.projectSkipped(event);
                     break;
                 case ProjectStarted:
-                    listener.projectStarted( event );
+                    listener.projectStarted(event);
                     break;
                 case ProjectSucceeded:
-                    listener.projectSucceeded( event );
+                    listener.projectSucceeded(event);
                     break;
                 case ProjectFailed:
-                    listener.projectFailed( event );
+                    listener.projectFailed(event);
                     break;
 
                 case MojoSkipped:
-                    listener.mojoSkipped( event );
+                    listener.mojoSkipped(event);
                     break;
                 case MojoStarted:
-                    listener.mojoStarted( event );
+                    listener.mojoStarted(event);
                     break;
                 case MojoSucceeded:
-                    listener.mojoSucceeded( event );
+                    listener.mojoSucceeded(event);
                     break;
                 case MojoFailed:
-                    listener.mojoFailed( event );
+                    listener.mojoFailed(event);
                     break;
 
                 case ForkStarted:
-                    listener.forkStarted( event );
+                    listener.forkStarted(event);
                     break;
                 case ForkSucceeded:
-                    listener.forkSucceeded( event );
+                    listener.forkSucceeded(event);
                     break;
                 case ForkFailed:
-                    listener.forkFailed( event );
+                    listener.forkFailed(event);
                     break;
 
                 case ForkedProjectStarted:
-                    listener.forkedProjectStarted( event );
+                    listener.forkedProjectStarted(event);
                     break;
                 case ForkedProjectSucceeded:
-                    listener.forkedProjectSucceeded( event );
+                    listener.forkedProjectSucceeded(event);
                     break;
                 case ForkedProjectFailed:
-                    listener.forkedProjectFailed( event );
+                    listener.forkedProjectFailed(event);
                     break;
 
                 default:
-                    throw new IllegalStateException( "Unknown execution event type " + eventType );
+                    throw new IllegalStateException("Unknown execution event type " + eventType);
             }
         }
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 /**
  * Defines events that the model builder fires during construction of the effective model. When a listener encounters
@@ -27,14 +26,12 @@ package org.apache.maven.model.building;
  *
  * @author Benjamin Bentmann
  */
-public interface ModelBuildingListener
-{
+public interface ModelBuildingListener {
 
     /**
      * Notifies the listener that the model has been constructed to the extent where build extensions can be processed.
      *
      * @param event The details about the event.
      */
-    void buildExtensionsAssembled( ModelBuildingEvent event );
-
+    void buildExtensionsAssembled(ModelBuildingEvent event);
 }

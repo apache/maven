@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 /**
  * The transformerContextBuilder is responsible for initializing the TransformerContext.
@@ -26,8 +25,7 @@ package org.apache.maven.model.building;
  * @author Robert Scholte
  * @since 4.0.0
  */
-public interface TransformerContextBuilder
-{
+public interface TransformerContextBuilder {
     /**
      * This method is used to initialize the TransformerContext
      *
@@ -35,7 +33,7 @@ public interface TransformerContextBuilder
      * @param problems the problemCollector
      * @return the mutable transformerContext
      */
-    TransformerContext initialize( ModelBuildingRequest request, ModelProblemCollector problems );
+    TransformerContext initialize(ModelBuildingRequest request, ModelProblemCollector problems);
 
     /**
      * The immutable transformerContext, can be used after the buildplan is finished.

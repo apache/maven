@@ -1,5 +1,3 @@
-package org.apache.maven.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,31 +16,28 @@ package org.apache.maven.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.metadata;
 
 /**
  * MetadataResolutionRequestTypeEnum
  */
-public enum MetadataResolutionRequestTypeEnum
-{
-      tree( 1 )
-    , graph( 2 )
-    , classpathCompile( 3 )
-    , classpathTest( 4 )
-    , classpathRuntime( 5 )
-    , versionedGraph( 6 )
-    , scopedGraph( 7 )
-    ;
+public enum MetadataResolutionRequestTypeEnum {
+    tree(1),
+    graph(2),
+    classpathCompile(3),
+    classpathTest(4),
+    classpathRuntime(5),
+    versionedGraph(6),
+    scopedGraph(7);
 
     private int id;
 
     // Constructor
-    MetadataResolutionRequestTypeEnum( int id )
-    {
+    MetadataResolutionRequestTypeEnum(int id) {
         this.id = id;
     }
 
-    int getId()
-    {
+    int getId() {
         return id;
     }
 }

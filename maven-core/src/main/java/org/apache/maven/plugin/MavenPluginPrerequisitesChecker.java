@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,21 +16,20 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import java.util.function.Consumer;
-
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
 /**
  * Service responsible for checking if plugin's prerequisites are met.
  */
 @FunctionalInterface
-public interface MavenPluginPrerequisitesChecker extends Consumer<PluginDescriptor>
-{
+public interface MavenPluginPrerequisitesChecker extends Consumer<PluginDescriptor> {
     /**
-     * 
+     *
      * @param pluginDescriptor
      * @throws IllegalStateException in case the checked prerequisites are not met
      */
-    void accept( PluginDescriptor pluginDescriptor );
+    void accept(PluginDescriptor pluginDescriptor);
 }

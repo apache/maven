@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.toolchain;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.toolchain;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -27,82 +26,61 @@ import org.apache.maven.artifact.versioning.VersionRange;
  *
  * @author mkleint
  */
-public final class RequirementMatcherFactory
-{
-    private RequirementMatcherFactory()
-    {
+public final class RequirementMatcherFactory {
+    private RequirementMatcherFactory() {}
+
+    public static RequirementMatcher createExactMatcher(String provideValue) {
+        return new ExactMatcher(provideValue);
     }
 
-    public static RequirementMatcher createExactMatcher( String provideValue )
-    {
-        return new ExactMatcher( provideValue );
+    public static RequirementMatcher createVersionMatcher(String provideValue) {
+        return new VersionMatcher(provideValue);
     }
 
-    public static RequirementMatcher createVersionMatcher( String provideValue )
-    {
-        return new VersionMatcher( provideValue );
-    }
-
-    private static final class ExactMatcher
-        implements RequirementMatcher
-    {
+    private static final class ExactMatcher implements RequirementMatcher {
 
         private String provides;
 
-        private ExactMatcher( String provides )
-        {
+        private ExactMatcher(String provides) {
             this.provides = provides;
         }
 
         @Override
-        public boolean matches( String requirement )
-        {
-            return provides.equalsIgnoreCase( requirement );
+        public boolean matches(String requirement) {
+            return provides.equalsIgnoreCase(requirement);
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return provides;
         }
     }
 
-    private static final class VersionMatcher
-        implements RequirementMatcher
-    {
+    private static final class VersionMatcher implements RequirementMatcher {
         DefaultArtifactVersion version;
 
-        private VersionMatcher( String version )
-        {
-            this.version = new DefaultArtifactVersion( version );
+        private VersionMatcher(String version) {
+            this.version = new DefaultArtifactVersion(version);
         }
 
         @Override
-        public boolean matches( String requirement )
-        {
-            try
-            {
-                VersionRange range = VersionRange.createFromVersionSpec( requirement );
-                if ( range.hasRestrictions() )
-                {
-                    return range.containsVersion( version );
+        public boolean matches(String requirement) {
+            try {
+                VersionRange range = VersionRange.createFromVersionSpec(requirement);
+                if (range.hasRestrictions()) {
+                    return range.containsVersion(version);
+                } else {
+                    return range.getRecommendedVersion().compareTo(version) == 0;
                 }
-                else
-                {
-                    return range.getRecommendedVersion().compareTo( version ) == 0;
-                }
-            }
-            catch ( InvalidVersionSpecificationException ex )
-            {
-                //TODO error reporting
+            } catch (InvalidVersionSpecificationException ex) {
+                // TODO error reporting
                 ex.printStackTrace();
                 return false;
             }
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return version.toString();
         }
     }

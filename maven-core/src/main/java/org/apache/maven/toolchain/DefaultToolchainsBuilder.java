@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,55 +16,43 @@ package org.apache.maven.toolchain;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain;
 
+import java.io.File;
+import java.io.Reader;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Reader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.Reader;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 /**
  * @author Benjamin Bentmann
  * @deprecated instead use {@link org.apache.maven.toolchain.building.DefaultToolchainsBuilder}
  */
 @Deprecated
-@Named( "default" )
+@Named("default")
 @Singleton
-public class DefaultToolchainsBuilder
-    implements ToolchainsBuilder
-{
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+public class DefaultToolchainsBuilder implements ToolchainsBuilder {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public PersistedToolchains build( File userToolchainsFile )
-        throws MisconfiguredToolchainException
-    {
+    public PersistedToolchains build(File userToolchainsFile) throws MisconfiguredToolchainException {
         PersistedToolchains toolchains = null;
 
-        if ( userToolchainsFile != null && userToolchainsFile.isFile() )
-        {
-            try ( Reader in = ReaderFactory.newXmlReader( userToolchainsFile ) )
-            {
-                toolchains = new MavenToolchainsXpp3Reader().read( in );
-            }
-            catch ( Exception e )
-            {
+        if (userToolchainsFile != null && userToolchainsFile.isFile()) {
+            try (Reader in = ReaderFactory.newXmlReader(userToolchainsFile)) {
+                toolchains = new MavenToolchainsXpp3Reader().read(in);
+            } catch (Exception e) {
                 throw new MisconfiguredToolchainException(
-                    "Cannot read toolchains file at " + userToolchainsFile.getAbsolutePath(), e );
+                        "Cannot read toolchains file at " + userToolchainsFile.getAbsolutePath(), e);
             }
 
-        }
-        else if ( userToolchainsFile != null )
-        {
-            logger.debug( "Toolchains configuration was not found at " + userToolchainsFile );
+        } else if (userToolchainsFile != null) {
+            logger.debug("Toolchains configuration was not found at " + userToolchainsFile);
         }
 
         return toolchains;
     }
-
 }
