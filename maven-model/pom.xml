@@ -99,10 +99,10 @@ under the License.
           </execution>
           <execution>
             <id>velocity-v4</id>
-            <phase>generate-sources</phase>
             <goals>
               <goal>velocity</goal>
             </goals>
+            <phase>generate-sources</phase>
             <configuration>
               <version>4.2.0</version>
               <models>
@@ -137,11 +137,11 @@ under the License.
         <executions>
           <execution>
             <id>modello-site-docs</id>
-            <phase>pre-site</phase>
             <goals>
               <goal>xdoc</goal>
               <goal>xsd</goal>
             </goals>
+            <phase>pre-site</phase>
           </execution>
           <execution>
             <id>modello</id>
