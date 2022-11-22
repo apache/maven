@@ -36,6 +36,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 /**
  * @author Jason van Zyl
  */
+@Deprecated
 public class PluginDescriptorBuilder
 {
     public PluginDescriptor build( Reader reader )

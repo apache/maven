@@ -34,7 +34,7 @@ under the License.
   <defaults>
     <default>
       <key>package</key>
-      <value>plugin descriptor XML documentation (no java generation)</value><!-- intentionally non-buildable value -->
+      <value>org.apache.maven.plugin.descriptor</value><!-- intentionally non-buildable value -->
     </default>
   </defaults>
   <classes>
@@ -370,7 +370,7 @@ under the License.
     <class xdoc.anchorName="parameter">
       <name>Parameter</name>
       <version>1.0.0+</version>
-      <description>A phase mapping definition.</description>
+      <description>A parameter definition.</description>
       <!-- see o.a.m.plugin.descriptor.Parameter -->
       <fields>
         <field>
@@ -455,6 +455,37 @@ under the License.
           ]]></description>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.1.0+</version> <!--previously the model has been handcrafted -->
+          <comment>Add setters/getters for expression and default value coming from the mojo's configuration</comment>
+          <code><![CDATA[
+    /* getters exposing information originally comfing from the mojo's configuration */
+    private String expression;
+    private String defaultValue;
+
+    public String getExpression()
+    {
+        return expression;
+    }
+
+    public void setExpression( String expression )
+    {
+        this.expression = expression;
+    }
+
+    public void setDefaultValue( String defaultValue )
+    {
+        this.defaultValue = defaultValue;
+    }
+
+    public String getDefaultValue()
+    {
+        return defaultValue;
+    }]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
 
     <class>
@@ -512,6 +543,26 @@ under the License.
           <description>The field name which has this requirement.</description>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.1.0+</version> <!--previously the model has been handcrafted -->
+          <comment>Conversion to Plexus Component Requirement</comment>
+          <code><![CDATA[
+    /**
+     * Converts the given requirement to a Plexus Component Requirement
+     */
+    org.codehaus.plexus.component.repository.ComponentRequirement toComponentRequirement()
+    {
+        org.codehaus.plexus.component.repository.ComponentRequirement componentRequirement
+            = new org.codehaus.plexus.component.repository.ComponentRequirement();
+        componentRequirement.setRole( role );
+        componentRequirement.setRoleHint( roleHint );
+        componentRequirement.setFieldName( fieldName );
+        return componentRequirement;
+    }]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
 
     <class xdoc.anchorName="dependency">
@@ -547,6 +598,27 @@ under the License.
           <description>The type of dependency.</description>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.1.0+</version> <!--previously the model has been handcrafted -->
+          <comment>Conversion to Plexus Component Dependency</comment>
+          <code><![CDATA[
+    /**
+     * Converts the given dependency to a Plexus Component Dependency
+     */
+    org.codehaus.plexus.component.repository.ComponentDependency toComponentDependency()
+    {
+        org.codehaus.plexus.component.repository.ComponentDependency componentDependency
+            = new org.codehaus.plexus.component.repository.ComponentDependency();
+        componentDependency.setGroupId( groupId );
+        componentDependency.setArtifactId( artifactId );
+        componentDependency.setVersion( version );
+        componentDependency.setType( type );
+        return componentDependency;
+    }]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
   </classes>
 </model>

@@ -39,6 +39,7 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
  * TODO is there a need for the delegation of MavenMojoDescriptor to this?
  * Why not just extend ComponentDescriptor here?
  */
+@Deprecated
 public class MojoDescriptor
     extends ComponentDescriptor<Mojo>
     implements Cloneable

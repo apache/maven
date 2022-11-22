@@ -46,6 +46,7 @@ import java.util.Set;
 /**
  * @author Jason van Zyl
  */
+@Deprecated
 public class PluginDescriptor
     extends ComponentSetDescriptor
     implements Cloneable

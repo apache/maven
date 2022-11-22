@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.lifecycle;
+package org.apache.maven.plugin;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -38,7 +38,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-class ImmutableCollections
+public class ImmutableCollections
 {
 
     private static final List<?> EMPTY_LIST = new AbstractImmutableList<Object>()
@@ -88,7 +88,7 @@ class ImmutableCollections
         }
     };
 
-    static <E> List<E> copy( Collection<E> collection )
+    public static <E> List<E> copy( Collection<E> collection )
     {
         if ( collection == null )
         {
