@@ -175,10 +175,7 @@ public class ${className}
   #set ( $classUcapName = $Helper.capitalise( $class.name ) )
   #set ( $classLcapName = $Helper.uncapitalise( $class.name ) )
   #set ( $ancestors = $Helper.ancestors( $class ) )
-  #set ( $allFields = [] )
-  #foreach ( $cl in $ancestors )
-    #set ( $dummy = $allFields.addAll( $cl.allFields ) )
-  #end
+  #set ( $allFields = $Helper.xmlFields( $class ) )
     private ${classUcapName} parse${classUcapName}( XmlPullParser parser, boolean strict, InputSource source )
         throws IOException, XmlPullParserException
     {

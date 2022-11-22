@@ -77,18 +77,38 @@ under the License.
         <artifactId>modello-plugin-velocity</artifactId>
         <executions>
           <execution>
-            <id>velocity</id>
+            <id>velocity-v3</id>
             <goals>
               <goal>velocity</goal>
             </goals>
             <phase>generate-sources</phase>
             <configuration>
-              <version>4.0.0</version>
+              <version>4.1.0</version>
               <models>
                 <model>target/mdo/maven.mdo</model>
               </models>
               <templates>
                 <template>src/main/mdo/model-v3.vm</template>
+              </templates>
+              <params>
+                <param>packageModelV3=org.apache.maven.model</param>
+                <param>packageModelV4=org.apache.maven.api.model</param>
+                <param>packageToolV4=org.apache.maven.model.v4</param>
+              </params>
+            </configuration>
+          </execution>
+          <execution>
+            <id>velocity-v4</id>
+            <goals>
+              <goal>velocity</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <version>4.2.0</version>
+              <models>
+                <model>target/mdo/maven.mdo</model>
+              </models>
+              <templates>
                 <template>src/main/mdo/merger.vm</template>
                 <template>src/main/mdo/transformer.vm</template>
                 <template>src/main/mdo/reader.vm</template>
@@ -102,6 +122,30 @@ under the License.
                 <param>packageToolV4=org.apache.maven.model.v4</param>
               </params>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <configuration>
+          <version>4.0.0</version>
+          <models>
+            <model>target/mdo/maven.mdo</model>
+          </models>
+        </configuration>
+        <executions>
+          <execution>
+            <id>modello-site-docs</id>
+            <goals>
+              <goal>xdoc</goal>
+              <goal>xsd</goal>
+            </goals>
+            <phase>pre-site</phase>
+          </execution>
+          <execution>
+            <id>modello</id>
+            <phase>none</phase>
           </execution>
         </executions>
       </plugin>
