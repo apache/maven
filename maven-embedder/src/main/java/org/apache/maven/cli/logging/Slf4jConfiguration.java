@@ -44,6 +44,14 @@ public interface Slf4jConfiguration
     void setRootLoggerLevel( Level level );
 
     /**
+     * Set logging level for given logger name.
+
+     * @param loggerName the logger name.
+     * @param level the level.
+     */
+    void setLoggerLevel( String loggerName, Level level );
+
+    /**
      * Activate logging implementation configuration (if necessary).
      */
     void activate();

@@ -116,6 +116,8 @@ public class CLIManager
 
     public static final String COLOR = "color";
 
+    public static final String VERBOSE_LOGGERS = "XL";
+
     /** This option is deprecated and may be repurposed as Java debug in a future version.
      * Use {@code -X/--verbose} instead. */
     @Deprecated
@@ -164,6 +166,7 @@ public class CLIManager
         options.addOption( Option.builder( BUILDER ).longOpt( "builder" ).hasArg().desc( "The id of the build strategy to use" ).build() );
         options.addOption( Option.builder( NO_TRANSFER_PROGRESS ).longOpt( "no-transfer-progress" ).desc( "Do not display transfer progress when downloading or uploading" ).build() );
         options.addOption( Option.builder().longOpt( COLOR ).hasArg().optionalArg( true ).desc( "Defines the color mode of the output. Supported are 'auto', 'always', 'never'." ).build() );
+        options.addOption( Option.builder( VERBOSE_LOGGERS ).longOpt( "verboseLoggers" ).hasArg().desc( "Produce verbose output for loggers (comma separated list of logger names)" ).build() );
 
         // Deprecated
         options.addOption( Option.builder().longOpt( DEBUG ).desc( "Produce execution verbose output (deprecated; only kept for backward compatibility)" ).build() );

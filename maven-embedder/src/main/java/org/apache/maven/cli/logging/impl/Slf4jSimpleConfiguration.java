@@ -23,6 +23,8 @@ import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
 import org.slf4j.MavenSlf4jFriend;
 import org.slf4j.impl.MavenSlf4jSimpleFriend;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Configuration for slf4j-simple.
  *
@@ -35,6 +37,22 @@ public class Slf4jSimpleConfiguration
     @Override
     public void setRootLoggerLevel( Level level )
     {
+        requireNonNull( level );
+        setSlf4jSimpleLoggerLevel( "defaultLogLevel", level );
+    }
+
+    @Override
+    public void setLoggerLevel( final String loggerName, final Level level )
+    {
+        requireNonNull( loggerName );
+        requireNonNull( level );
+        setSlf4jSimpleLoggerLevel( "log." + loggerName, level );
+    }
+
+    private void setSlf4jSimpleLoggerLevel( final String loggerName, final Level level )
+    {
+        requireNonNull( loggerName );
+        requireNonNull( level );
         String value;
         switch ( level )
         {
@@ -50,7 +68,7 @@ public class Slf4jSimpleConfiguration
                 value = "error";
                 break;
         }
-        System.setProperty( "org.slf4j.simpleLogger.defaultLogLevel", value );
+        System.setProperty( "org.slf4j.simpleLogger." + loggerName, value );
     }
 
     @Override
