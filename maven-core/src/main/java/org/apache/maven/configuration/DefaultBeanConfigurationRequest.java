@@ -1,5 +1,3 @@
-package org.apache.maven.configuration;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.configuration;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.configuration;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.model.Build;
@@ -32,9 +31,7 @@ import org.codehaus.plexus.util.StringUtils;
  *
  * @author Benjamin Bentmann
  */
-public class DefaultBeanConfigurationRequest
-    implements BeanConfigurationRequest
-{
+public class DefaultBeanConfigurationRequest implements BeanConfigurationRequest {
 
     private Object bean;
 
@@ -48,34 +45,28 @@ public class DefaultBeanConfigurationRequest
 
     private BeanConfigurationPathTranslator pathTranslator;
 
-    public Object getBean()
-    {
+    public Object getBean() {
         return bean;
     }
 
-    public DefaultBeanConfigurationRequest setBean( Object bean )
-    {
+    public DefaultBeanConfigurationRequest setBean(Object bean) {
         this.bean = bean;
         return this;
     }
 
-    public Object getConfiguration()
-    {
+    public Object getConfiguration() {
         return configuration;
     }
 
-    public String getConfigurationElement()
-    {
+    public String getConfigurationElement() {
         return configurationElement;
     }
 
-    public DefaultBeanConfigurationRequest setConfiguration( Object configuration )
-    {
-        return setConfiguration( configuration, null );
+    public DefaultBeanConfigurationRequest setConfiguration(Object configuration) {
+        return setConfiguration(configuration, null);
     }
 
-    public DefaultBeanConfigurationRequest setConfiguration( Object configuration, String element )
-    {
+    public DefaultBeanConfigurationRequest setConfiguration(Object configuration, String element) {
         this.configuration = configuration;
         this.configurationElement = element;
         return this;
@@ -94,56 +85,41 @@ public class DefaultBeanConfigurationRequest
      *            empty to use the general plugin configuration.
      * @return This request for chaining, never {@code null}.
      */
-    public DefaultBeanConfigurationRequest setConfiguration( Model model, String pluginGroupId,
-                                                             String pluginArtifactId, String pluginExecutionId )
-    {
-        Plugin plugin = findPlugin( model, pluginGroupId, pluginArtifactId );
-        if ( plugin != null )
-        {
-            if ( StringUtils.isNotEmpty( pluginExecutionId ) )
-            {
-                for ( PluginExecution execution : plugin.getExecutions() )
-                {
-                    if ( pluginExecutionId.equals( execution.getId() ) )
-                    {
-                        setConfiguration( execution.getConfiguration() );
+    public DefaultBeanConfigurationRequest setConfiguration(
+            Model model, String pluginGroupId, String pluginArtifactId, String pluginExecutionId) {
+        Plugin plugin = findPlugin(model, pluginGroupId, pluginArtifactId);
+        if (plugin != null) {
+            if (StringUtils.isNotEmpty(pluginExecutionId)) {
+                for (PluginExecution execution : plugin.getExecutions()) {
+                    if (pluginExecutionId.equals(execution.getId())) {
+                        setConfiguration(execution.getConfiguration());
                         break;
                     }
                 }
-            }
-            else
-            {
-                setConfiguration( plugin.getConfiguration() );
+            } else {
+                setConfiguration(plugin.getConfiguration());
             }
         }
         return this;
     }
 
-    private Plugin findPlugin( Model model, String groupId, String artifactId )
-    {
-        Validate.notBlank( groupId, "groupId can neither be null, empty nor blank" );
-        Validate.notBlank( artifactId, "artifactId can neither be null, empty nor blank" );
+    private Plugin findPlugin(Model model, String groupId, String artifactId) {
+        Validate.notBlank(groupId, "groupId can neither be null, empty nor blank");
+        Validate.notBlank(artifactId, "artifactId can neither be null, empty nor blank");
 
-        if ( model != null )
-        {
+        if (model != null) {
             Build build = model.getBuild();
-            if ( build != null )
-            {
-                for ( Plugin plugin : build.getPlugins() )
-                {
-                    if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
-                    {
+            if (build != null) {
+                for (Plugin plugin : build.getPlugins()) {
+                    if (groupId.equals(plugin.getGroupId()) && artifactId.equals(plugin.getArtifactId())) {
                         return plugin;
                     }
                 }
 
                 PluginManagement mgmt = build.getPluginManagement();
-                if ( mgmt != null )
-                {
-                    for ( Plugin plugin : mgmt.getPlugins() )
-                    {
-                        if ( groupId.equals( plugin.getGroupId() ) && artifactId.equals( plugin.getArtifactId() ) )
-                        {
+                if (mgmt != null) {
+                    for (Plugin plugin : mgmt.getPlugins()) {
+                        if (groupId.equals(plugin.getGroupId()) && artifactId.equals(plugin.getArtifactId())) {
                             return plugin;
                         }
                     }
@@ -154,37 +130,30 @@ public class DefaultBeanConfigurationRequest
         return null;
     }
 
-    public ClassLoader getClassLoader()
-    {
+    public ClassLoader getClassLoader() {
         return classLoader;
     }
 
-    public DefaultBeanConfigurationRequest setClassLoader( ClassLoader classLoader )
-    {
+    public DefaultBeanConfigurationRequest setClassLoader(ClassLoader classLoader) {
         this.classLoader = classLoader;
         return this;
     }
 
-    public BeanConfigurationValuePreprocessor getValuePreprocessor()
-    {
+    public BeanConfigurationValuePreprocessor getValuePreprocessor() {
         return valuePreprocessor;
     }
 
-    public DefaultBeanConfigurationRequest setValuePreprocessor( BeanConfigurationValuePreprocessor valuePreprocessor )
-    {
+    public DefaultBeanConfigurationRequest setValuePreprocessor(BeanConfigurationValuePreprocessor valuePreprocessor) {
         this.valuePreprocessor = valuePreprocessor;
         return this;
     }
 
-    public BeanConfigurationPathTranslator getPathTranslator()
-    {
+    public BeanConfigurationPathTranslator getPathTranslator() {
         return pathTranslator;
     }
 
-    public DefaultBeanConfigurationRequest setPathTranslator( BeanConfigurationPathTranslator pathTranslator )
-    {
+    public DefaultBeanConfigurationRequest setPathTranslator(BeanConfigurationPathTranslator pathTranslator) {
         this.pathTranslator = pathTranslator;
         return this;
     }
-
 }

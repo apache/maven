@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,11 @@ package org.apache.maven.plugin.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.internal;
 
 import java.util.concurrent.atomic.AtomicReference;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
 import org.eclipse.aether.RepositorySystemSession;
@@ -38,41 +35,30 @@ import org.eclipse.aether.RepositorySystemSession;
  */
 @Named
 @Singleton
-public class DefaultLegacySupport
-    implements LegacySupport
-{
+public class DefaultLegacySupport implements LegacySupport {
 
-    private static final ThreadLocal<AtomicReference<MavenSession>> SESSION =
-        new InheritableThreadLocal<>();
+    private static final ThreadLocal<AtomicReference<MavenSession>> SESSION = new InheritableThreadLocal<>();
 
-    public void setSession( MavenSession session )
-    {
+    public void setSession(MavenSession session) {
         AtomicReference<MavenSession> reference = DefaultLegacySupport.SESSION.get();
-        if ( reference != null )
-        {
-            reference.set( null );
+        if (reference != null) {
+            reference.set(null);
         }
 
-        if ( session == null && reference != null )
-        {
+        if (session == null && reference != null) {
             DefaultLegacySupport.SESSION.remove();
-        }
-        else
-        {
-            DefaultLegacySupport.SESSION.set( new AtomicReference<>( session ) );
+        } else {
+            DefaultLegacySupport.SESSION.set(new AtomicReference<>(session));
         }
     }
 
-    public MavenSession getSession()
-    {
+    public MavenSession getSession() {
         AtomicReference<MavenSession> currentSession = DefaultLegacySupport.SESSION.get();
         return currentSession != null ? currentSession.get() : null;
     }
 
-    public RepositorySystemSession getRepositorySession()
-    {
+    public RepositorySystemSession getRepositorySession() {
         MavenSession session = getSession();
-        return ( session != null ) ? session.getRepositorySession() : null;
+        return (session != null) ? session.getRepositorySession() : null;
     }
-
 }

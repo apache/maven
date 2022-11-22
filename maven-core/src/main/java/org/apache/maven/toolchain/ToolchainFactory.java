@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.toolchain;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,7 +16,7 @@ package org.apache.maven.toolchain;
  * specific language governing permissions and limitations
  * under the License.
  */
-
+package org.apache.maven.toolchain;
 
 import org.apache.maven.toolchain.model.ToolchainModel;
 
@@ -28,13 +26,11 @@ import org.apache.maven.toolchain.model.ToolchainModel;
  * @author mkleint
  * @since 2.0.9
  */
-public interface ToolchainFactory
-{
+public interface ToolchainFactory {
     /**
      * Create instance of toolchain.
      **/
-    ToolchainPrivate createToolchain( ToolchainModel model )
-        throws MisconfiguredToolchainException;
+    ToolchainPrivate createToolchain(ToolchainModel model) throws MisconfiguredToolchainException;
 
     /**
      * Returns the default instance of the particular type of toolchain, can return <code>null</code>

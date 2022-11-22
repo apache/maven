@@ -1,5 +1,3 @@
-package org.apache.maven.project.collector;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,37 +16,34 @@ package org.apache.maven.project.collector;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.collector;
 
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Strategy to collect projects based on the <code>-f</code> CLI parameter or the pom.xml in the working directory.
  */
-@Named( "RequestPomCollectionStrategy" )
+@Named("RequestPomCollectionStrategy")
 @Singleton
-public class RequestPomCollectionStrategy implements ProjectCollectionStrategy
-{
+public class RequestPomCollectionStrategy implements ProjectCollectionStrategy {
     private final ProjectsSelector projectsSelector;
 
     @Inject
-    public RequestPomCollectionStrategy( ProjectsSelector projectsSelector )
-    {
+    public RequestPomCollectionStrategy(ProjectsSelector projectsSelector) {
         this.projectsSelector = projectsSelector;
     }
 
     @Override
-    public List<MavenProject> collectProjects( MavenExecutionRequest request ) throws ProjectBuildingException
-    {
-        List<File> files = Collections.singletonList( request.getPom().getAbsoluteFile() );
-        return projectsSelector.selectProjects( files, request );
+    public List<MavenProject> collectProjects(MavenExecutionRequest request) throws ProjectBuildingException {
+        List<File> files = Collections.singletonList(request.getPom().getAbsoluteFile());
+        return projectsSelector.selectProjects(files, request);
     }
 }

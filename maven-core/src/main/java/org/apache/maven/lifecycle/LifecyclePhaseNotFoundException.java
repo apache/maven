@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,14 @@ package org.apache.maven.lifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle;
 
 /**
  * Signals a failure to locate the lifecycle for some phase.
  *
  * @author Benjamin Bentmann
  */
-public class LifecyclePhaseNotFoundException
-    extends Exception
-{
+public class LifecyclePhaseNotFoundException extends Exception {
 
     private final String lifecyclePhase;
 
@@ -36,10 +33,9 @@ public class LifecyclePhaseNotFoundException
      * @param message The detail message, may be {@code null}.
      * @param lifecyclePhase The name of the lifecycle phase that could not be located, may be {@code null}.
      */
-    public LifecyclePhaseNotFoundException( String message, String lifecyclePhase )
-    {
-        super( message );
-        this.lifecyclePhase = ( lifecyclePhase != null ) ? lifecyclePhase : "";
+    public LifecyclePhaseNotFoundException(String message, String lifecyclePhase) {
+        super(message);
+        this.lifecyclePhase = (lifecyclePhase != null) ? lifecyclePhase : "";
     }
 
     /**
@@ -47,9 +43,7 @@ public class LifecyclePhaseNotFoundException
      *
      * @return The lifecycle phase that was not found, never {@code null}.
      */
-    public String getLifecyclePhase()
-    {
+    public String getLifecyclePhase() {
         return lifecyclePhase;
     }
-
 }

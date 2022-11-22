@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.toolchain.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain.building;
 
 import org.apache.maven.building.Source;
 
@@ -27,37 +26,30 @@ import org.apache.maven.building.Source;
  * @author Robert Scholte
  * @since 3.3.0
  */
-public class DefaultToolchainsBuildingRequest
-    implements ToolchainsBuildingRequest
-{
+public class DefaultToolchainsBuildingRequest implements ToolchainsBuildingRequest {
     private Source globalToolchainsSource;
 
     private Source userToolchainsSource;
 
     @Override
-    public Source getGlobalToolchainsSource()
-    {
+    public Source getGlobalToolchainsSource() {
         return globalToolchainsSource;
     }
 
     @Override
-    public ToolchainsBuildingRequest setGlobalToolchainsSource( Source globalToolchainsSource )
-    {
+    public ToolchainsBuildingRequest setGlobalToolchainsSource(Source globalToolchainsSource) {
         this.globalToolchainsSource = globalToolchainsSource;
         return this;
     }
 
     @Override
-    public Source getUserToolchainsSource()
-    {
+    public Source getUserToolchainsSource() {
         return userToolchainsSource;
     }
 
     @Override
-    public ToolchainsBuildingRequest setUserToolchainsSource( Source userToolchainsSource )
-    {
+    public ToolchainsBuildingRequest setUserToolchainsSource(Source userToolchainsSource) {
         this.userToolchainsSource = userToolchainsSource;
         return this;
     }
-
 }

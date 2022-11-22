@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.impl.MetadataGenerator;
@@ -37,9 +35,7 @@ import org.eclipse.aether.util.ConfigUtils;
  * <p>
  * Local snapshot metadata contains non-transformed snapshot version.
  */
-class LocalSnapshotMetadataGenerator
-        implements MetadataGenerator
-{
+class LocalSnapshotMetadataGenerator implements MetadataGenerator {
 
     private Map<Object, LocalSnapshotMetadata> snapshots;
 
@@ -47,43 +43,35 @@ class LocalSnapshotMetadataGenerator
 
     private final Date timestamp;
 
-    LocalSnapshotMetadataGenerator( RepositorySystemSession session, InstallRequest request )
-    {
-        legacyFormat = ConfigUtils.getBoolean( session.getConfigProperties(), false, "maven.metadata.legacy" );
+    LocalSnapshotMetadataGenerator(RepositorySystemSession session, InstallRequest request) {
+        legacyFormat = ConfigUtils.getBoolean(session.getConfigProperties(), false, "maven.metadata.legacy");
 
-        timestamp = (Date) ConfigUtils.getObject( session, new Date(), "maven.startTime" );
+        timestamp = (Date) ConfigUtils.getObject(session, new Date(), "maven.startTime");
 
         snapshots = new LinkedHashMap<>();
     }
 
-    public Collection<? extends Metadata> prepare( Collection<? extends Artifact> artifacts )
-    {
-        for ( Artifact artifact : artifacts )
-        {
-            if ( artifact.isSnapshot() )
-            {
-                Object key = LocalSnapshotMetadata.getKey( artifact );
-                LocalSnapshotMetadata snapshotMetadata = snapshots.get( key );
-                if ( snapshotMetadata == null )
-                {
-                    snapshotMetadata = new LocalSnapshotMetadata( artifact, legacyFormat, timestamp );
-                    snapshots.put( key, snapshotMetadata );
+    public Collection<? extends Metadata> prepare(Collection<? extends Artifact> artifacts) {
+        for (Artifact artifact : artifacts) {
+            if (artifact.isSnapshot()) {
+                Object key = LocalSnapshotMetadata.getKey(artifact);
+                LocalSnapshotMetadata snapshotMetadata = snapshots.get(key);
+                if (snapshotMetadata == null) {
+                    snapshotMetadata = new LocalSnapshotMetadata(artifact, legacyFormat, timestamp);
+                    snapshots.put(key, snapshotMetadata);
                 }
-                snapshotMetadata.bind( artifact );
+                snapshotMetadata.bind(artifact);
             }
         }
 
         return Collections.emptyList();
     }
 
-    public Artifact transformArtifact( Artifact artifact )
-    {
+    public Artifact transformArtifact(Artifact artifact) {
         return artifact;
     }
 
-    public Collection<? extends Metadata> finish( Collection<? extends Artifact> artifacts )
-    {
+    public Collection<? extends Metadata> finish(Collection<? extends Artifact> artifacts) {
         return snapshots.values();
     }
-
 }

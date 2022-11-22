@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,7 +16,15 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Map;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
@@ -29,21 +35,10 @@ import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.metadata.AbstractMetadata;
 import org.eclipse.aether.metadata.MergeableMetadata;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Map;
-
 /**
  * @author Benjamin Bentmann
  */
-abstract class MavenMetadata
-    extends AbstractMetadata
-    implements MergeableMetadata
-{
+abstract class MavenMetadata extends AbstractMetadata implements MergeableMetadata {
 
     static final String MAVEN_METADATA_XML = "maven-metadata.xml";
 
@@ -55,87 +50,65 @@ abstract class MavenMetadata
 
     private boolean merged;
 
-    protected MavenMetadata( Metadata metadata, File file, Date timestamp )
-    {
+    protected MavenMetadata(Metadata metadata, File file, Date timestamp) {
         this.metadata = metadata;
         this.file = file;
         this.timestamp = timestamp;
     }
 
-    public String getType()
-    {
+    public String getType() {
         return MAVEN_METADATA_XML;
     }
 
-    public File getFile()
-    {
+    public File getFile() {
         return file;
     }
 
-    public void merge( File existing, File result )
-        throws RepositoryException
-    {
-        Metadata recessive = read( existing );
+    public void merge(File existing, File result) throws RepositoryException {
+        Metadata recessive = read(existing);
 
-        merge( recessive );
+        merge(recessive);
 
-        write( result, metadata );
+        write(result, metadata);
 
         merged = true;
     }
 
-    public boolean isMerged()
-    {
+    public boolean isMerged() {
         return merged;
     }
 
-    protected abstract void merge( Metadata recessive );
+    protected abstract void merge(Metadata recessive);
 
-    static Metadata read( File metadataFile )
-        throws RepositoryException
-    {
-        if ( metadataFile.length() <= 0 )
-        {
+    static Metadata read(File metadataFile) throws RepositoryException {
+        if (metadataFile.length() <= 0) {
             return new Metadata();
         }
 
-        try ( Reader reader = ReaderFactory.newXmlReader( metadataFile ) )
-        {
-            return new MetadataXpp3Reader().read( reader, false );
-        }
-        catch ( IOException e )
-        {
-            throw new RepositoryException( "Could not read metadata " + metadataFile + ": " + e.getMessage(), e );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new RepositoryException( "Could not parse metadata " + metadataFile + ": " + e.getMessage(), e );
+        try (Reader reader = ReaderFactory.newXmlReader(metadataFile)) {
+            return new MetadataXpp3Reader().read(reader, false);
+        } catch (IOException e) {
+            throw new RepositoryException("Could not read metadata " + metadataFile + ": " + e.getMessage(), e);
+        } catch (XmlPullParserException e) {
+            throw new RepositoryException("Could not parse metadata " + metadataFile + ": " + e.getMessage(), e);
         }
     }
 
-    private void write( File metadataFile, Metadata metadata )
-        throws RepositoryException
-    {
+    private void write(File metadataFile, Metadata metadata) throws RepositoryException {
         metadataFile.getParentFile().mkdirs();
-        try ( Writer writer = WriterFactory.newXmlWriter( metadataFile ) )
-        {
-            new MetadataXpp3Writer().write( writer, metadata );
-        }
-        catch ( IOException e )
-        {
-            throw new RepositoryException( "Could not write metadata " + metadataFile + ": " + e.getMessage(), e );
+        try (Writer writer = WriterFactory.newXmlWriter(metadataFile)) {
+            new MetadataXpp3Writer().write(writer, metadata);
+        } catch (IOException e) {
+            throw new RepositoryException("Could not write metadata " + metadataFile + ": " + e.getMessage(), e);
         }
     }
 
-    public Map<String, String> getProperties()
-    {
+    public Map<String, String> getProperties() {
         return Collections.emptyMap();
     }
 
     @Override
-    public org.eclipse.aether.metadata.Metadata setProperties( Map<String, String> properties )
-    {
+    public org.eclipse.aether.metadata.Metadata setProperties(Map<String, String> properties) {
         return this;
     }
-
 }

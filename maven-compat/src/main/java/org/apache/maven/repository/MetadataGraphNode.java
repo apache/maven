@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +27,7 @@ import java.util.List;
  * @author Oleg Gusakov
  *
  */
-public class MetadataGraphNode
-{
+public class MetadataGraphNode {
     /** node payload */
     MavenArtifactMetadata metadata;
 
@@ -39,60 +37,48 @@ public class MetadataGraphNode
     /** nodes, exident to this (I depend on) */
     List<MetadataGraphNode> exNodes;
 
-    public MetadataGraphNode()
-    {
-        inNodes = new ArrayList<>( 4 );
-        exNodes = new ArrayList<>( 8 );
+    public MetadataGraphNode() {
+        inNodes = new ArrayList<>(4);
+        exNodes = new ArrayList<>(8);
     }
 
-    public MetadataGraphNode( MavenArtifactMetadata metadata )
-    {
+    public MetadataGraphNode(MavenArtifactMetadata metadata) {
         this();
         this.metadata = metadata;
     }
 
-    public MetadataGraphNode addIncident( MetadataGraphNode node )
-    {
-        inNodes.add( node );
+    public MetadataGraphNode addIncident(MetadataGraphNode node) {
+        inNodes.add(node);
         return this;
     }
 
-    public MetadataGraphNode addExident( MetadataGraphNode node )
-    {
-        exNodes.add( node );
+    public MetadataGraphNode addExident(MetadataGraphNode node) {
+        exNodes.add(node);
         return this;
     }
 
     @Override
-    public boolean equals( Object obj )
-    {
-        if ( obj == null )
-        {
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
         }
 
-        if ( MetadataGraphNode.class.isAssignableFrom( obj.getClass() ) )
-        {
+        if (MetadataGraphNode.class.isAssignableFrom(obj.getClass())) {
             MetadataGraphNode node2 = (MetadataGraphNode) obj;
 
-            if ( node2.metadata == null )
-            {
+            if (node2.metadata == null) {
                 return metadata == null;
             }
 
-            return metadata != null && metadata.toString().equals( node2.metadata.toString() );
-        }
-        else
-        {
-            return super.equals( obj );
+            return metadata != null && metadata.toString().equals(node2.metadata.toString());
+        } else {
+            return super.equals(obj);
         }
     }
 
     @Override
-    public int hashCode()
-    {
-        if ( metadata == null )
-        {
+    public int hashCode() {
+        if (metadata == null) {
             return super.hashCode();
         }
 

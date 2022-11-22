@@ -1,5 +1,3 @@
-package org.apache.maven.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.building;
 
 import java.util.List;
 
@@ -26,8 +25,7 @@ import java.util.List;
  * @author Robert Scholte
  * @since 3.3.0
  */
-public class ProblemCollectorFactory
-{
+public class ProblemCollectorFactory {
 
     /**
      * The default implementation is not visible, create it with this factory
@@ -35,9 +33,7 @@ public class ProblemCollectorFactory
      * @param problems starting set of problems, may be {@code null}
      * @return a new instance of a ProblemCollector
      */
-    public static ProblemCollector newInstance( List<Problem> problems )
-    {
-        return new DefaultProblemCollector( problems );
+    public static ProblemCollector newInstance(List<Problem> problems) {
+        return new DefaultProblemCollector(problems);
     }
-
 }

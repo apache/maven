@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.manager;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.manager;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,9 +16,9 @@ package org.apache.maven.artifact.manager;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.manager;
 
 import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -34,9 +32,7 @@ import org.apache.maven.wagon.proxy.ProxyInfo;
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
  */
 @Deprecated
-public interface WagonManager
-    extends org.apache.maven.repository.legacy.WagonManager
-{
+public interface WagonManager extends org.apache.maven.repository.legacy.WagonManager {
     /**
      * this method is only here for backward compat (project-info-reports:dependencies)
      * the default implementation will return an empty AuthenticationInfo
@@ -44,16 +40,15 @@ public interface WagonManager
      * @param id an id
      * @return corresponding authentication info
      */
-    AuthenticationInfo getAuthenticationInfo( String id );
+    AuthenticationInfo getAuthenticationInfo(String id);
 
-    ProxyInfo getProxy( String protocol );
+    ProxyInfo getProxy(String protocol);
 
-    void getArtifact( Artifact artifact, ArtifactRepository repository )
-        throws TransferFailedException, ResourceDoesNotExistException;
+    void getArtifact(Artifact artifact, ArtifactRepository repository)
+            throws TransferFailedException, ResourceDoesNotExistException;
 
-    void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories )
-        throws TransferFailedException, ResourceDoesNotExistException;
+    void getArtifact(Artifact artifact, List<ArtifactRepository> remoteRepositories)
+            throws TransferFailedException, ResourceDoesNotExistException;
 
-    ArtifactRepository getMirrorRepository( ArtifactRepository repository );
-
+    ArtifactRepository getMirrorRepository(ArtifactRepository repository);
 }

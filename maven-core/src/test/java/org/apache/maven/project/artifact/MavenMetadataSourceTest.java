@@ -1,5 +1,3 @@
-package org.apache.maven.project.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,18 +16,17 @@ package org.apache.maven.project.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.artifact;
 
 import javax.inject.Inject;
-
 import org.apache.maven.repository.RepositorySystem;
-import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @PlexusTest
-public class MavenMetadataSourceTest
-{
+public class MavenMetadataSourceTest {
     @Inject
     private RepositorySystem repositorySystem;
 
@@ -38,9 +35,7 @@ public class MavenMetadataSourceTest
 
     @Test
     @Disabled
-    public void testShouldNotCarryExclusionsOverFromDependencyToDependency()
-        throws Exception
-    {
+    public void testShouldNotCarryExclusionsOverFromDependencyToDependency() throws Exception {
         /*
         Dependency dep1 = new Dependency();
         dep1.setGroupId( "test" );
@@ -88,9 +83,7 @@ public class MavenMetadataSourceTest
 
     @Test
     @Disabled("TODO restore these if it makes sense")
-    public void testShouldUseCompileScopeIfDependencyScopeEmpty()
-        throws Exception
-    {
+    public void testShouldUseCompileScopeIfDependencyScopeEmpty() throws Exception {
         /*
         String groupId = "org.apache.maven";
         String artifactId = "maven-model";
@@ -128,9 +121,7 @@ public class MavenMetadataSourceTest
 
     @Test
     @Disabled
-    public void testShouldUseInjectedTestScopeFromDependencyManagement()
-        throws Exception
-    {
+    public void testShouldUseInjectedTestScopeFromDependencyManagement() throws Exception {
         /*
         String groupId = "org.apache.maven";
         String artifactId = "maven-model";
@@ -180,5 +171,4 @@ public class MavenMetadataSourceTest
         assertEquals( "default scope NOT back-propagated to dependency.", Artifact.SCOPE_TEST, dep.getScope() );
         */
     }
-
 }

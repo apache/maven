@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,18 +16,17 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.io.File;
 import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.building.ModelSource;
 
 /**
  * Builds in-memory descriptions of projects.
  */
-public interface ProjectBuilder
-{
+public interface ProjectBuilder {
 
     /**
      * Builds a project descriptor from the specified POM file.
@@ -39,8 +36,7 @@ public interface ProjectBuilder
      * @return The result of the project building, never {@code null}.
      * @throws ProjectBuildingException If the project descriptor could not be successfully built.
      */
-    ProjectBuildingResult build( File projectFile, ProjectBuildingRequest request )
-        throws ProjectBuildingException;
+    ProjectBuildingResult build(File projectFile, ProjectBuildingRequest request) throws ProjectBuildingException;
 
     /**
      * Builds a project descriptor for the specified artifact.
@@ -50,8 +46,8 @@ public interface ProjectBuilder
      * @return The result of the project building, never {@code null}.
      * @throws ProjectBuildingException If the project descriptor could not be successfully built.
      */
-    ProjectBuildingResult build( Artifact projectArtifact, ProjectBuildingRequest request )
-        throws ProjectBuildingException;
+    ProjectBuildingResult build(Artifact projectArtifact, ProjectBuildingRequest request)
+            throws ProjectBuildingException;
 
     /**
      * Builds a project descriptor for the specified artifact.
@@ -64,8 +60,8 @@ public interface ProjectBuilder
      * @return The result of the project building, never {@code null}.
      * @throws ProjectBuildingException If the project descriptor could not be successfully built.
      */
-    ProjectBuildingResult build( Artifact projectArtifact, boolean allowStubModel, ProjectBuildingRequest request )
-        throws ProjectBuildingException;
+    ProjectBuildingResult build(Artifact projectArtifact, boolean allowStubModel, ProjectBuildingRequest request)
+            throws ProjectBuildingException;
 
     /**
      * Builds a project descriptor for the specified model source.
@@ -77,8 +73,8 @@ public interface ProjectBuilder
      *
      * @see org.apache.maven.model.building.ModelSource2
      */
-    ProjectBuildingResult build( ModelSource modelSource, ProjectBuildingRequest request )
-        throws ProjectBuildingException;
+    ProjectBuildingResult build(ModelSource modelSource, ProjectBuildingRequest request)
+            throws ProjectBuildingException;
 
     /**
      * Builds the projects for the specified POM files and optionally their children.
@@ -92,7 +88,6 @@ public interface ProjectBuilder
      * @throws ProjectBuildingException If an error was encountered during building of any project.
      *             {@link ProjectBuildingException#getResults()} provides access to the details of the problems.
      */
-    List<ProjectBuildingResult> build( List<File> pomFiles, boolean recursive, ProjectBuildingRequest request )
-        throws ProjectBuildingException;
-
+    List<ProjectBuildingResult> build(List<File> pomFiles, boolean recursive, ProjectBuildingRequest request)
+            throws ProjectBuildingException;
 }

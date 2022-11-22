@@ -1,5 +1,3 @@
-package org.apache.maven.configuration.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,10 @@ package org.apache.maven.configuration.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.configuration.internal;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.configurator.BasicComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
@@ -35,33 +33,34 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
  * and {@link EnhancedConverterLookup}.
  */
 @Singleton
-@Named( "enhanced" )
-public class EnhancedComponentConfigurator
-        extends BasicComponentConfigurator
-{
+@Named("enhanced")
+public class EnhancedComponentConfigurator extends BasicComponentConfigurator {
 
-    public EnhancedComponentConfigurator()
-    {
+    public EnhancedComponentConfigurator() {
         converterLookup = new EnhancedConverterLookup();
     }
 
     @Override
-    public void configureComponent( final Object component, final PlexusConfiguration configuration,
-                                    final ExpressionEvaluator evaluator, final ClassRealm realm,
-                                    final ConfigurationListener listener )
-            throws ComponentConfigurationException
-    {
-        try
-        {
-            ClassRealmConverter.pushContextRealm( realm );
+    public void configureComponent(
+            final Object component,
+            final PlexusConfiguration configuration,
+            final ExpressionEvaluator evaluator,
+            final ClassRealm realm,
+            final ConfigurationListener listener)
+            throws ComponentConfigurationException {
+        try {
+            ClassRealmConverter.pushContextRealm(realm);
 
-            new EnhancedConfigurationConverter().processConfiguration( converterLookup, component, realm, //
-                    configuration, evaluator, listener );
-        }
-        finally
-        {
+            new EnhancedConfigurationConverter()
+                    .processConfiguration(
+                            converterLookup,
+                            component,
+                            realm, //
+                            configuration,
+                            evaluator,
+                            listener);
+        } finally {
             ClassRealmConverter.popContextRealm();
         }
     }
-
 }

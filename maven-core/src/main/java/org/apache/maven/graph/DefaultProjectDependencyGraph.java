@@ -1,5 +1,3 @@
-package org.apache.maven.graph;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.graph;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.graph;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +29,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
@@ -42,9 +40,7 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
  *
  * @author Benjamin Bentmann
  */
-public class DefaultProjectDependencyGraph
-        implements ProjectDependencyGraph
-{
+public class DefaultProjectDependencyGraph implements ProjectDependencyGraph {
 
     private final ProjectSorter sorter;
 
@@ -61,10 +57,9 @@ public class DefaultProjectDependencyGraph
      * @throws DuplicateProjectException
      * @throws CycleDetectedException
      */
-    public DefaultProjectDependencyGraph( Collection<MavenProject> projects )
-            throws CycleDetectedException, DuplicateProjectException
-    {
-        this( projects, projects );
+    public DefaultProjectDependencyGraph(Collection<MavenProject> projects)
+            throws CycleDetectedException, DuplicateProjectException {
+        this(projects, projects);
     }
 
     /**
@@ -76,93 +71,77 @@ public class DefaultProjectDependencyGraph
      * @throws CycleDetectedException
      * @since 3.5.0
      */
-    public DefaultProjectDependencyGraph( Collection<MavenProject> allProjects,
-                                          Collection<MavenProject> projects )
-            throws CycleDetectedException, DuplicateProjectException
-    {
-        this.allProjects = Collections.unmodifiableList( new ArrayList<>( allProjects ) );
-        this.sorter = new ProjectSorter( projects );
+    public DefaultProjectDependencyGraph(Collection<MavenProject> allProjects, Collection<MavenProject> projects)
+            throws CycleDetectedException, DuplicateProjectException {
+        this.allProjects = Collections.unmodifiableList(new ArrayList<>(allProjects));
+        this.sorter = new ProjectSorter(projects);
         this.order = new HashMap<>();
         this.projects = new HashMap<>();
         List<MavenProject> sorted = this.sorter.getSortedProjects();
-        for ( int index = 0; index < sorted.size(); index++ )
-        {
-            MavenProject project = sorted.get( index );
-            String id = ProjectSorter.getId( project );
-            this.projects.put( id, project );
-            this.order.put( project, index );
+        for (int index = 0; index < sorted.size(); index++) {
+            MavenProject project = sorted.get(index);
+            String id = ProjectSorter.getId(project);
+            this.projects.put(id, project);
+            this.order.put(project, index);
         }
     }
 
     /**
      * @since 3.5.0
      */
-    public List<MavenProject> getAllProjects()
-    {
+    public List<MavenProject> getAllProjects() {
         return this.allProjects;
     }
 
-    public List<MavenProject> getSortedProjects()
-    {
-        return new ArrayList<>( sorter.getSortedProjects() );
+    public List<MavenProject> getSortedProjects() {
+        return new ArrayList<>(sorter.getSortedProjects());
     }
 
-    public List<MavenProject> getDownstreamProjects( MavenProject project, boolean transitive )
-    {
-        Objects.requireNonNull( project, "project cannot be null" );
+    public List<MavenProject> getDownstreamProjects(MavenProject project, boolean transitive) {
+        Objects.requireNonNull(project, "project cannot be null");
 
         Set<String> projectIds = new HashSet<>();
 
-        getDownstreamProjects( ProjectSorter.getId( project ), projectIds, transitive );
+        getDownstreamProjects(ProjectSorter.getId(project), projectIds, transitive);
 
-        return getSortedProjects( projectIds );
+        return getSortedProjects(projectIds);
     }
 
-    private void getDownstreamProjects( String projectId, Set<String> projectIds, boolean transitive )
-    {
-        for ( String id : sorter.getDependents( projectId ) )
-        {
-            if ( projectIds.add( id ) && transitive )
-            {
-                getDownstreamProjects( id, projectIds, transitive );
+    private void getDownstreamProjects(String projectId, Set<String> projectIds, boolean transitive) {
+        for (String id : sorter.getDependents(projectId)) {
+            if (projectIds.add(id) && transitive) {
+                getDownstreamProjects(id, projectIds, transitive);
             }
         }
     }
 
-    public List<MavenProject> getUpstreamProjects( MavenProject project, boolean transitive )
-    {
-        Objects.requireNonNull( project, "project cannot be null" );
+    public List<MavenProject> getUpstreamProjects(MavenProject project, boolean transitive) {
+        Objects.requireNonNull(project, "project cannot be null");
 
         Set<String> projectIds = new HashSet<>();
 
-        getUpstreamProjects( ProjectSorter.getId( project ), projectIds, transitive );
+        getUpstreamProjects(ProjectSorter.getId(project), projectIds, transitive);
 
-        return getSortedProjects( projectIds );
+        return getSortedProjects(projectIds);
     }
 
-    private void getUpstreamProjects( String projectId, Collection<String> projectIds, boolean transitive )
-    {
-        for ( String id : sorter.getDependencies( projectId ) )
-        {
-            if ( projectIds.add( id ) && transitive )
-            {
-                getUpstreamProjects( id, projectIds, transitive );
+    private void getUpstreamProjects(String projectId, Collection<String> projectIds, boolean transitive) {
+        for (String id : sorter.getDependencies(projectId)) {
+            if (projectIds.add(id) && transitive) {
+                getUpstreamProjects(id, projectIds, transitive);
             }
         }
     }
 
-    private List<MavenProject> getSortedProjects( Set<String> projectIds )
-    {
+    private List<MavenProject> getSortedProjects(Set<String> projectIds) {
         return projectIds.stream()
-                .map( projects::get )
-                .sorted( Comparator.comparingInt( order::get ) )
-                .collect( Collectors.toList() );
+                .map(projects::get)
+                .sorted(Comparator.comparingInt(order::get))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return sorter.getSortedProjects().toString();
     }
-
 }

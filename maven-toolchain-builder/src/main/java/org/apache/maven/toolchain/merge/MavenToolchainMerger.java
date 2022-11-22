@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain.merge;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.toolchain.merge;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,81 +16,68 @@ package org.apache.maven.toolchain.merge;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain.merge;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.maven.api.xml.Dom;
 import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.api.toolchain.ToolchainModel;
+import org.apache.maven.api.xml.Dom;
 
 /**
  *
  * @author Robert Scholte
  * @since 3.2.4
  */
-public class MavenToolchainMerger
-{
+public class MavenToolchainMerger {
 
-    public PersistedToolchains merge( PersistedToolchains dominant, PersistedToolchains recessive,
-                                      String recessiveSourceLevel )
-    {
-        if ( dominant == null || recessive == null )
-        {
+    public PersistedToolchains merge(
+            PersistedToolchains dominant, PersistedToolchains recessive, String recessiveSourceLevel) {
+        if (dominant == null || recessive == null) {
             return dominant;
         }
 
-        recessive.setSourceLevel( recessiveSourceLevel );
+        recessive.setSourceLevel(recessiveSourceLevel);
 
-        return shallowMerge( dominant.getToolchains(), recessive.getToolchains(), recessiveSourceLevel );
+        return shallowMerge(dominant.getToolchains(), recessive.getToolchains(), recessiveSourceLevel);
     }
 
-    private PersistedToolchains shallowMerge( List<ToolchainModel> dominant, List<ToolchainModel> recessive,
-                               String recessiveSourceLevel )
-    {
+    private PersistedToolchains shallowMerge(
+            List<ToolchainModel> dominant, List<ToolchainModel> recessive, String recessiveSourceLevel) {
         Map<Object, ToolchainModel> merged = new LinkedHashMap<>();
 
-        for ( ToolchainModel dominantModel : dominant )
-        {
-            Object key = getToolchainModelKey( dominantModel );
+        for (ToolchainModel dominantModel : dominant) {
+            Object key = getToolchainModelKey(dominantModel);
 
-            merged.put( key, dominantModel );
+            merged.put(key, dominantModel);
         }
 
-        for ( ToolchainModel recessiveModel : recessive )
-        {
-            Object key = getToolchainModelKey( recessiveModel );
+        for (ToolchainModel recessiveModel : recessive) {
+            Object key = getToolchainModelKey(recessiveModel);
 
-            ToolchainModel dominantModel = merged.get( key );
-            if ( dominantModel == null )
-            {
-                recessiveModel.setSourceLevel( recessiveSourceLevel );
-                merged.put( key, recessiveModel );
-            }
-            else
-            {
-                merged.put( key, mergeToolchainModelConfiguration( dominantModel, recessiveModel ) );
+            ToolchainModel dominantModel = merged.get(key);
+            if (dominantModel == null) {
+                recessiveModel.setSourceLevel(recessiveSourceLevel);
+                merged.put(key, recessiveModel);
+            } else {
+                merged.put(key, mergeToolchainModelConfiguration(dominantModel, recessiveModel));
             }
         }
         return PersistedToolchains.newBuilder()
-                .toolchains( new ArrayList<>( merged.values() ) )
+                .toolchains(new ArrayList<>(merged.values()))
                 .build();
     }
 
-    protected ToolchainModel mergeToolchainModelConfiguration( ToolchainModel target,
-                                                               ToolchainModel source )
-    {
+    protected ToolchainModel mergeToolchainModelConfiguration(ToolchainModel target, ToolchainModel source) {
         Dom src = source.getConfiguration();
         Dom tgt = target.getConfiguration();
-        Dom merged = Dom.merge( tgt, src );
-        return target.withConfiguration( merged );
+        Dom merged = Dom.merge(tgt, src);
+        return target.withConfiguration(merged);
     }
 
-    protected Object getToolchainModelKey( ToolchainModel model )
-    {
+    protected Object getToolchainModelKey(ToolchainModel model) {
         return model;
     }
-
 }

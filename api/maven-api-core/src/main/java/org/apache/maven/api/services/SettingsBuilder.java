@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,9 +16,9 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import java.nio.file.Path;
-
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nonnull;
@@ -28,8 +26,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
  */
-public interface SettingsBuilder extends Service
-{
+public interface SettingsBuilder extends Service {
 
     /**
      * Builds the effective settings of the specified settings files.
@@ -39,7 +36,7 @@ public interface SettingsBuilder extends Service
      * @throws SettingsBuilderException if the effective settings could not be built
      */
     @Nonnull
-    SettingsBuilderResult build( @Nonnull SettingsBuilderRequest request );
+    SettingsBuilderResult build(@Nonnull SettingsBuilderRequest request);
 
     /**
      * Builds the effective settings of the specified settings sources.
@@ -48,11 +45,9 @@ public interface SettingsBuilder extends Service
      * @throws SettingsBuilderException if the effective settings could not be built
      */
     @Nonnull
-    default SettingsBuilderResult build( @Nonnull Session session,
-                                         @Nonnull Source globalSettingsSource,
-                                         @Nonnull Source userSettingsSource )
-    {
-        return build( SettingsBuilderRequest.build( session, globalSettingsSource, userSettingsSource ) );
+    default SettingsBuilderResult build(
+            @Nonnull Session session, @Nonnull Source globalSettingsSource, @Nonnull Source userSettingsSource) {
+        return build(SettingsBuilderRequest.build(session, globalSettingsSource, userSettingsSource));
     }
 
     /**
@@ -62,10 +57,8 @@ public interface SettingsBuilder extends Service
      * @throws SettingsBuilderException if the effective settings could not be built
      */
     @Nonnull
-    default SettingsBuilderResult build( @Nonnull Session session,
-                                         @Nonnull Path globalSettingsPath,
-                                         @Nonnull Path userSettingsPath )
-    {
-        return build( SettingsBuilderRequest.build( session, globalSettingsPath, userSettingsPath ) );
+    default SettingsBuilderResult build(
+            @Nonnull Session session, @Nonnull Path globalSettingsPath, @Nonnull Path userSettingsPath) {
+        return build(SettingsBuilderRequest.build(session, globalSettingsPath, userSettingsPath));
     }
 }

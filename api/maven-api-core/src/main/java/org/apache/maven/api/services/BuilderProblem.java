@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
@@ -32,8 +31,7 @@ import org.apache.maven.api.annotations.Nullable;
  */
 @Experimental
 @Immutable
-public interface BuilderProblem
-{
+public interface BuilderProblem {
 
     /**
      * Gets the hint about the source of the problem. While the syntax of this hint is unspecified and depends on the
@@ -102,12 +100,9 @@ public interface BuilderProblem
      * @since 4.0
      */
     @Experimental
-    enum Severity
-    {
-
+    enum Severity {
         FATAL, //
         ERROR, //
         WARNING //
-
     }
 }

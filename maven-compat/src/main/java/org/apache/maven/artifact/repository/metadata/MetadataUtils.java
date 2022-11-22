@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,22 +16,19 @@ package org.apache.maven.artifact.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.repository.metadata;
 
 /**
  * Assists in handling repository metadata.
  *
  * @author Benjamin Bentmann
  */
-class MetadataUtils
-{
+class MetadataUtils {
 
-    public static Metadata cloneMetadata( Metadata src )
-    {
-        if ( src == null )
-        {
+    public static Metadata cloneMetadata(Metadata src) {
+        if (src == null) {
             return null;
         }
         return src.clone();
     }
-
 }

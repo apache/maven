@@ -1,5 +1,3 @@
-package org.apache.maven.cli.logging.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.cli.logging.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli.logging.impl;
 
 import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
 import org.slf4j.MavenSlf4jFriend;
@@ -29,15 +28,11 @@ import org.slf4j.impl.MavenSlf4jSimpleFriend;
  * @author Hervé Boutemy
  * @since 3.1.0
  */
-public class Slf4jSimpleConfiguration
-    extends BaseSlf4jConfiguration
-{
+public class Slf4jSimpleConfiguration extends BaseSlf4jConfiguration {
     @Override
-    public void setRootLoggerLevel( Level level )
-    {
+    public void setRootLoggerLevel(Level level) {
         String value;
-        switch ( level )
-        {
+        switch (level) {
             case DEBUG:
                 value = "debug";
                 break;
@@ -50,12 +45,11 @@ public class Slf4jSimpleConfiguration
                 value = "error";
                 break;
         }
-        System.setProperty( "org.slf4j.simpleLogger.defaultLogLevel", value );
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", value);
     }
 
     @Override
-    public void activate()
-    {
+    public void activate() {
         // property for root logger level or System.out redirection need to be taken into account
         MavenSlf4jFriend.reset();
         MavenSlf4jSimpleFriend.init();

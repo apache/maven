@@ -1,6 +1,3 @@
-package org.apache.maven.model.merge;
-
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -10,7 +7,7 @@ package org.apache.maven.model.merge;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,85 +16,85 @@ package org.apache.maven.model.merge;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.merge;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.Collections;
-
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Prerequisites;
 import org.apache.maven.api.model.Profile;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
-public class MavenModelMergerTest
-{
+public class MavenModelMergerTest {
     private MavenModelMerger modelMerger = new MavenModelMerger();
 
     // modelVersion is neither inherited nor injected
     @Test
-    public void testMergeModel_ModelVersion()
-    {
-        Model parent = Model.newBuilder().modelVersion( "4.0.0" ).build();
+    public void testMergeModel_ModelVersion() {
+        Model parent = Model.newBuilder().modelVersion("4.0.0").build();
         Model model = Model.newInstance();
-        Model.Builder builder = Model.newBuilder( model );
-        modelMerger.mergeModel_ModelVersion( builder, model, parent, false, null );
-        assertNull( builder.build().getModelVersion() );
+        Model.Builder builder = Model.newBuilder(model);
+        modelMerger.mergeModel_ModelVersion(builder, model, parent, false, null);
+        assertNull(builder.build().getModelVersion());
 
-        model = Model.newBuilder().modelVersion( "5.0.0" ).build();
-        builder = Model.newBuilder( model );
-        modelMerger.mergeModel_ModelVersion( builder, model, parent, false, null );
-        assertEquals( "5.0.0", builder.build().getModelVersion() );
+        model = Model.newBuilder().modelVersion("5.0.0").build();
+        builder = Model.newBuilder(model);
+        modelMerger.mergeModel_ModelVersion(builder, model, parent, false, null);
+        assertEquals("5.0.0", builder.build().getModelVersion());
     }
 
     // ArtifactId is neither inherited nor injected
     @Test
-    public void testMergeModel_ArtifactId()
-    {
-        Model parent = Model.newBuilder().artifactId( "PARENT" ).build();
+    public void testMergeModel_ArtifactId() {
+        Model parent = Model.newBuilder().artifactId("PARENT").build();
         Model model = Model.newInstance();
-        Model.Builder builder = Model.newBuilder( model );
-        modelMerger.mergeModel_ArtifactId( builder, model, parent, false, null );
-        assertNull( model.getArtifactId() );
+        Model.Builder builder = Model.newBuilder(model);
+        modelMerger.mergeModel_ArtifactId(builder, model, parent, false, null);
+        assertNull(model.getArtifactId());
 
-        model = Model.newBuilder().artifactId( "MODEL" ).build();
-        builder = Model.newBuilder( model );
-        modelMerger.mergeModel_ArtifactId( builder, model, parent, false, null );
-        assertEquals( "MODEL", builder.build().getArtifactId() );
+        model = Model.newBuilder().artifactId("MODEL").build();
+        builder = Model.newBuilder(model);
+        modelMerger.mergeModel_ArtifactId(builder, model, parent, false, null);
+        assertEquals("MODEL", builder.build().getArtifactId());
     }
 
     // Prerequisites are neither inherited nor injected
     @Test
-    public void testMergeModel_Prerequisites()
-    {
-        Model parent = Model.newBuilder().prerequisites( Prerequisites.newInstance() ).build();
+    public void testMergeModel_Prerequisites() {
+        Model parent =
+                Model.newBuilder().prerequisites(Prerequisites.newInstance()).build();
         Model model = Model.newInstance();
-        Model.Builder builder = Model.newBuilder( model );
-        modelMerger.mergeModel_Prerequisites( builder, model, parent, false, null );
-        assertNull( builder.build().getPrerequisites() );
+        Model.Builder builder = Model.newBuilder(model);
+        modelMerger.mergeModel_Prerequisites(builder, model, parent, false, null);
+        assertNull(builder.build().getPrerequisites());
 
-        Prerequisites modelPrerequisites = Prerequisites.newBuilder().maven( "3.0" ).build();
-        model = Model.newBuilder().prerequisites( modelPrerequisites ).build();
-        builder = Model.newBuilder( model );
-        modelMerger.mergeModel_Prerequisites( builder, model, parent, false, null );
-        assertEquals( modelPrerequisites, builder.build().getPrerequisites() );
+        Prerequisites modelPrerequisites =
+                Prerequisites.newBuilder().maven("3.0").build();
+        model = Model.newBuilder().prerequisites(modelPrerequisites).build();
+        builder = Model.newBuilder(model);
+        modelMerger.mergeModel_Prerequisites(builder, model, parent, false, null);
+        assertEquals(modelPrerequisites, builder.build().getPrerequisites());
     }
 
     // Profiles are neither inherited nor injected
     @Test
-    public void testMergeModel_Profiles()
-    {
-        Model parent = Model.newBuilder().profiles( Collections.singletonList( Profile.newInstance() ) ).build();
+    public void testMergeModel_Profiles() {
+        Model parent = Model.newBuilder()
+                .profiles(Collections.singletonList(Profile.newInstance()))
+                .build();
         Model model = Model.newInstance();
-        Model.Builder builder = Model.newBuilder( model );
-        modelMerger.mergeModel_Profiles( builder, model, parent, false, null );
-        assertEquals( 0, builder.build().getProfiles().size() );
+        Model.Builder builder = Model.newBuilder(model);
+        modelMerger.mergeModel_Profiles(builder, model, parent, false, null);
+        assertEquals(0, builder.build().getProfiles().size());
 
-        Profile modelProfile = Profile.newBuilder().id( "MODEL" ).build();
-        model = Model.newBuilder().profiles( Collections.singletonList( modelProfile ) ).build();
-        builder = Model.newBuilder( model );
-        modelMerger.mergeModel_Prerequisites( builder, model, parent, false, null );
-        assertEquals( Collections.singletonList( modelProfile ), builder.build().getProfiles() );
+        Profile modelProfile = Profile.newBuilder().id("MODEL").build();
+        model = Model.newBuilder()
+                .profiles(Collections.singletonList(modelProfile))
+                .build();
+        builder = Model.newBuilder(model);
+        modelMerger.mergeModel_Prerequisites(builder, model, parent, false, null);
+        assertEquals(Collections.singletonList(modelProfile), builder.build().getProfiles());
     }
-
 }

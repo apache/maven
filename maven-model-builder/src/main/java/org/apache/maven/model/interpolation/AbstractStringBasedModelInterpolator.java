@@ -1,5 +1,3 @@
-package org.apache.maven.model.interpolation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model.interpolation;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.model.interpolation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.interpolation;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,9 +25,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
 import javax.inject.Inject;
-
 import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
@@ -48,15 +45,12 @@ import org.codehaus.plexus.interpolation.ValueSource;
  *
  * @author jdcasey Created on Feb 3, 2005
  */
-public abstract class AbstractStringBasedModelInterpolator
-    implements ModelInterpolator
-{
-    private static final List<String> PROJECT_PREFIXES = Collections.singletonList( "project." );
+public abstract class AbstractStringBasedModelInterpolator implements ModelInterpolator {
+    private static final List<String> PROJECT_PREFIXES = Collections.singletonList("project.");
 
     private static final Collection<String> TRANSLATED_PATH_EXPRESSIONS;
 
-    static
-    {
+    static {
         Collection<String> translatedPrefixes = new HashSet<>();
 
         // MNG-1927, MNG-2124, MNG-3355:
@@ -64,13 +58,13 @@ public abstract class AbstractStringBasedModelInterpolator
         // sure interpolation of the directories below uses translated paths.
         // Afterward, we'll double back and translate any paths that weren't covered during interpolation via the
         // code below...
-        translatedPrefixes.add( "build.directory" );
-        translatedPrefixes.add( "build.outputDirectory" );
-        translatedPrefixes.add( "build.testOutputDirectory" );
-        translatedPrefixes.add( "build.sourceDirectory" );
-        translatedPrefixes.add( "build.testSourceDirectory" );
-        translatedPrefixes.add( "build.scriptSourceDirectory" );
-        translatedPrefixes.add( "reporting.outputDirectory" );
+        translatedPrefixes.add("build.directory");
+        translatedPrefixes.add("build.outputDirectory");
+        translatedPrefixes.add("build.testOutputDirectory");
+        translatedPrefixes.add("build.sourceDirectory");
+        translatedPrefixes.add("build.testSourceDirectory");
+        translatedPrefixes.add("build.scriptSourceDirectory");
+        translatedPrefixes.add("reporting.outputDirectory");
 
         TRANSLATED_PATH_EXPRESSIONS = translatedPrefixes;
     }
@@ -79,99 +73,95 @@ public abstract class AbstractStringBasedModelInterpolator
     private final UrlNormalizer urlNormalizer;
 
     @Inject
-    public AbstractStringBasedModelInterpolator( PathTranslator pathTranslator, UrlNormalizer urlNormalizer )
-    {
+    public AbstractStringBasedModelInterpolator(PathTranslator pathTranslator, UrlNormalizer urlNormalizer) {
         this.pathTranslator = pathTranslator;
         this.urlNormalizer = urlNormalizer;
     }
 
     @Override
-    public org.apache.maven.model.Model interpolateModel( org.apache.maven.model.Model model, File projectDir,
-                                                          ModelBuildingRequest request, ModelProblemCollector problems )
-    {
-        return new org.apache.maven.model.Model( interpolateModel( model.getDelegate(), projectDir,
-                request, problems ) );
+    public org.apache.maven.model.Model interpolateModel(
+            org.apache.maven.model.Model model,
+            File projectDir,
+            ModelBuildingRequest request,
+            ModelProblemCollector problems) {
+        return new org.apache.maven.model.Model(interpolateModel(model.getDelegate(), projectDir, request, problems));
     }
 
-    protected List<ValueSource> createValueSources( final Model model, final File projectDir,
-                                                    final ModelBuildingRequest config )
-    {
+    protected List<ValueSource> createValueSources(
+            final Model model, final File projectDir, final ModelBuildingRequest config) {
         Map<String, String> modelProperties = model.getProperties();
 
-        ValueSource projectPrefixValueSource = new PrefixedObjectValueSource( PROJECT_PREFIXES, model, false );
+        ValueSource projectPrefixValueSource = new PrefixedObjectValueSource(PROJECT_PREFIXES, model, false);
 
         // NOTE: Order counts here!
-        List<ValueSource> valueSources = new ArrayList<>( 8 );
+        List<ValueSource> valueSources = new ArrayList<>(8);
 
-        if ( projectDir != null )
-        {
-            ValueSource basedirValueSource = new PrefixedValueSourceWrapper( new AbstractValueSource( false )
-            {
-                @Override
-                public Object getValue( String expression )
-                {
-                    if ( "basedir".equals( expression ) )
-                    {
-                        return projectDir.getAbsolutePath();
-                    }
-                    return null;
-                }
-            }, PROJECT_PREFIXES, true );
-            valueSources.add( basedirValueSource );
+        if (projectDir != null) {
+            ValueSource basedirValueSource = new PrefixedValueSourceWrapper(
+                    new AbstractValueSource(false) {
+                        @Override
+                        public Object getValue(String expression) {
+                            if ("basedir".equals(expression)) {
+                                return projectDir.getAbsolutePath();
+                            }
+                            return null;
+                        }
+                    },
+                    PROJECT_PREFIXES,
+                    true);
+            valueSources.add(basedirValueSource);
 
-            ValueSource baseUriValueSource = new PrefixedValueSourceWrapper( new AbstractValueSource( false )
-            {
-                @Override
-                public Object getValue( String expression )
-                {
-                    if ( "baseUri".equals( expression ) )
-                    {
-                        return projectDir.getAbsoluteFile().toPath().toUri().toASCIIString();
-                    }
-                    return null;
-                }
-            }, PROJECT_PREFIXES, false );
-            valueSources.add( baseUriValueSource );
-            valueSources.add( new BuildTimestampValueSource( config.getBuildStartTime(), modelProperties ) );
+            ValueSource baseUriValueSource = new PrefixedValueSourceWrapper(
+                    new AbstractValueSource(false) {
+                        @Override
+                        public Object getValue(String expression) {
+                            if ("baseUri".equals(expression)) {
+                                return projectDir
+                                        .getAbsoluteFile()
+                                        .toPath()
+                                        .toUri()
+                                        .toASCIIString();
+                            }
+                            return null;
+                        }
+                    },
+                    PROJECT_PREFIXES,
+                    false);
+            valueSources.add(baseUriValueSource);
+            valueSources.add(new BuildTimestampValueSource(config.getBuildStartTime(), modelProperties));
         }
 
-        valueSources.add( projectPrefixValueSource );
+        valueSources.add(projectPrefixValueSource);
 
-        valueSources.add( new MapBasedValueSource( config.getUserProperties() ) );
+        valueSources.add(new MapBasedValueSource(config.getUserProperties()));
 
-        valueSources.add( new MapBasedValueSource( modelProperties ) );
+        valueSources.add(new MapBasedValueSource(modelProperties));
 
-        valueSources.add( new MapBasedValueSource( config.getSystemProperties() ) );
+        valueSources.add(new MapBasedValueSource(config.getSystemProperties()));
 
-        valueSources.add( new AbstractValueSource( false )
-        {
+        valueSources.add(new AbstractValueSource(false) {
             @Override
-            public Object getValue( String expression )
-            {
-                return config.getSystemProperties().getProperty( "env." + expression );
+            public Object getValue(String expression) {
+                return config.getSystemProperties().getProperty("env." + expression);
             }
-        } );
+        });
 
         return valueSources;
     }
 
-    protected List<? extends InterpolationPostProcessor> createPostProcessors( final Model model,
-                                                                               final File projectDir,
-                                                                               final ModelBuildingRequest config )
-    {
-        List<InterpolationPostProcessor> processors = new ArrayList<>( 2 );
-        if ( projectDir != null )
-        {
-            processors.add( new PathTranslatingPostProcessor( PROJECT_PREFIXES, TRANSLATED_PATH_EXPRESSIONS,
-                                                              projectDir, pathTranslator ) );
+    protected List<? extends InterpolationPostProcessor> createPostProcessors(
+            final Model model, final File projectDir, final ModelBuildingRequest config) {
+        List<InterpolationPostProcessor> processors = new ArrayList<>(2);
+        if (projectDir != null) {
+            processors.add(new PathTranslatingPostProcessor(
+                    PROJECT_PREFIXES, TRANSLATED_PATH_EXPRESSIONS,
+                    projectDir, pathTranslator));
         }
-        processors.add( new UrlNormalizingPostProcessor( urlNormalizer ) );
+        processors.add(new UrlNormalizingPostProcessor(urlNormalizer));
         return processors;
     }
 
-    protected RecursionInterceptor createRecursionInterceptor()
-    {
-        return new PrefixAwareRecursionInterceptor( PROJECT_PREFIXES );
+    protected RecursionInterceptor createRecursionInterceptor() {
+        return new PrefixAwareRecursionInterceptor(PROJECT_PREFIXES);
     }
-
 }

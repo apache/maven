@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.artifact.DefaultArtifactType;
@@ -48,11 +47,9 @@ import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
  *
  * @author Benjamin Bentmann
  */
-public final class MavenRepositorySystemUtils
-{
+public final class MavenRepositorySystemUtils {
 
-    private MavenRepositorySystemUtils()
-    {
+    private MavenRepositorySystemUtils() {
         // hide constructor
     }
 
@@ -64,45 +61,44 @@ public final class MavenRepositorySystemUtils
      *
      * @return The new repository system session, never {@code null}.
      */
-    public static DefaultRepositorySystemSession newSession()
-    {
+    public static DefaultRepositorySystemSession newSession() {
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
 
         DependencyTraverser depTraverser = new FatArtifactTraverser();
-        session.setDependencyTraverser( depTraverser );
+        session.setDependencyTraverser(depTraverser);
 
         DependencyManager depManager = new ClassicDependencyManager();
-        session.setDependencyManager( depManager );
+        session.setDependencyManager(depManager);
 
-        DependencySelector depFilter =
-            new AndDependencySelector( new ScopeDependencySelector( "test", "provided" ),
-                                       new OptionalDependencySelector(), new ExclusionDependencySelector() );
-        session.setDependencySelector( depFilter );
+        DependencySelector depFilter = new AndDependencySelector(
+                new ScopeDependencySelector("test", "provided"),
+                new OptionalDependencySelector(),
+                new ExclusionDependencySelector());
+        session.setDependencySelector(depFilter);
 
-        DependencyGraphTransformer transformer =
-            new ConflictResolver( new NearestVersionSelector(), new JavaScopeSelector(),
-                                  new SimpleOptionalitySelector(), new JavaScopeDeriver() );
-        transformer = new ChainedDependencyGraphTransformer( transformer, new JavaDependencyContextRefiner() );
-        session.setDependencyGraphTransformer( transformer );
+        DependencyGraphTransformer transformer = new ConflictResolver(
+                new NearestVersionSelector(), new JavaScopeSelector(),
+                new SimpleOptionalitySelector(), new JavaScopeDeriver());
+        transformer = new ChainedDependencyGraphTransformer(transformer, new JavaDependencyContextRefiner());
+        session.setDependencyGraphTransformer(transformer);
 
         DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
-        stereotypes.add( new DefaultArtifactType( "pom" ) );
-        stereotypes.add( new DefaultArtifactType( "maven-plugin", "jar", "", "java" ) );
-        stereotypes.add( new DefaultArtifactType( "jar", "jar", "", "java" ) );
-        stereotypes.add( new DefaultArtifactType( "ejb", "jar", "", "java" ) );
-        stereotypes.add( new DefaultArtifactType( "ejb-client", "jar", "client", "java" ) );
-        stereotypes.add( new DefaultArtifactType( "test-jar", "jar", "tests", "java" ) );
-        stereotypes.add( new DefaultArtifactType( "javadoc", "jar", "javadoc", "java" ) );
-        stereotypes.add( new DefaultArtifactType( "java-source", "jar", "sources", "java", false, false ) );
-        stereotypes.add( new DefaultArtifactType( "war", "war", "", "java", false, true ) );
-        stereotypes.add( new DefaultArtifactType( "ear", "ear", "", "java", false, true ) );
-        stereotypes.add( new DefaultArtifactType( "rar", "rar", "", "java", false, true ) );
-        stereotypes.add( new DefaultArtifactType( "par", "par", "", "java", false, true ) );
-        session.setArtifactTypeRegistry( stereotypes );
+        stereotypes.add(new DefaultArtifactType("pom"));
+        stereotypes.add(new DefaultArtifactType("maven-plugin", "jar", "", "java"));
+        stereotypes.add(new DefaultArtifactType("jar", "jar", "", "java"));
+        stereotypes.add(new DefaultArtifactType("ejb", "jar", "", "java"));
+        stereotypes.add(new DefaultArtifactType("ejb-client", "jar", "client", "java"));
+        stereotypes.add(new DefaultArtifactType("test-jar", "jar", "tests", "java"));
+        stereotypes.add(new DefaultArtifactType("javadoc", "jar", "javadoc", "java"));
+        stereotypes.add(new DefaultArtifactType("java-source", "jar", "sources", "java", false, false));
+        stereotypes.add(new DefaultArtifactType("war", "war", "", "java", false, true));
+        stereotypes.add(new DefaultArtifactType("ear", "ear", "", "java", false, true));
+        stereotypes.add(new DefaultArtifactType("rar", "rar", "", "java", false, true));
+        stereotypes.add(new DefaultArtifactType("par", "par", "", "java", false, true));
+        session.setArtifactTypeRegistry(stereotypes);
 
-        session.setArtifactDescriptorPolicy( new SimpleArtifactDescriptorPolicy( true, true ) );
+        session.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(true, true));
 
         return session;
     }
-
 }

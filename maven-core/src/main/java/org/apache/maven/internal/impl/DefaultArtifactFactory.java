@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,10 +16,13 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
+
+import static org.apache.maven.internal.impl.Utils.cast;
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.ArtifactFactory;
@@ -29,37 +30,32 @@ import org.apache.maven.api.services.ArtifactFactoryRequest;
 import org.apache.maven.shared.utils.StringUtils;
 import org.eclipse.aether.artifact.ArtifactType;
 
-import static org.apache.maven.internal.impl.Utils.cast;
-import static org.apache.maven.internal.impl.Utils.nonNull;
-
 @Named
 @Singleton
-public class DefaultArtifactFactory implements ArtifactFactory
-{
+public class DefaultArtifactFactory implements ArtifactFactory {
     @Override
-    public Artifact create( @Nonnull ArtifactFactoryRequest request )
-    {
-        nonNull( request, "request can not be null" );
-        DefaultSession session = cast( DefaultSession.class, request.getSession(),
-                "request.session should be a " + DefaultSession.class );
+    public Artifact create(@Nonnull ArtifactFactoryRequest request) {
+        nonNull(request, "request can not be null");
+        DefaultSession session =
+                cast(DefaultSession.class, request.getSession(), "request.session should be a " + DefaultSession.class);
         ArtifactType type = null;
-        if ( request.getType() != null )
-        {
-            type = session.getSession().getArtifactTypeRegistry().get( request.getType() );
+        if (request.getType() != null) {
+            type = session.getSession().getArtifactTypeRegistry().get(request.getType());
         }
-        String classifier = StringUtils.isNotEmpty( request.getClassifier() )
-                                ? request.getClassifier()
-                                : type != null ? type.getClassifier() : null;
-        String extension = StringUtils.isNotEmpty( request.getExtension() )
-                                ? request.getExtension() : type != null ? type.getExtension() : null;
+        String classifier = StringUtils.isNotEmpty(request.getClassifier())
+                ? request.getClassifier()
+                : type != null ? type.getClassifier() : null;
+        String extension = StringUtils.isNotEmpty(request.getExtension())
+                ? request.getExtension()
+                : type != null ? type.getExtension() : null;
         return new DefaultArtifact(
                 session,
                 new org.eclipse.aether.artifact.DefaultArtifact(
-                    request.getGroupId(),
-                    request.getArtifactId(),
-                    classifier,
-                    extension,
-                    request.getVersion(),
-                    type ) );
+                        request.getGroupId(),
+                        request.getArtifactId(),
+                        classifier,
+                        extension,
+                        request.getVersion(),
+                        type));
     }
 }

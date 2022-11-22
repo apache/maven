@@ -1,5 +1,3 @@
-package org.apache.maven.settings.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.settings.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.building;
 
 /**
  * Collects problems that are encountered during settings building.
  *
  * @author Benjamin Bentmann
  */
-public interface SettingsProblemCollector
-{
+public interface SettingsProblemCollector {
 
     /**
      * Adds the specified problem.
@@ -36,6 +34,5 @@ public interface SettingsProblemCollector
      * @param column The one-based index of the column containing the problem or {@code -1} if unknown.
      * @param cause The cause of the problem, may be {@code null}.
      */
-    void add( SettingsProblem.Severity severity, String message, int line, int column, Exception cause );
-
+    void add(SettingsProblem.Severity severity, String message, int line, int column, Exception cause);
 }

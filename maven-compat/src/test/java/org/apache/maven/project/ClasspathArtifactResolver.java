@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,15 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.impl.ArtifactResolver;
@@ -33,60 +33,44 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 /**
  * @author Benjamin Bentmann
  */
-@Named( "classpath" )
+@Named("classpath")
 @Singleton
-public class ClasspathArtifactResolver
-    implements ArtifactResolver
-{
+public class ClasspathArtifactResolver implements ArtifactResolver {
 
-    public List<ArtifactResult> resolveArtifacts( RepositorySystemSession session,
-                                                  Collection<? extends ArtifactRequest> requests )
-        throws ArtifactResolutionException
-    {
+    public List<ArtifactResult> resolveArtifacts(
+            RepositorySystemSession session, Collection<? extends ArtifactRequest> requests)
+            throws ArtifactResolutionException {
         List<ArtifactResult> results = new ArrayList<>();
 
-        for ( ArtifactRequest request : requests )
-        {
-            ArtifactResult result = new ArtifactResult( request );
-            results.add( result );
+        for (ArtifactRequest request : requests) {
+            ArtifactResult result = new ArtifactResult(request);
+            results.add(result);
 
             Artifact artifact = request.getArtifact();
-            if ( "maven-test".equals( artifact.getGroupId() ) )
-            {
-                String scope = artifact.getArtifactId().substring( "scope-".length() );
+            if ("maven-test".equals(artifact.getGroupId())) {
+                String scope = artifact.getArtifactId().substring("scope-".length());
 
-                try
-                {
-                    artifact =
-                        artifact.setFile( ProjectClasspathTest.getFileForClasspathResource( ProjectClasspathTest.dir
-                            + "transitive-" + scope + "-dep.xml" ) );
-                    result.setArtifact( artifact );
+                try {
+                    artifact = artifact.setFile(ProjectClasspathTest.getFileForClasspathResource(
+                            ProjectClasspathTest.dir + "transitive-" + scope + "-dep.xml"));
+                    result.setArtifact(artifact);
+                } catch (FileNotFoundException e) {
+                    throw new IllegalStateException("Missing test POM for " + artifact);
                 }
-                catch ( FileNotFoundException e )
-                {
-                    throw new IllegalStateException( "Missing test POM for " + artifact );
-                }
-            }
-            else
-            {
-                result.addException( new ArtifactNotFoundException( artifact, null ) );
-                throw new ArtifactResolutionException( results );
+            } else {
+                result.addException(new ArtifactNotFoundException(artifact, null));
+                throw new ArtifactResolutionException(results);
             }
         }
 
         return results;
     }
 
-    public ArtifactResult resolveArtifact( RepositorySystemSession session, ArtifactRequest request )
-        throws ArtifactResolutionException
-    {
-        return resolveArtifacts( session, Collections.singleton( request ) ).get( 0 );
+    public ArtifactResult resolveArtifact(RepositorySystemSession session, ArtifactRequest request)
+            throws ArtifactResolutionException {
+        return resolveArtifacts(session, Collections.singleton(request)).get(0);
     }
-
 }

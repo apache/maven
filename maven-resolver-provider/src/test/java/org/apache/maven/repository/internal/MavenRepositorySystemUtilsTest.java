@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,20 +16,18 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.eclipse.aether.RepositorySystemSession;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-public class MavenRepositorySystemUtilsTest
-{
+public class MavenRepositorySystemUtilsTest {
 
     @Test
-    public void testNewSession()
-    {
+    public void testNewSession() {
         RepositorySystemSession session = MavenRepositorySystemUtils.newSession();
-        assertNotNull( session );
+        assertNotNull(session);
     }
-
 }

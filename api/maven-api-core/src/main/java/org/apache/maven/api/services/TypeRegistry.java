@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Type;
@@ -30,8 +29,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * @since 4.0
  */
 @Experimental
-public interface TypeRegistry extends Service
-{
+public interface TypeRegistry extends Service {
 
     /**
      * Obtain the {@link Type} from the specified {@code id}.
@@ -42,6 +40,5 @@ public interface TypeRegistry extends Service
      * @return the type
      */
     @Nonnull
-    Type getType( @Nonnull String id );
-
+    Type getType(@Nonnull String id);
 }

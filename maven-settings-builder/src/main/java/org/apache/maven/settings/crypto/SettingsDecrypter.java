@@ -1,5 +1,3 @@
-package org.apache.maven.settings.crypto;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.settings.crypto;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.crypto;
 
 /**
  * Decrypts passwords in the settings.
  *
  * @author Benjamin Bentmann
  */
-public interface SettingsDecrypter
-{
+public interface SettingsDecrypter {
 
     /**
      * Decrypts passwords in the settings.
@@ -33,6 +31,5 @@ public interface SettingsDecrypter
      * @param request The settings decryption request that holds the parameters, must not be {@code null}.
      * @return The result of the settings decryption, never {@code null}.
      */
-    SettingsDecryptionResult decrypt( SettingsDecryptionRequest request );
-
+    SettingsDecryptionResult decrypt(SettingsDecryptionRequest request);
 }

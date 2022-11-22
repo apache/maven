@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,19 +16,16 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
 
 /**
  * Signals an internal error in Maven itself, e.g. a programming bug.
  *
  * @author Benjamin Bentmann
  */
-public class InternalErrorException
-    extends MavenExecutionException
-{
+public class InternalErrorException extends MavenExecutionException {
 
-    public InternalErrorException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public InternalErrorException(String message, Throwable cause) {
+        super(message, cause);
     }
-
 }

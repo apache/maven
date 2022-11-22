@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.descriptor;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.descriptor;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,20 +16,17 @@ package org.apache.maven.plugin.descriptor;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.descriptor;
 
 /**
  * DuplicateMojoDescriptorException
  */
-public class DuplicateMojoDescriptorException
-    extends InvalidPluginDescriptorException
-{
+public class DuplicateMojoDescriptorException extends InvalidPluginDescriptorException {
 
-    public DuplicateMojoDescriptorException( String goalPrefix, String goal, String existingImplementation,
-                                             String newImplementation )
-    {
-        super( "Goal: " + goal + " already exists in the plugin descriptor for prefix: " + goalPrefix
-            + System.lineSeparator() + "Existing implementation is: " + existingImplementation
-            + System.lineSeparator() + "Conflicting implementation is: " + newImplementation );
+    public DuplicateMojoDescriptorException(
+            String goalPrefix, String goal, String existingImplementation, String newImplementation) {
+        super("Goal: " + goal + " already exists in the plugin descriptor for prefix: " + goalPrefix
+                + System.lineSeparator() + "Existing implementation is: " + existingImplementation
+                + System.lineSeparator() + "Conflicting implementation is: " + newImplementation);
     }
-
 }

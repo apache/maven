@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import org.apache.maven.building.Source;
 
@@ -31,8 +30,7 @@ import org.apache.maven.building.Source;
  * @author Benjamin Bentmann
  * @author Robert Scholte
  */
-public interface ModelCache
-{
+public interface ModelCache {
     /**
      * Puts the specified data into the cache.
      *
@@ -41,8 +39,7 @@ public interface ModelCache
      * @param data The data to store in the cache, must not be {@code null}.
      * @since 4.0.0
      */
-    default void put( Source path, String tag, Object data )
-    {
+    default void put(Source path, String tag, Object data) {
         // only useful for ReactorModelCache
     }
 
@@ -54,8 +51,7 @@ public interface ModelCache
      * @return The requested data or {@code null} if none was present in the cache.
      * @since 4.0.0
      */
-    default Object get( Source path, String tag )
-    {
+    default Object get(Source path, String tag) {
         // only useful for ReactorModelCache
         return null;
     }
@@ -69,7 +65,7 @@ public interface ModelCache
      * @param tag The tag of the cache record, must not be {@code null}.
      * @param data The data to store in the cache, must not be {@code null}.
      */
-    void put( String groupId, String artifactId, String version, String tag, Object data );
+    void put(String groupId, String artifactId, String version, String tag, Object data);
 
     /**
      * Gets the specified data from the cache.
@@ -80,7 +76,7 @@ public interface ModelCache
      * @param tag The tag of the cache record, must not be {@code null}.
      * @return The requested data or {@code null} if none was present in the cache.
      */
-    Object get( String groupId, String artifactId, String version, String tag );
+    Object get(String groupId, String artifactId, String version, String tag);
 
     /**
      * Puts the specified data into the cache.
@@ -90,9 +86,8 @@ public interface ModelCache
      * @param data The data to store in the cache, must not be {@code null}.
      * @since 4.0.0
      */
-    default <T> void put( Source path, ModelCacheTag<T> tag, T data )
-    {
-        put( path, tag.getName(), tag.intoCache( data ) );
+    default <T> void put(Source path, ModelCacheTag<T> tag, T data) {
+        put(path, tag.getName(), tag.intoCache(data));
     }
 
     /**
@@ -103,10 +98,9 @@ public interface ModelCache
      * @return The requested data or {@code null} if none was present in the cache.
      * @since 4.0.0
      */
-    default <T> T get( Source path, ModelCacheTag<T> tag )
-    {
-        Object obj = get( path, tag.getName() );
-        return ( obj != null ) ? tag.fromCache( tag.getType().cast( obj ) ) : null;
+    default <T> T get(Source path, ModelCacheTag<T> tag) {
+        Object obj = get(path, tag.getName());
+        return (obj != null) ? tag.fromCache(tag.getType().cast(obj)) : null;
     }
 
     /**
@@ -118,9 +112,8 @@ public interface ModelCache
      * @param tag The tag of the cache record, must not be {@code null}.
      * @param data The data to store in the cache, must not be {@code null}.
      */
-    default <T> void put( String groupId, String artifactId, String version, ModelCacheTag<T> tag, T data )
-    {
-        put( groupId, artifactId, version, tag.getName(), tag.intoCache( data ) );
+    default <T> void put(String groupId, String artifactId, String version, ModelCacheTag<T> tag, T data) {
+        put(groupId, artifactId, version, tag.getName(), tag.intoCache(data));
     }
 
     /**
@@ -132,10 +125,8 @@ public interface ModelCache
      * @param tag The tag of the cache record, must not be {@code null}.
      * @return The requested data or {@code null} if none was present in the cache.
      */
-    default <T> T get( String groupId, String artifactId, String version, ModelCacheTag<T> tag )
-    {
-        Object obj = get( groupId, artifactId, version, tag.getName() );
-        return ( obj != null ) ? tag.fromCache( tag.getType().cast( obj ) ) : null;
+    default <T> T get(String groupId, String artifactId, String version, ModelCacheTag<T> tag) {
+        Object obj = get(groupId, artifactId, version, tag.getName());
+        return (obj != null) ? tag.fromCache(tag.getType().cast(obj)) : null;
     }
-
 }

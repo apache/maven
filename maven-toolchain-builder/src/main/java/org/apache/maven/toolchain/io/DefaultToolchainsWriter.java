@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.toolchain.io;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,16 +16,16 @@ package org.apache.maven.toolchain.io;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain.io;
 
-import org.apache.maven.api.toolchain.PersistedToolchains;
-import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Writer;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 import java.util.Objects;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import org.apache.maven.api.toolchain.PersistedToolchains;
+import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Writer;
 
 /**
  * Handles serialization of toolchains into the default textual format.
@@ -37,18 +35,15 @@ import java.util.Objects;
  */
 @Named
 @Singleton
-public class DefaultToolchainsWriter implements ToolchainsWriter
-{
+public class DefaultToolchainsWriter implements ToolchainsWriter {
 
     @Override
-    public void write( Writer output, Map<String, Object> options, PersistedToolchains toolchains ) throws IOException
-    {
-        Objects.requireNonNull( output, "output cannot be null" );
-        Objects.requireNonNull( toolchains, "toolchains cannot be null" );
+    public void write(Writer output, Map<String, Object> options, PersistedToolchains toolchains) throws IOException {
+        Objects.requireNonNull(output, "output cannot be null");
+        Objects.requireNonNull(toolchains, "toolchains cannot be null");
 
-        try ( Writer out = output )
-        {
-            new MavenToolchainsXpp3Writer().write( out, toolchains );
+        try (Writer out = output) {
+            new MavenToolchainsXpp3Writer().write(out, toolchains);
         }
     }
 }

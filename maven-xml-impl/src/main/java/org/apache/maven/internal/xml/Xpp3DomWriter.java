@@ -1,5 +1,3 @@
-package org.apache.maven.internal.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,11 @@ package org.apache.maven.internal.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.xml;
 
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Map;
-
 import org.apache.maven.api.xml.Dom;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
@@ -30,50 +28,38 @@ import org.codehaus.plexus.util.xml.XMLWriter;
 /**
  *
  */
-public class Xpp3DomWriter
-{
-    public static void write( Writer writer, Dom dom )
-    {
-        write( new PrettyPrintXMLWriter( writer ), dom );
+public class Xpp3DomWriter {
+    public static void write(Writer writer, Dom dom) {
+        write(new PrettyPrintXMLWriter(writer), dom);
     }
 
-    public static void write( PrintWriter writer, Dom dom )
-    {
-        write( new PrettyPrintXMLWriter( writer ), dom );
+    public static void write(PrintWriter writer, Dom dom) {
+        write(new PrettyPrintXMLWriter(writer), dom);
     }
 
-    public static void write( XMLWriter xmlWriter, Dom dom )
-    {
-        write( xmlWriter, dom, true );
+    public static void write(XMLWriter xmlWriter, Dom dom) {
+        write(xmlWriter, dom, true);
     }
 
-    public static void write( XMLWriter xmlWriter, Dom dom, boolean escape )
-    {
+    public static void write(XMLWriter xmlWriter, Dom dom, boolean escape) {
         // TODO: move to XMLWriter?
-        xmlWriter.startElement( dom.getName() );
-        for ( Map.Entry<String, String> attr : dom.getAttributes().entrySet() )
-        {
-            xmlWriter.addAttribute( attr.getKey(), attr.getValue() );
+        xmlWriter.startElement(dom.getName());
+        for (Map.Entry<String, String> attr : dom.getAttributes().entrySet()) {
+            xmlWriter.addAttribute(attr.getKey(), attr.getValue());
         }
-        for ( Dom aChildren : dom.getChildren() )
-        {
-            write( xmlWriter, aChildren, escape );
+        for (Dom aChildren : dom.getChildren()) {
+            write(xmlWriter, aChildren, escape);
         }
 
         String value = dom.getValue();
-        if ( value != null )
-        {
-            if ( escape )
-            {
-                xmlWriter.writeText( value );
-            }
-            else
-            {
-                xmlWriter.writeMarkup( value );
+        if (value != null) {
+            if (escape) {
+                xmlWriter.writeText(value);
+            } else {
+                xmlWriter.writeMarkup(value);
             }
         }
 
         xmlWriter.endElement();
     }
-
 }
