@@ -276,6 +276,14 @@ public class DefaultModelBuilder
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
 
+        // read and validate raw model
+        Model inputModel = request.getRawModel();
+        if ( inputModel == null )
+        {
+            inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
+            request.setRawModel( inputModel );
+        }
+
         // profile activation
         DefaultProfileActivationContext profileActivationContext = getProfileActivationContext( request );
 
@@ -294,13 +302,6 @@ public class DefaultModelBuilder
             }
             profileProps.putAll( profileActivationContext.getUserProperties() );
             profileActivationContext.setUserProperties( profileProps );
-        }
-
-        // read and validate raw model
-        Model inputModel = request.getRawModel();
-        if ( inputModel == null )
-        {
-            inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
         }
 
         problems.setRootModel( inputModel );
@@ -707,7 +708,11 @@ public class DefaultModelBuilder
         context.setActiveProfileIds( request.getActiveProfileIds() );
         context.setInactiveProfileIds( request.getInactiveProfileIds() );
         context.setSystemProperties( request.getSystemProperties() );
-        context.setUserProperties( request.getUserProperties() );
+        // enrich user properties with project packaging
+        Properties userProperties = request.getUserProperties();
+        userProperties.computeIfAbsent( (Object) ProfileActivationContext.PROPERTY_NAME_PACKAGING,
+                                        ( p ) -> (Object) request.getRawModel().getPackaging() );
+        context.setUserProperties( userProperties );
         context.setProjectDirectory( ( request.getPomFile() != null ) ? request.getPomFile().getParentFile() : null );
 
         return context;
