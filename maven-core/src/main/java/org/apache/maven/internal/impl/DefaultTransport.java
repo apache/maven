@@ -20,7 +20,10 @@ package org.apache.maven.internal.impl;
 
 import static java.util.Objects.requireNonNull;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.inject.Named;
@@ -58,11 +61,42 @@ public class DefaultTransport implements Transport {
             transporter.get(getTask);
             return true;
         } catch (Exception e) {
-            if (Transporter.ERROR_NOT_FOUND == transporter.classify(e)) {
-                return false;
+            if (Transporter.ERROR_NOT_FOUND != transporter.classify(e)) {
+                throw new RuntimeException(e);
             }
-            throw new RuntimeException(e);
+            return false;
         }
+    }
+
+    @Override
+    public byte[] getBytes(URI relativeSource) {
+        try {
+            Path tempPath = null;
+            try {
+                tempPath = Files.createTempFile("transport-get", "tmp");
+                if (get(relativeSource, tempPath)) {
+                    // TODO: check file size and prevent OOM?
+                    return Files.readAllBytes(tempPath);
+                }
+                return null;
+            } finally {
+                if (tempPath != null) {
+                    Files.deleteIfExists(tempPath);
+                }
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    @Override
+    public String getString(URI relativeSource, Charset charset) {
+        requireNonNull(charset, "charset is null");
+        byte[] data = getBytes(relativeSource);
+        if (data != null) {
+            return new String(data, charset);
+        }
+        return null;
     }
 
     @Override
@@ -87,6 +121,32 @@ public class DefaultTransport implements Transport {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void putBytes(byte[] source, URI relativeTarget) {
+        requireNonNull(source, "source is null");
+        try {
+            Path tempPath = null;
+            try {
+                tempPath = Files.createTempFile("transport-get", "tmp");
+                Files.write(tempPath, source);
+                put(tempPath, relativeTarget);
+            } finally {
+                if (tempPath != null) {
+                    Files.deleteIfExists(tempPath);
+                }
+            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    @Override
+    public void putString(String source, Charset charset, URI relativeTarget) {
+        requireNonNull(source, "source string is null");
+        requireNonNull(charset, "charset is null");
+        putBytes(source.getBytes(charset), relativeTarget);
     }
 
     @Override

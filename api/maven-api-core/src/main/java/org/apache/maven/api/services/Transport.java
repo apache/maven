@@ -20,10 +20,12 @@ package org.apache.maven.api.services;
 
 import java.io.Closeable;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Transport for specified remote repository (using provided remote repository base URI as root). Must be treated as a
@@ -35,20 +37,55 @@ import org.apache.maven.api.annotations.Experimental;
 @Consumer
 public interface Transport extends Closeable {
     /**
-     * GETs the source URI content into target file (does not have to exist, or will be overwritten if exist). The
+     * GETs the source URI content into target (does not have to exist, or will be overwritten if exist). The
      * source MUST BE relative from the {@link RemoteRepository#getUrl()} root.
      *
-     * @return {@code true} if the source was GET correctly from source URI into passed target file. Returns
-     * {@code false} if source does not exist (then file is intact, if it did not exist, still does not exist).
-     * @throws RuntimeException In any other case (GET did not successful and not due not exist).
+     * @return {@code true} if operation succeeded, {@code false} if source does not exist.
+     * @throws RuntimeException If failed (and not due source not exists).
      */
     boolean get(URI relativeSource, Path target);
 
     /**
-     * PUTs the source file (must exist) to target URI. The target MUST BE relative from the
+     * GETs the source URI content into target consumer. The
+     * source MUST BE relative from the {@link RemoteRepository#getUrl()} root.
+     *
+     * @return the byte array if operation succeeded, {@code null} if source does not exist.
+     * @throws RuntimeException If failed (and not due source not exists).
+     */
+    @Nullable
+    byte[] getBytes(URI relativeSource);
+
+    /**
+     * GETs the source URI content as string. The
+     * source MUST BE relative from the {@link RemoteRepository#getUrl()} root.
+     *
+     * @return the string if operation succeeded, {@code null} if source does not exist.
+     * @throws RuntimeException If failed (and not due source not exists).
+     */
+    @Nullable
+    String getString(URI relativeSource, Charset charset);
+
+    /**
+     * PUTs the source file (must exist as file) to target URI. The target MUST BE relative from the
      * {@link RemoteRepository#getUrl()} root.
      *
      * @throws RuntimeException If PUT fails for any reason.
      */
     void put(Path source, URI relativeTarget);
+
+    /**
+     * PUTs the source byte array to target URI. The target MUST BE relative from the
+     * {@link RemoteRepository#getUrl()} root.
+     *
+     * @throws RuntimeException If PUT fails for any reason.
+     */
+    void putBytes(byte[] source, URI relativeTarget);
+
+    /**
+     * PUTs the source string to target URI. The target MUST BE relative from the
+     * {@link RemoteRepository#getUrl()} root.
+     *
+     * @throws RuntimeException If PUT fails for any reason.
+     */
+    void putString(String source, Charset charset, URI relativeTarget);
 }
