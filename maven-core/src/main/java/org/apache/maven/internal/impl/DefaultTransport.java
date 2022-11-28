@@ -26,6 +26,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import org.apache.maven.api.services.Transport;
@@ -69,16 +70,16 @@ public class DefaultTransport implements Transport {
     }
 
     @Override
-    public byte[] getBytes(URI relativeSource) {
+    public Optional<byte[]> getBytes(URI relativeSource) {
         try {
             Path tempPath = null;
             try {
                 tempPath = Files.createTempFile("transport-get", "tmp");
                 if (get(relativeSource, tempPath)) {
                     // TODO: check file size and prevent OOM?
-                    return Files.readAllBytes(tempPath);
+                    return Optional.of(Files.readAllBytes(tempPath));
                 }
-                return null;
+                return Optional.empty();
             } finally {
                 if (tempPath != null) {
                     Files.deleteIfExists(tempPath);
@@ -90,13 +91,10 @@ public class DefaultTransport implements Transport {
     }
 
     @Override
-    public String getString(URI relativeSource, Charset charset) {
+    public Optional<String> getString(URI relativeSource, Charset charset) {
         requireNonNull(charset, "charset is null");
-        byte[] data = getBytes(relativeSource);
-        if (data != null) {
-            return new String(data, charset);
-        }
-        return null;
+        Optional<byte[]> data = getBytes(relativeSource);
+        return data.map(bytes -> new String(bytes, charset));
     }
 
     @Override

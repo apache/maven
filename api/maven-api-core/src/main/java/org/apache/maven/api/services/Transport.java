@@ -23,11 +23,11 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Optional;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Transport for specified remote repository (using provided remote repository base URI as root). Must be treated as a
@@ -54,8 +54,8 @@ public interface Transport extends Closeable {
      * @return the byte array if operation succeeded, {@code null} if source does not exist.
      * @throws RuntimeException If failed (and not due source not exists).
      */
-    @Nullable
-    byte[] getBytes(@Nonnull URI relativeSource);
+    @Nonnull
+    Optional<byte[]> getBytes(@Nonnull URI relativeSource);
 
     /**
      * GETs the source URI content as string. The source MUST BE relative from the {@link RemoteRepository#getUrl()}
@@ -64,8 +64,8 @@ public interface Transport extends Closeable {
      * @return the string if operation succeeded, {@code null} if source does not exist.
      * @throws RuntimeException If failed (and not due source not exists).
      */
-    @Nullable
-    String getString(@Nonnull URI relativeSource, @Nonnull Charset charset);
+    @Nonnull
+    Optional<String> getString(@Nonnull URI relativeSource, @Nonnull Charset charset);
 
     /**
      * GETs the source URI content as string using UTF8 charset. The source MUST BE relative from the
@@ -74,8 +74,8 @@ public interface Transport extends Closeable {
      * @return the string if operation succeeded, {@code null} if source does not exist.
      * @throws RuntimeException If failed (and not due source not exists).
      */
-    @Nullable
-    default String getString(@Nonnull URI relativeSource) {
+    @Nonnull
+    default Optional<String> getString(@Nonnull URI relativeSource) {
         return getString(relativeSource, StandardCharsets.UTF_8);
     }
 
