@@ -68,7 +68,7 @@ public interface Transport extends Closeable {
     String getString(@Nonnull URI relativeSource, @Nonnull Charset charset);
 
     /**
-     * GETs the source URI content as string using UTF8 charset. The source MUST BE relative from the 
+     * GETs the source URI content as string using UTF8 charset. The source MUST BE relative from the
      * {@link RemoteRepository#getUrl()} root.
      *
      * @return the string if operation succeeded, {@code null} if source does not exist.
@@ -103,7 +103,7 @@ public interface Transport extends Closeable {
     void putString(@Nonnull String source, @Nonnull Charset charset, @Nonnull URI relativeTarget);
 
     /**
-     * PUTs the source string to target URI (using UTF8 charset). The target MUST BE relative from the
+     * PUTs the source string using UTF8 charset to target URI. The target MUST BE relative from the
      * {@link RemoteRepository#getUrl()} root.
      *
      * @throws RuntimeException If PUT fails for any reason.
