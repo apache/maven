@@ -26,10 +26,8 @@ import org.apache.maven.api.annotations.Experimental;
  */
 @Experimental
 @Consumer
-public class TransportProviderException extends MavenException
-{
-    public TransportProviderException( String message, Throwable cause )
-    {
-        super( message, cause );
+public class TransportProviderException extends MavenException {
+    public TransportProviderException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

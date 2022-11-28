@@ -30,13 +30,12 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 @Consumer
-public interface TransportProvider extends Service
-{
+public interface TransportProvider extends Service {
     /**
      * Provides new {@link Transport} instance for given {@link RemoteRepository}, if possible.
      *
      * @throws TransportProviderException if passed in remote repository has invalid remote URL or unsupported protocol.
      */
     @Nonnull
-    Transport transport( @Nonnull Session session, @Nonnull RemoteRepository repository );
+    Transport transport(@Nonnull Session session, @Nonnull RemoteRepository repository);
 }

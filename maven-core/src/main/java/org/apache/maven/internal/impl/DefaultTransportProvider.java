@@ -18,13 +18,13 @@
  */
 package org.apache.maven.internal.impl;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.Transport;
@@ -33,38 +33,29 @@ import org.apache.maven.api.services.TransportProviderException;
 import org.eclipse.aether.spi.connector.transport.TransporterProvider;
 import org.eclipse.aether.transfer.NoTransporterException;
 
-import static java.util.Objects.requireNonNull;
-
 @Named
 @Singleton
-public class DefaultTransportProvider implements TransportProvider
-{
+public class DefaultTransportProvider implements TransportProvider {
     private final org.eclipse.aether.spi.connector.transport.TransporterProvider transporterProvider;
 
     @Inject
-    public DefaultTransportProvider( TransporterProvider transporterProvider )
-    {
-        this.transporterProvider = requireNonNull( transporterProvider );
+    public DefaultTransportProvider(TransporterProvider transporterProvider) {
+        this.transporterProvider = requireNonNull(transporterProvider);
     }
 
     @Override
-    public Transport transport( Session session, RemoteRepository repository )
-    {
-        try
-        {
-            URI baseURI = new URI( repository.getUrl() );
-            return new DefaultTransport( baseURI, transporterProvider.newTransporter(
-                    ( (DefaultSession) session ).getSession(),
-                    ( (DefaultRemoteRepository) repository ).getRepository() )
-            );
-        }
-        catch ( URISyntaxException e )
-        {
-            throw new TransportProviderException( "Remote repository URL invalid", e );
-        }
-        catch ( NoTransporterException e )
-        {
-            throw new TransportProviderException( "Unsupported remote repository", e );
+    public Transport transport(Session session, RemoteRepository repository) {
+        try {
+            URI baseURI = new URI(repository.getUrl());
+            return new DefaultTransport(
+                    baseURI,
+                    transporterProvider.newTransporter(
+                            ((DefaultSession) session).getSession(),
+                            ((DefaultRemoteRepository) repository).getRepository()));
+        } catch (URISyntaxException e) {
+            throw new TransportProviderException("Remote repository URL invalid", e);
+        } catch (NoTransporterException e) {
+            throw new TransportProviderException("Unsupported remote repository", e);
         }
     }
 }

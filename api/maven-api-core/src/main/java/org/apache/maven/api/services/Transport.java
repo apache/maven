@@ -21,7 +21,6 @@ package org.apache.maven.api.services;
 import java.io.Closeable;
 import java.net.URI;
 import java.nio.file.Path;
-
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
@@ -34,8 +33,7 @@ import org.apache.maven.api.annotations.Experimental;
  */
 @Experimental
 @Consumer
-public interface Transport extends Closeable
-{
+public interface Transport extends Closeable {
     /**
      * GETs the source URI content into target file (does not have to exist, or will be overwritten if exist). The
      * source MUST BE relative from the {@link RemoteRepository#getUrl()} root.
@@ -44,7 +42,7 @@ public interface Transport extends Closeable
      * {@code false} if source does not exist (then file is intact, if it did not exist, still does not exist).
      * @throws RuntimeException In any other case (GET did not successful and not due not exist).
      */
-    boolean get( URI relativeSource, Path target );
+    boolean get(URI relativeSource, Path target);
 
     /**
      * PUTs the source file (must exist) to target URI. The target MUST BE relative from the
@@ -52,5 +50,5 @@ public interface Transport extends Closeable
      *
      * @throws RuntimeException If PUT fails for any reason.
      */
-    void put( Path source, URI relativeTarget );
+    void put(Path source, URI relativeTarget);
 }
