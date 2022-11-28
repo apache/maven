@@ -21,6 +21,7 @@ package org.apache.maven.api.services;
 import java.io.Closeable;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.annotations.Consumer;
@@ -67,6 +68,17 @@ public interface Transport extends Closeable {
     String getString(@Nonnull URI relativeSource, @Nonnull Charset charset);
 
     /**
+     * GETs the source URI content as string using UTF8 charset. The source MUST BE relative from the 
+     * {@link RemoteRepository#getUrl()} root.
+     *
+     * @return the string if operation succeeded, {@code null} if source does not exist.
+     * @throws RuntimeException If failed (and not due source not exists).
+     */
+    default String getString(@Nonnull URI relativeSource) {
+        return getString(relativeSource, StandardCharsets.UTF_8);
+    }
+
+    /**
      * PUTs the source file (must exist as file) to target URI. The target MUST BE relative from the
      * {@link RemoteRepository#getUrl()} root.
      *
@@ -89,4 +101,14 @@ public interface Transport extends Closeable {
      * @throws RuntimeException If PUT fails for any reason.
      */
     void putString(@Nonnull String source, @Nonnull Charset charset, @Nonnull URI relativeTarget);
+
+    /**
+     * PUTs the source string to target URI (using UTF8 charset). The target MUST BE relative from the
+     * {@link RemoteRepository#getUrl()} root.
+     *
+     * @throws RuntimeException If PUT fails for any reason.
+     */
+    default void putString(@Nonnull String source, @Nonnull URI relativeTarget) {
+        putString(source, StandardCharsets.UTF_8, relativeTarget);
+    }
 }
