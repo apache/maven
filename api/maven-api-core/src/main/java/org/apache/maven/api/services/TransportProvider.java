@@ -26,6 +26,14 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
+ * Transporter provider is a service that provides somewhat trivial transport capabilities backed by Maven internals.
+ * This API does not try to cover all the requirements out there, just the basic ones, and is intentionally simple.
+ * If plugin or extension needs anything more complex feature wise (i.e. HTTP range support or alike) it should
+ * probably roll its own.
+ * <p>
+ * This implementation is backed by Maven Resolver API, supported protocols and transport selection depends on it. If
+ * resolver preference regarding transport is altered, it will affect this service as well.
+ *
  * @since 4.0
  */
 @Experimental
