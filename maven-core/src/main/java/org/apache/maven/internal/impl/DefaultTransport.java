@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -105,5 +106,11 @@ public class DefaultTransport implements Transport
         {
             throw new RuntimeException( e );
         }
+    }
+
+    @Override
+    public void close()
+    {
+        transporter.close();
     }
 }

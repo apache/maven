@@ -18,6 +18,7 @@
  */
 package org.apache.maven.api.services;
 
+import java.io.Closeable;
 import java.net.URI;
 import java.nio.file.Path;
 
@@ -26,11 +27,14 @@ import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
+ * Transport for specified remote repository (using provided remote repository base URI as root). Must be treated as a
+ * resource, best in try-with-resource block.
+ *
  * @since 4.0
  */
 @Experimental
 @Consumer
-public interface Transport
+public interface Transport extends Closeable
 {
     /**
      * GETs the source URI content into target file (does not have to exist, or will be overwritten if exist). The
@@ -38,13 +42,15 @@ public interface Transport
      *
      * @return {@code true} if the source was GET correctly from source URI into passed target file. Returns
      * {@code false} if source does not exist (then file is intact, if it did not exist, still does not exist).
-     * @throws java.io.UncheckedIOException
+     * @throws RuntimeException In any other case (GET did not successful and not due not exist).
      */
     boolean get( URI relativeSource, Path target );
 
     /**
      * PUTs the source file (must exist) to target URI. The target MUST BE relative from the
      * {@link RemoteRepository#getUrl()} root.
+     *
+     * @throws RuntimeException If PUT fails for any reason.
      */
     void put( Path source, URI relativeTarget );
 }

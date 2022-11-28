@@ -19,6 +19,7 @@
 package org.apache.maven.api.services;
 
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
@@ -29,7 +30,7 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 @Consumer
-public interface TransportProvider
+public interface TransportProvider extends Service
 {
     /**
      * Provides new {@link Transport} instance for given {@link RemoteRepository}, if possible.
