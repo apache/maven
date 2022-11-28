@@ -74,6 +74,7 @@ public interface Transport extends Closeable {
      * @return the string if operation succeeded, {@code null} if source does not exist.
      * @throws RuntimeException If failed (and not due source not exists).
      */
+    @Nullable
     default String getString(@Nonnull URI relativeSource) {
         return getString(relativeSource, StandardCharsets.UTF_8);
     }
