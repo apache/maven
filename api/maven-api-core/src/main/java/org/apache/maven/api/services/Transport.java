@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
 /**
@@ -43,27 +44,27 @@ public interface Transport extends Closeable {
      * @return {@code true} if operation succeeded, {@code false} if source does not exist.
      * @throws RuntimeException If failed (and not due source not exists).
      */
-    boolean get(URI relativeSource, Path target);
+    boolean get(@Nonnull URI relativeSource, @Nonnull Path target);
 
     /**
-     * GETs the source URI content into target consumer. The
-     * source MUST BE relative from the {@link RemoteRepository#getUrl()} root.
+     * GETs the source URI content as byte array. The source MUST BE relative from the {@link RemoteRepository#getUrl()}
+     * root.
      *
      * @return the byte array if operation succeeded, {@code null} if source does not exist.
      * @throws RuntimeException If failed (and not due source not exists).
      */
     @Nullable
-    byte[] getBytes(URI relativeSource);
+    byte[] getBytes(@Nonnull URI relativeSource);
 
     /**
-     * GETs the source URI content as string. The
-     * source MUST BE relative from the {@link RemoteRepository#getUrl()} root.
+     * GETs the source URI content as string. The source MUST BE relative from the {@link RemoteRepository#getUrl()}
+     * root.
      *
      * @return the string if operation succeeded, {@code null} if source does not exist.
      * @throws RuntimeException If failed (and not due source not exists).
      */
     @Nullable
-    String getString(URI relativeSource, Charset charset);
+    String getString(@Nonnull URI relativeSource, @Nonnull Charset charset);
 
     /**
      * PUTs the source file (must exist as file) to target URI. The target MUST BE relative from the
@@ -71,7 +72,7 @@ public interface Transport extends Closeable {
      *
      * @throws RuntimeException If PUT fails for any reason.
      */
-    void put(Path source, URI relativeTarget);
+    void put(@Nonnull Path source, @Nonnull URI relativeTarget);
 
     /**
      * PUTs the source byte array to target URI. The target MUST BE relative from the
@@ -79,7 +80,7 @@ public interface Transport extends Closeable {
      *
      * @throws RuntimeException If PUT fails for any reason.
      */
-    void putBytes(byte[] source, URI relativeTarget);
+    void putBytes(@Nonnull byte[] source, @Nonnull URI relativeTarget);
 
     /**
      * PUTs the source string to target URI. The target MUST BE relative from the
@@ -87,5 +88,5 @@ public interface Transport extends Closeable {
      *
      * @throws RuntimeException If PUT fails for any reason.
      */
-    void putString(String source, Charset charset, URI relativeTarget);
+    void putString(@Nonnull String source, @Nonnull Charset charset, @Nonnull URI relativeTarget);
 }
