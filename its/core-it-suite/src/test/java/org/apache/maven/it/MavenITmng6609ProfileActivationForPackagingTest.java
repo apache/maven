@@ -17,7 +17,7 @@ class MavenITmng6609ProfileActivationForPackagingTest
 
     public MavenITmng6609ProfileActivationForPackagingTest()
     {
-        super( "[3.9.0,4.0.0-alpha-1),[4.0.0-alpha-3,)" );
+        super( "[4.0.0-alpha-3,)" );
     }
 
     /**
