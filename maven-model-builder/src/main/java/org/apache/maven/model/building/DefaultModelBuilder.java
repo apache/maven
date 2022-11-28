@@ -276,8 +276,15 @@ public class DefaultModelBuilder
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
 
+        // read and validate raw model
+        Model inputModel = request.getRawModel();
+        if ( inputModel == null )
+        {
+            inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
+        }
+
         // profile activation
-        DefaultProfileActivationContext profileActivationContext = getProfileActivationContext( request );
+        DefaultProfileActivationContext profileActivationContext = getProfileActivationContext( request, inputModel );
 
         problems.setSource( "(external profiles)" );
         List<Profile> activeExternalProfiles = profileSelector.getActiveProfiles( request.getProfiles(),
@@ -294,13 +301,6 @@ public class DefaultModelBuilder
             }
             profileProps.putAll( profileActivationContext.getUserProperties() );
             profileActivationContext.setUserProperties( profileProps );
-        }
-
-        // read and validate raw model
-        Model inputModel = request.getRawModel();
-        if ( inputModel == null )
-        {
-            inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
         }
 
         problems.setRootModel( inputModel );
@@ -700,14 +700,18 @@ public class DefaultModelBuilder
         return model;
     }
 
-    private DefaultProfileActivationContext getProfileActivationContext( ModelBuildingRequest request )
+    private DefaultProfileActivationContext getProfileActivationContext( ModelBuildingRequest request, Model rawModel )
     {
         DefaultProfileActivationContext context = new DefaultProfileActivationContext();
 
         context.setActiveProfileIds( request.getActiveProfileIds() );
         context.setInactiveProfileIds( request.getInactiveProfileIds() );
         context.setSystemProperties( request.getSystemProperties() );
-        context.setUserProperties( request.getUserProperties() );
+        // enrich user properties with project packaging
+        Properties userProperties = request.getUserProperties();
+        userProperties.computeIfAbsent( (Object) ProfileActivationContext.PROPERTY_NAME_PACKAGING,
+                                        ( p ) -> (Object) rawModel.getPackaging() );
+        context.setUserProperties( userProperties );
         context.setProjectDirectory( ( request.getPomFile() != null ) ? request.getPomFile().getParentFile() : null );
 
         return context;
