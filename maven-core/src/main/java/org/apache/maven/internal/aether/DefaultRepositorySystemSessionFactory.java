@@ -84,11 +84,15 @@ public class DefaultRepositorySystemSessionFactory {
 
     private static final String MAVEN_RESOLVER_TRANSPORT_DEFAULT = "default";
 
+    private static final String MAVEN_RESOLVER_TRANSPORT_JETTY = "jetty";
+
     private static final String MAVEN_RESOLVER_TRANSPORT_WAGON = "wagon";
 
     private static final String MAVEN_RESOLVER_TRANSPORT_NATIVE = "native";
 
     private static final String MAVEN_RESOLVER_TRANSPORT_AUTO = "auto";
+
+    private static final String JETTY_TRANSPORTER_PRIORITY_KEY = "aether.priority.JettyTransporterFactory";
 
     private static final String WAGON_TRANSPORTER_PRIORITY_KEY = "aether.priority.WagonTransporterFactory";
 
@@ -237,6 +241,9 @@ public class DefaultRepositorySystemSessionFactory {
             // Make sure (whatever extra priority is set) that resolver native is selected
             configProps.put(NATIVE_FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
             configProps.put(NATIVE_HTTP_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
+        } else if (MAVEN_RESOLVER_TRANSPORT_JETTY.equals(transport)) {
+            // Make sure (whatever extra priority is set) that wagon is selected
+            configProps.put(JETTY_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
         } else if (MAVEN_RESOLVER_TRANSPORT_WAGON.equals(transport)) {
             // Make sure (whatever extra priority is set) that wagon is selected
             configProps.put(WAGON_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);

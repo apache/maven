@@ -147,7 +147,12 @@ under the License.
   </distributionManagement>
 
   <properties>
-    <javaVersion>8</javaVersion>
+    <javaVersion>11</javaVersion>
+    <maven.compiler.release>${javaVersion}</maven.compiler.release>
+    <maven.compiler.source>${javaVersion}</maven.compiler.source>
+    <!-- JETTY TODO: used by enforcer, but Jetty brings in Java 17 dep -->
+    <maven.compiler.target>17</maven.compiler.target>
+
     <classWorldsVersion>2.6.0</classWorldsVersion>
     <commonsCliVersion>1.5.0</commonsCliVersion>
     <commonsIoVersion>2.11.0</commonsIoVersion>
@@ -165,7 +170,7 @@ under the License.
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <cipherVersion>2.0</cipherVersion>
     <jxpathVersion>1.3</jxpathVersion>
-    <resolverVersion>1.9.2</resolverVersion>
+    <resolverVersion>1.9.3-SNAPSHOT</resolverVersion>
     <slf4jVersion>1.7.36</slf4jVersion>
     <xmlunitVersion>2.6.4</xmlunitVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
@@ -394,6 +399,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-transport-wagon</artifactId>
+        <version>${resolverVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.resolver</groupId>
+        <artifactId>maven-resolver-transport-jetty</artifactId>
         <version>${resolverVersion}</version>
       </dependency>
       <!--  Commons -->
