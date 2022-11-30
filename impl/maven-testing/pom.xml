@@ -73,9 +73,9 @@ under the License.
 
     <!-- plexus -->
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
+      <groupId>org.apache.maven</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>3.4.2</version>
+      <version>${mavenVersion}</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
