@@ -21,7 +21,6 @@ package org.apache.maven.plugin.testing.resources;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
@@ -73,7 +72,8 @@ public class TestResources
     /**
      * Creates new clean copy of test project directory structure. The copy is named after both the test being executed
      * and test project name, which allows the same test project can be used by multiple tests and by different
-     * instances of the same parametrized tests.<br>
+     * instances of the same parametrized tests.
+     * <p>
      * TODO Provide alternative working directory naming for Windows, which still limits path names to ~250 charecters
      */
     public File getBasedir( String project )
@@ -117,7 +117,11 @@ public class TestResources
         scanner.addDefaultExcludes();
         scanner.scan();
 
-        Set<String> actual = new TreeSet<>( Arrays.asList( scanner.getIncludedFiles() ) );
+        Set<String> actual = new TreeSet<>();
+        for ( String path : scanner.getIncludedFiles() )
+        {
+            actual.add( path );
+        }
         for ( String path : scanner.getIncludedDirectories() )
         {
             if ( path.length() > 0 )
@@ -129,7 +133,10 @@ public class TestResources
         Set<String> expected = new TreeSet<>();
         if ( expectedPaths != null )
         {
-            expected.addAll( Arrays.asList( expectedPaths ) );
+            for ( String path : expectedPaths )
+            {
+                expected.add( path );
+            }
         }
 
         // compare textual representation to make diff easier to understand

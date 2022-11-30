@@ -37,7 +37,7 @@ import java.util.List;
 public class StubArtifactRepository
     implements ArtifactRepository
 {
-    private final String baseDir;
+    private String baseDir = null;
 
     /**
      * Default constructor
@@ -271,6 +271,18 @@ public class StubArtifactRepository
 
     @Override
     public void setMirroredRepositories( List<ArtifactRepository> artifactRepositories )
+    {
+        // no op
+    }
+
+    @Override
+    public boolean isBlocked()
+    {
+        return false;
+    }
+
+    @Override
+    public void setBlocked( boolean blocked )
     {
         // no op
     }

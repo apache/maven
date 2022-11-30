@@ -43,14 +43,18 @@ public class MojoRuleTest
     private boolean beforeWasCalled = false;
 
     @Rule
-    public final MojoRule rule = new MojoRule() {
+    public MojoRule rule = new MojoRule() {
 
         @Override
-        protected void before()
+        protected void before() throws Throwable 
         {
             beforeWasCalled = true;
         }      
     };
+    
+    private String pom;
+
+    private Xpp3Dom pomDom;
 
     private PlexusConfiguration pluginConfiguration;
 
@@ -60,7 +64,8 @@ public class MojoRuleTest
         throws Exception
     {
 
-        String pom = "<project>" +
+        pom =
+            "<project>" +
                 "<build>" +
                 "<plugins>" +
                 "<plugin>" +
@@ -74,15 +79,17 @@ public class MojoRuleTest
                 "</build>" +
                 "</project>";
 
-        Xpp3Dom pomDom = Xpp3DomBuilder.build( new StringReader( pom ) );
+        pomDom = Xpp3DomBuilder.build( new StringReader( pom ) );
 
         pluginConfiguration = rule.extractPluginConfiguration( "maven-simple-plugin", pomDom );
     }
 
     /**
+     * @throws Exception if any
      */
     @Test
     public void testPluginConfigurationExtraction()
+        throws Exception
     {
         assertEquals( "valueOne", pluginConfiguration.getChild( "keyOne" ).getValue() );
 
@@ -159,12 +166,14 @@ public class MojoRuleTest
     @Test
     @WithoutMojo
     public void testNoRuleWrapper()
+        throws Exception
     {
         assertFalse( "before executed although WithMojo annotation was added", beforeWasCalled );
     }
 
     @Test    
     public void testWithRuleWrapper()
+        throws Exception
     {
         assertTrue( "before executed because WithMojo annotation was not added", beforeWasCalled );
     }

@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.apache.maven.api.Session;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
@@ -49,8 +50,8 @@ import org.junit.runners.model.Statement;
 
 /**
  * {@link TestRule} for usage with Junit-4.10ff. This is just a wrapper for an embedded 
- * {@link AbstractMojoTestCase}, so all <code>protected</code> methods of the TestCase are
- * exhibited as <code>public</code> in the rule. You may annotate single tests methods with
+ * {@link AbstractMojoTestCase}, so all {@code protected} methods of the TestCase are
+ * exhibited as {@code public} in the rule. You may annotate single tests methods with
  * {@link WithoutMojo} to prevent the rule from firing.
  *
  * @author Mirko Friedenhagen
@@ -87,8 +88,7 @@ public class MojoRule
     /**
      * May be overridden in the implementation to do stuff after the current test was run.
      */
-    @SuppressWarnings( "EmptyMethod" )
-    protected void after()
+    protected void after() 
     {
         
     }
@@ -407,6 +407,7 @@ public class MojoRule
         {
             sessionScope.enter();
             sessionScope.seed( MavenSession.class, session );
+            sessionScope.seed( Session.class, session.getSession() );
 
             MojoExecutionScope executionScope = lookup( MojoExecutionScope.class );
             try

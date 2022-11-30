@@ -23,7 +23,7 @@ import org.junit.Test;
 
 public class TestResourcesTest
 {
-    public final TestResources resources = new TestResources();
+    public TestResources resources = new TestResources();
 
     @Test( expected = IllegalStateException.class )
     public void testNoRuleAnnotation()

@@ -21,6 +21,7 @@ package org.apache.maven.plugin.testing;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -28,7 +29,6 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,7 +39,6 @@ import java.util.Properties;
 import com.google.inject.Module;
 import org.apache.commons.io.input.XmlStreamReader;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -48,7 +47,6 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
@@ -56,8 +54,8 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
@@ -74,7 +72,6 @@ import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.ReflectionUtils;
@@ -153,14 +150,14 @@ public abstract class AbstractMojoTestCase
         {
             
             PluginDescriptor pluginDescriptor = new PluginDescriptorBuilder().build( interpolationReader );
-
-            Artifact artifact = lookup( ArtifactFactory.class ).createBuildArtifact( pluginDescriptor.getGroupId(),
+    
+            Artifact artifact =
+                lookup( RepositorySystem.class ).createArtifact( pluginDescriptor.getGroupId(),
                                                                  pluginDescriptor.getArtifactId(),
                                                                  pluginDescriptor.getVersion(), ".jar" );
     
             artifact.setFile( getPluginArtifactFile() );
             pluginDescriptor.setPluginArtifact( artifact );
-            //noinspection ArraysAsListWithZeroOrOneArgument
             pluginDescriptor.setArtifacts( Arrays.asList( artifact ) );
     
             for ( ComponentDescriptor<?> desc : pluginDescriptor.getComponents() )
@@ -236,7 +233,7 @@ public abstract class AbstractMojoTestCase
     protected InputStream getPublicDescriptorStream()
         throws Exception
     {
-        return Files.newInputStream( new File( getPluginDescriptorPath() ).toPath() );
+        return new FileInputStream( new File( getPluginDescriptorPath() ) );
     }
 
     protected String getPluginDescriptorPath()
@@ -269,7 +266,6 @@ public abstract class AbstractMojoTestCase
     /**
      * @since 3.0.0
      */
-    @SuppressWarnings( "EmptyMethod" )
     protected void addGuiceModules( List<Module> modules )
     {
         // no custom guice modules by default
@@ -277,11 +273,15 @@ public abstract class AbstractMojoTestCase
 
     protected ContainerConfiguration setupContainerConfiguration()
     {
-        return new DefaultContainerConfiguration()
-          .setClassWorld( new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() ) )
+        ClassWorld classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
+
+        ContainerConfiguration cc = new DefaultContainerConfiguration()
+          .setClassWorld( classWorld )
           .setClassPathScanning( PlexusConstants.SCANNING_INDEX )
           .setAutoWiring( true )
-          .setName( "maven" );
+          .setName( "maven" );      
+
+        return cc;
     }
     
     @Override
@@ -403,12 +403,6 @@ public abstract class AbstractMojoTestCase
 
         T mojo = (T) lookup( Mojo.class, groupId + ":" + artifactId + ":" + version + ":" + goal );
 
-        LoggerManager loggerManager = getContainer().lookup( LoggerManager.class );
-        
-        Log mojoLogger = new DefaultLog( loggerManager.getLoggerForComponent( Mojo.ROLE ) );
-
-        mojo.setLog( mojoLogger );
-
         if ( pluginConfiguration != null )
         {
             /* requires v10 of plexus container for lookup on expression evaluator
@@ -494,7 +488,6 @@ public abstract class AbstractMojoTestCase
 
         MavenSession session = new MavenSession( container, MavenRepositorySystemUtils.newSession(), request, result );
         session.setCurrentProject( project );
-        //noinspection ArraysAsListWithZeroOrOneArgument
         session.setProjects( Arrays.asList( project ) );
         return session;
     }
@@ -525,7 +518,7 @@ public abstract class AbstractMojoTestCase
             executionConfiguration = new Xpp3Dom( "configuration" );
         }
 
-        Xpp3Dom defaultConfiguration = MojoDescriptorCreator.convert( mojoDescriptor );
+        Xpp3Dom defaultConfiguration = new Xpp3Dom( MojoDescriptorCreator.convert( mojoDescriptor ) );
 
         Xpp3Dom finalConfiguration = new Xpp3Dom( "configuration" );
 

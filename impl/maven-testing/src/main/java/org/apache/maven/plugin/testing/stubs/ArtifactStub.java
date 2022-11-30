@@ -185,7 +185,14 @@ public class ArtifactStub
     @Override
     public String getDependencyConflictId()
     {
-        return getGroupId() + ":" + getArtifactId() + ":" + getType() + ":" + getClassifier();
+        StringBuffer buffer = new StringBuffer();
+
+        buffer.append( getGroupId() );
+        buffer.append( ":" ).append( getArtifactId() );
+        buffer.append( ":" ).append( getType() );
+        buffer.append( ":" ).append( getClassifier() );
+
+        return buffer.toString();
     }
 
     /**
@@ -193,7 +200,6 @@ public class ArtifactStub
      *
      * @see org.apache.maven.artifact.Artifact#addMetadata(org.apache.maven.artifact.metadata.ArtifactMetadata)
      */
-    @SuppressWarnings( "deprecation" )
     @Override
     public void addMetadata( ArtifactMetadata artifactMetadata )
     {
@@ -204,7 +210,6 @@ public class ArtifactStub
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.Artifact#getMetadataList()
      */
-    @SuppressWarnings( "deprecation" )
     @Override
     public Collection<ArtifactMetadata> getMetadataList()
     {
@@ -544,7 +549,6 @@ public class ArtifactStub
         return true;
     }
 
-    @SuppressWarnings( "EmptyMethod" )
     public void setFromAuthoritativeRepository( boolean fromAuthoritativeRepository )
     {
         // nothing

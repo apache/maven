@@ -19,6 +19,7 @@ package org.apache.maven.plugin.testing;
  * under the License.
  */
 
+import org.apache.maven.api.plugin.testing.MojoTest;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
@@ -29,9 +30,13 @@ import java.util.Map;
 /**
  * @author Jason van Zyl
  */
+@MojoTest
 public class MojoTestCaseTest
     extends AbstractMojoTestCase
 {
+    private String pom;
+
+    private Xpp3Dom pomDom;
 
     private PlexusConfiguration pluginConfiguration;
 
@@ -42,7 +47,8 @@ public class MojoTestCaseTest
     {
         super.setUp();
 
-        String pom = "<project>" +
+        pom =
+            "<project>" +
                 "<build>" +
                 "<plugins>" +
                 "<plugin>" +
@@ -56,14 +62,16 @@ public class MojoTestCaseTest
                 "</build>" +
                 "</project>";
 
-        Xpp3Dom pomDom = Xpp3DomBuilder.build( new StringReader( pom ) );
+        pomDom = Xpp3DomBuilder.build( new StringReader( pom ) );
 
         pluginConfiguration = extractPluginConfiguration( "maven-simple-plugin", pomDom );
     }
 
     /**
+     * @throws Exception if any
      */
     public void testPluginConfigurationExtraction()
+        throws Exception
     {
         assertEquals( "valueOne", pluginConfiguration.getChild( "keyOne" ).getValue() );
 

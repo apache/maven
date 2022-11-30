@@ -22,10 +22,14 @@ package org.apache.maven.plugin.testing;
 import java.io.IOException;
 
 import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ArtifactStubFactoryTest
-    extends TestCase
 {
+    @Test
     public void testVersionChecks() throws IOException
     {
         ArtifactStubFactory factory = new ArtifactStubFactory();
@@ -35,7 +39,8 @@ public class ArtifactStubFactoryTest
         assertFalse(factory.getSnapshotArtifact().isRelease());
     }
 
-    public void testCreateFiles()
+    @Test
+    public void testCreateFiles() throws IOException
     {
         ArtifactStubFactory factory = new ArtifactStubFactory();
         assertFalse(factory.isCreateFiles());

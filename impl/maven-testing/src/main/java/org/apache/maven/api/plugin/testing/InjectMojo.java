@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.testing;
+package org.apache.maven.api.plugin.testing;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.plugin.testing;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,32 +19,20 @@ package org.apache.maven.plugin.testing;
  * under the License.
  */
 
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
- * @author Jason van Zyl
+ *
  */
-public class SimpleMojo
-    extends AbstractMojo
+@Retention( RetentionPolicy.RUNTIME )
+public @interface InjectMojo
 {
-    private String keyOne;
 
-    private String keyTwo;
+    String goal();
 
-    public String getKeyOne()
-    {
-        return keyOne;
-    }
+    String pom();
 
-    public String getKeyTwo()
-    {
-        return keyTwo;
-    }
+    boolean empty() default false;
 
-    @Override
-    public void execute()
-        throws MojoExecutionException
-    {
-    }
 }

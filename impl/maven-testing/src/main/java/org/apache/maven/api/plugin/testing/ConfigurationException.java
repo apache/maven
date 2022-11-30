@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.testing;
+package org.apache.maven.api.plugin.testing;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,32 +19,39 @@ package org.apache.maven.plugin.testing;
  * under the License.
  */
 
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-
 /**
- * @author Jason van Zyl
+ * ConfigurationException
+ *
+ * @author jesse
  */
-public class SimpleMojo
-    extends AbstractMojo
+public class ConfigurationException
+    extends Exception
 {
-    private String keyOne;
+    /** serialVersionUID */
+    static final long serialVersionUID = -6180939638742159065L;
 
-    private String keyTwo;
-
-    public String getKeyOne()
+    /**
+     * @param message The detailed message.
+     */
+    public ConfigurationException( String message )
     {
-        return keyOne;
+        super( message );
     }
 
-    public String getKeyTwo()
+    /**
+     * @param cause The detailed cause.
+     */
+    public ConfigurationException( Throwable cause )
     {
-        return keyTwo;
+        super( cause );
     }
 
-    @Override
-    public void execute()
-        throws MojoExecutionException
+    /**
+     * @param message The detailed message.
+     * @param cause The detailed cause.
+     */
+    public ConfigurationException( String message, Throwable cause )
     {
+        super( message, cause );
     }
 }
