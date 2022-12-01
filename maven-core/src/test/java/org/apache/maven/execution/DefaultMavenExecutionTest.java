@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.execution;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,8 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
+
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
@@ -25,32 +25,27 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
-
 import org.apache.maven.project.MavenProject;
 import org.junit.Test;
 
 /**
  * @author Benjamin Bentmann
  */
-public class DefaultMavenExecutionTest
-{
+public class DefaultMavenExecutionTest {
     @Test
-    public void testCopyDefault()
-    {
+    public void testCopyDefault() {
         MavenExecutionRequest original = new DefaultMavenExecutionRequest();
-        MavenExecutionRequest copy = DefaultMavenExecutionRequest.copy( original );
-        assertNotNull( copy );
-        assertNotSame( copy, original );
+        MavenExecutionRequest copy = DefaultMavenExecutionRequest.copy(original);
+        assertNotNull(copy);
+        assertNotSame(copy, original);
     }
 
     @Test
-    public void testResultWithNullTopologicallySortedProjectsIsEmptyList()
-    {
+    public void testResultWithNullTopologicallySortedProjectsIsEmptyList() {
         MavenExecutionResult result = new DefaultMavenExecutionResult();
-        result.setTopologicallySortedProjects( null );
+        result.setTopologicallySortedProjects(null);
         List<MavenProject> projects = result.getTopologicallySortedProjects();
-        assertNotNull( projects );
-        assertThat( projects, is( empty() ) );
+        assertNotNull(projects);
+        assertThat(projects, is(empty()));
     }
-
 }

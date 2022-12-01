@@ -1,5 +1,3 @@
-package org.apache.maven.model.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,13 @@ package org.apache.maven.model.io;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.io;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Map;
-
 import org.apache.maven.model.Model;
 
 /**
@@ -32,8 +30,7 @@ import org.apache.maven.model.Model;
  *
  * @author Benjamin Bentmann
  */
-public interface ModelWriter
-{
+public interface ModelWriter {
 
     /**
      * Writes the supplied model to the specified file. Any non-existing parent directories of the output file will be
@@ -44,8 +41,7 @@ public interface ModelWriter
      * @param model The model to serialize, must not be {@code null}.
      * @throws IOException If the model could not be serialized.
      */
-    void write( File output, Map<String, Object> options, Model model )
-        throws IOException;
+    void write(File output, Map<String, Object> options, Model model) throws IOException;
 
     /**
      * Writes the supplied model to the specified character writer. The writer will be automatically closed before the
@@ -56,8 +52,7 @@ public interface ModelWriter
      * @param model The model to serialize, must not be {@code null}.
      * @throws IOException If the model could not be serialized.
      */
-    void write( Writer output, Map<String, Object> options, Model model )
-        throws IOException;
+    void write(Writer output, Map<String, Object> options, Model model) throws IOException;
 
     /**
      * Writes the supplied model to the specified byte stream. The stream will be automatically closed before the method
@@ -68,7 +63,5 @@ public interface ModelWriter
      * @param model The model to serialize, must not be {@code null}.
      * @throws IOException If the model could not be serialized.
      */
-    void write( OutputStream output, Map<String, Object> options, Model model )
-        throws IOException;
-
+    void write(OutputStream output, Map<String, Object> options, Model model) throws IOException;
 }

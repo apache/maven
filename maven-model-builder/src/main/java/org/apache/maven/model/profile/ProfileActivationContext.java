@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.profile;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile;
 
 import java.io.File;
 import java.util.List;
@@ -28,8 +27,7 @@ import java.util.Map;
  *
  * @author Benjamin Bentmann
  */
-public interface ProfileActivationContext
-{
+public interface ProfileActivationContext {
     /**
      * Key of the property containing the project's packaging.
      * Available in {@link #getUserProperties()}.
@@ -81,5 +79,4 @@ public interface ProfileActivationContext
      * @return The project properties, never {@code null}.
      */
     Map<String, String> getProjectProperties();
-
 }

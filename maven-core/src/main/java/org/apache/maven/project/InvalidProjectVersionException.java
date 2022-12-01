@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,45 +16,45 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.io.File;
-
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 
 /**
  * InvalidProjectVersionException
  */
-public class InvalidProjectVersionException
-    extends ProjectBuildingException
-{
+public class InvalidProjectVersionException extends ProjectBuildingException {
 
     private final String locationInPom;
 
     private final String offendingVersion;
 
-    public InvalidProjectVersionException( String projectId, String locationInPom, String offendingVersion,
-                                           File pomFile, InvalidVersionSpecificationException cause )
-    {
-        super( projectId, formatMessage( projectId, locationInPom, offendingVersion, cause ), pomFile, cause );
+    public InvalidProjectVersionException(
+            String projectId,
+            String locationInPom,
+            String offendingVersion,
+            File pomFile,
+            InvalidVersionSpecificationException cause) {
+        super(projectId, formatMessage(projectId, locationInPom, offendingVersion, cause), pomFile, cause);
         this.locationInPom = locationInPom;
         this.offendingVersion = offendingVersion;
     }
 
-    private static String formatMessage( String projectId, String locationInPom, String offendingVersion,
-                                         InvalidVersionSpecificationException cause )
-    {
+    private static String formatMessage(
+            String projectId,
+            String locationInPom,
+            String offendingVersion,
+            InvalidVersionSpecificationException cause) {
         return "Invalid version: " + offendingVersion + " found for: " + locationInPom + " in project: " + projectId
-            + ". Reason: " + cause.getMessage();
+                + ". Reason: " + cause.getMessage();
     }
 
-    public String getOffendingVersion()
-    {
+    public String getOffendingVersion() {
         return offendingVersion;
     }
 
-    public String getLocationInPom()
-    {
+    public String getLocationInPom() {
         return locationInPom;
     }
-
 }

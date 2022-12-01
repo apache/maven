@@ -1,5 +1,3 @@
-package org.apache.maven.model.normalization;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.normalization;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.normalization;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -29,8 +28,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
  *
  * @author Benjamin Bentmann
  */
-public interface ModelNormalizer
-{
+public interface ModelNormalizer {
 
     /**
      * Merges duplicate elements like multiple declarations of the same build plugin in the specified model.
@@ -39,7 +37,7 @@ public interface ModelNormalizer
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void mergeDuplicates( Model model, ModelBuildingRequest request, ModelProblemCollector problems );
+    void mergeDuplicates(Model model, ModelBuildingRequest request, ModelProblemCollector problems);
 
     /**
      * Sets default values in the specified model that for technical reasons cannot be set directly in the Modello
@@ -49,6 +47,5 @@ public interface ModelNormalizer
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void injectDefaultValues( Model model, ModelBuildingRequest request, ModelProblemCollector problems );
-
+    void injectDefaultValues(Model model, ModelBuildingRequest request, ModelProblemCollector problems);
 }

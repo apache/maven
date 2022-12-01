@@ -1,5 +1,3 @@
-package org.apache.maven.internal.aether;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,16 @@ package org.apache.maven.internal.aether;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.aether;
+
+import static java.util.Objects.requireNonNull;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.sisu.EagerSingleton;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * Maven internal component that bridges container "shut down" to {@link RepositorySystem#shutdown()}.
@@ -36,19 +34,16 @@ import static java.util.Objects.requireNonNull;
  */
 @Named
 @EagerSingleton
-public final class ResolverLifecycle
-{
+public final class ResolverLifecycle {
     private final Provider<RepositorySystem> repositorySystemProvider;
 
     @Inject
-    public ResolverLifecycle( Provider<RepositorySystem> repositorySystemProvider )
-    {
-        this.repositorySystemProvider = requireNonNull( repositorySystemProvider );
+    public ResolverLifecycle(Provider<RepositorySystem> repositorySystemProvider) {
+        this.repositorySystemProvider = requireNonNull(repositorySystemProvider);
     }
 
     @PreDestroy
-    public void shutdown()
-    {
+    public void shutdown() {
         repositorySystemProvider.get().shutdown();
     }
 }

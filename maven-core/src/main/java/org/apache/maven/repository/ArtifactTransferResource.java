@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 /**
  * Describes a resource being uploaded or downloaded by the repository system.
  *
  * @author Benjamin Bentmann
  */
-public interface ArtifactTransferResource
-{
+public interface ArtifactTransferResource {
 
     /**
      * The base URL of the repository, e.g. "http://repo1.maven.org/maven2/". Unless the URL is unknown, it will be
@@ -62,5 +60,4 @@ public interface ArtifactTransferResource
      * @return The timestamp when the transfer of this artifact was started.
      */
     long getTransferStartTime();
-
 }

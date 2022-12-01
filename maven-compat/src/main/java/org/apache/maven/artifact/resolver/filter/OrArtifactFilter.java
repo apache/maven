@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver.filter;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,11 @@ package org.apache.maven.artifact.resolver.filter;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver.filter;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
 import org.apache.maven.artifact.Artifact;
 
 /**
@@ -30,28 +28,21 @@ import org.apache.maven.artifact.Artifact;
  *
  * @author Benjamin Bentmann
  */
-public class OrArtifactFilter
-    implements ArtifactFilter
-{
+public class OrArtifactFilter implements ArtifactFilter {
 
     private Set<ArtifactFilter> filters;
 
-    public OrArtifactFilter()
-    {
+    public OrArtifactFilter() {
         this.filters = new LinkedHashSet<>();
     }
 
-    public OrArtifactFilter( Collection<ArtifactFilter> filters )
-    {
-        this.filters = new LinkedHashSet<>( filters );
+    public OrArtifactFilter(Collection<ArtifactFilter> filters) {
+        this.filters = new LinkedHashSet<>(filters);
     }
 
-    public boolean include( Artifact artifact )
-    {
-        for ( ArtifactFilter filter : filters )
-        {
-            if ( filter.include( artifact ) )
-            {
+    public boolean include(Artifact artifact) {
+        for (ArtifactFilter filter : filters) {
+            if (filter.include(artifact)) {
                 return true;
             }
         }
@@ -59,35 +50,29 @@ public class OrArtifactFilter
         return false;
     }
 
-    public void add( ArtifactFilter artifactFilter )
-    {
-        filters.add( artifactFilter );
+    public void add(ArtifactFilter artifactFilter) {
+        filters.add(artifactFilter);
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int hash = 17;
         hash = hash * 31 + filters.hashCode();
         return hash;
     }
 
     @Override
-    public boolean equals( Object obj )
-    {
-        if ( this == obj )
-        {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
 
-        if ( !( obj instanceof OrArtifactFilter ) )
-        {
+        if (!(obj instanceof OrArtifactFilter)) {
             return false;
         }
 
         OrArtifactFilter other = (OrArtifactFilter) obj;
 
-        return filters.equals( other.filters );
+        return filters.equals(other.filters);
     }
-
 }

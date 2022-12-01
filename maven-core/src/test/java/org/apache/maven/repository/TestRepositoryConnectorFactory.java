@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.eclipse.aether.RepositorySystemSession;
@@ -29,20 +28,15 @@ import org.eclipse.aether.transfer.NoRepositoryConnectorException;
 /**
  * @author Benjamin Bentmann
  */
-@Component( role = RepositoryConnectorFactory.class, hint = "test" )
-public class TestRepositoryConnectorFactory
-    implements RepositoryConnectorFactory
-{
+@Component(role = RepositoryConnectorFactory.class, hint = "test")
+public class TestRepositoryConnectorFactory implements RepositoryConnectorFactory {
 
-    public RepositoryConnector newInstance( RepositorySystemSession session, RemoteRepository repository )
-        throws NoRepositoryConnectorException
-    {
-        return new TestRepositoryConnector( repository );
+    public RepositoryConnector newInstance(RepositorySystemSession session, RemoteRepository repository)
+            throws NoRepositoryConnectorException {
+        return new TestRepositoryConnector(repository);
     }
 
-    public float getPriority()
-    {
+    public float getPriority() {
         return 0;
     }
-
 }

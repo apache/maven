@@ -1,5 +1,3 @@
-package org.apache.maven.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,7 +16,16 @@ package org.apache.maven.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -54,54 +61,38 @@ import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  */
-public abstract class AbstractArtifactComponentTestCase
-    extends PlexusTestCase
-{
+public abstract class AbstractArtifactComponentTestCase extends PlexusTestCase {
     protected ArtifactFactory artifactFactory;
 
     protected ArtifactRepositoryFactory artifactRepositoryFactory;
 
     @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
+    protected void customizeContainerConfiguration(ContainerConfiguration containerConfiguration) {
+        super.customizeContainerConfiguration(containerConfiguration);
+        containerConfiguration.setAutoWiring(true);
+        containerConfiguration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
     }
 
     @Override
-    protected void setUp()
-        throws Exception
-    {
+    protected void setUp() throws Exception {
         super.setUp();
-        artifactFactory = lookup( ArtifactFactory.class );
-        artifactRepositoryFactory = lookup( ArtifactRepositoryFactory.class );
+        artifactFactory = lookup(ArtifactFactory.class);
+        artifactRepositoryFactory = lookup(ArtifactRepositoryFactory.class);
 
         RepositorySystemSession repoSession = initRepoSession();
-        MavenSession session = new MavenSession( getContainer(), repoSession, new DefaultMavenExecutionRequest(),
-                                                 new DefaultMavenExecutionResult() );
+        MavenSession session = new MavenSession(
+                getContainer(), repoSession, new DefaultMavenExecutionRequest(), new DefaultMavenExecutionResult());
 
-        LegacySupport legacySupport = lookup( LegacySupport.class );
-        legacySupport.setSession( session );
+        LegacySupport legacySupport = lookup(LegacySupport.class);
+        legacySupport.setSession(session);
     }
 
     @Override
-    protected void tearDown()
-        throws Exception
-    {
-        release( artifactFactory );
+    protected void tearDown() throws Exception {
+        release(artifactFactory);
 
         super.tearDown();
     }
@@ -113,123 +104,105 @@ public abstract class AbstractArtifactComponentTestCase
      *
      * @throws Exception
      */
-    protected ArtifactRepository badLocalRepository()
-        throws Exception
-    {
+    protected ArtifactRepository badLocalRepository() throws Exception {
         String path = "target/test-repositories/" + component() + "/bad-local-repository";
 
-        File f = new File( getBasedir(), path );
+        File f = new File(getBasedir(), path);
 
         f.createNewFile();
 
         ArtifactRepositoryLayout repoLayout =
-            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
+                (ArtifactRepositoryLayout) lookup(ArtifactRepositoryLayout.ROLE, "default");
 
-        return artifactRepositoryFactory.createArtifactRepository( "test", "file://" + f.getPath(), repoLayout, null,
-                                                                   null );
+        return artifactRepositoryFactory.createArtifactRepository(
+                "test", "file://" + f.getPath(), repoLayout, null, null);
     }
 
-    protected String getRepositoryLayout()
-    {
+    protected String getRepositoryLayout() {
         return "default";
     }
 
-    protected ArtifactRepository localRepository()
-        throws Exception
-    {
+    protected ArtifactRepository localRepository() throws Exception {
         String path = "target/test-repositories/" + component() + "/local-repository";
 
-        File f = new File( getBasedir(), path );
+        File f = new File(getBasedir(), path);
 
         ArtifactRepositoryLayout repoLayout =
-            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
+                (ArtifactRepositoryLayout) lookup(ArtifactRepositoryLayout.ROLE, "default");
 
-        return artifactRepositoryFactory.createArtifactRepository( "local", "file://" + f.getPath(), repoLayout, null,
-                                                                   null );
+        return artifactRepositoryFactory.createArtifactRepository(
+                "local", "file://" + f.getPath(), repoLayout, null, null);
     }
 
-    protected ArtifactRepository remoteRepository()
-        throws Exception
-    {
+    protected ArtifactRepository remoteRepository() throws Exception {
         String path = "target/test-repositories/" + component() + "/remote-repository";
 
-        File f = new File( getBasedir(), path );
+        File f = new File(getBasedir(), path);
 
         ArtifactRepositoryLayout repoLayout =
-            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
+                (ArtifactRepositoryLayout) lookup(ArtifactRepositoryLayout.ROLE, "default");
 
-        return artifactRepositoryFactory.createArtifactRepository( "test", "file://" + f.getPath(), repoLayout,
-                                                                   new ArtifactRepositoryPolicy(),
-                                                                   new ArtifactRepositoryPolicy() );
+        return artifactRepositoryFactory.createArtifactRepository(
+                "test",
+                "file://" + f.getPath(),
+                repoLayout,
+                new ArtifactRepositoryPolicy(),
+                new ArtifactRepositoryPolicy());
     }
 
-    protected ArtifactRepository badRemoteRepository()
-        throws Exception
-    {
+    protected ArtifactRepository badRemoteRepository() throws Exception {
         ArtifactRepositoryLayout repoLayout =
-            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
+                (ArtifactRepositoryLayout) lookup(ArtifactRepositoryLayout.ROLE, "default");
 
-        return artifactRepositoryFactory.createArtifactRepository( "test", "http://foo.bar/repository", repoLayout,
-                                                                   null, null );
+        return artifactRepositoryFactory.createArtifactRepository(
+                "test", "http://foo.bar/repository", repoLayout, null, null);
     }
 
-    protected void assertRemoteArtifactPresent( Artifact artifact )
-        throws Exception
-    {
+    protected void assertRemoteArtifactPresent(Artifact artifact) throws Exception {
         ArtifactRepository remoteRepo = remoteRepository();
 
-        String path = remoteRepo.pathOf( artifact );
+        String path = remoteRepo.pathOf(artifact);
 
-        File file = new File( remoteRepo.getBasedir(), path );
+        File file = new File(remoteRepo.getBasedir(), path);
 
-        if ( !file.exists() )
-        {
-            fail( "Remote artifact " + file + " should be present." );
+        if (!file.exists()) {
+            fail("Remote artifact " + file + " should be present.");
         }
     }
 
-    protected void assertLocalArtifactPresent( Artifact artifact )
-        throws Exception
-    {
+    protected void assertLocalArtifactPresent(Artifact artifact) throws Exception {
         ArtifactRepository localRepo = localRepository();
 
-        String path = localRepo.pathOf( artifact );
+        String path = localRepo.pathOf(artifact);
 
-        File file = new File( localRepo.getBasedir(), path );
+        File file = new File(localRepo.getBasedir(), path);
 
-        if ( !file.exists() )
-        {
-            fail( "Local artifact " + file + " should be present." );
+        if (!file.exists()) {
+            fail("Local artifact " + file + " should be present.");
         }
     }
 
-    protected void assertRemoteArtifactNotPresent( Artifact artifact )
-        throws Exception
-    {
+    protected void assertRemoteArtifactNotPresent(Artifact artifact) throws Exception {
         ArtifactRepository remoteRepo = remoteRepository();
 
-        String path = remoteRepo.pathOf( artifact );
+        String path = remoteRepo.pathOf(artifact);
 
-        File file = new File( remoteRepo.getBasedir(), path );
+        File file = new File(remoteRepo.getBasedir(), path);
 
-        if ( file.exists() )
-        {
-            fail( "Remote artifact " + file + " should not be present." );
+        if (file.exists()) {
+            fail("Remote artifact " + file + " should not be present.");
         }
     }
 
-    protected void assertLocalArtifactNotPresent( Artifact artifact )
-        throws Exception
-    {
+    protected void assertLocalArtifactNotPresent(Artifact artifact) throws Exception {
         ArtifactRepository localRepo = localRepository();
 
-        String path = localRepo.pathOf( artifact );
+        String path = localRepo.pathOf(artifact);
 
-        File file = new File( localRepo.getBasedir(), path );
+        File file = new File(localRepo.getBasedir(), path);
 
-        if ( file.exists() )
-        {
-            fail( "Local artifact " + file + " should not be present." );
+        if (file.exists()) {
+            fail("Local artifact " + file + " should not be present.");
         }
     }
 
@@ -237,12 +210,10 @@ public abstract class AbstractArtifactComponentTestCase
     //
     // ----------------------------------------------------------------------
 
-    protected List<ArtifactRepository> remoteRepositories()
-        throws Exception
-    {
+    protected List<ArtifactRepository> remoteRepositories() throws Exception {
         List<ArtifactRepository> remoteRepositories = new ArrayList<>();
 
-        remoteRepositories.add( remoteRepository() );
+        remoteRepositories.add(remoteRepository());
 
         return remoteRepositories;
     }
@@ -251,124 +222,97 @@ public abstract class AbstractArtifactComponentTestCase
     // Test artifact generation for unit tests
     // ----------------------------------------------------------------------
 
-    protected Artifact createLocalArtifact( String artifactId, String version )
-        throws Exception
-    {
-        Artifact artifact = createArtifact( artifactId, version );
+    protected Artifact createLocalArtifact(String artifactId, String version) throws Exception {
+        Artifact artifact = createArtifact(artifactId, version);
 
-        createArtifact( artifact, localRepository() );
+        createArtifact(artifact, localRepository());
 
         return artifact;
     }
 
-    protected Artifact createRemoteArtifact( String artifactId, String version )
-        throws Exception
-    {
-        Artifact artifact = createArtifact( artifactId, version );
+    protected Artifact createRemoteArtifact(String artifactId, String version) throws Exception {
+        Artifact artifact = createArtifact(artifactId, version);
 
-        createArtifact( artifact, remoteRepository() );
+        createArtifact(artifact, remoteRepository());
 
         return artifact;
     }
 
-    protected void createLocalArtifact( Artifact artifact )
-        throws Exception
-    {
-        createArtifact( artifact, localRepository() );
+    protected void createLocalArtifact(Artifact artifact) throws Exception {
+        createArtifact(artifact, localRepository());
     }
 
-    protected void createRemoteArtifact( Artifact artifact )
-        throws Exception
-    {
-        createArtifact( artifact, remoteRepository() );
+    protected void createRemoteArtifact(Artifact artifact) throws Exception {
+        createArtifact(artifact, remoteRepository());
     }
 
-    protected void createArtifact( Artifact artifact, ArtifactRepository repository )
-        throws Exception
-    {
-        String path = repository.pathOf( artifact );
+    protected void createArtifact(Artifact artifact, ArtifactRepository repository) throws Exception {
+        String path = repository.pathOf(artifact);
 
-        File artifactFile = new File( repository.getBasedir(), path );
+        File artifactFile = new File(repository.getBasedir(), path);
 
-        if ( !artifactFile.getParentFile().exists() )
-        {
+        if (!artifactFile.getParentFile().exists()) {
             artifactFile.getParentFile().mkdirs();
         }
-        try ( Writer writer = new OutputStreamWriter( new FileOutputStream( artifactFile ), StandardCharsets.ISO_8859_1) )
-        {
-            writer.write( artifact.getId() );
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(artifactFile), StandardCharsets.ISO_8859_1)) {
+            writer.write(artifact.getId());
         }
     }
 
-    protected Artifact createArtifact( String artifactId, String version )
-        throws Exception
-    {
-        return createArtifact( artifactId, version, "jar" );
+    protected Artifact createArtifact(String artifactId, String version) throws Exception {
+        return createArtifact(artifactId, version, "jar");
     }
 
-    protected Artifact createArtifact( String artifactId, String version, String type )
-        throws Exception
-    {
-        return createArtifact( "org.apache.maven", artifactId, version, type );
+    protected Artifact createArtifact(String artifactId, String version, String type) throws Exception {
+        return createArtifact("org.apache.maven", artifactId, version, type);
     }
 
-    protected Artifact createArtifact( String groupId, String artifactId, String version, String type )
-        throws Exception
-    {
-        Artifact a = artifactFactory.createBuildArtifact( groupId, artifactId, version, type );
+    protected Artifact createArtifact(String groupId, String artifactId, String version, String type) throws Exception {
+        Artifact a = artifactFactory.createBuildArtifact(groupId, artifactId, version, type);
 
         return a;
     }
 
-    protected void deleteLocalArtifact( Artifact artifact )
-        throws Exception
-    {
-        deleteArtifact( artifact, localRepository() );
+    protected void deleteLocalArtifact(Artifact artifact) throws Exception {
+        deleteArtifact(artifact, localRepository());
     }
 
-    protected void deleteArtifact( Artifact artifact, ArtifactRepository repository )
-        throws Exception
-    {
-        String path = repository.pathOf( artifact );
+    protected void deleteArtifact(Artifact artifact, ArtifactRepository repository) throws Exception {
+        String path = repository.pathOf(artifact);
 
-        File artifactFile = new File( repository.getBasedir(), path );
+        File artifactFile = new File(repository.getBasedir(), path);
 
-        if ( artifactFile.exists() )
-        {
-            if ( !artifactFile.delete() )
-            {
-                throw new IOException( "Failure while attempting to delete artifact " + artifactFile );
+        if (artifactFile.exists()) {
+            if (!artifactFile.delete()) {
+                throw new IOException("Failure while attempting to delete artifact " + artifactFile);
             }
         }
     }
 
-    protected RepositorySystemSession initRepoSession()
-        throws Exception
-    {
+    protected RepositorySystemSession initRepoSession() throws Exception {
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
-        session.setArtifactDescriptorPolicy( new SimpleArtifactDescriptorPolicy( true, true ) );
+        session.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(true, true));
         DependencyTraverser depTraverser = new FatArtifactTraverser();
-        session.setDependencyTraverser( depTraverser );
+        session.setDependencyTraverser(depTraverser);
 
         DependencyManager depManager = new ClassicDependencyManager();
-        session.setDependencyManager( depManager );
+        session.setDependencyManager(depManager);
 
-        DependencySelector depFilter = new AndDependencySelector( new ScopeDependencySelector( "test", "provided" ),
-                                                                  new OptionalDependencySelector(),
-                                                                  new ExclusionDependencySelector() );
-        session.setDependencySelector( depFilter );
+        DependencySelector depFilter = new AndDependencySelector(
+                new ScopeDependencySelector("test", "provided"),
+                new OptionalDependencySelector(),
+                new ExclusionDependencySelector());
+        session.setDependencySelector(depFilter);
 
-        DependencyGraphTransformer transformer =
-            new ConflictResolver( new NearestVersionSelector(), new JavaScopeSelector(),
-                                  new SimpleOptionalitySelector(), new JavaScopeDeriver() );
-        transformer = new ChainedDependencyGraphTransformer( transformer, new JavaDependencyContextRefiner() );
-        session.setDependencyGraphTransformer( transformer );
+        DependencyGraphTransformer transformer = new ConflictResolver(
+                new NearestVersionSelector(), new JavaScopeSelector(),
+                new SimpleOptionalitySelector(), new JavaScopeDeriver());
+        transformer = new ChainedDependencyGraphTransformer(transformer, new JavaDependencyContextRefiner());
+        session.setDependencyGraphTransformer(transformer);
 
-        LocalRepository localRepo = new LocalRepository( localRepository().getBasedir() );
-        session.setLocalRepositoryManager(
-            new SimpleLocalRepositoryManagerFactory().newInstance( session, localRepo ) );
+        LocalRepository localRepo = new LocalRepository(localRepository().getBasedir());
+        session.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory().newInstance(session, localRepo));
 
         return session;
     }
-
 }

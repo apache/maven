@@ -1,5 +1,3 @@
-package org.apache.maven.project.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,35 +16,28 @@ package org.apache.maven.project.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.artifact;
 
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusTestCase;
 import org.junit.Ignore;
 
 @Ignore
-public class MavenMetadataSourceTest
-    extends PlexusTestCase
-{
+public class MavenMetadataSourceTest extends PlexusTestCase {
     private RepositorySystem repositorySystem;
 
-    protected void setUp()
-        throws Exception
-    {
+    protected void setUp() throws Exception {
         super.setUp();
-        repositorySystem = lookup( RepositorySystem.class );
+        repositorySystem = lookup(RepositorySystem.class);
     }
 
     @Override
-    protected void tearDown()
-        throws Exception
-    {
+    protected void tearDown() throws Exception {
         repositorySystem = null;
         super.tearDown();
     }
 
-    public void testShouldNotCarryExclusionsOverFromDependencyToDependency()
-        throws Exception
-    {
+    public void testShouldNotCarryExclusionsOverFromDependencyToDependency() throws Exception {
         /*
         Dependency dep1 = new Dependency();
         dep1.setGroupId( "test" );
@@ -92,7 +83,7 @@ public class MavenMetadataSourceTest
         */
     }
 
-    //TODO restore these if it makes sense
+    // TODO restore these if it makes sense
     /*
     public void testShouldUseCompileScopeIfDependencyScopeEmpty()
         throws Exception

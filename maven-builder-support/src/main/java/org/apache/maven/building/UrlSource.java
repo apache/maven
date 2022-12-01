@@ -1,5 +1,3 @@
-package org.apache.maven.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.building;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,9 +28,7 @@ import java.util.Objects;
  *
  * @author Benjamin Bentmann
  */
-public class UrlSource
-    implements Source
-{
+public class UrlSource implements Source {
 
     private URL url;
 
@@ -40,21 +37,17 @@ public class UrlSource
      *
      * @param url The file, must not be {@code null}.
      */
-    public UrlSource( URL url )
-    {
-        this.url = Objects.requireNonNull( url, "url cannot be null" );
+    public UrlSource(URL url) {
+        this.url = Objects.requireNonNull(url, "url cannot be null");
     }
 
     @Override
-    public InputStream getInputStream()
-        throws IOException
-    {
+    public InputStream getInputStream() throws IOException {
         return url.openStream();
     }
 
     @Override
-    public String getLocation()
-    {
+    public String getLocation() {
         return url.toString();
     }
 
@@ -63,15 +56,12 @@ public class UrlSource
      *
      * @return The underlying URL, never {@code null}.
      */
-    public URL getUrl()
-    {
+    public URL getUrl() {
         return url;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getLocation();
     }
-
 }

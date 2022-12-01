@@ -1,7 +1,3 @@
-package org.apache.maven.model.profile.activation;
-
-import java.util.Objects;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,66 +16,58 @@ import java.util.Objects;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile.activation;
 
+import java.util.Objects;
 import java.util.Properties;
-
+import junit.framework.TestCase;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
 import org.apache.maven.model.profile.ProfileActivationContext;
-
-import junit.framework.TestCase;
 
 /**
  * Provides common services to test {@link ProfileActivator} implementations.
  *
  * @author Benjamin Bentmann
  */
-public abstract class AbstractProfileActivatorTest<T extends ProfileActivator>
-    extends TestCase
-{
+public abstract class AbstractProfileActivatorTest<T extends ProfileActivator> extends TestCase {
 
     private Class<T> activatorClass;
 
     protected T activator;
 
-    public AbstractProfileActivatorTest( Class<T> activatorClass )
-    {
-        this.activatorClass = Objects.requireNonNull( activatorClass, "activatorClass cannot be null" );;
+    public AbstractProfileActivatorTest(Class<T> activatorClass) {
+        this.activatorClass = Objects.requireNonNull(activatorClass, "activatorClass cannot be null");
+        ;
     }
 
     @Override
-    protected void setUp()
-        throws Exception
-    {
+    protected void setUp() throws Exception {
         super.setUp();
 
         activator = activatorClass.getConstructor().newInstance();
     }
 
     @Override
-    protected void tearDown()
-        throws Exception
-    {
+    protected void tearDown() throws Exception {
         activator = null;
 
         super.tearDown();
     }
 
-    protected ProfileActivationContext newContext( final Properties userProperties, final Properties systemProperties )
-    {
+    protected ProfileActivationContext newContext(final Properties userProperties, final Properties systemProperties) {
         DefaultProfileActivationContext context = new DefaultProfileActivationContext();
-        return context.setUserProperties( userProperties ).setSystemProperties( systemProperties );
+        return context.setUserProperties(userProperties).setSystemProperties(systemProperties);
     }
 
-    protected void assertActivation( boolean active, Profile profile, ProfileActivationContext context )
-    {
+    protected void assertActivation(boolean active, Profile profile, ProfileActivationContext context) {
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
-        assertEquals( active, activator.isActive( profile, context, problems ) );
+        assertEquals(active, activator.isActive(profile, context, problems));
 
-        assertEquals( problems.getErrors().toString(), 0, problems.getErrors().size() );
-        assertEquals( problems.getWarnings().toString(), 0, problems.getWarnings().size() );
+        assertEquals(problems.getErrors().toString(), 0, problems.getErrors().size());
+        assertEquals(
+                problems.getWarnings().toString(), 0, problems.getWarnings().size());
     }
-
 }

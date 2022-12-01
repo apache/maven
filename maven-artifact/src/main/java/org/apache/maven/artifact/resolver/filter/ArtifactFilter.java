@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver.filter;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver.filter;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,13 +16,13 @@ package org.apache.maven.artifact.resolver.filter;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver.filter;
 
 import org.apache.maven.artifact.Artifact;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
-public interface ArtifactFilter
-{
-    boolean include( Artifact artifact );
+public interface ArtifactFilter {
+    boolean include(Artifact artifact);
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,24 +16,21 @@ package org.apache.maven.lifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle;
 
 /**
  * Signals a failure to build because no goal was specified.
  *
  * @author Benjamin Bentmann
  */
-public class NoGoalSpecifiedException
-    extends Exception
-{
+public class NoGoalSpecifiedException extends Exception {
 
     /**
      * Creates a new exception.
      *
      * @param message The detail message, may be {@code null}.
      */
-    public NoGoalSpecifiedException( String message )
-    {
-        super( message );
+    public NoGoalSpecifiedException(String message) {
+        super(message);
     }
-
 }

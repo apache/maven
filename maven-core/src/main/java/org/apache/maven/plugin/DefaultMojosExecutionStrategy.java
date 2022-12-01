@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,29 +16,25 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
-
+import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.List;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
 
 /**
  * Default mojo execution strategy. It just iterates over mojo executions and runs one by one
  */
 @Named
 @Singleton
-public class DefaultMojosExecutionStrategy implements MojosExecutionStrategy
-{
+public class DefaultMojosExecutionStrategy implements MojosExecutionStrategy {
     @Override
-    public void execute( List<MojoExecution> mojos, MavenSession session, MojoExecutionRunner mojoRunner )
-            throws LifecycleExecutionException
-    {
-        for ( MojoExecution mojoExecution : mojos )
-        {
-            mojoRunner.run( mojoExecution );
+    public void execute(List<MojoExecution> mojos, MavenSession session, MojoExecutionRunner mojoRunner)
+            throws LifecycleExecutionException {
+        for (MojoExecution mojoExecution : mojos) {
+            mojoRunner.run(mojoExecution);
         }
-
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import junit.framework.TestCase;
 
@@ -26,31 +25,24 @@ import junit.framework.TestCase;
  *
  * @author Benjamin Bentmann
  */
-public class DeveloperTest
-    extends TestCase
-{
+public class DeveloperTest extends TestCase {
 
-    public void testHashCodeNullSafe()
-    {
+    public void testHashCodeNullSafe() {
         new Developer().hashCode();
     }
 
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Developer().equals( null ) );
+    public void testEqualsNullSafe() {
+        assertFalse(new Developer().equals(null));
 
-        new Developer().equals( new Developer() );
+        new Developer().equals(new Developer());
     }
 
-    public void testEqualsIdentity()
-    {
+    public void testEqualsIdentity() {
         Developer thing = new Developer();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Developer().toString() );
+    public void testToStringNullSafe() {
+        assertNotNull(new Developer().toString());
     }
-
 }

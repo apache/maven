@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,24 +16,21 @@ package org.apache.maven.lifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle;
 
 /**
  * Signals a failure to execute a lifecycle phase or mojo because a project is required but not present.
  *
  * @author Benjamin Bentmann
  */
-public class MissingProjectException
-    extends Exception
-{
+public class MissingProjectException extends Exception {
 
     /**
      * Creates a new exception.
      *
      * @param message The detail message, may be {@code null}.
      */
-    public MissingProjectException( String message )
-    {
-        super( message );
+    public MissingProjectException(String message) {
+        super(message);
     }
-
 }

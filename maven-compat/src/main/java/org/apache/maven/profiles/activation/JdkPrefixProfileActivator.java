@@ -1,5 +1,3 @@
-package org.apache.maven.profiles.activation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.profiles.activation;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.profiles.activation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.profiles.activation;
 
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -30,71 +29,54 @@ import org.codehaus.plexus.util.StringUtils;
  * JdkPrefixProfileActivator
  */
 @Deprecated
-public class JdkPrefixProfileActivator
-    extends DetectedProfileActivator
-{
-    private static final String JDK_VERSION = System.getProperty( "java.version" );
+public class JdkPrefixProfileActivator extends DetectedProfileActivator {
+    private static final String JDK_VERSION = System.getProperty("java.version");
 
-    public boolean isActive( Profile profile )
-        throws ProfileActivationException
-    {
+    public boolean isActive(Profile profile) throws ProfileActivationException {
         Activation activation = profile.getActivation();
 
         String jdk = activation.getJdk();
 
         // null case is covered by canDetermineActivation(), so we can do a straight startsWith() here.
-        if ( jdk.startsWith( "[" ) || jdk.startsWith( "(" ) )
-        {
-            try
-            {
-                return matchJdkVersionRange( jdk );
-            }
-            catch ( InvalidVersionSpecificationException e )
-            {
-                throw new ProfileActivationException( "Invalid JDK version in profile '" + profile.getId() + "': "
-                    + e.getMessage() );
+        if (jdk.startsWith("[") || jdk.startsWith("(")) {
+            try {
+                return matchJdkVersionRange(jdk);
+            } catch (InvalidVersionSpecificationException e) {
+                throw new ProfileActivationException(
+                        "Invalid JDK version in profile '" + profile.getId() + "': " + e.getMessage());
             }
         }
 
         boolean reverse = false;
 
-        if ( jdk.startsWith( "!" ) )
-        {
+        if (jdk.startsWith("!")) {
             reverse = true;
-            jdk = jdk.substring( 1 );
+            jdk = jdk.substring(1);
         }
 
-        if ( getJdkVersion().startsWith( jdk ) )
-        {
+        if (getJdkVersion().startsWith(jdk)) {
             return !reverse;
-        }
-        else
-        {
+        } else {
             return reverse;
         }
     }
 
-    private boolean matchJdkVersionRange( String jdk )
-        throws InvalidVersionSpecificationException
-    {
-        VersionRange jdkVersionRange = VersionRange.createFromVersionSpec( convertJdkToMavenVersion( jdk ) );
-        DefaultArtifactVersion jdkVersion = new DefaultArtifactVersion( convertJdkToMavenVersion( getJdkVersion() ) );
-        return jdkVersionRange.containsVersion( jdkVersion );
+    private boolean matchJdkVersionRange(String jdk) throws InvalidVersionSpecificationException {
+        VersionRange jdkVersionRange = VersionRange.createFromVersionSpec(convertJdkToMavenVersion(jdk));
+        DefaultArtifactVersion jdkVersion = new DefaultArtifactVersion(convertJdkToMavenVersion(getJdkVersion()));
+        return jdkVersionRange.containsVersion(jdkVersion);
     }
 
-    private String convertJdkToMavenVersion( String jdk )
-    {
-        return jdk.replaceAll( "_", "-" );
+    private String convertJdkToMavenVersion(String jdk) {
+        return jdk.replaceAll("_", "-");
     }
 
-    protected String getJdkVersion()
-    {
+    protected String getJdkVersion() {
         return JDK_VERSION;
     }
 
-    protected boolean canDetectActivation( Profile profile )
-    {
-        return profile.getActivation() != null && StringUtils.isNotEmpty( profile.getActivation().getJdk() );
+    protected boolean canDetectActivation(Profile profile) {
+        return profile.getActivation() != null
+                && StringUtils.isNotEmpty(profile.getActivation().getJdk());
     }
-
 }

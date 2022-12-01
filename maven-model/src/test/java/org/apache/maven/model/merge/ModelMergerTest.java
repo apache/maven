@@ -1,5 +1,3 @@
-package org.apache.maven.model.merge;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,11 @@ package org.apache.maven.model.merge;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.merge;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-
 import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
 import org.junit.Test;

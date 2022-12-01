@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,21 +16,19 @@ package org.apache.maven.toolchain.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain.building;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.maven.building.Problem;
 
 /**
  * @author Robert Scholte
  * @since 3.3.0
  */
-public class ToolchainsBuildingException
-    extends Exception
-{
+public class ToolchainsBuildingException extends Exception {
 
     private final List<Problem> problems;
 
@@ -41,14 +37,12 @@ public class ToolchainsBuildingException
      *
      * @param problems The problems that causes this exception, must not be {@code null}.
      */
-    public ToolchainsBuildingException( List<Problem> problems )
-    {
-        super( toMessage( problems ) );
+    public ToolchainsBuildingException(List<Problem> problems) {
+        super(toMessage(problems));
 
         this.problems = new ArrayList<>();
-        if ( problems != null )
-        {
-            this.problems.addAll( problems );
+        if (problems != null) {
+            this.problems.addAll(problems);
         }
     }
 
@@ -57,33 +51,29 @@ public class ToolchainsBuildingException
      *
      * @return The problems that caused this exception, never {@code null}.
      */
-    public List<Problem> getProblems()
-    {
+    public List<Problem> getProblems() {
         return problems;
     }
 
-    private static String toMessage( List<Problem> problems )
-    {
-        StringWriter buffer = new StringWriter( 1024 );
+    private static String toMessage(List<Problem> problems) {
+        StringWriter buffer = new StringWriter(1024);
 
-        PrintWriter writer = new PrintWriter( buffer );
+        PrintWriter writer = new PrintWriter(buffer);
 
-        writer.print( problems.size() );
-        writer.print( ( problems.size() == 1 ) ? " problem was " : " problems were " );
-        writer.print( "encountered while building the effective toolchains" );
+        writer.print(problems.size());
+        writer.print((problems.size() == 1) ? " problem was " : " problems were ");
+        writer.print("encountered while building the effective toolchains");
         writer.println();
 
-        for ( Problem problem : problems )
-        {
-            writer.print( "[" );
-            writer.print( problem.getSeverity() );
-            writer.print( "] " );
-            writer.print( problem.getMessage() );
+        for (Problem problem : problems) {
+            writer.print("[");
+            writer.print(problem.getSeverity());
+            writer.print("] ");
+            writer.print(problem.getMessage());
             String location = problem.getLocation();
-            if ( !location.isEmpty() )
-            {
-                writer.print( " @ " );
-                writer.print( location );
+            if (!location.isEmpty()) {
+                writer.print(" @ ");
+                writer.print(location);
             }
             writer.println();
         }

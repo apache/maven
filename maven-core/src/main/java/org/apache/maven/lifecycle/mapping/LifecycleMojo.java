@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.mapping;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.mapping;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,49 +16,42 @@ package org.apache.maven.lifecycle.mapping;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.mapping;
 
 import java.util.List;
-
 import org.apache.maven.model.Dependency;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * LifecycleMojo
  */
-public class LifecycleMojo
-{
-    
+public class LifecycleMojo {
+
     private String goal;
     private Xpp3Dom configuration;
     private List<Dependency> dependencies;
-    
-    public String getGoal()
-    {
+
+    public String getGoal() {
         return goal;
     }
-    
-    public Xpp3Dom getConfiguration()
-    {
+
+    public Xpp3Dom getConfiguration() {
         return configuration;
     }
-    
-    public List<Dependency> getDependencies()
-    {
+
+    public List<Dependency> getDependencies() {
         return dependencies;
     }
-    
-    public void setGoal( String goal )
-    {
+
+    public void setGoal(String goal) {
         this.goal = goal;
     }
-    
-    public void setConfiguration( Xpp3Dom configuration )
-    {
+
+    public void setConfiguration(Xpp3Dom configuration) {
         this.configuration = configuration;
     }
-    
-    public void setDependencies( List<Dependency> dependencies )
-    {
+
+    public void setDependencies(List<Dependency> dependencies) {
         this.dependencies = dependencies;
     }
 }

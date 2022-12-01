@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,13 +16,13 @@ package org.apache.maven.artifact.resolver;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
@@ -45,8 +43,7 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
  *       complex requiring a long list of checks, need to create a parent/interface/encapsulation
  *       for the types of exceptions
  */
-public class ArtifactResolutionResult
-{
+public class ArtifactResolutionResult {
     private Artifact originatingArtifact;
 
     private List<Artifact> missingArtifacts;
@@ -71,115 +68,93 @@ public class ArtifactResolutionResult
 
     private Set<ResolutionNode> resolutionNodes;
 
-    public Artifact getOriginatingArtifact()
-    {
+    public Artifact getOriginatingArtifact() {
         return originatingArtifact;
     }
 
-    public ArtifactResolutionResult setOriginatingArtifact( final Artifact originatingArtifact )
-    {
+    public ArtifactResolutionResult setOriginatingArtifact(final Artifact originatingArtifact) {
         this.originatingArtifact = originatingArtifact;
 
         return this;
     }
 
-    public void addArtifact( Artifact artifact )
-    {
-        if ( artifacts == null )
-        {
+    public void addArtifact(Artifact artifact) {
+        if (artifacts == null) {
             artifacts = new LinkedHashSet<>();
         }
 
-        artifacts.add( artifact );
+        artifacts.add(artifact);
     }
 
-    public Set<Artifact> getArtifacts()
-    {
-        if ( artifacts == null )
-        {
+    public Set<Artifact> getArtifacts() {
+        if (artifacts == null) {
             artifacts = new LinkedHashSet<>();
         }
 
         return artifacts;
     }
 
-    public void setArtifacts( Set<Artifact> artifacts )
-    {
+    public void setArtifacts(Set<Artifact> artifacts) {
         this.artifacts = artifacts;
     }
 
-    public Set<ResolutionNode> getArtifactResolutionNodes()
-    {
-        if ( resolutionNodes == null )
-        {
+    public Set<ResolutionNode> getArtifactResolutionNodes() {
+        if (resolutionNodes == null) {
             resolutionNodes = new LinkedHashSet<>();
         }
 
         return resolutionNodes;
     }
 
-    public void setArtifactResolutionNodes( Set<ResolutionNode> resolutionNodes )
-    {
+    public void setArtifactResolutionNodes(Set<ResolutionNode> resolutionNodes) {
         this.resolutionNodes = resolutionNodes;
     }
 
-    public boolean hasMissingArtifacts()
-    {
+    public boolean hasMissingArtifacts() {
         return missingArtifacts != null && !missingArtifacts.isEmpty();
     }
 
-    public List<Artifact> getMissingArtifacts()
-    {
+    public List<Artifact> getMissingArtifacts() {
         return missingArtifacts == null
-                   ? Collections.<Artifact>emptyList()
-                   : Collections.unmodifiableList( missingArtifacts );
-
+                ? Collections.<Artifact>emptyList()
+                : Collections.unmodifiableList(missingArtifacts);
     }
 
-    public ArtifactResolutionResult addMissingArtifact( Artifact artifact )
-    {
-        missingArtifacts = initList( missingArtifacts );
+    public ArtifactResolutionResult addMissingArtifact(Artifact artifact) {
+        missingArtifacts = initList(missingArtifacts);
 
-        missingArtifacts.add( artifact );
+        missingArtifacts.add(artifact);
 
         return this;
     }
 
-    public ArtifactResolutionResult setUnresolvedArtifacts( final List<Artifact> unresolvedArtifacts )
-    {
+    public ArtifactResolutionResult setUnresolvedArtifacts(final List<Artifact> unresolvedArtifacts) {
         this.missingArtifacts = unresolvedArtifacts;
 
         return this;
     }
 
-    public boolean isSuccess()
-    {
-        return !( hasMissingArtifacts() || hasExceptions() );
+    public boolean isSuccess() {
+        return !(hasMissingArtifacts() || hasExceptions());
     }
 
     // ------------------------------------------------------------------------
     // Exceptions
     // ------------------------------------------------------------------------
 
-    public boolean hasExceptions()
-    {
+    public boolean hasExceptions() {
         return exceptions != null && !exceptions.isEmpty();
     }
 
-    public List<Exception> getExceptions()
-    {
-        return exceptions == null
-                   ? Collections.<Exception>emptyList()
-                   : Collections.unmodifiableList( exceptions );
-
+    public List<Exception> getExceptions() {
+        return exceptions == null ? Collections.<Exception>emptyList() : Collections.unmodifiableList(exceptions);
     }
 
     // ------------------------------------------------------------------------
     // Version Range Violations
     // ------------------------------------------------------------------------
 
-    public boolean hasVersionRangeViolations()
-    {
+    public boolean hasVersionRangeViolations() {
         return versionRangeViolations != null;
     }
 
@@ -188,152 +163,131 @@ public class ArtifactResolutionResult
      *       {@link #getVersionRangeViolation(int)} but it's not used like that in
      *       DefaultLegacyArtifactCollector
      */
-    public ArtifactResolutionResult addVersionRangeViolation( Exception e )
-    {
-        versionRangeViolations = initList( versionRangeViolations );
+    public ArtifactResolutionResult addVersionRangeViolation(Exception e) {
+        versionRangeViolations = initList(versionRangeViolations);
 
-        versionRangeViolations.add( e );
+        versionRangeViolations.add(e);
 
-        exceptions = initList( exceptions );
+        exceptions = initList(exceptions);
 
-        exceptions.add( e );
+        exceptions.add(e);
 
         return this;
     }
 
-    public OverConstrainedVersionException getVersionRangeViolation( int i )
-    {
-        return (OverConstrainedVersionException) versionRangeViolations.get( i );
+    public OverConstrainedVersionException getVersionRangeViolation(int i) {
+        return (OverConstrainedVersionException) versionRangeViolations.get(i);
     }
 
-    public List<Exception> getVersionRangeViolations()
-    {
+    public List<Exception> getVersionRangeViolations() {
         return versionRangeViolations == null
-                   ? Collections.<Exception>emptyList()
-                   : Collections.unmodifiableList( versionRangeViolations );
-
+                ? Collections.<Exception>emptyList()
+                : Collections.unmodifiableList(versionRangeViolations);
     }
 
     // ------------------------------------------------------------------------
     // Metadata Resolution Exceptions: ArtifactResolutionExceptions
     // ------------------------------------------------------------------------
 
-    public boolean hasMetadataResolutionExceptions()
-    {
+    public boolean hasMetadataResolutionExceptions() {
         return metadataResolutionExceptions != null;
     }
 
-    public ArtifactResolutionResult addMetadataResolutionException( ArtifactResolutionException e )
-    {
-        metadataResolutionExceptions = initList( metadataResolutionExceptions );
+    public ArtifactResolutionResult addMetadataResolutionException(ArtifactResolutionException e) {
+        metadataResolutionExceptions = initList(metadataResolutionExceptions);
 
-        metadataResolutionExceptions.add( e );
+        metadataResolutionExceptions.add(e);
 
-        exceptions = initList( exceptions );
+        exceptions = initList(exceptions);
 
-        exceptions.add( e );
+        exceptions.add(e);
 
         return this;
     }
 
-    public ArtifactResolutionException getMetadataResolutionException( int i )
-    {
-        return metadataResolutionExceptions.get( i );
+    public ArtifactResolutionException getMetadataResolutionException(int i) {
+        return metadataResolutionExceptions.get(i);
     }
 
-    public List<ArtifactResolutionException> getMetadataResolutionExceptions()
-    {
+    public List<ArtifactResolutionException> getMetadataResolutionExceptions() {
         return metadataResolutionExceptions == null
-                   ? Collections.<ArtifactResolutionException>emptyList()
-                   : Collections.unmodifiableList( metadataResolutionExceptions );
-
+                ? Collections.<ArtifactResolutionException>emptyList()
+                : Collections.unmodifiableList(metadataResolutionExceptions);
     }
 
     // ------------------------------------------------------------------------
     // ErrorArtifactExceptions: ArtifactResolutionExceptions
     // ------------------------------------------------------------------------
 
-    public boolean hasErrorArtifactExceptions()
-    {
+    public boolean hasErrorArtifactExceptions() {
         return errorArtifactExceptions != null;
     }
 
-    public ArtifactResolutionResult addErrorArtifactException( ArtifactResolutionException e )
-    {
-        errorArtifactExceptions = initList( errorArtifactExceptions );
+    public ArtifactResolutionResult addErrorArtifactException(ArtifactResolutionException e) {
+        errorArtifactExceptions = initList(errorArtifactExceptions);
 
-        errorArtifactExceptions.add( e );
+        errorArtifactExceptions.add(e);
 
-        exceptions = initList( exceptions );
+        exceptions = initList(exceptions);
 
-        exceptions.add( e );
+        exceptions.add(e);
 
         return this;
     }
 
-    public List<ArtifactResolutionException> getErrorArtifactExceptions()
-    {
-        if ( errorArtifactExceptions == null )
-        {
+    public List<ArtifactResolutionException> getErrorArtifactExceptions() {
+        if (errorArtifactExceptions == null) {
             return Collections.emptyList();
         }
 
-        return Collections.unmodifiableList( errorArtifactExceptions );
+        return Collections.unmodifiableList(errorArtifactExceptions);
     }
 
     // ------------------------------------------------------------------------
     // Circular Dependency Exceptions
     // ------------------------------------------------------------------------
 
-    public boolean hasCircularDependencyExceptions()
-    {
+    public boolean hasCircularDependencyExceptions() {
         return circularDependencyExceptions != null;
     }
 
-    public ArtifactResolutionResult addCircularDependencyException( CyclicDependencyException e )
-    {
-        circularDependencyExceptions = initList( circularDependencyExceptions );
+    public ArtifactResolutionResult addCircularDependencyException(CyclicDependencyException e) {
+        circularDependencyExceptions = initList(circularDependencyExceptions);
 
-        circularDependencyExceptions.add( e );
+        circularDependencyExceptions.add(e);
 
-        exceptions = initList( exceptions );
+        exceptions = initList(exceptions);
 
-        exceptions.add( e );
+        exceptions.add(e);
 
         return this;
     }
 
-    public CyclicDependencyException getCircularDependencyException( int i )
-    {
-        return circularDependencyExceptions.get( i );
+    public CyclicDependencyException getCircularDependencyException(int i) {
+        return circularDependencyExceptions.get(i);
     }
 
-    public List<CyclicDependencyException> getCircularDependencyExceptions()
-    {
-        if ( circularDependencyExceptions == null )
-        {
+    public List<CyclicDependencyException> getCircularDependencyExceptions() {
+        if (circularDependencyExceptions == null) {
             return Collections.emptyList();
         }
 
-        return Collections.unmodifiableList( circularDependencyExceptions );
+        return Collections.unmodifiableList(circularDependencyExceptions);
     }
 
     // ------------------------------------------------------------------------
     // Repositories
     // ------------------------------------------------------------------------
 
-    public List<ArtifactRepository> getRepositories()
-    {
-        if ( repositories == null )
-        {
+    public List<ArtifactRepository> getRepositories() {
+        if (repositories == null) {
             return Collections.emptyList();
         }
 
-        return Collections.unmodifiableList( repositories );
+        return Collections.unmodifiableList(repositories);
     }
 
-    public ArtifactResolutionResult setRepositories( final List<ArtifactRepository> repositories )
-    {
+    public ArtifactResolutionResult setRepositories(final List<ArtifactRepository> repositories) {
         this.repositories = repositories;
 
         return this;
@@ -343,30 +297,25 @@ public class ArtifactResolutionResult
     // Internal
     //
 
-    private <T> List<T> initList( final List<T> l )
-    {
-        if ( l == null )
-        {
+    private <T> List<T> initList(final List<T> l) {
+        if (l == null) {
             return new ArrayList<>();
         }
         return l;
     }
 
-    public String toString()
-    {
+    public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        if ( artifacts != null )
-        {
+        if (artifacts != null) {
             int i = 1;
-            sb.append( "---------\n" );
-            sb.append( artifacts.size() ).append( '\n' );
-            for ( Artifact a : artifacts )
-            {
-                sb.append( i ).append( ' ' ).append( a ).append( '\n' );
+            sb.append("---------\n");
+            sb.append(artifacts.size()).append('\n');
+            for (Artifact a : artifacts) {
+                sb.append(i).append(' ').append(a).append('\n');
                 i++;
             }
-            sb.append( "---------\n" );
+            sb.append("---------\n");
         }
 
         return sb.toString();

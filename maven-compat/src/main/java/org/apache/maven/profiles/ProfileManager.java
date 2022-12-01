@@ -1,5 +1,3 @@
-package org.apache.maven.profiles;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.profiles;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,35 +16,33 @@ package org.apache.maven.profiles;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.model.Profile;
-import org.apache.maven.profiles.activation.ProfileActivationException;
+package org.apache.maven.profiles;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import org.apache.maven.model.Profile;
+import org.apache.maven.profiles.activation.ProfileActivationException;
 
 /**
  * ProfileManager
  */
 @Deprecated
-public interface ProfileManager
-{
+public interface ProfileManager {
 
-    void addProfile( Profile profile );
+    void addProfile(Profile profile);
 
-    void explicitlyActivate( String profileId );
+    void explicitlyActivate(String profileId);
 
-    void explicitlyActivate( List<String> profileIds );
+    void explicitlyActivate(List<String> profileIds);
 
-    void explicitlyDeactivate( String profileId );
+    void explicitlyDeactivate(String profileId);
 
-    void explicitlyDeactivate( List<String> profileIds );
+    void explicitlyDeactivate(List<String> profileIds);
 
-    List getActiveProfiles()
-        throws ProfileActivationException;
+    List getActiveProfiles() throws ProfileActivationException;
 
-    void addProfiles( List<Profile> profiles );
+    void addProfiles(List<Profile> profiles);
 
     Map getProfilesById();
 
@@ -57,5 +53,4 @@ public interface ProfileManager
     List getIdsActivatedByDefault();
 
     Properties getRequestProperties();
-
 }

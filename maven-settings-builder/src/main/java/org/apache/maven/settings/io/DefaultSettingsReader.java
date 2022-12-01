@@ -1,5 +1,3 @@
-package org.apache.maven.settings.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.settings.io;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.io;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,10 +24,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 import java.util.Objects;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -41,57 +38,41 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  */
 @Named
 @Singleton
-public class DefaultSettingsReader
-    implements SettingsReader
-{
+public class DefaultSettingsReader implements SettingsReader {
 
     @Override
-    public Settings read( File input, Map<String, ?> options )
-        throws IOException
-    {
-        Objects.requireNonNull( input, "input cannot be null" );
+    public Settings read(File input, Map<String, ?> options) throws IOException {
+        Objects.requireNonNull(input, "input cannot be null");
 
-        Settings settings = read( ReaderFactory.newXmlReader( input ), options );
+        Settings settings = read(ReaderFactory.newXmlReader(input), options);
 
         return settings;
     }
 
     @Override
-    public Settings read( Reader input, Map<String, ?> options )
-        throws IOException
-    {
-        Objects.requireNonNull( input, "input cannot be null" );
+    public Settings read(Reader input, Map<String, ?> options) throws IOException {
+        Objects.requireNonNull(input, "input cannot be null");
 
-        try ( final Reader in = input )
-        {
-            return new SettingsXpp3Reader().read( in, isStrict( options ) );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new SettingsParseException( e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
+        try (Reader in = input) {
+            return new SettingsXpp3Reader().read(in, isStrict(options));
+        } catch (XmlPullParserException e) {
+            throw new SettingsParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
         }
     }
 
     @Override
-    public Settings read( InputStream input, Map<String, ?> options )
-        throws IOException
-    {
-        Objects.requireNonNull( input, "input cannot be null" );
+    public Settings read(InputStream input, Map<String, ?> options) throws IOException {
+        Objects.requireNonNull(input, "input cannot be null");
 
-        try ( final InputStream in = input )
-        {
-            return new SettingsXpp3Reader().read( in, isStrict( options ) );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new SettingsParseException( e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
+        try (InputStream in = input) {
+            return new SettingsXpp3Reader().read(in, isStrict(options));
+        } catch (XmlPullParserException e) {
+            throw new SettingsParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
         }
     }
 
-    private boolean isStrict( Map<String, ?> options )
-    {
-        Object value = ( options != null ) ? options.get( IS_STRICT ) : null;
-        return value == null || Boolean.parseBoolean( value.toString() );
+    private boolean isStrict(Map<String, ?> options) {
+        Object value = (options != null) ? options.get(IS_STRICT) : null;
+        return value == null || Boolean.parseBoolean(value.toString());
     }
-
 }

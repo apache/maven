@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.internal;
 
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.DependencyCollectionContext;
@@ -33,64 +32,50 @@ import org.eclipse.aether.graph.Dependency;
  *
  * @author Benjamin Bentmann
  */
-class WagonExcluder
-    implements DependencySelector
-{
+class WagonExcluder implements DependencySelector {
 
     private final boolean coreArtifact;
 
-    WagonExcluder()
-    {
-        this( false );
+    WagonExcluder() {
+        this(false);
     }
 
-    private WagonExcluder( boolean coreArtifact )
-    {
+    private WagonExcluder(boolean coreArtifact) {
         this.coreArtifact = coreArtifact;
     }
 
-    public boolean selectDependency( Dependency dependency )
-    {
-        return !coreArtifact || !isWagonProvider( dependency.getArtifact() );
+    public boolean selectDependency(Dependency dependency) {
+        return !coreArtifact || !isWagonProvider(dependency.getArtifact());
     }
 
-    public DependencySelector deriveChildSelector( DependencyCollectionContext context )
-    {
-        if ( coreArtifact || !isLegacyCoreArtifact( context.getDependency().getArtifact() ) )
-        {
+    public DependencySelector deriveChildSelector(DependencyCollectionContext context) {
+        if (coreArtifact || !isLegacyCoreArtifact(context.getDependency().getArtifact())) {
             return this;
-        }
-        else
-        {
-            return new WagonExcluder( true );
+        } else {
+            return new WagonExcluder(true);
         }
     }
 
-    private boolean isLegacyCoreArtifact( Artifact artifact )
-    {
+    private boolean isLegacyCoreArtifact(Artifact artifact) {
         String version = artifact.getVersion();
-        return version != null && version.startsWith( "2." ) && artifact.getArtifactId().startsWith( "maven-" )
-            && artifact.getGroupId().equals( "org.apache.maven" );
+        return version != null
+                && version.startsWith("2.")
+                && artifact.getArtifactId().startsWith("maven-")
+                && artifact.getGroupId().equals("org.apache.maven");
     }
 
-    private boolean isWagonProvider( Artifact artifact )
-    {
-        if ( "org.apache.maven.wagon".equals( artifact.getGroupId() ) )
-        {
-            return artifact.getArtifactId().startsWith( "wagon-" );
+    private boolean isWagonProvider(Artifact artifact) {
+        if ("org.apache.maven.wagon".equals(artifact.getGroupId())) {
+            return artifact.getArtifactId().startsWith("wagon-");
         }
         return false;
     }
 
     @Override
-    public boolean equals( Object obj )
-    {
-        if ( obj == this )
-        {
+    public boolean equals(Object obj) {
+        if (obj == this) {
             return true;
-        }
-        else if ( obj == null || !getClass().equals( obj.getClass() ) )
-        {
+        } else if (obj == null || !getClass().equals(obj.getClass())) {
             return false;
         }
 
@@ -99,11 +84,9 @@ class WagonExcluder
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int hash = getClass().hashCode();
-        hash = hash * 31 + ( coreArtifact ? 1 : 0 );
+        hash = hash * 31 + (coreArtifact ? 1 : 0);
         return hash;
     }
-
 }

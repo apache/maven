@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,10 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.io.File;
 import java.net.URI;
-
 import org.apache.maven.building.FileSource;
 
 /**
@@ -29,78 +27,66 @@ import org.apache.maven.building.FileSource;
  *
  * @author Benjamin Bentmann
  */
-public class FileModelSource extends FileSource implements ModelSource2
-{
+public class FileModelSource extends FileSource implements ModelSource2 {
 
     /**
      * Creates a new model source backed by the specified file.
      *
      * @param pomFile The POM file, must not be {@code null}.
      */
-    public FileModelSource( File pomFile )
-    {
-        super( pomFile );
+    public FileModelSource(File pomFile) {
+        super(pomFile);
     }
-    
+
     /**
-     * 
+     *
      * @return the file of this source
-     * 
+     *
      * @deprecated instead use {@link #getFile()}
      */
     @Deprecated
-    public File getPomFile()
-    {
+    public File getPomFile() {
         return getFile();
     }
-    
+
     @Override
-    public ModelSource2 getRelatedSource( String relPath )
-    {
-        relPath = relPath.replace( '\\', File.separatorChar ).replace( '/', File.separatorChar );
+    public ModelSource2 getRelatedSource(String relPath) {
+        relPath = relPath.replace('\\', File.separatorChar).replace('/', File.separatorChar);
 
-        File relatedPom = new File( getFile().getParentFile(), relPath );
+        File relatedPom = new File(getFile().getParentFile(), relPath);
 
-        if ( relatedPom.isDirectory() )
-        {
+        if (relatedPom.isDirectory()) {
             // TODO figure out how to reuse ModelLocator.locatePom(File) here
-            relatedPom = new File( relatedPom, "pom.xml" );
+            relatedPom = new File(relatedPom, "pom.xml");
         }
 
-        if ( relatedPom.isFile() && relatedPom.canRead() )
-        {
-            return new FileModelSource( new File( relatedPom.toURI().normalize() ) );
+        if (relatedPom.isFile() && relatedPom.canRead()) {
+            return new FileModelSource(new File(relatedPom.toURI().normalize()));
         }
 
         return null;
     }
 
     @Override
-    public URI getLocationURI()
-    {
+    public URI getLocationURI() {
         return getFile().toURI();
     }
 
     @Override
-    public boolean equals( Object obj ) 
-    {
-        if ( this == obj ) 
-        {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        
-        if ( !( obj instanceof FileModelSource ) ) 
-        {
+
+        if (!(obj instanceof FileModelSource)) {
             return false;
         }
-        FileModelSource other = ( FileModelSource ) obj;
-        return getFile().equals( other.getFile() );
+        FileModelSource other = (FileModelSource) obj;
+        return getFile().equals(other.getFile());
     }
 
     @Override
-    public int hashCode() 
-    {
-        return getFile().hashCode(); 
+    public int hashCode() {
+        return getFile().hashCode();
     }
-
 }

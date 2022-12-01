@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.legacy;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,9 +16,9 @@ package org.apache.maven.repository.legacy;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy;
 
 import java.io.File;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
@@ -28,17 +26,15 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 /**
  * UpdateCheckManager
  */
-public interface UpdateCheckManager
-{
+public interface UpdateCheckManager {
 
-    boolean isUpdateRequired( Artifact artifact, ArtifactRepository repository );
+    boolean isUpdateRequired(Artifact artifact, ArtifactRepository repository);
 
-    void touch( Artifact artifact, ArtifactRepository repository, String error );
+    void touch(Artifact artifact, ArtifactRepository repository, String error);
 
-    String getError( Artifact artifact, ArtifactRepository repository );
+    String getError(Artifact artifact, ArtifactRepository repository);
 
-    boolean isUpdateRequired( RepositoryMetadata metadata, ArtifactRepository repository, File file );
+    boolean isUpdateRequired(RepositoryMetadata metadata, ArtifactRepository repository, File file);
 
-    void touch( RepositoryMetadata metadata, ArtifactRepository repository, File file );
-
+    void touch(RepositoryMetadata metadata, ArtifactRepository repository, File file);
 }

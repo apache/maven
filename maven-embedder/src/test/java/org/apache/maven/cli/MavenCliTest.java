@@ -1,5 +1,3 @@
-package org.apache.maven.cli;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.cli;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.cli;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -34,7 +33,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
@@ -48,93 +46,79 @@ import org.junit.Test;
 import org.junit.function.ThrowingRunnable;
 import org.mockito.InOrder;
 
-public class MavenCliTest
-{
+public class MavenCliTest {
     MavenCli cli;
 
     private String origBasedir;
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         cli = new MavenCli();
-        origBasedir = System.getProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY );
+        origBasedir = System.getProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
     }
 
     @After
-    public void tearDown()
-        throws Exception
-    {
-        if ( origBasedir != null )
-        {
-            System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY, origBasedir );
-        }
-        else
-        {
-            System.getProperties().remove( MavenCli.MULTIMODULE_PROJECT_DIRECTORY );
+    public void tearDown() throws Exception {
+        if (origBasedir != null) {
+            System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, origBasedir);
+        } else {
+            System.getProperties().remove(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
         }
     }
 
     @Test
-    public void testCalculateDegreeOfConcurrency()
-    {
-        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "0" ) );
-        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "-1" ) );
-        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "0x4" ) );
-        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "1.0" ) );
-        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "1." ) );
-        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "AA" ) );
-        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "C" ) );
-        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "C2.2C" ) );
-        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "C2.2" ) );
-        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "2C2" ) );
-        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "CXXX" ) );
-        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "XXXC" ) );
+    public void testCalculateDegreeOfConcurrency() {
+        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("0"));
+        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("-1"));
+        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("0x4"));
+        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("1.0"));
+        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("1."));
+        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("AA"));
+        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("C"));
+        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("C2.2C"));
+        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("C2.2"));
+        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("2C2"));
+        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("CXXX"));
+        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("XXXC"));
 
         int cpus = Runtime.getRuntime().availableProcessors();
-        assertEquals( (int) ( cpus * 2.2 ), cli.calculateDegreeOfConcurrency( "2.2C" ) );
-        assertEquals( 1, cli.calculateDegreeOfConcurrency( "0.0001C" ) );
-        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "2.C" ) );
-        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "-2.2C" ) );
-        assertThrows( IllegalArgumentException.class, new ConcurrencyCalculator( "0C" ) );
+        assertEquals((int) (cpus * 2.2), cli.calculateDegreeOfConcurrency("2.2C"));
+        assertEquals(1, cli.calculateDegreeOfConcurrency("0.0001C"));
+        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("2.C"));
+        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("-2.2C"));
+        assertThrows(IllegalArgumentException.class, new ConcurrencyCalculator("0C"));
     }
 
     @Test
-    public void testMavenConfig()
-        throws Exception
-    {
-        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
-                            new File( "src/test/projects/config" ).getCanonicalPath() );
-        CliRequest request = new CliRequest( new String[0], null );
+    public void testMavenConfig() throws Exception {
+        System.setProperty(
+                MavenCli.MULTIMODULE_PROJECT_DIRECTORY, new File("src/test/projects/config").getCanonicalPath());
+        CliRequest request = new CliRequest(new String[0], null);
 
         // read .mvn/maven.config
-        cli.initialize( request );
-        cli.cli( request );
-        assertEquals( "multithreaded", request.commandLine.getOptionValue( CLIManager.BUILDER ) );
-        assertEquals( "8", request.commandLine.getOptionValue( CLIManager.THREADS ) );
+        cli.initialize(request);
+        cli.cli(request);
+        assertEquals("multithreaded", request.commandLine.getOptionValue(CLIManager.BUILDER));
+        assertEquals("8", request.commandLine.getOptionValue(CLIManager.THREADS));
 
         // override from command line
-        request = new CliRequest( new String[]{ "--builder", "foobar" }, null );
-        cli.cli( request );
-        assertEquals( "foobar", request.commandLine.getOptionValue( "builder" ) );
+        request = new CliRequest(new String[] {"--builder", "foobar"}, null);
+        cli.cli(request);
+        assertEquals("foobar", request.commandLine.getOptionValue("builder"));
     }
 
     @Test
-    public void testMavenConfigInvalid()
-        throws Exception
-    {
-        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
-                            new File( "src/test/projects/config-illegal" ).getCanonicalPath() );
-        CliRequest request = new CliRequest( new String[0], null );
+    public void testMavenConfigInvalid() throws Exception {
+        System.setProperty(
+                MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
+                new File("src/test/projects/config-illegal").getCanonicalPath());
+        CliRequest request = new CliRequest(new String[0], null);
 
-        cli.initialize( request );
-        try
-        {
-            cli.cli( request );
+        cli.initialize(request);
+        try {
+            cli.cli(request);
             fail();
-        }
-        catch ( ParseException expected )
-        {
+        } catch (ParseException expected) {
 
         }
     }
@@ -151,18 +135,17 @@ public class MavenCliTest
      * @throws Exception in case of failure.
      */
     @Test
-    public void testMVNConfigurationThreadCanBeOverwrittenViaCommandLine()
-        throws Exception
-    {
-        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
-                            new File( "src/test/projects/mavenConfigProperties" ).getCanonicalPath() );
-        CliRequest request = new CliRequest( new String[]{ "-T", "5" }, null );
+    public void testMVNConfigurationThreadCanBeOverwrittenViaCommandLine() throws Exception {
+        System.setProperty(
+                MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
+                new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
+        CliRequest request = new CliRequest(new String[] {"-T", "5"}, null);
 
-        cli.initialize( request );
+        cli.initialize(request);
         // read .mvn/maven.config
-        cli.cli( request );
+        cli.cli(request);
 
-        assertEquals( "5", request.commandLine.getOptionValue( CLIManager.THREADS ) );
+        assertEquals("5", request.commandLine.getOptionValue(CLIManager.THREADS));
     }
 
     /**
@@ -177,20 +160,19 @@ public class MavenCliTest
      * @throws Exception
      */
     @Test
-    public void testMVNConfigurationDefinedPropertiesCanBeOverwrittenViaCommandLine()
-        throws Exception
-    {
-        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
-                            new File( "src/test/projects/mavenConfigProperties" ).getCanonicalPath() );
-        CliRequest request = new CliRequest( new String[]{ "-Drevision=8.1.0" }, null );
+    public void testMVNConfigurationDefinedPropertiesCanBeOverwrittenViaCommandLine() throws Exception {
+        System.setProperty(
+                MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
+                new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
+        CliRequest request = new CliRequest(new String[] {"-Drevision=8.1.0"}, null);
 
-        cli.initialize( request );
+        cli.initialize(request);
         // read .mvn/maven.config
-        cli.cli( request );
-        cli.properties( request );
+        cli.cli(request);
+        cli.properties(request);
 
-        String revision = System.getProperty( "revision" );
-        assertEquals( "8.1.0", revision );
+        String revision = System.getProperty("revision");
+        assertEquals("8.1.0", revision);
     }
 
     /**
@@ -205,20 +187,19 @@ public class MavenCliTest
      * @throws Exception
      */
     @Test
-    public void testMVNConfigurationCLIRepeatedPropertiesLastWins()
-        throws Exception
-    {
-        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
-                            new File( "src/test/projects/mavenConfigProperties" ).getCanonicalPath() );
-        CliRequest request = new CliRequest( new String[]{ "-Drevision=8.1.0", "-Drevision=8.2.0" }, null );
+    public void testMVNConfigurationCLIRepeatedPropertiesLastWins() throws Exception {
+        System.setProperty(
+                MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
+                new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
+        CliRequest request = new CliRequest(new String[] {"-Drevision=8.1.0", "-Drevision=8.2.0"}, null);
 
-        cli.initialize( request );
+        cli.initialize(request);
         // read .mvn/maven.config
-        cli.cli( request );
-        cli.properties( request );
+        cli.cli(request);
+        cli.properties(request);
 
-        String revision = System.getProperty( "revision" );
-        assertEquals( "8.2.0", revision );
+        String revision = System.getProperty("revision");
+        assertEquals("8.2.0", revision);
     }
 
     /**
@@ -233,85 +214,81 @@ public class MavenCliTest
      * @throws Exception
      */
     @Test
-    public void testMVNConfigurationFunkyArguments()
-        throws Exception
-    {
-        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
-                            new File( "src/test/projects/mavenConfigProperties" ).getCanonicalPath() );
+    public void testMVNConfigurationFunkyArguments() throws Exception {
+        System.setProperty(
+                MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
+                new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
         CliRequest request = new CliRequest(
-            new String[]{ "-Drevision=8.1.0", "--file=-Dpom.xml", "\"-Dfoo=bar ", "\"-Dfoo2=bar two\"",
-                "-Drevision=8.2.0" }, null );
+                new String[] {
+                    "-Drevision=8.1.0", "--file=-Dpom.xml", "\"-Dfoo=bar ", "\"-Dfoo2=bar two\"", "-Drevision=8.2.0"
+                },
+                null);
 
-        cli.initialize( request );
+        cli.initialize(request);
         // read .mvn/maven.config
-        cli.cli( request );
-        cli.properties( request );
+        cli.cli(request);
+        cli.properties(request);
 
-        String revision = System.getProperty( "revision" );
-        assertEquals( "8.2.0", revision );
+        String revision = System.getProperty("revision");
+        assertEquals("8.2.0", revision);
 
-        assertEquals( "bar ", request.getUserProperties().getProperty( "foo" ) );
-        assertEquals( "bar two", request.getUserProperties().getProperty( "foo2" ) );
+        assertEquals("bar ", request.getUserProperties().getProperty("foo"));
+        assertEquals("bar two", request.getUserProperties().getProperty("foo2"));
 
-        assertEquals( "-Dpom.xml", request.getCommandLine().getOptionValue( CLIManager.ALTERNATE_POM_FILE ) );
+        assertEquals("-Dpom.xml", request.getCommandLine().getOptionValue(CLIManager.ALTERNATE_POM_FILE));
     }
 
     @Test
-    public void testStyleColors()
-        throws Exception
-    {
-        assumeTrue( "ANSI not supported", MessageUtils.isColorEnabled() );
+    public void testStyleColors() throws Exception {
+        assumeTrue("ANSI not supported", MessageUtils.isColorEnabled());
         CliRequest request;
 
-        MessageUtils.setColorEnabled( true );
-        request = new CliRequest( new String[] { "-B" }, null );
-        cli.cli( request );
-        cli.properties( request );
-        cli.logging( request );
-        assertFalse( MessageUtils.isColorEnabled() );
+        MessageUtils.setColorEnabled(true);
+        request = new CliRequest(new String[] {"-B"}, null);
+        cli.cli(request);
+        cli.properties(request);
+        cli.logging(request);
+        assertFalse(MessageUtils.isColorEnabled());
 
-        MessageUtils.setColorEnabled( true );
-        request = new CliRequest( new String[] { "-l", "target/temp/mvn.log" }, null );
+        MessageUtils.setColorEnabled(true);
+        request = new CliRequest(new String[] {"-l", "target/temp/mvn.log"}, null);
         request.workingDirectory = "target/temp";
-        cli.cli( request );
-        cli.properties( request );
-        cli.logging( request );
-        assertFalse( MessageUtils.isColorEnabled() );
+        cli.cli(request);
+        cli.properties(request);
+        cli.logging(request);
+        assertFalse(MessageUtils.isColorEnabled());
 
-        MessageUtils.setColorEnabled( false );
-        request = new CliRequest( new String[] { "-Dstyle.color=always" }, null );
-        cli.cli( request );
-        cli.properties( request );
-        cli.logging( request );
-        assertTrue( MessageUtils.isColorEnabled() );
+        MessageUtils.setColorEnabled(false);
+        request = new CliRequest(new String[] {"-Dstyle.color=always"}, null);
+        cli.cli(request);
+        cli.properties(request);
+        cli.logging(request);
+        assertTrue(MessageUtils.isColorEnabled());
 
-        MessageUtils.setColorEnabled( true );
-        request = new CliRequest( new String[] { "-Dstyle.color=never" }, null );
-        cli.cli( request );
-        cli.properties( request );
-        cli.logging( request );
-        assertFalse( MessageUtils.isColorEnabled() );
+        MessageUtils.setColorEnabled(true);
+        request = new CliRequest(new String[] {"-Dstyle.color=never"}, null);
+        cli.cli(request);
+        cli.properties(request);
+        cli.logging(request);
+        assertFalse(MessageUtils.isColorEnabled());
 
-        MessageUtils.setColorEnabled( false );
-        request = new CliRequest( new String[] { "-Dstyle.color=always", "-B", "-l", "target/temp/mvn.log" }, null );
+        MessageUtils.setColorEnabled(false);
+        request = new CliRequest(new String[] {"-Dstyle.color=always", "-B", "-l", "target/temp/mvn.log"}, null);
         request.workingDirectory = "target/temp";
-        cli.cli( request );
-        cli.properties( request );
-        cli.logging( request );
-        assertTrue( MessageUtils.isColorEnabled() );
+        cli.cli(request);
+        cli.properties(request);
+        cli.logging(request);
+        assertTrue(MessageUtils.isColorEnabled());
 
-        try
-        {
-            MessageUtils.setColorEnabled( false );
-            request = new CliRequest( new String[] { "-Dstyle.color=maybe", "-B", "-l", "target/temp/mvn.log" }, null );
+        try {
+            MessageUtils.setColorEnabled(false);
+            request = new CliRequest(new String[] {"-Dstyle.color=maybe", "-B", "-l", "target/temp/mvn.log"}, null);
             request.workingDirectory = "target/temp";
-            cli.cli( request );
-            cli.properties( request );
-            cli.logging( request );
-            fail( "maybe is not a valid option" );
-        }
-        catch ( IllegalArgumentException e )
-        {
+            cli.cli(request);
+            cli.properties(request);
+            cli.logging(request);
+            fail("maybe is not a valid option");
+        } catch (IllegalArgumentException e) {
             // noop
         }
     }
@@ -331,7 +308,7 @@ public class MavenCliTest
             }
         };
 
-        CliRequest cliRequest = new CliRequest(new String[]{}, null);
+        CliRequest cliRequest = new CliRequest(new String[] {}, null);
 
         customizedMavenCli.cli(cliRequest);
         customizedMavenCli.logging(cliRequest);
@@ -339,8 +316,12 @@ public class MavenCliTest
         customizedMavenCli.toolchains(cliRequest);
 
         InOrder orderdEventSpyDispatcherMock = inOrder(eventSpyDispatcherMock);
-        orderdEventSpyDispatcherMock.verify(eventSpyDispatcherMock, times(1)).onEvent(any(ToolchainsBuildingRequest.class));
-        orderdEventSpyDispatcherMock.verify(eventSpyDispatcherMock, times(1)).onEvent(any(ToolchainsBuildingResult.class));
+        orderdEventSpyDispatcherMock
+                .verify(eventSpyDispatcherMock, times(1))
+                .onEvent(any(ToolchainsBuildingRequest.class));
+        orderdEventSpyDispatcherMock
+                .verify(eventSpyDispatcherMock, times(1))
+                .onEvent(any(ToolchainsBuildingResult.class));
     }
 
     /**
@@ -348,47 +329,40 @@ public class MavenCliTest
      * @throws Exception cli invocation.
      */
     @Test
-    public void testVersionStringWithoutAnsi() throws Exception
-    {
+    public void testVersionStringWithoutAnsi() throws Exception {
         // given
         // - request with version and batch mode
-        CliRequest cliRequest = new CliRequest( new String[] {
-                "--version",
-                "--batch-mode"
-        }, null );
+        CliRequest cliRequest = new CliRequest(new String[] {"--version", "--batch-mode"}, null);
         ByteArrayOutputStream systemOut = new ByteArrayOutputStream();
         PrintStream oldOut = System.out;
-        System.setOut( new PrintStream( systemOut ) );
+        System.setOut(new PrintStream(systemOut));
 
         // when
         try {
-            cli.cli( cliRequest );
-        } catch ( MavenCli.ExitException exitException ) {
+            cli.cli(cliRequest);
+        } catch (MavenCli.ExitException exitException) {
             // expected
         } finally {
             // restore sysout
-            System.setOut( oldOut );
+            System.setOut(oldOut);
         }
-        String versionOut = new String( systemOut.toByteArray(), StandardCharsets.UTF_8 );
+        String versionOut = new String(systemOut.toByteArray(), StandardCharsets.UTF_8);
 
         // then
-        assertEquals( MessageUtils.stripAnsiCodes( versionOut ), versionOut );
+        assertEquals(MessageUtils.stripAnsiCodes(versionOut), versionOut);
     }
 
-    class ConcurrencyCalculator implements ThrowingRunnable
-    {
+    class ConcurrencyCalculator implements ThrowingRunnable {
 
         private final String value;
 
-        public ConcurrencyCalculator( String value )
-        {
+        public ConcurrencyCalculator(String value) {
             this.value = value;
         }
 
         @Override
-        public void run() throws Throwable
-        {
-            cli.calculateDegreeOfConcurrency( value );
+        public void run() throws Throwable {
+            cli.calculateDegreeOfConcurrency(value);
         }
     }
 }

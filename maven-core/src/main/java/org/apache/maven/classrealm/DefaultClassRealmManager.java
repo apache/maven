@@ -1,5 +1,3 @@
-package org.apache.maven.classrealm;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.classrealm;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.classrealm;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -30,11 +29,9 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
 import org.apache.maven.extension.internal.CoreExports;
@@ -58,9 +55,7 @@ import org.eclipse.aether.artifact.Artifact;
  */
 @Named
 @Singleton
-public class DefaultClassRealmManager
-    implements ClassRealmManager
-{
+public class DefaultClassRealmManager implements ClassRealmManager {
     public static final String API_REALMID = "maven.api";
 
     /**
@@ -91,54 +86,49 @@ public class DefaultClassRealmManager
     private final Set<String> providedArtifacts;
 
     @Inject
-    public DefaultClassRealmManager( Logger logger, PlexusContainer container,
-                                     List<ClassRealmManagerDelegate> delegates, CoreExports exports )
-    {
+    public DefaultClassRealmManager(
+            Logger logger, PlexusContainer container, List<ClassRealmManagerDelegate> delegates, CoreExports exports) {
         this.logger = logger;
-        this.world = ( (MutablePlexusContainer) container ).getClassWorld();
+        this.world = ((MutablePlexusContainer) container).getClassWorld();
         this.containerRealm = container.getContainerRealm();
         this.delegates = delegates;
 
         Map<String, ClassLoader> foreignImports = exports.getExportedPackages();
 
-        this.mavenApiRealm =
-            createRealm( API_REALMID, RealmType.Core, null /* parent */, null /* parentImports */,
-                         foreignImports, null /* artifacts */ );
+        this.mavenApiRealm = createRealm(
+                API_REALMID,
+                RealmType.Core,
+                null /* parent */,
+                null /* parentImports */,
+                foreignImports,
+                null /* artifacts */);
 
         this.providedArtifacts = exports.getExportedArtifacts();
     }
 
-    private ClassRealm newRealm( String id )
-    {
-        synchronized ( world )
-        {
+    private ClassRealm newRealm(String id) {
+        synchronized (world) {
             String realmId = id;
 
             Random random = new Random();
 
-            while ( true )
-            {
-                try
-                {
-                    ClassRealm classRealm = world.newRealm( realmId, null );
+            while (true) {
+                try {
+                    ClassRealm classRealm = world.newRealm(realmId, null);
 
-                    if ( logger.isDebugEnabled() )
-                    {
-                        logger.debug( "Created new class realm " + realmId );
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Created new class realm " + realmId);
                     }
 
                     return classRealm;
-                }
-                catch ( DuplicateRealmException e )
-                {
+                } catch (DuplicateRealmException e) {
                     realmId = id + '-' + random.nextInt();
                 }
             }
         }
     }
 
-    public ClassRealm getMavenApiRealm()
-    {
+    public ClassRealm getMavenApiRealm() {
         return mavenApiRealm;
     }
 
@@ -154,255 +144,227 @@ public class DefaultClassRealmManager
      *            missing file) will automatically be excluded from the realm.
      * @return The created class realm, never {@code null}.
      */
-    private ClassRealm createRealm( String baseRealmId, RealmType type, ClassLoader parent, List<String> parentImports,
-                                    Map<String, ClassLoader> foreignImports, List<Artifact> artifacts )
-    {
+    private ClassRealm createRealm(
+            String baseRealmId,
+            RealmType type,
+            ClassLoader parent,
+            List<String> parentImports,
+            Map<String, ClassLoader> foreignImports,
+            List<Artifact> artifacts) {
         Set<String> artifactIds = new LinkedHashSet<>();
 
         List<ClassRealmConstituent> constituents = new ArrayList<>();
 
-        if ( artifacts != null )
-        {
-            for ( Artifact artifact : artifacts )
-            {
-                if ( !isProvidedArtifact( artifact ) )
-                {
-                    artifactIds.add( getId( artifact ) );
-                    if ( artifact.getFile() != null )
-                    {
-                        constituents.add( new ArtifactClassRealmConstituent( artifact ) );
+        if (artifacts != null) {
+            for (Artifact artifact : artifacts) {
+                if (!isProvidedArtifact(artifact)) {
+                    artifactIds.add(getId(artifact));
+                    if (artifact.getFile() != null) {
+                        constituents.add(new ArtifactClassRealmConstituent(artifact));
                     }
                 }
             }
         }
 
-        if ( parentImports != null )
-        {
-            parentImports = new ArrayList<>( parentImports );
-        }
-        else
-        {
+        if (parentImports != null) {
+            parentImports = new ArrayList<>(parentImports);
+        } else {
             parentImports = new ArrayList<>();
         }
 
-        if ( foreignImports != null )
-        {
-            foreignImports = new TreeMap<>( foreignImports );
-        }
-        else
-        {
+        if (foreignImports != null) {
+            foreignImports = new TreeMap<>(foreignImports);
+        } else {
             foreignImports = new TreeMap<>();
         }
 
-        ClassRealm classRealm = newRealm( baseRealmId );
+        ClassRealm classRealm = newRealm(baseRealmId);
 
-        if ( parent != null )
-        {
-            classRealm.setParentClassLoader( parent );
+        if (parent != null) {
+            classRealm.setParentClassLoader(parent);
         }
 
-        callDelegates( classRealm, type, parent, parentImports, foreignImports, constituents );
+        callDelegates(classRealm, type, parent, parentImports, foreignImports, constituents);
 
-        wireRealm( classRealm, parentImports, foreignImports );
+        wireRealm(classRealm, parentImports, foreignImports);
 
-        Set<String> includedIds = populateRealm( classRealm, constituents );
+        Set<String> includedIds = populateRealm(classRealm, constituents);
 
-        if ( logger.isDebugEnabled() )
-        {
-            artifactIds.removeAll( includedIds );
+        if (logger.isDebugEnabled()) {
+            artifactIds.removeAll(includedIds);
 
-            for ( String id : artifactIds )
-            {
-                logger.debug( "  Excluded: " + id );
+            for (String id : artifactIds) {
+                logger.debug("  Excluded: " + id);
             }
         }
 
         return classRealm;
     }
 
-    public ClassRealm getCoreRealm()
-    {
+    public ClassRealm getCoreRealm() {
         return containerRealm;
     }
 
-    public ClassRealm createProjectRealm( Model model, List<Artifact> artifacts )
-    {
-        Objects.requireNonNull( model, "model cannot be null" );
+    public ClassRealm createProjectRealm(Model model, List<Artifact> artifacts) {
+        Objects.requireNonNull(model, "model cannot be null");
 
         ClassLoader parent = getMavenApiRealm();
 
-        return createRealm( getKey( model ), RealmType.Project, parent, null, null, artifacts );
+        return createRealm(getKey(model), RealmType.Project, parent, null, null, artifacts);
     }
 
-    private static String getKey( Model model )
-    {
+    private static String getKey(Model model) {
         return "project>" + model.getGroupId() + ":" + model.getArtifactId() + ":" + model.getVersion();
     }
 
-    public ClassRealm createExtensionRealm( Plugin plugin, List<Artifact> artifacts )
-    {
-        Objects.requireNonNull( plugin, "plugin cannot be null" );
+    public ClassRealm createExtensionRealm(Plugin plugin, List<Artifact> artifacts) {
+        Objects.requireNonNull(plugin, "plugin cannot be null");
 
         ClassLoader parent = PARENT_CLASSLOADER;
 
-        Map<String, ClassLoader> foreignImports =
-            Collections.<String, ClassLoader>singletonMap( "", getMavenApiRealm() );
+        Map<String, ClassLoader> foreignImports = Collections.<String, ClassLoader>singletonMap("", getMavenApiRealm());
 
-        return createRealm( getKey( plugin, true ), RealmType.Extension, parent, null, foreignImports, artifacts );
+        return createRealm(getKey(plugin, true), RealmType.Extension, parent, null, foreignImports, artifacts);
     }
 
-    private boolean isProvidedArtifact( Artifact artifact )
-    {
-        return providedArtifacts.contains( artifact.getGroupId() + ":" + artifact.getArtifactId() );
+    private boolean isProvidedArtifact(Artifact artifact) {
+        return providedArtifacts.contains(artifact.getGroupId() + ":" + artifact.getArtifactId());
     }
 
-    public ClassRealm createPluginRealm( Plugin plugin, ClassLoader parent, List<String> parentImports,
-                                         Map<String, ClassLoader> foreignImports, List<Artifact> artifacts )
-    {
-        Objects.requireNonNull( plugin, "plugin cannot be null" );
+    public ClassRealm createPluginRealm(
+            Plugin plugin,
+            ClassLoader parent,
+            List<String> parentImports,
+            Map<String, ClassLoader> foreignImports,
+            List<Artifact> artifacts) {
+        Objects.requireNonNull(plugin, "plugin cannot be null");
 
-        if ( parent == null )
-        {
+        if (parent == null) {
             parent = PARENT_CLASSLOADER;
         }
 
-        return createRealm( getKey( plugin, false ), RealmType.Plugin, parent, parentImports, foreignImports,
-                            artifacts );
+        return createRealm(getKey(plugin, false), RealmType.Plugin, parent, parentImports, foreignImports, artifacts);
     }
 
-    private static String getKey( Plugin plugin, boolean extension )
-    {
-        String version = ArtifactUtils.toSnapshotVersion( plugin.getVersion() );
-        return ( extension ? "extension>" : "plugin>" ) + plugin.getGroupId() + ":" + plugin.getArtifactId() + ":"
-            + version;
+    private static String getKey(Plugin plugin, boolean extension) {
+        String version = ArtifactUtils.toSnapshotVersion(plugin.getVersion());
+        return (extension ? "extension>" : "plugin>") + plugin.getGroupId() + ":" + plugin.getArtifactId() + ":"
+                + version;
     }
 
-    private static String getId( Artifact artifact )
-    {
-        return getId( artifact.getGroupId(), artifact.getArtifactId(), artifact.getExtension(),
-                      artifact.getClassifier(), artifact.getBaseVersion() );
+    private static String getId(Artifact artifact) {
+        return getId(
+                artifact.getGroupId(),
+                artifact.getArtifactId(),
+                artifact.getExtension(),
+                artifact.getClassifier(),
+                artifact.getBaseVersion());
     }
 
-    private static String getId( ClassRealmConstituent constituent )
-    {
-        return getId( constituent.getGroupId(), constituent.getArtifactId(), constituent.getType(),
-                      constituent.getClassifier(), constituent.getVersion() );
+    private static String getId(ClassRealmConstituent constituent) {
+        return getId(
+                constituent.getGroupId(),
+                constituent.getArtifactId(),
+                constituent.getType(),
+                constituent.getClassifier(),
+                constituent.getVersion());
     }
 
-    private static String getId( String gid, String aid, String type, String cls, String ver )
-    {
-        return gid + ':' + aid + ':' + type + ( StringUtils.isNotEmpty( cls ) ? ':' + cls : "" ) + ':' + ver;
+    private static String getId(String gid, String aid, String type, String cls, String ver) {
+        return gid + ':' + aid + ':' + type + (StringUtils.isNotEmpty(cls) ? ':' + cls : "") + ':' + ver;
     }
 
-    private void callDelegates( ClassRealm classRealm, RealmType type, ClassLoader parent, List<String> parentImports,
-                                Map<String, ClassLoader> foreignImports, List<ClassRealmConstituent> constituents )
-    {
-        List<ClassRealmManagerDelegate> delegates = new ArrayList<>( this.delegates );
+    private void callDelegates(
+            ClassRealm classRealm,
+            RealmType type,
+            ClassLoader parent,
+            List<String> parentImports,
+            Map<String, ClassLoader> foreignImports,
+            List<ClassRealmConstituent> constituents) {
+        List<ClassRealmManagerDelegate> delegates = new ArrayList<>(this.delegates);
 
-        if ( !delegates.isEmpty() )
-        {
+        if (!delegates.isEmpty()) {
             ClassRealmRequest request =
-                new DefaultClassRealmRequest( type, parent, parentImports, foreignImports, constituents );
+                    new DefaultClassRealmRequest(type, parent, parentImports, foreignImports, constituents);
 
-            for ( ClassRealmManagerDelegate delegate : delegates )
-            {
-                try
-                {
-                    delegate.setupRealm( classRealm, request );
-                }
-                catch ( Exception e )
-                {
-                    logger.error( delegate.getClass().getName() + " failed to setup class realm " + classRealm + ": "
-                        + e.getMessage(), e );
+            for (ClassRealmManagerDelegate delegate : delegates) {
+                try {
+                    delegate.setupRealm(classRealm, request);
+                } catch (Exception e) {
+                    logger.error(
+                            delegate.getClass().getName() + " failed to setup class realm " + classRealm + ": "
+                                    + e.getMessage(),
+                            e);
                 }
             }
         }
     }
 
-    private Set<String> populateRealm( ClassRealm classRealm, List<ClassRealmConstituent> constituents )
-    {
+    private Set<String> populateRealm(ClassRealm classRealm, List<ClassRealmConstituent> constituents) {
         Set<String> includedIds = new LinkedHashSet<>();
 
-        if ( logger.isDebugEnabled() )
-        {
-            logger.debug( "Populating class realm " + classRealm.getId() );
+        if (logger.isDebugEnabled()) {
+            logger.debug("Populating class realm " + classRealm.getId());
         }
 
-        for ( ClassRealmConstituent constituent : constituents )
-        {
+        for (ClassRealmConstituent constituent : constituents) {
             File file = constituent.getFile();
 
-            String id = getId( constituent );
-            includedIds.add( id );
+            String id = getId(constituent);
+            includedIds.add(id);
 
-            if ( logger.isDebugEnabled() )
-            {
-                logger.debug( "  Included: " + id );
+            if (logger.isDebugEnabled()) {
+                logger.debug("  Included: " + id);
             }
 
-            try
-            {
-                classRealm.addURL( file.toURI().toURL() );
-            }
-            catch ( MalformedURLException e )
-            {
+            try {
+                classRealm.addURL(file.toURI().toURL());
+            } catch (MalformedURLException e) {
                 // Not going to happen
-                logger.error( e.getMessage(), e );
+                logger.error(e.getMessage(), e);
             }
         }
 
         return includedIds;
     }
 
-    private void wireRealm( ClassRealm classRealm, List<String> parentImports, Map<String, ClassLoader> foreignImports )
-    {
-        if ( foreignImports != null && !foreignImports.isEmpty() )
-        {
-            if ( logger.isDebugEnabled() )
-            {
-                logger.debug( "Importing foreign packages into class realm " + classRealm.getId() );
+    private void wireRealm(ClassRealm classRealm, List<String> parentImports, Map<String, ClassLoader> foreignImports) {
+        if (foreignImports != null && !foreignImports.isEmpty()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Importing foreign packages into class realm " + classRealm.getId());
             }
 
-            for ( Map.Entry<String, ClassLoader> entry : foreignImports.entrySet() )
-            {
+            for (Map.Entry<String, ClassLoader> entry : foreignImports.entrySet()) {
                 ClassLoader importedRealm = entry.getValue();
                 String imp = entry.getKey();
 
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.debug( "  Imported: " + imp + " < " + getId( importedRealm ) );
+                if (logger.isDebugEnabled()) {
+                    logger.debug("  Imported: " + imp + " < " + getId(importedRealm));
                 }
 
-                classRealm.importFrom( importedRealm, imp );
+                classRealm.importFrom(importedRealm, imp);
             }
         }
 
-        if ( parentImports != null && !parentImports.isEmpty() )
-        {
-            if ( logger.isDebugEnabled() )
-            {
-                logger.debug( "Importing parent packages into class realm " + classRealm.getId() );
+        if (parentImports != null && !parentImports.isEmpty()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Importing parent packages into class realm " + classRealm.getId());
             }
 
-            for ( String imp : parentImports )
-            {
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.debug( "  Imported: " + imp + " < " + getId( classRealm.getParentClassLoader() ) );
+            for (String imp : parentImports) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("  Imported: " + imp + " < " + getId(classRealm.getParentClassLoader()));
                 }
 
-                classRealm.importFromParent( imp );
+                classRealm.importFromParent(imp);
             }
         }
     }
 
-    private String getId( ClassLoader classLoader )
-    {
-        if ( classLoader instanceof ClassRealm )
-        {
-            return ( (ClassRealm) classLoader ).getId();
+    private String getId(ClassLoader classLoader) {
+        if (classLoader instanceof ClassRealm) {
+            return ((ClassRealm) classLoader).getId();
         }
-        return String.valueOf( classLoader );
+        return String.valueOf(classLoader);
     }
-
 }

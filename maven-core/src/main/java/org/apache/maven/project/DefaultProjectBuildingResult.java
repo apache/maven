@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,11 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.maven.model.building.ModelProblem;
 
 /**
@@ -30,9 +28,7 @@ import org.apache.maven.model.building.ModelProblem;
  *
  * @author Benjamin Bentmann
  */
-class DefaultProjectBuildingResult
-    implements ProjectBuildingResult
-{
+class DefaultProjectBuildingResult implements ProjectBuildingResult {
 
     private String projectId;
 
@@ -51,13 +47,12 @@ class DefaultProjectBuildingResult
      * @param problems The problems that were encountered, may be {@code null}.
      * @param dependencyResolutionResult The result of the resolution for the project dependencies, may be {@code null}.
      */
-    DefaultProjectBuildingResult( MavenProject project, List<ModelProblem> problems,
-                                  DependencyResolutionResult dependencyResolutionResult )
-    {
-        this.projectId =
-            ( project != null ) ? project.getGroupId() + ':' + project.getArtifactId() + ':' + project.getVersion()
-                            : "";
-        this.pomFile = ( project != null ) ? project.getFile() : null;
+    DefaultProjectBuildingResult(
+            MavenProject project, List<ModelProblem> problems, DependencyResolutionResult dependencyResolutionResult) {
+        this.projectId = (project != null)
+                ? project.getGroupId() + ':' + project.getArtifactId() + ':' + project.getVersion()
+                : "";
+        this.pomFile = (project != null) ? project.getFile() : null;
         this.project = project;
         this.problems = problems;
         this.dependencyResolutionResult = dependencyResolutionResult;
@@ -70,41 +65,33 @@ class DefaultProjectBuildingResult
      * @param pomFile The POM file from which the project was built, may be {@code null}.
      * @param problems The problems that were encountered, may be {@code null}.
      */
-    DefaultProjectBuildingResult( String projectId, File pomFile, List<ModelProblem> problems )
-    {
-        this.projectId = ( projectId != null ) ? projectId : "";
+    DefaultProjectBuildingResult(String projectId, File pomFile, List<ModelProblem> problems) {
+        this.projectId = (projectId != null) ? projectId : "";
         this.pomFile = pomFile;
         this.problems = problems;
     }
 
-    public String getProjectId()
-    {
+    public String getProjectId() {
         return projectId;
     }
 
-    public File getPomFile()
-    {
+    public File getPomFile() {
         return pomFile;
     }
 
-    public MavenProject getProject()
-    {
+    public MavenProject getProject() {
         return project;
     }
 
-    public List<ModelProblem> getProblems()
-    {
-        if ( problems == null )
-        {
+    public List<ModelProblem> getProblems() {
+        if (problems == null) {
             problems = new ArrayList<>();
         }
 
         return problems;
     }
 
-    public DependencyResolutionResult getDependencyResolutionResult()
-    {
+    public DependencyResolutionResult getDependencyResolutionResult() {
         return dependencyResolutionResult;
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.model.Plugin;
@@ -34,9 +33,7 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-public class PluginManagerException
-    extends Exception
-{
+public class PluginManagerException extends Exception {
 
     private final String pluginGroupId;
 
@@ -48,9 +45,8 @@ public class PluginManagerException
 
     private MavenProject project;
 
-    protected PluginManagerException( Plugin plugin, String message, MavenProject project, Throwable cause )
-    {
-        super( message, cause );
+    protected PluginManagerException(Plugin plugin, String message, MavenProject project, Throwable cause) {
+        super(message, cause);
 
         this.project = project;
         pluginGroupId = plugin.getGroupId();
@@ -58,27 +54,24 @@ public class PluginManagerException
         pluginVersion = plugin.getVersion();
     }
 
-    public PluginManagerException( Plugin plugin, String message, Throwable cause )
-    {
-        super( message, cause );
+    public PluginManagerException(Plugin plugin, String message, Throwable cause) {
+        super(message, cause);
 
         pluginGroupId = plugin.getGroupId();
         pluginArtifactId = plugin.getArtifactId();
         pluginVersion = plugin.getVersion();
     }
 
-    protected PluginManagerException( MojoDescriptor mojoDescriptor, String message, Throwable cause )
-    {
-        super( message, cause );
+    protected PluginManagerException(MojoDescriptor mojoDescriptor, String message, Throwable cause) {
+        super(message, cause);
         pluginGroupId = mojoDescriptor.getPluginDescriptor().getGroupId();
         pluginArtifactId = mojoDescriptor.getPluginDescriptor().getArtifactId();
         pluginVersion = mojoDescriptor.getPluginDescriptor().getVersion();
         goal = mojoDescriptor.getGoal();
     }
 
-    protected PluginManagerException( MojoDescriptor mojoDescriptor, MavenProject project, String message )
-    {
-        super( message );
+    protected PluginManagerException(MojoDescriptor mojoDescriptor, MavenProject project, String message) {
+        super(message);
         this.project = project;
         pluginGroupId = mojoDescriptor.getPluginDescriptor().getGroupId();
         pluginArtifactId = mojoDescriptor.getPluginDescriptor().getArtifactId();
@@ -86,10 +79,9 @@ public class PluginManagerException
         goal = mojoDescriptor.getGoal();
     }
 
-    protected PluginManagerException( MojoDescriptor mojoDescriptor, MavenProject project, String message,
-                                      Throwable cause )
-    {
-        super( message, cause );
+    protected PluginManagerException(
+            MojoDescriptor mojoDescriptor, MavenProject project, String message, Throwable cause) {
+        super(message, cause);
         this.project = project;
         pluginGroupId = mojoDescriptor.getPluginDescriptor().getGroupId();
         pluginArtifactId = mojoDescriptor.getPluginDescriptor().getArtifactId();
@@ -97,37 +89,33 @@ public class PluginManagerException
         goal = mojoDescriptor.getGoal();
     }
 
-    public PluginManagerException( Plugin plugin, InvalidVersionSpecificationException cause )
-    {
-        super( cause );
+    public PluginManagerException(Plugin plugin, InvalidVersionSpecificationException cause) {
+        super(cause);
 
         pluginGroupId = plugin.getGroupId();
         pluginArtifactId = plugin.getArtifactId();
         pluginVersion = plugin.getVersion();
     }
 
-    public PluginManagerException( Plugin plugin, String message, PlexusConfigurationException cause )
-    {
-        super( message, cause );
+    public PluginManagerException(Plugin plugin, String message, PlexusConfigurationException cause) {
+        super(message, cause);
 
         pluginGroupId = plugin.getGroupId();
         pluginArtifactId = plugin.getArtifactId();
         pluginVersion = plugin.getVersion();
     }
 
-    public PluginManagerException( Plugin plugin, String message, ComponentRepositoryException cause )
-    {
-        super( message, cause );
+    public PluginManagerException(Plugin plugin, String message, ComponentRepositoryException cause) {
+        super(message, cause);
 
         pluginGroupId = plugin.getGroupId();
         pluginArtifactId = plugin.getArtifactId();
         pluginVersion = plugin.getVersion();
     }
 
-    public PluginManagerException( MojoDescriptor mojoDescriptor, MavenProject project, String message,
-                                   NoSuchRealmException cause )
-    {
-        super( message, cause );
+    public PluginManagerException(
+            MojoDescriptor mojoDescriptor, MavenProject project, String message, NoSuchRealmException cause) {
+        super(message, cause);
 
         this.project = project;
         pluginGroupId = mojoDescriptor.getPluginDescriptor().getGroupId();
@@ -136,10 +124,9 @@ public class PluginManagerException
         goal = mojoDescriptor.getGoal();
     }
 
-    public PluginManagerException( MojoDescriptor mojoDescriptor, String message, MavenProject project,
-                                   PlexusContainerException cause )
-    {
-        super( message, cause );
+    public PluginManagerException(
+            MojoDescriptor mojoDescriptor, String message, MavenProject project, PlexusContainerException cause) {
+        super(message, cause);
 
         this.project = project;
 
@@ -151,18 +138,16 @@ public class PluginManagerException
         goal = mojoDescriptor.getGoal();
     }
 
-    public PluginManagerException( Plugin plugin, String message, PlexusContainerException cause )
-    {
-        super( message, cause );
+    public PluginManagerException(Plugin plugin, String message, PlexusContainerException cause) {
+        super(message, cause);
 
         pluginGroupId = plugin.getGroupId();
         pluginArtifactId = plugin.getArtifactId();
         pluginVersion = plugin.getVersion();
     }
 
-    public PluginManagerException( Plugin plugin, String message, MavenProject project )
-    {
-        super( message );
+    public PluginManagerException(Plugin plugin, String message, MavenProject project) {
+        super(message);
 
         pluginGroupId = plugin.getGroupId();
         pluginArtifactId = plugin.getArtifactId();
@@ -170,28 +155,23 @@ public class PluginManagerException
         this.project = project;
     }
 
-    public String getPluginGroupId()
-    {
+    public String getPluginGroupId() {
         return pluginGroupId;
     }
 
-    public String getPluginArtifactId()
-    {
+    public String getPluginArtifactId() {
         return pluginArtifactId;
     }
 
-    public String getPluginVersion()
-    {
+    public String getPluginVersion() {
         return pluginVersion;
     }
 
-    public String getGoal()
-    {
+    public String getGoal() {
         return goal;
     }
 
-    public MavenProject getProject()
-    {
+    public MavenProject getProject() {
         return project;
     }
 }

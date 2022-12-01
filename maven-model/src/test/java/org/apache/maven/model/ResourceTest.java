@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import junit.framework.TestCase;
 
@@ -26,31 +25,24 @@ import junit.framework.TestCase;
  *
  * @author Benjamin Bentmann
  */
-public class ResourceTest
-    extends TestCase
-{
+public class ResourceTest extends TestCase {
 
-    public void testHashCodeNullSafe()
-    {
+    public void testHashCodeNullSafe() {
         new Resource().hashCode();
     }
 
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Resource().equals( null ) );
+    public void testEqualsNullSafe() {
+        assertFalse(new Resource().equals(null));
 
-        new Resource().equals( new Resource() );
+        new Resource().equals(new Resource());
     }
 
-    public void testEqualsIdentity()
-    {
+    public void testEqualsIdentity() {
         Resource thing = new Resource();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Resource().toString() );
+    public void testToStringNullSafe() {
+        assertNotNull(new Resource().toString());
     }
-
 }
