@@ -99,7 +99,7 @@ under the License.
         <field>
           <name>requiredJavaVersion</name>
           <version>1.1.0+</version>
-          <description>A version range which specifies the supported Java versions. The same values as for POM profile activation element 'jdk' are allowed, i.e. version ranges, version prefixes and negated version prefixes (starting with '!').</description>
+          <description>A version range which specifies the supported Java versions. A version range can either use the usual mathematical syntax "[2.0.10,2.1.0),[3.0,)" or use a single version "2.2.1". The latter is a short form for "[2.2.1,)", i.e. denotes the minimum version required.</description>
           <type>String</type>
         </field>
         <field>
