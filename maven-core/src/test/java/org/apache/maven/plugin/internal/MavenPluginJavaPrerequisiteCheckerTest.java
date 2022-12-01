@@ -28,8 +28,10 @@ class MavenPluginJavaPrerequisiteCheckerTest {
     @Test
     void testMatchesVersion() {
         MavenPluginJavaPrerequisiteChecker checker = new MavenPluginJavaPrerequisiteChecker(new GenericVersionScheme());
-        assertTrue(checker.matchesVersion("1.0", "8"));
+        assertTrue(checker.matchesVersion("1.0", "1.8"));
+        assertTrue(checker.matchesVersion("1.8", "9.0.1+11"));
         assertFalse(checker.matchesVersion("[1.0,2],[3,4]", "2.1"));
+        assertTrue(checker.matchesVersion("[1.0,2],[3,4]", "3.1"));
         assertThrows(IllegalArgumentException.class, () -> checker.matchesVersion("(1.0,0)", "11"));
     }
 }

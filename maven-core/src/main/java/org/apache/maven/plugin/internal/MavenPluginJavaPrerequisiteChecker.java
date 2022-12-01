@@ -58,13 +58,13 @@ public class MavenPluginJavaPrerequisiteChecker implements MavenPluginPrerequisi
             constraint = versionScheme.parseVersionConstraint(requiredVersion);
         } catch (InvalidVersionSpecificationException e) {
             throw new IllegalArgumentException(
-                    "Invalid requiredJavaVersion given in plugin descriptor: " + e.getMessage(), e);
+                    "Invalid 'requiredJavaVersion' given in plugin descriptor", e);
         }
         Version current;
         try {
             current = versionScheme.parseVersion(currentVersion);
         } catch (InvalidVersionSpecificationException e) {
-            throw new IllegalStateException("Could not parse current Java version: " + e.getMessage(), e);
+            throw new IllegalStateException("Could not parse current Java version", e);
         }
         if (constraint.getRange() == null) {
             return constraint.getVersion().compareTo(current) <= 0;
