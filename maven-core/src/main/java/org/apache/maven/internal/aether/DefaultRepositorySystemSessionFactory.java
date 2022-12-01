@@ -18,6 +18,10 @@
  */
 package org.apache.maven.internal.aether;
 
+import static java.util.stream.Collectors.toList;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,12 +52,15 @@ import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.NoLocalRepositoryManagerException;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
 import org.eclipse.aether.spi.localrepo.LocalRepositoryManagerFactory;
+import org.eclipse.aether.util.ConfigUtils;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
+import org.eclipse.aether.util.repository.ChainedLocalRepositoryManager;
 import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
 import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
@@ -65,6 +72,23 @@ import org.eclipse.sisu.Nullable;
  */
 @Named
 public class DefaultRepositorySystemSessionFactory {
+    /**
+     * User property for chained LRM: list of "tail" local repository paths (separated by comma), to be used with
+     * {@link ChainedLocalRepositoryManager}.
+     * Default value: {@code null}, no chained LRM is used.
+     *
+     * @since 3.9.0
+     */
+    private static final String MAVEN_REPO_LOCAL_TAIL = "maven.repo.local.tail";
+
+    /**
+     * User property for chained LRM: should artifact availability be ignored in tail local repositories or not.
+     * Default: {@code true}, will ignore availability from tail local repositories.
+     *
+     * @since 3.9.0
+     */
+    private static final String MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY = "maven.repo.local.tail.ignoreAvailability";
+
     private static final String MAVEN_RESOLVER_TRANSPORT_KEY = "maven.resolver.transport";
 
     private static final String MAVEN_RESOLVER_TRANSPORT_DEFAULT = "default";
@@ -354,7 +378,23 @@ public class DefaultRepositorySystemSessionFactory {
                 session.setLocalRepositoryManager(repoSystem.newLocalRepositoryManager(session, localRepo));
             }
         } else {
-            session.setLocalRepositoryManager(repoSystem.newLocalRepositoryManager(session, localRepo));
+            LocalRepositoryManager lrm = repoSystem.newLocalRepositoryManager(session, localRepo);
+
+            String localRepoTail = ConfigUtils.getString(session, null, MAVEN_REPO_LOCAL_TAIL);
+            if (localRepoTail != null) {
+                boolean ignoreTailAvailability =
+                        ConfigUtils.getBoolean(session, true, MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY);
+                List<LocalRepositoryManager> tail = new ArrayList<>();
+                List<String> paths = Arrays.stream(localRepoTail.split(","))
+                        .filter(p -> p != null && !p.trim().isEmpty())
+                        .collect(toList());
+                for (String path : paths) {
+                    tail.add(repoSystem.newLocalRepositoryManager(session, new LocalRepository(path)));
+                }
+                session.setLocalRepositoryManager(new ChainedLocalRepositoryManager(lrm, tail, ignoreTailAvailability));
+            } else {
+                session.setLocalRepositoryManager(lrm);
+            }
         }
     }
 
