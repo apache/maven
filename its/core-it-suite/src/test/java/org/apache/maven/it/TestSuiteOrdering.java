@@ -93,6 +93,7 @@ public class TestSuiteOrdering implements ClassOrderer
          * the tests are to finishing. Newer tests are also more likely to fail, so this is
          * a fail fast technique as well.
          */
+        suite.addTestSuite( MavenITmng7606DependencyImportScopeTest.class );
         suite.addTestSuite( MavenITmng6609ProfileActivationForPackagingTest.class );
         suite.addTestSuite( MavenITmng7566JavaPrerequisiteTest.class );
         suite.addTestSuite( MavenITmng5889FindBasedir.class );
