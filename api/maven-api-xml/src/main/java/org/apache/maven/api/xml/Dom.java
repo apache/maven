@@ -58,6 +58,17 @@ public interface Dom {
     String SELF_COMBINATION_REMOVE = "remove";
 
     /**
+     * In case of complex XML structures, combining can be done based on id.
+     */
+    String ID_COMBINATION_MODE_ATTRIBUTE = "combine.id";
+
+    /**
+     * In case of complex XML structures, combining can be done based on keys.
+     * This is a comma separated list of attribute names.
+     */
+    String KEYS_COMBINATION_MODE_ATTRIBUTE = "combine.keys";
+
+    /**
      * This default mode for combining a DOM node during merge means that where element names match, the process will
      * try to merge the element attributes and values, rather than overriding the recessive element completely with the
      * dominant one. This means that wherever the dominant element doesn't provide the value or a particular attribute,
