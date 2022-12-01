@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import org.apache.maven.plugin.logging.Log;
 
@@ -31,8 +30,7 @@ import org.apache.maven.plugin.logging.Log;
  *
  * @author Jason van Zyl
  */
-public interface Mojo
-{
+public interface Mojo {
     /** The component <code>role</code> hint for Plexus container */
     String ROLE = Mojo.class.getName();
 
@@ -46,8 +44,7 @@ public interface Mojo
      * @throws MojoFailureException if an expected problem (such as a compilation failure) occurs.
      * Throwing this exception causes a "BUILD FAILURE" message to be displayed.
      */
-    void execute()
-        throws MojoExecutionException, MojoFailureException;
+    void execute() throws MojoExecutionException, MojoFailureException;
 
     /**
      * Inject a standard <code>Maven</code> logging mechanism to allow this <code>Mojo</code> to communicate events
@@ -56,7 +53,7 @@ public interface Mojo
      * @param log a new logger
      */
     // TODO not sure about this here, and may want a getLog on here as well/instead
-    void setLog( Log log );
+    void setLog(Log log);
 
     /**
      * Furnish access to the standard Maven logging mechanism which is managed in this base class.

@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,9 @@ package org.apache.maven.toolchain;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain;
 
 import java.io.File;
-
 import org.apache.maven.toolchain.model.PersistedToolchains;
 
 /**
@@ -29,8 +27,7 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
  *
  * @author Benjamin Bentmann
  */
-public interface ToolchainsBuilder
-{
+public interface ToolchainsBuilder {
 
     /**
      * Builds the toolchains model from the configured toolchain files.
@@ -40,7 +37,5 @@ public interface ToolchainsBuilder
      *         not exist.
      * @throws MisconfiguredToolchainException If the toolchain file exists but cannot be parsed.
      */
-    PersistedToolchains build( File userToolchainsFile )
-        throws MisconfiguredToolchainException;
-
+    PersistedToolchains build(File userToolchainsFile) throws MisconfiguredToolchainException;
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.model.path;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model.path;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,15 +16,14 @@ package org.apache.maven.model.path;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.path;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Reporting;
@@ -40,75 +37,62 @@ import org.apache.maven.model.building.ModelBuildingRequest;
  */
 @Named
 @Singleton
-public class DefaultModelPathTranslator
-    implements ModelPathTranslator
-{
+public class DefaultModelPathTranslator implements ModelPathTranslator {
 
     @Inject
     private PathTranslator pathTranslator;
 
-    public DefaultModelPathTranslator setPathTranslator( PathTranslator pathTranslator )
-    {
+    public DefaultModelPathTranslator setPathTranslator(PathTranslator pathTranslator) {
         this.pathTranslator = pathTranslator;
         return this;
     }
 
     @Override
-    public void alignToBaseDirectory( Model model, File basedir, ModelBuildingRequest request )
-    {
-        if ( model == null || basedir == null )
-        {
+    public void alignToBaseDirectory(Model model, File basedir, ModelBuildingRequest request) {
+        if (model == null || basedir == null) {
             return;
         }
 
         Build build = model.getBuild();
 
-        if ( build != null )
-        {
-            build.setDirectory( alignToBaseDirectory( build.getDirectory(), basedir ) );
+        if (build != null) {
+            build.setDirectory(alignToBaseDirectory(build.getDirectory(), basedir));
 
-            build.setSourceDirectory( alignToBaseDirectory( build.getSourceDirectory(), basedir ) );
+            build.setSourceDirectory(alignToBaseDirectory(build.getSourceDirectory(), basedir));
 
-            build.setTestSourceDirectory( alignToBaseDirectory( build.getTestSourceDirectory(), basedir ) );
+            build.setTestSourceDirectory(alignToBaseDirectory(build.getTestSourceDirectory(), basedir));
 
-            build.setScriptSourceDirectory( alignToBaseDirectory( build.getScriptSourceDirectory(), basedir ) );
+            build.setScriptSourceDirectory(alignToBaseDirectory(build.getScriptSourceDirectory(), basedir));
 
-            for ( Resource resource : build.getResources() )
-            {
-                resource.setDirectory( alignToBaseDirectory( resource.getDirectory(), basedir ) );
+            for (Resource resource : build.getResources()) {
+                resource.setDirectory(alignToBaseDirectory(resource.getDirectory(), basedir));
             }
 
-            for ( Resource resource : build.getTestResources() )
-            {
-                resource.setDirectory( alignToBaseDirectory( resource.getDirectory(), basedir ) );
+            for (Resource resource : build.getTestResources()) {
+                resource.setDirectory(alignToBaseDirectory(resource.getDirectory(), basedir));
             }
 
-            if ( build.getFilters() != null )
-            {
-                List<String> filters = new ArrayList<>( build.getFilters().size() );
-                for ( String filter : build.getFilters() )
-                {
-                    filters.add( alignToBaseDirectory( filter, basedir ) );
+            if (build.getFilters() != null) {
+                List<String> filters = new ArrayList<>(build.getFilters().size());
+                for (String filter : build.getFilters()) {
+                    filters.add(alignToBaseDirectory(filter, basedir));
                 }
-                build.setFilters( filters );
+                build.setFilters(filters);
             }
 
-            build.setOutputDirectory( alignToBaseDirectory( build.getOutputDirectory(), basedir ) );
+            build.setOutputDirectory(alignToBaseDirectory(build.getOutputDirectory(), basedir));
 
-            build.setTestOutputDirectory( alignToBaseDirectory( build.getTestOutputDirectory(), basedir ) );
+            build.setTestOutputDirectory(alignToBaseDirectory(build.getTestOutputDirectory(), basedir));
         }
 
         Reporting reporting = model.getReporting();
 
-        if ( reporting != null )
-        {
-            reporting.setOutputDirectory( alignToBaseDirectory( reporting.getOutputDirectory(), basedir ) );
+        if (reporting != null) {
+            reporting.setOutputDirectory(alignToBaseDirectory(reporting.getOutputDirectory(), basedir));
         }
     }
 
-    private String alignToBaseDirectory( String path, File basedir )
-    {
-        return pathTranslator.alignToBaseDirectory( path, basedir );
+    private String alignToBaseDirectory(String path, File basedir) {
+        return pathTranslator.alignToBaseDirectory(path, basedir);
     }
-
 }

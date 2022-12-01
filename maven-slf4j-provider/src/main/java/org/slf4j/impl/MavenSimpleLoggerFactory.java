@@ -1,5 +1,3 @@
-package org.slf4j.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,29 +16,24 @@ package org.slf4j.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.slf4j.impl;
 
 import org.slf4j.Logger;
 
 /**
  * MavenSimpleLoggerFactory
  */
-public class MavenSimpleLoggerFactory
-    extends SimpleLoggerFactory
-{
+public class MavenSimpleLoggerFactory extends SimpleLoggerFactory {
     /**
      * Return an appropriate {@link MavenSimpleLogger} instance by name.
      */
-    public Logger getLogger( String name )
-    {
-        Logger simpleLogger = loggerMap.get( name );
-        if ( simpleLogger != null )
-        {
+    public Logger getLogger(String name) {
+        Logger simpleLogger = loggerMap.get(name);
+        if (simpleLogger != null) {
             return simpleLogger;
-        }
-        else
-        {
-            Logger newInstance = new MavenSimpleLogger( name );
-            Logger oldInstance = loggerMap.putIfAbsent( name, newInstance );
+        } else {
+            Logger newInstance = new MavenSimpleLogger(name);
+            Logger oldInstance = loggerMap.putIfAbsent(name, newInstance);
             return oldInstance == null ? newInstance : oldInstance;
         }
     }

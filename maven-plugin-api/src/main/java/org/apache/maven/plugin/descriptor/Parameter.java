@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.descriptor;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.descriptor;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,13 +16,12 @@ package org.apache.maven.plugin.descriptor;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.descriptor;
 
 /**
  * @author Jason van Zyl
  */
-public class Parameter
-    implements Cloneable
-{
+public class Parameter implements Cloneable {
     private String alias;
 
     private String name;
@@ -53,138 +50,111 @@ public class Parameter
     //
     // ----------------------------------------------------------------------
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public void setName( String name )
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public String getType()
-    {
+    public String getType() {
         return type;
     }
 
-    public void setType( String type )
-    {
+    public void setType(String type) {
         this.type = type;
     }
 
-    public boolean isRequired()
-    {
+    public boolean isRequired() {
         return required;
     }
 
-    public void setRequired( boolean required )
-    {
+    public void setRequired(boolean required) {
         this.required = required;
     }
 
-    public String getDescription()
-    {
+    public String getDescription() {
         return description;
     }
 
-    public void setDescription( String description )
-    {
+    public void setDescription(String description) {
         this.description = description;
     }
 
-    public String getExpression()
-    {
+    public String getExpression() {
         return expression;
     }
 
-    public void setExpression( String expression )
-    {
+    public void setExpression(String expression) {
         this.expression = expression;
     }
 
-    public String getDeprecated()
-    {
+    public String getDeprecated() {
         return deprecated;
     }
 
-    public void setDeprecated( String deprecated )
-    {
+    public void setDeprecated(String deprecated) {
         this.deprecated = deprecated;
     }
 
-    public int hashCode()
-    {
+    public int hashCode() {
         return name.hashCode();
     }
 
-    public boolean equals( Object other )
-    {
-        return ( other instanceof Parameter ) && getName().equals( ( (Parameter) other ).getName() );
+    public boolean equals(Object other) {
+        return (other instanceof Parameter) && getName().equals(((Parameter) other).getName());
     }
 
-    public String getAlias()
-    {
+    public String getAlias() {
         return alias;
     }
 
-    public void setAlias( String alias )
-    {
+    public void setAlias(String alias) {
         this.alias = alias;
     }
 
-    public boolean isEditable()
-    {
+    public boolean isEditable() {
         return editable;
     }
 
-    public void setEditable( boolean editable )
-    {
+    public void setEditable(boolean editable) {
         this.editable = editable;
     }
 
-    public void setDefaultValue( String defaultValue )
-    {
+    public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
     }
 
-    public String getDefaultValue()
-    {
+    public String getDefaultValue() {
         return defaultValue;
     }
 
-    public String toString()
-    {
+    public String toString() {
         return "Mojo parameter [name: \'" + getName() + "\'; alias: \'" + getAlias() + "\']";
     }
 
-    public Requirement getRequirement()
-    {
+    public Requirement getRequirement() {
         return requirement;
     }
 
-    public void setRequirement( Requirement requirement )
-    {
+    public void setRequirement(Requirement requirement) {
         this.requirement = requirement;
     }
 
-    public String getImplementation()
-    {
+    public String getImplementation() {
         return implementation;
     }
 
-    public void setImplementation( String implementation )
-    {
+    public void setImplementation(String implementation) {
         this.implementation = implementation;
     }
 
-    public String getSince()
-    {
+    public String getSince() {
         return since;
     }
 
-    public void setSince( String since )
-    {
+    public void setSince(String since) {
         this.since = since;
     }
 
@@ -192,16 +162,11 @@ public class Parameter
      * Creates a shallow copy of this parameter.
      */
     @Override
-    public Parameter clone()
-    {
-        try
-        {
+    public Parameter clone() {
+        try {
             return (Parameter) super.clone();
-        }
-        catch ( CloneNotSupportedException e )
-        {
-            throw new UnsupportedOperationException( e );
+        } catch (CloneNotSupportedException e) {
+            throw new UnsupportedOperationException(e);
         }
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,11 +16,11 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.List;
-
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
@@ -43,10 +41,8 @@ import org.eclipse.aether.repository.RemoteRepository;
 /**
  * DefaultBuildPluginManager
  */
-@Component( role = BuildPluginManager.class )
-public class DefaultBuildPluginManager
-    implements BuildPluginManager
-{
+@Component(role = BuildPluginManager.class)
+public class DefaultBuildPluginManager implements BuildPluginManager {
 
     @Requirement
     private MavenPluginManager mavenPluginManager;
@@ -60,13 +56,12 @@ public class DefaultBuildPluginManager
     private MojoExecutionListener mojoExecutionListener;
 
     // this tricks plexus-component-metadata generate required metadata
-    @Requirement( role = MojoExecutionListener.class )
+    @Requirement(role = MojoExecutionListener.class)
     private List<MojoExecutionListener> mojoExecutionListeners;
 
-    public void setMojoExecutionListeners( final List<MojoExecutionListener> listeners )
-    {
+    public void setMojoExecutionListeners(final List<MojoExecutionListener> listeners) {
         this.mojoExecutionListeners = listeners;
-        this.mojoExecutionListener = new CompoundMojoExecutionListener( listeners );
+        this.mojoExecutionListener = new CompoundMojoExecutionListener(listeners);
     }
 
     /**
@@ -78,21 +73,19 @@ public class DefaultBuildPluginManager
      * @throws PluginResolutionException The plugin could be found but could not be resolved.
      * @throws InvalidPluginDescriptorException
      */
-    public PluginDescriptor loadPlugin( Plugin plugin, List<RemoteRepository> repositories,
-                                        RepositorySystemSession session )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-        InvalidPluginDescriptorException
-    {
-        return mavenPluginManager.getPluginDescriptor( plugin, repositories, session );
+    public PluginDescriptor loadPlugin(
+            Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session)
+            throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+                    InvalidPluginDescriptorException {
+        return mavenPluginManager.getPluginDescriptor(plugin, repositories, session);
     }
 
     // ----------------------------------------------------------------------
     // Mojo execution
     // ----------------------------------------------------------------------
 
-    public void executeMojo( MavenSession session, MojoExecution mojoExecution )
-        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException
-    {
+    public void executeMojo(MavenSession session, MojoExecution mojoExecution)
+            throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException {
         MavenProject project = session.getCurrentProject();
 
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
@@ -100,120 +93,99 @@ public class DefaultBuildPluginManager
         Mojo mojo = null;
 
         ClassRealm pluginRealm;
-        try
-        {
-            pluginRealm = getPluginRealm( session, mojoDescriptor.getPluginDescriptor() );
-        }
-        catch ( PluginResolutionException e )
-        {
-            throw new PluginExecutionException( mojoExecution, project, e );
+        try {
+            pluginRealm = getPluginRealm(session, mojoDescriptor.getPluginDescriptor());
+        } catch (PluginResolutionException e) {
+            throw new PluginExecutionException(mojoExecution, project, e);
         }
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader( pluginRealm );
+        Thread.currentThread().setContextClassLoader(pluginRealm);
 
         MavenSession oldSession = legacySupport.getSession();
 
         scope.enter();
 
-        try
-        {
-            scope.seed( MavenProject.class, project );
-            scope.seed( MojoExecution.class, mojoExecution );
+        try {
+            scope.seed(MavenProject.class, project);
+            scope.seed(MojoExecution.class, mojoExecution);
 
-            mojo = mavenPluginManager.getConfiguredMojo( Mojo.class, session, mojoExecution );
+            mojo = mavenPluginManager.getConfiguredMojo(Mojo.class, session, mojoExecution);
 
-            legacySupport.setSession( session );
+            legacySupport.setSession(session);
 
             // NOTE: DuplicateArtifactAttachmentException is currently unchecked, so be careful removing this try/catch!
             // This is necessary to avoid creating compatibility problems for existing plugins that use
             // MavenProjectHelper.attachArtifact(..).
-            try
-            {
-                MojoExecutionEvent mojoExecutionEvent = new MojoExecutionEvent( session, project, mojoExecution, mojo );
+            try {
+                MojoExecutionEvent mojoExecutionEvent = new MojoExecutionEvent(session, project, mojoExecution, mojo);
 
-                mojoExecutionListener.beforeMojoExecution( mojoExecutionEvent );
+                mojoExecutionListener.beforeMojoExecution(mojoExecutionEvent);
 
                 mojo.execute();
 
-                mojoExecutionListener.afterMojoExecutionSuccess( mojoExecutionEvent );
-            }
-            catch ( ClassCastException e )
-            {
+                mojoExecutionListener.afterMojoExecutionSuccess(mojoExecutionEvent);
+            } catch (ClassCastException e) {
                 // to be processed in the outer catch block
                 throw e;
+            } catch (RuntimeException e) {
+                throw new PluginExecutionException(mojoExecution, project, e);
             }
-            catch ( RuntimeException e )
-            {
-                throw new PluginExecutionException( mojoExecution, project, e );
-            }
-        }
-        catch ( PluginContainerException e )
-        {
-            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
-                                                                                 e ) );
+        } catch (PluginContainerException e) {
+            mojoExecutionListener.afterExecutionFailure(
+                    new MojoExecutionEvent(session, project, mojoExecution, mojo, e));
 
-            throw new PluginExecutionException( mojoExecution, project, e );
-        }
-        catch ( NoClassDefFoundError e )
-        {
-            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
-                                                                                 e ) );
+            throw new PluginExecutionException(mojoExecution, project, e);
+        } catch (NoClassDefFoundError e) {
+            mojoExecutionListener.afterExecutionFailure(
+                    new MojoExecutionEvent(session, project, mojoExecution, mojo, e));
 
-            ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
-            PrintStream ps = new PrintStream( os );
-            ps.println( "A required class was missing while executing " + mojoDescriptor.getId() + ": "
-                + e.getMessage() );
-            pluginRealm.display( ps );
+            ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
+            PrintStream ps = new PrintStream(os);
+            ps.println(
+                    "A required class was missing while executing " + mojoDescriptor.getId() + ": " + e.getMessage());
+            pluginRealm.display(ps);
 
-            Exception wrapper = new PluginContainerException( mojoDescriptor, pluginRealm, os.toString(), e );
+            Exception wrapper = new PluginContainerException(mojoDescriptor, pluginRealm, os.toString(), e);
 
-            throw new PluginExecutionException( mojoExecution, project, wrapper );
-        }
-        catch ( LinkageError e )
-        {
-            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
-                                                                                 e ) );
+            throw new PluginExecutionException(mojoExecution, project, wrapper);
+        } catch (LinkageError e) {
+            mojoExecutionListener.afterExecutionFailure(
+                    new MojoExecutionEvent(session, project, mojoExecution, mojo, e));
 
-            ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
-            PrintStream ps = new PrintStream( os );
-            ps.println( "An API incompatibility was encountered while executing " + mojoDescriptor.getId() + ": "
-                + e.getClass().getName() + ": " + e.getMessage() );
-            pluginRealm.display( ps );
+            ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
+            PrintStream ps = new PrintStream(os);
+            ps.println("An API incompatibility was encountered while executing " + mojoDescriptor.getId() + ": "
+                    + e.getClass().getName() + ": " + e.getMessage());
+            pluginRealm.display(ps);
 
-            Exception wrapper = new PluginContainerException( mojoDescriptor, pluginRealm, os.toString(), e );
+            Exception wrapper = new PluginContainerException(mojoDescriptor, pluginRealm, os.toString(), e);
 
-            throw new PluginExecutionException( mojoExecution, project, wrapper );
-        }
-        catch ( ClassCastException e )
-        {
-            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
-                                                                                 e ) );
+            throw new PluginExecutionException(mojoExecution, project, wrapper);
+        } catch (ClassCastException e) {
+            mojoExecutionListener.afterExecutionFailure(
+                    new MojoExecutionEvent(session, project, mojoExecution, mojo, e));
 
-            ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
-            PrintStream ps = new PrintStream( os );
-            ps.println( "A type incompatibility occurred while executing " + mojoDescriptor.getId() + ": "
-                + e.getMessage() );
-            pluginRealm.display( ps );
+            ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
+            PrintStream ps = new PrintStream(os);
+            ps.println("A type incompatibility occurred while executing " + mojoDescriptor.getId() + ": "
+                    + e.getMessage());
+            pluginRealm.display(ps);
 
-            throw new PluginExecutionException( mojoExecution, project, os.toString(), e );
-        }
-        catch ( RuntimeException e )
-        {
-            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
-                                                                                 e ) );
+            throw new PluginExecutionException(mojoExecution, project, os.toString(), e);
+        } catch (RuntimeException e) {
+            mojoExecutionListener.afterExecutionFailure(
+                    new MojoExecutionEvent(session, project, mojoExecution, mojo, e));
 
             throw e;
-        }
-        finally
-        {
-            mavenPluginManager.releaseMojo( mojo, mojoExecution );
+        } finally {
+            mavenPluginManager.releaseMojo(mojo, mojoExecution);
 
             scope.exit();
 
-            Thread.currentThread().setContextClassLoader( oldClassLoader );
+            Thread.currentThread().setContextClassLoader(oldClassLoader);
 
-            legacySupport.setSession( oldSession );
+            legacySupport.setSession(oldSession);
         }
     }
 
@@ -222,26 +194,22 @@ public class DefaultBuildPluginManager
      *      call, which is not nice.
      * @throws PluginResolutionException
      */
-    public ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor )
-        throws PluginResolutionException, PluginManagerException
-    {
+    public ClassRealm getPluginRealm(MavenSession session, PluginDescriptor pluginDescriptor)
+            throws PluginResolutionException, PluginManagerException {
         ClassRealm pluginRealm = pluginDescriptor.getClassRealm();
-        if ( pluginRealm != null )
-        {
+        if (pluginRealm != null) {
             return pluginRealm;
         }
 
-        mavenPluginManager.setupPluginRealm( pluginDescriptor, session, null, null, null );
+        mavenPluginManager.setupPluginRealm(pluginDescriptor, session, null, null, null);
 
         return pluginDescriptor.getClassRealm();
     }
 
-    public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, List<RemoteRepository> repositories,
-                                             RepositorySystemSession session )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-        MojoNotFoundException, InvalidPluginDescriptorException
-    {
-        return mavenPluginManager.getMojoDescriptor( plugin, goal, repositories, session );
+    public MojoDescriptor getMojoDescriptor(
+            Plugin plugin, String goal, List<RemoteRepository> repositories, RepositorySystemSession session)
+            throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+                    MojoNotFoundException, InvalidPluginDescriptorException {
+        return mavenPluginManager.getMojoDescriptor(plugin, goal, repositories, session);
     }
-
 }

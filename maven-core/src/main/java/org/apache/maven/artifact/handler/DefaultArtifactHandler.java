@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.handler;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.handler;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.handler;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.handler;
 
 import org.codehaus.plexus.component.annotations.Component;
 
@@ -25,10 +24,8 @@ import org.codehaus.plexus.component.annotations.Component;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author Jason van Zyl
  */
-@Component( role = ArtifactHandler.class )
-public class DefaultArtifactHandler
-    implements ArtifactHandler
-{
+@Component(role = ArtifactHandler.class)
+public class DefaultArtifactHandler implements ArtifactHandler {
     private String extension;
 
     private String type;
@@ -45,90 +42,70 @@ public class DefaultArtifactHandler
 
     private boolean addedToClasspath;
 
-    public DefaultArtifactHandler()
-    {
-    }
+    public DefaultArtifactHandler() {}
 
-    public DefaultArtifactHandler( String type )
-    {
+    public DefaultArtifactHandler(String type) {
         this.type = type;
     }
 
-    public String getExtension()
-    {
-        if ( extension == null )
-        {
+    public String getExtension() {
+        if (extension == null) {
             extension = type;
         }
         return extension;
     }
 
-    public void setExtension( String extension )
-    {
+    public void setExtension(String extension) {
         this.extension = extension;
     }
 
-    public String getType()
-    {
+    public String getType() {
         return type;
     }
 
-    public String getClassifier()
-    {
+    public String getClassifier() {
         return classifier;
     }
 
-    public String getDirectory()
-    {
-        if ( directory == null )
-        {
+    public String getDirectory() {
+        if (directory == null) {
             directory = getPackaging() + "s";
         }
         return directory;
     }
 
-    public String getPackaging()
-    {
-        if ( packaging == null )
-        {
+    public String getPackaging() {
+        if (packaging == null) {
             packaging = type;
         }
         return packaging;
     }
 
-    public boolean isIncludesDependencies()
-    {
+    public boolean isIncludesDependencies() {
         return includesDependencies;
     }
 
-    public void setIncludesDependencies( boolean includesDependencies )
-    {
+    public void setIncludesDependencies(boolean includesDependencies) {
         this.includesDependencies = includesDependencies;
     }
 
-    public String getLanguage()
-    {
-        if ( language == null )
-        {
+    public String getLanguage() {
+        if (language == null) {
             language = "none";
         }
 
         return language;
     }
 
-    public void setLanguage( String language )
-    {
+    public void setLanguage(String language) {
         this.language = language;
     }
 
-    public boolean isAddedToClasspath()
-    {
+    public boolean isAddedToClasspath() {
         return addedToClasspath;
     }
 
-    public void setAddedToClasspath( boolean addedToClasspath )
-    {
+    public void setAddedToClasspath(boolean addedToClasspath) {
         this.addedToClasspath = addedToClasspath;
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.model.path;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model.path;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.model.path;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.path;
 
 import java.io.File;
 
@@ -26,8 +25,7 @@ import java.io.File;
  *
  * @author Jason van Zyl
  */
-public interface PathTranslator
-{
+public interface PathTranslator {
 
     /**
      * Resolves the specified path against the given base directory. The resolved path will be absolute and uses the
@@ -38,6 +36,5 @@ public interface PathTranslator
      * @param basedir The base directory to resolve relative paths against, may be {@code null}.
      * @return The resolved path or {@code null} if the input path was {@code null}.
      */
-    String alignToBaseDirectory( String path, File basedir );
-
+    String alignToBaseDirectory(String path, File basedir);
 }

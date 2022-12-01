@@ -1,5 +1,3 @@
-package org.apache.maven.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,47 +16,40 @@ package org.apache.maven.building;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.junit.Test;
-
-import java.io.InputStream;
-import java.util.Scanner;
+package org.apache.maven.building;
 
 import static org.junit.Assert.assertEquals;
 
-public class StringSourceTest
-{
-    @Test
-    public void testGetInputStream()
-        throws Exception
-    {
-        StringSource source = new StringSource( "Hello World!" );
+import java.io.InputStream;
+import java.util.Scanner;
+import org.junit.Test;
 
-        try ( InputStream is = source.getInputStream();
-              Scanner scanner = new Scanner( is ) )
-        {
-            assertEquals( "Hello World!", scanner.nextLine() );
+public class StringSourceTest {
+    @Test
+    public void testGetInputStream() throws Exception {
+        StringSource source = new StringSource("Hello World!");
+
+        try (InputStream is = source.getInputStream();
+                Scanner scanner = new Scanner(is)) {
+            assertEquals("Hello World!", scanner.nextLine());
         }
     }
 
     @Test
-    public void testGetLocation()
-    {
-        StringSource source = new StringSource( "Hello World!" );
-        assertEquals( "(memory)", source.getLocation() );
+    public void testGetLocation() {
+        StringSource source = new StringSource("Hello World!");
+        assertEquals("(memory)", source.getLocation());
 
-        source = new StringSource( "Hello World!", "LOCATION" );
-        assertEquals( "LOCATION", source.getLocation() );
+        source = new StringSource("Hello World!", "LOCATION");
+        assertEquals("LOCATION", source.getLocation());
     }
 
     @Test
-    public void testGetContent()
-    {
-        StringSource source = new StringSource( null );
-        assertEquals( "", source.getContent() );
+    public void testGetContent() {
+        StringSource source = new StringSource(null);
+        assertEquals("", source.getContent());
 
-        source = new StringSource( "Hello World!", "LOCATION" );
-        assertEquals( "Hello World!", source.getContent() );
+        source = new StringSource("Hello World!", "LOCATION");
+        assertEquals("Hello World!", source.getContent());
     }
-
 }

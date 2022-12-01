@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,9 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.net.MalformedURLException;
-
 import org.apache.maven.repository.internal.util.ConsoleRepositoryListener;
 import org.apache.maven.repository.internal.util.ConsoleTransferListener;
 import org.codehaus.plexus.ContainerConfiguration;
@@ -32,56 +30,49 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 
-public abstract class AbstractRepositoryTestCase
-    extends PlexusTestCase
-{
+public abstract class AbstractRepositoryTestCase extends PlexusTestCase {
     protected RepositorySystem system;
 
     protected RepositorySystemSession session;
 
     @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
+    protected void customizeContainerConfiguration(ContainerConfiguration containerConfiguration) {
+        super.customizeContainerConfiguration(containerConfiguration);
+        containerConfiguration.setAutoWiring(true);
+        containerConfiguration.setClassPathScanning(PlexusConstants.SCANNING_INDEX);
     }
 
     @Override
-    protected void setUp()
-        throws Exception
-    {
+    protected void setUp() throws Exception {
         super.setUp();
-        system = lookup( RepositorySystem.class );
-        session = newMavenRepositorySystemSession( system );
+        system = lookup(RepositorySystem.class);
+        session = newMavenRepositorySystemSession(system);
     }
 
     @Override
-    protected void tearDown()
-        throws Exception
-    {
+    protected void tearDown() throws Exception {
         session = null;
         system = null;
         super.tearDown();
     }
 
-    public static RepositorySystemSession newMavenRepositorySystemSession( RepositorySystem system )
-    {
+    public static RepositorySystemSession newMavenRepositorySystemSession(RepositorySystem system) {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
 
-        LocalRepository localRepo = new LocalRepository( "target/local-repo" );
-        session.setLocalRepositoryManager( system.newLocalRepositoryManager( session, localRepo ) );
+        LocalRepository localRepo = new LocalRepository("target/local-repo");
+        session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
 
-        session.setTransferListener( new ConsoleTransferListener() );
-        session.setRepositoryListener( new ConsoleRepositoryListener() );
+        session.setTransferListener(new ConsoleTransferListener());
+        session.setRepositoryListener(new ConsoleRepositoryListener());
 
         return session;
     }
 
-    public static RemoteRepository newTestRepository()
-        throws MalformedURLException
-    {
-        return new RemoteRepository.Builder( "repo", "default",
-                                             getTestFile( "target/test-classes/repo" ).toURI().toURL().toString() ).build();
+    public static RemoteRepository newTestRepository() throws MalformedURLException {
+        return new RemoteRepository.Builder(
+                        "repo",
+                        "default",
+                        getTestFile("target/test-classes/repo").toURI().toURL().toString())
+                .build();
     }
 }

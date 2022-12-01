@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver.filter;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,33 +16,30 @@ package org.apache.maven.artifact.resolver.filter;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver.filter;
 
 import java.util.Arrays;
 import java.util.List;
-
 import junit.framework.TestCase;
 
 /**
  * @author Igor Fedorenko
  */
-public class FilterHashEqualsTest
-    extends TestCase
-{
+public class FilterHashEqualsTest extends TestCase {
 
-    public void testIncludesExcludesArtifactFilter()
-    {
-        List<String> patterns = Arrays.asList( "c", "d", "e" );
+    public void testIncludesExcludesArtifactFilter() {
+        List<String> patterns = Arrays.asList("c", "d", "e");
 
-        IncludesArtifactFilter f1 = new IncludesArtifactFilter( patterns );
+        IncludesArtifactFilter f1 = new IncludesArtifactFilter(patterns);
 
-        IncludesArtifactFilter f2 = new IncludesArtifactFilter( patterns );
+        IncludesArtifactFilter f2 = new IncludesArtifactFilter(patterns);
 
-        assertTrue( f1.equals(f2) );
-        assertTrue( f2.equals(f1) );
-        assertTrue( f1.hashCode() == f2.hashCode() );
+        assertTrue(f1.equals(f2));
+        assertTrue(f2.equals(f1));
+        assertTrue(f1.hashCode() == f2.hashCode());
 
-        IncludesArtifactFilter f3 = new IncludesArtifactFilter( Arrays.asList( "d", "c", "e" ) );
-        assertTrue( f1.equals( f3 ) );
-        assertTrue( f1.hashCode() == f3.hashCode() );
+        IncludesArtifactFilter f3 = new IncludesArtifactFilter(Arrays.asList("d", "c", "e"));
+        assertTrue(f1.equals(f3));
+        assertTrue(f1.hashCode() == f3.hashCode());
     }
 }

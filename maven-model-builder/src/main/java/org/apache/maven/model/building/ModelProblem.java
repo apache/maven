@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 /**
  * Describes a problem that was encountered during model building. A problem can either be an exception that was thrown
@@ -26,27 +25,22 @@ package org.apache.maven.model.building;
  *
  * @author Benjamin Bentmann
  */
-public interface ModelProblem
-{
+public interface ModelProblem {
 
     /**
      * The different severity levels for a problem, in decreasing order.
      */
-    enum Severity
-    {
-
+    enum Severity {
         FATAL, //
         ERROR, //
         WARNING //
-
     }
 
     /**
      * Version
      */
-    enum Version
-    {
-        //based on ModeBuildingResult.validationLevel
+    enum Version {
+        // based on ModeBuildingResult.validationLevel
         BASE,
         V20,
         V30,
@@ -116,5 +110,4 @@ public interface ModelProblem
      * @return The version, never {@code null}.
      */
     Version getVersion();
-
 }

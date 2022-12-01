@@ -1,5 +1,3 @@
-package org.apache.maven.execution.scope.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.execution.scope.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,42 +16,39 @@ package org.apache.maven.execution.scope.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution.scope.internal;
 
+import com.google.inject.AbstractModule;
 import org.apache.maven.execution.scope.MojoExecutionScoped;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
-import com.google.inject.AbstractModule;
-
 /**
  * MojoExecutionScopeModule
  */
-public class MojoExecutionScopeModule
-    extends AbstractModule
-{
+public class MojoExecutionScopeModule extends AbstractModule {
     protected final MojoExecutionScope scope;
 
-    public MojoExecutionScopeModule( PlexusContainer container )
-        throws ComponentLookupException
-    {
-        this( container.lookup( MojoExecutionScope.class ) );
+    public MojoExecutionScopeModule(PlexusContainer container) throws ComponentLookupException {
+        this(container.lookup(MojoExecutionScope.class));
     }
 
-    protected MojoExecutionScopeModule( MojoExecutionScope scope )
-    {
+    protected MojoExecutionScopeModule(MojoExecutionScope scope) {
         this.scope = scope;
     }
 
     @Override
-    protected void configure()
-    {
-        bindScope( MojoExecutionScoped.class, scope );
-        bind( MojoExecutionScope.class ).toInstance( scope );
+    protected void configure() {
+        bindScope(MojoExecutionScoped.class, scope);
+        bind(MojoExecutionScope.class).toInstance(scope);
 
-        bind( MavenProject.class ).toProvider( MojoExecutionScope.<MavenProject>seededKeyProvider() ).in( scope );
-        bind( MojoExecution.class ).toProvider( MojoExecutionScope.<MojoExecution>seededKeyProvider() ).in( scope );
+        bind(MavenProject.class)
+                .toProvider(MojoExecutionScope.<MavenProject>seededKeyProvider())
+                .in(scope);
+        bind(MojoExecution.class)
+                .toProvider(MojoExecutionScope.<MojoExecution>seededKeyProvider())
+                .in(scope);
     }
-
 }

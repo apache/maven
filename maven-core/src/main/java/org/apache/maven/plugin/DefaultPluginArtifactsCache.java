@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Plugin;
@@ -41,16 +39,12 @@ import org.eclipse.aether.repository.WorkspaceRepository;
  * @author Igor Fedorenko
  * @author Benjamin Bentmann
  */
-@Component( role = PluginArtifactsCache.class )
-public class DefaultPluginArtifactsCache
-    implements PluginArtifactsCache
-{
+@Component(role = PluginArtifactsCache.class)
+public class DefaultPluginArtifactsCache implements PluginArtifactsCache {
     /**
      * CacheKey
      */
-    protected static class CacheKey
-        implements Key
-    {
+    protected static class CacheKey implements Key {
         private final Plugin plugin;
 
         private final WorkspaceRepository workspace;
@@ -63,144 +57,126 @@ public class DefaultPluginArtifactsCache
 
         private final int hashCode;
 
-        public CacheKey( Plugin plugin, DependencyFilter extensionFilter, List<RemoteRepository> repositories,
-                         RepositorySystemSession session )
-        {
+        public CacheKey(
+                Plugin plugin,
+                DependencyFilter extensionFilter,
+                List<RemoteRepository> repositories,
+                RepositorySystemSession session) {
             this.plugin = plugin.clone();
-            workspace = RepositoryUtils.getWorkspace( session );
+            workspace = RepositoryUtils.getWorkspace(session);
             this.localRepo = session.getLocalRepository();
-            this.repositories = new ArrayList<>( repositories.size() );
-            for ( RemoteRepository repository : repositories )
-            {
-                if ( repository.isRepositoryManager() )
-                {
-                    this.repositories.addAll( repository.getMirroredRepositories() );
-                }
-                else
-                {
-                    this.repositories.add( repository );
+            this.repositories = new ArrayList<>(repositories.size());
+            for (RemoteRepository repository : repositories) {
+                if (repository.isRepositoryManager()) {
+                    this.repositories.addAll(repository.getMirroredRepositories());
+                } else {
+                    this.repositories.add(repository);
                 }
             }
             this.filter = extensionFilter;
 
             int hash = 17;
-            hash = hash * 31 + CacheUtils.pluginHashCode( plugin );
-            hash = hash * 31 + Objects.hashCode( workspace );
-            hash = hash * 31 + Objects.hashCode( localRepo );
-            hash = hash * 31 + RepositoryUtils.repositoriesHashCode( repositories );
-            hash = hash * 31 + Objects.hashCode( extensionFilter );
+            hash = hash * 31 + CacheUtils.pluginHashCode(plugin);
+            hash = hash * 31 + Objects.hashCode(workspace);
+            hash = hash * 31 + Objects.hashCode(localRepo);
+            hash = hash * 31 + RepositoryUtils.repositoriesHashCode(repositories);
+            hash = hash * 31 + Objects.hashCode(extensionFilter);
             this.hashCode = hash;
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return plugin.getId();
         }
 
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return hashCode;
         }
 
         @Override
-        public boolean equals( Object o )
-        {
-            if ( o == this )
-            {
+        public boolean equals(Object o) {
+            if (o == this) {
                 return true;
             }
 
-            if ( !( o instanceof CacheKey ) )
-            {
+            if (!(o instanceof CacheKey)) {
                 return false;
             }
 
             CacheKey that = (CacheKey) o;
 
-            return CacheUtils.pluginEquals( plugin, that.plugin ) 
-                && Objects.equals( workspace, that.workspace )
-                && Objects.equals( localRepo, that.localRepo ) 
-                && RepositoryUtils.repositoriesEquals( repositories, that.repositories )
-                && Objects.equals( filter, that.filter );
+            return CacheUtils.pluginEquals(plugin, that.plugin)
+                    && Objects.equals(workspace, that.workspace)
+                    && Objects.equals(localRepo, that.localRepo)
+                    && RepositoryUtils.repositoriesEquals(repositories, that.repositories)
+                    && Objects.equals(filter, that.filter);
         }
     }
 
     protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<>();
 
-    public Key createKey( Plugin plugin, DependencyFilter extensionFilter, List<RemoteRepository> repositories,
-                          RepositorySystemSession session )
-    {
-        return new CacheKey( plugin, extensionFilter, repositories, session );
+    public Key createKey(
+            Plugin plugin,
+            DependencyFilter extensionFilter,
+            List<RemoteRepository> repositories,
+            RepositorySystemSession session) {
+        return new CacheKey(plugin, extensionFilter, repositories, session);
     }
 
-    public CacheRecord get( Key key )
-        throws PluginResolutionException
-    {
-        CacheRecord cacheRecord = cache.get( key );
+    public CacheRecord get(Key key) throws PluginResolutionException {
+        CacheRecord cacheRecord = cache.get(key);
 
-        if ( cacheRecord != null && cacheRecord.getException() != null )
-        {
+        if (cacheRecord != null && cacheRecord.getException() != null) {
             throw cacheRecord.getException();
         }
 
         return cacheRecord;
     }
 
-    public CacheRecord put( Key key, List<Artifact> pluginArtifacts )
-    {
-        Objects.requireNonNull( pluginArtifacts, "pluginArtifacts cannot be null" );
+    public CacheRecord put(Key key, List<Artifact> pluginArtifacts) {
+        Objects.requireNonNull(pluginArtifacts, "pluginArtifacts cannot be null");
 
-        assertUniqueKey( key );
+        assertUniqueKey(key);
 
-        CacheRecord record =
-            new CacheRecord( Collections.unmodifiableList( new ArrayList<>( pluginArtifacts ) ) );
+        CacheRecord record = new CacheRecord(Collections.unmodifiableList(new ArrayList<>(pluginArtifacts)));
 
-        cache.put( key, record );
+        cache.put(key, record);
 
         return record;
     }
 
-    protected void assertUniqueKey( Key key )
-    {
-        if ( cache.containsKey( key ) )
-        {
-            throw new IllegalStateException( "Duplicate artifact resolution result for plugin " + key );
+    protected void assertUniqueKey(Key key) {
+        if (cache.containsKey(key)) {
+            throw new IllegalStateException("Duplicate artifact resolution result for plugin " + key);
         }
     }
 
-    public CacheRecord put( Key key, PluginResolutionException exception )
-    {
-        Objects.requireNonNull( exception, "exception cannot be null" );
+    public CacheRecord put(Key key, PluginResolutionException exception) {
+        Objects.requireNonNull(exception, "exception cannot be null");
 
-        assertUniqueKey( key );
+        assertUniqueKey(key);
 
-        CacheRecord record = new CacheRecord( exception );
+        CacheRecord record = new CacheRecord(exception);
 
-        cache.put( key, record );
+        cache.put(key, record);
 
         return record;
     }
 
-    public void flush()
-    {
+    public void flush() {
         cache.clear();
     }
 
-    protected static int pluginHashCode( Plugin plugin )
-    {
-        return CacheUtils.pluginHashCode( plugin );
+    protected static int pluginHashCode(Plugin plugin) {
+        return CacheUtils.pluginHashCode(plugin);
     }
 
-    protected static boolean pluginEquals( Plugin a, Plugin b )
-    {
-        return CacheUtils.pluginEquals( a, b );
+    protected static boolean pluginEquals(Plugin a, Plugin b) {
+        return CacheUtils.pluginEquals(a, b);
     }
 
-    public void register( MavenProject project, Key cacheKey, CacheRecord record )
-    {
+    public void register(MavenProject project, Key cacheKey, CacheRecord record) {
         // default cache does not track record usage
     }
-
 }

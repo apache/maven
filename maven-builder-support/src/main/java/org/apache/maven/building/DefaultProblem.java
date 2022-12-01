@@ -1,5 +1,3 @@
-package org.apache.maven.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.building;
 
 /**
  * Describes a problem that was encountered during settings building. A problem can either be an exception that was
@@ -27,9 +26,7 @@ package org.apache.maven.building;
  * @author Benjamin Bentmann
  * @author Robert Scholte
  */
-class DefaultProblem
-    implements Problem
-{
+class DefaultProblem implements Problem {
 
     private final String source;
 
@@ -55,85 +52,68 @@ class DefaultProblem
      * @param columnNumber The one-based index of the column containing the problem or {@code -1} if unknown.
      * @param exception The exception that caused this problem, may be {@code null}.
      */
-    DefaultProblem( String message, Severity severity, String source, int lineNumber, int columnNumber,
-                                   Exception exception )
-    {
+    DefaultProblem(
+            String message, Severity severity, String source, int lineNumber, int columnNumber, Exception exception) {
         this.message = message;
-        this.severity = ( severity != null ) ? severity : Severity.ERROR;
-        this.source = ( source != null ) ? source : "";
+        this.severity = (severity != null) ? severity : Severity.ERROR;
+        this.source = (source != null) ? source : "";
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.exception = exception;
     }
 
-    public String getSource()
-    {
+    public String getSource() {
         return source;
     }
 
-    public int getLineNumber()
-    {
+    public int getLineNumber() {
         return lineNumber;
     }
 
-    public int getColumnNumber()
-    {
+    public int getColumnNumber() {
         return columnNumber;
     }
 
-    public String getLocation()
-    {
-        StringBuilder buffer = new StringBuilder( 256 );
+    public String getLocation() {
+        StringBuilder buffer = new StringBuilder(256);
 
-        if ( getSource().length() > 0 )
-        {
-            if ( buffer.length() > 0 )
-            {
-                buffer.append( ", " );
+        if (getSource().length() > 0) {
+            if (buffer.length() > 0) {
+                buffer.append(", ");
             }
-            buffer.append( getSource() );
+            buffer.append(getSource());
         }
 
-        if ( getLineNumber() > 0 )
-        {
-            if ( buffer.length() > 0 )
-            {
-                buffer.append( ", " );
+        if (getLineNumber() > 0) {
+            if (buffer.length() > 0) {
+                buffer.append(", ");
             }
-            buffer.append( "line " ).append( getLineNumber() );
+            buffer.append("line ").append(getLineNumber());
         }
 
-        if ( getColumnNumber() > 0 )
-        {
-            if ( buffer.length() > 0 )
-            {
-                buffer.append( ", " );
+        if (getColumnNumber() > 0) {
+            if (buffer.length() > 0) {
+                buffer.append(", ");
             }
-            buffer.append( "column " ).append( getColumnNumber() );
+            buffer.append("column ").append(getColumnNumber());
         }
 
         return buffer.toString();
     }
 
-    public Exception getException()
-    {
+    public Exception getException() {
         return exception;
     }
 
-    public String getMessage()
-    {
+    public String getMessage() {
         String msg;
 
-        if ( message != null && message.length() > 0 )
-        {
+        if (message != null && message.length() > 0) {
             msg = message;
-        }
-        else
-        {
+        } else {
             msg = exception.getMessage();
 
-            if ( msg == null )
-            {
+            if (msg == null) {
                 msg = "";
             }
         }
@@ -141,21 +121,18 @@ class DefaultProblem
         return msg;
     }
 
-    public Severity getSeverity()
-    {
+    public Severity getSeverity() {
         return severity;
     }
 
     @Override
-    public String toString()
-    {
-        StringBuilder buffer = new StringBuilder( 128 );
+    public String toString() {
+        StringBuilder buffer = new StringBuilder(128);
 
-        buffer.append( '[' ).append( getSeverity() ).append( "] " );
-        buffer.append( getMessage() );
-        buffer.append( " @ " ).append( getLocation() );
+        buffer.append('[').append(getSeverity()).append("] ");
+        buffer.append(getMessage());
+        buffer.append(" @ ").append(getLocation());
 
         return buffer.toString();
     }
-
 }

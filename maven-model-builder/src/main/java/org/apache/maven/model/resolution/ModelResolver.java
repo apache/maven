@@ -1,5 +1,3 @@
-package org.apache.maven.model.resolution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.resolution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.resolution;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
@@ -31,8 +30,7 @@ import org.apache.maven.model.building.ModelSource;
  *
  * @author Benjamin Bentmann
  */
-public interface ModelResolver
-{
+public interface ModelResolver {
 
     /**
      * Tries to resolve the POM for the specified coordinates.
@@ -43,8 +41,7 @@ public interface ModelResolver
      * @return The source of the requested POM, never {@code null}.
      * @throws UnresolvableModelException If the POM could not be resolved from any configured repository.
      */
-    ModelSource resolveModel( String groupId, String artifactId, String version )
-        throws UnresolvableModelException;
+    ModelSource resolveModel(String groupId, String artifactId, String version) throws UnresolvableModelException;
 
     /**
      * Tries to resolve the POM for the specified parent coordinates possibly updating {@code parent}.
@@ -64,8 +61,7 @@ public interface ModelResolver
      *
      * @see Parent#clone()
      */
-    ModelSource resolveModel( Parent parent )
-        throws UnresolvableModelException;
+    ModelSource resolveModel(Parent parent) throws UnresolvableModelException;
 
     /**
      * Tries to resolve the POM for the specified dependency coordinates possibly updating {@code dependency}.
@@ -85,8 +81,7 @@ public interface ModelResolver
      *
      * @see Dependency#clone()
      */
-    ModelSource resolveModel( Dependency dependency )
-        throws UnresolvableModelException;
+    ModelSource resolveModel(Dependency dependency) throws UnresolvableModelException;
 
     /**
      * Adds a repository to use for subsequent resolution requests. The order in which repositories are added matters,
@@ -96,8 +91,7 @@ public interface ModelResolver
      * @param repository The repository to add to the internal search chain, must not be {@code null}.
      * @throws InvalidRepositoryException If the repository could not be added (e.g. due to invalid URL or layout).
      */
-    void addRepository( Repository repository )
-        throws InvalidRepositoryException;
+    void addRepository(Repository repository) throws InvalidRepositoryException;
 
     /**
      * Adds a repository to use for subsequent resolution requests. The order in which repositories are added matters,
@@ -110,8 +104,7 @@ public interface ModelResolver
      * @param repository The repository to add to the internal search chain, must not be {@code null}.
      * @throws InvalidRepositoryException If the repository could not be added (e.g. due to invalid URL or layout).
      */
-    void addRepository( Repository repository, boolean replace )
-            throws InvalidRepositoryException;
+    void addRepository(Repository repository, boolean replace) throws InvalidRepositoryException;
 
     /**
      * Clones this resolver for usage in a forked resolution process. In general, implementors need not provide a deep
@@ -121,5 +114,4 @@ public interface ModelResolver
      * @return The cloned resolver, never {@code null}.
      */
     ModelResolver newCopy();
-
 }

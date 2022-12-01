@@ -1,5 +1,3 @@
-package org.apache.maven.classrealm;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,59 +16,48 @@ package org.apache.maven.classrealm;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.classrealm;
 
 import java.io.File;
-
 import org.eclipse.aether.artifact.Artifact;
 
 /**
  * @author Benjamin Bentmann
  */
-class ArtifactClassRealmConstituent
-    implements ClassRealmConstituent
-{
+class ArtifactClassRealmConstituent implements ClassRealmConstituent {
 
     private final Artifact artifact;
 
-    ArtifactClassRealmConstituent( Artifact artifact )
-    {
+    ArtifactClassRealmConstituent(Artifact artifact) {
         this.artifact = artifact;
     }
 
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return artifact.getGroupId();
     }
 
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return artifact.getArtifactId();
     }
 
-    public String getType()
-    {
+    public String getType() {
         return artifact.getExtension();
     }
 
-    public String getClassifier()
-    {
+    public String getClassifier() {
         return artifact.getClassifier();
     }
 
-    public String getVersion()
-    {
+    public String getVersion() {
         return artifact.getBaseVersion();
     }
 
-    public File getFile()
-    {
+    public File getFile() {
         return artifact.getFile();
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return artifact.toString();
     }
-
 }

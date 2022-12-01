@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,28 +16,23 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
+import junit.framework.TestCase;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.impl.MetadataGeneratorFactory;
 import org.eclipse.aether.spi.locator.ServiceLocator;
 
-import junit.framework.TestCase;
+public class MavenRepositorySystemUtilsTest extends TestCase {
 
-public class MavenRepositorySystemUtilsTest
-    extends TestCase
-{
-
-    public void testGetRepositorySystem()
-    {
+    public void testGetRepositorySystem() {
         ServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
-        RepositorySystem repoSys = locator.getService( RepositorySystem.class );
-        assertNotNull( repoSys );
+        RepositorySystem repoSys = locator.getService(RepositorySystem.class);
+        assertNotNull(repoSys);
     }
 
-    public void testGetMetadataGeneratorFactories()
-    {
+    public void testGetMetadataGeneratorFactories() {
         ServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
-        assertEquals( 2, locator.getServices( MetadataGeneratorFactory.class ).size() );
+        assertEquals(2, locator.getServices(MetadataGeneratorFactory.class).size());
     }
-
 }

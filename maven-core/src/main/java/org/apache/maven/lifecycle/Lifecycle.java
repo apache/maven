@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,23 +16,19 @@ package org.apache.maven.lifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle;
 
 import java.util.List;
 import java.util.Map;
-
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 
 /**
  * Class Lifecycle.
  */
-public class Lifecycle
-{
-    public Lifecycle()
-    {
-    }
+public class Lifecycle {
+    public Lifecycle() {}
 
-    public Lifecycle( String id, List<String> phases, Map<String, LifecyclePhase> defaultPhases )
-    {
+    public Lifecycle(String id, List<String> phases, Map<String, LifecyclePhase> defaultPhases) {
         this.id = id;
         this.phases = phases;
         this.defaultPhases = defaultPhases;
@@ -58,31 +52,25 @@ public class Lifecycle
 
     private Map<String, LifecyclePhase> defaultPhases;
 
-    public String getId()
-    {
+    public String getId() {
         return this.id;
     }
 
-    public List<String> getPhases()
-    {
+    public List<String> getPhases() {
         return this.phases;
     }
 
-    public Map<String, LifecyclePhase> getDefaultLifecyclePhases()
-    {
+    public Map<String, LifecyclePhase> getDefaultLifecyclePhases() {
         return defaultPhases;
     }
-    
+
     @Deprecated
-    public Map<String, String> getDefaultPhases()
-    {
-        return LifecyclePhase.toLegacyMap( getDefaultLifecyclePhases() );
+    public Map<String, String> getDefaultPhases() {
+        return LifecyclePhase.toLegacyMap(getDefaultLifecyclePhases());
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return id + " -> " + phases;
     }
-
 }

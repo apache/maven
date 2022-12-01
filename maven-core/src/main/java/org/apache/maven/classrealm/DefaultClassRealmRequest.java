@@ -1,5 +1,3 @@
-package org.apache.maven.classrealm;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.classrealm;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.classrealm;
 
 import java.util.List;
 import java.util.Map;
@@ -25,9 +24,7 @@ import java.util.Map;
 /**
  * @author Benjamin Bentmann
  */
-class DefaultClassRealmRequest
-    implements ClassRealmRequest
-{
+class DefaultClassRealmRequest implements ClassRealmRequest {
 
     private final RealmType type;
 
@@ -39,9 +36,12 @@ class DefaultClassRealmRequest
 
     private final List<ClassRealmConstituent> constituents;
 
-    DefaultClassRealmRequest( RealmType type, ClassLoader parent, List<String> parentImports,
-                              Map<String, ClassLoader> foreignImports, List<ClassRealmConstituent> constituents )
-    {
+    DefaultClassRealmRequest(
+            RealmType type,
+            ClassLoader parent,
+            List<String> parentImports,
+            Map<String, ClassLoader> foreignImports,
+            List<ClassRealmConstituent> constituents) {
         this.type = type;
         this.parent = parent;
         this.parentImports = parentImports;
@@ -49,34 +49,27 @@ class DefaultClassRealmRequest
         this.constituents = constituents;
     }
 
-    public RealmType getType()
-    {
+    public RealmType getType() {
         return type;
     }
 
-    public ClassLoader getParent()
-    {
+    public ClassLoader getParent() {
         return parent;
     }
 
-    public List<String> getImports()
-    {
+    public List<String> getImports() {
         return getParentImports();
     }
 
-    public List<String> getParentImports()
-    {
+    public List<String> getParentImports() {
         return parentImports;
     }
 
-    public Map<String, ClassLoader> getForeignImports()
-    {
+    public Map<String, ClassLoader> getForeignImports() {
         return foreignImports;
     }
 
-    public List<ClassRealmConstituent> getConstituents()
-    {
+    public List<ClassRealmConstituent> getConstituents() {
         return constituents;
     }
-
 }

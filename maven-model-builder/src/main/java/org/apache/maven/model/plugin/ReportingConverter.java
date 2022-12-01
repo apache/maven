@@ -1,5 +1,3 @@
-package org.apache.maven.model.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.plugin;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -29,8 +28,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
  *
  * @author Benjamin Bentmann
  */
-public interface ReportingConverter
-{
+public interface ReportingConverter {
 
     /**
      * Converts values from model's reporting section into the configuration for Maven Site Plugin 3.x.
@@ -39,6 +37,5 @@ public interface ReportingConverter
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void convertReporting( Model model, ModelBuildingRequest request, ModelProblemCollector problems );
-
+    void convertReporting(Model model, ModelBuildingRequest request, ModelProblemCollector problems);
 }

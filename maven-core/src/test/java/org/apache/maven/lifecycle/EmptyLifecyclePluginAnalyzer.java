@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,60 +16,51 @@ package org.apache.maven.lifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 
 /**
  * @author Benjamin Bentmann
  */
-public class EmptyLifecyclePluginAnalyzer
-    implements LifeCyclePluginAnalyzer
-{
-    public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
-    {
+public class EmptyLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
+    public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles(String packaging) {
         Set<Plugin> plugins;
 
         // NOTE: The upper-case packaging name is intentional, that's a special hinting mode used for certain tests
-        if ( "JAR".equals( packaging ) )
-        {
+        if ("JAR".equals(packaging)) {
             plugins = new LinkedHashSet<>();
 
-            plugins.add( newPlugin( "maven-compiler-plugin", "compile", "testCompile" ) );
-            plugins.add( newPlugin( "maven-resources-plugin", "resources", "testResources" ) );
-            plugins.add( newPlugin( "maven-surefire-plugin", "test" ) );
-            plugins.add( newPlugin( "maven-jar-plugin", "jar" ) );
-            plugins.add( newPlugin( "maven-install-plugin", "install" ) );
-            plugins.add( newPlugin( "maven-deploy-plugin", "deploy" ) );
-        }
-        else
-        {
+            plugins.add(newPlugin("maven-compiler-plugin", "compile", "testCompile"));
+            plugins.add(newPlugin("maven-resources-plugin", "resources", "testResources"));
+            plugins.add(newPlugin("maven-surefire-plugin", "test"));
+            plugins.add(newPlugin("maven-jar-plugin", "jar"));
+            plugins.add(newPlugin("maven-install-plugin", "install"));
+            plugins.add(newPlugin("maven-deploy-plugin", "deploy"));
+        } else {
             plugins = Collections.emptySet();
         }
 
         return plugins;
     }
 
-    private Plugin newPlugin( String artifactId, String... goals )
-    {
+    private Plugin newPlugin(String artifactId, String... goals) {
         Plugin plugin = new Plugin();
 
-        plugin.setGroupId( "org.apache.maven.plugins" );
-        plugin.setArtifactId( artifactId );
+        plugin.setGroupId("org.apache.maven.plugins");
+        plugin.setArtifactId(artifactId);
 
-        for ( String goal : goals )
-        {
+        for (String goal : goals) {
             PluginExecution pluginExecution = new PluginExecution();
-            pluginExecution.setId( "default-" + goal );
-            pluginExecution.addGoal( goal );
-            plugin.addExecution( pluginExecution );
+            pluginExecution.setId("default-" + goal);
+            pluginExecution.addGoal(goal);
+            plugin.addExecution(pluginExecution);
         }
 
         return plugin;
     }
-
 }

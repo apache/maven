@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,10 +16,10 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import java.io.File;
 import java.util.Properties;
-
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -54,7 +52,7 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
  * <tr><td><code>settings</code></td>          <td></td>               <td>{@link MavenSession#getSettings()}</td></tr>
  * <tr><td><code>settings.*</code></td>        <td></td>               <td></td></tr>
  * <tr><td><code>basedir</code></td>           <td></td>
- *                                             <td>{@link MavenSession#getExecutionRootDirectory()} or 
+ *                                             <td>{@link MavenSession#getExecutionRootDirectory()} or
  *                                                 <code>System.getProperty( "user.dir" )</code> if null</td></tr>
  * <tr><td><code>mojoExecution</code></td>     <td></td>               <td>the actual {@link MojoExecution}</td></tr>
  * <tr><td><code>mojo</code></td>              <td>(since Maven 3)</td><td>same as <code>mojoExecution</code></td></tr>
@@ -73,9 +71,7 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
  * @see MavenSession
  * @see MojoExecution
  */
-public class PluginParameterExpressionEvaluator
-    implements TypeAwareExpressionEvaluator
-{
+public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEvaluator {
     private MavenSession session;
 
     private MojoExecution mojoExecution;
@@ -86,297 +82,213 @@ public class PluginParameterExpressionEvaluator
 
     private Properties properties;
 
-    @Deprecated //TODO used by the Enforcer plugin
-    public PluginParameterExpressionEvaluator( MavenSession session, MojoExecution mojoExecution,
-                                               PathTranslator pathTranslator, Logger logger, MavenProject project,
-                                               Properties properties )
-    {
-        this( session, mojoExecution );
+    @Deprecated // TODO used by the Enforcer plugin
+    public PluginParameterExpressionEvaluator(
+            MavenSession session,
+            MojoExecution mojoExecution,
+            PathTranslator pathTranslator,
+            Logger logger,
+            MavenProject project,
+            Properties properties) {
+        this(session, mojoExecution);
     }
 
-    public PluginParameterExpressionEvaluator( MavenSession session )
-    {
-        this( session, null );
+    public PluginParameterExpressionEvaluator(MavenSession session) {
+        this(session, null);
     }
 
-    public PluginParameterExpressionEvaluator( MavenSession session, MojoExecution mojoExecution )
-    {
+    public PluginParameterExpressionEvaluator(MavenSession session, MojoExecution mojoExecution) {
         this.session = session;
         this.mojoExecution = mojoExecution;
         this.properties = new Properties();
         this.project = session.getCurrentProject();
 
         //
-        // Maven4: We may want to evaluate how this is used but we add these separate as the 
+        // Maven4: We may want to evaluate how this is used but we add these separate as the
         // getExecutionProperties is deprecated in MavenSession.
         //
-        this.properties.putAll( session.getUserProperties() );
-        this.properties.putAll( session.getSystemProperties() );
-        
+        this.properties.putAll(session.getUserProperties());
+        this.properties.putAll(session.getSystemProperties());
+
         String basedir = null;
 
-        if ( project != null )
-        {
+        if (project != null) {
             File projectFile = project.getBasedir();
 
             // this should always be the case for non-super POM instances...
-            if ( projectFile != null )
-            {
+            if (projectFile != null) {
                 basedir = projectFile.getAbsolutePath();
             }
         }
 
-        if ( basedir == null )
-        {
+        if (basedir == null) {
             basedir = session.getExecutionRootDirectory();
         }
 
-        if ( basedir == null )
-        {
-            basedir = System.getProperty( "user.dir" );
+        if (basedir == null) {
+            basedir = System.getProperty("user.dir");
         }
 
         this.basedir = basedir;
     }
 
     @Override
-    public Object evaluate( String expr )
-        throws ExpressionEvaluationException
-    {
-        return evaluate( expr, null );
+    public Object evaluate(String expr) throws ExpressionEvaluationException {
+        return evaluate(expr, null);
     }
 
     @Override
-    @SuppressWarnings( "checkstyle:methodlength" )
-    public Object evaluate( String expr, Class<?> type )
-        throws ExpressionEvaluationException
-    {
+    @SuppressWarnings("checkstyle:methodlength")
+    public Object evaluate(String expr, Class<?> type) throws ExpressionEvaluationException {
         Object value = null;
 
-        if ( expr == null )
-        {
+        if (expr == null) {
             return null;
         }
 
-        String expression = stripTokens( expr );
-        if ( expression.equals( expr ) )
-        {
-            int index = expr.indexOf( "${" );
-            if ( index >= 0 )
-            {
-                int lastIndex = expr.indexOf( '}', index );
-                if ( lastIndex >= 0 )
-                {
-                    String retVal = expr.substring( 0, index );
+        String expression = stripTokens(expr);
+        if (expression.equals(expr)) {
+            int index = expr.indexOf("${");
+            if (index >= 0) {
+                int lastIndex = expr.indexOf('}', index);
+                if (lastIndex >= 0) {
+                    String retVal = expr.substring(0, index);
 
-                    if ( ( index > 0 ) && ( expr.charAt( index - 1 ) == '$' ) )
-                    {
-                        retVal += expr.substring( index + 1, lastIndex + 1 );
-                    }
-                    else
-                    {
-                        Object subResult = evaluate( expr.substring( index, lastIndex + 1 ) );
+                    if ((index > 0) && (expr.charAt(index - 1) == '$')) {
+                        retVal += expr.substring(index + 1, lastIndex + 1);
+                    } else {
+                        Object subResult = evaluate(expr.substring(index, lastIndex + 1));
 
-                        if ( subResult != null )
-                        {
+                        if (subResult != null) {
                             retVal += subResult;
-                        }
-                        else
-                        {
-                            retVal += "$" + expr.substring( index + 1, lastIndex + 1 );
+                        } else {
+                            retVal += "$" + expr.substring(index + 1, lastIndex + 1);
                         }
                     }
 
-                    retVal += evaluate( expr.substring( lastIndex + 1 ) );
+                    retVal += evaluate(expr.substring(lastIndex + 1));
                     return retVal;
                 }
             }
 
             // Was not an expression
-            if ( expression.contains( "$$" ) )
-            {
-                return expression.replaceAll( "\\$\\$", "\\$" );
-            }
-            else
-            {
+            if (expression.contains("$$")) {
+                return expression.replaceAll("\\$\\$", "\\$");
+            } else {
                 return expression;
             }
         }
 
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
-        if ( "localRepository".equals( expression ) )
-        {
+        if ("localRepository".equals(expression)) {
             value = session.getLocalRepository();
-        }
-        else if ( "session".equals( expression ) )
-        {
+        } else if ("session".equals(expression)) {
             value = session;
-        }
-        else if ( expression.startsWith( "session" ) )
-        {
-            try
-            {
-                int pathSeparator = expression.indexOf( '/' );
+        } else if (expression.startsWith("session")) {
+            try {
+                int pathSeparator = expression.indexOf('/');
 
-                if ( pathSeparator > 0 )
-                {
-                    String pathExpression = expression.substring( 1, pathSeparator );
-                    value = ReflectionValueExtractor.evaluate( pathExpression, session );
-                    value = value + expression.substring( pathSeparator );
+                if (pathSeparator > 0) {
+                    String pathExpression = expression.substring(1, pathSeparator);
+                    value = ReflectionValueExtractor.evaluate(pathExpression, session);
+                    value = value + expression.substring(pathSeparator);
+                } else {
+                    value = ReflectionValueExtractor.evaluate(expression.substring(1), session);
                 }
-                else
-                {
-                    value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), session );
-                }
-            }
-            catch ( Exception e )
-            {
+            } catch (Exception e) {
                 // TODO don't catch exception
-                throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression,
-                                                         e );
+                throw new ExpressionEvaluationException(
+                        "Error evaluating plugin parameter expression: " + expression, e);
             }
-        }
-        else if ( "reactorProjects".equals( expression ) )
-        {
+        } else if ("reactorProjects".equals(expression)) {
             value = session.getProjects();
-        }
-        else if ( "mojoExecution".equals( expression ) )
-        {
+        } else if ("mojoExecution".equals(expression)) {
             value = mojoExecution;
-        }
-        else if ( "project".equals( expression ) )
-        {
+        } else if ("project".equals(expression)) {
             value = project;
-        }
-        else if ( "executedProject".equals( expression ) )
-        {
+        } else if ("executedProject".equals(expression)) {
             value = project.getExecutionProject();
-        }
-        else if ( expression.startsWith( "project" ) || expression.startsWith( "pom" ) )
-        {
-            try
-            {
-                int pathSeparator = expression.indexOf( '/' );
+        } else if (expression.startsWith("project") || expression.startsWith("pom")) {
+            try {
+                int pathSeparator = expression.indexOf('/');
 
-                if ( pathSeparator > 0 )
-                {
-                    String pathExpression = expression.substring( 0, pathSeparator );
-                    value = ReflectionValueExtractor.evaluate( pathExpression, project );
-                    value = value + expression.substring( pathSeparator );
+                if (pathSeparator > 0) {
+                    String pathExpression = expression.substring(0, pathSeparator);
+                    value = ReflectionValueExtractor.evaluate(pathExpression, project);
+                    value = value + expression.substring(pathSeparator);
+                } else {
+                    value = ReflectionValueExtractor.evaluate(expression.substring(1), project);
                 }
-                else
-                {
-                    value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), project );
-                }
-            }
-            catch ( Exception e )
-            {
+            } catch (Exception e) {
                 // TODO don't catch exception
-                throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression,
-                                                         e );
+                throw new ExpressionEvaluationException(
+                        "Error evaluating plugin parameter expression: " + expression, e);
             }
-        }
-        else if ( expression.equals( "repositorySystemSession" ) )
-        {
+        } else if (expression.equals("repositorySystemSession")) {
             value = session.getRepositorySession();
-        }
-        else if ( expression.equals( "mojo" ) )
-        {
+        } else if (expression.equals("mojo")) {
             value = mojoExecution;
-        }
-        else if ( expression.startsWith( "mojo" ) )
-        {
-            try
-            {
-                int pathSeparator = expression.indexOf( '/' );
+        } else if (expression.startsWith("mojo")) {
+            try {
+                int pathSeparator = expression.indexOf('/');
 
-                if ( pathSeparator > 0 )
-                {
-                    String pathExpression = expression.substring( 1, pathSeparator );
-                    value = ReflectionValueExtractor.evaluate( pathExpression, mojoExecution );
-                    value = value + expression.substring( pathSeparator );
+                if (pathSeparator > 0) {
+                    String pathExpression = expression.substring(1, pathSeparator);
+                    value = ReflectionValueExtractor.evaluate(pathExpression, mojoExecution);
+                    value = value + expression.substring(pathSeparator);
+                } else {
+                    value = ReflectionValueExtractor.evaluate(expression.substring(1), mojoExecution);
                 }
-                else
-                {
-                    value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), mojoExecution );
-                }
-            }
-            catch ( Exception e )
-            {
+            } catch (Exception e) {
                 // TODO don't catch exception
-                throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression,
-                                                         e );
+                throw new ExpressionEvaluationException(
+                        "Error evaluating plugin parameter expression: " + expression, e);
             }
-        }
-        else if ( expression.equals( "plugin" ) )
-        {
+        } else if (expression.equals("plugin")) {
             value = mojoDescriptor.getPluginDescriptor();
-        }
-        else if ( expression.startsWith( "plugin" ) )
-        {
-            try
-            {
-                int pathSeparator = expression.indexOf( '/' );
+        } else if (expression.startsWith("plugin")) {
+            try {
+                int pathSeparator = expression.indexOf('/');
 
                 PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
-                if ( pathSeparator > 0 )
-                {
-                    String pathExpression = expression.substring( 1, pathSeparator );
-                    value = ReflectionValueExtractor.evaluate( pathExpression, pluginDescriptor );
-                    value = value + expression.substring( pathSeparator );
+                if (pathSeparator > 0) {
+                    String pathExpression = expression.substring(1, pathSeparator);
+                    value = ReflectionValueExtractor.evaluate(pathExpression, pluginDescriptor);
+                    value = value + expression.substring(pathSeparator);
+                } else {
+                    value = ReflectionValueExtractor.evaluate(expression.substring(1), pluginDescriptor);
                 }
-                else
-                {
-                    value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), pluginDescriptor );
-                }
+            } catch (Exception e) {
+                throw new ExpressionEvaluationException(
+                        "Error evaluating plugin parameter expression: " + expression, e);
             }
-            catch ( Exception e )
-            {
-                throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression,
-                                                         e );
-            }
-        }
-        else if ( "settings".equals( expression ) )
-        {
+        } else if ("settings".equals(expression)) {
             value = session.getSettings();
-        }
-        else if ( expression.startsWith( "settings" ) )
-        {
-            try
-            {
-                int pathSeparator = expression.indexOf( '/' );
+        } else if (expression.startsWith("settings")) {
+            try {
+                int pathSeparator = expression.indexOf('/');
 
-                if ( pathSeparator > 0 )
-                {
-                    String pathExpression = expression.substring( 1, pathSeparator );
-                    value = ReflectionValueExtractor.evaluate( pathExpression, session.getSettings() );
-                    value = value + expression.substring( pathSeparator );
+                if (pathSeparator > 0) {
+                    String pathExpression = expression.substring(1, pathSeparator);
+                    value = ReflectionValueExtractor.evaluate(pathExpression, session.getSettings());
+                    value = value + expression.substring(pathSeparator);
+                } else {
+                    value = ReflectionValueExtractor.evaluate(expression.substring(1), session.getSettings());
                 }
-                else
-                {
-                    value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), session.getSettings() );
-                }
-            }
-            catch ( Exception e )
-            {
+            } catch (Exception e) {
                 // TODO don't catch exception
-                throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression,
-                                                         e );
+                throw new ExpressionEvaluationException(
+                        "Error evaluating plugin parameter expression: " + expression, e);
             }
-        }
-        else if ( "basedir".equals( expression ) )
-        {
+        } else if ("basedir".equals(expression)) {
             value = basedir;
-        }
-        else if ( expression.startsWith( "basedir" ) )
-        {
-            int pathSeparator = expression.indexOf( '/' );
+        } else if (expression.startsWith("basedir")) {
+            int pathSeparator = expression.indexOf('/');
 
-            if ( pathSeparator > 0 )
-            {
-                value = basedir + expression.substring( pathSeparator );
+            if (pathSeparator > 0) {
+                value = basedir + expression.substring(pathSeparator);
             }
         }
 
@@ -388,49 +300,39 @@ public class PluginParameterExpressionEvaluator
          * could still be converted by the configurator so we leave those alone). If so, back off to evaluating the
          * expression from properties only.
          */
-        if ( value != null && type != null && !( value instanceof String ) && !isTypeCompatible( type, value ) )
-        {
+        if (value != null && type != null && !(value instanceof String) && !isTypeCompatible(type, value)) {
             value = null;
         }
 
-        if ( value == null )
-        {
+        if (value == null) {
             // The CLI should win for defining properties
 
-            if ( properties != null )
-            {
+            if (properties != null) {
                 // We will attempt to get nab a property as a way to specify a parameter
                 // to a plugin. My particular case here is allowing the surefire plugin
                 // to run a single test so I want to specify that class on the cli as
                 // a parameter.
 
-                value = properties.getProperty( expression );
+                value = properties.getProperty(expression);
             }
 
-            if ( ( value == null ) && ( ( project != null ) && ( project.getProperties() != null ) ) )
-            {
-                value = project.getProperties().getProperty( expression );
+            if ((value == null) && ((project != null) && (project.getProperties() != null))) {
+                value = project.getProperties().getProperty(expression);
             }
-
         }
 
-        if ( value instanceof String )
-        {
+        if (value instanceof String) {
             // TODO without #, this could just be an evaluate call...
 
             String val = (String) value;
 
-            int exprStartDelimiter = val.indexOf( "${" );
+            int exprStartDelimiter = val.indexOf("${");
 
-            if ( exprStartDelimiter >= 0 )
-            {
-                if ( exprStartDelimiter > 0 )
-                {
-                    value = val.substring( 0, exprStartDelimiter ) + evaluate( val.substring( exprStartDelimiter ) );
-                }
-                else
-                {
-                    value = evaluate( val.substring( exprStartDelimiter ) );
+            if (exprStartDelimiter >= 0) {
+                if (exprStartDelimiter > 0) {
+                    value = val.substring(0, exprStartDelimiter) + evaluate(val.substring(exprStartDelimiter));
+                } else {
+                    value = evaluate(val.substring(exprStartDelimiter));
                 }
             }
         }
@@ -438,49 +340,37 @@ public class PluginParameterExpressionEvaluator
         return value;
     }
 
-    private static boolean isTypeCompatible( Class<?> type, Object value )
-    {
-        if ( type.isInstance( value ) )
-        {
+    private static boolean isTypeCompatible(Class<?> type, Object value) {
+        if (type.isInstance(value)) {
             return true;
         }
         // likely Boolean -> boolean, Short -> int etc. conversions, it's not the problem case we try to avoid
-        return ( ( type.isPrimitive() || type.getName().startsWith( "java.lang." ) )
-                        && value.getClass().getName().startsWith( "java.lang." ) );
+        return ((type.isPrimitive() || type.getName().startsWith("java.lang."))
+                && value.getClass().getName().startsWith("java.lang."));
     }
 
-    private String stripTokens( String expr )
-    {
-        if ( expr.startsWith( "${" ) && ( expr.indexOf( '}' ) == expr.length() - 1 ) )
-        {
-            expr = expr.substring( 2, expr.length() - 1 );
+    private String stripTokens(String expr) {
+        if (expr.startsWith("${") && (expr.indexOf('}') == expr.length() - 1)) {
+            expr = expr.substring(2, expr.length() - 1);
         }
         return expr;
     }
 
     @Override
-    public File alignToBaseDirectory( File file )
-    {
+    public File alignToBaseDirectory(File file) {
         // TODO Copied from the DefaultInterpolator. We likely want to resurrect the PathTranslator or at least a
         // similar component for re-usage
-        if ( file != null )
-        {
-            if ( file.isAbsolute() )
-            {
+        if (file != null) {
+            if (file.isAbsolute()) {
                 // path was already absolute, just normalize file separator and we're done
-            }
-            else if ( file.getPath().startsWith( File.separator ) )
-            {
+            } else if (file.getPath().startsWith(File.separator)) {
                 // drive-relative Windows path, don't align with project directory but with drive root
                 file = file.getAbsoluteFile();
-            }
-            else
-            {
+            } else {
                 // an ordinary relative path, align with project directory
-                file = new File( new File( basedir, file.getPath() ).toURI().normalize() ).getAbsoluteFile();
+                file = new File(new File(basedir, file.getPath()).toURI().normalize()).getAbsoluteFile();
             }
         }
         return file;
     }
-
 }

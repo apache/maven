@@ -1,5 +1,3 @@
-package org.apache.maven.project.path;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.path;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,24 +16,23 @@ package org.apache.maven.project.path;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.path;
 
 import java.io.File;
-
 import org.apache.maven.model.Model;
 
 /**
  * @author Jason van Zyl
  */
 @Deprecated
-public interface PathTranslator
-{
+public interface PathTranslator {
     String ROLE = PathTranslator.class.getName();
 
-    void alignToBaseDirectory( Model model, File basedir );
+    void alignToBaseDirectory(Model model, File basedir);
 
-    String alignToBaseDirectory( String path, File basedir );
+    String alignToBaseDirectory(String path, File basedir);
 
-    void unalignFromBaseDirectory( Model model, File basedir );
+    void unalignFromBaseDirectory(Model model, File basedir);
 
-    String unalignFromBaseDirectory( String directory, File basedir );
+    String unalignFromBaseDirectory(String directory, File basedir);
 }
