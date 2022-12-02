@@ -23,7 +23,9 @@ under the License.
   <name>ExtensionDescriptor</name>
   <description><![CDATA[
     Extension descriptor, stored in <code>META-INF/maven/extension.xml</code> in an extension's jar artifact to
-    precisely control parts of the extension and dependencies to expose.
+    precisely control parts of the extension and dependencies to expose in the API class loader.
+    Maven uses Plexus Classworlds to build the class loader hierarchy, therefore some concepts used in this extensions
+    stem from Plexus Classworlds originally.
     <p><i>Notice:</i> this documentation is generated from a Modello model but the code executed is not generated
     from this descriptor. Please report if you find anything wrong.</p>
   ]]></description>
@@ -46,8 +48,10 @@ under the License.
             <type>String</type>
             <multiplicity>*</multiplicity>
           </association>
-          <description>Packages from the artifact that are exposed.</description>
-          <!-- TODO explain package vs package.class vs package.* -->
+          <description><![CDATA[Restricts the classes/resources from the current artifact's CoreExtension class realm that are exposed. Values ending with ".*" expose all classes/resources which are directly contained in the given package in binary form. 
+            Other values define only the prefix of classes/resources being exposed. Their binary name must be equal to the prefix or starting with the prefix (followed by "." or "$").
+            In particular this includes all subpackages. Despite the element name one can also only expose individual classes of a particular package by adding its binary name as value.
+          ]]></description>
         </field>
         <field>
           <name>exportedArtifacts</name>
@@ -56,7 +60,8 @@ under the License.
             <type>String</type>
             <multiplicity>*</multiplicity>
           </association>
-          <description><![CDATA[Artifacts that are exposed: <code>groupId:artifactId</code> file.]]>
+          <description><![CDATA[Artifacts in the format <code>groupId:artifactId</code>. All the ones listed here are filtered (i.e. removed) from plugin and build extension class realms,
+          i.e. referencing any of those coordinates in plugin/build extension dependencies has no effect.]]>
           </description>
         </field>
       </fields>
