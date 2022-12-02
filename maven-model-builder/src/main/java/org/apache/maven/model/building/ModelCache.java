@@ -18,6 +18,8 @@
  */
 package org.apache.maven.model.building;
 
+import java.util.function.Supplier;
+
 import org.apache.maven.building.Source;
 
 /**
@@ -127,4 +129,19 @@ public interface ModelCache {
         Object obj = get(groupId, artifactId, version, tag.getName());
         return (obj != null) ? tag.fromCache(tag.getType().cast(obj)) : null;
     }
+
+    default <T> T computeIfAbsent(
+            String groupId, String artifactId, String version, ModelCacheTag<T> tag, Supplier<Supplier<T>> data) {
+        Object obj = computeIfAbsent(groupId, artifactId, version, tag.getName(), (Supplier) data);
+        return (obj != null) ? tag.fromCache(tag.getType().cast(obj)) : null;
+    }
+
+    default <T> T computeIfAbsent(Source path, ModelCacheTag<T> tag, Supplier<Supplier<T>> data) {
+        Object obj = computeIfAbsent(path, tag.getName(), (Supplier) data);
+        return (obj != null) ? tag.fromCache(tag.getType().cast(obj)) : null;
+    }
+
+    Object computeIfAbsent(String groupId, String artifactId, String version, String tag, Supplier<Supplier<?>> data);
+
+    Object computeIfAbsent(Source path, String tag, Supplier<Supplier<?>> data);
 }

@@ -38,7 +38,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinTask;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.feature.Features;
@@ -1007,12 +1011,11 @@ public class DefaultModelBuilder implements ModelBuilder {
     private Model readFileModel(ModelBuildingRequest request, DefaultModelProblemCollector problems)
             throws ModelBuildingException {
         ModelSource modelSource = request.getModelSource();
-        org.apache.maven.api.model.Model model = fromCache(request.getModelCache(), modelSource, ModelCacheTag.FILE);
-        if (model == null) {
-            model = doReadFileModel(modelSource, request, problems);
-
-            intoCache(request.getModelCache(), modelSource, ModelCacheTag.FILE, model);
-        }
+        org.apache.maven.api.model.Model model = cache(
+                request.getModelCache(),
+                modelSource,
+                ModelCacheTag.FILE,
+                () -> doReadFileModel(modelSource, request, problems));
 
         if (modelSource instanceof FileModelSource) {
             if (request.getTransformerContextBuilder() instanceof DefaultTransformerContextBuilder) {
@@ -1129,45 +1132,41 @@ public class DefaultModelBuilder implements ModelBuilder {
             throws ModelBuildingException {
         ModelSource modelSource = request.getModelSource();
 
-        ModelData cachedData = fromCache(request.getModelCache(), modelSource, ModelCacheTag.RAW);
-        if (cachedData != null) {
-            return cachedData.getModel();
-        }
+        ModelData cachedData = cache(request.getModelCache(), modelSource, ModelCacheTag.RAW, () -> {
+            Model rawModel;
+            if (Features.buildConsumer(request.getUserProperties()) && modelSource instanceof FileModelSource) {
+                rawModel = readFileModel(request, problems);
+                File pomFile = ((FileModelSource) modelSource).getFile();
 
-        Model rawModel;
-        if (Features.buildConsumer(request.getUserProperties()) && modelSource instanceof FileModelSource) {
-            rawModel = readFileModel(request, problems);
-            File pomFile = ((FileModelSource) modelSource).getFile();
-
-            try {
-                if (request.getTransformerContextBuilder() != null) {
-                    TransformerContext context =
-                            request.getTransformerContextBuilder().initialize(request, problems);
-                    transformer.transform(pomFile.toPath(), context, rawModel);
+                try {
+                    if (request.getTransformerContextBuilder() != null) {
+                        TransformerContext context =
+                                request.getTransformerContextBuilder().initialize(request, problems);
+                        transformer.transform(pomFile.toPath(), context, rawModel);
+                    }
+                } catch (TransformerException e) {
+                    problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.V40).setException(e));
                 }
-            } catch (TransformerException e) {
-                problems.add(new ModelProblemCollectorRequest(Severity.FATAL, Version.V40).setException(e));
+            } else if (request.getFileModel() == null) {
+                rawModel = readFileModel(request, problems);
+            } else {
+                rawModel = request.getFileModel().clone();
             }
-        } else if (request.getFileModel() == null) {
-            rawModel = readFileModel(request, problems);
-        } else {
-            rawModel = request.getFileModel().clone();
-        }
 
-        modelValidator.validateRawModel(rawModel, request, problems);
+            modelValidator.validateRawModel(rawModel, request, problems);
 
-        if (hasFatalErrors(problems)) {
-            throw problems.newModelBuildingException();
-        }
+            if (hasFatalErrors(problems)) {
+                throw problems.newModelBuildingException();
+            }
 
-        String groupId = getGroupId(rawModel);
-        String artifactId = rawModel.getArtifactId();
-        String version = getVersion(rawModel);
+            String groupId = getGroupId(rawModel);
+            String artifactId = rawModel.getArtifactId();
+            String version = getVersion(rawModel);
 
-        ModelData modelData = new ModelData(modelSource, rawModel, groupId, artifactId, version);
-        intoCache(request.getModelCache(), modelSource, ModelCacheTag.RAW, modelData);
-
-        return rawModel;
+            ModelData modelData = new ModelData(modelSource, rawModel, groupId, artifactId, version);
+            return modelData;
+        });
+        return cachedData != null ? cachedData.getModel() : null;
     }
 
     private String getGroupId(Model model) {
@@ -1708,15 +1707,11 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         org.apache.maven.api.model.DependencyManagement importMgmt =
-                fromCache(request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT);
-        if (importMgmt == null) {
-            DependencyManagement importMgmtV3 = doLoadDependencyManagement(
-                    model, request, problems, dependency, groupId, artifactId, version, importIds);
-            if (importMgmtV3 != null) {
-                importMgmt = importMgmtV3.getDelegate();
-                intoCache(request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, importMgmt);
-            }
-        }
+                cache(request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, () -> {
+                    DependencyManagement importMgmtV3 = doLoadDependencyManagement(
+                            model, request, problems, dependency, groupId, artifactId, version, importIds);
+                    return importMgmtV3 != null ? importMgmtV3.getDelegate() : null;
+                });
 
         // [MNG-5600] Dependency management import should support exclusions.
         List<Exclusion> exclusions = dependency.getDelegate().getExclusions();
@@ -1823,32 +1818,50 @@ public class DefaultModelBuilder implements ModelBuilder {
         return importMgmt;
     }
 
-    private <T> void intoCache(
-            ModelCache modelCache, String groupId, String artifactId, String version, ModelCacheTag<T> tag, T data) {
-        if (modelCache != null) {
-            modelCache.put(groupId, artifactId, version, tag, data);
+    private static <T> T cache(
+            ModelCache cache,
+            String groupId,
+            String artifactId,
+            String version,
+            ModelCacheTag<T> tag,
+            Callable<T> supplier) {
+        return doWithCache(cache, supplier, s -> cache.computeIfAbsent(groupId, artifactId, version, tag, s));
+    }
+
+    private static <T> T cache(ModelCache cache, Source source, ModelCacheTag<T> tag, Callable<T> supplier) {
+        return doWithCache(cache, supplier, s -> cache.computeIfAbsent(source, tag, s));
+    }
+
+    private static <T> T doWithCache(
+            ModelCache cache, Callable<T> supplier, Function<Supplier<Supplier<T>>, T> asyncSupplierConsumer) {
+        if (cache != null) {
+            return asyncSupplierConsumer.apply(() -> {
+                ForkJoinTask<T> task = ForkJoinTask.adapt(supplier);
+                task.fork();
+                return () -> {
+                    task.quietlyJoin();
+                    if (task.isCompletedAbnormally()) {
+                        Throwable e = task.getException();
+                        while (e instanceof RuntimeException && e.getCause() != null) {
+                            e = e.getCause();
+                        }
+                        uncheckedThrow(e);
+                    }
+                    return task.getRawResult();
+                };
+            });
+        } else {
+            try {
+                return supplier.call();
+            } catch (Exception e) {
+                uncheckedThrow(e);
+                return null;
+            }
         }
     }
 
-    private <T> void intoCache(ModelCache modelCache, Source source, ModelCacheTag<T> tag, T data) {
-        if (modelCache != null) {
-            modelCache.put(source, tag, data);
-        }
-    }
-
-    private static <T> T fromCache(
-            ModelCache modelCache, String groupId, String artifactId, String version, ModelCacheTag<T> tag) {
-        if (modelCache != null) {
-            return modelCache.get(groupId, artifactId, version, tag);
-        }
-        return null;
-    }
-
-    private static <T> T fromCache(ModelCache modelCache, Source source, ModelCacheTag<T> tag) {
-        if (modelCache != null) {
-            return modelCache.get(source, tag);
-        }
-        return null;
+    static <T extends Throwable> void uncheckedThrow(Throwable t) throws T {
+        throw (T) t; // rely on vacuous cast
     }
 
     private void fireEvent(
