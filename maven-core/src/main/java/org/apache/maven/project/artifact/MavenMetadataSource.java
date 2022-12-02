@@ -1,5 +1,3 @@
-package org.apache.maven.project.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.artifact;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -88,18 +86,16 @@ import org.eclipse.aether.transfer.ArtifactNotFoundException;
 /**
  * @author Jason van Zyl
  */
-@Component( role = ArtifactMetadataSource.class, hint = "maven" )
-public class MavenMetadataSource
-    implements ArtifactMetadataSource
-{
+@Component(role = ArtifactMetadataSource.class, hint = "maven")
+public class MavenMetadataSource implements ArtifactMetadataSource {
     @Requirement
     private RepositoryMetadataManager repositoryMetadataManager;
 
     @Requirement
     private ArtifactFactory repositorySystem;
 
-    //TODO This prevents a cycle in the composition which shows us another problem we need to deal with.
-    //@Requirement
+    // TODO This prevents a cycle in the composition which shows us another problem we need to deal with.
+    // @Requirement
     private ProjectBuilder projectBuilder;
 
     @Requirement
@@ -114,59 +110,56 @@ public class MavenMetadataSource
     @Requirement
     private LegacySupport legacySupport;
 
-    private void injectSession( MetadataResolutionRequest request )
-    {
+    private void injectSession(MetadataResolutionRequest request) {
         RepositorySystemSession session = legacySupport.getRepositorySession();
 
-        if ( session != null )
-        {
-            request.setOffline( session.isOffline() );
-            request.setForceUpdate( RepositoryPolicy.UPDATE_POLICY_ALWAYS.equals( session.getUpdatePolicy() ) );
+        if (session != null) {
+            request.setOffline(session.isOffline());
+            request.setForceUpdate(RepositoryPolicy.UPDATE_POLICY_ALWAYS.equals(session.getUpdatePolicy()));
         }
     }
 
-    public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
-                                     List<ArtifactRepository> remoteRepositories )
-        throws ArtifactMetadataRetrievalException
-    {
-        return retrieve( artifact, localRepository, remoteRepositories, false );
+    public ResolutionGroup retrieve(
+            Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
+            throws ArtifactMetadataRetrievalException {
+        return retrieve(artifact, localRepository, remoteRepositories, false);
     }
 
-    public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
-                                     List<ArtifactRepository> remoteRepositories, boolean resolveManagedVersions )
-        throws ArtifactMetadataRetrievalException
-    {
+    public ResolutionGroup retrieve(
+            Artifact artifact,
+            ArtifactRepository localRepository,
+            List<ArtifactRepository> remoteRepositories,
+            boolean resolveManagedVersions)
+            throws ArtifactMetadataRetrievalException {
         MetadataResolutionRequest request = new DefaultMetadataResolutionRequest();
-        injectSession( request );
-        request.setArtifact( artifact );
-        request.setLocalRepository( localRepository );
-        request.setRemoteRepositories( remoteRepositories );
-        request.setResolveManagedVersions( resolveManagedVersions );
-        return retrieve( request );
+        injectSession(request);
+        request.setArtifact(artifact);
+        request.setLocalRepository(localRepository);
+        request.setRemoteRepositories(remoteRepositories);
+        request.setResolveManagedVersions(resolveManagedVersions);
+        return retrieve(request);
     }
 
-    public ResolutionGroup retrieve( MetadataResolutionRequest request )
-        throws ArtifactMetadataRetrievalException
-    {
+    public ResolutionGroup retrieve(MetadataResolutionRequest request) throws ArtifactMetadataRetrievalException {
         Artifact artifact = request.getArtifact();
 
         //
         // If we have a system scoped artifact then we do not want any searching in local or remote repositories
         // and we want artifact resolution to only return the system scoped artifact itself.
         //
-        if ( artifact.getScope() != null && artifact.getScope().equals( Artifact.SCOPE_SYSTEM ) )
-        {
-            return new ResolutionGroup( null, null, null );
+        if (artifact.getScope() != null && artifact.getScope().equals(Artifact.SCOPE_SYSTEM)) {
+            return new ResolutionGroup(null, null, null);
         }
 
-        ResolutionGroup cached =
-            cache.get( artifact, request.isResolveManagedVersions(), request.getLocalRepository(),
-                       request.getRemoteRepositories() );
+        ResolutionGroup cached = cache.get(
+                artifact,
+                request.isResolveManagedVersions(),
+                request.getLocalRepository(),
+                request.getRemoteRepositories());
 
-        if ( cached != null
-        // if the POM has no file, we cached a missing artifact, only return the cached data if no update forced
-            && ( !request.isForceUpdate() || hasFile( cached.getPomArtifact() ) ) )
-        {
+        if (cached != null
+                // if the POM has no file, we cached a missing artifact, only return the cached data if no update forced
+                && (!request.isForceUpdate() || hasFile(cached.getPomArtifact()))) {
             return cached;
         }
 
@@ -183,43 +176,33 @@ public class MavenMetadataSource
         // TODO hack: don't rebuild model if it was already loaded during reactor resolution
         final WorkspaceReader workspace = legacySupport.getRepositorySession().getWorkspaceReader();
         Model model = null;
-        if ( workspace instanceof MavenWorkspaceReader )
-        {
-            model = ( (MavenWorkspaceReader) workspace ).findModel( RepositoryUtils.toArtifact( artifact ) );
+        if (workspace instanceof MavenWorkspaceReader) {
+            model = ((MavenWorkspaceReader) workspace).findModel(RepositoryUtils.toArtifact(artifact));
         }
 
-        if ( model != null )
-        {
+        if (model != null) {
             pomArtifact = artifact;
             dependencies = model.getDependencies();
             DependencyManagement dependencyManagement = model.getDependencyManagement();
             managedDependencies = dependencyManagement == null ? null : dependencyManagement.getDependencies();
             MavenSession session = legacySupport.getSession();
-            if ( session != null )
-            {
-                MavenProject project = session.getProjectMap().get(
-                        ArtifactUtils.key( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() ) );
+            if (session != null) {
+                MavenProject project = session.getProjectMap()
+                        .get(ArtifactUtils.key(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()));
                 pomRepositories = project.getRemoteArtifactRepositories();
-            }
-            else
-            {
+            } else {
                 pomRepositories = new ArrayList<>();
             }
-        }
-        else if ( artifact instanceof ArtifactWithDependencies )
-        {
+        } else if (artifact instanceof ArtifactWithDependencies) {
             pomArtifact = artifact;
 
-            dependencies = ( (ArtifactWithDependencies) artifact ).getDependencies();
+            dependencies = ((ArtifactWithDependencies) artifact).getDependencies();
 
-            managedDependencies = ( (ArtifactWithDependencies) artifact ).getManagedDependencies();
-        }
-        else
-        {
-            ProjectRelocation rel = retrieveRelocatedProject( artifact, request );
+            managedDependencies = ((ArtifactWithDependencies) artifact).getManagedDependencies();
+        } else {
+            ProjectRelocation rel = retrieveRelocatedProject(artifact, request);
 
-            if ( rel == null )
-            {
+            if (rel == null) {
                 return null;
             }
 
@@ -227,18 +210,15 @@ public class MavenMetadataSource
 
             relocatedArtifact = rel.relocatedArtifact;
 
-            if ( rel.project == null )
-            {
+            if (rel.project == null) {
                 // When this happens we have a Maven 1.x POM, or some invalid POM.
                 // It should have never found its way into Maven 2.x repository but it did.
                 dependencies = Collections.emptyList();
-            }
-            else
-            {
+            } else {
                 dependencies = rel.project.getDependencies();
 
                 DependencyManagement depMgmt = rel.project.getDependencyManagement();
-                managedDependencies = ( depMgmt != null ) ? depMgmt.getDependencies() : null;
+                managedDependencies = (depMgmt != null) ? depMgmt.getDependencies() : null;
 
                 pomRepositories = rel.project.getRemoteArtifactRepositories();
             }
@@ -246,263 +226,224 @@ public class MavenMetadataSource
 
         Set<Artifact> artifacts = Collections.emptySet();
 
-        if ( !artifact.getArtifactHandler().isIncludesDependencies() )
-        {
+        if (!artifact.getArtifactHandler().isIncludesDependencies()) {
             artifacts = new LinkedHashSet<>();
 
-            for ( Dependency dependency : dependencies )
-            {
-                Artifact dependencyArtifact = createDependencyArtifact( dependency, artifact, pomArtifact );
+            for (Dependency dependency : dependencies) {
+                Artifact dependencyArtifact = createDependencyArtifact(dependency, artifact, pomArtifact);
 
-                if ( dependencyArtifact != null )
-                {
-                    artifacts.add( dependencyArtifact );
+                if (dependencyArtifact != null) {
+                    artifacts.add(dependencyArtifact);
                 }
             }
         }
 
         Map<String, Artifact> managedVersions = null;
 
-        if ( managedDependencies != null && request.isResolveManagedVersions() )
-        {
+        if (managedDependencies != null && request.isResolveManagedVersions()) {
             managedVersions = new HashMap<>();
 
-            for ( Dependency managedDependency : managedDependencies )
-            {
-                Artifact managedArtifact = createDependencyArtifact( managedDependency, null, pomArtifact );
+            for (Dependency managedDependency : managedDependencies) {
+                Artifact managedArtifact = createDependencyArtifact(managedDependency, null, pomArtifact);
 
-                managedVersions.put( managedDependency.getManagementKey(), managedArtifact );
+                managedVersions.put(managedDependency.getManagementKey(), managedArtifact);
             }
         }
 
         List<ArtifactRepository> aggregatedRepositories =
-            aggregateRepositories( request.getRemoteRepositories(), pomRepositories );
+                aggregateRepositories(request.getRemoteRepositories(), pomRepositories);
 
         ResolutionGroup result =
-            new ResolutionGroup( pomArtifact, relocatedArtifact, artifacts, managedVersions, aggregatedRepositories );
+                new ResolutionGroup(pomArtifact, relocatedArtifact, artifacts, managedVersions, aggregatedRepositories);
 
-        cache.put( artifact, request.isResolveManagedVersions(), request.getLocalRepository(),
-                   request.getRemoteRepositories(), result );
+        cache.put(
+                artifact,
+                request.isResolveManagedVersions(),
+                request.getLocalRepository(),
+                request.getRemoteRepositories(),
+                result);
 
         return result;
     }
 
-    private boolean hasFile( Artifact artifact )
-    {
-        return artifact != null && artifact.getFile() != null && artifact.getFile().exists();
+    private boolean hasFile(Artifact artifact) {
+        return artifact != null
+                && artifact.getFile() != null
+                && artifact.getFile().exists();
     }
 
-    private List<ArtifactRepository> aggregateRepositories( List<ArtifactRepository> requestRepositories,
-                                                            List<ArtifactRepository> pomRepositories )
-    {
+    private List<ArtifactRepository> aggregateRepositories(
+            List<ArtifactRepository> requestRepositories, List<ArtifactRepository> pomRepositories) {
         List<ArtifactRepository> repositories = requestRepositories;
 
-        if ( pomRepositories != null && !pomRepositories.isEmpty() )
-        {
+        if (pomRepositories != null && !pomRepositories.isEmpty()) {
             Map<String, ArtifactRepository> repos = new LinkedHashMap<>();
 
-            for ( ArtifactRepository repo : requestRepositories )
-            {
-                if ( !repos.containsKey( repo.getId() ) )
-                {
-                    repos.put( repo.getId(), repo );
+            for (ArtifactRepository repo : requestRepositories) {
+                if (!repos.containsKey(repo.getId())) {
+                    repos.put(repo.getId(), repo);
                 }
             }
 
-            for ( ArtifactRepository repo : pomRepositories )
-            {
-                if ( !repos.containsKey( repo.getId() ) )
-                {
-                    repos.put( repo.getId(), repo );
+            for (ArtifactRepository repo : pomRepositories) {
+                if (!repos.containsKey(repo.getId())) {
+                    repos.put(repo.getId(), repo);
                 }
             }
 
-            repositories = new ArrayList<>( repos.values() );
+            repositories = new ArrayList<>(repos.values());
         }
 
         return repositories;
     }
 
-    private Artifact createDependencyArtifact( Dependency dependency, Artifact owner, Artifact pom )
-        throws ArtifactMetadataRetrievalException
-    {
-        try
-        {
-            String inheritedScope = ( owner != null ) ? owner.getScope() : null;
+    private Artifact createDependencyArtifact(Dependency dependency, Artifact owner, Artifact pom)
+            throws ArtifactMetadataRetrievalException {
+        try {
+            String inheritedScope = (owner != null) ? owner.getScope() : null;
 
-            ArtifactFilter inheritedFilter = ( owner != null ) ? owner.getDependencyFilter() : null;
+            ArtifactFilter inheritedFilter = (owner != null) ? owner.getDependencyFilter() : null;
 
-            return createDependencyArtifact( repositorySystem, dependency, inheritedScope, inheritedFilter );
-        }
-        catch ( InvalidVersionSpecificationException e )
-        {
-            throw new ArtifactMetadataRetrievalException( "Invalid version for dependency "
-                + dependency.getManagementKey() + ": " + e.getMessage(), e, pom );
+            return createDependencyArtifact(repositorySystem, dependency, inheritedScope, inheritedFilter);
+        } catch (InvalidVersionSpecificationException e) {
+            throw new ArtifactMetadataRetrievalException(
+                    "Invalid version for dependency " + dependency.getManagementKey() + ": " + e.getMessage(), e, pom);
         }
     }
 
-    private static Artifact createDependencyArtifact( ArtifactFactory factory, Dependency dependency,
-                                                      String inheritedScope, ArtifactFilter inheritedFilter )
-        throws InvalidVersionSpecificationException
-    {
-        String effectiveScope = getEffectiveScope( dependency.getScope(), inheritedScope );
+    private static Artifact createDependencyArtifact(
+            ArtifactFactory factory, Dependency dependency, String inheritedScope, ArtifactFilter inheritedFilter)
+            throws InvalidVersionSpecificationException {
+        String effectiveScope = getEffectiveScope(dependency.getScope(), inheritedScope);
 
-        if ( effectiveScope == null )
-        {
+        if (effectiveScope == null) {
             return null;
         }
 
-        VersionRange versionRange = VersionRange.createFromVersionSpec( dependency.getVersion() );
+        VersionRange versionRange = VersionRange.createFromVersionSpec(dependency.getVersion());
 
-        Artifact dependencyArtifact =
-            factory.createDependencyArtifact( dependency.getGroupId(), dependency.getArtifactId(), versionRange,
-                                              dependency.getType(), dependency.getClassifier(), effectiveScope,
-                                              dependency.isOptional() );
+        Artifact dependencyArtifact = factory.createDependencyArtifact(
+                dependency.getGroupId(),
+                dependency.getArtifactId(),
+                versionRange,
+                dependency.getType(),
+                dependency.getClassifier(),
+                effectiveScope,
+                dependency.isOptional());
 
         ArtifactFilter dependencyFilter = inheritedFilter;
 
-        if ( dependencyFilter != null && !dependencyFilter.include( dependencyArtifact ) )
-        {
+        if (dependencyFilter != null && !dependencyFilter.include(dependencyArtifact)) {
             return null;
         }
 
-        if ( Artifact.SCOPE_SYSTEM.equals( effectiveScope ) )
-        {
-            dependencyArtifact.setFile( new File( dependency.getSystemPath() ) );
+        if (Artifact.SCOPE_SYSTEM.equals(effectiveScope)) {
+            dependencyArtifact.setFile(new File(dependency.getSystemPath()));
         }
 
-        dependencyArtifact.setDependencyFilter( createDependencyFilter( dependency, dependencyFilter ) );
+        dependencyArtifact.setDependencyFilter(createDependencyFilter(dependency, dependencyFilter));
 
         return dependencyArtifact;
     }
 
-    private static String getEffectiveScope( String originalScope, String inheritedScope )
-    {
+    private static String getEffectiveScope(String originalScope, String inheritedScope) {
         String effectiveScope = Artifact.SCOPE_RUNTIME;
 
-        if ( originalScope == null )
-        {
+        if (originalScope == null) {
             originalScope = Artifact.SCOPE_COMPILE;
         }
 
-        if ( inheritedScope == null )
-        {
+        if (inheritedScope == null) {
             // direct dependency retains its scope
             effectiveScope = originalScope;
-        }
-        else if ( Artifact.SCOPE_TEST.equals( originalScope ) || Artifact.SCOPE_PROVIDED.equals( originalScope ) )
-        {
+        } else if (Artifact.SCOPE_TEST.equals(originalScope) || Artifact.SCOPE_PROVIDED.equals(originalScope)) {
             // test and provided are not transitive, so exclude them
             effectiveScope = null;
-        }
-        else if ( Artifact.SCOPE_SYSTEM.equals( originalScope ) )
-        {
+        } else if (Artifact.SCOPE_SYSTEM.equals(originalScope)) {
             // system scope come through unchanged...
             effectiveScope = Artifact.SCOPE_SYSTEM;
-        }
-        else if ( Artifact.SCOPE_COMPILE.equals( originalScope ) && Artifact.SCOPE_COMPILE.equals( inheritedScope ) )
-        {
+        } else if (Artifact.SCOPE_COMPILE.equals(originalScope) && Artifact.SCOPE_COMPILE.equals(inheritedScope)) {
             // added to retain compile scope. Remove if you want compile inherited as runtime
             effectiveScope = Artifact.SCOPE_COMPILE;
-        }
-        else if ( Artifact.SCOPE_TEST.equals( inheritedScope ) )
-        {
+        } else if (Artifact.SCOPE_TEST.equals(inheritedScope)) {
             effectiveScope = Artifact.SCOPE_TEST;
-        }
-        else if ( Artifact.SCOPE_PROVIDED.equals( inheritedScope ) )
-        {
+        } else if (Artifact.SCOPE_PROVIDED.equals(inheritedScope)) {
             effectiveScope = Artifact.SCOPE_PROVIDED;
         }
 
         return effectiveScope;
     }
 
-    private static ArtifactFilter createDependencyFilter( Dependency dependency, ArtifactFilter inheritedFilter )
-    {
+    private static ArtifactFilter createDependencyFilter(Dependency dependency, ArtifactFilter inheritedFilter) {
         ArtifactFilter effectiveFilter = inheritedFilter;
 
-        if ( !dependency.getExclusions().isEmpty() )
-        {
-            effectiveFilter = new ExclusionArtifactFilter( dependency.getExclusions() );
+        if (!dependency.getExclusions().isEmpty()) {
+            effectiveFilter = new ExclusionArtifactFilter(dependency.getExclusions());
 
-            if ( inheritedFilter != null )
-            {
-                effectiveFilter = new AndArtifactFilter( Arrays.asList( inheritedFilter, effectiveFilter ) );
+            if (inheritedFilter != null) {
+                effectiveFilter = new AndArtifactFilter(Arrays.asList(inheritedFilter, effectiveFilter));
             }
         }
 
         return effectiveFilter;
     }
 
-    public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
-                                                            List<ArtifactRepository> remoteRepositories )
-        throws ArtifactMetadataRetrievalException
-    {
+    public List<ArtifactVersion> retrieveAvailableVersions(
+            Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
+            throws ArtifactMetadataRetrievalException {
         MetadataResolutionRequest request = new DefaultMetadataResolutionRequest();
-        injectSession( request );
-        request.setArtifact( artifact );
-        request.setLocalRepository( localRepository );
-        request.setRemoteRepositories( remoteRepositories );
-        return retrieveAvailableVersions( request );
+        injectSession(request);
+        request.setArtifact(artifact);
+        request.setLocalRepository(localRepository);
+        request.setRemoteRepositories(remoteRepositories);
+        return retrieveAvailableVersions(request);
     }
 
-    public List<ArtifactVersion> retrieveAvailableVersions( MetadataResolutionRequest request )
-        throws ArtifactMetadataRetrievalException
-    {
-        RepositoryMetadata metadata = new ArtifactRepositoryMetadata( request.getArtifact() );
+    public List<ArtifactVersion> retrieveAvailableVersions(MetadataResolutionRequest request)
+            throws ArtifactMetadataRetrievalException {
+        RepositoryMetadata metadata = new ArtifactRepositoryMetadata(request.getArtifact());
 
-        try
-        {
-            repositoryMetadataManager.resolve( metadata, request );
-        }
-        catch ( RepositoryMetadataResolutionException e )
-        {
-            throw new ArtifactMetadataRetrievalException( e.getMessage(), e, request.getArtifact() );
+        try {
+            repositoryMetadataManager.resolve(metadata, request);
+        } catch (RepositoryMetadataResolutionException e) {
+            throw new ArtifactMetadataRetrievalException(e.getMessage(), e, request.getArtifact());
         }
 
-        List<String> availableVersions = request.getLocalRepository().findVersions( request.getArtifact() );
+        List<String> availableVersions = request.getLocalRepository().findVersions(request.getArtifact());
 
-        return retrieveAvailableVersionsFromMetadata( metadata.getMetadata(), availableVersions );
+        return retrieveAvailableVersionsFromMetadata(metadata.getMetadata(), availableVersions);
     }
 
-    public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact,
-                                                                                    ArtifactRepository localRepository,
-                                                                              ArtifactRepository deploymentRepository )
-        throws ArtifactMetadataRetrievalException
-    {
-        RepositoryMetadata metadata = new ArtifactRepositoryMetadata( artifact );
+    public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
+            Artifact artifact, ArtifactRepository localRepository, ArtifactRepository deploymentRepository)
+            throws ArtifactMetadataRetrievalException {
+        RepositoryMetadata metadata = new ArtifactRepositoryMetadata(artifact);
 
-        try
-        {
-            repositoryMetadataManager.resolveAlways( metadata, localRepository, deploymentRepository );
-        }
-        catch ( RepositoryMetadataResolutionException e )
-        {
-            throw new ArtifactMetadataRetrievalException( e.getMessage(), e, artifact );
+        try {
+            repositoryMetadataManager.resolveAlways(metadata, localRepository, deploymentRepository);
+        } catch (RepositoryMetadataResolutionException e) {
+            throw new ArtifactMetadataRetrievalException(e.getMessage(), e, artifact);
         }
 
-        List<String> availableVersions = localRepository.findVersions( artifact );
+        List<String> availableVersions = localRepository.findVersions(artifact);
 
-        return retrieveAvailableVersionsFromMetadata( metadata.getMetadata(), availableVersions );
+        return retrieveAvailableVersionsFromMetadata(metadata.getMetadata(), availableVersions);
     }
 
-    private List<ArtifactVersion> retrieveAvailableVersionsFromMetadata( Metadata repoMetadata,
-                                                                         List<String> availableVersions )
-    {
+    private List<ArtifactVersion> retrieveAvailableVersionsFromMetadata(
+            Metadata repoMetadata, List<String> availableVersions) {
         Collection<String> versions = new LinkedHashSet<>();
 
-        if ( ( repoMetadata != null ) && ( repoMetadata.getVersioning() != null ) )
-        {
-            versions.addAll( repoMetadata.getVersioning().getVersions() );
+        if ((repoMetadata != null) && (repoMetadata.getVersioning() != null)) {
+            versions.addAll(repoMetadata.getVersioning().getVersions());
         }
 
-        versions.addAll( availableVersions );
+        versions.addAll(availableVersions);
 
-        List<ArtifactVersion> artifactVersions = new ArrayList<>( versions.size() );
+        List<ArtifactVersion> artifactVersions = new ArrayList<>(versions.size());
 
-        for ( String version : versions )
-        {
-            artifactVersions.add( new DefaultArtifactVersion( version ) );
+        for (String version : versions) {
+            artifactVersions.add(new DefaultArtifactVersion(version));
         }
 
         return artifactVersions;
@@ -510,181 +451,149 @@ public class MavenMetadataSource
 
     // USED BY MAVEN ASSEMBLY PLUGIN
     @Deprecated
-    public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, List<Dependency> dependencies,
-                                                 String inheritedScope, ArtifactFilter dependencyFilter,
-                                                 MavenProject project )
-        throws InvalidDependencyVersionException
-    {
+    public static Set<Artifact> createArtifacts(
+            ArtifactFactory artifactFactory,
+            List<Dependency> dependencies,
+            String inheritedScope,
+            ArtifactFilter dependencyFilter,
+            MavenProject project)
+            throws InvalidDependencyVersionException {
         Set<Artifact> artifacts = new LinkedHashSet<>();
 
-        for ( Dependency d : dependencies )
-        {
+        for (Dependency d : dependencies) {
             Artifact dependencyArtifact;
-            try
-            {
-                dependencyArtifact = createDependencyArtifact( artifactFactory, d, inheritedScope, dependencyFilter );
-            }
-            catch ( InvalidVersionSpecificationException e )
-            {
-                throw new InvalidDependencyVersionException( project.getId(), d, project.getFile(), e );
+            try {
+                dependencyArtifact = createDependencyArtifact(artifactFactory, d, inheritedScope, dependencyFilter);
+            } catch (InvalidVersionSpecificationException e) {
+                throw new InvalidDependencyVersionException(project.getId(), d, project.getFile(), e);
             }
 
-            if ( dependencyArtifact != null )
-            {
-                artifacts.add( dependencyArtifact );
+            if (dependencyArtifact != null) {
+                artifacts.add(dependencyArtifact);
             }
         }
 
         return artifacts;
     }
 
-    private ProjectBuilder getProjectBuilder()
-    {
-        if ( projectBuilder != null )
-        {
+    private ProjectBuilder getProjectBuilder() {
+        if (projectBuilder != null) {
             return projectBuilder;
         }
 
-        try
-        {
-            projectBuilder = container.lookup( ProjectBuilder.class );
-        }
-        catch ( ComponentLookupException e )
-        {
+        try {
+            projectBuilder = container.lookup(ProjectBuilder.class);
+        } catch (ComponentLookupException e) {
             // Won't happen
         }
 
         return projectBuilder;
     }
-    @SuppressWarnings( "checkstyle:methodlength" )
-    private ProjectRelocation retrieveRelocatedProject( Artifact artifact, MetadataResolutionRequest repositoryRequest )
-        throws ArtifactMetadataRetrievalException
-    {
+
+    @SuppressWarnings("checkstyle:methodlength")
+    private ProjectRelocation retrieveRelocatedProject(Artifact artifact, MetadataResolutionRequest repositoryRequest)
+            throws ArtifactMetadataRetrievalException {
         MavenProject project;
 
         Artifact pomArtifact;
         Artifact relocatedArtifact = null;
         boolean done = false;
-        do
-        {
+        do {
             project = null;
 
-            pomArtifact =
-                repositorySystem.createProjectArtifact( artifact.getGroupId(),
-                                                        artifact.getArtifactId(),
-                                                        artifact.getVersion(), artifact.getScope() );
+            pomArtifact = repositorySystem.createProjectArtifact(
+                    artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getScope());
 
-            if ( "pom".equals( artifact.getType() ) )
-            {
-                pomArtifact.setFile( artifact.getFile() );
+            if ("pom".equals(artifact.getType())) {
+                pomArtifact.setFile(artifact.getFile());
             }
 
-            if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
-            {
+            if (Artifact.SCOPE_SYSTEM.equals(artifact.getScope())) {
                 done = true;
-            }
-            else
-            {
-                try
-                {
+            } else {
+                try {
                     ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
-                    configuration.setLocalRepository( repositoryRequest.getLocalRepository() );
-                    configuration.setRemoteRepositories( repositoryRequest.getRemoteRepositories() );
-                    configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
-                    configuration.setProcessPlugins( false );
-                    configuration.setRepositoryMerging( ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT );
+                    configuration.setLocalRepository(repositoryRequest.getLocalRepository());
+                    configuration.setRemoteRepositories(repositoryRequest.getRemoteRepositories());
+                    configuration.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+                    configuration.setProcessPlugins(false);
+                    configuration.setRepositoryMerging(ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT);
                     MavenSession session = legacySupport.getSession();
-                    if ( session != null )
-                    {
-                        configuration.setSystemProperties( session.getSystemProperties() );
-                        configuration.setUserProperties( session.getUserProperties() );
+                    if (session != null) {
+                        configuration.setSystemProperties(session.getSystemProperties());
+                        configuration.setUserProperties(session.getUserProperties());
+                    } else {
+                        configuration.setSystemProperties(getSystemProperties());
+                        configuration.setUserProperties(new Properties());
                     }
-                    else
-                    {
-                        configuration.setSystemProperties( getSystemProperties() );
-                        configuration.setUserProperties( new Properties() );
-                    }
-                    configuration.setRepositorySession( legacySupport.getRepositorySession() );
+                    configuration.setRepositorySession(legacySupport.getRepositorySession());
 
-                    project = getProjectBuilder().build( pomArtifact, configuration ).getProject();
-                }
-                catch ( ProjectBuildingException e )
-                {
-                    ModelProblem missingParentPom = hasMissingParentPom( e );
-                    if ( missingParentPom != null )
-                    {
-                        throw new ArtifactMetadataRetrievalException( "Failed to process POM for "
-                            + artifact.getId() + ": " + missingParentPom.getMessage(),
-                                                                      missingParentPom.getException(),
-                                                                      artifact );
+                    project = getProjectBuilder()
+                            .build(pomArtifact, configuration)
+                            .getProject();
+                } catch (ProjectBuildingException e) {
+                    ModelProblem missingParentPom = hasMissingParentPom(e);
+                    if (missingParentPom != null) {
+                        throw new ArtifactMetadataRetrievalException(
+                                "Failed to process POM for " + artifact.getId() + ": " + missingParentPom.getMessage(),
+                                missingParentPom.getException(),
+                                artifact);
                     }
 
                     String message;
 
-                    if ( isMissingPom( e ) )
-                    {
+                    if (isMissingPom(e)) {
                         message = "Missing POM for " + artifact.getId();
-                    }
-                    else if ( isNonTransferrablePom( e ) )
-                    {
-                        throw new ArtifactMetadataRetrievalException( "Failed to retrieve POM for "
-                            + artifact.getId() + ": " + e.getCause().getMessage(), e.getCause(),
-                                                                      artifact );
-                    }
-                    else
-                    {
-                        message =
-                            "Invalid POM for " + artifact.getId()
+                    } else if (isNonTransferrablePom(e)) {
+                        throw new ArtifactMetadataRetrievalException(
+                                "Failed to retrieve POM for " + artifact.getId() + ": "
+                                        + e.getCause().getMessage(),
+                                e.getCause(),
+                                artifact);
+                    } else {
+                        message = "Invalid POM for " + artifact.getId()
                                 + ", transitive dependencies (if any) will not be available"
                                 + ", enable debug logging for more details";
                     }
 
-                    if ( logger.isDebugEnabled() )
-                    {
+                    if (logger.isDebugEnabled()) {
                         message += ": " + e.getMessage();
                     }
 
-                    logger.warn( message );
+                    logger.warn(message);
                 }
 
-                if ( project != null )
-                {
+                if (project != null) {
                     Relocation relocation = null;
 
                     DistributionManagement distMgmt = project.getDistributionManagement();
-                    if ( distMgmt != null )
-                    {
+                    if (distMgmt != null) {
                         relocation = distMgmt.getRelocation();
 
-                        artifact.setDownloadUrl( distMgmt.getDownloadUrl() );
-                        pomArtifact.setDownloadUrl( distMgmt.getDownloadUrl() );
+                        artifact.setDownloadUrl(distMgmt.getDownloadUrl());
+                        pomArtifact.setDownloadUrl(distMgmt.getDownloadUrl());
                     }
 
-                    if ( relocation != null )
-                    {
-                        if ( relocation.getGroupId() != null )
-                        {
-                            artifact.setGroupId( relocation.getGroupId() );
+                    if (relocation != null) {
+                        if (relocation.getGroupId() != null) {
+                            artifact.setGroupId(relocation.getGroupId());
                             relocatedArtifact = artifact;
-                            project.setGroupId( relocation.getGroupId() );
+                            project.setGroupId(relocation.getGroupId());
                         }
-                        if ( relocation.getArtifactId() != null )
-                        {
-                            artifact.setArtifactId( relocation.getArtifactId() );
+                        if (relocation.getArtifactId() != null) {
+                            artifact.setArtifactId(relocation.getArtifactId());
                             relocatedArtifact = artifact;
-                            project.setArtifactId( relocation.getArtifactId() );
+                            project.setArtifactId(relocation.getArtifactId());
                         }
-                        if ( relocation.getVersion() != null )
-                        {
+                        if (relocation.getVersion() != null) {
                             // note: see MNG-3454. This causes a problem, but fixing it may break more.
-                            artifact.setVersionRange( VersionRange.createFromVersion( relocation.getVersion() ) );
+                            artifact.setVersionRange(VersionRange.createFromVersion(relocation.getVersion()));
                             relocatedArtifact = artifact;
-                            project.setVersion( relocation.getVersion() );
+                            project.setVersion(relocation.getVersion());
                         }
 
-                        if ( artifact.getDependencyFilter() != null
-                            && !artifact.getDependencyFilter().include( artifact ) )
-                        {
+                        if (artifact.getDependencyFilter() != null
+                                && !artifact.getDependencyFilter().include(artifact)) {
                             return null;
                         }
 
@@ -692,47 +601,37 @@ public class MavenMetadataSource
                         // retrieved, we need to update it.
                         // TODO shouldn't the versions be merged across relocations?
                         List<ArtifactVersion> available = artifact.getAvailableVersions();
-                        if ( available != null && !available.isEmpty() )
-                        {
+                        if (available != null && !available.isEmpty()) {
                             MetadataResolutionRequest metadataRequest =
-                                new DefaultMetadataResolutionRequest( repositoryRequest );
-                            metadataRequest.setArtifact( artifact );
-                            available = retrieveAvailableVersions( metadataRequest );
-                            artifact.setAvailableVersions( available );
+                                    new DefaultMetadataResolutionRequest(repositoryRequest);
+                            metadataRequest.setArtifact(artifact);
+                            available = retrieveAvailableVersions(metadataRequest);
+                            artifact.setAvailableVersions(available);
                         }
 
-                        String message =
-                            "\n  This artifact has been relocated to " + artifact.getGroupId() + ":"
+                        String message = "\n  This artifact has been relocated to " + artifact.getGroupId() + ":"
                                 + artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n";
 
-                        if ( relocation.getMessage() != null )
-                        {
+                        if (relocation.getMessage() != null) {
                             message += "  " + relocation.getMessage() + "\n";
                         }
 
-                        if ( artifact.getDependencyTrail() != null && artifact.getDependencyTrail().size() == 1 )
-                        {
-                            logger.warn( "While downloading " + pomArtifact.getGroupId() + ":"
-                                + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message + "\n" );
+                        if (artifact.getDependencyTrail() != null
+                                && artifact.getDependencyTrail().size() == 1) {
+                            logger.warn("While downloading " + pomArtifact.getGroupId() + ":"
+                                    + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message + "\n");
+                        } else {
+                            logger.debug("While downloading " + pomArtifact.getGroupId() + ":"
+                                    + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message + "\n");
                         }
-                        else
-                        {
-                            logger.debug( "While downloading " + pomArtifact.getGroupId() + ":"
-                                + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message + "\n" );
-                        }
-                    }
-                    else
-                    {
+                    } else {
                         done = true;
                     }
-                }
-                else
-                {
+                } else {
                     done = true;
                 }
             }
-        }
-        while ( !done );
+        } while (!done);
 
         ProjectRelocation rel = new ProjectRelocation();
         rel.project = project;
@@ -742,61 +641,49 @@ public class MavenMetadataSource
         return rel;
     }
 
-    private ModelProblem hasMissingParentPom( ProjectBuildingException e )
-    {
-        if ( e.getCause() instanceof ModelBuildingException )
-        {
+    private ModelProblem hasMissingParentPom(ProjectBuildingException e) {
+        if (e.getCause() instanceof ModelBuildingException) {
             ModelBuildingException mbe = (ModelBuildingException) e.getCause();
-            for ( ModelProblem problem : mbe.getProblems() )
-            {
-                if ( problem.getException() instanceof UnresolvableModelException )
-                {
+            for (ModelProblem problem : mbe.getProblems()) {
+                if (problem.getException() instanceof UnresolvableModelException) {
                     return problem;
                 }
             }
-
         }
         return null;
     }
 
-    private boolean isMissingPom( Exception e )
-    {
-        if ( e.getCause() instanceof MultipleArtifactsNotFoundException )
-        {
+    private boolean isMissingPom(Exception e) {
+        if (e.getCause() instanceof MultipleArtifactsNotFoundException) {
             return true;
         }
         return e.getCause() instanceof org.eclipse.aether.resolution.ArtifactResolutionException
-            && e.getCause().getCause() instanceof ArtifactNotFoundException;
+                && e.getCause().getCause() instanceof ArtifactNotFoundException;
     }
 
-    private boolean isNonTransferrablePom( Exception e )
-    {
-        if ( e.getCause() instanceof ArtifactResolutionException )
-        {
+    private boolean isNonTransferrablePom(Exception e) {
+        if (e.getCause() instanceof ArtifactResolutionException) {
             return true;
         }
         return e.getCause() instanceof org.eclipse.aether.resolution.ArtifactResolutionException
-            && !( e.getCause().getCause() instanceof ArtifactNotFoundException );
+                && !(e.getCause().getCause() instanceof ArtifactNotFoundException);
     }
 
-    private Properties getSystemProperties()
-    {
+    private Properties getSystemProperties() {
         Properties props = new Properties();
 
-        EnvironmentUtils.addEnvVars( props );
+        EnvironmentUtils.addEnvVars(props);
 
-        SystemProperties.addSystemProperties( props );
+        SystemProperties.addSystemProperties(props);
 
         return props;
     }
 
-    private static final class ProjectRelocation
-    {
+    private static final class ProjectRelocation {
         private MavenProject project;
 
         private Artifact pomArtifact;
 
         private Artifact relocatedArtifact;
     }
-
 }

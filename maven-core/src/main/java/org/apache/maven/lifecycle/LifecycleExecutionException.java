@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.lifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle;
 
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
@@ -28,80 +27,70 @@ import org.apache.maven.shared.utils.logging.MessageBuilder;
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
-public class LifecycleExecutionException
-    extends Exception
-{
+public class LifecycleExecutionException extends Exception {
     private MavenProject project;
 
-    public LifecycleExecutionException( String message )
-    {
-        super( message );
+    public LifecycleExecutionException(String message) {
+        super(message);
     }
 
-    public LifecycleExecutionException( Throwable cause )
-    {
-        super( cause );
+    public LifecycleExecutionException(Throwable cause) {
+        super(cause);
     }
 
-    public LifecycleExecutionException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public LifecycleExecutionException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public LifecycleExecutionException( String message, MavenProject project )
-    {
-        super( message );
+    public LifecycleExecutionException(String message, MavenProject project) {
+        super(message);
         this.project = project;
     }
 
-    public LifecycleExecutionException( String message, MojoExecution execution, MavenProject project )
-    {
-        super( message );
+    public LifecycleExecutionException(String message, MojoExecution execution, MavenProject project) {
+        super(message);
         this.project = project;
     }
 
-    public LifecycleExecutionException( String message, MojoExecution execution, MavenProject project, Throwable cause )
-    {
-        super( message, cause );
+    public LifecycleExecutionException(String message, MojoExecution execution, MavenProject project, Throwable cause) {
+        super(message, cause);
         this.project = project;
     }
 
-    public LifecycleExecutionException( MojoExecution execution, MavenProject project, Throwable cause )
-    {
-        this( createMessage( execution, project, cause ), execution, project, cause );
+    public LifecycleExecutionException(MojoExecution execution, MavenProject project, Throwable cause) {
+        this(createMessage(execution, project, cause), execution, project, cause);
     }
 
-    public MavenProject getProject()
-    {
+    public MavenProject getProject() {
         return project;
     }
 
-    private static String createMessage( MojoExecution execution, MavenProject project, Throwable cause )
-    {
-        MessageBuilder buffer = buffer( 256 );
+    private static String createMessage(MojoExecution execution, MavenProject project, Throwable cause) {
+        MessageBuilder buffer = buffer(256);
 
-        buffer.a( "Failed to execute goal" );
+        buffer.a("Failed to execute goal");
 
-        if ( execution != null )
-        {
-            buffer.a( ' ' );
-            buffer.mojo( execution.getGroupId() + ':' + execution.getArtifactId() + ':' + execution.getVersion() + ':'
-                + execution.getGoal() );
-            buffer.a( ' ' ).strong( '(' + execution.getExecutionId() + ')' );
+        if (execution != null) {
+            buffer.a(' ');
+            buffer.mojo(execution.getGroupId()
+                    + ':'
+                    + execution.getArtifactId()
+                    + ':'
+                    + execution.getVersion()
+                    + ':'
+                    + execution.getGoal());
+            buffer.a(' ').strong('(' + execution.getExecutionId() + ')');
         }
 
-        if ( project != null )
-        {
-            buffer.a( " on project " );
-            buffer.project( project.getArtifactId() );
+        if (project != null) {
+            buffer.a(" on project ");
+            buffer.project(project.getArtifactId());
         }
 
-        if ( cause != null )
-        {
-            buffer.a( ": " ).failure( cause.getMessage() );
+        if (cause != null) {
+            buffer.a(": ").failure(cause.getMessage());
         }
 
         return buffer.toString();
     }
-
 }

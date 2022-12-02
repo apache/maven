@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.handler;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.handler;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.handler;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.handler;
 
 /**
  * An artifact handler defines for a dependency type, defined as Plexus role:<ul>
@@ -25,11 +24,10 @@ package org.apache.maven.artifact.handler;
  * <li>information on how to use the artifact: whether to add it to the classpath, or to take into account its
  * dependencies.</li>
  * </ul>
- * 
+ *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
-public interface ArtifactHandler
-{
+public interface ArtifactHandler {
     String ROLE = ArtifactHandler.class.getName();
 
     /**
@@ -43,7 +41,7 @@ public interface ArtifactHandler
 
     /**
      * Get the classifier associated to the dependency type.
-     * 
+     *
      * @return the classifier
      */
     String getClassifier();

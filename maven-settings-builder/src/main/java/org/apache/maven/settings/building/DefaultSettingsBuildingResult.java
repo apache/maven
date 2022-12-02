@@ -1,5 +1,3 @@
-package org.apache.maven.settings.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,10 @@ package org.apache.maven.settings.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.building;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.maven.settings.Settings;
 
 /**
@@ -29,30 +27,24 @@ import org.apache.maven.settings.Settings;
  *
  * @author Benjamin Bentmann
  */
-class DefaultSettingsBuildingResult
-    implements SettingsBuildingResult
-{
+class DefaultSettingsBuildingResult implements SettingsBuildingResult {
 
     private Settings effectiveSettings;
 
     private List<SettingsProblem> problems;
 
-    DefaultSettingsBuildingResult( Settings effectiveSettings, List<SettingsProblem> problems )
-    {
+    DefaultSettingsBuildingResult(Settings effectiveSettings, List<SettingsProblem> problems) {
         this.effectiveSettings = effectiveSettings;
-        this.problems = ( problems != null ) ? problems : new ArrayList<SettingsProblem>();
+        this.problems = (problems != null) ? problems : new ArrayList<SettingsProblem>();
     }
 
     @Override
-    public Settings getEffectiveSettings()
-    {
+    public Settings getEffectiveSettings() {
         return effectiveSettings;
     }
 
     @Override
-    public List<SettingsProblem> getProblems()
-    {
+    public List<SettingsProblem> getProblems() {
         return problems;
     }
-
 }

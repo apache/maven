@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver.filter;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver.filter;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,13 +16,13 @@ package org.apache.maven.artifact.resolver.filter;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver.filter;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.maven.artifact.Artifact;
 
 /**
@@ -32,68 +30,55 @@ import org.apache.maven.artifact.Artifact;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-public class AndArtifactFilter
-    implements ArtifactFilter
-{
+public class AndArtifactFilter implements ArtifactFilter {
     private Set<ArtifactFilter> filters;
 
-    public AndArtifactFilter()
-    {
+    public AndArtifactFilter() {
         this.filters = new LinkedHashSet<>();
     }
 
-    public AndArtifactFilter( List<ArtifactFilter> filters )
-    {
-        this.filters = new LinkedHashSet<>( filters );
+    public AndArtifactFilter(List<ArtifactFilter> filters) {
+        this.filters = new LinkedHashSet<>(filters);
     }
 
-    public boolean include( Artifact artifact )
-    {
+    public boolean include(Artifact artifact) {
         boolean include = true;
-        for ( Iterator<ArtifactFilter> i = filters.iterator(); i.hasNext() && include; )
-        {
+        for (Iterator<ArtifactFilter> i = filters.iterator(); i.hasNext() && include; ) {
             ArtifactFilter filter = i.next();
-            if ( !filter.include( artifact ) )
-            {
+            if (!filter.include(artifact)) {
                 include = false;
             }
         }
         return include;
     }
 
-    public void add( ArtifactFilter artifactFilter )
-    {
-        filters.add( artifactFilter );
+    public void add(ArtifactFilter artifactFilter) {
+        filters.add(artifactFilter);
     }
 
-    public List<ArtifactFilter> getFilters()
-    {
-        return new ArrayList<>( filters );
+    public List<ArtifactFilter> getFilters() {
+        return new ArrayList<>(filters);
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int hash = 17;
         hash = hash * 31 + filters.hashCode();
         return hash;
     }
 
     @Override
-    public boolean equals( Object obj )
-    {
-        if ( this == obj )
-        {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
 
-        if ( !( obj instanceof AndArtifactFilter ) )
-        {
+        if (!(obj instanceof AndArtifactFilter)) {
             return false;
         }
 
         AndArtifactFilter other = (AndArtifactFilter) obj;
 
-        return filters.equals( other.filters );
+        return filters.equals(other.filters);
     }
 }

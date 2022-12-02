@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 
@@ -31,16 +30,12 @@ import org.apache.maven.lifecycle.LifecycleExecutionException;
  * @see MojoExecutionListener
  * @since 3.1.2
  */
-public interface ProjectExecutionListener
-{
-    void beforeProjectExecution( ProjectExecutionEvent event )
-        throws LifecycleExecutionException;
+public interface ProjectExecutionListener {
+    void beforeProjectExecution(ProjectExecutionEvent event) throws LifecycleExecutionException;
 
-    void beforeProjectLifecycleExecution( ProjectExecutionEvent event )
-        throws LifecycleExecutionException;
+    void beforeProjectLifecycleExecution(ProjectExecutionEvent event) throws LifecycleExecutionException;
 
-    void afterProjectExecutionSuccess( ProjectExecutionEvent event )
-        throws LifecycleExecutionException;
+    void afterProjectExecutionSuccess(ProjectExecutionEvent event) throws LifecycleExecutionException;
 
-    void afterProjectExecutionFailure( ProjectExecutionEvent event );
+    void afterProjectExecutionFailure(ProjectExecutionEvent event);
 }

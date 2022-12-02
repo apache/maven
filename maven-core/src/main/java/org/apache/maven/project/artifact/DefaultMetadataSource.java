@@ -1,5 +1,3 @@
-package org.apache.maven.project.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.artifact;
 
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.codehaus.plexus.component.annotations.Component;
@@ -29,9 +28,5 @@ import org.codehaus.plexus.component.annotations.Component;
  *
  * @author Benjamin Bentmann
  */
-@Component( role = ArtifactMetadataSource.class )
-public class DefaultMetadataSource
-    extends MavenMetadataSource
-{
-
-}
+@Component(role = ArtifactMetadataSource.class)
+public class DefaultMetadataSource extends MavenMetadataSource {}

@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.io.File;
 import java.util.HashMap;
@@ -29,23 +28,19 @@ import java.util.Map;
  *
  * @author Benjamin Bentmann
  */
-class ReactorModelPool
-{
+class ReactorModelPool {
 
     private final Map<CacheKey, File> pomFiles = new HashMap<>();
 
-    public File get( String groupId, String artifactId, String version )
-    {
-        return pomFiles.get( new CacheKey( groupId, artifactId, version ) );
+    public File get(String groupId, String artifactId, String version) {
+        return pomFiles.get(new CacheKey(groupId, artifactId, version));
     }
 
-    public void put( String groupId, String artifactId, String version, File pomFile )
-    {
-        pomFiles.put( new CacheKey( groupId, artifactId, version ), pomFile );
+    public void put(String groupId, String artifactId, String version, File pomFile) {
+        pomFiles.put(new CacheKey(groupId, artifactId, version), pomFile);
     }
 
-    private static final class CacheKey
-    {
+    private static final class CacheKey {
 
         private final String groupId;
 
@@ -55,11 +50,10 @@ class ReactorModelPool
 
         private final int hashCode;
 
-        CacheKey( String groupId, String artifactId, String version )
-        {
-            this.groupId = ( groupId != null ) ? groupId : "";
-            this.artifactId = ( artifactId != null ) ? artifactId : "";
-            this.version = ( version != null ) ? version : "";
+        CacheKey(String groupId, String artifactId, String version) {
+            this.groupId = (groupId != null) ? groupId : "";
+            this.artifactId = (artifactId != null) ? artifactId : "";
+            this.version = (version != null) ? version : "";
 
             int hash = 17;
             hash = hash * 31 + this.groupId.hashCode();
@@ -69,38 +63,30 @@ class ReactorModelPool
         }
 
         @Override
-        public boolean equals( Object obj )
-        {
-            if ( this == obj )
-            {
+        public boolean equals(Object obj) {
+            if (this == obj) {
                 return true;
             }
 
-            if ( !( obj instanceof CacheKey ) )
-            {
+            if (!(obj instanceof CacheKey)) {
                 return false;
             }
 
             CacheKey that = (CacheKey) obj;
 
-            return artifactId.equals( that.artifactId ) && groupId.equals( that.groupId )
-                && version.equals( that.version );
+            return artifactId.equals(that.artifactId) && groupId.equals(that.groupId) && version.equals(that.version);
         }
 
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return hashCode;
         }
 
         @Override
-        public String toString()
-        {
-            StringBuilder buffer = new StringBuilder( 128 );
-            buffer.append( groupId ).append( ':' ).append( artifactId ).append( ':' ).append( version );
+        public String toString() {
+            StringBuilder buffer = new StringBuilder(128);
+            buffer.append(groupId).append(':').append(artifactId).append(':').append(version);
             return buffer.toString();
         }
-
     }
-
 }

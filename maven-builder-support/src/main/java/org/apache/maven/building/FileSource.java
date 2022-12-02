@@ -1,5 +1,3 @@
-package org.apache.maven.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.building;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,9 +29,7 @@ import java.util.Objects;
  *
  * @author Benjamin Bentmann
  */
-public class FileSource
-    implements Source
-{
+public class FileSource implements Source {
     private final File file;
 
     /**
@@ -40,21 +37,17 @@ public class FileSource
      *
      * @param file The file, must not be {@code null}.
      */
-    public FileSource( File file )
-    {
-        this.file = Objects.requireNonNull( file, "file cannot be null" ).getAbsoluteFile();
+    public FileSource(File file) {
+        this.file = Objects.requireNonNull(file, "file cannot be null").getAbsoluteFile();
     }
 
     @Override
-    public InputStream getInputStream()
-        throws IOException
-    {
-        return new FileInputStream( file );
+    public InputStream getInputStream() throws IOException {
+        return new FileInputStream(file);
     }
 
     @Override
-    public String getLocation()
-    {
+    public String getLocation() {
         return file.getPath();
     }
 
@@ -63,14 +56,12 @@ public class FileSource
      *
      * @return The underlying file, never {@code null}.
      */
-    public File getFile()
-    {
+    public File getFile() {
         return file;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getLocation();
     }
 }

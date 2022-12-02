@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.util.List;
 
@@ -25,13 +24,11 @@ import java.util.List;
  * Extends the ModelproblemCollector by the capacity of returning the collected problems.
  * @author Milos Kleint
  */
-public interface ModelProblemCollectorExt extends ModelProblemCollector
-{
+public interface ModelProblemCollectorExt extends ModelProblemCollector {
 
     /**
      * The collected problems.
      * @return a list of model problems encountered, never {@code null}
      */
     List<ModelProblem> getProblems();
-
 }

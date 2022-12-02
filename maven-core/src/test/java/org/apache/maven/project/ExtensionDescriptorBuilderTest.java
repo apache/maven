@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
@@ -27,7 +26,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-
 import junit.framework.TestCase;
 
 /**
@@ -35,64 +33,51 @@ import junit.framework.TestCase;
  *
  * @author Benjamin Bentmann
  */
-public class ExtensionDescriptorBuilderTest
-    extends TestCase
-{
+public class ExtensionDescriptorBuilderTest extends TestCase {
 
     private ExtensionDescriptorBuilder builder;
 
     @Override
-    protected void setUp()
-        throws Exception
-    {
+    protected void setUp() throws Exception {
         super.setUp();
 
         builder = new ExtensionDescriptorBuilder();
     }
 
     @Override
-    protected void tearDown()
-        throws Exception
-    {
+    protected void tearDown() throws Exception {
         builder = null;
 
         super.tearDown();
     }
 
-    private InputStream toStream( String xml )
-    {
-        return new ByteArrayInputStream( xml.getBytes( StandardCharsets.UTF_8 ) );
+    private InputStream toStream(String xml) {
+        return new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
     }
 
-    public void testEmptyDescriptor()
-        throws Exception
-    {
+    public void testEmptyDescriptor() throws Exception {
         String xml = "<extension></extension>";
 
-        ExtensionDescriptor ed = builder.build( toStream( xml ) );
+        ExtensionDescriptor ed = builder.build(toStream(xml));
 
-        assertNotNull( ed );
-        assertNotNull( ed.getExportedPackages() );
-        assertThat( ed.getExportedPackages(), is( empty() ) );
-        assertNotNull( ed.getExportedArtifacts() );
-        assertThat( ed.getExportedArtifacts(), is( empty() ) );
+        assertNotNull(ed);
+        assertNotNull(ed.getExportedPackages());
+        assertThat(ed.getExportedPackages(), is(empty()));
+        assertNotNull(ed.getExportedArtifacts());
+        assertThat(ed.getExportedArtifacts(), is(empty()));
     }
 
-    public void testCompleteDescriptor()
-        throws Exception
-    {
-        String xml =
-            "<?xml version='1.0' encoding='UTF-8'?>" + "<extension>" + "<exportedPackages>"
+    public void testCompleteDescriptor() throws Exception {
+        String xml = "<?xml version='1.0' encoding='UTF-8'?>" + "<extension>" + "<exportedPackages>"
                 + "<exportedPackage>a</exportedPackage>" + "<exportedPackage>b</exportedPackage>"
                 + "<exportedPackage>c</exportedPackage>" + "</exportedPackages>" + "<exportedArtifacts>"
                 + "<exportedArtifact>x</exportedArtifact>" + "<exportedArtifact>y</exportedArtifact>"
                 + "<exportedArtifact> z </exportedArtifact>" + "</exportedArtifacts>" + "</extension>";
 
-        ExtensionDescriptor ed = builder.build( toStream( xml ) );
+        ExtensionDescriptor ed = builder.build(toStream(xml));
 
-        assertNotNull( ed );
-        assertEquals( Arrays.asList( "a", "b", "c" ), ed.getExportedPackages() );
-        assertEquals( Arrays.asList( "x", "y", "z" ), ed.getExportedArtifacts() );
+        assertNotNull(ed);
+        assertEquals(Arrays.asList("a", "b", "c"), ed.getExportedPackages());
+        assertEquals(Arrays.asList("x", "y", "z"), ed.getExportedArtifacts());
     }
-
 }

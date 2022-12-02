@@ -1,5 +1,3 @@
-package org.apache.maven.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.building;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,16 +26,14 @@ import java.io.InputStream;
  *
  * @author Benjamin Bentmann
  */
-public interface Source
-{
+public interface Source {
 
     /**
      * Gets a byte stream to the source contents. Closing the returned stream is the responsibility of the caller.
      *
      * @return A byte stream to the source contents, never {@code null}.
      */
-    InputStream getInputStream()
-        throws IOException;
+    InputStream getInputStream() throws IOException;
 
     /**
      * Provides a user-friendly hint about the location of the source. This could be a local file path, a URI or just an
@@ -45,5 +42,4 @@ public interface Source
      * @return A user-friendly hint about the location of the source, never {@code null}.
      */
     String getLocation();
-
 }

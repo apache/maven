@@ -1,5 +1,3 @@
-package org.apache.maven.project.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,55 +16,53 @@ package org.apache.maven.project.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.artifact;
 
 import static org.junit.Assert.assertArrayEquals;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.codehaus.plexus.PlexusTestCase;
 
-public class DefaultProjectArtifactsCacheTest extends PlexusTestCase
-{
-    
+public class DefaultProjectArtifactsCacheTest extends PlexusTestCase {
+
     private ProjectArtifactsCache cache;
 
     @Override
-    protected void setUp()
-        throws Exception
-    {
+    protected void setUp() throws Exception {
         super.setUp();
-        cache = lookup( ProjectArtifactsCache.class );
+        cache = lookup(ProjectArtifactsCache.class);
     }
-    
-    public void testProjectDependencyOrder() throws Exception
-    {
-        ProjectArtifactsCache.Key project1 = new ProjectArtifactsCache.Key(){};
-        
-        Set<Artifact> artifacts = new LinkedHashSet<>( 4 );
-        artifacts.add( new DefaultArtifact( "g", "a1", "v", "compile", "jar", "", null ) );
-        artifacts.add( new DefaultArtifact( "g", "a2", "v", "compile", "jar", "", null ) );
-        artifacts.add( new DefaultArtifact( "g", "a3", "v", "compile", "jar", "", null ) );
-        artifacts.add( new DefaultArtifact( "g", "a4", "v", "compile", "jar", "", null ) );
-        
-        cache.put( project1, artifacts );
-        
-        assertArrayEquals( artifacts.toArray( new Artifact[0] ),
-                           cache.get( project1 ).getArtifacts().toArray( new Artifact[0] ) );
-        
-        ProjectArtifactsCache.Key project2 = new ProjectArtifactsCache.Key(){};
-        
-        Set<Artifact> reversedArtifacts = new LinkedHashSet<>( 4 );
-        artifacts.add( new DefaultArtifact( "g", "a4", "v", "compile", "jar", "", null ) );
-        artifacts.add( new DefaultArtifact( "g", "a3", "v", "compile", "jar", "", null ) );
-        artifacts.add( new DefaultArtifact( "g", "a2", "v", "compile", "jar", "", null ) );
-        artifacts.add( new DefaultArtifact( "g", "a1", "v", "compile", "jar", "", null ) );
-        
-        cache.put( project2, reversedArtifacts );
-        
-        assertArrayEquals( reversedArtifacts.toArray( new Artifact[0] ),
-                           cache.get( project2 ).getArtifacts().toArray( new Artifact[0] ) );
+
+    public void testProjectDependencyOrder() throws Exception {
+        ProjectArtifactsCache.Key project1 = new ProjectArtifactsCache.Key() {};
+
+        Set<Artifact> artifacts = new LinkedHashSet<>(4);
+        artifacts.add(new DefaultArtifact("g", "a1", "v", "compile", "jar", "", null));
+        artifacts.add(new DefaultArtifact("g", "a2", "v", "compile", "jar", "", null));
+        artifacts.add(new DefaultArtifact("g", "a3", "v", "compile", "jar", "", null));
+        artifacts.add(new DefaultArtifact("g", "a4", "v", "compile", "jar", "", null));
+
+        cache.put(project1, artifacts);
+
+        assertArrayEquals(
+                artifacts.toArray(new Artifact[0]),
+                cache.get(project1).getArtifacts().toArray(new Artifact[0]));
+
+        ProjectArtifactsCache.Key project2 = new ProjectArtifactsCache.Key() {};
+
+        Set<Artifact> reversedArtifacts = new LinkedHashSet<>(4);
+        artifacts.add(new DefaultArtifact("g", "a4", "v", "compile", "jar", "", null));
+        artifacts.add(new DefaultArtifact("g", "a3", "v", "compile", "jar", "", null));
+        artifacts.add(new DefaultArtifact("g", "a2", "v", "compile", "jar", "", null));
+        artifacts.add(new DefaultArtifact("g", "a1", "v", "compile", "jar", "", null));
+
+        cache.put(project2, reversedArtifacts);
+
+        assertArrayEquals(
+                reversedArtifacts.toArray(new Artifact[0]),
+                cache.get(project2).getArtifacts().toArray(new Artifact[0]));
     }
 }

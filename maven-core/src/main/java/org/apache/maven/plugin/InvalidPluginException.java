@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
@@ -27,22 +26,16 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-public class InvalidPluginException
-    extends Exception
-{
-    public InvalidPluginException( String message, ProjectBuildingException e )
-    {
-        super( message, e );
+public class InvalidPluginException extends Exception {
+    public InvalidPluginException(String message, ProjectBuildingException e) {
+        super(message, e);
     }
 
-    public InvalidPluginException( String message, InvalidDependencyVersionException e )
-    {
-        super( message, e );
+    public InvalidPluginException(String message, InvalidDependencyVersionException e) {
+        super(message, e);
     }
 
-    public InvalidPluginException( String message )
-    {
-        super( message );
+    public InvalidPluginException(String message) {
+        super(message);
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,19 +16,19 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import org.eclipse.aether.RepositorySystemSession;
 
 /**
  * Component interface that allows per-project customization of Aether repository system sessions.
- * 
- * <strong>Note:</strong> This interface is part of work in progress and can be changed or removed without notice. 
+ *
+ * <strong>Note:</strong> This interface is part of work in progress and can be changed or removed without notice.
  * @since 3.2.4
  */
-public interface RepositorySessionDecorator
-{
+public interface RepositorySessionDecorator {
     /**
      * Returns possibly {@code null} Aether repository system session to be used to resolve project dependencies.
      */
-    RepositorySystemSession decorate( MavenProject project, RepositorySystemSession session );
+    RepositorySystemSession decorate(MavenProject project, RepositorySystemSession session);
 }

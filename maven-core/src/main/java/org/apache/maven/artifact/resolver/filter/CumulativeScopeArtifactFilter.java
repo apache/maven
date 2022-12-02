@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver.filter;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver.filter;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.resolver.filter;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver.filter;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -32,9 +31,7 @@ import java.util.Set;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author jdcasey
  */
-public class CumulativeScopeArtifactFilter
-    extends AbstractScopeArtifactFilter
-{
+public class CumulativeScopeArtifactFilter extends AbstractScopeArtifactFilter {
 
     private Set<String> scopes;
 
@@ -43,11 +40,10 @@ public class CumulativeScopeArtifactFilter
      *
      * @param scopes The scopes to enable, along with all implied scopes, may be {@code null}.
      */
-    public CumulativeScopeArtifactFilter( Collection<String> scopes )
-    {
+    public CumulativeScopeArtifactFilter(Collection<String> scopes) {
         this.scopes = new HashSet<>();
 
-        addScopes( scopes );
+        addScopes(scopes);
     }
 
     /**
@@ -55,45 +51,36 @@ public class CumulativeScopeArtifactFilter
      *
      * @param filters The filters to combine, may be {@code null}.
      */
-    public CumulativeScopeArtifactFilter( CumulativeScopeArtifactFilter... filters )
-    {
+    public CumulativeScopeArtifactFilter(CumulativeScopeArtifactFilter... filters) {
         this.scopes = new HashSet<>();
 
-        if ( filters != null )
-        {
-            for ( CumulativeScopeArtifactFilter filter : filters )
-            {
-                addScopes( filter.getScopes() );
+        if (filters != null) {
+            for (CumulativeScopeArtifactFilter filter : filters) {
+                addScopes(filter.getScopes());
             }
         }
     }
 
-    private void addScopes( Collection<String> scopes )
-    {
-        if ( scopes != null )
-        {
-            for ( String scope : scopes )
-            {
-                addScope( scope );
+    private void addScopes(Collection<String> scopes) {
+        if (scopes != null) {
+            for (String scope : scopes) {
+                addScope(scope);
             }
         }
     }
 
-    private void addScope( String scope )
-    {
-        this.scopes.add( scope );
+    private void addScope(String scope) {
+        this.scopes.add(scope);
 
-        addScopeInternal( scope );
+        addScopeInternal(scope);
     }
 
-    public Set<String> getScopes()
-    {
+    public Set<String> getScopes() {
         return scopes;
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int hash = 17;
 
         hash = hash * 31 + scopes.hashCode();
@@ -102,21 +89,17 @@ public class CumulativeScopeArtifactFilter
     }
 
     @Override
-    public boolean equals( Object obj )
-    {
-        if ( this == obj )
-        {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
 
-        if ( !( obj instanceof CumulativeScopeArtifactFilter ) )
-        {
+        if (!(obj instanceof CumulativeScopeArtifactFilter)) {
             return false;
         }
 
         CumulativeScopeArtifactFilter that = (CumulativeScopeArtifactFilter) obj;
 
-        return scopes.equals( that.scopes );
+        return scopes.equals(that.scopes);
     }
-
 }

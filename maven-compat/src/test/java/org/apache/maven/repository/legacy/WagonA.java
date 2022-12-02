@@ -1,8 +1,3 @@
-package org.apache.maven.repository.legacy;
-
-import org.apache.maven.wagon.Wagon;
-import org.codehaus.plexus.component.annotations.Component;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -12,7 +7,7 @@ import org.codehaus.plexus.component.annotations.Component;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -21,6 +16,10 @@ import org.codehaus.plexus.component.annotations.Component;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy;
+
+import org.apache.maven.wagon.Wagon;
+import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Wagon for testing, for protocol <code>a</code>
@@ -28,12 +27,9 @@ import org.codehaus.plexus.component.annotations.Component;
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
-@Component(role=Wagon.class,hint="a")
-public class WagonA
-    extends WagonMock
-{
-    public String[] getSupportedProtocols()
-    {
-        return new String[]{ "a" };
+@Component(role = Wagon.class, hint = "a")
+public class WagonA extends WagonMock {
+    public String[] getSupportedProtocols() {
+        return new String[] {"a"};
     }
 }

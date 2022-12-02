@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,22 +16,18 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
 
 /**
  * A special throwable used to signal a graceful abort of the build.
  */
-public class BuildAbort
-    extends Error
-{
+public class BuildAbort extends Error {
 
-    public BuildAbort( String message )
-    {
-        super( message );
+    public BuildAbort(String message) {
+        super(message);
     }
 
-    public BuildAbort( String message, Throwable cause )
-    {
-        super( message, cause );
+    public BuildAbort(String message, Throwable cause) {
+        super(message, cause);
     }
-
 }

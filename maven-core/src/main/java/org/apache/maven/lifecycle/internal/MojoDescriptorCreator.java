@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,7 +16,11 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.StringTokenizer;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
@@ -44,10 +46,6 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.StringTokenizer;
-
 /**
  * <p>
  * Resolves dependencies for the artifacts in context of the lifecycle build
@@ -60,9 +58,8 @@ import java.util.StringTokenizer;
  * @author jdcasey
  * @author Kristian Rosenvold (extracted class only)
  */
-@Component( role = MojoDescriptorCreator.class )
-public class MojoDescriptorCreator
-{
+@Component(role = MojoDescriptorCreator.class)
+public class MojoDescriptorCreator {
 
     @Requirement
     private Logger logger;
@@ -79,26 +76,22 @@ public class MojoDescriptorCreator
     @Requirement
     private LifecyclePluginResolver lifecyclePluginResolver;
 
-    public MojoDescriptorCreator()
-    {
-    }
+    public MojoDescriptorCreator() {}
 
-    public MojoDescriptorCreator( PluginVersionResolver pluginVersionResolver, BuildPluginManager pluginManager,
-                                  PluginPrefixResolver pluginPrefixResolver,
-                                  LifecyclePluginResolver lifecyclePluginResolver )
-    {
+    public MojoDescriptorCreator(
+            PluginVersionResolver pluginVersionResolver,
+            BuildPluginManager pluginManager,
+            PluginPrefixResolver pluginPrefixResolver,
+            LifecyclePluginResolver lifecyclePluginResolver) {
         this.pluginVersionResolver = pluginVersionResolver;
         this.pluginManager = pluginManager;
         this.pluginPrefixResolver = pluginPrefixResolver;
         this.lifecyclePluginResolver = lifecyclePluginResolver;
     }
 
-    private Plugin findPlugin( String groupId, String artifactId, Collection<Plugin> plugins )
-    {
-        for ( Plugin plugin : plugins )
-        {
-            if ( artifactId.equals( plugin.getArtifactId() ) && groupId.equals( plugin.getGroupId() ) )
-            {
+    private Plugin findPlugin(String groupId, String artifactId, Collection<Plugin> plugins) {
+        for (Plugin plugin : plugins) {
+            if (artifactId.equals(plugin.getArtifactId()) && groupId.equals(plugin.getGroupId())) {
                 return plugin;
             }
         }
@@ -106,29 +99,24 @@ public class MojoDescriptorCreator
         return null;
     }
 
-    public static Xpp3Dom convert( MojoDescriptor mojoDescriptor )
-    {
-        Xpp3Dom dom = new Xpp3Dom( "configuration" );
+    public static Xpp3Dom convert(MojoDescriptor mojoDescriptor) {
+        Xpp3Dom dom = new Xpp3Dom("configuration");
 
         PlexusConfiguration c = mojoDescriptor.getMojoConfiguration();
 
         PlexusConfiguration[] ces = c.getChildren();
 
-        if ( ces != null )
-        {
-            for ( PlexusConfiguration ce : ces )
-            {
-                String value = ce.getValue( null );
-                String defaultValue = ce.getAttribute( "default-value", null );
-                if ( value != null || defaultValue != null )
-                {
-                    Xpp3Dom e = new Xpp3Dom( ce.getName() );
-                    e.setValue( value );
-                    if ( defaultValue != null )
-                    {
-                        e.setAttribute( "default-value", defaultValue );
+        if (ces != null) {
+            for (PlexusConfiguration ce : ces) {
+                String value = ce.getValue(null);
+                String defaultValue = ce.getAttribute("default-value", null);
+                if (value != null || defaultValue != null) {
+                    Xpp3Dom e = new Xpp3Dom(ce.getName());
+                    e.setValue(value);
+                    if (defaultValue != null) {
+                        e.setAttribute("default-value", defaultValue);
                     }
-                    dom.addChild( e );
+                    dom.addChild(e);
                 }
             }
         }
@@ -138,21 +126,19 @@ public class MojoDescriptorCreator
 
     // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process@executionId
 
-    public MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-        MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
-        PluginVersionResolutionException
-    {
+    public MojoDescriptor getMojoDescriptor(String task, MavenSession session, MavenProject project)
+            throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+                    MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+                    PluginVersionResolutionException {
         String goal = null;
 
         Plugin plugin = null;
 
-        StringTokenizer tok = new StringTokenizer( task, ":" );
+        StringTokenizer tok = new StringTokenizer(task, ":");
 
         int numTokens = tok.countTokens();
 
-        if ( numTokens >= 4 )
-        {
+        if (numTokens >= 4) {
             // We have everything that we need
             //
             // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
@@ -163,25 +149,21 @@ public class MojoDescriptorCreator
             // goal
             //
             plugin = new Plugin();
-            plugin.setGroupId( tok.nextToken() );
-            plugin.setArtifactId( tok.nextToken() );
-            plugin.setVersion( tok.nextToken() );
+            plugin.setGroupId(tok.nextToken());
+            plugin.setArtifactId(tok.nextToken());
+            plugin.setVersion(tok.nextToken());
             goal = tok.nextToken();
 
             // This won't be valid, but it constructs something easy to read in the error message
-            while ( tok.hasMoreTokens() )
-            {
+            while (tok.hasMoreTokens()) {
                 goal += ":" + tok.nextToken();
             }
-        }
-        else if ( numTokens == 3 )
-        {
+        } else if (numTokens == 3) {
             // groupId:artifactId:goal or pluginPrefix:version:goal (since Maven 3.9.0)
 
             String firstToken = tok.nextToken();
             // groupId or pluginPrefix? heuristics: groupId contains dot (.) but not pluginPrefix
-            if ( firstToken.contains( "." ) )
-            {
+            if (firstToken.contains(".")) {
                 // We have everything that we need except the version
                 //
                 // org.apache.maven.plugins:maven-remote-resources-plugin:???:process
@@ -192,31 +174,24 @@ public class MojoDescriptorCreator
                 // goal
                 //
                 plugin = new Plugin();
-                plugin.setGroupId( firstToken );
-                plugin.setArtifactId( tok.nextToken() );
-            }
-            else
-            {
+                plugin.setGroupId(firstToken);
+                plugin.setArtifactId(tok.nextToken());
+            } else {
                 // pluginPrefix:version:goal, like remote-resources:3.5.0:process
-                plugin = findPluginForPrefix( firstToken, session );
-                plugin.setVersion( tok.nextToken() );
+                plugin = findPluginForPrefix(firstToken, session);
+                plugin.setVersion(tok.nextToken());
             }
             goal = tok.nextToken();
-        }
-        else if ( numTokens <= 2 )
-        {
+        } else if (numTokens <= 2) {
             // We have a prefix and goal
             //
             // idea:idea
             //
             String prefix = tok.nextToken();
 
-            if ( numTokens == 2 )
-            {
+            if (numTokens == 2) {
                 goal = tok.nextToken();
-            }
-            else
-            {
+            } else {
                 // goal was missing - pass through to MojoNotFoundException
                 goal = "";
             }
@@ -230,93 +205,77 @@ public class MojoDescriptorCreator
             // Maven plugin deployment we will find the right PluginDescriptor from the remote
             // repository.
 
-            plugin = findPluginForPrefix( prefix, session );
+            plugin = findPluginForPrefix(prefix, session);
         }
 
-        int executionIdx = goal.indexOf( '@' );
-        if ( executionIdx > 0 )
-        {
-            goal = goal.substring( 0, executionIdx );
+        int executionIdx = goal.indexOf('@');
+        if (executionIdx > 0) {
+            goal = goal.substring(0, executionIdx);
         }
 
-        injectPluginDeclarationFromProject( plugin, project );
+        injectPluginDeclarationFromProject(plugin, project);
 
         // If there is no version to be found then we need to look in the repository metadata for
         // this plugin and see what's specified as the latest release.
         //
-        if ( plugin.getVersion() == null )
-        {
-            resolvePluginVersion( plugin, session, project );
+        if (plugin.getVersion() == null) {
+            resolvePluginVersion(plugin, session, project);
         }
 
-        return pluginManager.getMojoDescriptor( plugin, goal, project.getRemotePluginRepositories(),
-                                                session.getRepositorySession() );
+        return pluginManager.getMojoDescriptor(
+                plugin, goal, project.getRemotePluginRepositories(), session.getRepositorySession());
     }
 
     // TODO take repo mans into account as one may be aggregating prefixes of many
     // TODO collect at the root of the repository, read the one at the root, and fetch remote if something is missing
     // or the user forces the issue
 
-    public Plugin findPluginForPrefix( String prefix, MavenSession session )
-        throws NoPluginFoundForPrefixException
-    {
+    public Plugin findPluginForPrefix(String prefix, MavenSession session) throws NoPluginFoundForPrefixException {
         // [prefix]:[goal]
 
-        if ( session.getCurrentProject() != null )
-        {
-            try
-            {
-                lifecyclePluginResolver.resolveMissingPluginVersions( session.getCurrentProject(), session );
-            }
-            catch ( PluginVersionResolutionException e )
-            {
+        if (session.getCurrentProject() != null) {
+            try {
+                lifecyclePluginResolver.resolveMissingPluginVersions(session.getCurrentProject(), session);
+            } catch (PluginVersionResolutionException e) {
                 // not critical here
-                logger.debug( e.getMessage(), e );
+                logger.debug(e.getMessage(), e);
             }
         }
 
-        PluginPrefixRequest prefixRequest = new DefaultPluginPrefixRequest( prefix, session );
-        PluginPrefixResult prefixResult = pluginPrefixResolver.resolve( prefixRequest );
+        PluginPrefixRequest prefixRequest = new DefaultPluginPrefixRequest(prefix, session);
+        PluginPrefixResult prefixResult = pluginPrefixResolver.resolve(prefixRequest);
 
         Plugin plugin = new Plugin();
-        plugin.setGroupId( prefixResult.getGroupId() );
-        plugin.setArtifactId( prefixResult.getArtifactId() );
+        plugin.setGroupId(prefixResult.getGroupId());
+        plugin.setArtifactId(prefixResult.getArtifactId());
 
         return plugin;
     }
 
-    private void resolvePluginVersion( Plugin plugin, MavenSession session, MavenProject project )
-        throws PluginVersionResolutionException
-    {
-        PluginVersionRequest versionRequest =
-            new DefaultPluginVersionRequest( plugin, session.getRepositorySession(),
-                                             project.getRemotePluginRepositories() );
-        plugin.setVersion( pluginVersionResolver.resolve( versionRequest ).getVersion() );
+    private void resolvePluginVersion(Plugin plugin, MavenSession session, MavenProject project)
+            throws PluginVersionResolutionException {
+        PluginVersionRequest versionRequest = new DefaultPluginVersionRequest(
+                plugin, session.getRepositorySession(), project.getRemotePluginRepositories());
+        plugin.setVersion(pluginVersionResolver.resolve(versionRequest).getVersion());
     }
 
-    private void injectPluginDeclarationFromProject( Plugin plugin, MavenProject project )
-    {
-        Plugin pluginInPom = findPlugin( plugin, project.getBuildPlugins() );
+    private void injectPluginDeclarationFromProject(Plugin plugin, MavenProject project) {
+        Plugin pluginInPom = findPlugin(plugin, project.getBuildPlugins());
 
-        if ( pluginInPom == null && project.getPluginManagement() != null )
-        {
-            pluginInPom = findPlugin( plugin, project.getPluginManagement().getPlugins() );
+        if (pluginInPom == null && project.getPluginManagement() != null) {
+            pluginInPom = findPlugin(plugin, project.getPluginManagement().getPlugins());
         }
 
-        if ( pluginInPom != null )
-        {
-            if ( plugin.getVersion() == null )
-            {
-                plugin.setVersion( pluginInPom.getVersion() );
+        if (pluginInPom != null) {
+            if (plugin.getVersion() == null) {
+                plugin.setVersion(pluginInPom.getVersion());
             }
 
-            plugin.setDependencies( new ArrayList<>( pluginInPom.getDependencies() ) );
+            plugin.setDependencies(new ArrayList<>(pluginInPom.getDependencies()));
         }
     }
 
-    private Plugin findPlugin( Plugin plugin, Collection<Plugin> plugins )
-    {
-        return findPlugin( plugin.getGroupId(), plugin.getArtifactId(), plugins );
+    private Plugin findPlugin(Plugin plugin, Collection<Plugin> plugins) {
+        return findPlugin(plugin.getGroupId(), plugin.getArtifactId(), plugins);
     }
-
 }

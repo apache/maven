@@ -1,5 +1,3 @@
-package org.apache.maven.configuration.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,10 @@ package org.apache.maven.configuration.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.configuration.internal;
 
 import java.io.File;
 import java.util.Objects;
-
 import org.apache.maven.configuration.BeanConfigurationException;
 import org.apache.maven.configuration.BeanConfigurationPathTranslator;
 import org.apache.maven.configuration.BeanConfigurationRequest;
@@ -44,111 +42,81 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  *
  * @author Benjamin Bentmann
  */
-@Component( role = BeanConfigurator.class )
-public class DefaultBeanConfigurator
-    implements BeanConfigurator
-{
+@Component(role = BeanConfigurator.class)
+public class DefaultBeanConfigurator implements BeanConfigurator {
 
     private final ConverterLookup converterLookup = new DefaultConverterLookup();
 
-    public void configureBean( BeanConfigurationRequest request )
-        throws BeanConfigurationException
-    {
-        Objects.requireNonNull( request, "request cannot be null" );
-        Objects.requireNonNull( request.getBean(), "request.bean cannot be null" );
+    public void configureBean(BeanConfigurationRequest request) throws BeanConfigurationException {
+        Objects.requireNonNull(request, "request cannot be null");
+        Objects.requireNonNull(request.getBean(), "request.bean cannot be null");
 
         Object configuration = request.getConfiguration();
-        if ( configuration == null )
-        {
+        if (configuration == null) {
             return;
         }
 
         PlexusConfiguration plexusConfig;
-        if ( configuration instanceof PlexusConfiguration )
-        {
+        if (configuration instanceof PlexusConfiguration) {
             plexusConfig = (PlexusConfiguration) configuration;
-        }
-        else if ( configuration instanceof Xpp3Dom )
-        {
-            plexusConfig = new XmlPlexusConfiguration( (Xpp3Dom) configuration );
-        }
-        else
-        {
-            throw new BeanConfigurationException( "unsupported bean configuration source ("
-                + configuration.getClass().getName() + ")" );
+        } else if (configuration instanceof Xpp3Dom) {
+            plexusConfig = new XmlPlexusConfiguration((Xpp3Dom) configuration);
+        } else {
+            throw new BeanConfigurationException("unsupported bean configuration source ("
+                    + configuration.getClass().getName() + ")");
         }
 
-        if ( request.getConfigurationElement() != null )
-        {
-            plexusConfig = plexusConfig.getChild( request.getConfigurationElement() );
+        if (request.getConfigurationElement() != null) {
+            plexusConfig = plexusConfig.getChild(request.getConfigurationElement());
         }
 
         ClassLoader classLoader = request.getClassLoader();
-        if ( classLoader == null )
-        {
+        if (classLoader == null) {
             classLoader = request.getBean().getClass().getClassLoader();
         }
 
-        BeanExpressionEvaluator evaluator = new BeanExpressionEvaluator( request );
+        BeanExpressionEvaluator evaluator = new BeanExpressionEvaluator(request);
 
         ObjectWithFieldsConverter converter = new ObjectWithFieldsConverter();
 
-        try
-        {
-            converter.processConfiguration( converterLookup, request.getBean(), classLoader, plexusConfig, evaluator );
-        }
-        catch ( ComponentConfigurationException e )
-        {
-            throw new BeanConfigurationException( e.getMessage(), e );
+        try {
+            converter.processConfiguration(converterLookup, request.getBean(), classLoader, plexusConfig, evaluator);
+        } catch (ComponentConfigurationException e) {
+            throw new BeanConfigurationException(e.getMessage(), e);
         }
     }
 
-    static class BeanExpressionEvaluator
-        implements TypeAwareExpressionEvaluator
-    {
+    static class BeanExpressionEvaluator implements TypeAwareExpressionEvaluator {
 
         private final BeanConfigurationValuePreprocessor preprocessor;
 
         private final BeanConfigurationPathTranslator translator;
 
-        BeanExpressionEvaluator( BeanConfigurationRequest request )
-        {
+        BeanExpressionEvaluator(BeanConfigurationRequest request) {
             preprocessor = request.getValuePreprocessor();
             translator = request.getPathTranslator();
         }
 
-        public Object evaluate( String expression, Class<?> type )
-            throws ExpressionEvaluationException
-        {
-            if ( preprocessor != null )
-            {
-                try
-                {
-                    return preprocessor.preprocessValue( expression, type );
-                }
-                catch ( BeanConfigurationException e )
-                {
-                    throw new ExpressionEvaluationException( e.getMessage(), e );
+        public Object evaluate(String expression, Class<?> type) throws ExpressionEvaluationException {
+            if (preprocessor != null) {
+                try {
+                    return preprocessor.preprocessValue(expression, type);
+                } catch (BeanConfigurationException e) {
+                    throw new ExpressionEvaluationException(e.getMessage(), e);
                 }
             }
             return expression;
         }
 
-        public Object evaluate( String expression )
-            throws ExpressionEvaluationException
-        {
-            return evaluate( expression, null );
+        public Object evaluate(String expression) throws ExpressionEvaluationException {
+            return evaluate(expression, null);
         }
 
-        public File alignToBaseDirectory( File file )
-        {
-            if ( translator != null )
-            {
-                return translator.translatePath( file );
+        public File alignToBaseDirectory(File file) {
+            if (translator != null) {
+                return translator.translatePath(file);
             }
             return file;
         }
-
     }
-
 }

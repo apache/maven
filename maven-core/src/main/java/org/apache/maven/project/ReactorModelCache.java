@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,35 +16,30 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.model.building.ModelCache;
+package org.apache.maven.project;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.maven.model.building.ModelCache;
 
 /**
  * A simple model cache used to accelerate model building during a reactor build.
  *
  * @author Benjamin Bentmann
  */
-class ReactorModelCache
-    implements ModelCache
-{
+class ReactorModelCache implements ModelCache {
 
-    private final Map<CacheKey, Object> models = new ConcurrentHashMap<>( 256 );
+    private final Map<CacheKey, Object> models = new ConcurrentHashMap<>(256);
 
-    public Object get( String groupId, String artifactId, String version, String tag )
-    {
-        return models.get( new CacheKey( groupId, artifactId, version, tag ) );
+    public Object get(String groupId, String artifactId, String version, String tag) {
+        return models.get(new CacheKey(groupId, artifactId, version, tag));
     }
 
-    public void put( String groupId, String artifactId, String version, String tag, Object data )
-    {
-        models.put( new CacheKey( groupId, artifactId, version, tag ), data );
+    public void put(String groupId, String artifactId, String version, String tag, Object data) {
+        models.put(new CacheKey(groupId, artifactId, version, tag), data);
     }
 
-    private static final class CacheKey
-    {
+    private static final class CacheKey {
 
         private final String groupId;
 
@@ -58,12 +51,11 @@ class ReactorModelCache
 
         private final int hashCode;
 
-        CacheKey( String groupId, String artifactId, String version, String tag )
-        {
-            this.groupId = ( groupId != null ) ? groupId : "";
-            this.artifactId = ( artifactId != null ) ? artifactId : "";
-            this.version = ( version != null ) ? version : "";
-            this.tag = ( tag != null ) ? tag : "";
+        CacheKey(String groupId, String artifactId, String version, String tag) {
+            this.groupId = (groupId != null) ? groupId : "";
+            this.artifactId = (artifactId != null) ? artifactId : "";
+            this.version = (version != null) ? version : "";
+            this.tag = (tag != null) ? tag : "";
 
             int hash = 17;
             hash = hash * 31 + this.groupId.hashCode();
@@ -74,30 +66,26 @@ class ReactorModelCache
         }
 
         @Override
-        public boolean equals( Object obj )
-        {
-            if ( this == obj )
-            {
+        public boolean equals(Object obj) {
+            if (this == obj) {
                 return true;
             }
 
-            if ( !( obj instanceof CacheKey ) )
-            {
+            if (!(obj instanceof CacheKey)) {
                 return false;
             }
 
             CacheKey that = (CacheKey) obj;
 
-            return artifactId.equals( that.artifactId ) && groupId.equals( that.groupId )
-                && version.equals( that.version ) && tag.equals( that.tag );
+            return artifactId.equals(that.artifactId)
+                    && groupId.equals(that.groupId)
+                    && version.equals(that.version)
+                    && tag.equals(that.tag);
         }
 
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return hashCode;
         }
-
     }
-
 }

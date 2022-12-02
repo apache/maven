@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import org.apache.maven.model.building.ModelCache;
 import org.eclipse.aether.RepositoryCache;
@@ -28,44 +27,34 @@ import org.eclipse.aether.RepositorySystemSession;
  *
  * @author Benjamin Bentmann
  */
-class DefaultModelCache
-    implements ModelCache
-{
+class DefaultModelCache implements ModelCache {
 
     private final RepositorySystemSession session;
 
     private final RepositoryCache cache;
 
-    public static ModelCache newInstance( RepositorySystemSession session )
-    {
-        if ( session.getCache() == null )
-        {
+    public static ModelCache newInstance(RepositorySystemSession session) {
+        if (session.getCache() == null) {
             return null;
-        }
-        else
-        {
-            return new DefaultModelCache( session );
+        } else {
+            return new DefaultModelCache(session);
         }
     }
 
-    private DefaultModelCache( RepositorySystemSession session )
-    {
+    private DefaultModelCache(RepositorySystemSession session) {
         this.session = session;
         this.cache = session.getCache();
     }
 
-    public Object get( String groupId, String artifactId, String version, String tag )
-    {
-        return cache.get( session, new Key( groupId, artifactId, version, tag ) );
+    public Object get(String groupId, String artifactId, String version, String tag) {
+        return cache.get(session, new Key(groupId, artifactId, version, tag));
     }
 
-    public void put( String groupId, String artifactId, String version, String tag, Object data )
-    {
-        cache.put( session, new Key( groupId, artifactId, version, tag ), data );
+    public void put(String groupId, String artifactId, String version, String tag, Object data) {
+        cache.put(session, new Key(groupId, artifactId, version, tag), data);
     }
 
-    static class Key
-    {
+    static class Key {
 
         private final String groupId;
 
@@ -77,8 +66,7 @@ class DefaultModelCache
 
         private final int hash;
 
-        Key( String groupId, String artifactId, String version, String tag )
-        {
+        Key(String groupId, String artifactId, String version, String tag) {
             this.groupId = groupId;
             this.artifactId = artifactId;
             this.version = version;
@@ -93,27 +81,24 @@ class DefaultModelCache
         }
 
         @Override
-        public boolean equals( Object obj )
-        {
-            if ( this == obj )
-            {
+        public boolean equals(Object obj) {
+            if (this == obj) {
                 return true;
             }
-            if ( null == obj || !getClass().equals( obj.getClass() ) )
-            {
+            if (null == obj || !getClass().equals(obj.getClass())) {
                 return false;
             }
 
             Key that = (Key) obj;
-            return artifactId.equals( that.artifactId ) && groupId.equals( that.groupId )
-                && version.equals( that.version ) && tag.equals( that.tag );
+            return artifactId.equals(that.artifactId)
+                    && groupId.equals(that.groupId)
+                    && version.equals(that.version)
+                    && tag.equals(that.tag);
         }
 
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return hash;
         }
-
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.model.interpolation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model.interpolation;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,21 +16,18 @@ package org.apache.maven.model.interpolation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.interpolation;
 
 import java.util.Date;
 import java.util.Properties;
-
 import junit.framework.TestCase;
 
-public class MavenBuildTimestampTest
-    extends TestCase
-{
-    public void testMavenBuildTimestampUsesUTC()
-    {
+public class MavenBuildTimestampTest extends TestCase {
+    public void testMavenBuildTimestampUsesUTC() {
         Properties interpolationProperties = new Properties();
-        interpolationProperties.setProperty( "maven.build.timestamp.format", "yyyyMMdd'T'HHmm'Z'" );
-        MavenBuildTimestamp timestamp = new MavenBuildTimestamp( new Date(), interpolationProperties );
+        interpolationProperties.setProperty("maven.build.timestamp.format", "yyyyMMdd'T'HHmm'Z'");
+        MavenBuildTimestamp timestamp = new MavenBuildTimestamp(new Date(), interpolationProperties);
         String formattedTimestamp = timestamp.formattedTimestamp();
-        assertTrue( "We expect the UTC marker at the end of the timestamp.", formattedTimestamp.endsWith( "Z" ) );
+        assertTrue("We expect the UTC marker at the end of the timestamp.", formattedTimestamp.endsWith("Z"));
     }
 }

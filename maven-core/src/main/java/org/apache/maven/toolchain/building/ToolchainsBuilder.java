@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.toolchain.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain.building;
 
 /**
  * Builds the effective toolchains from a user toolchains file and/or a global toolchains file.
@@ -25,8 +24,7 @@ package org.apache.maven.toolchain.building;
  * @author Robert Scholte
  * @since 3.3.0
  */
-public interface ToolchainsBuilder
-{
+public interface ToolchainsBuilder {
 
     /**
      * Builds the effective toolchains of the specified toolchains files.
@@ -35,7 +33,5 @@ public interface ToolchainsBuilder
      * @return The result of the toolchains building, never {@code null}.
      * @throws ToolchainsBuildingException If the effective toolchains could not be built.
      */
-    ToolchainsBuildingResult build( ToolchainsBuildingRequest request )
-        throws ToolchainsBuildingException;
-
+    ToolchainsBuildingResult build(ToolchainsBuildingRequest request) throws ToolchainsBuildingException;
 }

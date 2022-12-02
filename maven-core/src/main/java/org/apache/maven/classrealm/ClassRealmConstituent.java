@@ -1,5 +1,3 @@
-package org.apache.maven.classrealm;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.classrealm;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.classrealm;
 
 import java.io.File;
 
@@ -26,8 +25,7 @@ import java.io.File;
  *
  * @author Benjamin Bentmann
  */
-public interface ClassRealmConstituent
-{
+public interface ClassRealmConstituent {
 
     /**
      * Gets the group id of the constituent's artifact.
@@ -70,5 +68,4 @@ public interface ClassRealmConstituent
      * @return The file, never {@code null}.
      */
     File getFile();
-
 }

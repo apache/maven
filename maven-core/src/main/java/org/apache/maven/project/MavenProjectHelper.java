@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.io.File;
 import java.util.List;
@@ -25,8 +24,7 @@ import java.util.List;
 /**
  * Convenience interface for plugins to add or replace artifacts and resources on projects.
  */
-public interface MavenProjectHelper
-{
+public interface MavenProjectHelper {
     String ROLE = MavenProjectHelper.class.getName();
 
     /**
@@ -35,7 +33,7 @@ public interface MavenProjectHelper
      * @param artifactFile artifact file.
      * @param artifactClassifier artifact classifier.
      */
-    void attachArtifact( MavenProject project, File artifactFile, String artifactClassifier );
+    void attachArtifact(MavenProject project, File artifactFile, String artifactClassifier);
 
     /**
      * * See {@link #attachArtifact(MavenProject, String, String, java.io.File)}, but with classifier set to null.
@@ -43,7 +41,7 @@ public interface MavenProjectHelper
      * @param artifactType artifact type.
      * @param artifactFile artifact file.
      */
-    void attachArtifact( MavenProject project, String artifactType, File artifactFile );
+    void attachArtifact(MavenProject project, String artifactType, File artifactFile);
 
     /**
      * Add or replace an artifact to the current project.
@@ -52,7 +50,7 @@ public interface MavenProjectHelper
      * @param artifactClassifier the classifier or null.
      * @param artifactFile the file for the artifact.
      */
-    void attachArtifact( MavenProject project, String artifactType, String artifactClassifier, File artifactFile );
+    void attachArtifact(MavenProject project, String artifactType, String artifactClassifier, File artifactFile);
 
     /**
      * Add a resource directory to the project.
@@ -61,7 +59,7 @@ public interface MavenProjectHelper
      * @param includes include patterns.
      * @param excludes exclude patterns.
      */
-    void addResource( MavenProject project, String resourceDirectory, List<String> includes, List<String> excludes );
+    void addResource(MavenProject project, String resourceDirectory, List<String> includes, List<String> excludes);
 
     /**
      * Add a test resource directory to the project.
@@ -70,7 +68,5 @@ public interface MavenProjectHelper
      * @param includes include patterns.
      * @param excludes exclude patterns.
      */
-    void addTestResource( MavenProject project, String resourceDirectory, List<String> includes,
-                          List<String> excludes );
-
+    void addTestResource(MavenProject project, String resourceDirectory, List<String> includes, List<String> excludes);
 }

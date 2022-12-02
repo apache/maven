@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import org.apache.maven.plugin.MojoExecutionException;
 
@@ -30,13 +29,10 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @see org.apache.maven.execution.scope.WeakMojoExecutionListener
  * @since 3.1.2
  */
-public interface MojoExecutionListener
-{
-    void beforeMojoExecution( MojoExecutionEvent event )
-        throws MojoExecutionException;
+public interface MojoExecutionListener {
+    void beforeMojoExecution(MojoExecutionEvent event) throws MojoExecutionException;
 
-    void afterMojoExecutionSuccess( MojoExecutionEvent event )
-        throws MojoExecutionException;
+    void afterMojoExecutionSuccess(MojoExecutionEvent event) throws MojoExecutionException;
 
-    void afterExecutionFailure( MojoExecutionEvent event );
+    void afterExecutionFailure(MojoExecutionEvent event);
 }

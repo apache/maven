@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 /**
  * Caches auxiliary data used during model building like already processed raw/effective models. The data in the cache
@@ -28,8 +27,7 @@ package org.apache.maven.model.building;
  *
  * @author Benjamin Bentmann
  */
-public interface ModelCache
-{
+public interface ModelCache {
 
     /**
      * Puts the specified data into the cache.
@@ -40,7 +38,7 @@ public interface ModelCache
      * @param tag The tag of the cache record, must not be {@code null}.
      * @param data The data to store in the cache, must not be {@code null}.
      */
-    void put( String groupId, String artifactId, String version, String tag, Object data );
+    void put(String groupId, String artifactId, String version, String tag, Object data);
 
     /**
      * Gets the specified data from the cache.
@@ -51,6 +49,5 @@ public interface ModelCache
      * @param tag The tag of the cache record, must not be {@code null}.
      * @return The requested data or {@code null} if none was present in the cache.
      */
-    Object get( String groupId, String artifactId, String version, String tag );
-
+    Object get(String groupId, String artifactId, String version, String tag);
 }

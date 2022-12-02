@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import junit.framework.TestCase;
 
@@ -26,31 +25,24 @@ import junit.framework.TestCase;
  *
  * @author Benjamin Bentmann
  */
-public class CiManagementTest
-    extends TestCase
-{
+public class CiManagementTest extends TestCase {
 
-    public void testHashCodeNullSafe()
-    {
+    public void testHashCodeNullSafe() {
         new CiManagement().hashCode();
     }
 
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new CiManagement().equals( null ) );
+    public void testEqualsNullSafe() {
+        assertFalse(new CiManagement().equals(null));
 
-        new CiManagement().equals( new CiManagement() );
+        new CiManagement().equals(new CiManagement());
     }
 
-    public void testEqualsIdentity()
-    {
+    public void testEqualsIdentity() {
         CiManagement thing = new CiManagement();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new CiManagement().toString() );
+    public void testToStringNullSafe() {
+        assertNotNull(new CiManagement().toString());
     }
-
 }
