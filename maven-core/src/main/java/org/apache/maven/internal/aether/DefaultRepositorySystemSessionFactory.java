@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -224,6 +225,75 @@ public class DefaultRepositorySystemSessionFactory {
                 dom = new Xpp3Dom(dom.getName(), null, null, children, null);
                 PlexusConfiguration config = XmlPlexusConfiguration.toPlexusConfiguration(dom);
                 configProps.put("aether.connector.wagon.config." + server.getId(), config);
+
+                // Translate to proper resolver configuration properties as well (as Plexus XML above is Wagon specific
+                // only) but support only configuration/httpConfiguration/all, see
+                // https://maven.apache.org/guides/mini/guide-http-settings.html
+                Map<String, String> headers = null;
+                Integer connectTimeout = null;
+                Integer requestTimeout = null;
+
+                PlexusConfiguration httpHeaders = config.getChild("httpHeaders", false);
+                if (httpHeaders != null) {
+                    PlexusConfiguration[] properties = httpHeaders.getChildren("property");
+                    if (properties != null && properties.length > 0) {
+                        headers = new HashMap<>();
+                        for (PlexusConfiguration property : properties) {
+                            headers.put(
+                                    property.getChild("name").getValue(),
+                                    property.getChild("value").getValue());
+                        }
+                    }
+                }
+
+                PlexusConfiguration connectTimeoutXml = config.getChild("connectTimeout", false);
+                if (connectTimeoutXml != null) {
+                    connectTimeout = Integer.parseInt(connectTimeoutXml.getValue());
+                } else {
+                    // fallback configuration name
+                    PlexusConfiguration httpConfiguration = config.getChild("httpConfiguration", false);
+                    if (httpConfiguration != null) {
+                        PlexusConfiguration httpConfigurationAll = httpConfiguration.getChild("all", false);
+                        if (httpConfigurationAll != null) {
+                            connectTimeoutXml = httpConfigurationAll.getChild("connectionTimeout", false);
+                            if (connectTimeoutXml != null) {
+                                connectTimeout = Integer.parseInt(connectTimeoutXml.getValue());
+                                logger.warn("Settings for server {} uses legacy format", server.getId());
+                            }
+                        }
+                    }
+                }
+
+                PlexusConfiguration requestTimeoutXml = config.getChild("requestTimeout", false);
+                if (requestTimeoutXml != null) {
+                    requestTimeout = Integer.parseInt(requestTimeoutXml.getValue());
+                } else {
+                    // fallback configuration name
+                    PlexusConfiguration httpConfiguration = config.getChild("httpConfiguration", false);
+                    if (httpConfiguration != null) {
+                        PlexusConfiguration httpConfigurationAll = httpConfiguration.getChild("all", false);
+                        if (httpConfigurationAll != null) {
+                            requestTimeoutXml = httpConfigurationAll.getChild("readTimeout", false);
+                            if (requestTimeoutXml != null) {
+                                requestTimeout = Integer.parseInt(requestTimeoutXml.getValue());
+                                logger.warn("Settings for server {} uses legacy format", server.getId());
+                            }
+                        }
+                    }
+                }
+
+                // org.eclipse.aether.ConfigurationProperties.HTTP_HEADERS => Map<String, String>
+                if (headers != null) {
+                    configProps.put(ConfigurationProperties.HTTP_HEADERS + "." + server.getId(), headers);
+                }
+                // org.eclipse.aether.ConfigurationProperties.CONNECT_TIMEOUT => int
+                if (connectTimeout != null) {
+                    configProps.put(ConfigurationProperties.CONNECT_TIMEOUT + "." + server.getId(), connectTimeout);
+                }
+                // org.eclipse.aether.ConfigurationProperties.REQUEST_TIMEOUT => int
+                if (requestTimeout != null) {
+                    configProps.put(ConfigurationProperties.REQUEST_TIMEOUT + "." + server.getId(), requestTimeout);
+                }
             }
 
             configProps.put("aether.connector.perms.fileMode." + server.getId(), server.getFilePermissions());
@@ -233,23 +303,7 @@ public class DefaultRepositorySystemSessionFactory {
 
         Object transport = configProps.getOrDefault(MAVEN_RESOLVER_TRANSPORT_KEY, MAVEN_RESOLVER_TRANSPORT_DEFAULT);
         if (MAVEN_RESOLVER_TRANSPORT_DEFAULT.equals(transport)) {
-            // The "default" mode (user did not set anything) needs to tweak resolver default priorities
-            // that are coded like this (default values):
-            //
-            // org.eclipse.aether.transport.http.HttpTransporterFactory.priority = 5.0f;
-            // org.eclipse.aether.transport.wagon.WagonTransporterFactory.priority = -1.0f;
-            //
-            // Hence, as both are present on classpath, HttpTransport would be selected, while
-            // we want to retain "default" behaviour of Maven and use Wagon. To achieve that,
-            // we set explicitly priority of WagonTransport to 6.0f (just above of HttpTransport),
-            // to make it "win" over HttpTransport. We do this to NOT interfere with possibly
-            // installed OTHER transports and their priorities, as unlike "wagon" or "native"
-            // transport setting, that sets priorities to MAX, hence prevents any 3rd party
-            // transport to get into play (inhibits them), in default mode we want to retain
-            // old behavior. Also, this "default" mode is different from "auto" setting,
-            // as it does not alter resolver priorities at all, and uses priorities as is.
-
-            configProps.put(WAGON_TRANSPORTER_PRIORITY_KEY, "6");
+            // The "default" mode (user did not set anything) from now on defaults to AUTO
         } else if (MAVEN_RESOLVER_TRANSPORT_NATIVE.equals(transport)) {
             // Make sure (whatever extra priority is set) that resolver native is selected
             configProps.put(NATIVE_FILE_TRANSPORTER_PRIORITY_KEY, RESOLVER_MAX_PRIORITY);
