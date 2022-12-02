@@ -178,8 +178,7 @@ under the License.
     <exportedArtifact>org.apache.maven:maven-repository-metadata</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-settings</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-settings-builder</exportedArtifact>
-    <exportedArtifact>org.apache.maven:maven-toolchain-builder</exportedArtifact>
-    <exportedArtifact>org.apache.maven:maven-toolchain-model</exportedArtifact>
+    <exportedArtifact>org.apache.maven:maven-toolchain</exportedArtifact>
     <exportedArtifact>org.apache.maven.wagon:wagon-provider-api</exportedArtifact>
     <exportedArtifact>org.apache.maven.resolver:maven-resolver-api</exportedArtifact>
     <exportedArtifact>org.apache.maven.resolver:maven-resolver-spi</exportedArtifact>
