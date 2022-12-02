@@ -227,9 +227,8 @@ public class DefaultRepositorySystemSessionFactory {
                 configProps.put("aether.connector.wagon.config." + server.getId(), config);
 
                 // Translate to proper resolver configuration properties as well (as Plexus XML above is Wagon specific
-                // only)
-                // but support only configuration/httpConfiguration/all, not the per-method nonsense
-                // https://maven.apache.org/guides/mini/guide-http-settings.html#support-for-general-wagon-configuration-standards
+                // only) but support only configuration/httpConfiguration/all, see
+                // https://maven.apache.org/guides/mini/guide-http-settings.html
                 Map<String, String> headers = null;
                 Integer connectTimeout = null;
                 Integer requestTimeout = null;
