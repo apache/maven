@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -224,6 +225,60 @@ public class DefaultRepositorySystemSessionFactory {
                 dom = new Xpp3Dom(dom.getName(), null, null, children, null);
                 PlexusConfiguration config = XmlPlexusConfiguration.toPlexusConfiguration(dom);
                 configProps.put("aether.connector.wagon.config." + server.getId(), config);
+
+                // translate to proper Resolver configuration properties as well, support all of "standards" as on page
+                // https://maven.apache.org/guides/mini/guide-http-settings.html#support-for-general-wagon-configuration-standards
+                Map<String, String> headers = null;
+                Integer connectTimeout = null;
+                Integer requestTimeout = null;
+
+                PlexusConfiguration httpHeaders = config.getChild("httpHeaders", false);
+                if (httpHeaders != null) {
+                    PlexusConfiguration[] properties = httpHeaders.getChildren("property");
+                    if (properties != null && properties.length > 0) {
+                        headers = new HashMap<>();
+                        for (PlexusConfiguration property : properties) {
+                            headers.put(
+                                    property.getChild("name").getValue(),
+                                    property.getChild("value").getValue());
+                        }
+                    }
+                }
+
+                PlexusConfiguration connectTimeoutXml = config.getChild("connectTimeout", false);
+                if (connectTimeoutXml != null) {
+                    connectTimeout = Integer.parseInt(connectTimeoutXml.getValue());
+                } else {
+                    // fallback configuration name
+                    connectTimeoutXml = config.getChild("connectionTimeout", false);
+                    if (connectTimeoutXml != null) {
+                        connectTimeout = Integer.parseInt(connectTimeoutXml.getValue());
+                    }
+                }
+
+                PlexusConfiguration requestTimeoutXml = config.getChild("requestTimeout", false);
+                if (requestTimeoutXml != null) {
+                    requestTimeout = Integer.parseInt(requestTimeoutXml.getValue());
+                } else {
+                    // fallback configuration name
+                    requestTimeoutXml = config.getChild("readTimeout", false);
+                    if (requestTimeoutXml != null) {
+                        requestTimeout = Integer.parseInt(requestTimeoutXml.getValue());
+                    }
+                }
+
+                // org.eclipse.aether.ConfigurationProperties.HTTP_HEADERS => Map<String, String>
+                if (headers != null) {
+                    configProps.put(ConfigurationProperties.HTTP_HEADERS + "." + server.getId(), headers);
+                }
+                // org.eclipse.aether.ConfigurationProperties.CONNECT_TIMEOUT => int
+                if (connectTimeout != null) {
+                    configProps.put(ConfigurationProperties.CONNECT_TIMEOUT + "." + server.getId(), connectTimeout);
+                }
+                // org.eclipse.aether.ConfigurationProperties.REQUEST_TIMEOUT => int
+                if (requestTimeout != null) {
+                    configProps.put(ConfigurationProperties.REQUEST_TIMEOUT + "." + server.getId(), requestTimeout);
+                }
             }
 
             configProps.put("aether.connector.perms.fileMode." + server.getId(), server.getFilePermissions());
