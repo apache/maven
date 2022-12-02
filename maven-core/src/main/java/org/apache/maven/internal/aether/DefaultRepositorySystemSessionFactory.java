@@ -226,7 +226,9 @@ public class DefaultRepositorySystemSessionFactory {
                 PlexusConfiguration config = XmlPlexusConfiguration.toPlexusConfiguration(dom);
                 configProps.put("aether.connector.wagon.config." + server.getId(), config);
 
-                // translate to proper Resolver configuration properties as well, support all of "standards" as on page
+                // Translate to proper resolver configuration properties as well (as Plexus XML above is Wagon specific
+                // only)
+                // but support only configuration/httpConfiguration/all, not the per-method nonsense
                 // https://maven.apache.org/guides/mini/guide-http-settings.html#support-for-general-wagon-configuration-standards
                 Map<String, String> headers = null;
                 Integer connectTimeout = null;
@@ -250,9 +252,16 @@ public class DefaultRepositorySystemSessionFactory {
                     connectTimeout = Integer.parseInt(connectTimeoutXml.getValue());
                 } else {
                     // fallback configuration name
-                    connectTimeoutXml = config.getChild("connectionTimeout", false);
-                    if (connectTimeoutXml != null) {
-                        connectTimeout = Integer.parseInt(connectTimeoutXml.getValue());
+                    PlexusConfiguration httpConfiguration = config.getChild("httpConfiguration", false);
+                    if (httpConfiguration != null) {
+                        PlexusConfiguration httpConfigurationAll = httpConfiguration.getChild("all", false);
+                        if (httpConfigurationAll != null) {
+                            connectTimeoutXml = httpConfigurationAll.getChild("connectionTimeout", false);
+                            if (connectTimeoutXml != null) {
+                                connectTimeout = Integer.parseInt(connectTimeoutXml.getValue());
+                                logger.warn("Settings for server {} uses legacy format", server.getId());
+                            }
+                        }
                     }
                 }
 
@@ -261,9 +270,16 @@ public class DefaultRepositorySystemSessionFactory {
                     requestTimeout = Integer.parseInt(requestTimeoutXml.getValue());
                 } else {
                     // fallback configuration name
-                    requestTimeoutXml = config.getChild("readTimeout", false);
-                    if (requestTimeoutXml != null) {
-                        requestTimeout = Integer.parseInt(requestTimeoutXml.getValue());
+                    PlexusConfiguration httpConfiguration = config.getChild("httpConfiguration", false);
+                    if (httpConfiguration != null) {
+                        PlexusConfiguration httpConfigurationAll = httpConfiguration.getChild("all", false);
+                        if (httpConfigurationAll != null) {
+                            requestTimeoutXml = httpConfigurationAll.getChild("readTimeout", false);
+                            if (requestTimeoutXml != null) {
+                                requestTimeout = Integer.parseInt(requestTimeoutXml.getValue());
+                                logger.warn("Settings for server {} uses legacy format", server.getId());
+                            }
+                        }
                     }
                 }
 
