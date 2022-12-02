@@ -2,6 +2,7 @@
   <servers>
     <server>
       <id>test-small-timeout</id>
+      <!-- Plexus Configuration: legacy (only all supported) -->
       <configuration>
         <httpConfiguration>
           <all>

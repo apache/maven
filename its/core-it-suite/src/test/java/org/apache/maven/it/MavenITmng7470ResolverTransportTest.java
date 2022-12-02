@@ -97,24 +97,35 @@ public class MavenITmng7470ResolverTransportTest
         verifier.resetStreams();
     }
 
+    private static final String WAGON_LOG_SNIPPET = "[DEBUG] Using transporter WagonTransporter";
+
+    private static final String NATIVE_LOG_SNIPPET = "[DEBUG] Using transporter HttpTransporter";
+
     @Test
     public void testResolverTransportDefault()
             throws Exception
     {
-        performTest( null, "[DEBUG] Using transporter WagonTransporter" );
+        if ( matchesVersionRange( "[4.0.0-alpha-3,)" ) )
+        {
+            performTest( null, NATIVE_LOG_SNIPPET );
+        }
+        else // [3.9.0,) but not 4, see above and ctor
+        {
+            performTest( null, WAGON_LOG_SNIPPET );
+        }
     }
 
     @Test
     public void testResolverTransportWagon()
             throws Exception
     {
-        performTest( "wagon", "[DEBUG] Using transporter WagonTransporter" );
+        performTest( "wagon", WAGON_LOG_SNIPPET );
     }
 
     @Test
     public void testResolverTransportNative()
             throws Exception
     {
-        performTest( "native", "[DEBUG] Using transporter HttpTransporter" );
+        performTest( "native", NATIVE_LOG_SNIPPET );
     }
 }
