@@ -19,7 +19,7 @@
 package org.apache.maven.project;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.apache.maven.model.building.ModelProblem;
 
@@ -30,15 +30,15 @@ import org.apache.maven.model.building.ModelProblem;
  */
 class DefaultProjectBuildingResult implements ProjectBuildingResult {
 
-    private String projectId;
+    private final String projectId;
 
-    private File pomFile;
+    private final File pomFile;
 
-    private MavenProject project;
+    private final MavenProject project;
 
-    private List<ModelProblem> problems;
+    private final List<ModelProblem> problems;
 
-    private DependencyResolutionResult dependencyResolutionResult;
+    private final DependencyResolutionResult dependencyResolutionResult;
 
     /**
      * Creates a new result with the specified contents.
@@ -54,7 +54,7 @@ class DefaultProjectBuildingResult implements ProjectBuildingResult {
                 : "";
         this.pomFile = (project != null) ? project.getFile() : null;
         this.project = project;
-        this.problems = problems;
+        this.problems = problems != null ? problems : Collections.emptyList();
         this.dependencyResolutionResult = dependencyResolutionResult;
     }
 
@@ -68,7 +68,9 @@ class DefaultProjectBuildingResult implements ProjectBuildingResult {
     DefaultProjectBuildingResult(String projectId, File pomFile, List<ModelProblem> problems) {
         this.projectId = (projectId != null) ? projectId : "";
         this.pomFile = pomFile;
-        this.problems = problems;
+        this.project = null;
+        this.problems = problems != null ? problems : Collections.emptyList();
+        this.dependencyResolutionResult = null;
     }
 
     public String getProjectId() {
@@ -84,10 +86,6 @@ class DefaultProjectBuildingResult implements ProjectBuildingResult {
     }
 
     public List<ModelProblem> getProblems() {
-        if (problems == null) {
-            problems = new ArrayList<>();
-        }
-
         return problems;
     }
 

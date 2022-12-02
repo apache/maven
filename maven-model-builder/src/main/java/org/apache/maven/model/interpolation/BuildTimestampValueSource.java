@@ -23,17 +23,19 @@ import java.util.Map;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 
 class BuildTimestampValueSource extends AbstractValueSource {
-    private final MavenBuildTimestamp mavenBuildTimestamp;
+    private final Date startTime;
+    private final Map<String, String> properties;
 
     BuildTimestampValueSource(Date startTime, Map<String, String> properties) {
         super(false);
-        this.mavenBuildTimestamp = new MavenBuildTimestamp(startTime, properties);
+        this.startTime = startTime;
+        this.properties = properties;
     }
 
     @Override
     public Object getValue(String expression) {
         if ("build.timestamp".equals(expression) || "maven.build.timestamp".equals(expression)) {
-            return mavenBuildTimestamp.formattedTimestamp();
+            return new MavenBuildTimestamp(startTime, properties).formattedTimestamp();
         }
         return null;
     }

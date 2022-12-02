@@ -46,7 +46,7 @@ public class DefaultProfileSelector implements ProfileSelector {
 
     @Inject
     public DefaultProfileSelector(List<ProfileActivator> activators) {
-        this.activators = activators;
+        this.activators = new ArrayList<>(activators);
     }
 
     public DefaultProfileSelector addProfileActivator(ProfileActivator profileActivator) {
@@ -96,19 +96,17 @@ public class DefaultProfileSelector implements ProfileSelector {
         for (ProfileActivator activator : activators) {
             if (activator.presentInConfig(profile, context, problems)) {
                 isActive = true;
-            }
-        }
-        for (ProfileActivator activator : activators) {
-            try {
-                if (activator.presentInConfig(profile, context, problems)) {
-                    isActive &= activator.isActive(profile, context, problems);
+                try {
+                    if (!activator.isActive(profile, context, problems)) {
+                        return false;
+                    }
+                } catch (RuntimeException e) {
+                    problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                            .setMessage("Failed to determine activation for profile " + profile.getId())
+                            .setLocation(profile.getLocation(""))
+                            .setException(e));
+                    return false;
                 }
-            } catch (RuntimeException e) {
-                problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
-                        .setMessage("Failed to determine activation for profile " + profile.getId())
-                        .setLocation(profile.getLocation(""))
-                        .setException(e));
-                return false;
             }
         }
         return isActive;
