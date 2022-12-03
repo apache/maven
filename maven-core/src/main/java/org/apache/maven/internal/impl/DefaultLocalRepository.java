@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,52 +16,44 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.api.annotations.Nonnull;
-import javax.inject.Inject;
-
-import java.nio.file.Path;
-
-import org.apache.maven.api.LocalRepository;
+package org.apache.maven.internal.impl;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
-public class DefaultLocalRepository implements LocalRepository
-{
+import java.nio.file.Path;
+import javax.inject.Inject;
+import org.apache.maven.api.LocalRepository;
+import org.apache.maven.api.annotations.Nonnull;
+
+public class DefaultLocalRepository implements LocalRepository {
 
     private final @Nonnull org.eclipse.aether.repository.LocalRepository repository;
 
     @Inject
-    public DefaultLocalRepository( @Nonnull org.eclipse.aether.repository.LocalRepository repository )
-    {
-        this.repository = nonNull( repository, "repository can not be null" );
+    public DefaultLocalRepository(@Nonnull org.eclipse.aether.repository.LocalRepository repository) {
+        this.repository = nonNull(repository, "repository can not be null");
     }
 
     @Nonnull
-    public org.eclipse.aether.repository.LocalRepository getRepository()
-    {
+    public org.eclipse.aether.repository.LocalRepository getRepository() {
         return repository;
     }
 
     @Nonnull
     @Override
-    public String getId()
-    {
+    public String getId() {
         return repository.getId();
     }
 
     @Nonnull
     @Override
-    public String getType()
-    {
+    public String getType() {
         return repository.getContentType();
     }
 
     @Nonnull
     @Override
-    public Path getPath()
-    {
+    public Path getPath() {
         return repository.getBasedir().toPath();
     }
-
 }

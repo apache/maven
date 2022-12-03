@@ -80,10 +80,7 @@ public class ${className}
 #foreach ( $class in $model.allClasses )
   #if ( $class.name != "InputSource" && $class.name != "InputLocation" )
     #set ( $ancestors = $Helper.ancestors( $class ) )
-    #set ( $allFields = [] )
-    #foreach ( $cl in $ancestors )
-      #set ( $dummy = $allFields.addAll( $cl.allFields ) )
-    #end
+    #set ( $allFields = $Helper.xmlFields( $class ) )
     protected ${class.name} transform${class.name}( ${class.name} target )
     {
         if ( target == null )

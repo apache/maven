@@ -1,5 +1,3 @@
-package org.apache.maven.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,50 +16,40 @@ package org.apache.maven.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.building;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Scanner;
-
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-public class UrlSourceTest
-{
+public class UrlSourceTest {
 
     @Test
-    public void testUrlSource()
-    {
+    public void testUrlSource() {
         NullPointerException e = assertThrows(
-                NullPointerException.class,
-                () -> new UrlSource( null ),
-                "Should fail, since you must specify a url" );
-        assertEquals( "url cannot be null", e.getMessage() );
+                NullPointerException.class, () -> new UrlSource(null), "Should fail, since you must specify a url");
+        assertEquals("url cannot be null", e.getMessage());
     }
 
     @Test
-    public void testGetInputStream()
-        throws Exception
-    {
-        URL txtFile = new File( "target/test-classes/source.txt" ).toURI().toURL();
-        UrlSource source = new UrlSource( txtFile );
-        try ( InputStream is = source.getInputStream();
-              Scanner scanner = new Scanner( is ) )
-        {
-            assertEquals( "Hello World!", scanner.nextLine() );
+    public void testGetInputStream() throws Exception {
+        URL txtFile = new File("target/test-classes/source.txt").toURI().toURL();
+        UrlSource source = new UrlSource(txtFile);
+        try (InputStream is = source.getInputStream();
+                Scanner scanner = new Scanner(is)) {
+            assertEquals("Hello World!", scanner.nextLine());
         }
     }
 
     @Test
-    public void testGetLocation()
-        throws Exception
-    {
-        URL txtFile = new File( "target/test-classes/source.txt" ).toURI().toURL();
-        UrlSource source = new UrlSource( txtFile );
-        assertEquals( txtFile.toExternalForm(), source.getLocation() );
+    public void testGetLocation() throws Exception {
+        URL txtFile = new File("target/test-classes/source.txt").toURI().toURL();
+        UrlSource source = new UrlSource(txtFile);
+        assertEquals(txtFile.toExternalForm(), source.getLocation());
     }
-
 }

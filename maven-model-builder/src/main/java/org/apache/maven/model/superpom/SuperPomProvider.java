@@ -1,5 +1,3 @@
-package org.apache.maven.model.superpom;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.superpom;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.superpom;
 
 import org.apache.maven.api.model.Model;
 
@@ -26,8 +25,7 @@ import org.apache.maven.api.model.Model;
  *
  * @author Benjamin Bentmann
  */
-public interface SuperPomProvider
-{
+public interface SuperPomProvider {
 
     /**
      * Gets the super POM for the specified model version. The returned model is supposed to be read-only, i.e. if the
@@ -37,6 +35,5 @@ public interface SuperPomProvider
      * @param version The model version to retrieve the super POM for (e.g. "4.0.0"), must not be {@code null}.
      * @return The super POM, never {@code null}.
      */
-    Model getSuperModel( String version );
-
+    Model getSuperModel(String version);
 }

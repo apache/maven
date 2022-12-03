@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,9 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
+
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,7 +31,6 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.LocalRepository;
@@ -56,10 +56,7 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 
-import static org.apache.maven.internal.impl.Utils.nonNull;
-
-public class DefaultSession extends AbstractSession
-{
+public class DefaultSession extends AbstractSession {
 
     private final MavenSession mavenSession;
     private final RepositorySystemSession session;
@@ -70,270 +67,225 @@ public class DefaultSession extends AbstractSession
     private final RuntimeInformation runtimeInformation;
     private final Map<Class<? extends Service>, Service> services = new HashMap<>();
 
-    @SuppressWarnings( "checkstyle:ParameterNumber" )
-    public DefaultSession( @Nonnull MavenSession session,
-                           @Nonnull RepositorySystem repositorySystem,
-                           @Nullable List<RemoteRepository> repositories,
-                           @Nonnull MavenRepositorySystem mavenRepositorySystem,
-                           @Nonnull PlexusContainer container,
-                           @Nonnull RuntimeInformation runtimeInformation )
-    {
-        this.mavenSession = nonNull( session );
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public DefaultSession(
+            @Nonnull MavenSession session,
+            @Nonnull RepositorySystem repositorySystem,
+            @Nullable List<RemoteRepository> repositories,
+            @Nonnull MavenRepositorySystem mavenRepositorySystem,
+            @Nonnull PlexusContainer container,
+            @Nonnull RuntimeInformation runtimeInformation) {
+        this.mavenSession = nonNull(session);
         this.session = mavenSession.getRepositorySession();
-        this.repositorySystem = nonNull( repositorySystem );
+        this.repositorySystem = nonNull(repositorySystem);
         this.repositories = repositories != null
                 ? repositories
                 : mavenSession.getRequest().getRemoteRepositories().stream()
-                .map( RepositoryUtils::toRepo ).map( this::getRemoteRepository ).collect( Collectors.toList() );
+                        .map(RepositoryUtils::toRepo)
+                        .map(this::getRemoteRepository)
+                        .collect(Collectors.toList());
         this.mavenRepositorySystem = mavenRepositorySystem;
         this.container = container;
         this.runtimeInformation = runtimeInformation;
     }
 
-    public MavenSession getMavenSession()
-    {
+    public MavenSession getMavenSession() {
         return mavenSession;
     }
 
     @Nonnull
     @Override
-    public LocalRepository getLocalRepository()
-    {
-        return new DefaultLocalRepository( session.getLocalRepository() );
+    public LocalRepository getLocalRepository() {
+        return new DefaultLocalRepository(session.getLocalRepository());
     }
 
     @Nonnull
     @Override
-    public List<RemoteRepository> getRemoteRepositories()
-    {
-        return Collections.unmodifiableList( repositories );
+    public List<RemoteRepository> getRemoteRepositories() {
+        return Collections.unmodifiableList(repositories);
     }
 
     @Nonnull
     @Override
-    public Settings getSettings()
-    {
+    public Settings getSettings() {
         return mavenSession.getSettings().getDelegate();
     }
 
     @Nonnull
     @Override
-    public Map<String, String> getUserProperties()
-    {
-        return new PropertiesAsMap( mavenSession.getUserProperties() );
+    public Map<String, String> getUserProperties() {
+        return new PropertiesAsMap(mavenSession.getUserProperties());
     }
 
     @Nonnull
     @Override
-    public Map<String, String> getSystemProperties()
-    {
-        return new PropertiesAsMap( mavenSession.getSystemProperties() );
+    public Map<String, String> getSystemProperties() {
+        return new PropertiesAsMap(mavenSession.getSystemProperties());
     }
 
     @Nonnull
     @Override
-    public String getMavenVersion()
-    {
+    public String getMavenVersion() {
         return runtimeInformation.getMavenVersion();
     }
 
     @Override
-    public int getDegreeOfConcurrency()
-    {
+    public int getDegreeOfConcurrency() {
         return mavenSession.getRequest().getDegreeOfConcurrency();
     }
 
     @Nonnull
     @Override
-    public Instant getStartTime()
-    {
+    public Instant getStartTime() {
         return mavenSession.getStartTime().toInstant();
     }
 
     @Nonnull
     @Override
-    public Path getMultiModuleProjectDirectory()
-    {
+    public Path getMultiModuleProjectDirectory() {
         return mavenSession.getRequest().getMultiModuleProjectDirectory().toPath();
     }
 
     @Nonnull
     @Override
-    public Path getExecutionRootDirectory()
-    {
-        return Paths.get( mavenSession.getRequest().getBaseDirectory() );
+    public Path getExecutionRootDirectory() {
+        return Paths.get(mavenSession.getRequest().getBaseDirectory());
     }
 
     @Nonnull
     @Override
-    public List<Project> getProjects()
-    {
-        return getProjects( mavenSession.getProjects() );
+    public List<Project> getProjects() {
+        return getProjects(mavenSession.getProjects());
     }
 
     @Nonnull
     @Override
-    public Map<String, Object> getPluginContext( Project project )
-    {
-        nonNull( project, "project" );
-        try
-        {
-            MojoExecution mojoExecution = container.lookup( MojoExecution.class );
+    public Map<String, Object> getPluginContext(Project project) {
+        nonNull(project, "project");
+        try {
+            MojoExecution mojoExecution = container.lookup(MojoExecution.class);
             MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
             PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-            return mavenSession.getPluginContext( pluginDescriptor, ( ( DefaultProject ) project ).getProject() );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new MavenException( "The PluginContext is only available during a mojo execution", e );
+            return mavenSession.getPluginContext(pluginDescriptor, ((DefaultProject) project).getProject());
+        } catch (ComponentLookupException e) {
+            throw new MavenException("The PluginContext is only available during a mojo execution", e);
         }
     }
 
     @Nonnull
     @Override
-    public SessionData getData()
-    {
+    public SessionData getData() {
         org.eclipse.aether.SessionData data = session.getData();
-        return new SessionData()
-        {
+        return new SessionData() {
             @Override
-            public void set( @Nonnull Object key, @Nullable Object value )
-            {
-                data.set( key, value );
+            public void set(@Nonnull Object key, @Nullable Object value) {
+                data.set(key, value);
             }
 
             @Override
-            public boolean set( @Nonnull Object key, @Nullable Object oldValue, @Nullable Object newValue )
-            {
-                return data.set( key, oldValue, newValue );
+            public boolean set(@Nonnull Object key, @Nullable Object oldValue, @Nullable Object newValue) {
+                return data.set(key, oldValue, newValue);
             }
 
             @Nullable
             @Override
-            public Object get( @Nonnull Object key )
-            {
-                return data.get( key );
+            public Object get(@Nonnull Object key) {
+                return data.get(key);
             }
 
             @Nullable
             @Override
-            public Object computeIfAbsent( @Nonnull Object key, @Nonnull Supplier<Object> supplier )
-            {
-                 return data.computeIfAbsent( key, supplier );
+            public Object computeIfAbsent(@Nonnull Object key, @Nonnull Supplier<Object> supplier) {
+                return data.computeIfAbsent(key, supplier);
             }
         };
     }
 
     @Nonnull
     @Override
-    public Session withLocalRepository( @Nonnull LocalRepository localRepository )
-    {
-        nonNull( localRepository, "localRepository" );
-        if ( session.getLocalRepository() != null
-                && Objects.equals( session.getLocalRepository().getBasedir().toPath(),
-                localRepository.getPath() ) )
-        {
+    public Session withLocalRepository(@Nonnull LocalRepository localRepository) {
+        nonNull(localRepository, "localRepository");
+        if (session.getLocalRepository() != null
+                && Objects.equals(session.getLocalRepository().getBasedir().toPath(), localRepository.getPath())) {
             return this;
         }
-        org.eclipse.aether.repository.LocalRepository repository = toRepository( localRepository );
-        org.eclipse.aether.repository.LocalRepositoryManager localRepositoryManager
-                = repositorySystem.newLocalRepositoryManager( session, repository );
+        org.eclipse.aether.repository.LocalRepository repository = toRepository(localRepository);
+        org.eclipse.aether.repository.LocalRepositoryManager localRepositoryManager =
+                repositorySystem.newLocalRepositoryManager(session, repository);
 
-        RepositorySystemSession repoSession = new DefaultRepositorySystemSession( session )
-                .setLocalRepositoryManager( localRepositoryManager );
-        MavenSession newSession = new MavenSession( mavenSession.getContainer(), repoSession,
-                mavenSession.getRequest(), mavenSession.getResult() );
-        return new DefaultSession( newSession, repositorySystem, repositories,
-                mavenRepositorySystem, container, runtimeInformation );
+        RepositorySystemSession repoSession =
+                new DefaultRepositorySystemSession(session).setLocalRepositoryManager(localRepositoryManager);
+        MavenSession newSession = new MavenSession(
+                mavenSession.getContainer(), repoSession, mavenSession.getRequest(), mavenSession.getResult());
+        return new DefaultSession(
+                newSession, repositorySystem, repositories, mavenRepositorySystem, container, runtimeInformation);
     }
 
     @Nonnull
     @Override
-    public Session withRemoteRepositories( @Nonnull List<RemoteRepository> repositories )
-    {
-        return new DefaultSession( mavenSession, repositorySystem, repositories,
-                mavenRepositorySystem, container, runtimeInformation );
+    public Session withRemoteRepositories(@Nonnull List<RemoteRepository> repositories) {
+        return new DefaultSession(
+                mavenSession, repositorySystem, repositories, mavenRepositorySystem, container, runtimeInformation);
     }
 
     @Nonnull
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <T extends Service> T getService( Class<T> clazz ) throws NoSuchElementException
-    {
-        T t = (T) services.computeIfAbsent( clazz, this::lookup );
-        if ( t == null )
-        {
-            throw new NoSuchElementException( clazz.getName() );
+    @SuppressWarnings("unchecked")
+    public <T extends Service> T getService(Class<T> clazz) throws NoSuchElementException {
+        T t = (T) services.computeIfAbsent(clazz, this::lookup);
+        if (t == null) {
+            throw new NoSuchElementException(clazz.getName());
         }
         return t;
     }
 
-    private Service lookup( Class<? extends Service> c )
-    {
-        try
-        {
-            return container.lookup( c );
-        }
-        catch ( ComponentLookupException e )
-        {
-            NoSuchElementException nsee = new NoSuchElementException( c.getName() );
-            e.initCause( e );
+    private Service lookup(Class<? extends Service> c) {
+        try {
+            return container.lookup(c);
+        } catch (ComponentLookupException e) {
+            NoSuchElementException nsee = new NoSuchElementException(c.getName());
+            e.initCause(e);
             throw nsee;
         }
     }
 
     @Nonnull
-    public RepositorySystemSession getSession()
-    {
+    public RepositorySystemSession getSession() {
         return session;
     }
 
     @Nonnull
-    public RepositorySystem getRepositorySystem()
-    {
+    public RepositorySystem getRepositorySystem() {
         return repositorySystem;
     }
 
-    public ArtifactRepository toArtifactRepository( RemoteRepository repository )
-    {
-        if ( repository instanceof DefaultRemoteRepository )
-        {
-            org.eclipse.aether.repository.RemoteRepository rr
-                    = ( (DefaultRemoteRepository) repository ).getRepository();
+    public ArtifactRepository toArtifactRepository(RemoteRepository repository) {
+        if (repository instanceof DefaultRemoteRepository) {
+            org.eclipse.aether.repository.RemoteRepository rr = ((DefaultRemoteRepository) repository).getRepository();
 
-            try
-            {
+            try {
                 return mavenRepositorySystem.createRepository(
                         rr.getUrl(),
                         rr.getId(),
-                        rr.getPolicy( false ).isEnabled(),
-                        rr.getPolicy( false ).getUpdatePolicy(),
-                        rr.getPolicy( true ).isEnabled(),
-                        rr.getPolicy( true ).getUpdatePolicy(),
-                        rr.getPolicy( false ).getChecksumPolicy()
+                        rr.getPolicy(false).isEnabled(),
+                        rr.getPolicy(false).getUpdatePolicy(),
+                        rr.getPolicy(true).isEnabled(),
+                        rr.getPolicy(true).getUpdatePolicy(),
+                        rr.getPolicy(false).getChecksumPolicy());
 
-                );
+            } catch (Exception e) {
+                throw new RuntimeException("Unable to create repository", e);
             }
-            catch ( Exception e )
-            {
-                throw new RuntimeException( "Unable to create repository", e );
-            }
-        }
-        else
-        {
+        } else {
             // TODO
-            throw new UnsupportedOperationException( "Not yet implemented" );
+            throw new UnsupportedOperationException("Not yet implemented");
         }
     }
 
-    public org.eclipse.aether.graph.Dependency toDependency( DependencyCoordinate dependency )
-    {
-        if ( dependency instanceof DefaultDependencyCoordinate )
-        {
-            return ( (DefaultDependencyCoordinate) dependency ).getDependency();
-        }
-        else
-        {
+    public org.eclipse.aether.graph.Dependency toDependency(DependencyCoordinate dependency) {
+        if (dependency instanceof DefaultDependencyCoordinate) {
+            return ((DefaultDependencyCoordinate) dependency).getDependency();
+        } else {
             return new org.eclipse.aether.graph.Dependency(
                     new org.eclipse.aether.artifact.DefaultArtifact(
                             dependency.getGroupId(),
@@ -341,9 +293,8 @@ public class DefaultSession extends AbstractSession
                             dependency.getClassifier(),
                             dependency.getType().getExtension(),
                             dependency.getVersion().toString(),
-                            null ),
-                    dependency.getScope().id() );
+                            null),
+                    dependency.getScope().id());
         }
     }
-
 }

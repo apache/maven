@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,21 +16,20 @@ package org.apache.maven.model.profile;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.profile.activation.ProfileActivator;
 
@@ -43,109 +40,80 @@ import org.apache.maven.model.profile.activation.ProfileActivator;
  */
 @Named
 @Singleton
-public class DefaultProfileSelector
-    implements ProfileSelector
-{
+public class DefaultProfileSelector implements ProfileSelector {
 
     private final List<ProfileActivator> activators;
 
     @Inject
-    public DefaultProfileSelector( List<ProfileActivator> activators )
-    {
-        this.activators = activators;
+    public DefaultProfileSelector(List<ProfileActivator> activators) {
+        this.activators = new ArrayList<>(activators);
     }
 
-    public DefaultProfileSelector addProfileActivator( ProfileActivator profileActivator )
-    {
-        if ( profileActivator != null )
-        {
-            activators.add( profileActivator );
+    public DefaultProfileSelector addProfileActivator(ProfileActivator profileActivator) {
+        if (profileActivator != null) {
+            activators.add(profileActivator);
         }
         return this;
     }
 
     @Override
-    public List<Profile> getActiveProfiles( Collection<Profile> profiles, ProfileActivationContext context,
-                                            ModelProblemCollector problems )
-    {
-        Collection<String> activatedIds = new HashSet<>( context.getActiveProfileIds() );
-        Collection<String> deactivatedIds = new HashSet<>( context.getInactiveProfileIds() );
+    public List<Profile> getActiveProfiles(
+            Collection<Profile> profiles, ProfileActivationContext context, ModelProblemCollector problems) {
+        Collection<String> activatedIds = new HashSet<>(context.getActiveProfileIds());
+        Collection<String> deactivatedIds = new HashSet<>(context.getInactiveProfileIds());
 
-        List<Profile> activeProfiles = new ArrayList<>( profiles.size() );
+        List<Profile> activeProfiles = new ArrayList<>(profiles.size());
         List<Profile> activePomProfilesByDefault = new ArrayList<>();
         boolean activatedPomProfileNotByDefault = false;
 
-        for ( Profile profile : profiles )
-        {
-            if ( !deactivatedIds.contains( profile.getId() ) )
-            {
-                if ( activatedIds.contains( profile.getId() ) || isActive( profile, context, problems ) )
-                {
-                    activeProfiles.add( profile );
+        for (Profile profile : profiles) {
+            if (!deactivatedIds.contains(profile.getId())) {
+                if (activatedIds.contains(profile.getId()) || isActive(profile, context, problems)) {
+                    activeProfiles.add(profile);
 
-                    if ( Profile.SOURCE_POM.equals( profile.getSource() ) )
-                    {
+                    if (Profile.SOURCE_POM.equals(profile.getSource())) {
                         activatedPomProfileNotByDefault = true;
                     }
-                }
-                else if ( isActiveByDefault( profile ) )
-                {
-                    if ( Profile.SOURCE_POM.equals( profile.getSource() ) )
-                    {
-                        activePomProfilesByDefault.add( profile );
-                    }
-                    else
-                    {
-                        activeProfiles.add( profile );
+                } else if (isActiveByDefault(profile)) {
+                    if (Profile.SOURCE_POM.equals(profile.getSource())) {
+                        activePomProfilesByDefault.add(profile);
+                    } else {
+                        activeProfiles.add(profile);
                     }
                 }
-
             }
         }
 
-        if ( !activatedPomProfileNotByDefault )
-        {
-            activeProfiles.addAll( activePomProfilesByDefault );
+        if (!activatedPomProfileNotByDefault) {
+            activeProfiles.addAll(activePomProfilesByDefault);
         }
 
         return activeProfiles;
     }
 
-    private boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
-    {
+    private boolean isActive(Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
         boolean isActive = false;
-        for ( ProfileActivator activator : activators )
-        {
-            if ( activator.presentInConfig( profile, context, problems ) )
-            {
+        for (ProfileActivator activator : activators) {
+            if (activator.presentInConfig(profile, context, problems)) {
                 isActive = true;
-            }
-        }
-        for ( ProfileActivator activator : activators )
-        {
-            try
-            {
-                if ( activator.presentInConfig( profile, context, problems ) )
-                {
-                    isActive &=  activator.isActive( profile, context, problems );
+                try {
+                    if (!activator.isActive(profile, context, problems)) {
+                        return false;
+                    }
+                } catch (RuntimeException e) {
+                    problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                            .setMessage("Failed to determine activation for profile " + profile.getId())
+                            .setLocation(profile.getLocation(""))
+                            .setException(e));
+                    return false;
                 }
-            }
-            catch ( RuntimeException e )
-            {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                        .setMessage( "Failed to determine activation for profile " + profile.getId() )
-                        .setLocation( profile.getLocation( "" ) )
-                        .setException( e ) );
-                return false;
             }
         }
         return isActive;
     }
 
-    private boolean isActiveByDefault( Profile profile )
-    {
+    private boolean isActiveByDefault(Profile profile) {
         Activation activation = profile.getActivation();
         return activation != null && activation.isActiveByDefault();
     }
-
 }

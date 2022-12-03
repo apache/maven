@@ -1,5 +1,3 @@
-package org.apache.maven.settings.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.settings.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.building;
 
 /**
  * Describes a problem that was encountered during settings building. A problem can either be an exception that was
@@ -26,9 +25,7 @@ package org.apache.maven.settings.building;
  *
  * @author Benjamin Bentmann
  */
-public class DefaultSettingsProblem
-    implements SettingsProblem
-{
+public class DefaultSettingsProblem implements SettingsProblem {
 
     private final String source;
 
@@ -53,91 +50,74 @@ public class DefaultSettingsProblem
      * @param columnNumber The one-based index of the column containing the problem or {@code -1} if unknown.
      * @param exception The exception that caused this problem, may be {@code null}.
      */
-    public DefaultSettingsProblem( String message, Severity severity, String source, int lineNumber, int columnNumber,
-                                   Exception exception )
-    {
+    public DefaultSettingsProblem(
+            String message, Severity severity, String source, int lineNumber, int columnNumber, Exception exception) {
         this.message = message;
-        this.severity = ( severity != null ) ? severity : Severity.ERROR;
-        this.source = ( source != null ) ? source : "";
+        this.severity = (severity != null) ? severity : Severity.ERROR;
+        this.source = (source != null) ? source : "";
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.exception = exception;
     }
 
     @Override
-    public String getSource()
-    {
+    public String getSource() {
         return source;
     }
 
     @Override
-    public int getLineNumber()
-    {
+    public int getLineNumber() {
         return lineNumber;
     }
 
     @Override
-    public int getColumnNumber()
-    {
+    public int getColumnNumber() {
         return columnNumber;
     }
 
     @Override
-    public String getLocation()
-    {
-        StringBuilder buffer = new StringBuilder( 256 );
+    public String getLocation() {
+        StringBuilder buffer = new StringBuilder(256);
 
-        if ( getSource().length() > 0 )
-        {
-            if ( buffer.length() > 0 )
-            {
-                buffer.append( ", " );
+        if (getSource().length() > 0) {
+            if (buffer.length() > 0) {
+                buffer.append(", ");
             }
-            buffer.append( getSource() );
+            buffer.append(getSource());
         }
 
-        if ( getLineNumber() > 0 )
-        {
-            if ( buffer.length() > 0 )
-            {
-                buffer.append( ", " );
+        if (getLineNumber() > 0) {
+            if (buffer.length() > 0) {
+                buffer.append(", ");
             }
-            buffer.append( "line " ).append( getLineNumber() );
+            buffer.append("line ").append(getLineNumber());
         }
 
-        if ( getColumnNumber() > 0 )
-        {
-            if ( buffer.length() > 0 )
-            {
-                buffer.append( ", " );
+        if (getColumnNumber() > 0) {
+            if (buffer.length() > 0) {
+                buffer.append(", ");
             }
-            buffer.append( "column " ).append( getColumnNumber() );
+            buffer.append("column ").append(getColumnNumber());
         }
 
         return buffer.toString();
     }
 
     @Override
-    public Exception getException()
-    {
+    public Exception getException() {
         return exception;
     }
 
     @Override
-    public String getMessage()
-    {
+    public String getMessage() {
         String msg;
 
-        if ( message != null && message.length() > 0 )
-        {
+        if (message != null && message.length() > 0) {
             msg = message;
-        }
-        else
-        {
+        } else {
             msg = exception.getMessage();
 
-            if ( msg == null )
-            {
+            if (msg == null) {
                 msg = "";
             }
         }
@@ -146,26 +126,22 @@ public class DefaultSettingsProblem
     }
 
     @Override
-    public Severity getSeverity()
-    {
+    public Severity getSeverity() {
         return severity;
     }
 
     @Override
-    public String toString()
-    {
-        StringBuilder buffer = new StringBuilder( 128 );
+    public String toString() {
+        StringBuilder buffer = new StringBuilder(128);
 
-        buffer.append( '[' ).append( getSeverity() ).append( "] " );
-        buffer.append( getMessage() );
+        buffer.append('[').append(getSeverity()).append("] ");
+        buffer.append(getMessage());
         String location = getLocation();
-        if ( !location.isEmpty() )
-        {
-             buffer.append( " @ " );
-             buffer.append( location );
+        if (!location.isEmpty()) {
+            buffer.append(" @ ");
+            buffer.append(location);
         }
 
         return buffer.toString();
     }
-
 }

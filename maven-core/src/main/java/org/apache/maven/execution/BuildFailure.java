@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import org.apache.maven.project.MavenProject;
 
@@ -26,9 +25,7 @@ import org.apache.maven.project.MavenProject;
  *
  * @author Benjamin Bentmann
  */
-public class BuildFailure
-    extends BuildSummary
-{
+public class BuildFailure extends BuildSummary {
 
     /**
      * The cause of the build failure.
@@ -42,9 +39,8 @@ public class BuildFailure
      * @param time The build time of the project in milliseconds.
      * @param cause The cause of the build failure, may be {@code null}.
      */
-    public BuildFailure( MavenProject project, long time, Throwable cause )
-    {
-        super( project, time );
+    public BuildFailure(MavenProject project, long time, Throwable cause) {
+        super(project, time);
         this.cause = cause;
     }
 
@@ -53,9 +49,7 @@ public class BuildFailure
      *
      * @return The cause of the build failure or {@code null} if unknown.
      */
-    public Throwable getCause()
-    {
+    public Throwable getCause() {
         return cause;
     }
-
 }

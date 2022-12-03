@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,15 @@ package org.apache.maven.model.profile;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import javax.inject.Named;
-import javax.inject.Singleton;
+package org.apache.maven.model.profile;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.BuildBase;
 import org.apache.maven.api.model.Model;
@@ -49,204 +46,181 @@ import org.apache.maven.model.merge.MavenModelMerger;
  */
 @Named
 @Singleton
-@SuppressWarnings( { "checkstyle:methodname" } )
-public class DefaultProfileInjector
-    implements ProfileInjector
-{
+@SuppressWarnings({"checkstyle:methodname"})
+public class DefaultProfileInjector implements ProfileInjector {
 
     private ProfileModelMerger merger = new ProfileModelMerger();
 
     @Override
-    public void injectProfile( org.apache.maven.model.Model model,
-                               org.apache.maven.model.Profile profile,
-                               ModelBuildingRequest request,
-                               ModelProblemCollector problems )
-    {
-        if ( profile != null )
-        {
-            Model.Builder builder = Model.newBuilder( model.getDelegate() );
-            merger.mergeModelBase( builder, model.getDelegate(), profile.getDelegate() );
+    public void injectProfile(
+            org.apache.maven.model.Model model,
+            org.apache.maven.model.Profile profile,
+            ModelBuildingRequest request,
+            ModelProblemCollector problems) {
+        if (profile != null) {
+            Model.Builder builder = Model.newBuilder(model.getDelegate());
+            merger.mergeModelBase(builder, model.getDelegate(), profile.getDelegate());
 
-            if ( profile.getBuild() != null )
-            {
+            if (profile.getBuild() != null) {
                 Build build = model.getBuild() != null ? model.getBuild().getDelegate() : Build.newInstance();
-                Build.Builder bbuilder = Build.newBuilder( build );
-                merger.mergeBuildBase( bbuilder, build, profile.getBuild().getDelegate() );
-                builder.build( bbuilder.build() );
+                Build.Builder bbuilder = Build.newBuilder(build);
+                merger.mergeBuildBase(bbuilder, build, profile.getBuild().getDelegate());
+                builder.build(bbuilder.build());
             }
 
-            model.update( builder.build() );
+            model.update(builder.build());
         }
     }
 
     /**
      * ProfileModelMerger
      */
-    protected static class ProfileModelMerger
-        extends MavenModelMerger
-    {
+    protected static class ProfileModelMerger extends MavenModelMerger {
 
-        public void mergeModelBase( ModelBase.Builder builder, ModelBase target, ModelBase source )
-        {
-            mergeModelBase( builder, target, source, true, Collections.emptyMap() );
+        public void mergeModelBase(ModelBase.Builder builder, ModelBase target, ModelBase source) {
+            mergeModelBase(builder, target, source, true, Collections.emptyMap());
         }
 
-        public void mergeBuildBase( BuildBase.Builder builder, BuildBase target, BuildBase source )
-        {
-            mergeBuildBase( builder, target, source, true, Collections.emptyMap() );
+        public void mergeBuildBase(BuildBase.Builder builder, BuildBase target, BuildBase source) {
+            mergeBuildBase(builder, target, source, true, Collections.emptyMap());
         }
 
         @Override
-        protected void mergePluginContainer_Plugins( PluginContainer.Builder builder,
-                                                     PluginContainer target,  PluginContainer source,
-                                                     boolean sourceDominant,  Map<Object, Object> context )
-        {
+        protected void mergePluginContainer_Plugins(
+                PluginContainer.Builder builder,
+                PluginContainer target,
+                PluginContainer source,
+                boolean sourceDominant,
+                Map<Object, Object> context) {
             List<Plugin> src = source.getPlugins();
-            if ( !src.isEmpty() )
-            {
+            if (!src.isEmpty()) {
                 List<Plugin> tgt = target.getPlugins();
-                Map<Object, Plugin> master = new LinkedHashMap<>( tgt.size() * 2 );
+                Map<Object, Plugin> master = new LinkedHashMap<>(tgt.size() * 2);
 
-                for ( Plugin element : tgt )
-                {
-                    Object key = getPluginKey().apply( element );
-                    master.put( key, element );
+                for (Plugin element : tgt) {
+                    Object key = getPluginKey().apply(element);
+                    master.put(key, element);
                 }
 
                 Map<Object, List<Plugin>> predecessors = new LinkedHashMap<>();
                 List<Plugin> pending = new ArrayList<>();
-                for ( Plugin element : src )
-                {
-                    Object key = getPluginKey().apply( element );
-                    Plugin existing = master.get( key );
-                    if ( existing != null )
-                    {
-                        existing = mergePlugin( existing, element, sourceDominant, context );
-                        master.put( key, existing );
-                        if ( !pending.isEmpty() )
-                        {
-                            predecessors.put( key, pending );
+                for (Plugin element : src) {
+                    Object key = getPluginKey().apply(element);
+                    Plugin existing = master.get(key);
+                    if (existing != null) {
+                        existing = mergePlugin(existing, element, sourceDominant, context);
+                        master.put(key, existing);
+                        if (!pending.isEmpty()) {
+                            predecessors.put(key, pending);
                             pending = new ArrayList<>();
                         }
-                    }
-                    else
-                    {
-                        pending.add( element );
+                    } else {
+                        pending.add(element);
                     }
                 }
 
-                List<Plugin> result = new ArrayList<>( src.size() + tgt.size() );
-                for ( Map.Entry<Object, Plugin> entry : master.entrySet() )
-                {
-                    List<Plugin> pre = predecessors.get( entry.getKey() );
-                    if ( pre != null )
-                    {
-                        result.addAll( pre );
+                List<Plugin> result = new ArrayList<>(src.size() + tgt.size());
+                for (Map.Entry<Object, Plugin> entry : master.entrySet()) {
+                    List<Plugin> pre = predecessors.get(entry.getKey());
+                    if (pre != null) {
+                        result.addAll(pre);
                     }
-                    result.add( entry.getValue() );
+                    result.add(entry.getValue());
                 }
-                result.addAll( pending );
+                result.addAll(pending);
 
-                builder.plugins( result );
+                builder.plugins(result);
             }
         }
 
         @Override
-        protected void mergePlugin_Executions( Plugin.Builder builder, Plugin target, Plugin source,
-                                               boolean sourceDominant, Map<Object, Object> context )
-        {
+        protected void mergePlugin_Executions(
+                Plugin.Builder builder,
+                Plugin target,
+                Plugin source,
+                boolean sourceDominant,
+                Map<Object, Object> context) {
             List<PluginExecution> src = source.getExecutions();
-            if ( !src.isEmpty() )
-            {
+            if (!src.isEmpty()) {
                 List<PluginExecution> tgt = target.getExecutions();
-                Map<Object, PluginExecution> merged =
-                    new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
+                Map<Object, PluginExecution> merged = new LinkedHashMap<>((src.size() + tgt.size()) * 2);
 
-                for ( PluginExecution element : tgt )
-                {
-                    Object key = getPluginExecutionKey().apply( element );
-                    merged.put( key, element );
+                for (PluginExecution element : tgt) {
+                    Object key = getPluginExecutionKey().apply(element);
+                    merged.put(key, element);
                 }
 
-                for ( PluginExecution element : src )
-                {
-                    Object key = getPluginExecutionKey().apply( element );
-                    PluginExecution existing = merged.get( key );
-                    if ( existing != null )
-                    {
-                        element = mergePluginExecution( existing, element, sourceDominant, context );
+                for (PluginExecution element : src) {
+                    Object key = getPluginExecutionKey().apply(element);
+                    PluginExecution existing = merged.get(key);
+                    if (existing != null) {
+                        element = mergePluginExecution(existing, element, sourceDominant, context);
                     }
-                    merged.put( key, element );
+                    merged.put(key, element);
                 }
 
-                builder.executions( merged.values() );
+                builder.executions(merged.values());
             }
         }
 
         @Override
-        protected void mergeReporting_Plugins( Reporting.Builder builder, Reporting target, Reporting source,
-                                               boolean sourceDominant, Map<Object, Object> context )
-        {
+        protected void mergeReporting_Plugins(
+                Reporting.Builder builder,
+                Reporting target,
+                Reporting source,
+                boolean sourceDominant,
+                Map<Object, Object> context) {
             List<ReportPlugin> src = source.getPlugins();
-            if ( !src.isEmpty() )
-            {
+            if (!src.isEmpty()) {
                 List<ReportPlugin> tgt = target.getPlugins();
-                Map<Object, ReportPlugin> merged =
-                    new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
+                Map<Object, ReportPlugin> merged = new LinkedHashMap<>((src.size() + tgt.size()) * 2);
 
-                for ( ReportPlugin element : tgt )
-                {
-                    Object key = getReportPluginKey().apply( element );
-                    merged.put( key, element );
+                for (ReportPlugin element : tgt) {
+                    Object key = getReportPluginKey().apply(element);
+                    merged.put(key, element);
                 }
 
-                for ( ReportPlugin element : src )
-                {
-                    Object key = getReportPluginKey().apply( element );
-                    ReportPlugin existing = merged.get( key );
-                    if ( existing != null )
-                    {
-                        element = mergeReportPlugin( existing, element, sourceDominant, context );
+                for (ReportPlugin element : src) {
+                    Object key = getReportPluginKey().apply(element);
+                    ReportPlugin existing = merged.get(key);
+                    if (existing != null) {
+                        element = mergeReportPlugin(existing, element, sourceDominant, context);
                     }
-                    merged.put( key, element );
+                    merged.put(key, element);
                 }
 
-                builder.plugins( merged.values() );
+                builder.plugins(merged.values());
             }
         }
 
         @Override
-        protected void mergeReportPlugin_ReportSets( ReportPlugin.Builder builder, ReportPlugin target,
-                                                     ReportPlugin source, boolean sourceDominant,
-                                                     Map<Object, Object> context )
-        {
+        protected void mergeReportPlugin_ReportSets(
+                ReportPlugin.Builder builder,
+                ReportPlugin target,
+                ReportPlugin source,
+                boolean sourceDominant,
+                Map<Object, Object> context) {
             List<ReportSet> src = source.getReportSets();
-            if ( !src.isEmpty() )
-            {
+            if (!src.isEmpty()) {
                 List<ReportSet> tgt = target.getReportSets();
-                Map<Object, ReportSet> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
+                Map<Object, ReportSet> merged = new LinkedHashMap<>((src.size() + tgt.size()) * 2);
 
-                for ( ReportSet element : tgt )
-                {
-                    Object key = getReportSetKey().apply( element );
-                    merged.put( key, element );
+                for (ReportSet element : tgt) {
+                    Object key = getReportSetKey().apply(element);
+                    merged.put(key, element);
                 }
 
-                for ( ReportSet element : src )
-                {
-                    Object key = getReportSetKey().apply( element );
-                    ReportSet existing = merged.get( key );
-                    if ( existing != null )
-                    {
-                        element = mergeReportSet( existing, element, sourceDominant, context );
+                for (ReportSet element : src) {
+                    Object key = getReportSetKey().apply(element);
+                    ReportSet existing = merged.get(key);
+                    if (existing != null) {
+                        element = mergeReportSet(existing, element, sourceDominant, context);
                     }
-                    merged.put( key, element );
+                    merged.put(key, element);
                 }
 
-                builder.reportSets( merged.values() );
+                builder.reportSets(merged.values());
             }
         }
-
     }
-
 }

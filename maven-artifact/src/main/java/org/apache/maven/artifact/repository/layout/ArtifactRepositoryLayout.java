@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository.layout;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.repository.layout;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,21 +16,21 @@ package org.apache.maven.artifact.repository.layout;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.repository.layout;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /** @author jdcasey */
-public interface ArtifactRepositoryLayout
-{
+public interface ArtifactRepositoryLayout {
     String ROLE = ArtifactRepositoryLayout.class.getName();
 
     String getId();
 
-    String pathOf( Artifact artifact );
+    String pathOf(Artifact artifact);
 
-    String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository );
+    String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository);
 
-    String pathOfRemoteRepositoryMetadata( ArtifactMetadata metadata );
+    String pathOfRemoteRepositoryMetadata(ArtifactMetadata metadata);
 }

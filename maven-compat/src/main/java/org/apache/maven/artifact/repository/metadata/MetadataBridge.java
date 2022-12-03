@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,11 @@ package org.apache.maven.artifact.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.repository.metadata;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.Map;
-
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
@@ -38,85 +36,64 @@ import org.eclipse.aether.metadata.Metadata;
  *
  * @author Benjamin Bentmann
  */
-public final class MetadataBridge
-    extends AbstractMetadata
-    implements MergeableMetadata
-{
+public final class MetadataBridge extends AbstractMetadata implements MergeableMetadata {
 
     private ArtifactMetadata metadata;
 
     private boolean merged;
 
-    public MetadataBridge( ArtifactMetadata metadata )
-    {
+    public MetadataBridge(ArtifactMetadata metadata) {
         this.metadata = metadata;
     }
 
-    public void merge( File current, File result )
-        throws RepositoryException
-    {
-        try
-        {
-            if ( current.exists() )
-            {
-                FileUtils.copyFile( current, result );
+    public void merge(File current, File result) throws RepositoryException {
+        try {
+            if (current.exists()) {
+                FileUtils.copyFile(current, result);
             }
-            ArtifactRepository localRepo = new MetadataRepository( result );
-            metadata.storeInLocalRepository( localRepo, localRepo );
+            ArtifactRepository localRepo = new MetadataRepository(result);
+            metadata.storeInLocalRepository(localRepo, localRepo);
             merged = true;
-        }
-        catch ( Exception e )
-        {
-            throw new RepositoryException( e.getMessage(), e );
+        } catch (Exception e) {
+            throw new RepositoryException(e.getMessage(), e);
         }
     }
 
-    public boolean isMerged()
-    {
+    public boolean isMerged() {
         return merged;
     }
 
-    public String getGroupId()
-    {
-        return emptify( metadata.getGroupId() );
+    public String getGroupId() {
+        return emptify(metadata.getGroupId());
     }
 
-    public String getArtifactId()
-    {
-        return metadata.storedInGroupDirectory() ? "" : emptify( metadata.getArtifactId() );
+    public String getArtifactId() {
+        return metadata.storedInGroupDirectory() ? "" : emptify(metadata.getArtifactId());
     }
 
-    public String getVersion()
-    {
-        return metadata.storedInArtifactVersionDirectory() ? emptify( metadata.getBaseVersion() ) : "";
+    public String getVersion() {
+        return metadata.storedInArtifactVersionDirectory() ? emptify(metadata.getBaseVersion()) : "";
     }
 
-    public String getType()
-    {
+    public String getType() {
         return metadata.getRemoteFilename();
     }
 
-    private String emptify( String string )
-    {
-        return ( string != null ) ? string : "";
+    private String emptify(String string) {
+        return (string != null) ? string : "";
     }
 
-    public File getFile()
-    {
+    public File getFile() {
         return null;
     }
 
-    public MetadataBridge setFile( File file )
-    {
+    public MetadataBridge setFile(File file) {
         return this;
     }
 
-    public Nature getNature()
-    {
-        if ( metadata instanceof RepositoryMetadata )
-        {
-            switch ( ( (RepositoryMetadata) metadata ).getNature() )
-            {
+    public Nature getNature() {
+        if (metadata instanceof RepositoryMetadata) {
+            switch (((RepositoryMetadata) metadata).getNature()) {
                 case RepositoryMetadata.RELEASE_OR_SNAPSHOT:
                     return Nature.RELEASE_OR_SNAPSHOT;
                 case RepositoryMetadata.SNAPSHOT:
@@ -124,49 +101,38 @@ public final class MetadataBridge
                 default:
                     return Nature.RELEASE;
             }
-        }
-        else
-        {
+        } else {
             return Nature.RELEASE;
         }
     }
 
-    public Map<String, String> getProperties()
-    {
+    public Map<String, String> getProperties() {
         return Collections.emptyMap();
     }
 
     @Override
-    public Metadata setProperties( Map<String, String> properties )
-    {
+    public Metadata setProperties(Map<String, String> properties) {
         return this;
     }
 
-    @SuppressWarnings( "deprecation" )
-    static class MetadataRepository
-        extends DefaultArtifactRepository
-    {
+    @SuppressWarnings("deprecation")
+    static class MetadataRepository extends DefaultArtifactRepository {
 
         private File metadataFile;
 
-        MetadataRepository( File metadataFile )
-        {
-            super( "local", "", null );
+        MetadataRepository(File metadataFile) {
+            super("local", "", null);
             this.metadataFile = metadataFile;
         }
 
         @Override
-        public String getBasedir()
-        {
+        public String getBasedir() {
             return metadataFile.getParent();
         }
 
         @Override
-        public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
-        {
+        public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
             return metadataFile.getName();
         }
-
     }
-
 }

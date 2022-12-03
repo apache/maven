@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -28,7 +27,6 @@ import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TimeZone;
-
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
@@ -38,120 +36,100 @@ import org.eclipse.aether.artifact.Artifact;
 /**
  * Maven remote GAV level metadata.
  */
-final class RemoteSnapshotMetadata
-    extends MavenSnapshotMetadata
-{
+final class RemoteSnapshotMetadata extends MavenSnapshotMetadata {
     public static final String DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT = "yyyyMMdd.HHmmss";
 
-    public static final TimeZone DEFAULT_SNAPSHOT_TIME_ZONE = TimeZone.getTimeZone( "Etc/UTC" );
+    public static final TimeZone DEFAULT_SNAPSHOT_TIME_ZONE = TimeZone.getTimeZone("Etc/UTC");
 
     private final Map<String, SnapshotVersion> versions = new LinkedHashMap<>();
 
-    RemoteSnapshotMetadata( Artifact artifact, boolean legacyFormat, Date timestamp )
-    {
-        super( createRepositoryMetadata( artifact, legacyFormat ), null, legacyFormat, timestamp );
+    RemoteSnapshotMetadata(Artifact artifact, boolean legacyFormat, Date timestamp) {
+        super(createRepositoryMetadata(artifact, legacyFormat), null, legacyFormat, timestamp);
     }
 
-    private RemoteSnapshotMetadata( Metadata metadata, File file, boolean legacyFormat, Date timestamp )
-    {
-        super( metadata, file, legacyFormat, timestamp );
+    private RemoteSnapshotMetadata(Metadata metadata, File file, boolean legacyFormat, Date timestamp) {
+        super(metadata, file, legacyFormat, timestamp);
     }
 
-    public MavenMetadata setFile( File file )
-    {
-        return new RemoteSnapshotMetadata( metadata, file, legacyFormat, timestamp );
+    public MavenMetadata setFile(File file) {
+        return new RemoteSnapshotMetadata(metadata, file, legacyFormat, timestamp);
     }
 
-    public String getExpandedVersion( Artifact artifact )
-    {
-        String key = getKey( artifact.getClassifier(), artifact.getExtension() );
-        return versions.get( key ).getVersion();
+    public String getExpandedVersion(Artifact artifact) {
+        String key = getKey(artifact.getClassifier(), artifact.getExtension());
+        return versions.get(key).getVersion();
     }
 
     @Override
-    protected void merge( Metadata recessive )
-    {
+    protected void merge(Metadata recessive) {
         Snapshot snapshot;
         String lastUpdated;
 
-        if ( metadata.getVersioning() == null )
-        {
-            DateFormat utcDateFormatter = new SimpleDateFormat( DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT );
-            utcDateFormatter.setCalendar( new GregorianCalendar() );
-            utcDateFormatter.setTimeZone( DEFAULT_SNAPSHOT_TIME_ZONE );
+        if (metadata.getVersioning() == null) {
+            DateFormat utcDateFormatter = new SimpleDateFormat(DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT);
+            utcDateFormatter.setCalendar(new GregorianCalendar());
+            utcDateFormatter.setTimeZone(DEFAULT_SNAPSHOT_TIME_ZONE);
 
             snapshot = new Snapshot();
-            snapshot.setBuildNumber( getBuildNumber( recessive ) + 1 );
-            snapshot.setTimestamp( utcDateFormatter.format( timestamp ) );
+            snapshot.setBuildNumber(getBuildNumber(recessive) + 1);
+            snapshot.setTimestamp(utcDateFormatter.format(timestamp));
 
             Versioning versioning = new Versioning();
-            versioning.setSnapshot( snapshot );
-            versioning.setLastUpdatedTimestamp( timestamp );
+            versioning.setSnapshot(snapshot);
+            versioning.setLastUpdatedTimestamp(timestamp);
             lastUpdated = versioning.getLastUpdated();
 
-            metadata.setVersioning( versioning );
-        }
-        else
-        {
+            metadata.setVersioning(versioning);
+        } else {
             snapshot = metadata.getVersioning().getSnapshot();
             lastUpdated = metadata.getVersioning().getLastUpdated();
         }
 
-        for ( Artifact artifact : artifacts )
-        {
+        for (Artifact artifact : artifacts) {
             String version = artifact.getVersion();
 
-            if ( version.endsWith( SNAPSHOT ) )
-            {
+            if (version.endsWith(SNAPSHOT)) {
                 String qualifier = snapshot.getTimestamp() + '-' + snapshot.getBuildNumber();
-                version = version.substring( 0, version.length() - SNAPSHOT.length() ) + qualifier;
+                version = version.substring(0, version.length() - SNAPSHOT.length()) + qualifier;
             }
 
             SnapshotVersion sv = new SnapshotVersion();
-            sv.setClassifier( artifact.getClassifier() );
-            sv.setExtension( artifact.getExtension() );
-            sv.setVersion( version );
-            sv.setUpdated( lastUpdated );
+            sv.setClassifier(artifact.getClassifier());
+            sv.setExtension(artifact.getExtension());
+            sv.setVersion(version);
+            sv.setUpdated(lastUpdated);
 
-            versions.put( getKey( sv.getClassifier(), sv.getExtension() ), sv );
+            versions.put(getKey(sv.getClassifier(), sv.getExtension()), sv);
         }
 
         artifacts.clear();
 
         Versioning versioning = recessive.getVersioning();
-        if ( versioning != null )
-        {
-            for ( SnapshotVersion sv : versioning.getSnapshotVersions() )
-            {
-                String key = getKey( sv.getClassifier(), sv.getExtension() );
-                if ( !versions.containsKey( key ) )
-                {
-                    versions.put( key, sv );
+        if (versioning != null) {
+            for (SnapshotVersion sv : versioning.getSnapshotVersions()) {
+                String key = getKey(sv.getClassifier(), sv.getExtension());
+                if (!versions.containsKey(key)) {
+                    versions.put(key, sv);
                 }
             }
         }
 
-        if ( !legacyFormat )
-        {
-            metadata.getVersioning().setSnapshotVersions( new ArrayList<>( versions.values() ) );
+        if (!legacyFormat) {
+            metadata.getVersioning().setSnapshotVersions(new ArrayList<>(versions.values()));
         }
     }
 
-    private static int getBuildNumber( Metadata metadata )
-    {
+    private static int getBuildNumber(Metadata metadata) {
         int number = 0;
 
         Versioning versioning = metadata.getVersioning();
-        if ( versioning != null )
-        {
+        if (versioning != null) {
             Snapshot snapshot = versioning.getSnapshot();
-            if ( snapshot != null && snapshot.getBuildNumber() > 0 )
-            {
+            if (snapshot != null && snapshot.getBuildNumber() > 0) {
                 number = snapshot.getBuildNumber();
             }
         }
 
         return number;
     }
-
 }

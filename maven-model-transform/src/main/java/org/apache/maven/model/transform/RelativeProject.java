@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,39 +16,35 @@ package org.apache.maven.model.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform;
 
 /**
  *
  * @author Robert Scholte
  * @since 4.0.0
  */
-public class RelativeProject
-{
+public class RelativeProject {
     private final String groupId;
 
     private final String artifactId;
 
     private final String version;
 
-    public RelativeProject( String groupId, String artifactId, String version )
-    {
+    public RelativeProject(String groupId, String artifactId, String version) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
     }
 
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return groupId;
     }
 
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return artifactId;
     }
 
-    public String getVersion()
-    {
+    public String getVersion() {
         return version;
     }
 }

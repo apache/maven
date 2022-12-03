@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,10 @@ package org.apache.maven.model.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform;
 
 import java.util.List;
 import java.util.function.Function;
-
 import org.apache.maven.model.transform.pull.NodeBufferingParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
@@ -32,56 +30,45 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
  * @author Guillaume Nodet
  * @since 4.0.0
  */
-class CiFriendlyXMLFilter
-    extends NodeBufferingParser
-{
+class CiFriendlyXMLFilter extends NodeBufferingParser {
     private final boolean replace;
 
     private Function<String, String> replaceChain = Function.identity();
 
-    CiFriendlyXMLFilter( XmlPullParser xmlPullParser, boolean replace )
-    {
-        super( xmlPullParser, "version" );
+    CiFriendlyXMLFilter(XmlPullParser xmlPullParser, boolean replace) {
+        super(xmlPullParser, "version");
         this.replace = replace;
     }
 
-    public CiFriendlyXMLFilter setChangelist( String changelist )
-    {
-        replaceChain = replaceChain.andThen( t -> t.replace( "${changelist}", changelist ) );
+    public CiFriendlyXMLFilter setChangelist(String changelist) {
+        replaceChain = replaceChain.andThen(t -> t.replace("${changelist}", changelist));
         return this;
     }
 
-    public CiFriendlyXMLFilter setRevision( String revision )
-    {
-        replaceChain = replaceChain.andThen( t -> t.replace( "${revision}", revision ) );
+    public CiFriendlyXMLFilter setRevision(String revision) {
+        replaceChain = replaceChain.andThen(t -> t.replace("${revision}", revision));
         return this;
     }
 
-    public CiFriendlyXMLFilter setSha1( String sha1 )
-    {
-        replaceChain = replaceChain.andThen( t -> t.replace( "${sha1}", sha1 ) );
+    public CiFriendlyXMLFilter setSha1(String sha1) {
+        replaceChain = replaceChain.andThen(t -> t.replace("${sha1}", sha1));
         return this;
     }
 
     /**
      * @return {@code true} is any of the ci properties is set, otherwise {@code false}
      */
-    public boolean isSet()
-    {
-        return !replaceChain.equals( Function.identity() );
+    public boolean isSet() {
+        return !replaceChain.equals(Function.identity());
     }
 
     @Override
-    protected void process( List<Event> buffer )
-    {
-        for ( Event event : buffer )
-        {
-            if ( event.event == TEXT && replace && event.text.contains( "${" ) )
-            {
-                event.text = replaceChain.apply( event.text );
+    protected void process(List<Event> buffer) {
+        for (Event event : buffer) {
+            if (event.event == TEXT && replace && event.text.contains("${")) {
+                event.text = replaceChain.apply(event.text);
             }
-            pushEvent( event );
+            pushEvent(event);
         }
     }
-
 }

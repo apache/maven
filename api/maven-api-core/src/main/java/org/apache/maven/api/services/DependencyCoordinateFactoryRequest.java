@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,13 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
+
+import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-
 import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Exclusion;
@@ -32,16 +32,13 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 
-import static org.apache.maven.api.services.BaseRequest.nonNull;
-
 /**
  *
  * @since 4.0
  */
 @Experimental
 @Immutable
-public interface DependencyCoordinateFactoryRequest extends ArtifactCoordinateFactoryRequest
-{
+public interface DependencyCoordinateFactoryRequest extends ArtifactCoordinateFactoryRequest {
 
     String getScope();
 
@@ -51,58 +48,59 @@ public interface DependencyCoordinateFactoryRequest extends ArtifactCoordinateFa
     Collection<Exclusion> getExclusions();
 
     @Nonnull
-    static DependencyCoordinateFactoryRequest build( @Nonnull Session session, String groupId, String artifactId,
-                                                   String version, String classifier, String extension, String type )
-    {
+    static DependencyCoordinateFactoryRequest build(
+            @Nonnull Session session,
+            String groupId,
+            String artifactId,
+            String version,
+            String classifier,
+            String extension,
+            String type) {
         return DependencyCoordinateFactoryRequest.builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .groupId( groupId )
-                .artifactId( artifactId )
-                .version( version )
-                .classifier( classifier )
-                .extension( extension )
-                .type( type )
+                .session(nonNull(session, "session cannot be null"))
+                .groupId(groupId)
+                .artifactId(artifactId)
+                .version(version)
+                .classifier(classifier)
+                .extension(extension)
+                .type(type)
                 .build();
     }
 
     @Nonnull
-    static DependencyCoordinateFactoryRequest build( @Nonnull Session session, @Nonnull ArtifactCoordinate coordinate )
-    {
+    static DependencyCoordinateFactoryRequest build(@Nonnull Session session, @Nonnull ArtifactCoordinate coordinate) {
         return builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .groupId( nonNull( coordinate, "coordinate cannot be null" ).getGroupId() )
-                .artifactId( coordinate.getArtifactId() )
-                .version( coordinate.getVersion().asString() )
-                .classifier( coordinate.getClassifier() )
-                .extension( coordinate.getExtension() )
+                .session(nonNull(session, "session cannot be null"))
+                .groupId(nonNull(coordinate, "coordinate cannot be null").getGroupId())
+                .artifactId(coordinate.getArtifactId())
+                .version(coordinate.getVersion().asString())
+                .classifier(coordinate.getClassifier())
+                .extension(coordinate.getExtension())
                 .build();
     }
 
     @Nonnull
-    static DependencyCoordinateFactoryRequest build( @Nonnull Session session, @Nonnull Dependency dependency )
-    {
+    static DependencyCoordinateFactoryRequest build(@Nonnull Session session, @Nonnull Dependency dependency) {
         return builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .groupId( nonNull( dependency, "dependency" ).getGroupId() )
-                .artifactId( dependency.getArtifactId() )
-                .version( dependency.getVersion().asString() )
-                .classifier( dependency.getClassifier() )
-                .extension( dependency.getExtension() )
-                .type( dependency.getType().getName() )
-                .scope( dependency.getScope().id() )
-                .optional( dependency.isOptional() )
+                .session(nonNull(session, "session cannot be null"))
+                .groupId(nonNull(dependency, "dependency").getGroupId())
+                .artifactId(dependency.getArtifactId())
+                .version(dependency.getVersion().asString())
+                .classifier(dependency.getClassifier())
+                .extension(dependency.getExtension())
+                .type(dependency.getType().getName())
+                .scope(dependency.getScope().id())
+                .optional(dependency.isOptional())
                 .build();
     }
 
     @Nonnull
-    static DependencyCoordinateFactoryRequestBuilder builder()
-    {
+    static DependencyCoordinateFactoryRequestBuilder builder() {
         return new DependencyCoordinateFactoryRequestBuilder();
     }
 
     @NotThreadSafe
-    class DependencyCoordinateFactoryRequestBuilder
-    {
+    class DependencyCoordinateFactoryRequestBuilder {
         private Session session;
         private String groupId;
         private String artifactId;
@@ -114,100 +112,80 @@ public interface DependencyCoordinateFactoryRequest extends ArtifactCoordinateFa
         private boolean optional;
         private Collection<Exclusion> exclusions = Collections.emptyList();
 
-        DependencyCoordinateFactoryRequestBuilder()
-        {
-        }
+        DependencyCoordinateFactoryRequestBuilder() {}
 
-        public DependencyCoordinateFactoryRequestBuilder session( Session session )
-        {
+        public DependencyCoordinateFactoryRequestBuilder session(Session session) {
             this.session = session;
             return this;
         }
 
-        public DependencyCoordinateFactoryRequestBuilder groupId( String groupId )
-        {
+        public DependencyCoordinateFactoryRequestBuilder groupId(String groupId) {
             this.groupId = groupId;
             return this;
         }
 
-        public DependencyCoordinateFactoryRequestBuilder artifactId( String artifactId )
-        {
+        public DependencyCoordinateFactoryRequestBuilder artifactId(String artifactId) {
             this.artifactId = artifactId;
             return this;
         }
 
-        public DependencyCoordinateFactoryRequestBuilder version( String version )
-        {
+        public DependencyCoordinateFactoryRequestBuilder version(String version) {
             this.version = version;
             return this;
         }
 
-        public DependencyCoordinateFactoryRequestBuilder classifier( String classifier )
-        {
+        public DependencyCoordinateFactoryRequestBuilder classifier(String classifier) {
             this.classifier = classifier;
             return this;
         }
 
-        public DependencyCoordinateFactoryRequestBuilder extension( String extension )
-        {
+        public DependencyCoordinateFactoryRequestBuilder extension(String extension) {
             this.extension = extension;
             return this;
         }
 
-        public DependencyCoordinateFactoryRequestBuilder type( String type )
-        {
+        public DependencyCoordinateFactoryRequestBuilder type(String type) {
             this.type = type;
             return this;
         }
 
-        public DependencyCoordinateFactoryRequestBuilder scope( String scope )
-        {
+        public DependencyCoordinateFactoryRequestBuilder scope(String scope) {
             this.scope = scope;
             return this;
         }
 
-        public DependencyCoordinateFactoryRequestBuilder optional( boolean optional )
-        {
+        public DependencyCoordinateFactoryRequestBuilder optional(boolean optional) {
             this.optional = optional;
             return this;
         }
 
-        public DependencyCoordinateFactoryRequestBuilder exclusions( Collection<Exclusion> exclusions )
-        {
-            if ( exclusions != null )
-            {
-                if ( this.exclusions.isEmpty() )
-                {
+        public DependencyCoordinateFactoryRequestBuilder exclusions(Collection<Exclusion> exclusions) {
+            if (exclusions != null) {
+                if (this.exclusions.isEmpty()) {
                     this.exclusions = new ArrayList<>();
                 }
-                this.exclusions.addAll( exclusions );
+                this.exclusions.addAll(exclusions);
             }
             return this;
         }
 
-        public DependencyCoordinateFactoryRequestBuilder exclusion( Exclusion exclusion )
-        {
-            if ( exclusion != null )
-            {
-                if ( this.exclusions.isEmpty() )
-                {
+        public DependencyCoordinateFactoryRequestBuilder exclusion(Exclusion exclusion) {
+            if (exclusion != null) {
+                if (this.exclusions.isEmpty()) {
                     this.exclusions = new ArrayList<>();
                 }
-                this.exclusions.add( exclusion );
+                this.exclusions.add(exclusion);
             }
             return this;
         }
 
-        public DependencyCoordinateFactoryRequest build()
-        {
-            return new DefaultDependencyCoordinateFactoryRequest( session, groupId, artifactId, version,
-                    classifier, extension, type, scope, optional, exclusions );
+        public DependencyCoordinateFactoryRequest build() {
+            return new DefaultDependencyCoordinateFactoryRequest(
+                    session, groupId, artifactId, version, classifier, extension, type, scope, optional, exclusions);
         }
 
-        private static class DefaultDependencyCoordinateFactoryRequest
-                extends BaseRequest
-                implements DependencyCoordinateFactoryRequest
-        {
+        private static class DefaultDependencyCoordinateFactoryRequest extends BaseRequest
+                implements DependencyCoordinateFactoryRequest {
             private final String groupId;
             private final String artifactId;
             private final String version;
@@ -218,19 +196,19 @@ public interface DependencyCoordinateFactoryRequest extends ArtifactCoordinateFa
             private final boolean optional;
             private final Collection<Exclusion> exclusions;
 
-            @SuppressWarnings( "checkstyle:ParameterNumber" )
+            @SuppressWarnings("checkstyle:ParameterNumber")
             private DefaultDependencyCoordinateFactoryRequest(
-                            @Nonnull Session session, String groupId,
-                            String artifactId,
-                            String version,
-                            String classifier,
-                            String extension,
-                            String type,
-                            String scope,
-                            boolean optional,
-                            Collection<Exclusion> exclusions )
-            {
-                super( session );
+                    @Nonnull Session session,
+                    String groupId,
+                    String artifactId,
+                    String version,
+                    String classifier,
+                    String extension,
+                    String type,
+                    String scope,
+                    boolean optional,
+                    Collection<Exclusion> exclusions) {
+                super(session);
                 this.groupId = groupId;
                 this.artifactId = artifactId;
                 this.version = version;
@@ -243,60 +221,50 @@ public interface DependencyCoordinateFactoryRequest extends ArtifactCoordinateFa
             }
 
             @Override
-            public String getGroupId()
-            {
+            public String getGroupId() {
                 return groupId;
             }
 
             @Override
-            public String getArtifactId()
-            {
+            public String getArtifactId() {
                 return artifactId;
             }
 
             @Override
-            public String getVersion()
-            {
+            public String getVersion() {
                 return version;
             }
 
             @Override
-            public String getClassifier()
-            {
+            public String getClassifier() {
                 return classifier;
             }
 
             @Override
-            public String getExtension()
-            {
+            public String getExtension() {
                 return extension;
             }
 
             @Override
-            public String getType()
-            {
+            public String getType() {
                 return type;
             }
 
             @Override
-            public String getScope()
-            {
+            public String getScope() {
                 return scope;
             }
 
             @Override
-            public boolean isOptional()
-            {
+            public boolean isOptional() {
                 return optional;
             }
 
             @Nonnull
             @Override
-            public Collection<Exclusion> getExclusions()
-            {
+            public Collection<Exclusion> getExclusions() {
                 return exclusions;
             }
         }
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.configuration;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.configuration;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.configuration;
 
 import java.io.File;
 
@@ -26,9 +25,7 @@ import java.io.File;
  *
  * @author Benjamin Bentmann
  */
-public class BasedirBeanConfigurationPathTranslator
-    implements BeanConfigurationPathTranslator
-{
+public class BasedirBeanConfigurationPathTranslator implements BeanConfigurationPathTranslator {
 
     private final File basedir;
 
@@ -38,34 +35,25 @@ public class BasedirBeanConfigurationPathTranslator
      * @param basedir The base directory to resolve relative paths against, may be {@code null} to disable path
      *            translation.
      */
-    public BasedirBeanConfigurationPathTranslator( File basedir )
-    {
+    public BasedirBeanConfigurationPathTranslator(File basedir) {
         this.basedir = basedir;
     }
 
-    public File translatePath( File path )
-    {
+    public File translatePath(File path) {
         File result = path;
 
-        if ( path != null && basedir != null )
-        {
-            if ( path.isAbsolute() )
-            {
+        if (path != null && basedir != null) {
+            if (path.isAbsolute()) {
                 // path is already absolute, we're done
-            }
-            else if ( path.getPath().startsWith( File.separator ) )
-            {
+            } else if (path.getPath().startsWith(File.separator)) {
                 // drive-relative Windows path, don't align with base dir but with drive root
                 result = path.getAbsoluteFile();
-            }
-            else
-            {
+            } else {
                 // an ordinary relative path, align with base dir
-                result = new File( new File( basedir, path.getPath() ).toURI().normalize() ).getAbsoluteFile();
+                result = new File(new File(basedir, path.getPath()).toURI().normalize()).getAbsoluteFile();
             }
         }
 
         return result;
     }
-
 }

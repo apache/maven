@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.version.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.version.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.version.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,11 +28,9 @@ import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.MetadataReader;
@@ -73,14 +70,12 @@ import org.slf4j.LoggerFactory;
  */
 @Named
 @Singleton
-public class DefaultPluginVersionResolver
-    implements PluginVersionResolver
-{
+public class DefaultPluginVersionResolver implements PluginVersionResolver {
     private static final String REPOSITORY_CONTEXT = "plugin";
 
     private static final Object CACHE_KEY = new Object();
 
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final RepositorySystem repositorySystem;
     private final MetadataReader metadataReader;
     private final MavenPluginManager pluginManager;
@@ -91,8 +86,7 @@ public class DefaultPluginVersionResolver
             RepositorySystem repositorySystem,
             MetadataReader metadataReader,
             MavenPluginManager pluginManager,
-            VersionScheme versionScheme )
-    {
+            VersionScheme versionScheme) {
         this.repositorySystem = repositorySystem;
         this.metadataReader = metadataReader;
         this.pluginManager = pluginManager;
@@ -100,311 +94,256 @@ public class DefaultPluginVersionResolver
     }
 
     @Override
-    public PluginVersionResult resolve( PluginVersionRequest request )
-        throws PluginVersionResolutionException
-    {
-        PluginVersionResult result = resolveFromProject( request );
+    public PluginVersionResult resolve(PluginVersionRequest request) throws PluginVersionResolutionException {
+        PluginVersionResult result = resolveFromProject(request);
 
-        if ( result == null )
-        {
-            ConcurrentMap<Key, PluginVersionResult> cache = getCache( request.getRepositorySession().getData() );
-            Key key = getKey( request );
-            result = cache.get( key );
+        if (result == null) {
+            ConcurrentMap<Key, PluginVersionResult> cache =
+                    getCache(request.getRepositorySession().getData());
+            Key key = getKey(request);
+            result = cache.get(key);
 
-            if ( result == null )
-            {
-                result = resolveFromRepository( request );
+            if (result == null) {
+                result = resolveFromRepository(request);
 
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.debug( "Resolved plugin version for " + request.getGroupId() + ":" + request.getArtifactId()
-                        + " to " + result.getVersion() + " from repository " + result.getRepository() );
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Resolved plugin version for " + request.getGroupId() + ":" + request.getArtifactId()
+                            + " to " + result.getVersion() + " from repository " + result.getRepository());
                 }
 
-                cache.putIfAbsent( key, result );
+                cache.putIfAbsent(key, result);
+            } else if (logger.isDebugEnabled()) {
+                logger.debug("Reusing cached resolved plugin version for " + request.getGroupId() + ":"
+                        + request.getArtifactId() + " to " + result.getVersion() + " from POM " + request.getPom());
             }
-            else if ( logger.isDebugEnabled() )
-            {
-                logger.debug( "Reusing cached resolved plugin version for " + request.getGroupId() + ":"
-                        + request.getArtifactId() + " to " + result.getVersion() + " from POM " + request.getPom() );
-            }
-        }
-        else if ( logger.isDebugEnabled() )
-        {
-            logger.debug( "Resolved plugin version for " + request.getGroupId() + ":" + request.getArtifactId() + " to "
-                + result.getVersion() + " from POM " + request.getPom() );
+        } else if (logger.isDebugEnabled()) {
+            logger.debug("Resolved plugin version for " + request.getGroupId() + ":" + request.getArtifactId() + " to "
+                    + result.getVersion() + " from POM " + request.getPom());
         }
 
         return result;
     }
 
-    private PluginVersionResult resolveFromRepository( PluginVersionRequest request )
-        throws PluginVersionResolutionException
-    {
-        RequestTrace trace = RequestTrace.newChild( null, request );
+    private PluginVersionResult resolveFromRepository(PluginVersionRequest request)
+            throws PluginVersionResolutionException {
+        RequestTrace trace = RequestTrace.newChild(null, request);
 
         DefaultPluginVersionResult result = new DefaultPluginVersionResult();
 
-        org.eclipse.aether.metadata.Metadata metadata =
-            new DefaultMetadata( request.getGroupId(), request.getArtifactId(), "maven-metadata.xml",
-                                 DefaultMetadata.Nature.RELEASE_OR_SNAPSHOT );
+        org.eclipse.aether.metadata.Metadata metadata = new DefaultMetadata(
+                request.getGroupId(),
+                request.getArtifactId(),
+                "maven-metadata.xml",
+                DefaultMetadata.Nature.RELEASE_OR_SNAPSHOT);
 
         List<MetadataRequest> requests = new ArrayList<>();
 
-        requests.add( new MetadataRequest( metadata, null, REPOSITORY_CONTEXT ).setTrace( trace ) );
+        requests.add(new MetadataRequest(metadata, null, REPOSITORY_CONTEXT).setTrace(trace));
 
-        for ( RemoteRepository repository : request.getRepositories() )
-        {
-            requests.add( new MetadataRequest( metadata, repository, REPOSITORY_CONTEXT ).setTrace( trace ) );
+        for (RemoteRepository repository : request.getRepositories()) {
+            requests.add(new MetadataRequest(metadata, repository, REPOSITORY_CONTEXT).setTrace(trace));
         }
 
-        List<MetadataResult> results = repositorySystem.resolveMetadata( request.getRepositorySession(), requests );
+        List<MetadataResult> results = repositorySystem.resolveMetadata(request.getRepositorySession(), requests);
 
         Versions versions = new Versions();
 
-        for ( MetadataResult res : results )
-        {
+        for (MetadataResult res : results) {
             ArtifactRepository repository = res.getRequest().getRepository();
-            if ( repository == null )
-            {
+            if (repository == null) {
                 repository = request.getRepositorySession().getLocalRepository();
             }
 
-            mergeMetadata( request.getRepositorySession(), trace, versions, res.getMetadata(), repository );
+            mergeMetadata(request.getRepositorySession(), trace, versions, res.getMetadata(), repository);
         }
 
-        selectVersion( result, request, versions );
+        selectVersion(result, request, versions);
 
         return result;
     }
 
-    private void selectVersion( DefaultPluginVersionResult result, PluginVersionRequest request, Versions versions )
-        throws PluginVersionResolutionException
-    {
+    private void selectVersion(DefaultPluginVersionResult result, PluginVersionRequest request, Versions versions)
+            throws PluginVersionResolutionException {
         String version = null;
         ArtifactRepository repo = null;
 
-        if ( StringUtils.isNotEmpty( versions.releaseVersion ) )
-        {
+        if (StringUtils.isNotEmpty(versions.releaseVersion)) {
             version = versions.releaseVersion;
             repo = versions.releaseRepository;
-        }
-        else if ( StringUtils.isNotEmpty( versions.latestVersion ) )
-        {
+        } else if (StringUtils.isNotEmpty(versions.latestVersion)) {
             version = versions.latestVersion;
             repo = versions.latestRepository;
         }
-        if ( version != null && !isCompatible( request, version ) )
-        {
-            versions.versions.remove( version );
+        if (version != null && !isCompatible(request, version)) {
+            versions.versions.remove(version);
             version = null;
         }
 
-        if ( version == null )
-        {
-            TreeSet<Version> releases = new TreeSet<>( Collections.reverseOrder() );
-            TreeSet<Version> snapshots = new TreeSet<>( Collections.reverseOrder() );
+        if (version == null) {
+            TreeSet<Version> releases = new TreeSet<>(Collections.reverseOrder());
+            TreeSet<Version> snapshots = new TreeSet<>(Collections.reverseOrder());
 
-            for ( String ver : versions.versions.keySet() )
-            {
-                try
-                {
-                    Version v = versionScheme.parseVersion( ver );
+            for (String ver : versions.versions.keySet()) {
+                try {
+                    Version v = versionScheme.parseVersion(ver);
 
-                    if ( ver.endsWith( "-SNAPSHOT" ) )
-                    {
-                        snapshots.add( v );
+                    if (ver.endsWith("-SNAPSHOT")) {
+                        snapshots.add(v);
+                    } else {
+                        releases.add(v);
                     }
-                    else
-                    {
-                        releases.add( v );
-                    }
-                }
-                catch ( InvalidVersionSpecificationException e )
-                {
+                } catch (InvalidVersionSpecificationException e) {
                     // ignore
                 }
             }
 
-            for ( Version v : releases )
-            {
+            for (Version v : releases) {
                 String ver = v.toString();
-                if ( isCompatible( request, ver ) )
-                {
+                if (isCompatible(request, ver)) {
                     version = ver;
-                    repo = versions.versions.get( version );
+                    repo = versions.versions.get(version);
                     break;
                 }
             }
 
-            if ( version == null )
-            {
-                for ( Version v : snapshots )
-                {
+            if (version == null) {
+                for (Version v : snapshots) {
                     String ver = v.toString();
-                    if ( isCompatible( request, ver ) )
-                    {
+                    if (isCompatible(request, ver)) {
                         version = ver;
-                        repo = versions.versions.get( version );
+                        repo = versions.versions.get(version);
                         break;
                     }
                 }
             }
         }
 
-        if ( version != null )
-        {
-            result.setVersion( version );
-            result.setRepository( repo );
-        }
-        else
-        {
-            throw new PluginVersionResolutionException( request.getGroupId(), request.getArtifactId(),
-                                                        request.getRepositorySession().getLocalRepository(),
-                                                        request.getRepositories(),
-                                                        "Plugin not found in any plugin repository" );
+        if (version != null) {
+            result.setVersion(version);
+            result.setRepository(repo);
+        } else {
+            throw new PluginVersionResolutionException(
+                    request.getGroupId(),
+                    request.getArtifactId(),
+                    request.getRepositorySession().getLocalRepository(),
+                    request.getRepositories(),
+                    "Plugin not found in any plugin repository");
         }
     }
 
-    private boolean isCompatible( PluginVersionRequest request, String version )
-    {
+    private boolean isCompatible(PluginVersionRequest request, String version) {
         Plugin plugin = new Plugin();
-        plugin.setGroupId( request.getGroupId() );
-        plugin.setArtifactId( request.getArtifactId() );
-        plugin.setVersion( version );
+        plugin.setGroupId(request.getGroupId());
+        plugin.setArtifactId(request.getArtifactId());
+        plugin.setVersion(version);
 
         PluginDescriptor pluginDescriptor;
 
-        try
-        {
-            pluginDescriptor =
-                pluginManager.getPluginDescriptor( plugin, request.getRepositories(), request.getRepositorySession() );
-        }
-        catch ( PluginResolutionException e )
-        {
-            logger.debug( "Ignoring unresolvable plugin version " + version, e );
+        try {
+            pluginDescriptor = pluginManager.getPluginDescriptor(
+                    plugin, request.getRepositories(), request.getRepositorySession());
+        } catch (PluginResolutionException e) {
+            logger.debug("Ignoring unresolvable plugin version " + version, e);
             return false;
-        }
-        catch ( Exception e )
-        {
+        } catch (Exception e) {
             // ignore for now and delay failure to higher level processing
             return true;
         }
 
-        try
-        {
-            pluginManager.checkPrerequisites( pluginDescriptor );
-        }
-        catch ( Exception e )
-        {
-            logger.warn( "Ignoring incompatible plugin version " + version, e );
+        try {
+            pluginManager.checkPrerequisites(pluginDescriptor);
+        } catch (Exception e) {
+            logger.warn("Ignoring incompatible plugin version " + version, e);
             return false;
         }
 
         return true;
     }
 
-    private void mergeMetadata( RepositorySystemSession session, RequestTrace trace, Versions versions,
-                                org.eclipse.aether.metadata.Metadata metadata, ArtifactRepository repository )
-    {
-        if ( metadata != null && metadata.getFile() != null && metadata.getFile().isFile() )
-        {
-            try
-            {
-                Map<String, ?> options = Collections.singletonMap( MetadataReader.IS_STRICT, Boolean.FALSE );
+    private void mergeMetadata(
+            RepositorySystemSession session,
+            RequestTrace trace,
+            Versions versions,
+            org.eclipse.aether.metadata.Metadata metadata,
+            ArtifactRepository repository) {
+        if (metadata != null && metadata.getFile() != null && metadata.getFile().isFile()) {
+            try {
+                Map<String, ?> options = Collections.singletonMap(MetadataReader.IS_STRICT, Boolean.FALSE);
 
-                Metadata repoMetadata = metadataReader.read( metadata.getFile(), options );
+                Metadata repoMetadata = metadataReader.read(metadata.getFile(), options);
 
-                mergeMetadata( versions, repoMetadata, repository );
-            }
-            catch ( IOException e )
-            {
-                invalidMetadata( session, trace, metadata, repository, e );
+                mergeMetadata(versions, repoMetadata, repository);
+            } catch (IOException e) {
+                invalidMetadata(session, trace, metadata, repository, e);
             }
         }
     }
 
-    private void invalidMetadata( RepositorySystemSession session, RequestTrace trace,
-                                  org.eclipse.aether.metadata.Metadata metadata, ArtifactRepository repository,
-                                  Exception exception )
-    {
+    private void invalidMetadata(
+            RepositorySystemSession session,
+            RequestTrace trace,
+            org.eclipse.aether.metadata.Metadata metadata,
+            ArtifactRepository repository,
+            Exception exception) {
         RepositoryListener listener = session.getRepositoryListener();
-        if ( listener != null )
-        {
-            RepositoryEvent.Builder event = new RepositoryEvent.Builder( session, EventType.METADATA_INVALID );
-            event.setTrace( trace );
-            event.setMetadata( metadata );
-            event.setException( exception );
-            event.setRepository( repository );
-            listener.metadataInvalid( event.build() );
+        if (listener != null) {
+            RepositoryEvent.Builder event = new RepositoryEvent.Builder(session, EventType.METADATA_INVALID);
+            event.setTrace(trace);
+            event.setMetadata(metadata);
+            event.setException(exception);
+            event.setRepository(repository);
+            listener.metadataInvalid(event.build());
         }
     }
 
-    private void mergeMetadata( Versions versions, Metadata source, ArtifactRepository repository )
-    {
+    private void mergeMetadata(Versions versions, Metadata source, ArtifactRepository repository) {
         Versioning versioning = source.getVersioning();
-        if ( versioning != null )
-        {
-            String timestamp = StringUtils.clean( versioning.getLastUpdated() );
+        if (versioning != null) {
+            String timestamp = StringUtils.clean(versioning.getLastUpdated());
 
-            if ( StringUtils.isNotEmpty( versioning.getRelease() )
-                && timestamp.compareTo( versions.releaseTimestamp ) > 0 )
-            {
+            if (StringUtils.isNotEmpty(versioning.getRelease()) && timestamp.compareTo(versions.releaseTimestamp) > 0) {
                 versions.releaseVersion = versioning.getRelease();
                 versions.releaseTimestamp = timestamp;
                 versions.releaseRepository = repository;
             }
 
-            if ( StringUtils.isNotEmpty( versioning.getLatest() )
-                && timestamp.compareTo( versions.latestTimestamp ) > 0 )
-            {
+            if (StringUtils.isNotEmpty(versioning.getLatest()) && timestamp.compareTo(versions.latestTimestamp) > 0) {
                 versions.latestVersion = versioning.getLatest();
                 versions.latestTimestamp = timestamp;
                 versions.latestRepository = repository;
             }
 
-            for ( String version : versioning.getVersions() )
-            {
-                if ( !versions.versions.containsKey( version ) )
-                {
-                    versions.versions.put( version, repository );
+            for (String version : versioning.getVersions()) {
+                if (!versions.versions.containsKey(version)) {
+                    versions.versions.put(version, repository);
                 }
             }
         }
     }
 
-    private PluginVersionResult resolveFromProject( PluginVersionRequest request )
-    {
+    private PluginVersionResult resolveFromProject(PluginVersionRequest request) {
         PluginVersionResult result = null;
 
-        if ( request.getPom() != null && request.getPom().getBuild() != null )
-        {
+        if (request.getPom() != null && request.getPom().getBuild() != null) {
             Build build = request.getPom().getBuild();
 
-            result = resolveFromProject( request, build.getPlugins() );
+            result = resolveFromProject(request, build.getPlugins());
 
-            if ( result == null && build.getPluginManagement() != null )
-            {
-                result = resolveFromProject( request, build.getPluginManagement().getPlugins() );
+            if (result == null && build.getPluginManagement() != null) {
+                result = resolveFromProject(request, build.getPluginManagement().getPlugins());
             }
         }
 
         return result;
     }
 
-    private PluginVersionResult resolveFromProject( PluginVersionRequest request, List<Plugin> plugins )
-    {
-        for ( Plugin plugin : plugins )
-        {
-            if ( request.getGroupId().equals( plugin.getGroupId() )
-                && request.getArtifactId().equals( plugin.getArtifactId() ) )
-            {
-                if ( plugin.getVersion() != null )
-                {
-                    return new DefaultPluginVersionResult( plugin.getVersion() );
-                }
-                else
-                {
+    private PluginVersionResult resolveFromProject(PluginVersionRequest request, List<Plugin> plugins) {
+        for (Plugin plugin : plugins) {
+            if (request.getGroupId().equals(plugin.getGroupId())
+                    && request.getArtifactId().equals(plugin.getArtifactId())) {
+                if (plugin.getVersion() != null) {
+                    return new DefaultPluginVersionResult(plugin.getVersion());
+                } else {
                     return null;
                 }
             }
@@ -412,69 +351,57 @@ public class DefaultPluginVersionResolver
         return null;
     }
 
-    @SuppressWarnings( "unchecked" )
-    private ConcurrentMap<Key, PluginVersionResult> getCache( SessionData data )
-    {
-        ConcurrentMap<Key, PluginVersionResult> cache =
-                ( ConcurrentMap<Key, PluginVersionResult> ) data.get( CACHE_KEY );
-        while ( cache == null )
-        {
-            cache = new ConcurrentHashMap<>( 256 );
-            if ( data.set( CACHE_KEY, null, cache ) )
-            {
+    @SuppressWarnings("unchecked")
+    private ConcurrentMap<Key, PluginVersionResult> getCache(SessionData data) {
+        ConcurrentMap<Key, PluginVersionResult> cache = (ConcurrentMap<Key, PluginVersionResult>) data.get(CACHE_KEY);
+        while (cache == null) {
+            cache = new ConcurrentHashMap<>(256);
+            if (data.set(CACHE_KEY, null, cache)) {
                 break;
             }
-            cache = ( ConcurrentMap<Key, PluginVersionResult> ) data.get( CACHE_KEY );
+            cache = (ConcurrentMap<Key, PluginVersionResult>) data.get(CACHE_KEY);
         }
         return cache;
     }
 
-    private static Key getKey( PluginVersionRequest request )
-    {
-        return new Key( request.getGroupId(), request.getArtifactId(), request.getRepositories() );
+    private static Key getKey(PluginVersionRequest request) {
+        return new Key(request.getGroupId(), request.getArtifactId(), request.getRepositories());
     }
 
-    static class Key
-    {
+    static class Key {
         final String groupId;
         final String artifactId;
         final List<RemoteRepository> repositories;
         final int hash;
 
-        Key( String groupId, String artifactId, List<RemoteRepository> repositories )
-        {
+        Key(String groupId, String artifactId, List<RemoteRepository> repositories) {
             this.groupId = groupId;
             this.artifactId = artifactId;
             this.repositories = repositories;
-            this.hash = Objects.hash( groupId, artifactId, repositories );
+            this.hash = Objects.hash(groupId, artifactId, repositories);
         }
 
         @Override
-        public boolean equals( Object o )
-        {
-            if ( this == o )
-            {
+        public boolean equals(Object o) {
+            if (this == o) {
                 return true;
             }
-            if ( o == null || getClass() != o.getClass() )
-            {
+            if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            Key key = ( Key ) o;
-            return groupId.equals( key.groupId )
-                    && artifactId.equals( key.artifactId )
-                    && repositories.equals( key.repositories );
+            Key key = (Key) o;
+            return groupId.equals(key.groupId)
+                    && artifactId.equals(key.artifactId)
+                    && repositories.equals(key.repositories);
         }
 
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return hash;
         }
     }
 
-    static class Versions
-    {
+    static class Versions {
 
         String releaseVersion = "";
 
@@ -489,7 +416,5 @@ public class DefaultPluginVersionResolver
         ArtifactRepository latestRepository;
 
         Map<String, ArtifactRepository> versions = new LinkedHashMap<>();
-
     }
-
 }

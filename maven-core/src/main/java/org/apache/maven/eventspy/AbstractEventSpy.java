@@ -1,5 +1,3 @@
-package org.apache.maven.eventspy;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,28 +16,17 @@ package org.apache.maven.eventspy;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.eventspy;
 
 /**
  * A skeleton eventspy that does nothing other than helping implementors.
  * @since 3.0.2
  */
-public abstract class AbstractEventSpy
-    implements EventSpy
-{
+public abstract class AbstractEventSpy implements EventSpy {
 
-    public void init( Context context )
-        throws Exception
-    {
-    }
+    public void init(Context context) throws Exception {}
 
-    public void onEvent( Object event )
-        throws Exception
-    {
-    }
+    public void onEvent(Object event) throws Exception {}
 
-    public void close()
-        throws Exception
-    {
-    }
-
+    public void close() throws Exception {}
 }

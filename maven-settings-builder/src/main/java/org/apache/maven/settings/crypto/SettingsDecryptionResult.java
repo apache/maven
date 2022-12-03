@@ -1,5 +1,3 @@
-package org.apache.maven.settings.crypto;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,9 @@ package org.apache.maven.settings.crypto;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.crypto;
 
 import java.util.List;
-
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.building.SettingsProblem;
@@ -30,8 +28,7 @@ import org.apache.maven.settings.building.SettingsProblem;
  *
  * @author Benjamin Bentmann
  */
-public interface SettingsDecryptionResult
-{
+public interface SettingsDecryptionResult {
 
     /**
      * Gets the decrypted server. This is a convenience method to retrieve the first element from {@link #getServers()}.
@@ -67,5 +64,4 @@ public interface SettingsDecryptionResult
      * @return The problems that were encountered during the decryption, can be empty but never {@code null}.
      */
     List<SettingsProblem> getProblems();
-
 }

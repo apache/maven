@@ -1,5 +1,3 @@
-package org.apache.maven.settings.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,9 @@ package org.apache.maven.settings.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.building;
 
 import java.util.List;
-
 import org.apache.maven.settings.Settings;
 
 /**
@@ -28,8 +26,7 @@ import org.apache.maven.settings.Settings;
  *
  * @author Benjamin Bentmann
  */
-public interface SettingsBuildingResult
-{
+public interface SettingsBuildingResult {
 
     /**
      * Gets the assembled settings.
@@ -46,5 +43,4 @@ public interface SettingsBuildingResult
      * @return The problems that were encountered during the settings building, can be empty but never {@code null}.
      */
     List<SettingsProblem> getProblems();
-
 }

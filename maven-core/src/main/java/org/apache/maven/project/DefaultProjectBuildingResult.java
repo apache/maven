@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,11 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
 import org.apache.maven.model.building.ModelProblem;
 
 /**
@@ -30,19 +28,17 @@ import org.apache.maven.model.building.ModelProblem;
  *
  * @author Benjamin Bentmann
  */
-class DefaultProjectBuildingResult
-    implements ProjectBuildingResult
-{
+class DefaultProjectBuildingResult implements ProjectBuildingResult {
 
-    private String projectId;
+    private final String projectId;
 
-    private File pomFile;
+    private final File pomFile;
 
-    private MavenProject project;
+    private final MavenProject project;
 
-    private List<ModelProblem> problems;
+    private final List<ModelProblem> problems;
 
-    private DependencyResolutionResult dependencyResolutionResult;
+    private final DependencyResolutionResult dependencyResolutionResult;
 
     /**
      * Creates a new result with the specified contents.
@@ -51,15 +47,14 @@ class DefaultProjectBuildingResult
      * @param problems The problems that were encountered, may be {@code null}.
      * @param dependencyResolutionResult The result of the resolution for the project dependencies, may be {@code null}.
      */
-    DefaultProjectBuildingResult( MavenProject project, List<ModelProblem> problems,
-                                  DependencyResolutionResult dependencyResolutionResult )
-    {
-        this.projectId =
-            ( project != null ) ? project.getGroupId() + ':' + project.getArtifactId() + ':' + project.getVersion()
-                            : "";
-        this.pomFile = ( project != null ) ? project.getFile() : null;
+    DefaultProjectBuildingResult(
+            MavenProject project, List<ModelProblem> problems, DependencyResolutionResult dependencyResolutionResult) {
+        this.projectId = (project != null)
+                ? project.getGroupId() + ':' + project.getArtifactId() + ':' + project.getVersion()
+                : "";
+        this.pomFile = (project != null) ? project.getFile() : null;
         this.project = project;
-        this.problems = problems;
+        this.problems = problems != null ? problems : Collections.emptyList();
         this.dependencyResolutionResult = dependencyResolutionResult;
     }
 
@@ -70,41 +65,31 @@ class DefaultProjectBuildingResult
      * @param pomFile The POM file from which the project was built, may be {@code null}.
      * @param problems The problems that were encountered, may be {@code null}.
      */
-    DefaultProjectBuildingResult( String projectId, File pomFile, List<ModelProblem> problems )
-    {
-        this.projectId = ( projectId != null ) ? projectId : "";
+    DefaultProjectBuildingResult(String projectId, File pomFile, List<ModelProblem> problems) {
+        this.projectId = (projectId != null) ? projectId : "";
         this.pomFile = pomFile;
-        this.problems = problems;
+        this.project = null;
+        this.problems = problems != null ? problems : Collections.emptyList();
+        this.dependencyResolutionResult = null;
     }
 
-    public String getProjectId()
-    {
+    public String getProjectId() {
         return projectId;
     }
 
-    public File getPomFile()
-    {
+    public File getPomFile() {
         return pomFile;
     }
 
-    public MavenProject getProject()
-    {
+    public MavenProject getProject() {
         return project;
     }
 
-    public List<ModelProblem> getProblems()
-    {
-        if ( problems == null )
-        {
-            problems = new ArrayList<>();
-        }
-
+    public List<ModelProblem> getProblems() {
         return problems;
     }
 
-    public DependencyResolutionResult getDependencyResolutionResult()
-    {
+    public DependencyResolutionResult getDependencyResolutionResult() {
         return dependencyResolutionResult;
     }
-
 }

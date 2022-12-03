@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,34 +16,31 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.api.Service;
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
+package org.apache.maven.api.services;
 
 import java.nio.file.Path;
 import java.util.Optional;
-
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.Service;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  *
  * @since 4.0
  */
 @Experimental
-public interface ArtifactManager extends Service
-{
+public interface ArtifactManager extends Service {
 
     /**
      * Returns the path of the file previously associated to this artifact
      * or {@code Optional.empty()} if no path has been associated.
      */
     @Nonnull
-    Optional<Path> getPath( @Nonnull Artifact artifact );
+    Optional<Path> getPath(@Nonnull Artifact artifact);
 
     /**
      * Associates the given file path to the artifact.
      */
-    void setPath( @Nonnull Artifact artifact, Path path );
-
+    void setPath(@Nonnull Artifact artifact, Path path);
 }

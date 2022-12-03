@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import org.apache.maven.building.StringSource;
 
@@ -29,18 +28,15 @@ import org.apache.maven.building.StringSource;
  * @deprecated instead use {@link StringSource}
  */
 @Deprecated
-public class StringModelSource extends StringSource
-    implements ModelSource
-{
+public class StringModelSource extends StringSource implements ModelSource {
 
     /**
      * Creates a new model source backed by the specified string.
      *
      * @param pom The POM's string representation, may be empty or {@code null}.
      */
-    public StringModelSource( CharSequence pom )
-    {
-        this( pom, null );
+    public StringModelSource(CharSequence pom) {
+        this(pom, null);
     }
 
     /**
@@ -49,8 +45,7 @@ public class StringModelSource extends StringSource
      * @param pom The POM's string representation, may be empty or {@code null}.
      * @param location The location to report for this use, may be {@code null}.
      */
-    public StringModelSource( CharSequence pom, String location )
-    {
-        super( pom, location );
+    public StringModelSource(CharSequence pom, String location) {
+        super(pom, location);
     }
 }

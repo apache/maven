@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.versioning;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.versioning;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,40 +16,33 @@ package org.apache.maven.artifact.versioning;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.versioning;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import org.apache.maven.artifact.Artifact;
 
 /**
  * ManagedVersionMap
  */
 @Deprecated
-public class ManagedVersionMap
-    extends HashMap<String, Artifact>
-{
-    public ManagedVersionMap( Map<String, Artifact> map )
-    {
+public class ManagedVersionMap extends HashMap<String, Artifact> {
+    public ManagedVersionMap(Map<String, Artifact> map) {
         super();
-        if ( map != null )
-        {
-            putAll( map );
+        if (map != null) {
+            putAll(map);
         }
     }
 
-    public String toString()
-    {
-        StringBuilder buffer = new StringBuilder( "ManagedVersionMap (" + size() + " entries)\n" );
+    public String toString() {
+        StringBuilder buffer = new StringBuilder("ManagedVersionMap (" + size() + " entries)\n");
         Iterator<String> iter = keySet().iterator();
-        while ( iter.hasNext() )
-        {
+        while (iter.hasNext()) {
             String key = iter.next();
-            buffer.append( key ).append( '=' ).append( get( key ) );
-            if ( iter.hasNext() )
-            {
-                buffer.append( '\n' );
+            buffer.append(key).append('=').append(get(key));
+            if (iter.hasNext()) {
+                buffer.append('\n');
             }
         }
         return buffer.toString();

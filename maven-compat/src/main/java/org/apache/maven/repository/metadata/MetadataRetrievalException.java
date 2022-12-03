@@ -1,5 +1,3 @@
-package org.apache.maven.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,42 +16,36 @@ package org.apache.maven.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.metadata;
 
 /**
  * Error while retrieving repository metadata from the repository.
  *
  * @author Jason van Zyl
  */
-public class MetadataRetrievalException
-    extends Exception
-{
+public class MetadataRetrievalException extends Exception {
 
     private ArtifactMetadata artifact;
 
-    public MetadataRetrievalException( String message )
-    {
-        this( message, null, null );
+    public MetadataRetrievalException(String message) {
+        this(message, null, null);
     }
 
-    public MetadataRetrievalException( Throwable cause )
-    {
-        this( null, cause, null );
+    public MetadataRetrievalException(Throwable cause) {
+        this(null, cause, null);
     }
 
-    public MetadataRetrievalException( String message, Throwable cause )
-    {
-        this( message, cause, null );
+    public MetadataRetrievalException(String message, Throwable cause) {
+        this(message, cause, null);
     }
 
-    public MetadataRetrievalException( String message, Throwable cause, ArtifactMetadata artifact )
-    {
-        super( message, cause );
+    public MetadataRetrievalException(String message, Throwable cause, ArtifactMetadata artifact) {
+        super(message, cause);
 
         this.artifact = artifact;
     }
 
-    public ArtifactMetadata getArtifactMetadata()
-    {
+    public ArtifactMetadata getArtifactMetadata() {
         return artifact;
     }
 }

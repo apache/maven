@@ -82,6 +82,7 @@ under the License.
     -->
   </pluginGroups>
 
+  <!-- TODO Since when can proxies be selected as depicted? -->
   <!-- proxies
    | This is a list of proxies which can be used on this machine to connect to the network.
    | Unless otherwise specified (by system property or command-line switch), the first proxy
@@ -176,7 +177,7 @@ under the License.
    |
    | As noted above, profiles can be activated in a variety of ways. One way - the activeProfiles
    | section of this document (settings.xml) - will be discussed later. Another way essentially
-   | relies on the detection of a system property, either matching a particular value for the property,
+   | relies on the detection of a property, either matching a particular value for the property,
    | or merely testing its existence. Profiles can also be activated by JDK version prefix, where a
    | value of '1.4' might activate a profile when the build is executed on a JDK version of '1.4.2_07'.
    | Finally, the list of active profiles can be specified directly from the command line.
@@ -218,9 +219,9 @@ under the License.
     -->
 
     <!--
-     | Here is another profile, activated by the system property 'target-env' with a value of 'dev',
-     | which provides a specific path to the Tomcat instance. To use this, your plugin configuration
-     | might hypothetically look like:
+     | Here is another profile, activated by the property 'target-env' with a value of 'dev', which
+     | provides a specific path to the Tomcat instance. To use this, your plugin configuration might
+     | hypothetically look like:
      |
      | ...
      | <plugin>

@@ -1,5 +1,3 @@
-package org.apache.maven.monitor.event;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.monitor.event;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,18 +16,17 @@ package org.apache.maven.monitor.event;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.monitor.event;
 
 /**
  * @author jdcasey
  */
 @Deprecated
-public interface EventMonitor
-{
+public interface EventMonitor {
 
-    void startEvent( String eventName, String target, long timestamp );
+    void startEvent(String eventName, String target, long timestamp);
 
-    void endEvent( String eventName, String target, long timestamp );
+    void endEvent(String eventName, String target, long timestamp);
 
-    void errorEvent( String eventName, String target, long timestamp, Throwable cause );
-
+    void errorEvent(String eventName, String target, long timestamp, Throwable cause);
 }

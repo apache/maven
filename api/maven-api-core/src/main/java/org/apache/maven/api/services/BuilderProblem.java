@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,8 +16,12 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Describes a problem that was encountered during project building. A problem can either be an exception that was
@@ -28,8 +30,8 @@ import org.apache.maven.api.annotations.Experimental;
  * @since 4.0
  */
 @Experimental
-public interface ProjectBuilderProblem
-{
+@Immutable
+public interface BuilderProblem {
 
     /**
      * Gets the hint about the source of the problem. While the syntax of this hint is unspecified and depends on the
@@ -37,15 +39,16 @@ public interface ProjectBuilderProblem
      * track the problem back to its origin. A concrete example for such a source hint can be the file path or URL from
      * which the settings were read.
      *
-     * @return The hint about the source of the problem or an empty string if unknown, never {@code null}.
+     * @return the hint about the source of the problem or an empty string if unknown, never {@code null}
      */
+    @Nonnull
     String getSource();
 
     /**
      * Gets the one-based index of the line containing the problem. The line number should refer to some text file that
      * is given by {@link #getSource()}.
      *
-     * @return The one-based index of the line containing the problem or a non-positive value if unknown.
+     * @return the one-based index of the line containing the problem or a non-positive value if unknown
      */
     int getLineNumber();
 
@@ -53,7 +56,7 @@ public interface ProjectBuilderProblem
      * Gets the one-based index of the column containing the problem. The column number should refer to some text file
      * that is given by {@link #getSource()}.
      *
-     * @return The one-based index of the column containing the problem or non-positive value if unknown.
+     * @return the one-based index of the column containing the problem or non-positive value if unknown
      */
     int getColumnNumber();
 
@@ -62,29 +65,44 @@ public interface ProjectBuilderProblem
      * {@link #getSource()}, {@link #getLineNumber()} and {@link #getColumnNumber()}. The exact syntax of the returned
      * value is undefined.
      *
-     * @return The location of the problem, never {@code null}.
+     * @return the location of the problem, never {@code null}
      */
+    @Nonnull
     String getLocation();
 
     /**
      * Gets the exception that caused this problem (if any).
      *
-     * @return The exception that caused this problem or {@code null} if not applicable.
+     * @return the exception that caused this problem or {@code null} if not applicable
      */
+    @Nullable
     Exception getException();
 
     /**
      * Gets the message that describes this problem.
      *
-     * @return The message describing this problem, never {@code null}.
+     * @return the message describing this problem, never {@code null}
      */
+    @Nonnull
     String getMessage();
 
     /**
      * Gets the severity level of this problem.
      *
-     * @return The severity level of this problem, never {@code null}.
+     * @return the severity level of this problem, never {@code null}
      */
-    ProjectBuilderProblemSeverity getSeverity();
+    @Nonnull
+    Severity getSeverity();
 
+    /**
+     * The different severity levels for a problem, in decreasing order.
+     *
+     * @since 4.0
+     */
+    @Experimental
+    enum Severity {
+        FATAL, //
+        ERROR, //
+        WARNING //
+    }
 }

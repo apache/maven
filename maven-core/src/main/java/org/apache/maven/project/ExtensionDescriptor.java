@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,60 +28,45 @@ import java.util.List;
  *
  * @author Benjamin Bentmann
  */
-public class ExtensionDescriptor
-{
+public class ExtensionDescriptor {
 
     private List<String> exportedPackages;
 
     private List<String> exportedArtifacts;
 
-    ExtensionDescriptor()
-    {
+    ExtensionDescriptor() {
         // hide constructor
     }
 
-    public List<String> getExportedPackages()
-    {
-        if ( exportedPackages == null )
-        {
+    public List<String> getExportedPackages() {
+        if (exportedPackages == null) {
             exportedPackages = new ArrayList<>();
         }
 
         return exportedPackages;
     }
 
-    public void setExportedPackages( List<String> exportedPackages )
-    {
-        if ( exportedPackages == null )
-        {
+    public void setExportedPackages(List<String> exportedPackages) {
+        if (exportedPackages == null) {
             this.exportedPackages = null;
-        }
-        else
-        {
-            this.exportedPackages = new ArrayList<>( exportedPackages );
+        } else {
+            this.exportedPackages = new ArrayList<>(exportedPackages);
         }
     }
 
-    public List<String> getExportedArtifacts()
-    {
-        if ( exportedArtifacts == null )
-        {
+    public List<String> getExportedArtifacts() {
+        if (exportedArtifacts == null) {
             exportedArtifacts = new ArrayList<>();
         }
 
         return exportedArtifacts;
     }
 
-    public void setExportedArtifacts( List<String> exportedArtifacts )
-    {
-        if ( exportedArtifacts == null )
-        {
+    public void setExportedArtifacts(List<String> exportedArtifacts) {
+        if (exportedArtifacts == null) {
             this.exportedArtifacts = null;
-        }
-        else
-        {
-            this.exportedArtifacts = new ArrayList<>( exportedArtifacts );
+        } else {
+            this.exportedArtifacts = new ArrayList<>(exportedArtifacts);
         }
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.version;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.version;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.version;
 
 /**
  * Resolves a version for a plugin.
@@ -25,8 +24,7 @@ package org.apache.maven.plugin.version;
  * @since 3.0
  * @author Benjamin Bentmann
  */
-public interface PluginVersionResolver
-{
+public interface PluginVersionResolver {
 
     /**
      * Resolves the version for the specified request.
@@ -36,7 +34,5 @@ public interface PluginVersionResolver
      * @return The result of the version resolution, never {@code null}.
      * @throws PluginVersionResolutionException If the plugin version could not be resolved.
      */
-    PluginVersionResult resolve( PluginVersionRequest request )
-        throws PluginVersionResolutionException;
-
+    PluginVersionResult resolve(PluginVersionRequest request) throws PluginVersionResolutionException;
 }

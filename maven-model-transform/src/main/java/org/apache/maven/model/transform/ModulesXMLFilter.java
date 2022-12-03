@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,9 @@ package org.apache.maven.model.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform;
 
 import java.util.List;
-
 import org.apache.maven.model.transform.pull.NodeBufferingParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
@@ -31,17 +29,12 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
  * @author Guillaume Nodet
  * @since 4.0.0
  */
-class ModulesXMLFilter
-    extends NodeBufferingParser
-{
-    ModulesXMLFilter( XmlPullParser xmlPullParser )
-    {
-        super( xmlPullParser, "modules" );
+class ModulesXMLFilter extends NodeBufferingParser {
+    ModulesXMLFilter(XmlPullParser xmlPullParser) {
+        super(xmlPullParser, "modules");
     }
 
-    protected void process( List<Event> buffer )
-    {
+    protected void process(List<Event> buffer) {
         // Do nothing, as we want to delete those nodes completely
     }
-
 }

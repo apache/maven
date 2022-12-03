@@ -80,7 +80,7 @@
 
         <field xml.transient="true">
           <name>pomFile</name>
-          <version>5.0.0+</version>
+          <version>4.2.0+</version>
           <required>false</required>
           <description>Originating POM file</description>
           <type>DOM</type> <!-- This is transformed to a File/Path in the template -->
@@ -434,7 +434,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>5.0.0+</version>
+          <version>4.2.0+</version>
           <code>
             <![CDATA[
     /**
@@ -579,6 +579,16 @@
             <type>Repository</type>
             <multiplicity>*</multiplicity>
           </association>
+        </field>
+        <field xdoc.separator="blank">
+          <name>reports</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+             <b>Deprecated</b>. Now ignored by Maven.
+             ]]>
+          </description>
+          <type>DOM</type>
         </field>
         <field>
           <name>reporting</name>
@@ -2233,6 +2243,16 @@
           </association>
         </field>
         <field>
+          <name>goals</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+             <b>Deprecated</b>. Unused by Maven.
+             ]]>
+          </description>
+          <type>DOM</type>
+        </field>
+        <field>
           <name>dependencies</name>
           <description>Additional dependencies that this project needs to introduce to the plugin's
             classloader.</description>
@@ -2598,7 +2618,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>5.0.0+</version>
+          <version>4.2.0+</version>
           <code>
             <![CDATA[
     public static final String SOURCE_POM = "pom";
@@ -2672,7 +2692,7 @@
         <field>
           <name>property</name>
           <version>4.0.0+</version>
-          <description>Specifies that this profile will be activated when this system property is
+          <description>Specifies that this profile will be activated when this property is
             specified.</description>
           <association>
             <type>ActivationProperty</type>
@@ -2774,7 +2794,7 @@
         activated. On the other hand, {@code exists} will test for the existence of the file and if it is
         there, the profile will be activated.<br>
         Variable interpolation for these file specifications is limited to {@code ${basedir}},
-        System properties and request properties.]]></description>
+        system properties and user properties.]]></description>
       <fields>
         <field>
           <name>missing</name>

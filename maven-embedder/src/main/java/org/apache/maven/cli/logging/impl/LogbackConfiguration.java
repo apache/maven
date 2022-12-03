@@ -1,5 +1,3 @@
-package org.apache.maven.cli.logging.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.cli.logging.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli.logging.impl;
 
 import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
 import org.slf4j.Logger;
@@ -29,15 +28,11 @@ import org.slf4j.LoggerFactory;
  * @author Hervé Boutemy
  * @since 3.1.0
  */
-public class LogbackConfiguration
-    extends BaseSlf4jConfiguration
-{
+public class LogbackConfiguration extends BaseSlf4jConfiguration {
     @Override
-    public void setRootLoggerLevel( Level level )
-    {
+    public void setRootLoggerLevel(Level level) {
         ch.qos.logback.classic.Level value;
-        switch ( level )
-        {
+        switch (level) {
             case DEBUG:
                 value = ch.qos.logback.classic.Level.DEBUG;
                 break;
@@ -50,12 +45,11 @@ public class LogbackConfiguration
                 value = ch.qos.logback.classic.Level.ERROR;
                 break;
         }
-        ( (ch.qos.logback.classic.Logger) LoggerFactory.getLogger( Logger.ROOT_LOGGER_NAME ) ).setLevel( value );
+        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).setLevel(value);
     }
 
     @Override
-    public void activate()
-    {
+    public void activate() {
         // no op
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,16 +16,15 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.util.List;
-
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 
 /** @deprecated */
 @Deprecated
-public final class ModelUtils
-{
+public final class ModelUtils {
 
     /**
      * This should be the resulting ordering of plugins after merging:
@@ -42,27 +39,21 @@ public final class ModelUtils
      * X -&gt; Y -&gt; A -&gt; B -&gt; C -&gt; D -&gt; E -&gt; F
      * </pre>
      */
-    public static void mergePluginLists( PluginContainer childContainer, PluginContainer parentContainer,
-                                         boolean handleAsInheritance )
-    {
+    public static void mergePluginLists(
+            PluginContainer childContainer, PluginContainer parentContainer, boolean handleAsInheritance) {
         throw new UnsupportedOperationException();
     }
 
-    public static List<Plugin> orderAfterMerge( List<Plugin> merged, List<Plugin> highPrioritySource,
-                                                List<Plugin> lowPrioritySource )
-    {
+    public static List<Plugin> orderAfterMerge(
+            List<Plugin> merged, List<Plugin> highPrioritySource, List<Plugin> lowPrioritySource) {
         throw new UnsupportedOperationException();
     }
 
-
-    public static void mergePluginDefinitions( Plugin child, Plugin parent, boolean handleAsInheritance )
-    {
+    public static void mergePluginDefinitions(Plugin child, Plugin parent, boolean handleAsInheritance) {
         throw new UnsupportedOperationException();
     }
 
-    public static void mergeFilterLists( List<String> childFilters, List<String> parentFilters )
-    {
+    public static void mergeFilterLists(List<String> childFilters, List<String> parentFilters) {
         throw new UnsupportedOperationException();
     }
-
 }

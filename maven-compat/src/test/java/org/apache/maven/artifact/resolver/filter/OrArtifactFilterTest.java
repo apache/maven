@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver.filter;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,41 +16,37 @@ package org.apache.maven.artifact.resolver.filter;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.util.Arrays;
-
-import org.junit.jupiter.api.Test;
+package org.apache.maven.artifact.resolver.filter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Arrays;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link OrArtifactFilter}.
  *
  * @author Benjamin Bentmann
  */
-public class OrArtifactFilterTest
-{
+public class OrArtifactFilterTest {
 
-    private ArtifactFilter newSubFilter()
-    {
+    private ArtifactFilter newSubFilter() {
         return artifact -> false;
     }
 
     @Test
-    public void testEquals()
-    {
+    public void testEquals() {
         OrArtifactFilter filter1 = new OrArtifactFilter();
 
-        OrArtifactFilter filter2 = new OrArtifactFilter( Arrays.asList( newSubFilter() ) );
+        OrArtifactFilter filter2 = new OrArtifactFilter(Arrays.asList(newSubFilter()));
 
-        assertFalse( filter1.equals( null ) );
-        assertTrue( filter1.equals( filter1 ) );
-        assertEquals( filter1.hashCode(), filter1.hashCode() );
+        assertFalse(filter1.equals(null));
+        assertTrue(filter1.equals(filter1));
+        assertEquals(filter1.hashCode(), filter1.hashCode());
 
-        assertFalse( filter1.equals( filter2 ) );
-        assertFalse( filter2.equals( filter1 ) );
+        assertFalse(filter1.equals(filter2));
+        assertFalse(filter2.equals(filter1));
     }
-
 }

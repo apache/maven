@@ -30,7 +30,7 @@ Abstract
 
   In order to really achieve this, we need mojo configurations (which are
   provided both in terms of static expressions that are just looked up, and
-  in terms of user-provided configuration from system properties or the POM).
+  in terms of user-provided configuration from properties or the POM).
   If these mojos are to be first-class components, the configuration from these
   various sources must be consolidated and injected using the container.
 

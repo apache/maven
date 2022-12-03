@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,10 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
@@ -31,32 +29,23 @@ import org.apache.maven.model.Repository;
  *
  * @author Benjamin Bentmann
  */
-public class EmptyProjectBuildingHelper
-    implements ProjectBuildingHelper
-{
+public class EmptyProjectBuildingHelper implements ProjectBuildingHelper {
 
-    public List<ArtifactRepository> createArtifactRepositories( List<Repository> pomRepositories,
-                                                                List<ArtifactRepository> externalRepositories,
-                                                                ProjectBuildingRequest request )
-    {
-        if ( externalRepositories != null )
-        {
+    public List<ArtifactRepository> createArtifactRepositories(
+            List<Repository> pomRepositories,
+            List<ArtifactRepository> externalRepositories,
+            ProjectBuildingRequest request) {
+        if (externalRepositories != null) {
             return externalRepositories;
-        }
-        else
-        {
+        } else {
             return new ArrayList<>();
         }
     }
 
-    public ProjectRealmCache.CacheRecord createProjectRealm( MavenProject project,
-                                                             Model model, ProjectBuildingRequest request )
-    {
-        return new ProjectRealmCache.CacheRecord( null, null );
+    public ProjectRealmCache.CacheRecord createProjectRealm(
+            MavenProject project, Model model, ProjectBuildingRequest request) {
+        return new ProjectRealmCache.CacheRecord(null, null);
     }
 
-    public void selectProjectRealm( MavenProject project )
-    {
-    }
-
+    public void selectProjectRealm(MavenProject project) {}
 }
