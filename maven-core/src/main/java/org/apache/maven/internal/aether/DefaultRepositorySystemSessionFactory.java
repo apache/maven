@@ -59,6 +59,7 @@ import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
 import org.eclipse.aether.spi.localrepo.LocalRepositoryManagerFactory;
 import org.eclipse.aether.util.ConfigUtils;
+import org.eclipse.aether.util.listener.ChainedRepositoryListener;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.repository.ChainedLocalRepositoryManager;
 import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
@@ -88,6 +89,16 @@ public class DefaultRepositorySystemSessionFactory {
      * @since 3.9.0
      */
     private static final String MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY = "maven.repo.local.tail.ignoreAvailability";
+
+    /**
+     * User property for reverse dependency tree. If enabled, Maven will record ".tracking" directory into local
+     * repository with "reverse dependency tree", essentially explaining WHY given artifact is present in local
+     * repository.
+     * Default: {@code false}, will not record anything.
+     *
+     * @since 3.9.0
+     */
+    private static final String MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE = "maven.repo.local.recordReverseTree";
 
     private static final String MAVEN_RESOLVER_TRANSPORT_KEY = "maven.resolver.transport";
 
@@ -350,6 +361,12 @@ public class DefaultRepositorySystemSessionFactory {
         session.setTransferListener(request.getTransferListener());
 
         session.setRepositoryListener(eventSpyDispatcher.chainListener(new LoggingRepositoryListener(logger)));
+
+        boolean recordReverseTree = ConfigUtils.getBoolean(session, false, MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE);
+        if (recordReverseTree) {
+            session.setRepositoryListener(new ChainedRepositoryListener(
+                    session.getRepositoryListener(), new ReverseTreeRepositoryListener()));
+        }
 
         mavenRepositorySystem.injectMirror(request.getRemoteRepositories(), request.getMirrors());
         mavenRepositorySystem.injectProxy(session, request.getRemoteRepositories());
