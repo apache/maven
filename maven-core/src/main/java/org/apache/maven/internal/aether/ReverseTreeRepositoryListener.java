@@ -25,6 +25,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.ListIterator;
 import java.util.Objects;
 import org.eclipse.aether.AbstractRepositoryListener;
@@ -42,8 +43,6 @@ import org.eclipse.aether.graph.DependencyNode;
  * @since 3.9.0
  */
 class ReverseTreeRepositoryListener extends AbstractRepositoryListener {
-    private static final String EOL = System.lineSeparator();
-
     @Override
     public void artifactResolved(RepositoryEvent event) {
         requireNonNull(event, "event cannot be null");
@@ -73,7 +72,8 @@ class ReverseTreeRepositoryListener extends AbstractRepositoryListener {
 
         if (isInScope(resolvedArtifact, nodeArtifact)) {
             Dependency node = collectStepTrace.getNode();
-            String trackingData = node + " (" + collectStepTrace.getContext() + ")" + EOL;
+            ArrayList<String> trackingData = new ArrayList<>();
+            trackingData.add(node + " (" + collectStepTrace.getContext() + ")");
             String indent = "";
             ListIterator<DependencyNode> iter = collectStepTrace
                     .getPath()
@@ -81,7 +81,7 @@ class ReverseTreeRepositoryListener extends AbstractRepositoryListener {
             while (iter.hasPrevious()) {
                 DependencyNode curr = iter.previous();
                 indent += "  ";
-                trackingData += indent + curr + " (" + collectStepTrace.getContext() + ")" + EOL;
+                trackingData.add(indent + curr + " (" + collectStepTrace.getContext() + ")");
             }
             try {
                 Path trackingDir =
@@ -93,7 +93,7 @@ class ReverseTreeRepositoryListener extends AbstractRepositoryListener {
                         .getArtifact()
                         .toString()
                         .replace(":", "_"));
-                Files.write(trackingFile, trackingData.getBytes(StandardCharsets.UTF_8));
+                Files.write(trackingFile, trackingData, StandardCharsets.UTF_8);
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
