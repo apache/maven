@@ -37,8 +37,6 @@ import org.junit.Test;
  * UT for {@link ReverseTreeRepositoryListener}.
  */
 public class ReverseTreeRepositoryListenerTest {
-    private final ReverseTreeRepositoryListener subject = new ReverseTreeRepositoryListener();
-
     @Test
     public void isLocalRepositoryArtifactTest() {
         File baseDir = new File("local/repository");
@@ -52,15 +50,19 @@ public class ReverseTreeRepositoryListenerTest {
         Artifact nonLocalReposioryArtifact = mock(Artifact.class);
         when(nonLocalReposioryArtifact.getFile()).thenReturn(new File("something/completely/different"));
 
-        assertThat(subject.isLocalRepositoryArtifact(session, localRepositoryArtifact), equalTo(true));
-        assertThat(subject.isLocalRepositoryArtifact(session, nonLocalReposioryArtifact), equalTo(false));
+        assertThat(
+                ReverseTreeRepositoryListener.isLocalRepositoryArtifact(session, localRepositoryArtifact),
+                equalTo(true));
+        assertThat(
+                ReverseTreeRepositoryListener.isLocalRepositoryArtifact(session, nonLocalReposioryArtifact),
+                equalTo(false));
     }
 
     @Test
     public void lookupCollectStepDataTest() {
         RequestTrace doesNotHaveIt =
                 RequestTrace.newChild(null, "foo").newChild("bar").newChild("baz");
-        assertThat(subject.lookupCollectStepData(doesNotHaveIt), nullValue());
+        assertThat(ReverseTreeRepositoryListener.lookupCollectStepData(doesNotHaveIt), nullValue());
 
         final CollectStepData data = mock(CollectStepData.class);
 
@@ -68,18 +70,18 @@ public class ReverseTreeRepositoryListenerTest {
                 .newChild("foo")
                 .newChild("bar")
                 .newChild("baz");
-        assertThat(subject.lookupCollectStepData(haveItFirst), sameInstance(data));
+        assertThat(ReverseTreeRepositoryListener.lookupCollectStepData(haveItFirst), sameInstance(data));
 
         RequestTrace haveItLast = RequestTrace.newChild(null, "foo")
                 .newChild("bar")
                 .newChild("baz")
                 .newChild(data);
-        assertThat(subject.lookupCollectStepData(haveItLast), sameInstance(data));
+        assertThat(ReverseTreeRepositoryListener.lookupCollectStepData(haveItLast), sameInstance(data));
 
         RequestTrace haveIt = RequestTrace.newChild(null, "foo")
                 .newChild("bar")
                 .newChild(data)
                 .newChild("baz");
-        assertThat(subject.lookupCollectStepData(haveIt), sameInstance(data));
+        assertThat(ReverseTreeRepositoryListener.lookupCollectStepData(haveIt), sameInstance(data));
     }
 }

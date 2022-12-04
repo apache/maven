@@ -98,7 +98,7 @@ class ReverseTreeRepositoryListener extends AbstractRepositoryListener {
      * <p>
      * Visible for testing.
      */
-    boolean isLocalRepositoryArtifact(RepositorySystemSession session, Artifact artifact) {
+    static boolean isLocalRepositoryArtifact(RepositorySystemSession session, Artifact artifact) {
         return artifact.getFile()
                 .getPath()
                 .startsWith(session.getLocalRepository().getBasedir().getPath());
@@ -110,7 +110,7 @@ class ReverseTreeRepositoryListener extends AbstractRepositoryListener {
      * <p>
      * Visible for testing.
      */
-    CollectStepData lookupCollectStepData(RequestTrace trace) {
+    static CollectStepData lookupCollectStepData(RequestTrace trace) {
         CollectStepData collectStepTrace = null;
         while (trace != null) {
             if (trace.getData() instanceof CollectStepData) {
@@ -128,7 +128,7 @@ class ReverseTreeRepositoryListener extends AbstractRepositoryListener {
      * method "filters" out in WHICH artifact are we interested in, but it intentionally neglects extension as
      * ArtifactDescriptorReader modifies extension to "pom" during collect. So all we have to rely on is GAV only.
      */
-    boolean isInScope(Artifact artifact, Artifact nodeArtifact) {
+    static boolean isInScope(Artifact artifact, Artifact nodeArtifact) {
         return Objects.equals(artifact.getGroupId(), nodeArtifact.getGroupId())
                 && Objects.equals(artifact.getArtifactId(), nodeArtifact.getArtifactId())
                 && Objects.equals(artifact.getVersion(), nodeArtifact.getVersion());
