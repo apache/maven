@@ -592,14 +592,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
         for (int i = 0; i < version.length(); i++) {
             char c = version.charAt(i);
 
-            if (c == '.') {
-                if (i == startIndex) {
-                    list.add(IntItem.ZERO);
-                } else {
-                    list.add(parseItem(isDigit, version.substring(startIndex, i)));
-                }
-                startIndex = i + 1;
-            } else if (c == '-') {
+            if (c == '.' || c=='-' || c=='+') {
                 if (i == startIndex) {
                     list.add(IntItem.ZERO);
                 } else {
@@ -607,8 +600,10 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                 }
                 startIndex = i + 1;
 
-                list.add(list = new ListItem());
-                stack.push(list);
+                if (c != '.' || !isDigit) {
+                    list.add(list = new ListItem());
+                    stack.push(list);
+                }
             } else if (Character.isDigit(c)) {
                 if (!isDigit && i > startIndex) {
                     // 1.0.0.RC1 < 1.0.0-RC2
