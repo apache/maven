@@ -20,6 +20,7 @@ package org.apache.maven.model.profile;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import javax.inject.Inject;
@@ -43,6 +44,10 @@ import org.apache.maven.model.profile.activation.ProfileActivator;
 public class DefaultProfileSelector implements ProfileSelector {
 
     private final List<ProfileActivator> activators;
+
+    public DefaultProfileSelector() {
+        this.activators = Collections.emptyList();
+    }
 
     @Inject
     public DefaultProfileSelector(List<ProfileActivator> activators) {
