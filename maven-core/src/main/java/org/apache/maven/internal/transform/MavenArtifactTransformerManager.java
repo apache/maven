@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import org.apache.maven.feature.Features;
+import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.transform.ArtifactTransformer;
@@ -37,22 +38,30 @@ import org.eclipse.aether.transform.Identity;
  */
 @Singleton
 @Named
-public class MavenArtifactTransformerManager implements ArtifactTransformerManager {
+public final class MavenArtifactTransformerManager implements ArtifactTransformerManager {
     private final ConsumerModelArtifactTransformer consumerModelArtifactTransformer;
 
+    private final SigningArtifactTransformer signingArtifactTransformer;
+
     @Inject
-    public MavenArtifactTransformerManager(ConsumerModelArtifactTransformer consumerModelArtifactTransformer) {
+    public MavenArtifactTransformerManager(ConsumerModelArtifactTransformer consumerModelArtifactTransformer,
+                                           SigningArtifactTransformer signingArtifactTransformer) {
         this.consumerModelArtifactTransformer = consumerModelArtifactTransformer;
+        this.signingArtifactTransformer = signingArtifactTransformer;
     }
 
     @Override
     public Collection<ArtifactTransformer> getTransformersForArtifact(
             RepositorySystemSession session, Artifact artifact) {
         ArrayList<ArtifactTransformer> result = new ArrayList<>();
-        if (Features.buildConsumer(session.getUserProperties()).isActive()) {
-            result.add(consumerModelArtifactTransformer);
-        } else {
-            result.add(Identity.TRANSFORMER);
+
+        // POM
+        if ("pom".equals(artifact.getExtension()) && StringUtils.isBlank(artifact.getClassifier())) {
+            if (Features.buildConsumer(session.getUserProperties()).isActive()) {
+                result.add(consumerModelArtifactTransformer);
+            } else {
+                result.add(Identity.TRANSFORMER);
+            }
         }
         // further chain, like sign? or have some generic chain and just pass (to resolver mgr to supplement it?
         return result;

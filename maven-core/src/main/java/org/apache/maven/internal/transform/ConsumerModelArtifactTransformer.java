@@ -52,7 +52,7 @@ import org.eclipse.aether.util.FileUtils;
  */
 @Singleton
 @Named
-public class ConsumerModelArtifactTransformer implements ArtifactTransformer {
+final class ConsumerModelArtifactTransformer implements ArtifactTransformer {
     @Override
     public TransformedArtifact transformInstallArtifact(RepositorySystemSession session, Artifact artifact)
             throws TransformException, IOException {
@@ -93,7 +93,7 @@ public class ConsumerModelArtifactTransformer implements ArtifactTransformer {
         return XmlUtils.writeDocument(reader, parser);
     }
 
-    private static class ConsumerPomArtifact implements TransformedArtifact {
+    private static class ConsumerPomArtifact extends TransformedArtifact {
         private final Artifact artifact;
 
         private final FileUtils.TempFile tempFile;
