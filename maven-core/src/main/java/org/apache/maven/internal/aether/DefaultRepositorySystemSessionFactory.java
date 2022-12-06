@@ -20,13 +20,8 @@ package org.apache.maven.internal.aether;
 
 import static java.util.stream.Collectors.toList;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -41,11 +36,10 @@ import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.feature.Features;
+import org.apache.maven.internal.transform.MavenArtifactTransformerManager;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.internal.xml.Xpp3Dom;
 import org.apache.maven.model.ModelBase;
-import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Mirror;
@@ -56,12 +50,9 @@ import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.SessionData;
-import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.repository.NoLocalRepositoryManagerException;
@@ -69,8 +60,6 @@ import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
 import org.eclipse.aether.spi.localrepo.LocalRepositoryManagerFactory;
-import org.eclipse.aether.transform.FileTransformer;
-import org.eclipse.aether.transform.TransformException;
 import org.eclipse.aether.util.ConfigUtils;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
@@ -151,6 +140,8 @@ public class DefaultRepositorySystemSessionFactory {
 
     private final RuntimeInformation runtimeInformation;
 
+    private final MavenArtifactTransformerManager artifactTransformerManager;
+
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
     public DefaultRepositorySystemSessionFactory(
@@ -161,7 +152,8 @@ public class DefaultRepositorySystemSessionFactory {
             SettingsDecrypter settingsDecrypter,
             EventSpyDispatcher eventSpyDispatcher,
             MavenRepositorySystem mavenRepositorySystem,
-            RuntimeInformation runtimeInformation) {
+            RuntimeInformation runtimeInformation,
+            MavenArtifactTransformerManager artifactTransformerManager) {
         this.artifactHandlerManager = artifactHandlerManager;
         this.repoSystem = repoSystem;
         this.simpleLocalRepoMgrFactory = simpleLocalRepoMgrFactory;
@@ -170,6 +162,7 @@ public class DefaultRepositorySystemSessionFactory {
         this.eventSpyDispatcher = eventSpyDispatcher;
         this.mavenRepositorySystem = mavenRepositorySystem;
         this.runtimeInformation = runtimeInformation;
+        this.artifactTransformerManager = artifactTransformerManager;
     }
 
     @SuppressWarnings("checkstyle:methodLength")
@@ -375,9 +368,7 @@ public class DefaultRepositorySystemSessionFactory {
 
         setUpLocalRepositoryManager(request, session);
 
-        if (Features.buildConsumer(request.getUserProperties()).isActive()) {
-            session.setFileTransformerManager(a -> getTransformersForArtifact(a, session.getData()));
-        }
+        session.setArtifactTransformerManager(artifactTransformerManager);
 
         return session;
     }
@@ -434,31 +425,5 @@ public class DefaultRepositorySystemSessionFactory {
         version = version.isEmpty() ? version : "/" + version;
         return "Apache-Maven" + version + " (Java " + System.getProperty("java.version") + "; "
                 + System.getProperty("os.name") + " " + System.getProperty("os.version") + ")";
-    }
-
-    private Collection<FileTransformer> getTransformersForArtifact(
-            final Artifact artifact, final SessionData sessionData) {
-        TransformerContext context = (TransformerContext) sessionData.get(TransformerContext.KEY);
-        Collection<FileTransformer> transformers = new ArrayList<>();
-
-        // In case of install:install-file there's no transformer context, as the goal is unrelated to the lifecycle.
-        if ("pom".equals(artifact.getExtension()) && context != null) {
-            transformers.add(new FileTransformer() {
-                @Override
-                public InputStream transformData(File pomFile) throws IOException, TransformException {
-                    try {
-                        return new ConsumerModelSourceTransformer().transform(pomFile.toPath(), context);
-                    } catch (XmlPullParserException e) {
-                        throw new TransformException(e);
-                    }
-                }
-
-                @Override
-                public Artifact transformArtifact(Artifact artifact) {
-                    return artifact;
-                }
-            });
-        }
-        return Collections.unmodifiableCollection(transformers);
     }
 }

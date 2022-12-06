@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.aether;
+package org.apache.maven.internal.transform;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -27,9 +27,7 @@ import org.apache.maven.model.building.TransformerContext;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.assertj.XmlAssert;
 
-public class ConsumerModelSourceTransformerTest {
-    private ConsumerModelSourceTransformer transformer = new ConsumerModelSourceTransformer();
-
+public class ConsumerModelArtifactTransformerTest {
     @Test
     public void transform() throws Exception {
         Path beforePomFile =
@@ -38,7 +36,8 @@ public class ConsumerModelSourceTransformerTest {
                 Paths.get("src/test/resources/projects/transform/after.pom").toAbsolutePath();
 
         try (InputStream expected = Files.newInputStream(afterPomFile);
-                InputStream result = transformer.transform(beforePomFile, new NoTransformerContext())) {
+                InputStream result =
+                        ConsumerModelArtifactTransformer.transform(beforePomFile, new NoTransformerContext())) {
             XmlAssert.assertThat(result).and(expected).areIdentical();
         }
     }
