@@ -113,7 +113,7 @@ public class DefaultArtifactVersionTest extends TestCase {
         assertVersionOlder("2.0-1", "2.0.1");
 
         assertVersionOlder("2.0.1-klm", "2.0.1-lmn");
-        assertVersionOlder("2.0.1", "2.0.1-xyz");
+        assertVersionOlder("2.0.1-xyz", "2.0.1"); // now 2.0.1-xyz < 2.0.1 as of MNG-7559
         assertVersionOlder("2.0.1-xyz-1", "2.0.1-1-xyz");
 
         assertVersionOlder("2.0.1", "2.0.1-123");

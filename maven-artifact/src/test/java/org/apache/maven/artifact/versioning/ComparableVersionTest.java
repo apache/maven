@@ -43,13 +43,16 @@ public class ComparableVersionTest extends TestCase {
     }
 
     private static final String[] VERSIONS_QUALIFIER = {
+        "1-abc",
         "1-alpha2snapshot",
         "1-alpha2",
         "1-alpha-123",
         "1-beta-2",
         "1-beta123",
+        "1-def",
         "1-m2",
         "1-m11",
+        "1-pom-1",
         "1-rc",
         "1-cr2",
         "1-rc123",
@@ -58,9 +61,6 @@ public class ComparableVersionTest extends TestCase {
         "1-sp",
         "1-sp2",
         "1-sp123",
-        "1-abc",
-        "1-def",
-        "1-pom-1",
         "1-1-snapshot",
         "1-1",
         "1-2",
@@ -68,8 +68,8 @@ public class ComparableVersionTest extends TestCase {
     };
 
     private static final String[] VERSIONS_NUMBER = {
-        "2.0", "2.0.a", "2-1", "2.0.2", "2.0.123", "2.1.0", "2.1-a", "2.1b", "2.1-c", "2.1-1", "2.1.0.1", "2.2",
-        "2.123", "11.a2", "11.a11", "11.b2", "11.b11", "11.m2", "11.m11", "11", "11.a", "11b", "11c", "11m"
+        "2.0.a", "2.0", "2-1", "2.0.2", "2.0.123", "2.1-a", "2.1b", "2.1-c", "2.1.0", "2.1-1", "2.1.0.1", "2.2",
+        "2.123", "11.a", "11.a2", "11.a11", "11b", "11.b2", "11.b11", "11c", "11m", "11.m2", "11.m11", "11"
     };
 
     private void checkVersionsOrder(String[] versions) {
@@ -195,7 +195,7 @@ public class ComparableVersionTest extends TestCase {
 
         checkVersionsOrder("2.0-1", "2.0.1");
         checkVersionsOrder("2.0.1-klm", "2.0.1-lmn");
-        checkVersionsOrder("2.0.1", "2.0.1-xyz");
+        checkVersionsOrder("2.0.1-xyz", "2.0.1"); // now 2.0.1-xyz < 2.0.1 as of MNG-7559
 
         checkVersionsOrder("2.0.1", "2.0.1-123");
         checkVersionsOrder("2.0.1-xyz", "2.0.1-123");
@@ -209,13 +209,9 @@ public class ComparableVersionTest extends TestCase {
      * <a href="https://netbeans.org/bugzilla/show_bug.cgi?id=226100">226100</a>
      */
     public void testMng5568() {
-        String a = "6.1.0";
-        String b = "6.1.0rc3";
-        String c = "6.1H.5-beta"; // this is the unusual version string, with 'H' in the middle
-
-        checkVersionsOrder(b, a); // classical
-        checkVersionsOrder(b, c); // now b < c, but before MNG-5568, we had b > c
-        checkVersionsOrder(a, c);
+        checkVersionsOrder("6.1H.5-beta", "6.1.0rc3"); // now H < RC as of MNG-7559
+        checkVersionsOrder("6.1.0rc3", "6.1.0"); // classical
+        checkVersionsOrder("6.1H.5-beta", "6.1.0"); // transitivity
     }
 
     /**
@@ -331,6 +327,22 @@ public class ComparableVersionTest extends TestCase {
         Comparable c2 = newComparable("2");
 
         assertEquals("reused instance should be equivalent to new instance", c1, c2);
+    }
+
+    /**
+     * Test <a href="https://issues.apache.org/jira/browse/MNG-7559">MNG-7559</a> edge cases
+     * -pfd < final, ga, release
+     * 2.0.1.MR < 2.0.1
+     * 9.4.1.jre16 > 9.4.1.jre16-preview
+     */
+    public void testMng7559() {
+        // checking general cases
+        checkVersionsOrder(new String[] {"ab", "alpha", "beta", "cd", "ea", "milestone", "mr", "pfd", "preview", "RC"});
+        // checking identified issues respect the general case
+        checkVersionsOrder("2.3-pfd", "2.3");
+        checkVersionsOrder("2.0.1.MR", "2.0.1");
+        checkVersionsOrder("9.4.1.jre16-preview", "9.4.1.jre16");
+        checkVersionsOrder("1-sp-1", "1-ga-1"); // proving website documentation right.
     }
 
     /**
