@@ -140,8 +140,6 @@ public class DefaultRepositorySystemSessionFactory {
 
     private final RuntimeInformation runtimeInformation;
 
-    private final MavenArtifactTransformerManager artifactTransformerManager;
-
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
     public DefaultRepositorySystemSessionFactory(
@@ -152,8 +150,7 @@ public class DefaultRepositorySystemSessionFactory {
             SettingsDecrypter settingsDecrypter,
             EventSpyDispatcher eventSpyDispatcher,
             MavenRepositorySystem mavenRepositorySystem,
-            RuntimeInformation runtimeInformation,
-            MavenArtifactTransformerManager artifactTransformerManager) {
+            RuntimeInformation runtimeInformation) {
         this.artifactHandlerManager = artifactHandlerManager;
         this.repoSystem = repoSystem;
         this.simpleLocalRepoMgrFactory = simpleLocalRepoMgrFactory;
@@ -162,7 +159,6 @@ public class DefaultRepositorySystemSessionFactory {
         this.eventSpyDispatcher = eventSpyDispatcher;
         this.mavenRepositorySystem = mavenRepositorySystem;
         this.runtimeInformation = runtimeInformation;
-        this.artifactTransformerManager = artifactTransformerManager;
     }
 
     @SuppressWarnings("checkstyle:methodLength")
@@ -368,7 +364,7 @@ public class DefaultRepositorySystemSessionFactory {
 
         setUpLocalRepositoryManager(request, session);
 
-        session.setArtifactTransformerManager(artifactTransformerManager);
+        session.setArtifactTransformerManager(new MavenArtifactTransformerManager(session));
 
         return session;
     }

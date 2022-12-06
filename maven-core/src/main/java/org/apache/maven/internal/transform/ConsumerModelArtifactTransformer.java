@@ -25,15 +25,11 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.function.Predicate;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import org.apache.maven.model.building.DefaultBuildPomXMLFilterFactory;
 import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.transform.RawToConsumerPomXMLFilterFactory;
 import org.apache.maven.model.transform.pull.XmlUtils;
 import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
 import org.codehaus.plexus.util.xml.pull.MXParser;
@@ -52,13 +48,10 @@ import org.eclipse.aether.util.FileUtils;
  *
  * @since TBD
  */
-@Singleton
-@Named
-final class ConsumerModelArtifactTransformer implements ArtifactTransformer, Predicate<Artifact> {
-    @Override
-    public boolean test(Artifact artifact) {
-        return "pom".equals(artifact.getExtension()) && StringUtils.isBlank(artifact.getClassifier());
-    }
+final class ConsumerModelArtifactTransformer implements ArtifactTransformer {
+    public static final ConsumerModelArtifactTransformer INSTANCE = new ConsumerModelArtifactTransformer();
+
+    private ConsumerModelArtifactTransformer() {}
 
     @Override
     public TransformedArtifact transformInstallArtifact(RepositorySystemSession session, Artifact artifact)

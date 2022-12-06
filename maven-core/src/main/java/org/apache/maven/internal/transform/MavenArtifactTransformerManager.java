@@ -18,12 +18,12 @@
  */
 package org.apache.maven.internal.transform;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import org.apache.maven.feature.Features;
+import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.transform.ArtifactTransformer;
@@ -35,38 +35,25 @@ import org.eclipse.aether.transform.Identity;
  *
  * @since TBD
  */
-@Singleton
-@Named
 public final class MavenArtifactTransformerManager implements ArtifactTransformerManager {
-    private final ConsumerModelArtifactTransformer consumerModelArtifactTransformer;
+    private final RepositorySystemSession session;
 
-    private final SigningArtifactTransformer signingArtifactTransformer;
-
-    @Inject
-    public MavenArtifactTransformerManager(ConsumerModelArtifactTransformer consumerModelArtifactTransformer,
-                                           SigningArtifactTransformer signingArtifactTransformer) {
-        this.consumerModelArtifactTransformer = consumerModelArtifactTransformer;
-        this.signingArtifactTransformer = signingArtifactTransformer;
+    public MavenArtifactTransformerManager(RepositorySystemSession session) {
+        this.session = requireNonNull(session);
     }
 
     @Override
-    public Collection<ArtifactTransformer> getTransformersForArtifact(
-            RepositorySystemSession session, Artifact artifact) {
+    public Collection<ArtifactTransformer> getTransformersForArtifact(Artifact artifact) {
         ArrayList<ArtifactTransformer> result = new ArrayList<>();
 
-        // POM
+        // Consumer POM: if feature enabled and artifact applies
         if (Features.buildConsumer(session.getUserProperties()).isActive()
-                && consumerModelArtifactTransformer.test(artifact)) {
-            result.add(consumerModelArtifactTransformer);
+                && "pom".equals(artifact.getExtension())
+                && StringUtils.isBlank(artifact.getClassifier())) {
+            result.add(ConsumerModelArtifactTransformer.INSTANCE);
         } else {
             result.add(Identity.TRANSFORMER);
         }
-        // signing
-        if (signingArtifactTransformer.test(artifact)) {
-            result.add(signingArtifactTransformer);
-        }
-
-        // further chain, like sign? or have some generic chain and just pass (to resolver mgr to supplement it?
         return result;
     }
 }
