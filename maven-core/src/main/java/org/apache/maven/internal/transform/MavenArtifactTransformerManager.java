@@ -24,7 +24,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import org.apache.maven.feature.Features;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.transform.ArtifactTransformer;
@@ -56,13 +55,17 @@ public final class MavenArtifactTransformerManager implements ArtifactTransforme
         ArrayList<ArtifactTransformer> result = new ArrayList<>();
 
         // POM
-        if ("pom".equals(artifact.getExtension()) && StringUtils.isBlank(artifact.getClassifier())) {
-            if (Features.buildConsumer(session.getUserProperties()).isActive()) {
-                result.add(consumerModelArtifactTransformer);
-            } else {
-                result.add(Identity.TRANSFORMER);
-            }
+        if (Features.buildConsumer(session.getUserProperties()).isActive()
+                && consumerModelArtifactTransformer.test(artifact)) {
+            result.add(consumerModelArtifactTransformer);
+        } else {
+            result.add(Identity.TRANSFORMER);
         }
+        // signing
+        if (signingArtifactTransformer.test(artifact)) {
+            result.add(signingArtifactTransformer);
+        }
+
         // further chain, like sign? or have some generic chain and just pass (to resolver mgr to supplement it?
         return result;
     }

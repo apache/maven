@@ -18,17 +18,21 @@
  */
 package org.apache.maven.internal.transform;
 
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Predicate;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.spi.connector.checksum.ChecksumAlgorithmFactorySelector;
 import org.eclipse.aether.transform.ArtifactTransformer;
 import org.eclipse.aether.transform.Identity;
-import org.eclipse.aether.transform.TransformException;
 import org.eclipse.aether.transform.TransformedArtifact;
 import org.eclipse.aether.util.FileUtils;
 import org.eclipse.aether.util.artifact.SubArtifact;
@@ -40,8 +44,21 @@ import org.eclipse.aether.util.artifact.SubArtifact;
  */
 @Singleton
 @Named
-public class SigningArtifactTransformer implements ArtifactTransformer {
-    private static final String EXT = ".asc";
+public class SigningArtifactTransformer implements ArtifactTransformer, Predicate<Artifact> {
+    private static final String EXT = "asc";
+
+    private final ChecksumAlgorithmFactorySelector checksumAlgorithmFactorySelector;
+
+    @Inject
+    public SigningArtifactTransformer(ChecksumAlgorithmFactorySelector checksumAlgorithmFactorySelector) {
+        this.checksumAlgorithmFactorySelector = requireNonNull(checksumAlgorithmFactorySelector);
+    }
+
+    @Override
+    public boolean test(Artifact artifact) {
+        String extension = artifact.getExtension();
+        return !extension.endsWith("." + EXT) && !checksumAlgorithmFactorySelector.isChecksum(extension);
+    }
 
     @Override
     public TransformedArtifact transformInstallArtifact(RepositorySystemSession session, Artifact artifact) {
@@ -55,7 +72,7 @@ public class SigningArtifactTransformer implements ArtifactTransformer {
         FileUtils.writeFile(signatureFile, p -> Files.write(p, "fake-signature".getBytes(StandardCharsets.UTF_8)));
 
         SubArtifact signature =
-                new SubArtifact(artifact, "", artifact.getExtension() + EXT, signatureFile.toFile());
+                new SubArtifact(artifact, "", artifact.getExtension() + "." + EXT, signatureFile.toFile());
         return new TransformedArtifact() {
             @Override
             public Artifact getTransformedArtifact() {
