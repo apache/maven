@@ -896,25 +896,25 @@ public class MavenCli {
         if ( cliRequest.commandLine.hasOption( CLIManager.INSTALLATION_STATUS ) )
         {
             // We need the default values to verify it
-            boolean canMavenExecture = true;
+            boolean canMavenExecute = true;
             final StringBuilder mavenInstallationErrors = new StringBuilder();
 
             // TODO move this to a separate class or function. Refactor!
             if ( !cliRequest.request.getLocalRepositoryPath().isDirectory() )
             {
-                canMavenExecture = false;
+                canMavenExecute = false;
                 mavenInstallationErrors.append( "Local repository is not a directory.\n" );
             }
 
             if ( !cliRequest.request.getLocalRepositoryPath().canRead() )
             {
-                canMavenExecture = false;
+                canMavenExecute = false;
                 mavenInstallationErrors.append( "No read permissions on local repository.\n" );
             }
 
             if ( !cliRequest.request.getLocalRepositoryPath().canWrite() )
             {
-                canMavenExecture = false;
+                canMavenExecute = false;
                 mavenInstallationErrors.append( "No write permissions on local repository.\n" );
             }
 
@@ -946,7 +946,7 @@ public class MavenCli {
 
             // TODO Now attempt to resolve org.apache.maven:apache-maven:3.8.6. This proves point 3.
 
-            if ( !canMavenExecture )
+            if ( !canMavenExecute )
             {
                 slf4jLogger.warn( mavenInstallationErrors.toString() );
                 return 1;
