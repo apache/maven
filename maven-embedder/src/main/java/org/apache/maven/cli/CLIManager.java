@@ -300,8 +300,7 @@ public class CLIManager {
                 .build());
         options.addOption(Option.builder()
                 .longOpt(INSTALLATION_STATUS)
-                .optionalArg(true)
-                .desc("Display maven installation status")
+                .desc("Display Maven installation status")
                 .build());
 
         // Deprecated
