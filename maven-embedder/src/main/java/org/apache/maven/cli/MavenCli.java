@@ -52,6 +52,9 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
+import org.apache.maven.RepositoryUtils;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Problem;
 import org.apache.maven.building.Source;
@@ -74,16 +77,20 @@ import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProfileActivation;
 import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
+import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
+import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.logwrapper.LogLevelRecorder;
 import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
@@ -110,6 +117,8 @@ import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.DefaultRepositoryCache;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.transfer.TransferListener;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
@@ -175,6 +184,14 @@ public class MavenCli {
     private Map<String, ConfigurationProcessor> configurationProcessors;
 
     private CLIManager cliManager;
+
+    private PlexusContainer plexusContainer;
+
+    private DefaultSessionFactory defaultSessionFactory;
+
+    private MavenRepositorySystem mavenRepositorySystem;
+
+    private DefaultRepositorySystemSessionFactory defaultRepositorySystemSessionFactory;
 
     private static final Pattern NEXT_LINE = Pattern.compile("\r?\n");
 
@@ -390,6 +407,13 @@ public class MavenCli {
                 System.out.println(CLIReportingUtils.showVersion());
             }
             throw new ExitException(0);
+        }
+
+        if ( cliRequest.commandLine.hasOption( CLIManager.INSTALLATION_STATUS ) )
+        {
+            // Handle display? Might be worth the try
+            cliRequest.request.getRemoteRepositories();
+
         }
     }
 
@@ -641,6 +665,17 @@ public class MavenCli {
 
         dispatcher = (DefaultSecDispatcher) container.lookup(SecDispatcher.class, "maven");
 
+        defaultRepositorySystemSessionFactory = container.lookup( DefaultRepositorySystemSessionFactory.class );
+        defaultSessionFactory = container.lookup( DefaultSessionFactory.class );
+        mavenRepositorySystem = container.lookup( MavenRepositorySystem.class );
+//
+//        private DefaultSessionFactory defaultSessionFactory;
+//
+//        private MavenRepositorySystem mavenRepositorySystem;
+//        private DefaultRepositorySystemSessionFactory defaultRepositorySystemSessionFactory;
+
+        plexusContainer = container;
+
         return container;
     }
 
@@ -851,10 +886,63 @@ public class MavenCli {
     }
 
     private int execute(CliRequest cliRequest) throws MavenExecutionRequestPopulationException {
-        MavenExecutionRequest request = executionRequestPopulator.populateDefaults(cliRequest.request);
+        MavenExecutionRequest request = executionRequestPopulator.populateDefaults(cliRequest.request); // Populate request
 
         if (cliRequest.request.getRepositoryCache() == null) {
             cliRequest.request.setRepositoryCache(new DefaultRepositoryCache());
+        }
+
+        if ( cliRequest.commandLine.hasOption( CLIManager.INSTALLATION_STATUS ) )
+        {
+            // We need the default values to verify it
+            boolean canMavenExecture = true;
+            final StringBuilder mavenInstallationErrors = new StringBuilder();
+
+            // TODO move this to a separate class or function. Refactor!
+            if ( !cliRequest.request.getLocalRepositoryPath().isDirectory() )
+            {
+                canMavenExecture = false;
+                mavenInstallationErrors.append( "Local repository is not a directory.\n" );
+            }
+
+            if ( !cliRequest.request.getLocalRepositoryPath().canRead() )
+            {
+                canMavenExecture = false;
+                mavenInstallationErrors.append( "No read permissions on local repository.\n" );
+            }
+
+            if ( !cliRequest.request.getLocalRepositoryPath().canWrite() )
+            {
+                canMavenExecture = false;
+                mavenInstallationErrors.append( "No write permissions on local repository.\n" );
+            }
+
+            final DefaultRepositorySystemSession repoSession =
+                    defaultRepositorySystemSessionFactory.newRepositorySession( request );
+            MavenSession session =
+                    new MavenSession( plexusContainer, repoSession, request, new DefaultMavenExecutionResult() );
+            defaultSessionFactory.getSession( session );
+
+            final DefaultRepositorySystemSession defaultRepositorySystemSession =
+                    defaultRepositorySystemSessionFactory.newRepositorySession( request );
+            defaultRepositorySystemSession.isOffline();
+
+            List<RemoteRepository> repos = RepositoryUtils.toRepos( cliRequest.request.getRemoteRepositories() );
+            for ( ArtifactRepository remoteRepository : cliRequest.request.getRemoteRepositories() )
+            {
+                // Need a way to verify proxy connection and remote repository
+                // 1. Verify Proxy
+                // 2. Verify authentication
+                // 3. Verify Mirror
+
+            }
+
+            if ( !canMavenExecture )
+            {
+                slf4jLogger.warn( mavenInstallationErrors.toString() );
+                return 1;
+            }
+            request.getLocalRepository();
         }
 
         eventSpyDispatcher.onEvent(request);
