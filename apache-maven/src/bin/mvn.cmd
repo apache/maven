@@ -136,8 +136,9 @@ exit /b
 
 :findBaseDir
 cd /d "%WDIR%"
+set "WDIR=%CD%"
 :findBaseDirLoop
-if exist "%WDIR%\.mvn" goto baseDirFound
+if exist ".mvn" goto baseDirFound
 cd ..
 IF "%WDIR%"=="%CD%" goto baseDirNotFound
 set "WDIR=%CD%"
