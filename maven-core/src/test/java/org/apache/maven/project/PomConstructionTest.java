@@ -1371,7 +1371,7 @@ public class PomConstructionTest {
     @Test
     public void testPluginManagementDuplicate() throws Exception {
         PomTestWrapper pom = this.buildPom("plugin-management-duplicate/sub");
-        assertEquals(8, ((List<?>) pom.getValue("build/pluginManagement/plugins")).size());
+        assertEquals(7, ((List<?>) pom.getValue("build/pluginManagement/plugins")).size());
     }
 
     @Test
