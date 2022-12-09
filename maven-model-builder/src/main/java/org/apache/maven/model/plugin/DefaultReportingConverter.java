@@ -20,8 +20,6 @@ package org.apache.maven.model.plugin;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
@@ -114,55 +112,6 @@ public class DefaultReportingConverter implements ReportingConverter {
                     "outputDirectory",
                     reporting.getOutputDirectory(),
                     reporting.getLocation("outputDirectory"));
-        }
-
-        // If using m-site-p >= 3.7.0, we do not need to compute the reportPlugins section
-        if (sitePlugin.getVersion() != null) {
-            try {
-                if (VersionRange.createFromVersionSpec("[3.7.0,)")
-                        .containsVersion(new DefaultArtifactVersion(sitePlugin.getVersion()))) {
-                    return;
-                }
-            } catch (Exception e) {
-                // ignore
-            }
-        }
-
-        reportPlugins = new Xpp3Dom("reportPlugins", location);
-        configuration.addChild(reportPlugins);
-
-        boolean hasMavenProjectInfoReportsPlugin = false;
-
-        /* waiting for MSITE-484 before deprecating <reporting> section
-        if ( !reporting.getPlugins().isEmpty()
-            && request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 )
-        {
-
-            problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V31 )
-                    .setMessage( "The <reporting> section is deprecated, please move the reports to the <configuration>"
-                                 + " section of the new Maven Site Plugin." )
-                    .setLocation( reporting.getLocation( "" ) ) );
-        }*/
-
-        for (ReportPlugin plugin : reporting.getPlugins()) {
-            Xpp3Dom reportPlugin = convert(plugin);
-            reportPlugins.addChild(reportPlugin);
-
-            if (!reporting.isExcludeDefaults()
-                    && !hasMavenProjectInfoReportsPlugin
-                    && "org.apache.maven.plugins".equals(plugin.getGroupId())
-                    && "maven-project-info-reports-plugin".equals(plugin.getArtifactId())) {
-                hasMavenProjectInfoReportsPlugin = true;
-            }
-        }
-
-        if (!reporting.isExcludeDefaults() && !hasMavenProjectInfoReportsPlugin) {
-            Xpp3Dom dom = new Xpp3Dom("reportPlugin", location);
-
-            addDom(dom, "groupId", "org.apache.maven.plugins");
-            addDom(dom, "artifactId", "maven-project-info-reports-plugin");
-
-            reportPlugins.addChild(dom);
         }
     }
 
