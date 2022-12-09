@@ -20,6 +20,8 @@ package org.apache.maven.model.plugin;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
@@ -112,6 +114,18 @@ public class DefaultReportingConverter implements ReportingConverter {
                     "outputDirectory",
                     reporting.getOutputDirectory(),
                     reporting.getLocation("outputDirectory"));
+        }
+
+        // If using m-site-p >= 3.7.0, we do not need to compute the reportPlugins section
+        if (sitePlugin.getVersion() != null) {
+            try {
+                if (VersionRange.createFromVersionSpec("[3.7.0,)")
+                        .containsVersion(new DefaultArtifactVersion(sitePlugin.getVersion()))) {
+                    return;
+                }
+            } catch (Exception e) {
+                // ignore
+            }
         }
 
         reportPlugins = new Xpp3Dom("reportPlugins", location);
