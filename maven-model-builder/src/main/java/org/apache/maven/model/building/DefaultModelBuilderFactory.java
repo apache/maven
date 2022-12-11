@@ -49,11 +49,9 @@ import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.path.UrlNormalizer;
 import org.apache.maven.model.plugin.DefaultPluginConfigurationExpander;
 import org.apache.maven.model.plugin.DefaultReportConfigurationExpander;
-import org.apache.maven.model.plugin.DefaultReportingConverter;
 import org.apache.maven.model.plugin.LifecycleBindingsInjector;
 import org.apache.maven.model.plugin.PluginConfigurationExpander;
 import org.apache.maven.model.plugin.ReportConfigurationExpander;
-import org.apache.maven.model.plugin.ReportingConverter;
 import org.apache.maven.model.profile.DefaultProfileInjector;
 import org.apache.maven.model.profile.DefaultProfileSelector;
 import org.apache.maven.model.profile.ProfileInjector;
@@ -96,7 +94,6 @@ public class DefaultModelBuilderFactory {
     private LifecycleBindingsInjector lifecycleBindingsInjector;
     private PluginConfigurationExpander pluginConfigurationExpander;
     private ReportConfigurationExpander reportConfigurationExpander;
-    private ReportingConverter reportingConverter;
     private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private ModelVersionProcessor versionProcessor;
 
@@ -182,11 +179,6 @@ public class DefaultModelBuilderFactory {
     public DefaultModelBuilderFactory setReportConfigurationExpander(
             ReportConfigurationExpander reportConfigurationExpander) {
         this.reportConfigurationExpander = reportConfigurationExpander;
-        return this;
-    }
-
-    public DefaultModelBuilderFactory setReportingConverter(ReportingConverter reportingConverter) {
-        this.reportingConverter = reportingConverter;
         return this;
     }
 
@@ -301,10 +293,6 @@ public class DefaultModelBuilderFactory {
         return new DefaultReportConfigurationExpander();
     }
 
-    protected ReportingConverter newReportingConverter() {
-        return new DefaultReportingConverter();
-    }
-
     private ModelSourceTransformer newModelSourceTransformer() {
         return new DefaultModelSourceTransformer();
     }
@@ -332,7 +320,6 @@ public class DefaultModelBuilderFactory {
                 lifecycleBindingsInjector != null ? lifecycleBindingsInjector : newLifecycleBindingsInjector(),
                 pluginConfigurationExpander != null ? pluginConfigurationExpander : newPluginConfigurationExpander(),
                 reportConfigurationExpander != null ? reportConfigurationExpander : newReportConfigurationExpander(),
-                reportingConverter != null ? reportingConverter : newReportingConverter(),
                 profileActivationFilePathInterpolator != null
                         ? profileActivationFilePathInterpolator
                         : newProfileActivationFilePathInterpolator(),

@@ -77,7 +77,6 @@ import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.plugin.LifecycleBindingsInjector;
 import org.apache.maven.model.plugin.PluginConfigurationExpander;
 import org.apache.maven.model.plugin.ReportConfigurationExpander;
-import org.apache.maven.model.plugin.ReportingConverter;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.apache.maven.model.profile.ProfileInjector;
@@ -118,7 +117,6 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final LifecycleBindingsInjector lifecycleBindingsInjector;
     private final PluginConfigurationExpander pluginConfigurationExpander;
     private final ReportConfigurationExpander reportConfigurationExpander;
-    private final ReportingConverter reportingConverter;
     private final ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private final ModelVersionProcessor versionProcessor;
 
@@ -141,7 +139,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             @Nullable LifecycleBindingsInjector lifecycleBindingsInjector,
             PluginConfigurationExpander pluginConfigurationExpander,
             ReportConfigurationExpander reportConfigurationExpander,
-            ReportingConverter reportingConverter,
             ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator,
             ModelVersionProcessor versionProcessor) {
         this.modelProcessor = modelProcessor;
@@ -160,7 +157,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.lifecycleBindingsInjector = lifecycleBindingsInjector;
         this.pluginConfigurationExpander = pluginConfigurationExpander;
         this.reportConfigurationExpander = reportConfigurationExpander;
-        this.reportingConverter = reportingConverter;
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
         this.versionProcessor = versionProcessor;
     }
@@ -188,7 +184,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
-                reportingConverter,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
     }
@@ -216,7 +211,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
-                reportingConverter,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
     }
@@ -244,7 +238,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
-                reportingConverter,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
     }
@@ -272,7 +265,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
-                reportingConverter,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
     }
@@ -300,7 +292,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
-                reportingConverter,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
     }
@@ -328,7 +319,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
-                reportingConverter,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
     }
@@ -356,7 +346,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
-                reportingConverter,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
     }
@@ -384,7 +373,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
-                reportingConverter,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
     }
@@ -412,7 +400,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
-                reportingConverter,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
     }
@@ -440,7 +427,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
-                reportingConverter,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
     }
@@ -468,7 +454,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
-                reportingConverter,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
     }
@@ -497,7 +482,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
-                reportingConverter,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
     }
@@ -526,7 +510,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
-                reportingConverter,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
     }
@@ -554,7 +537,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
-                reportingConverter,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
     }
@@ -582,7 +564,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
-                reportingConverter,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
     }
@@ -610,35 +591,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
-                reportingConverter,
-                profileActivationFilePathInterpolator,
-                versionProcessor);
-    }
-
-    /**
-     * @deprecated since Maven 4
-     * @see DefaultModelBuilderFactory#setReportingConverter(ReportingConverter)
-     */
-    @Deprecated
-    public DefaultModelBuilder setReportingConverter(ReportingConverter reportingConverter) {
-        return new DefaultModelBuilder(
-                modelProcessor,
-                modelValidator,
-                modelNormalizer,
-                modelInterpolator,
-                modelPathTranslator,
-                modelUrlNormalizer,
-                superPomProvider,
-                inheritanceAssembler,
-                profileSelector,
-                profileInjector,
-                pluginManagementInjector,
-                dependencyManagementInjector,
-                dependencyManagementImporter,
-                lifecycleBindingsInjector,
-                pluginConfigurationExpander,
-                reportConfigurationExpander,
-                reportingConverter,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
     }
@@ -667,7 +619,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 lifecycleBindingsInjector,
                 pluginConfigurationExpander,
                 reportConfigurationExpander,
-                reportingConverter,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
     }
@@ -962,9 +913,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         if (request.isProcessPlugins()) {
             // reports configuration
             reportConfigurationExpander.expandPluginConfiguration(resultModel, request, problems);
-
-            // reports conversion to decoupled site plugin
-            reportingConverter.convertReporting(resultModel, request, problems);
 
             // plugins configuration
             pluginConfigurationExpander.expandPluginConfiguration(resultModel, request, problems);
