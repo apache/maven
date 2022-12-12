@@ -112,7 +112,7 @@ for (String os in runITsOses) {
                                 }
                             }
                         } finally {
-                            junit testResults: '**/core-it-suite/**/target/surefire-reports/*.xml', allowEmptyResults: true                                            
+                            //junit testResults: '**/core-it-suite/**/target/surefire-reports/*.xml', allowEmptyResults: true                                            
                             archiveDirs(stageId, ['core-it-suite-logs':'core-it-suite/target/test-classes',
                                                   'core-it-suite-reports':'core-it-suite/target/surefire-reports'])
                             deleteDir() // clean up after ourselves to reduce disk space
