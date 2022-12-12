@@ -49,15 +49,6 @@ node(jenkinsEnv.nodeSelection(osNode)) {
         stage('Build / Unit Test') {
             String jdkName = jenkinsEnv.jdkFromVersion(buildOs, buildJdk)
             String mvnName = jenkinsEnv.mvnFromVersion(buildOs, buildMvn)
-//            withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/.repository", options:[
-//                artifactsPublisher(disabled: false),
-//                junitPublisher(ignoreAttachments: false),
-//                findbugsPublisher(disabled: true),
-//                openTasksPublisher(disabled: true),
-//                dependenciesFingerprintPublisher(disabled: false),
-//                invokerPublisher(disabled: true),
-//                pipelineGraphPublisher(disabled: false)
-//            ], publisherStrategy: 'EXPLICIT') {
             try {
                 withEnv(["JAVA_HOME=${ tool "$jdkName" }",
                          "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
@@ -71,10 +62,6 @@ node(jenkinsEnv.nodeSelection(osNode)) {
                 stash includes: 'apache-maven-bin.zip', name: 'maven-dist'
             }
         }
-
-//        tests = resolveScm source: [$class: 'GitSCMSource', credentialsId: '', id: '_', remote: 'https://gitbox.apache.org/repos/asf/maven-integration-testing.git', 
-//                                    traits: [[$class: 'jenkins.plugins.git.traits.BranchDiscoveryTrait'], [$class: 'GitToolSCMSourceTrait', gitTool: 'Default']]], 
-//                                    targets: [BRANCH_NAME, 'master']
     }
 }
 
@@ -97,7 +84,6 @@ for (String os in runITsOses) {
                     // will not trample each other plus workaround for JENKINS-52657
                     dir(isUnix() ? 'test' : "c:\\mvn-it-${EXECUTOR_NUMBER}.tmp") {
                         def WORK_DIR=pwd()
-//                        checkout tests
                         checkout([$class: 'GitSCM',
                                 branches: [[name: "*/master"]],
                                 extensions: [[$class: 'CloneOption', depth: 1, noTags: true, shallow: true]],
@@ -112,9 +98,6 @@ for (String os in runITsOses) {
                           unstash 'maven-dist'
                         }
                         try {
-//                            withMaven(jdk: jdkName, maven: mvnName, mavenLocalRepo:"${WORK_DIR}/it-local-repo", options:[
-//                                junitPublisher(ignoreAttachments: false)                           
-//                            ]) {
                             withEnv(["JAVA_HOME=${ tool "$jdkName" }",
                                         "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
                                         "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {                                               
