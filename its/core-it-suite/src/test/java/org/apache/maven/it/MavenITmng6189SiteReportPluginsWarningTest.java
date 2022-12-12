@@ -38,7 +38,7 @@ public class MavenITmng6189SiteReportPluginsWarningTest
 
     public MavenITmng6189SiteReportPluginsWarningTest()
     {
-        super( "(3.5-alpha-1,)" );
+        super( "(3.5-alpha-1,4.0.0-alpha-2]" );
     }
 
     @Test
