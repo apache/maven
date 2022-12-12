@@ -24,11 +24,11 @@ under the License.
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
     <version>38</version>
-    <relativePath/>
+    <relativePath />
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>4.0.0-alpha-3</version>
+  <version>4.0.0-alpha-4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -156,7 +156,7 @@ under the License.
     <mockitoVersion>3.2.0</mockitoVersion>
     <plexusVersion>2.1.0</plexusVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
-    <plexusUtilsVersion>4.0.0-alpha-3</plexusUtilsVersion>
+    <plexusUtilsVersion>4.0.0-alpha-4-SNAPSHOT</plexusUtilsVersion>
     <plexusUtilsVersionEmbedded>3.5.0</plexusUtilsVersionEmbedded>
     <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>30.1-jre</guavaVersion>
@@ -174,7 +174,7 @@ under the License.
     <distributionShortName>Maven</distributionShortName>
     <distributionName>Apache Maven</distributionName>
     <maven.site.path>ref/4-LATEST</maven.site.path>
-    <project.build.outputTimestamp>2022-12-12T10:34:45Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2022-12-12T10:37:34Z</project.build.outputTimestamp>
   </properties>
 
   <!--bootstrap-start-comment-->
