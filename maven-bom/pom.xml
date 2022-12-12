@@ -29,7 +29,7 @@ under the License.
   </parent>
 
   <artifactId>maven-bom</artifactId>
-  <version>4.0.0-alpha-3-SNAPSHOT</version>
+  <version>4.0.0-alpha-3</version>
   <packaging>pom</packaging>
 
   <name>Maven Dependencies BOM</name>
@@ -44,7 +44,7 @@ under the License.
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
     <url>https://github.com/apache/maven/tree/${project.scm.tag}/${project.artifactId}</url>
-    <tag>maven-4.0.0-alpha-1</tag>
+    <tag>maven-4.0.0-alpha-3</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
