@@ -225,7 +225,7 @@ under the License.
         <configuration>
           <version>1.1.0</version>
           <!-- This is a required attribute and is intentionally left empty -->
-          <models />
+          <models/>
         </configuration>
         <executions>
           <execution>
