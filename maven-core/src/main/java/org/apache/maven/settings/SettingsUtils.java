@@ -30,6 +30,7 @@ import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.RepositoryPolicy;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.settings.merge.MavenSettingsMerger;
+import org.apache.maven.settings.v4.SettingsMerger;
 
 /**
  * Several convenience methods to handle settings
@@ -49,6 +50,25 @@ public final class SettingsUtils {
      */
     public static Settings merge(Settings dominant, Settings recessive, String recessiveSourceLevel) {
         return new MavenSettingsMerger().merge(dominant, recessive, recessiveSourceLevel);
+    }
+
+    /**
+     * @param dominant
+     * @param recessive
+     * @param recessiveSourceLevel
+     * @deprecated please use {@link #merge(Settings, Settings, String)}
+     */
+    @Deprecated
+    public static void merge(
+            org.apache.maven.settings.Settings dominant,
+            org.apache.maven.settings.Settings recessive,
+            String recessiveSourceLevel) {
+
+        if (dominant == null || recessive == null) {
+            return;
+        }
+
+        dominant.delegate = new SettingsMerger().merge(dominant.getDelegate(), recessive.getDelegate(), true, null);
     }
 
     /**
