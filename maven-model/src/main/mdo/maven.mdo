@@ -1457,7 +1457,7 @@
         </codeSegment>
       </codeSegments>
     </class>
-    <class java.clone="deep" java.toString="true">
+    <class java.clone="deep">
       <name>MailingList</name>
       <version>3.0.0+</version>
       <description>This element describes all of the mailing lists associated with a project. The
@@ -1531,6 +1531,22 @@
       <comment>We could probably have a specific element for a dev mailing list for things like CI,
         and maybe even a specific element for the user and scm mailing lists. Then leave the more
         lose structure for any other type of mailing list.</comment>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "MailingList {name=" + name + ", archive=" + archive + "}";
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class java.clone="deep">
       <name>Organization</name>

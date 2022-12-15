@@ -60,11 +60,6 @@ public class MailingListTest
 
         String s = list.toString();
 
-        assertEquals( "name = 'modello-dev'\n" +
-                      "subscribe = 'null'\n" +
-                      "unsubscribe = 'null'\n" +
-                      "post = 'null'\n" +
-                      "archive = 'null'\n" +
-                      "otherArchives = '[]'", s );
+        assertEquals( "MailingList {name=modello-dev, archive=null}", s );
     }
 }
