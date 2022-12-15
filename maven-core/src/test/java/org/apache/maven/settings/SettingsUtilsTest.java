@@ -48,7 +48,7 @@ public class SettingsUtilsTest {
                 .pluginGroups(Arrays.asList("org.codehaus.plexus"))
                 .build();
 
-        Settings merged = SettingsUtilsV4.merge(dominant, recessive, Settings.GLOBAL_LEVEL);
+        Settings merged = SettingsUtilsV4.merge(dominant, recessive);
 
         List<String> pluginGroups = merged.getPluginGroups();
 
