@@ -51,7 +51,18 @@ public class DefaultLifecycles {
 
     private final PlexusContainer plexusContainer;
 
+    private Map<String, Lifecycle> customLifecycles;
+
     public DefaultLifecycles() {
+        this.plexusContainer = null;
+    }
+
+    /**
+     * @deprecated Rely on {@link #DefaultLifecycles(PlexusContainer)} instead
+     */
+    @Deprecated
+    public DefaultLifecycles(Map<String, Lifecycle> lifecycles, org.codehaus.plexus.logging.Logger logger) {
+        this.customLifecycles = lifecycles;
         this.plexusContainer = null;
     }
 
@@ -132,7 +143,7 @@ public class DefaultLifecycles {
         // TODO: Remove the following code when maven-compat is gone
         // This code is here to ensure maven-compat's EmptyLifecycleExecutor keeps on working.
         if (plexusContainer == null) {
-            return new HashMap<>();
+            return customLifecycles != null ? customLifecycles : new HashMap<>();
         }
 
         // Lifecycles cannot be cached as extensions might add custom lifecycles later in the execution.

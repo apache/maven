@@ -560,6 +560,55 @@ under the License.
           <artifactId>buildnumber-maven-plugin</artifactId>
           <version>1.4</version>
         </plugin>
+        <!-- enforce backwards compatibility -->
+        <plugin>
+          <groupId>com.github.siom79.japicmp</groupId>
+          <artifactId>japicmp-maven-plugin</artifactId>
+          <version>0.16.0</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>cmp</goal>
+              </goals>
+              <phase>verify</phase>
+              <configuration>
+                <parameter>
+                  <!-- baseline is 3.8.6 for Maven 4 -->
+                  <oldVersionPattern>3.8.6</oldVersionPattern>
+                  <breakBuildOnBinaryIncompatibleModifications>true</breakBuildOnBinaryIncompatibleModifications>
+                  <onlyBinaryIncompatible>true</onlyBinaryIncompatible>
+                  <!-- only exported packages from maven-core/META-INF/maven/extension.xml matter  -->
+                  <includes>
+                    <include>org.apache.maven.artifact</include>
+                    <include>org.apache.maven.classrealm</include>
+                    <include>org.apache.maven.cli</include>
+                    <include>org.apache.maven.configuration</include>
+                    <include>org.apache.maven.exception</include>
+                    <include>org.apache.maven.execution</include>
+                    <include>org.apache.maven.execution.scope</include>
+                    <include>org.apache.maven.feature</include>
+                    <include>org.apache.maven.graph</include>
+                    <include>org.apache.maven.lifecycle</include>
+                    <include>org.apache.maven.model</include>
+                    <include>org.apache.maven.monitor</include>
+                    <include>org.apache.maven.plugin</include>
+                    <include>org.apache.maven.profiles</include>
+                    <include>org.apache.maven.project</include>
+                    <include>org.apache.maven.reporting</include>
+                    <include>org.apache.maven.repository</include>
+                    <include>org.apache.maven.rtinfo</include>
+                    <include>org.apache.maven.rtinfo.internal</include>
+                    <include>org.apache.maven.settings</include>
+                    <include>org.apache.maven.toolchain</include>
+                    <include>org.apache.maven.usability</include>
+                  </includes>
+                  <includeExclusively>true</includeExclusively>
+                  <!-- don't include subpackages -->
+                </parameter>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>

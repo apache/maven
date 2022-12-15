@@ -235,7 +235,7 @@ public class DefaultMavenExecutionRequestPopulator implements MavenExecutionRequ
         request.setActiveProfiles(settings.getActiveProfiles());
 
         for (org.apache.maven.settings.Profile rawProfile : settings.getProfiles()) {
-            request.addProfile(SettingsUtils.convertFromSettingsProfile(rawProfile.getDelegate()));
+            request.addProfile(SettingsUtils.convertFromSettingsProfile(rawProfile));
 
             if (settings.getActiveProfiles().contains(rawProfile.getId())) {
                 List<Repository> remoteRepositories = rawProfile.getRepositories();

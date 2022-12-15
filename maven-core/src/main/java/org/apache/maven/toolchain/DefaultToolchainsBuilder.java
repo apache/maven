@@ -22,7 +22,7 @@ import java.io.File;
 import java.io.Reader;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import org.apache.maven.api.toolchain.PersistedToolchains;
+import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Reader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
 
         if (userToolchainsFile != null && userToolchainsFile.isFile()) {
             try (Reader in = ReaderFactory.newXmlReader(userToolchainsFile)) {
-                toolchains = new MavenToolchainsXpp3Reader().read(in);
+                toolchains = new PersistedToolchains(new MavenToolchainsXpp3Reader().read(in));
             } catch (Exception e) {
                 throw new MisconfiguredToolchainException(
                         "Cannot read toolchains file at " + userToolchainsFile.getAbsolutePath(), e);

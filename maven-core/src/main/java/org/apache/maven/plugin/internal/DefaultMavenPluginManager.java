@@ -306,6 +306,12 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         }
     }
 
+    @Override
+    @Deprecated
+    public void checkRequiredMavenVersion(PluginDescriptor pluginDescriptor) throws PluginIncompatibleException {
+        checkPrerequisites(pluginDescriptor);
+    }
+
     public void setupPluginRealm(
             PluginDescriptor pluginDescriptor,
             MavenSession session,

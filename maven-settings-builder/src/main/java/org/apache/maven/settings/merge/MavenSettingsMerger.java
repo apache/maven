@@ -33,7 +33,9 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  * @author Benjamin Bentmann
+ * @deprecated use {@link org.apache.maven.settings.v4.SettingsMerger}
  */
+@Deprecated
 public class MavenSettingsMerger {
 
     /**

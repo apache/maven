@@ -70,6 +70,22 @@ public class DefaultProjectDependencyGraph implements ProjectDependencyGraph {
      * @throws DuplicateProjectException
      * @throws CycleDetectedException
      * @since 3.5.0
+     * @deprecated Use {@link #DefaultProjectDependencyGraph(Collection, Collection)} instead.
+     */
+    @Deprecated
+    public DefaultProjectDependencyGraph(List<MavenProject> allProjects, Collection<MavenProject> projects)
+            throws CycleDetectedException, DuplicateProjectException {
+        this((Collection<MavenProject>) allProjects, projects);
+    }
+
+    /**
+     * Creates a new project dependency graph based on the specified projects.
+     *
+     * @param allProjects All collected projects.
+     * @param projects    The projects to create the dependency graph with.
+     * @throws DuplicateProjectException
+     * @throws CycleDetectedException
+     * @since 4.0.0
      */
     public DefaultProjectDependencyGraph(Collection<MavenProject> allProjects, Collection<MavenProject> projects)
             throws CycleDetectedException, DuplicateProjectException {

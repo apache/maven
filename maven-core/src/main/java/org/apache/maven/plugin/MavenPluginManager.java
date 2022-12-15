@@ -67,9 +67,19 @@ public interface MavenPluginManager {
                     InvalidPluginDescriptorException;
 
     /**
+     * Verifies the specified plugin is compatible with the current Maven runtime.
+     *
+     * @param pluginDescriptor The descriptor of the plugin to check, must not be {@code null}.
+     * @deprecated Use {@link #checkPrerequisites(PluginDescriptor)} instead.
+     */
+    @Deprecated
+    void checkRequiredMavenVersion(PluginDescriptor pluginDescriptor) throws PluginIncompatibleException;
+
+    /**
      * Verifies that the specified plugin's prerequisites are met.
      *
      * @param pluginDescriptor The descriptor of the plugin to check, must not be {@code null}.
+     * @since 4.0.0
      */
     void checkPrerequisites(PluginDescriptor pluginDescriptor) throws PluginIncompatibleException;
 

@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import org.apache.maven.api.Session;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
+import org.apache.maven.model.Profile;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -38,7 +39,7 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.SettingsUtils;
+import org.apache.maven.settings.SettingsUtilsV4;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
@@ -372,7 +373,8 @@ public class MavenSession implements Cloneable {
                 .servers(request.getServers().stream().map(Server::getDelegate).collect(Collectors.toList()))
                 .mirrors(request.getMirrors().stream().map(Mirror::getDelegate).collect(Collectors.toList()))
                 .profiles(request.getProfiles().stream()
-                        .map(SettingsUtils::convertToSettingsProfile)
+                        .map(Profile::getDelegate)
+                        .map(SettingsUtilsV4::convertToSettingsProfile)
                         .collect(Collectors.toList()))
                 .activeProfiles(request.getActiveProfiles())
                 .pluginGroups(request.getPluginGroups())

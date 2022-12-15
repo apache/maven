@@ -20,6 +20,7 @@ package org.apache.maven.lifecycle;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -101,6 +102,13 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
 
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles(String packaging) {
         return lifeCyclePluginAnalyzer.getPluginsBoundByDefaultToAllLifecycles(packaging);
+    }
+
+    // USED BY MAVEN HELP PLUGIN
+
+    @Deprecated
+    public Map<String, Lifecycle> getPhaseToLifecycleMap() {
+        return defaultLifeCycles.getPhaseToLifecycleMap();
     }
 
     // Used by m2eclipse

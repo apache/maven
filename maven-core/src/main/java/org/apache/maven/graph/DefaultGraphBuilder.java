@@ -68,6 +68,15 @@ public class DefaultGraphBuilder implements GraphBuilder {
     private final RequestPomCollectionStrategy requestPomCollectionStrategy;
     private final ProjectSelector projectSelector;
 
+    /**
+     * @deprecated Use {@link #DefaultGraphBuilder(BuildResumptionDataRepository, PomlessCollectionStrategy,
+     * MultiModuleCollectionStrategy, RequestPomCollectionStrategy)} instead or rely on JSR 330
+     */
+    @Deprecated
+    public DefaultGraphBuilder() {
+        this(null, null, null, null);
+    }
+
     @Inject
     public DefaultGraphBuilder(
             BuildResumptionDataRepository buildResumptionDataRepository,

@@ -48,7 +48,7 @@ public class SettingsUtilsTest {
                 .pluginGroups(Arrays.asList("org.codehaus.plexus"))
                 .build();
 
-        Settings merged = SettingsUtils.merge(dominant, recessive, Settings.GLOBAL_LEVEL);
+        Settings merged = SettingsUtilsV4.merge(dominant, recessive);
 
         List<String> pluginGroups = merged.getPluginGroups();
 
@@ -116,7 +116,7 @@ public class SettingsUtilsTest {
                 .pluginRepositories(pluginRepos)
                 .build();
 
-        Profile clone = SettingsUtils.convertToSettingsProfile(SettingsUtils.convertFromSettingsProfile(p));
+        Profile clone = SettingsUtilsV4.convertToSettingsProfile(SettingsUtilsV4.convertFromSettingsProfile(p));
 
         assertEquals(p.getId(), clone.getId());
         assertEquals(p.getActivation().getJdk(), clone.getActivation().getJdk());

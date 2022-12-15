@@ -19,7 +19,7 @@
 package org.apache.maven.toolchain;
 
 import java.io.File;
-import org.apache.maven.api.toolchain.PersistedToolchains;
+import org.apache.maven.toolchain.model.PersistedToolchains;
 
 /**
  * Builds the toolchains model from a previously configured filesystem path to the toolchains file.

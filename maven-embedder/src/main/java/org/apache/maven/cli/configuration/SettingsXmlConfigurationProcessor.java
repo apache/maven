@@ -202,7 +202,7 @@ public class SettingsXmlConfigurationProcessor implements ConfigurationProcessor
         request.setActiveProfiles(settings.getActiveProfiles());
 
         for (Profile rawProfile : settings.getProfiles()) {
-            request.addProfile(SettingsUtils.convertFromSettingsProfile(rawProfile.getDelegate()));
+            request.addProfile(SettingsUtils.convertFromSettingsProfile(rawProfile));
 
             if (settings.getActiveProfiles().contains(rawProfile.getId())) {
                 List<Repository> remoteRepositories = rawProfile.getRepositories();
