@@ -1,5 +1,3 @@
-package org.apache.maven.internal.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,76 +16,57 @@ package org.apache.maven.internal.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.xml;
 
 import java.io.Reader;
-
-//import org.apache.maven.api.model.InputLocation;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-public class DomBuilder
-{
+public class DomBuilder {
 
-    public static Xpp3Dom build( Reader reader )
-            throws MavenXmlException
-    {
-        return build( reader, true );
+    public static Xpp3Dom build(Reader reader) throws MavenXmlException {
+        return build(reader, true);
     }
 
-    public static Xpp3Dom build( Reader reader, boolean trim )
-            throws MavenXmlException
-    {
-        try
-        {
+    public static Xpp3Dom build(Reader reader, boolean trim) throws MavenXmlException {
+        try {
             MXParser parser = new MXParser();
-            parser.setInput( reader );
-            return build( parser, trim );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new MavenXmlException( "Unable to build DOM", e );
+            parser.setInput(reader);
+            return build(parser, trim);
+        } catch (XmlPullParserException e) {
+            throw new MavenXmlException("Unable to build DOM", e);
         }
     }
 
-    public static Xpp3Dom build( XmlPullParser parser )
-    {
-        return build( parser, true, null );
+    public static Xpp3Dom build(XmlPullParser parser) {
+        return build(parser, true, null);
     }
 
-    public static Xpp3Dom build( XmlPullParser parser, boolean trim )
-    {
-        return build( parser, trim, null );
+    public static Xpp3Dom build(XmlPullParser parser, boolean trim) {
+        return build(parser, trim, null);
     }
 
-    public static Xpp3Dom build( XmlPullParser parser, boolean trim, LocationBuilder locationBuilder )
-    {
-        try
-        {
+    public static Xpp3Dom build(XmlPullParser parser, boolean trim, LocationBuilder locationBuilder) {
+        try {
             Xpp3DomBuilder.InputLocationBuilder ilb =
-                    locationBuilder != null ? ( p -> locationBuilder.getLocation() ) : null;
-            return Xpp3DomBuilder.build( parser, trim, ilb );
-        }
-        catch ( Exception e )
-        {
-            throw new MavenXmlException( "Unable to build DOM", e );
+                    locationBuilder != null ? (p -> locationBuilder.getLocation()) : null;
+            return Xpp3DomBuilder.build(parser, trim, ilb);
+        } catch (Exception e) {
+            throw new MavenXmlException("Unable to build DOM", e);
         }
     }
 
-    public static class LocationBuilder
-    {
+    public static class LocationBuilder {
 
         private final Object location;
 
-        public LocationBuilder( Object location )
-        {
+        public LocationBuilder(Object location) {
             this.location = location;
         }
 
-        public Object getLocation()
-        {
+        public Object getLocation() {
             return location;
         }
     }
-
 }

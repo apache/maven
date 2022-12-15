@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,21 +16,24 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.io.IOException;
-import java.io.InputStream;
+package org.apache.maven.api.services;
 
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * The source for a project's XML model.
+ * The Exception class throw by the {@link SettingsBuilder}.
  *
  * @since 4.0
  */
 @Experimental
-public interface ProjectBuilderSource
-{
-    InputStream getInputStream() throws IOException;
+public class SettingsBuilderException extends MavenException {
+    /**
+     * @param message the message to give
+     * @param e the {@link Exception}
+     */
+    public SettingsBuilderException(String message, Exception e) {
+        super(message, e);
+    }
 
-    String getLocation();
+    // TODO: add SettingsBuilderResult
 }

@@ -37,6 +37,7 @@ under the License.
       <item name="Plugin Bindings to Default Lifecycle" href="default-bindings.html"/>
       <item name="Artifact Handlers" href="artifact-handlers.html"/>
       <item name="Core Extensions" href="core-extensions.html"/>
+      <item name="Extension Descriptor" href="extension.html"/>
     </menu>
 
     <menu ref="parent"/>

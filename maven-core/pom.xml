@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,14 +17,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-3-SNAPSHOT</version>
+    <version>4.0.0-alpha-4-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-core</artifactId>
@@ -196,8 +194,8 @@ under the License.
   <build>
     <resources>
       <resource>
-        <directory>src/main/resources</directory>
         <filtering>true</filtering>
+        <directory>src/main/resources</directory>
       </resource>
     </resources>
     <pluginManagement>
@@ -227,16 +225,16 @@ under the License.
         <configuration>
           <version>1.1.0</version>
           <!-- This is a required attribute and is intentionally left empty -->
-          <models />
+          <models/>
         </configuration>
         <executions>
           <execution>
             <!-- This step is required to generate xdoc, and does not generate java code -->
             <id>modello-site-doc</id>
-            <phase>pre-site</phase>
             <goals>
               <goal>xdoc</goal>
             </goals>
+            <phase>pre-site</phase>
             <configuration>
               <version>1.0.0</version>
               <models>

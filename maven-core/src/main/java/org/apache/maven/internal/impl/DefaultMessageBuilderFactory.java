@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,12 +16,11 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import javax.inject.Named;
-import javax.inject.Singleton;
+package org.apache.maven.internal.impl;
 
 import java.util.Objects;
-
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.MessageBuilder;
@@ -33,33 +30,27 @@ import org.apache.maven.shared.utils.logging.MessageUtils;
 @Experimental
 @Named
 @Singleton
-public class DefaultMessageBuilderFactory implements MessageBuilderFactory
-{
+public class DefaultMessageBuilderFactory implements MessageBuilderFactory {
 
     @Override
-    public boolean isColorEnabled()
-    {
+    public boolean isColorEnabled() {
         return MessageUtils.isColorEnabled();
     }
 
     @Override
-    public int getTerminalWidth()
-    {
+    public int getTerminalWidth() {
         return MessageUtils.getTerminalWidth();
     }
 
     @Override
     @Nonnull
-    public MessageBuilder builder()
-    {
-        return new DefaultMessageBuilder( MessageUtils.buffer() );
+    public MessageBuilder builder() {
+        return new DefaultMessageBuilder(MessageUtils.buffer());
     }
 
     @Override
     @Nonnull
-    public MessageBuilder builder( @Nonnull StringBuilder stringBuilder )
-    {
-        return new DefaultMessageBuilder( MessageUtils.buffer( Objects.requireNonNull( stringBuilder ) ) );
+    public MessageBuilder builder(@Nonnull StringBuilder stringBuilder) {
+        return new DefaultMessageBuilder(MessageUtils.buffer(Objects.requireNonNull(stringBuilder)));
     }
-
 }

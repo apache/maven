@@ -1,5 +1,3 @@
-package org.apache.maven.project.interpolation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.interpolation;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,53 +16,45 @@ package org.apache.maven.project.interpolation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.interpolation;
 
 /**
  * @author jdcasey
  */
-@SuppressWarnings( "serial" )
+@SuppressWarnings("serial")
 @Deprecated
-public class ModelInterpolationException
-    extends Exception
-{
+public class ModelInterpolationException extends Exception {
     private String expression;
 
     private String originalMessage;
 
-    public ModelInterpolationException( String message )
-    {
-        super( message );
+    public ModelInterpolationException(String message) {
+        super(message);
     }
 
-    public ModelInterpolationException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public ModelInterpolationException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public ModelInterpolationException( String expression, String message, Throwable cause )
-    {
-        super( "The POM expression: " + expression + " could not be evaluated. Reason: " + message, cause );
+    public ModelInterpolationException(String expression, String message, Throwable cause) {
+        super("The POM expression: " + expression + " could not be evaluated. Reason: " + message, cause);
 
         this.expression = expression;
         this.originalMessage = message;
     }
 
-    public ModelInterpolationException( String expression, String message )
-    {
-        super( "The POM expression: " + expression + " could not be evaluated. Reason: " + message );
+    public ModelInterpolationException(String expression, String message) {
+        super("The POM expression: " + expression + " could not be evaluated. Reason: " + message);
 
         this.expression = expression;
         this.originalMessage = message;
     }
 
-    public String getExpression()
-    {
+    public String getExpression() {
         return expression;
     }
 
-    public String getOriginalMessage()
-    {
+    public String getOriginalMessage() {
         return originalMessage;
     }
-
 }

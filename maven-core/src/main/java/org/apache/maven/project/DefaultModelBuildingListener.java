@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,10 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.util.List;
 import java.util.Objects;
-
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.AbstractModelBuildingListener;
@@ -38,9 +36,7 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
  *
  * @author Benjamin Bentmann
  */
-public class DefaultModelBuildingListener
-    extends AbstractModelBuildingListener
-{
+public class DefaultModelBuildingListener extends AbstractModelBuildingListener {
 
     private MavenProject project;
 
@@ -52,14 +48,15 @@ public class DefaultModelBuildingListener
 
     private List<ArtifactRepository> pluginRepositories;
 
-    public DefaultModelBuildingListener( MavenProject project, ProjectBuildingHelper projectBuildingHelper,
-                                         ProjectBuildingRequest projectBuildingRequest )
-    {
-        this.project = Objects.requireNonNull( project, "project cannot be null" );
+    public DefaultModelBuildingListener(
+            MavenProject project,
+            ProjectBuildingHelper projectBuildingHelper,
+            ProjectBuildingRequest projectBuildingRequest) {
+        this.project = Objects.requireNonNull(project, "project cannot be null");
         this.projectBuildingHelper =
-            Objects.requireNonNull( projectBuildingHelper, "projectBuildingHelper cannot be null" );
+                Objects.requireNonNull(projectBuildingHelper, "projectBuildingHelper cannot be null");
         this.projectBuildingRequest =
-            Objects.requireNonNull( projectBuildingRequest, "projectBuildingRequest cannot be null" );
+                Objects.requireNonNull(projectBuildingRequest, "projectBuildingRequest cannot be null");
         this.remoteRepositories = projectBuildingRequest.getRemoteRepositories();
         this.pluginRepositories = projectBuildingRequest.getPluginArtifactRepositories();
     }
@@ -69,64 +66,52 @@ public class DefaultModelBuildingListener
      *
      * @return The project, never {@code null}.
      */
-    public MavenProject getProject()
-    {
+    public MavenProject getProject() {
         return project;
     }
 
     @Override
-    public void buildExtensionsAssembled( ModelBuildingEvent event )
-    {
+    public void buildExtensionsAssembled(ModelBuildingEvent event) {
         Model model = event.getModel();
 
-        try
-        {
-            pluginRepositories =
-                projectBuildingHelper.createArtifactRepositories( model.getPluginRepositories(), pluginRepositories,
-                                                                  projectBuildingRequest );
+        try {
+            pluginRepositories = projectBuildingHelper.createArtifactRepositories(
+                    model.getPluginRepositories(), pluginRepositories, projectBuildingRequest);
+        } catch (Exception e) {
+            event.getProblems()
+                    .add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                            .setMessage("Invalid plugin repository: " + e.getMessage())
+                            .setException(e));
         }
-        catch ( Exception e )
-        {
-            event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Invalid plugin repository: " + e.getMessage() )
-                    .setException( e ) );
-        }
-        project.setPluginArtifactRepositories( pluginRepositories );
+        project.setPluginArtifactRepositories(pluginRepositories);
 
-        if ( event.getRequest().isProcessPlugins() )
-        {
-            try
-            {
+        if (event.getRequest().isProcessPlugins()) {
+            try {
                 ProjectRealmCache.CacheRecord record =
-                    projectBuildingHelper.createProjectRealm( project, model, projectBuildingRequest );
+                        projectBuildingHelper.createProjectRealm(project, model, projectBuildingRequest);
 
-                project.setClassRealm( record.getRealm() );
-                project.setExtensionDependencyFilter( record.getExtensionArtifactFilter() );
-            }
-            catch ( PluginResolutionException | PluginManagerException | PluginVersionResolutionException e )
-            {
-                event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                        .setMessage( "Unresolvable build extension: " + e.getMessage() )
-                        .setException( e ) );
+                project.setClassRealm(record.getRealm());
+                project.setExtensionDependencyFilter(record.getExtensionArtifactFilter());
+            } catch (PluginResolutionException | PluginManagerException | PluginVersionResolutionException e) {
+                event.getProblems()
+                        .add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                                .setMessage("Unresolvable build extension: " + e.getMessage())
+                                .setException(e));
             }
 
-            projectBuildingHelper.selectProjectRealm( project );
+            projectBuildingHelper.selectProjectRealm(project);
         }
 
         // build the regular repos after extensions are loaded to allow for custom layouts
-        try
-        {
-            remoteRepositories =
-                projectBuildingHelper.createArtifactRepositories( model.getRepositories(), remoteRepositories,
-                                                                  projectBuildingRequest );
+        try {
+            remoteRepositories = projectBuildingHelper.createArtifactRepositories(
+                    model.getRepositories(), remoteRepositories, projectBuildingRequest);
+        } catch (Exception e) {
+            event.getProblems()
+                    .add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                            .setMessage("Invalid artifact repository: " + e.getMessage())
+                            .setException(e));
         }
-        catch ( Exception e )
-        {
-            event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Invalid artifact repository: " + e.getMessage() )
-                    .setException( e ) );
-        }
-        project.setRemoteArtifactRepositories( remoteRepositories );
+        project.setRemoteArtifactRepositories(remoteRepositories);
     }
-
 }

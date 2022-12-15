@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform.pull;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.model.transform.pull;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform.pull;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -33,8 +31,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * @author Guillaume Nodet
  * @since 4.0.0
  */
-public abstract class NodeBufferingParser extends BufferingParser
-{
+public abstract class NodeBufferingParser extends BufferingParser {
 
     private final List<Event> buffer = new ArrayList<>();
 
@@ -42,40 +39,32 @@ public abstract class NodeBufferingParser extends BufferingParser
 
     private boolean buffering;
 
-    public NodeBufferingParser( XmlPullParser xmlPullParser, String nodeName )
-    {
-        super( xmlPullParser );
-        this.nodeName = Objects.requireNonNull( nodeName );
+    public NodeBufferingParser(XmlPullParser xmlPullParser, String nodeName) {
+        super(xmlPullParser);
+        this.nodeName = Objects.requireNonNull(nodeName);
     }
 
     @Override
-    protected boolean accept() throws XmlPullParserException, IOException
-    {
-        if ( nodeName.equals( xmlPullParser.getName() ) )
-        {
-            if ( xmlPullParser.getEventType() == START_TAG && !buffering )
-            {
-                buffer.add( bufferEvent() );
+    protected boolean accept() throws XmlPullParserException, IOException {
+        if (nodeName.equals(xmlPullParser.getName())) {
+            if (xmlPullParser.getEventType() == START_TAG && !buffering) {
+                buffer.add(bufferEvent());
                 buffering = true;
                 return false;
             }
-            if ( xmlPullParser.getEventType() == END_TAG && buffering )
-            {
-                buffer.add( bufferEvent() );
-                process( buffer );
+            if (xmlPullParser.getEventType() == END_TAG && buffering) {
+                buffer.add(bufferEvent());
+                process(buffer);
                 buffering = false;
                 buffer.clear();
                 return false;
             }
-        }
-        else if ( buffering )
-        {
-            buffer.add( bufferEvent() );
+        } else if (buffering) {
+            buffer.add(bufferEvent());
             return false;
         }
         return true;
     }
 
-    protected abstract void process( List<Event> buffer );
-
+    protected abstract void process(List<Event> buffer);
 }

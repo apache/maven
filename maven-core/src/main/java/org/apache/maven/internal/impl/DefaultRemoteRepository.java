@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,50 +16,43 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.api.annotations.Nonnull;
+package org.apache.maven.internal.impl;
 
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.annotations.Nonnull;
 
-public class DefaultRemoteRepository implements RemoteRepository
-{
+public class DefaultRemoteRepository implements RemoteRepository {
     private final org.eclipse.aether.repository.RemoteRepository repository;
 
-    public DefaultRemoteRepository( org.eclipse.aether.repository.RemoteRepository repository )
-    {
+    public DefaultRemoteRepository(org.eclipse.aether.repository.RemoteRepository repository) {
         this.repository = repository;
     }
 
-    public org.eclipse.aether.repository.RemoteRepository getRepository()
-    {
+    public org.eclipse.aether.repository.RemoteRepository getRepository() {
         return repository;
     }
 
     @Nonnull
     @Override
-    public String getId()
-    {
+    public String getId() {
         return repository.getId();
     }
 
     @Nonnull
     @Override
-    public String getType()
-    {
+    public String getType() {
         return repository.getContentType();
     }
 
     @Nonnull
     @Override
-    public String getUrl()
-    {
+    public String getUrl() {
         return repository.getUrl();
     }
 
     @Nonnull
     @Override
-    public String getProtocol()
-    {
+    public String getProtocol() {
         return repository.getProtocol();
     }
 }

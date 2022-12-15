@@ -1,5 +1,3 @@
-package org.apache.maven.cli.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.cli.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.cli.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli.internal;
 
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
 
@@ -26,22 +25,19 @@ import org.apache.maven.cli.internal.extension.model.CoreExtension;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-public class ExtensionResolutionException
-    extends Exception
-{
+public class ExtensionResolutionException extends Exception {
 
     private final CoreExtension extension;
 
-    public ExtensionResolutionException( CoreExtension extension, Throwable cause )
-    {
-        super( "Extension " + extension.getId() + " or one of its dependencies could not be resolved: "
-                        + cause.getMessage(), cause );
+    public ExtensionResolutionException(CoreExtension extension, Throwable cause) {
+        super(
+                "Extension " + extension.getId() + " or one of its dependencies could not be resolved: "
+                        + cause.getMessage(),
+                cause);
         this.extension = extension;
     }
 
-    public CoreExtension getExtension()
-    {
+    public CoreExtension getExtension() {
         return extension;
     }
-
 }

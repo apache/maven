@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,9 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.util.List;
-
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
@@ -36,8 +34,7 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
  *
  * @author Benjamin Bentmann
  */
-public interface ProjectBuildingHelper
-{
+public interface ProjectBuildingHelper {
 
     /**
      * Creates the effective artifact repositories from the specified POM repositories.
@@ -50,10 +47,11 @@ public interface ProjectBuildingHelper
      * @return The effective artifact repositories, never {@code null}.
      * @throws InvalidRepositoryException
      */
-    List<ArtifactRepository> createArtifactRepositories( List<Repository> pomRepositories,
-                                                         List<ArtifactRepository> externalRepositories,
-                                                         ProjectBuildingRequest request )
-        throws InvalidRepositoryException;
+    List<ArtifactRepository> createArtifactRepositories(
+            List<Repository> pomRepositories,
+            List<ArtifactRepository> externalRepositories,
+            ProjectBuildingRequest request)
+            throws InvalidRepositoryException;
 
     /**
      * Creates the project realm that hosts the build extensions of the specified model.
@@ -65,9 +63,8 @@ public interface ProjectBuildingHelper
      * @return The record with the project realm and extension artifact filter, never {@code null}.
      * @throws PluginResolutionException If any build extension could not be resolved.
      */
-    ProjectRealmCache.CacheRecord createProjectRealm( MavenProject project, Model model,
-                                                      ProjectBuildingRequest request )
-        throws PluginResolutionException, PluginVersionResolutionException, PluginManagerException;
+    ProjectRealmCache.CacheRecord createProjectRealm(MavenProject project, Model model, ProjectBuildingRequest request)
+            throws PluginResolutionException, PluginVersionResolutionException, PluginManagerException;
 
     /**
      * Updates the context class loader such that the container will search the project realm when the model builder
@@ -76,6 +73,5 @@ public interface ProjectBuildingHelper
      *
      * @param project The project whose class realm should be selected, must not be {@code null}.
      */
-    void selectProjectRealm( MavenProject project );
-
+    void selectProjectRealm(MavenProject project);
 }

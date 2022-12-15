@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,8 +31,7 @@ import java.util.List;
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold (extracted class only)
  */
-public final class TaskSegment
-{
+public final class TaskSegment {
 
     // Can be both "LifeCycleTask" (clean/install) and "GoalTask" (org.mortbay.jetty:maven-jetty-plugin:6.1.19:run)
 
@@ -41,31 +39,26 @@ public final class TaskSegment
 
     private final boolean aggregating;
 
-    public TaskSegment( boolean aggregating )
-    {
+    public TaskSegment(boolean aggregating) {
         this.aggregating = aggregating;
         tasks = new ArrayList<>();
     }
 
-    public TaskSegment( boolean aggregating, Object... tasks )
-    {
+    public TaskSegment(boolean aggregating, Object... tasks) {
         this.aggregating = aggregating;
-        this.tasks = new ArrayList<>( Arrays.asList( tasks ) );
+        this.tasks = new ArrayList<>(Arrays.asList(tasks));
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getTasks().toString();
     }
 
-    public List<Object> getTasks()
-    {
+    public List<Object> getTasks() {
         return tasks;
     }
 
-    public boolean isAggregating()
-    {
+    public boolean isAggregating() {
         return aggregating;
     }
 

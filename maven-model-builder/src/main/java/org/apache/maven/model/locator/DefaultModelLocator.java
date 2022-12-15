@@ -1,5 +1,3 @@
-package org.apache.maven.model.locator;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,9 @@ package org.apache.maven.model.locator;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.locator;
 
 import java.io.File;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -31,14 +29,10 @@ import javax.inject.Singleton;
  */
 @Named
 @Singleton
-public class DefaultModelLocator
-    implements ModelLocator
-{
+public class DefaultModelLocator implements ModelLocator {
 
     @Override
-    public File locatePom( File projectDirectory )
-    {
-        return new File( projectDirectory, "pom.xml" );
+    public File locatePom(File projectDirectory) {
+        return new File(projectDirectory, "pom.xml");
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.exception;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.exception;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.exception;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.exception;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,8 +31,7 @@ import java.util.List;
  * <li>child exception summaries.</li>
  * </ul>
  */
-public class ExceptionSummary
-{
+public class ExceptionSummary {
 
     private Throwable exception;
 
@@ -43,40 +41,30 @@ public class ExceptionSummary
 
     private List<ExceptionSummary> children;
 
-    public ExceptionSummary( Throwable exception, String message, String reference )
-    {
-        this( exception, message, reference, null );
+    public ExceptionSummary(Throwable exception, String message, String reference) {
+        this(exception, message, reference, null);
     }
 
-    public ExceptionSummary( Throwable exception, String message, String reference, List<ExceptionSummary> children )
-    {
+    public ExceptionSummary(Throwable exception, String message, String reference, List<ExceptionSummary> children) {
         this.exception = exception;
-        this.message = ( message != null ) ? message : "";
-        this.reference = ( reference != null ) ? reference : "";
-        this.children = ( children != null )
-                            ? Collections.unmodifiableList( children )
-                            : Collections.emptyList();
-
+        this.message = (message != null) ? message : "";
+        this.reference = (reference != null) ? reference : "";
+        this.children = (children != null) ? Collections.unmodifiableList(children) : Collections.emptyList();
     }
 
-    public Throwable getException()
-    {
+    public Throwable getException() {
         return exception;
     }
 
-    public String getMessage()
-    {
+    public String getMessage() {
         return message;
     }
 
-    public String getReference()
-    {
+    public String getReference() {
         return reference;
     }
 
-    public List<ExceptionSummary> getChildren()
-    {
+    public List<ExceptionSummary> getChildren() {
         return children;
     }
-
 }

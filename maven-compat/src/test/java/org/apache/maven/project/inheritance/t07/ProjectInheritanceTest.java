@@ -1,5 +1,3 @@
-package org.apache.maven.project.inheritance.t07;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.inheritance.t07;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,28 +16,26 @@ package org.apache.maven.project.inheritance.t07;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.io.File;
-import java.util.Set;
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
-import org.junit.jupiter.api.Test;
+package org.apache.maven.project.inheritance.t07;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
+import java.util.Set;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
+import org.junit.jupiter.api.Test;
+
 /**
  * A test which demonstrates maven's dependency management
  *
  * @author Jason van Zyl
  */
-public class ProjectInheritanceTest
-    extends AbstractProjectInheritanceTestCase
-{
+public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
     // p1 inherits from p0
@@ -52,37 +48,31 @@ public class ProjectInheritanceTest
     // ----------------------------------------------------------------------
 
     @Test
-    public void testDependencyManagement()
-        throws Exception
-    {
+    public void testDependencyManagement() throws Exception {
         File localRepo = getLocalRepositoryPath();
-        File pom0 = new File( localRepo, "p0/pom.xml" );
+        File pom0 = new File(localRepo, "p0/pom.xml");
 
         File pom0Basedir = pom0.getParentFile();
 
-        File pom1 = new File( pom0Basedir, "p1/pom.xml" );
+        File pom1 = new File(pom0Basedir, "p1/pom.xml");
 
         // load everything...
-        MavenProject project1 = getProjectWithDependencies( pom1 );
+        MavenProject project1 = getProjectWithDependencies(pom1);
 
-        assertEquals( pom0Basedir, project1.getParent().getBasedir() );
+        assertEquals(pom0Basedir, project1.getParent().getBasedir());
         System.out.println("Project " + project1.getId() + " " + project1);
         Set set = project1.getArtifacts();
-        assertNotNull( set, "No artifacts" );
-        assertTrue( set.size() > 0, "No Artifacts" );
-        assertTrue( set.size() == 3, "Set size should be 3, is " + set.size() );
+        assertNotNull(set, "No artifacts");
+        assertTrue(set.size() > 0, "No Artifacts");
+        assertTrue(set.size() == 3, "Set size should be 3, is " + set.size());
 
-        for ( Object aSet : set )
-        {
+        for (Object aSet : set) {
             Artifact artifact = (Artifact) aSet;
-            assertFalse( artifact.getArtifactId().equals( "t07-d" ) );
-            System.out.println(
-                "Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion() + " Optional=" + (
-                    artifact.isOptional()
-                        ? "true"
-                        : "false" ) );
-            assertTrue( artifact.getVersion().equals( "1.0" ),
-                        "Incorrect version for " + artifact.getDependencyConflictId() );
+            assertFalse(artifact.getArtifactId().equals("t07-d"));
+            System.out.println("Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion()
+                    + " Optional=" + (artifact.isOptional() ? "true" : "false"));
+            assertTrue(
+                    artifact.getVersion().equals("1.0"), "Incorrect version for " + artifact.getDependencyConflictId());
         }
     }
 }

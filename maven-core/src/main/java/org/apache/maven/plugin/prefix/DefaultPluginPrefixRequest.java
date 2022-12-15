@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.prefix;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,10 @@ package org.apache.maven.plugin.prefix;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.prefix;
 
 import java.util.Collections;
 import java.util.List;
-
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
@@ -34,9 +32,7 @@ import org.eclipse.aether.repository.RemoteRepository;
  * @since 3.0
  * @author Benjamin Bentmann
  */
-public class DefaultPluginPrefixRequest
-    implements PluginPrefixRequest
-{
+public class DefaultPluginPrefixRequest implements PluginPrefixRequest {
 
     private String prefix;
 
@@ -51,9 +47,7 @@ public class DefaultPluginPrefixRequest
     /**
      * Creates an empty request.
      */
-    public DefaultPluginPrefixRequest()
-    {
-    }
+    public DefaultPluginPrefixRequest() {}
 
     /**
      * Creates a request for the specified plugin prefix and build session. The provided build session will be used to
@@ -63,94 +57,75 @@ public class DefaultPluginPrefixRequest
      * @param prefix The plugin prefix to resolve, must not be {@code null}.
      * @param session The build session from which to derive further settings, must not be {@code null}.
      */
-    public DefaultPluginPrefixRequest( String prefix, MavenSession session )
-    {
-        setPrefix( prefix );
+    public DefaultPluginPrefixRequest(String prefix, MavenSession session) {
+        setPrefix(prefix);
 
-        setRepositorySession( session.getRepositorySession() );
+        setRepositorySession(session.getRepositorySession());
 
         MavenProject project = session.getCurrentProject();
-        if ( project != null )
-        {
-            setRepositories( project.getRemotePluginRepositories() );
-            setPom( project.getModel() );
+        if (project != null) {
+            setRepositories(project.getRemotePluginRepositories());
+            setPom(project.getModel());
         }
 
-        setPluginGroups( session.getPluginGroups() );
+        setPluginGroups(session.getPluginGroups());
     }
 
-    public String getPrefix()
-    {
+    public String getPrefix() {
         return prefix;
     }
 
-    public DefaultPluginPrefixRequest setPrefix( String prefix )
-    {
+    public DefaultPluginPrefixRequest setPrefix(String prefix) {
         this.prefix = prefix;
 
         return this;
     }
 
-    public List<String> getPluginGroups()
-    {
+    public List<String> getPluginGroups() {
         return pluginGroups;
     }
 
-    public DefaultPluginPrefixRequest setPluginGroups( List<String> pluginGroups )
-    {
-        if ( pluginGroups != null )
-        {
-            this.pluginGroups = Collections.unmodifiableList( pluginGroups );
-        }
-        else
-        {
+    public DefaultPluginPrefixRequest setPluginGroups(List<String> pluginGroups) {
+        if (pluginGroups != null) {
+            this.pluginGroups = Collections.unmodifiableList(pluginGroups);
+        } else {
             this.pluginGroups = Collections.emptyList();
         }
 
         return this;
     }
 
-    public Model getPom()
-    {
+    public Model getPom() {
         return pom;
     }
 
-    public DefaultPluginPrefixRequest setPom( Model pom )
-    {
+    public DefaultPluginPrefixRequest setPom(Model pom) {
         this.pom = pom;
 
         return this;
     }
 
-    public List<RemoteRepository> getRepositories()
-    {
+    public List<RemoteRepository> getRepositories() {
         return repositories;
     }
 
-    public DefaultPluginPrefixRequest setRepositories( List<RemoteRepository> repositories )
-    {
-        if ( repositories != null )
-        {
-            this.repositories = Collections.unmodifiableList( repositories );
-        }
-        else
-        {
+    public DefaultPluginPrefixRequest setRepositories(List<RemoteRepository> repositories) {
+        if (repositories != null) {
+            this.repositories = Collections.unmodifiableList(repositories);
+        } else {
             this.repositories = Collections.emptyList();
         }
 
         return this;
     }
 
-    public RepositorySystemSession getRepositorySession()
-    {
+    public RepositorySystemSession getRepositorySession() {
         return session;
     }
 
-    public DefaultPluginPrefixRequest setRepositorySession( RepositorySystemSession session )
-    {
+    public DefaultPluginPrefixRequest setRepositorySession(RepositorySystemSession session) {
         this.session = session;
 
         return this;
     }
-
 }

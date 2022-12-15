@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,129 +16,114 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.MessageBuilder;
 
 @Experimental
-public class DefaultMessageBuilder implements MessageBuilder
-{
+public class DefaultMessageBuilder implements MessageBuilder {
     private final @Nonnull org.apache.maven.shared.utils.logging.MessageBuilder delegate;
 
-    public DefaultMessageBuilder( @Nonnull org.apache.maven.shared.utils.logging.MessageBuilder delegate )
-    {
+    public DefaultMessageBuilder(@Nonnull org.apache.maven.shared.utils.logging.MessageBuilder delegate) {
         this.delegate = delegate;
     }
 
     @Override
     @Nonnull
-    public MessageBuilder success( Object o )
-    {
-        delegate.success( o );
+    public MessageBuilder success(Object o) {
+        delegate.success(o);
         return this;
     }
 
     @Override
     @Nonnull
-    public MessageBuilder warning( Object o )
-    {
-        delegate.warning( o );
+    public MessageBuilder warning(Object o) {
+        delegate.warning(o);
         return this;
     }
 
     @Override
     @Nonnull
-    public MessageBuilder failure( Object o )
-    {
-        delegate.failure( o );
+    public MessageBuilder failure(Object o) {
+        delegate.failure(o);
         return this;
     }
 
     @Override
     @Nonnull
-    public MessageBuilder strong( Object o )
-    {
-        delegate.strong( o );
+    public MessageBuilder strong(Object o) {
+        delegate.strong(o);
         return this;
     }
 
     @Override
     @Nonnull
-    public MessageBuilder mojo( Object o )
-    {
-        delegate.mojo( o );
+    public MessageBuilder mojo(Object o) {
+        delegate.mojo(o);
         return this;
     }
 
     @Override
     @Nonnull
-    public MessageBuilder project( Object o )
-    {
-        delegate.project( o );
+    public MessageBuilder project(Object o) {
+        delegate.project(o);
         return this;
     }
 
     @Override
     @Nonnull
-    public MessageBuilder a( char[] chars, int i, int i1 )
-    {
-        delegate.a( chars, i, i1 );
+    public MessageBuilder a(char[] chars, int i, int i1) {
+        delegate.a(chars, i, i1);
         return this;
     }
 
     @Override
     @Nonnull
-    public MessageBuilder a( char[] chars )
-    {
-        delegate.a( chars );
+    public MessageBuilder a(char[] chars) {
+        delegate.a(chars);
         return this;
     }
 
     @Override
     @Nonnull
-    public MessageBuilder a( CharSequence charSequence, int i, int i1 )
-    {
-        delegate.a( charSequence, i, i1 );
+    public MessageBuilder a(CharSequence charSequence, int i, int i1) {
+        delegate.a(charSequence, i, i1);
         return this;
     }
 
     @Override
     @Nonnull
-    public MessageBuilder a( CharSequence charSequence )
-    {
-        delegate.a( charSequence );
+    public MessageBuilder a(CharSequence charSequence) {
+        delegate.a(charSequence);
         return this;
     }
 
     @Override
     @Nonnull
-    public MessageBuilder a( Object o )
-    {
-        delegate.a( o );
+    public MessageBuilder a(Object o) {
+        delegate.a(o);
         return this;
     }
 
     @Override
     @Nonnull
-    public MessageBuilder newline()
-    {
+    public MessageBuilder newline() {
         delegate.newline();
         return this;
     }
 
     @Override
     @Nonnull
-    public MessageBuilder format( String s, Object... objects )
-    {
-        delegate.format( s, objects );
+    public MessageBuilder format(String s, Object... objects) {
+        delegate.format(s, objects);
         return this;
     }
 
     @Override
     @Nonnull
-    public String build()
-    {
+    public String build() {
         return delegate.toString();
     }
 }

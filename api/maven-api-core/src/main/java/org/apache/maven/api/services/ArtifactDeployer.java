@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,13 +16,13 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import java.util.Collection;
-
-import org.apache.maven.api.Service;
-import org.apache.maven.api.Session;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.Service;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
@@ -35,14 +33,13 @@ import org.apache.maven.api.annotations.Nonnull;
  * @see Session#deployArtifact(RemoteRepository, Artifact...)
  */
 @Experimental
-public interface ArtifactDeployer extends Service
-{
+public interface ArtifactDeployer extends Service {
 
     /**
      * @param request {@link ArtifactDeployerRequest}
      * @throws ArtifactDeployerException if the deployment failed
      */
-    void deploy( @Nonnull ArtifactDeployerRequest request );
+    void deploy(@Nonnull ArtifactDeployerRequest request);
 
     /**
      * @param session the repository session
@@ -51,11 +48,8 @@ public interface ArtifactDeployer extends Service
      * @throws ArtifactDeployerException if the deployment failed
      * @throws IllegalArgumentException if an argument is {@code null} or invalid
      */
-    default void deploy( @Nonnull Session session,
-                         @Nonnull RemoteRepository repository,
-                         @Nonnull Collection<Artifact> artifacts )
-    {
-        deploy( ArtifactDeployerRequest.build( session, repository, artifacts ) );
+    default void deploy(
+            @Nonnull Session session, @Nonnull RemoteRepository repository, @Nonnull Collection<Artifact> artifacts) {
+        deploy(ArtifactDeployerRequest.build(session, repository, artifacts));
     }
-
 }

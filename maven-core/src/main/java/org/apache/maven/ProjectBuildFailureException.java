@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
 
 import org.apache.maven.plugin.MojoFailureException;
 
@@ -30,26 +29,21 @@ import org.apache.maven.plugin.MojoFailureException;
  * @author jdcasey
  *
  */
-public class ProjectBuildFailureException
-    extends BuildFailureException
-{
+public class ProjectBuildFailureException extends BuildFailureException {
 
     private final String projectId;
 
-    public ProjectBuildFailureException( String projectId, MojoFailureException cause )
-    {
-        super( "Build for project: " + projectId + " failed during execution of mojo.", cause );
+    public ProjectBuildFailureException(String projectId, MojoFailureException cause) {
+        super("Build for project: " + projectId + " failed during execution of mojo.", cause);
 
         this.projectId = projectId;
     }
 
-    public MojoFailureException getMojoFailureException()
-    {
+    public MojoFailureException getMojoFailureException() {
         return (MojoFailureException) getCause();
     }
 
-    public String getProjectId()
-    {
+    public String getProjectId() {
         return projectId;
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.model.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.plugin;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -28,8 +27,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
  *
  * @author Benjamin Bentmann
  */
-public interface PluginConfigurationExpander
-{
+public interface PluginConfigurationExpander {
 
     /**
      * Merges values from general build plugin configuration into the individual plugin executions of the given model.
@@ -38,6 +36,5 @@ public interface PluginConfigurationExpander
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void expandPluginConfiguration( Model model, ModelBuildingRequest request, ModelProblemCollector problems );
-
+    void expandPluginConfiguration(Model model, ModelBuildingRequest request, ModelProblemCollector problems);
 }

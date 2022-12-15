@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.versioning;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.versioning;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,9 +16,9 @@ package org.apache.maven.artifact.versioning;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.versioning;
 
 import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -30,20 +28,12 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-public class OverConstrainedVersionException
-    extends ArtifactResolutionException
-{
-    public OverConstrainedVersionException( String msg,
-                                            Artifact artifact )
-    {
-        super( msg, artifact );
+public class OverConstrainedVersionException extends ArtifactResolutionException {
+    public OverConstrainedVersionException(String msg, Artifact artifact) {
+        super(msg, artifact);
     }
 
-    public OverConstrainedVersionException( String msg,
-                                            Artifact artifact,
-                                            List<ArtifactRepository> remoteRepositories )
-    {
-        super( msg, artifact, remoteRepositories );
+    public OverConstrainedVersionException(String msg, Artifact artifact, List<ArtifactRepository> remoteRepositories) {
+        super(msg, artifact, remoteRepositories);
     }
-
 }

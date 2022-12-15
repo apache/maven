@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,82 +16,70 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Tests {@link ExtensionDescriptorBuilder}.
  *
  * @author Benjamin Bentmann
  */
-public class ExtensionDescriptorBuilderTest
-{
+public class ExtensionDescriptorBuilderTest {
 
     private ExtensionDescriptorBuilder builder;
 
     @BeforeEach
-    public void setUp()
-        throws Exception
-    {
+    public void setUp() throws Exception {
         builder = new ExtensionDescriptorBuilder();
     }
 
     @AfterEach
-    public void tearDown()
-        throws Exception
-    {
+    public void tearDown() throws Exception {
         builder = null;
     }
 
-    private InputStream toStream( String xml )
-    {
-        return new ByteArrayInputStream( xml.getBytes( StandardCharsets.UTF_8 ) );
+    private InputStream toStream(String xml) {
+        return new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
     }
 
     @Test
-    public void testEmptyDescriptor()
-        throws Exception
-    {
+    public void testEmptyDescriptor() throws Exception {
         String xml = "<extension></extension>";
 
-        ExtensionDescriptor ed = builder.build( toStream( xml ) );
+        ExtensionDescriptor ed = builder.build(toStream(xml));
 
-        assertNotNull( ed );
-        assertNotNull( ed.getExportedPackages() );
-        assertThat( ed.getExportedPackages(), is( empty() ) );
-        assertNotNull( ed.getExportedArtifacts() );
-        assertThat( ed.getExportedArtifacts(), is( empty() ) );
+        assertNotNull(ed);
+        assertNotNull(ed.getExportedPackages());
+        assertThat(ed.getExportedPackages(), is(empty()));
+        assertNotNull(ed.getExportedArtifacts());
+        assertThat(ed.getExportedArtifacts(), is(empty()));
     }
 
     @Test
-    public void testCompleteDescriptor()
-        throws Exception
-    {
-        String xml =
-            "<?xml version='1.0' encoding='UTF-8'?>" + "<extension>" + "<exportedPackages>"
+    public void testCompleteDescriptor() throws Exception {
+        String xml = "<?xml version='1.0' encoding='UTF-8'?>" + "<extension>" + "<exportedPackages>"
                 + "<exportedPackage>a</exportedPackage>" + "<exportedPackage>b</exportedPackage>"
                 + "<exportedPackage>c</exportedPackage>" + "</exportedPackages>" + "<exportedArtifacts>"
                 + "<exportedArtifact>x</exportedArtifact>" + "<exportedArtifact>y</exportedArtifact>"
                 + "<exportedArtifact> z </exportedArtifact>" + "</exportedArtifacts>" + "</extension>";
 
-        ExtensionDescriptor ed = builder.build( toStream( xml ) );
+        ExtensionDescriptor ed = builder.build(toStream(xml));
 
-        assertNotNull( ed );
-        assertEquals( Arrays.asList( "a", "b", "c" ), ed.getExportedPackages() );
-        assertEquals( Arrays.asList( "x", "y", "z" ), ed.getExportedArtifacts() );
+        assertNotNull(ed);
+        assertEquals(Arrays.asList("a", "b", "c"), ed.getExportedPackages());
+        assertEquals(Arrays.asList("x", "y", "z"), ed.getExportedArtifacts());
     }
-
 }

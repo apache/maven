@@ -1,5 +1,3 @@
-package org.apache.maven.settings;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.settings;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,17 +16,16 @@ package org.apache.maven.settings;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings;
 
 /**
  * Several convenience methods to handle settings
  *
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  */
-public final class SettingsUtils
-{
+public final class SettingsUtils {
 
-    private SettingsUtils()
-    {
+    private SettingsUtils() {
         // don't allow construction.
     }
 
@@ -37,53 +34,48 @@ public final class SettingsUtils
      * @param recessive
      * @param recessiveSourceLevel
      */
-    public static void merge( Settings dominant, Settings recessive, String recessiveSourceLevel )
-    {
-        SettingsUtilsV4.merge( dominant.getDelegate(), recessive.getDelegate(), recessiveSourceLevel );
+    public static void merge(Settings dominant, Settings recessive, String recessiveSourceLevel) {
+        SettingsUtilsV4.merge(dominant.getDelegate(), recessive.getDelegate(), recessiveSourceLevel);
     }
 
     /**
      * @param modelProfile
      * @return a profile
      */
-    public static Profile convertToSettingsProfile( org.apache.maven.model.Profile modelProfile )
-    {
-        return new Profile( SettingsUtilsV4.convertToSettingsProfile( modelProfile.getDelegate() ) );
+    public static Profile convertToSettingsProfile(org.apache.maven.model.Profile modelProfile) {
+        return new Profile(SettingsUtilsV4.convertToSettingsProfile(modelProfile.getDelegate()));
     }
 
     /**
      * @param settingsProfile
      * @return a profile
      */
-    public static org.apache.maven.model.Profile convertFromSettingsProfile( Profile settingsProfile )
-    {
+    public static org.apache.maven.model.Profile convertFromSettingsProfile(Profile settingsProfile) {
         return new org.apache.maven.model.Profile(
-                SettingsUtilsV4.convertFromSettingsProfile( settingsProfile.getDelegate() ) );
+                SettingsUtilsV4.convertFromSettingsProfile(settingsProfile.getDelegate()));
     }
 
     /**
      * @param settings could be null
      * @return a new instance of settings or null if settings was null.
      */
-    public static Settings copySettings( Settings settings )
-    {
-        if ( settings == null )
-        {
+    public static Settings copySettings(Settings settings) {
+        if (settings == null) {
             return null;
         }
 
         Settings clone = new Settings();
-        clone.setActiveProfiles( settings.getActiveProfiles() );
-        clone.setInteractiveMode( settings.isInteractiveMode() );
-        clone.setLocalRepository( settings.getLocalRepository() );
-        clone.setMirrors( settings.getMirrors() );
-        clone.setOffline( settings.isOffline() );
-        clone.setPluginGroups( settings.getPluginGroups() );
-        clone.setProfiles( settings.getProfiles() );
-        clone.setProxies( settings.getProxies() );
-        clone.setServers( settings.getServers() );
-        clone.setSourceLevel( settings.getSourceLevel() );
-        clone.setUsePluginRegistry( settings.isUsePluginRegistry() );
+        clone.setActiveProfiles(settings.getActiveProfiles());
+        clone.setInteractiveMode(settings.isInteractiveMode());
+        clone.setLocalRepository(settings.getLocalRepository());
+        clone.setMirrors(settings.getMirrors());
+        clone.setOffline(settings.isOffline());
+        clone.setPluginGroups(settings.getPluginGroups());
+        clone.setProfiles(settings.getProfiles());
+        clone.setProxies(settings.getProxies());
+        clone.setServers(settings.getServers());
+        clone.setSourceLevel(settings.getSourceLevel());
+        clone.setUsePluginRegistry(settings.isUsePluginRegistry());
 
         return clone;
     }

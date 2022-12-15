@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,12 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collections;
 import java.util.List;
-
 import org.apache.maven.model.Model;
 
 /**
@@ -33,9 +31,7 @@ import org.apache.maven.model.Model;
  *
  * @author Benjamin Bentmann
  */
-public class ModelBuildingException
-    extends Exception
-{
+public class ModelBuildingException extends Exception {
 
     private final ModelBuildingResult result;
 
@@ -48,24 +44,19 @@ public class ModelBuildingException
      * @deprecated Use {@link #ModelBuildingException(ModelBuildingResult)} instead.
      */
     @Deprecated
-    public ModelBuildingException( Model model, String modelId, List<ModelProblem> problems )
-    {
-        super( toMessage( modelId, problems ) );
+    public ModelBuildingException(Model model, String modelId, List<ModelProblem> problems) {
+        super(toMessage(modelId, problems));
 
-        if ( model != null )
-        {
+        if (model != null) {
             DefaultModelBuildingResult tmp = new DefaultModelBuildingResult();
-            if ( modelId == null )
-            {
+            if (modelId == null) {
                 modelId = "";
             }
-            tmp.addModelId( modelId );
-            tmp.setRawModel( modelId, model );
-            tmp.setProblems( problems );
+            tmp.addModelId(modelId);
+            tmp.setRawModel(modelId, model);
+            tmp.setProblems(problems);
             result = tmp;
-        }
-        else
-        {
+        } else {
             result = null;
         }
     }
@@ -75,9 +66,8 @@ public class ModelBuildingException
      *
      * @param result The interim result, may be {@code null}.
      */
-    public ModelBuildingException( ModelBuildingResult result )
-    {
-        super( toMessage( result ) );
+    public ModelBuildingException(ModelBuildingResult result) {
+        super(toMessage(result));
         this.result = result;
     }
 
@@ -86,8 +76,7 @@ public class ModelBuildingException
      *
      * @return The interim model building result or {@code null} if not available.
      */
-    public ModelBuildingResult getResult()
-    {
+    public ModelBuildingResult getResult() {
         return result;
     }
 
@@ -96,14 +85,11 @@ public class ModelBuildingException
      *
      * @return The erroneous model or {@code null} if not available.
      */
-    public Model getModel()
-    {
-        if ( result == null )
-        {
+    public Model getModel() {
+        if (result == null) {
             return null;
         }
-        if ( result.getEffectiveModel() != null )
-        {
+        if (result.getEffectiveModel() != null) {
             return result.getEffectiveModel();
         }
         return result.getRawModel();
@@ -116,13 +102,11 @@ public class ModelBuildingException
      *
      * @return The identifier of the POM or an empty string if not known, never {@code null}.
      */
-    public String getModelId()
-    {
-        if ( result == null || result.getModelIds().isEmpty() )
-        {
+    public String getModelId() {
+        if (result == null || result.getModelIds().isEmpty()) {
             return "";
         }
-        return result.getModelIds().get( 0 );
+        return result.getModelIds().get(0);
     }
 
     /**
@@ -130,55 +114,46 @@ public class ModelBuildingException
      *
      * @return The problems that caused this exception, never {@code null}.
      */
-    public List<ModelProblem> getProblems()
-    {
-        if ( result == null )
-        {
+    public List<ModelProblem> getProblems() {
+        if (result == null) {
             return Collections.emptyList();
         }
-        return Collections.unmodifiableList( result.getProblems() );
+        return Collections.unmodifiableList(result.getProblems());
     }
 
-    private static String toMessage( ModelBuildingResult result )
-    {
-        if ( result != null && !result.getModelIds().isEmpty() )
-        {
-            return toMessage( result.getModelIds().get( 0 ), result.getProblems() );
+    private static String toMessage(ModelBuildingResult result) {
+        if (result != null && !result.getModelIds().isEmpty()) {
+            return toMessage(result.getModelIds().get(0), result.getProblems());
         }
         return null;
     }
 
-    private static String toMessage( String modelId, List<ModelProblem> problems )
-    {
-        StringWriter buffer = new StringWriter( 1024 );
+    private static String toMessage(String modelId, List<ModelProblem> problems) {
+        StringWriter buffer = new StringWriter(1024);
 
-        PrintWriter writer = new PrintWriter( buffer );
+        PrintWriter writer = new PrintWriter(buffer);
 
-        writer.print( problems.size() );
-        writer.print( ( problems.size() == 1 ) ? " problem was " : " problems were " );
-        writer.print( "encountered while building the effective model" );
-        if ( modelId != null && modelId.length() > 0 )
-        {
-            writer.print( " for " );
-            writer.print( modelId );
+        writer.print(problems.size());
+        writer.print((problems.size() == 1) ? " problem was " : " problems were ");
+        writer.print("encountered while building the effective model");
+        if (modelId != null && modelId.length() > 0) {
+            writer.print(" for ");
+            writer.print(modelId);
         }
         writer.println();
 
-        for ( ModelProblem problem : problems )
-        {
-            writer.print( "[" );
-            writer.print( problem.getSeverity() );
-            writer.print( "] " );
-            writer.print( problem.getMessage() );
-            String location = ModelProblemUtils.formatLocation( problem, modelId );
-            if ( !location.isEmpty() )
-            {
-                writer.print( " @ " );
-                writer.println( location );
+        for (ModelProblem problem : problems) {
+            writer.print("[");
+            writer.print(problem.getSeverity());
+            writer.print("] ");
+            writer.print(problem.getMessage());
+            String location = ModelProblemUtils.formatLocation(problem, modelId);
+            if (!location.isEmpty()) {
+                writer.print(" @ ");
+                writer.println(location);
             }
         }
 
         return buffer.toString();
     }
-
 }

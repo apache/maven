@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.legacy;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,48 +16,39 @@ package org.apache.maven.repository.legacy;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy;
 
 import org.apache.maven.wagon.TransferFailedException;
 
 /**
  * WagonConfigurationException
  */
-public class WagonConfigurationException
-    extends TransferFailedException
-{
+public class WagonConfigurationException extends TransferFailedException {
 
     static final long serialVersionUID = 1;
 
     private final String originalMessage;
     private final String repositoryId;
 
-    public WagonConfigurationException( String repositoryId,
-                                        String message,
-                                        Throwable cause )
-    {
-        super( "While configuring wagon for '" + repositoryId + "': " + message, cause );
+    public WagonConfigurationException(String repositoryId, String message, Throwable cause) {
+        super("While configuring wagon for '" + repositoryId + "': " + message, cause);
 
         this.repositoryId = repositoryId;
         this.originalMessage = message;
     }
 
-    public WagonConfigurationException( String repositoryId,
-                                        String message )
-    {
-        super( "While configuring wagon for '" + repositoryId + "': " + message );
+    public WagonConfigurationException(String repositoryId, String message) {
+        super("While configuring wagon for '" + repositoryId + "': " + message);
 
         this.repositoryId = repositoryId;
         this.originalMessage = message;
     }
 
-    public final String getRepositoryId()
-    {
+    public final String getRepositoryId() {
         return repositoryId;
     }
 
-    public final String getOriginalMessage()
-    {
+    public final String getOriginalMessage() {
         return originalMessage;
     }
-
 }

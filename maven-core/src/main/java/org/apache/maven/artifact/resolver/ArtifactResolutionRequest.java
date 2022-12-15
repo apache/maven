@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,12 +16,12 @@ package org.apache.maven.artifact.resolver;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
@@ -39,9 +37,7 @@ import org.apache.maven.settings.Server;
  *
  * @author Jason van Zyl
  */
-public class ArtifactResolutionRequest
-    implements RepositoryRequest
-{
+public class ArtifactResolutionRequest implements RepositoryRequest {
     private static final String LS = System.lineSeparator();
 
     private Artifact artifact;
@@ -79,62 +75,52 @@ public class ArtifactResolutionRequest
 
     private List<Proxy> proxies;
 
-    public ArtifactResolutionRequest()
-    {
+    public ArtifactResolutionRequest() {
         // nothing here
     }
 
-    public ArtifactResolutionRequest( RepositoryRequest request )
-    {
-        setLocalRepository( request.getLocalRepository() );
-        setRemoteRepositories( request.getRemoteRepositories() );
-        setOffline( request.isOffline() );
-        setForceUpdate( request.isForceUpdate() );
+    public ArtifactResolutionRequest(RepositoryRequest request) {
+        setLocalRepository(request.getLocalRepository());
+        setRemoteRepositories(request.getRemoteRepositories());
+        setOffline(request.isOffline());
+        setForceUpdate(request.isForceUpdate());
     }
 
-    public Artifact getArtifact()
-    {
+    public Artifact getArtifact() {
         return artifact;
     }
 
-    public ArtifactResolutionRequest setArtifact( Artifact artifact )
-    {
+    public ArtifactResolutionRequest setArtifact(Artifact artifact) {
         this.artifact = artifact;
 
         return this;
     }
 
-    public ArtifactResolutionRequest setArtifactDependencies( Set<Artifact> artifactDependencies )
-    {
+    public ArtifactResolutionRequest setArtifactDependencies(Set<Artifact> artifactDependencies) {
         this.artifactDependencies = artifactDependencies;
 
         return this;
     }
 
-    public Set<Artifact> getArtifactDependencies()
-    {
+    public Set<Artifact> getArtifactDependencies() {
         return artifactDependencies;
     }
 
-    public ArtifactRepository getLocalRepository()
-    {
+    public ArtifactRepository getLocalRepository() {
         return localRepository;
     }
 
-    public ArtifactResolutionRequest setLocalRepository( ArtifactRepository localRepository )
-    {
+    public ArtifactResolutionRequest setLocalRepository(ArtifactRepository localRepository) {
         this.localRepository = localRepository;
 
         return this;
     }
 
-    public List<ArtifactRepository> getRemoteRepositories()
-    {
+    public List<ArtifactRepository> getRemoteRepositories() {
         return remoteRepositories;
     }
 
-    public ArtifactResolutionRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
-    {
+    public ArtifactResolutionRequest setRemoteRepositories(List<ArtifactRepository> remoteRepositories) {
         this.remoteRepositories = remoteRepositories;
 
         return this;
@@ -146,13 +132,11 @@ public class ArtifactResolutionRequest
      * @return The filter used to determine which of the artifacts in the dependency graph should be traversed or
      *         {@code null} to collect all transitive dependencies.
      */
-    public ArtifactFilter getCollectionFilter()
-    {
+    public ArtifactFilter getCollectionFilter() {
         return collectionFilter;
     }
 
-    public ArtifactResolutionRequest setCollectionFilter( ArtifactFilter filter )
-    {
+    public ArtifactResolutionRequest setCollectionFilter(ArtifactFilter filter) {
         this.collectionFilter = filter;
 
         return this;
@@ -165,154 +149,136 @@ public class ArtifactResolutionRequest
      * @return The filter used to determine which of the artifacts should have their files resolved or {@code null} to
      *         resolve the files for all collected artifacts.
      */
-    public ArtifactFilter getResolutionFilter()
-    {
+    public ArtifactFilter getResolutionFilter() {
         return resolutionFilter;
     }
 
-    public ArtifactResolutionRequest setResolutionFilter( ArtifactFilter filter )
-    {
+    public ArtifactResolutionRequest setResolutionFilter(ArtifactFilter filter) {
         this.resolutionFilter = filter;
 
         return this;
     }
 
-    public List<ResolutionListener> getListeners()
-    {
+    public List<ResolutionListener> getListeners() {
         return listeners;
     }
 
-    public ArtifactResolutionRequest setListeners( List<ResolutionListener> listeners )
-    {
+    public ArtifactResolutionRequest setListeners(List<ResolutionListener> listeners) {
         this.listeners = listeners;
 
         return this;
     }
 
-    public ArtifactResolutionRequest addListener( ResolutionListener listener )
-    {
-        listeners.add( listener );
+    public ArtifactResolutionRequest addListener(ResolutionListener listener) {
+        listeners.add(listener);
 
         return this;
     }
 
-    public Map<String, Artifact> getManagedVersionMap()
-    {
+    public Map<String, Artifact> getManagedVersionMap() {
         return managedVersionMap;
     }
 
-    public ArtifactResolutionRequest setManagedVersionMap( Map<String, Artifact> managedVersionMap )
-    {
+    public ArtifactResolutionRequest setManagedVersionMap(Map<String, Artifact> managedVersionMap) {
         this.managedVersionMap = managedVersionMap;
 
         return this;
     }
 
-    public ArtifactResolutionRequest setResolveRoot( boolean resolveRoot )
-    {
+    public ArtifactResolutionRequest setResolveRoot(boolean resolveRoot) {
         this.resolveRoot = resolveRoot;
 
         return this;
     }
 
-    public boolean isResolveRoot()
-    {
+    public boolean isResolveRoot() {
         return resolveRoot;
     }
 
-    public ArtifactResolutionRequest setResolveTransitively( boolean resolveDependencies )
-    {
+    public ArtifactResolutionRequest setResolveTransitively(boolean resolveDependencies) {
         this.resolveTransitively = resolveDependencies;
 
         return this;
     }
 
-    public boolean isResolveTransitively()
-    {
+    public boolean isResolveTransitively() {
         return resolveTransitively;
     }
 
-    public String toString()
-    {
+    public String toString() {
         StringBuilder sb = new StringBuilder()
-                .append( "REQUEST: " ).append( LS )
-                .append( "artifact: " ).append( artifact ).append( LS )
-                .append( artifactDependencies ).append( LS )
-                .append( "localRepository: " ).append( localRepository ).append( LS )
-                .append( "remoteRepositories: " ).append( remoteRepositories );
+                .append("REQUEST: ")
+                .append(LS)
+                .append("artifact: ")
+                .append(artifact)
+                .append(LS)
+                .append(artifactDependencies)
+                .append(LS)
+                .append("localRepository: ")
+                .append(localRepository)
+                .append(LS)
+                .append("remoteRepositories: ")
+                .append(remoteRepositories);
 
         return sb.toString();
     }
 
-    public boolean isOffline()
-    {
+    public boolean isOffline() {
         return offline;
     }
 
-    public ArtifactResolutionRequest setOffline( boolean offline )
-    {
+    public ArtifactResolutionRequest setOffline(boolean offline) {
         this.offline = offline;
 
         return this;
     }
 
-    public boolean isForceUpdate()
-    {
+    public boolean isForceUpdate() {
         return forceUpdate;
     }
 
-    public ArtifactResolutionRequest setForceUpdate( boolean forceUpdate )
-    {
+    public ArtifactResolutionRequest setForceUpdate(boolean forceUpdate) {
         this.forceUpdate = forceUpdate;
 
         return this;
     }
 
-    public ArtifactResolutionRequest setServers( List<Server> servers )
-    {
+    public ArtifactResolutionRequest setServers(List<Server> servers) {
         this.servers = servers;
 
         return this;
     }
 
-    public List<Server> getServers()
-    {
-        if ( servers == null )
-        {
+    public List<Server> getServers() {
+        if (servers == null) {
             servers = new ArrayList<>();
         }
 
         return servers;
     }
 
-    public ArtifactResolutionRequest setMirrors( List<Mirror> mirrors )
-    {
+    public ArtifactResolutionRequest setMirrors(List<Mirror> mirrors) {
         this.mirrors = mirrors;
 
         return this;
     }
 
-    public List<Mirror> getMirrors()
-    {
-        if ( mirrors == null )
-        {
+    public List<Mirror> getMirrors() {
+        if (mirrors == null) {
             mirrors = new ArrayList<>();
         }
 
         return mirrors;
     }
 
-    public ArtifactResolutionRequest setProxies( List<Proxy> proxies )
-    {
+    public ArtifactResolutionRequest setProxies(List<Proxy> proxies) {
         this.proxies = proxies;
 
         return this;
     }
 
-    public List<Proxy> getProxies()
-    {
-        if ( proxies == null )
-        {
+    public List<Proxy> getProxies() {
+        if (proxies == null) {
             proxies = new ArrayList<>();
         }
 
@@ -323,8 +289,7 @@ public class ArtifactResolutionRequest
     // Used by Tycho and will break users and force them to upgrade to Maven 3.1 so we should really leave
     // this here, possibly indefinitely.
     //
-    public ArtifactResolutionRequest setCache( RepositoryCache cache )
-    {
+    public ArtifactResolutionRequest setCache(RepositoryCache cache) {
         return this;
     }
 }

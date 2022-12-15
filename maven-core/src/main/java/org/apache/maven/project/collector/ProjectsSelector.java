@@ -1,5 +1,3 @@
-package org.apache.maven.project.collector;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,19 +16,18 @@ package org.apache.maven.project.collector;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.collector;
 
+import java.io.File;
+import java.util.List;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 
-import java.io.File;
-import java.util.List;
-
 /**
  * Facade to select projects for a given set of pom.xml files.
  */
-public interface ProjectsSelector
-{
+public interface ProjectsSelector {
     /**
      * Select Maven projects from a list of POM files.
      * @param files List of POM files.
@@ -38,6 +35,5 @@ public interface ProjectsSelector
      * @return A list of projects that have been found in the specified POM files.
      * @throws ProjectBuildingException In case the POMs are not used.
      */
-    List<MavenProject> selectProjects( List<File> files, MavenExecutionRequest request )
-            throws ProjectBuildingException;
+    List<MavenProject> selectProjects(List<File> files, MavenExecutionRequest request) throws ProjectBuildingException;
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.resolver;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -27,8 +26,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-public interface ResolutionListener
-{
+public interface ResolutionListener {
     String ROLE = ResolutionListener.class.getName();
 
     int TEST_ARTIFACT = 1;
@@ -64,32 +62,29 @@ public interface ResolutionListener
 
     int MANAGE_ARTIFACT_SYSTEM_PATH = 14;
 
-    void testArtifact( Artifact node );
+    void testArtifact(Artifact node);
 
-    void startProcessChildren( Artifact artifact );
+    void startProcessChildren(Artifact artifact);
 
-    void endProcessChildren( Artifact artifact );
+    void endProcessChildren(Artifact artifact);
 
-    void includeArtifact( Artifact artifact );
+    void includeArtifact(Artifact artifact);
 
-    void omitForNearer( Artifact omitted,
-                        Artifact kept );
+    void omitForNearer(Artifact omitted, Artifact kept);
 
-    void updateScope( Artifact artifact,
-                      String scope );
+    void updateScope(Artifact artifact, String scope);
 
     @Deprecated
-    void manageArtifact( Artifact artifact,
-                         Artifact replacement );
+    void manageArtifact(Artifact artifact, Artifact replacement);
 
     // TODO Use the following two instead of manageArtifact
     // TODO Remove ResolutionListenerDM interface
 
-    //void manageArtifactVersion( Artifact artifact, Artifact replacement );
+    // void manageArtifactVersion( Artifact artifact, Artifact replacement );
 
-    //void manageArtifactScope( Artifact artifact, Artifact replacement );
+    // void manageArtifactScope( Artifact artifact, Artifact replacement );
 
-    void omitForCycle( Artifact artifact );
+    void omitForCycle(Artifact artifact);
 
     /**
      * This event means that the artifactScope has NOT been updated to a farther node artifactScope because current
@@ -98,12 +93,9 @@ public interface ResolutionListener
      * @param artifact     current node artifact, the one in the first level pom
      * @param ignoredScope artifactScope that was ignored because artifact was in first level pom
      */
-    void updateScopeCurrentPom( Artifact artifact,
-                                String ignoredScope );
+    void updateScopeCurrentPom(Artifact artifact, String ignoredScope);
 
-    void selectVersionFromRange( Artifact artifact );
+    void selectVersionFromRange(Artifact artifact);
 
-    void restrictRange( Artifact artifact,
-                        Artifact replacement,
-                        VersionRange newRange );
+    void restrictRange(Artifact artifact, Artifact replacement, VersionRange newRange);
 }

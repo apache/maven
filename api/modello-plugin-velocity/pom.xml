@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,15 +23,13 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-api</artifactId>
-    <version>4.0.0-alpha-3-SNAPSHOT</version>
+    <version>4.0.0-alpha-4-SNAPSHOT</version>
   </parent>
 
   <artifactId>modello-plugin-velocity</artifactId>
   <packaging>maven-plugin</packaging>
   <name>Modello Velocity Plugin</name>
-  <description>
-    Modello Velocity Plugin generates custom templates.
-  </description>
+  <description>Modello Velocity Plugin generates custom templates.</description>
 
   <dependencies>
     <dependency>

@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,46 +16,41 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.junit.jupiter.api.Test;
+package org.apache.maven.model;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@code Parent}.
  *
  * @author Benjamin Bentmann
  */
-public class ParentTest
-{
+public class ParentTest {
 
     @Test
-    public void testHashCodeNullSafe()
-    {
+    public void testHashCodeNullSafe() {
         new Parent().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Parent().equals( null ) );
+    public void testEqualsNullSafe() {
+        assertFalse(new Parent().equals(null));
 
-        new Parent().equals( new Parent() );
+        new Parent().equals(new Parent());
     }
 
     @Test
-    public void testEqualsIdentity()
-    {
+    public void testEqualsIdentity() {
         Parent thing = new Parent();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Parent().toString() );
+    public void testToStringNullSafe() {
+        assertNotNull(new Parent().toString());
     }
-
 }

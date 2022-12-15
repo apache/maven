@@ -1,5 +1,3 @@
-package org.apache.maven.settings.crypto;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,10 @@ package org.apache.maven.settings.crypto;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.crypto;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.building.SettingsProblem;
@@ -31,9 +29,7 @@ import org.apache.maven.settings.building.SettingsProblem;
  *
  * @author Benjamin Bentmann
  */
-class DefaultSettingsDecryptionResult
-    implements SettingsDecryptionResult
-{
+class DefaultSettingsDecryptionResult implements SettingsDecryptionResult {
 
     private List<Server> servers;
 
@@ -41,41 +37,34 @@ class DefaultSettingsDecryptionResult
 
     private List<SettingsProblem> problems;
 
-    DefaultSettingsDecryptionResult( List<Server> servers, List<Proxy> proxies, List<SettingsProblem> problems )
-    {
-        this.servers = ( servers != null ) ? servers : new ArrayList<>();
-        this.proxies = ( proxies != null ) ? proxies : new ArrayList<>();
-        this.problems = ( problems != null ) ? problems : new ArrayList<>();
+    DefaultSettingsDecryptionResult(List<Server> servers, List<Proxy> proxies, List<SettingsProblem> problems) {
+        this.servers = (servers != null) ? servers : new ArrayList<>();
+        this.proxies = (proxies != null) ? proxies : new ArrayList<>();
+        this.problems = (problems != null) ? problems : new ArrayList<>();
     }
 
     @Override
-    public Server getServer()
-    {
-        return servers.isEmpty() ? null : servers.get( 0 );
+    public Server getServer() {
+        return servers.isEmpty() ? null : servers.get(0);
     }
 
     @Override
-    public List<Server> getServers()
-    {
+    public List<Server> getServers() {
         return servers;
     }
 
     @Override
-    public Proxy getProxy()
-    {
-        return proxies.isEmpty() ? null : proxies.get( 0 );
+    public Proxy getProxy() {
+        return proxies.isEmpty() ? null : proxies.get(0);
     }
 
     @Override
-    public List<Proxy> getProxies()
-    {
+    public List<Proxy> getProxies() {
         return proxies;
     }
 
     @Override
-    public List<SettingsProblem> getProblems()
-    {
+    public List<SettingsProblem> getProblems() {
         return problems;
     }
-
 }

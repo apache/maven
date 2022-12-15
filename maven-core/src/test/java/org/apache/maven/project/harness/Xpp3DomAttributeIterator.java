@@ -1,5 +1,3 @@
-package org.apache.maven.project.harness;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.harness;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,11 +16,11 @@ package org.apache.maven.project.harness;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.harness;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.model.NodeIterator;
 import org.apache.commons.jxpath.ri.model.NodePointer;
@@ -33,9 +31,7 @@ import org.apache.maven.internal.xml.Xpp3Dom;
  *
  * @author Benjamin Bentmann
  */
-class Xpp3DomAttributeIterator
-        implements NodeIterator
-{
+class Xpp3DomAttributeIterator implements NodeIterator {
 
     private NodePointer parent;
 
@@ -47,35 +43,29 @@ class Xpp3DomAttributeIterator
 
     private int position;
 
-    public Xpp3DomAttributeIterator( NodePointer parent, QName qname )
-    {
+    public Xpp3DomAttributeIterator(NodePointer parent, QName qname) {
         this.parent = parent;
         this.node = (Xpp3Dom) parent.getNode();
 
         this.attributes = this.node.getAttributes().entrySet().stream()
-                .filter( a -> a.getKey().equals( qname.getName() ) || "*".equals( qname.getName() ) )
-                .collect( Collectors.toList() );
+                .filter(a -> a.getKey().equals(qname.getName()) || "*".equals(qname.getName()))
+                .collect(Collectors.toList());
     }
 
-    public NodePointer getNodePointer()
-    {
-        if ( position == 0 )
-        {
-            setPosition( 1 );
+    public NodePointer getNodePointer() {
+        if (position == 0) {
+            setPosition(1);
         }
-        return ( attribute == null ) ? null : new Xpp3DomAttributePointer( parent, attribute );
+        return (attribute == null) ? null : new Xpp3DomAttributePointer(parent, attribute);
     }
 
-    public int getPosition()
-    {
+    public int getPosition() {
         return position;
     }
 
-    public boolean setPosition( int position )
-    {
+    public boolean setPosition(int position) {
         this.position = position;
-        attribute = ( position > 0 && position <= attributes.size() ) ? attributes.get( position - 1 ) : null;
+        attribute = (position > 0 && position <= attributes.size()) ? attributes.get(position - 1) : null;
         return attribute != null;
     }
-
 }

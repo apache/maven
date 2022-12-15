@@ -1,5 +1,3 @@
-package org.apache.maven.configuration;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.configuration;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.configuration;
 
 /**
  * Unmarshals some textual configuration from the POM or similar into the properties of a bean. This component works
@@ -28,8 +27,7 @@ package org.apache.maven.configuration;
  * @since 3.0
  * @author Benjamin Bentmann
  */
-public interface BeanConfigurator
-{
+public interface BeanConfigurator {
 
     /**
      * Performs the specified bean configuration.
@@ -38,7 +36,5 @@ public interface BeanConfigurator
      *            {@code null}.
      * @throws BeanConfigurationException If the bean configuration could not be successfully processed.
      */
-    void configureBean( BeanConfigurationRequest request )
-        throws BeanConfigurationException;
-
+    void configureBean(BeanConfigurationRequest request) throws BeanConfigurationException;
 }

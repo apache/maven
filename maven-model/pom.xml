@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,14 +17,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-3-SNAPSHOT</version>
+    <version>4.0.0-alpha-4-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-model</artifactId>
@@ -37,12 +35,12 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-model</artifactId>
-      <version>4.0.0-alpha-3-SNAPSHOT</version>
+      <version>4.0.0-alpha-4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-xml-impl</artifactId>
-      <version>4.0.0-alpha-3-SNAPSHOT</version>
+      <version>4.0.0-alpha-4-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
@@ -55,10 +53,10 @@ under the License.
         <executions>
           <execution>
             <id>copy-model</id>
-            <phase>generate-sources</phase>
             <goals>
               <goal>copy</goal>
             </goals>
+            <phase>generate-sources</phase>
             <configuration>
               <artifactItems>
                 <artifactItem>
@@ -79,18 +77,38 @@ under the License.
         <artifactId>modello-plugin-velocity</artifactId>
         <executions>
           <execution>
-            <id>velocity</id>
-            <phase>generate-sources</phase>
+            <id>velocity-v3</id>
             <goals>
               <goal>velocity</goal>
             </goals>
+            <phase>generate-sources</phase>
             <configuration>
-              <version>4.0.0</version>
+              <version>4.1.0</version>
               <models>
                 <model>target/mdo/maven.mdo</model>
               </models>
               <templates>
                 <template>src/main/mdo/model-v3.vm</template>
+              </templates>
+              <params>
+                <param>packageModelV3=org.apache.maven.model</param>
+                <param>packageModelV4=org.apache.maven.api.model</param>
+                <param>packageToolV4=org.apache.maven.model.v4</param>
+              </params>
+            </configuration>
+          </execution>
+          <execution>
+            <id>velocity-v4</id>
+            <goals>
+              <goal>velocity</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <version>4.2.0</version>
+              <models>
+                <model>target/mdo/maven.mdo</model>
+              </models>
+              <templates>
                 <template>src/main/mdo/merger.vm</template>
                 <template>src/main/mdo/transformer.vm</template>
                 <template>src/main/mdo/reader.vm</template>
@@ -104,6 +122,30 @@ under the License.
                 <param>packageToolV4=org.apache.maven.model.v4</param>
               </params>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <configuration>
+          <version>4.0.0</version>
+          <models>
+            <model>target/mdo/maven.mdo</model>
+          </models>
+        </configuration>
+        <executions>
+          <execution>
+            <id>modello-site-docs</id>
+            <goals>
+              <goal>xdoc</goal>
+              <goal>xsd</goal>
+            </goals>
+            <phase>pre-site</phase>
+          </execution>
+          <execution>
+            <id>modello</id>
+            <phase>none</phase>
           </execution>
         </executions>
       </plugin>

@@ -1,5 +1,3 @@
-package org.apache.maven.classrealm;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,10 @@ package org.apache.maven.classrealm;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.classrealm;
 
 import java.util.List;
 import java.util.Map;
-
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -34,8 +32,7 @@ import org.eclipse.aether.artifact.Artifact;
  *
  * @author Benjamin Bentmann
  */
-public interface ClassRealmManager
-{
+public interface ClassRealmManager {
 
     /**
      * Gets the class realm hosting the Maven core.
@@ -59,7 +56,7 @@ public interface ClassRealmManager
      *            missing file) will automatically be excluded from the realm.
      * @return The new project realm, never {@code null}.
      */
-    ClassRealm createProjectRealm( Model model, List<Artifact> artifacts );
+    ClassRealm createProjectRealm(Model model, List<Artifact> artifacts);
 
     /**
      * Creates a new class realm for the specified build extension.
@@ -69,7 +66,7 @@ public interface ClassRealmManager
      *            missing file) will automatically be excluded from the realm.
      * @return The new extension realm, never {@code null}.
      */
-    ClassRealm createExtensionRealm( Plugin extension, List<Artifact> artifacts );
+    ClassRealm createExtensionRealm(Plugin extension, List<Artifact> artifacts);
 
     /**
      * Creates a new class realm for the specified plugin.
@@ -82,7 +79,10 @@ public interface ClassRealmManager
      *            missing file) will automatically be excluded from the realm.
      * @return The new plugin realm, never {@code null}.
      */
-    ClassRealm createPluginRealm( Plugin plugin, ClassLoader parent, List<String> parentImports,
-                                  Map<String, ClassLoader> foreignImports, List<Artifact> artifacts );
-
+    ClassRealm createPluginRealm(
+            Plugin plugin,
+            ClassLoader parent,
+            List<String> parentImports,
+            Map<String, ClassLoader> foreignImports,
+            List<Artifact> artifacts);
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,34 +16,27 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
-class Utils
-{
-    static <T> T nonNull( T t )
-    {
-        if ( t == null )
-        {
+class Utils {
+    static <T> T nonNull(T t) {
+        if (t == null) {
             throw new IllegalArgumentException();
         }
         return t;
     }
 
-    static <T> T nonNull( T t, String message )
-    {
-        if ( t == null )
-        {
-            throw new IllegalArgumentException( message );
+    static <T> T nonNull(T t, String message) {
+        if (t == null) {
+            throw new IllegalArgumentException(message);
         }
         return t;
     }
 
-    static <T> T cast( Class<T> clazz, Object o, String message )
-    {
-        if ( ! clazz.isInstance( o ) )
-        {
-            throw new IllegalArgumentException( message );
+    static <T> T cast(Class<T> clazz, Object o, String message) {
+        if (!clazz.isInstance(o)) {
+            throw new IllegalArgumentException(message);
         }
-        return clazz.cast( o );
+        return clazz.cast(o);
     }
-
 }

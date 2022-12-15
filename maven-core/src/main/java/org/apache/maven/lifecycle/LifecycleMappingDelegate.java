@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,10 +16,10 @@ package org.apache.maven.lifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle;
 
 import java.util.List;
 import java.util.Map;
-
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
@@ -43,10 +41,9 @@ import org.apache.maven.project.MavenProject;
  * @see org.apache.maven.lifecycle.internal.DefaultLifecycleMappingDelegate
  * @author ifedorenko
  */
-public interface LifecycleMappingDelegate
-{
-    Map<String, List<MojoExecution>> calculateLifecycleMappings( MavenSession session, MavenProject project,
-                                                                 Lifecycle lifecycle, String lifecyclePhase )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-        MojoNotFoundException, InvalidPluginDescriptorException;
+public interface LifecycleMappingDelegate {
+    Map<String, List<MojoExecution>> calculateLifecycleMappings(
+            MavenSession session, MavenProject project, Lifecycle lifecycle, String lifecyclePhase)
+            throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+                    MojoNotFoundException, InvalidPluginDescriptorException;
 }

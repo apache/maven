@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,7 +16,7 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
-
+package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
@@ -26,21 +24,20 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Defines a hierarchical visitor for collecting dependency node trees.
- * 
+ *
  * @since 4.0
  */
 @Experimental
 @Consumer
-public interface NodeVisitor
-{
+public interface NodeVisitor {
     /**
      * Starts the visit to the specified dependency node.
-     * 
+     *
      * @param node the dependency node to visit
      * @return <code>true</code> to visit the specified dependency node's children, <code>false</code> to skip the
      *         specified dependency node's children and proceed to its next sibling
      */
-    boolean enter( @Nonnull Node node );
+    boolean enter(@Nonnull Node node);
 
     /**
      * Ends the visit to the specified dependency node.
@@ -49,5 +46,5 @@ public interface NodeVisitor
      * @return <code>true</code> to visit the specified dependency node's next sibling, <code>false</code> to skip the
      *         specified dependency node's next siblings and proceed to its parent
      */
-    boolean leave( @Nonnull Node node );
+    boolean leave(@Nonnull Node node);
 }

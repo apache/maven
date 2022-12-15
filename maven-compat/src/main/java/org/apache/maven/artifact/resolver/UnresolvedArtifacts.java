@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,9 +16,9 @@ package org.apache.maven.artifact.resolver;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver;
 
 import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
@@ -30,18 +28,15 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  *
  * @author Jason van Zyl
  */
-public class UnresolvedArtifacts
-{
+public class UnresolvedArtifacts {
     private Artifact originatingArtifact;
 
     private List<Artifact> artifacts;
 
     private List<ArtifactRepository> remoteRepositories;
 
-    public UnresolvedArtifacts( Artifact originatingArtifact,
-                                List<Artifact> artifacts,
-                                List<ArtifactRepository> remoteRepositories )
-    {
+    public UnresolvedArtifacts(
+            Artifact originatingArtifact, List<Artifact> artifacts, List<ArtifactRepository> remoteRepositories) {
         this.originatingArtifact = originatingArtifact;
 
         this.artifacts = artifacts;
@@ -49,18 +44,15 @@ public class UnresolvedArtifacts
         this.remoteRepositories = remoteRepositories;
     }
 
-    public Artifact getOriginatingArtifact()
-    {
+    public Artifact getOriginatingArtifact() {
         return originatingArtifact;
     }
 
-    public List<Artifact> getArtifacts()
-    {
+    public List<Artifact> getArtifacts() {
         return artifacts;
     }
 
-    public List<ArtifactRepository> getRemoteRepositories()
-    {
+    public List<ArtifactRepository> getRemoteRepositories() {
         return remoteRepositories;
     }
 }
