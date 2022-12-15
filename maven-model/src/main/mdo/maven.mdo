@@ -1030,11 +1030,13 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
-     @Override
-     public String toString()
-     {
-         return String.format( "Contributor(name=%s, email=%s)", name, email );
-     }
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "Contributor {name=" + name + ", email=" + email + "}";
+    }
             ]]>
           </code>
         </codeSegment>
@@ -1252,11 +1254,13 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
-     @Override
-     public String toString()
-     {
-         return String.format( "Developer(super=%s, id=%s)", super.toString(), id );
-     }
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "Developer {id=" + id + ", " + super.toString() + "}";
+    }
             ]]>
           </code>
         </codeSegment>

@@ -62,6 +62,6 @@ public class DeveloperTest
 
         String s = dev.toString();
 
-        assert "Developer(super=Contributor(name=Maven Tester, email=tester@acme.localdomain), id=20220118)".equals( s ) : s;
+        assert "Developer {id=20220118, Contributor {name=Maven Tester, email=tester@acme.localdomain}}".equals( s ) : s;
     }
 }
