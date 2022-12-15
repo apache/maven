@@ -18,6 +18,7 @@
  */
 package org.apache.maven.repository.internal;
 
+import java.util.stream.Stream;
 import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceReader;
@@ -28,4 +29,20 @@ import org.eclipse.aether.repository.WorkspaceReader;
 public interface MavenWorkspaceReader extends WorkspaceReader {
 
     Model findModel(Artifact artifact);
+
+    /**
+     * List all available artifacts this workspace repository manages.
+     *
+     * @return a stream of artifacts in no particular order
+     * @since 3.9.0
+     */
+    Stream<Artifact> listArtifacts();
+
+    /**
+     * List all available models this workspace repository manages.
+     *
+     * @return a stream of models in no particular order
+     * @since 3.9.0
+     */
+    Stream<Model> listModels();
 }

@@ -19,8 +19,10 @@
 package org.apache.maven.internal.aether;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 import org.apache.maven.model.Model;
 import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.eclipse.aether.artifact.Artifact;
@@ -58,6 +60,24 @@ public final class MavenChainedWorkspaceReader implements MavenWorkspaceReader {
             }
         }
         return null;
+    }
+
+    @Override
+    public Stream<Artifact> listArtifacts() {
+        return Arrays.stream(readers)
+                .filter(MavenWorkspaceReader.class::isInstance)
+                .map(MavenWorkspaceReader.class::cast)
+                .flatMap(MavenWorkspaceReader::listArtifacts)
+                .distinct();
+    }
+
+    @Override
+    public Stream<Model> listModels() {
+        return Arrays.stream(readers)
+                .filter(MavenWorkspaceReader.class::isInstance)
+                .map(MavenWorkspaceReader.class::cast)
+                .flatMap(MavenWorkspaceReader::listModels)
+                .distinct();
     }
 
     @Override

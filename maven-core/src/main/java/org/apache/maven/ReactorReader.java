@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -84,10 +85,12 @@ class ReactorReader implements MavenWorkspaceReader {
     // Public API
     //
 
+    @Override
     public WorkspaceRepository getRepository() {
         return repository;
     }
 
+    @Override
     public File findArtifact(Artifact artifact) {
         String projectKey = ArtifactUtils.key(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
 
@@ -104,6 +107,7 @@ class ReactorReader implements MavenWorkspaceReader {
         return null;
     }
 
+    @Override
     public List<String> findVersions(Artifact artifact) {
         String key = ArtifactUtils.versionlessKey(artifact.getGroupId(), artifact.getArtifactId());
 
@@ -118,6 +122,20 @@ class ReactorReader implements MavenWorkspaceReader {
         String projectKey = ArtifactUtils.key(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
         MavenProject project = projectsByGAV.get(projectKey);
         return project == null ? null : project.getModel();
+    }
+
+    @Override
+    public Stream<Artifact> listArtifacts() {
+        return projectsByGAV.values().stream()
+                .flatMap(project ->
+                        Stream.concat(Stream.of(project.getArtifact()), project.getAttachedArtifacts().stream()))
+                .filter(Objects::nonNull)
+                .map(RepositoryUtils::toArtifact);
+    }
+
+    @Override
+    public Stream<Model> listModels() {
+        return projectsByGAV.values().stream().map(MavenProject::getModel).filter(Objects::nonNull);
     }
 
     //
