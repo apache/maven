@@ -94,7 +94,9 @@ for (String os in runITsOses) {
                             bat "if exist it-local-repo rmdir /s /q it-local-repo"
                             bat "if exist apache-maven-dist.zip del /q apache-maven-dist.zip"
                         }
-                        unstash 'maven-dist'
+                        dir('dists') {
+                          unstash 'maven-dist'
+                        }
                         try {
                             withEnv(["JAVA_HOME=${ tool "$jdkName" }",
                                         "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
