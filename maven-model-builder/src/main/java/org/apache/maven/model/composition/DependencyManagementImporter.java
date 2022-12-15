@@ -19,6 +19,7 @@
 package org.apache.maven.model.composition;
 
 import java.util.List;
+
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;

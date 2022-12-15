@@ -19,6 +19,7 @@
 package org.apache.maven.plugin.version;
 
 import java.util.List;
+
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 

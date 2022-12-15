@@ -18,13 +18,15 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;

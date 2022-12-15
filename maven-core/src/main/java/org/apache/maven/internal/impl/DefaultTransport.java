@@ -18,7 +18,8 @@
  */
 package org.apache.maven.internal.impl;
 
-import static java.util.Objects.requireNonNull;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -27,12 +28,13 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.api.services.Transport;
 import org.eclipse.aether.spi.connector.transport.GetTask;
 import org.eclipse.aether.spi.connector.transport.PutTask;
 import org.eclipse.aether.spi.connector.transport.Transporter;
+
+import static java.util.Objects.requireNonNull;
 
 @Named
 @Singleton

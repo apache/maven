@@ -18,18 +18,19 @@
  */
 package org.apache.maven.project;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import java.io.File;
 import java.lang.reflect.Field;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.repository.internal.DefaultArtifactDescriptorReader;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.ArtifactResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ProjectClasspathTest extends AbstractMavenProjectTestCase {
     static final String dir = "projects/scope/";

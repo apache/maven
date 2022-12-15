@@ -18,16 +18,18 @@
  */
 package org.apache.maven.artifact.handler;
 
-import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import javax.inject.Inject;
 
 import java.io.File;
 import java.util.List;
-import javax.inject.Inject;
+
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
+
+import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @PlexusTest
 public class ArtifactHandlerTest {

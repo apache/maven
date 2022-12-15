@@ -18,11 +18,11 @@
  */
 package org.apache.maven.project;
 
-import static java.util.stream.Collectors.joining;
-
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+
+import static java.util.stream.Collectors.joining;
 
 /**
  * Hamcrest matcher to help create fluent assertions about {@link ProjectBuildingResult} instances.

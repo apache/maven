@@ -18,10 +18,11 @@
  */
 package org.apache.maven.settings.building;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import java.io.File;
+
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * @author Benjamin Bentmann

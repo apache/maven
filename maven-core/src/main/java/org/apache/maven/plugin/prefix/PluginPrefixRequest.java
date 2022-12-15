@@ -19,6 +19,7 @@
 package org.apache.maven.plugin.prefix;
 
 import java.util.List;
+
 import org.apache.maven.model.Model;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;

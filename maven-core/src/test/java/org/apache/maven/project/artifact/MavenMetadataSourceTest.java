@@ -19,6 +19,7 @@
 package org.apache.maven.project.artifact;
 
 import javax.inject.Inject;
+
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;

@@ -18,13 +18,15 @@
  */
 package org.apache.maven.project;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.impl.ArtifactResolver;

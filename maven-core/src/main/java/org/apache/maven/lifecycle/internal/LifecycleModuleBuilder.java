@@ -18,11 +18,13 @@
  */
 package org.apache.maven.lifecycle.internal;
 
-import java.util.HashSet;
-import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.HashSet;
+import java.util.List;
+
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;

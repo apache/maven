@@ -18,8 +18,7 @@
  */
 package org.apache.maven.lifecycle.internal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import javax.inject.Inject;
 
 import java.io.File;
 import java.util.Collection;
@@ -27,12 +26,15 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
-import javax.inject.Inject;
+
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class LifecycleDependencyResolverTest extends AbstractCoreMavenComponentTestCase {
     @Inject

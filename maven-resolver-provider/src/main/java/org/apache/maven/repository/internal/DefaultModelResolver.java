@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Repository;

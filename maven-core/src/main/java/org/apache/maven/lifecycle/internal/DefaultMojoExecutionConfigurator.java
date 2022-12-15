@@ -18,14 +18,14 @@
  */
 package org.apache.maven.lifecycle.internal;
 
-import static java.util.Arrays.stream;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.api.xml.Dom;
 import org.apache.maven.internal.xml.Xpp3Dom;
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
@@ -40,6 +40,8 @@ import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.Arrays.stream;
 
 /**
  * @since 3.3.1, MNG-5753

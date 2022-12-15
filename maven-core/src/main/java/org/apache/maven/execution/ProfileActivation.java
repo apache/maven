@@ -18,8 +18,6 @@
  */
 package org.apache.maven.execution;
 
-import static java.util.stream.Collectors.toSet;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+
+import static java.util.stream.Collectors.toSet;
 
 /**
  * Container for storing the request from the user to activate or de-activate certain profiles and optionally fail the

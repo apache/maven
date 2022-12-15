@@ -18,6 +18,10 @@
  */
 package org.apache.maven.settings.building;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -25,9 +29,7 @@ import java.io.StringWriter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;

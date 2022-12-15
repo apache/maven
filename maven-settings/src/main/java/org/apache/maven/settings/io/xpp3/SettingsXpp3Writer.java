@@ -21,6 +21,7 @@ package org.apache.maven.settings.io.xpp3;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+
 import org.apache.maven.settings.Settings;
 
 public class SettingsXpp3Writer {

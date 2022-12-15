@@ -18,9 +18,9 @@
  */
 package org.apache.maven.artifact.versioning;
 
-import static org.apache.commons.lang3.math.NumberUtils.isDigits;
-
 import java.util.StringTokenizer;
+
+import static org.apache.commons.lang3.math.NumberUtils.isDigits;
 
 /**
  * Default implementation of artifact versioning.

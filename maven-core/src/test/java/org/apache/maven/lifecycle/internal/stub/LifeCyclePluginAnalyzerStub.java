@@ -21,6 +21,7 @@ package org.apache.maven.lifecycle.internal.stub;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
 import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;

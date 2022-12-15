@@ -18,19 +18,20 @@
  */
 package org.apache.maven.lifecycle.internal.stub;
 
-import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Kristian Rosenvold

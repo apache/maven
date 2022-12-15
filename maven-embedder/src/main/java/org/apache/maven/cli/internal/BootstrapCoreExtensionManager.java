@@ -18,13 +18,15 @@
  */
 package org.apache.maven.cli.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;

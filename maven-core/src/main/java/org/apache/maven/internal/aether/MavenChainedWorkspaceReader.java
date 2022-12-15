@@ -21,6 +21,7 @@ package org.apache.maven.internal.aether;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.eclipse.aether.artifact.Artifact;

@@ -18,10 +18,12 @@
  */
 package org.apache.maven.lifecycle.internal.stub;
 
+import javax.inject.Provider;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.inject.Provider;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;

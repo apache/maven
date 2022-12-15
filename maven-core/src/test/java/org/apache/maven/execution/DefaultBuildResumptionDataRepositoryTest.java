@@ -18,18 +18,19 @@
  */
 package org.apache.maven.execution;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
+import org.apache.maven.model.Build;
+import org.apache.maven.project.MavenProject;
+import org.junit.jupiter.api.Test;
+
 import static java.util.Collections.singleton;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import org.apache.maven.model.Build;
-import org.apache.maven.project.MavenProject;
-import org.junit.jupiter.api.Test;
 
 public class DefaultBuildResumptionDataRepositoryTest {
     private final DefaultBuildResumptionDataRepository repository = new DefaultBuildResumptionDataRepository();

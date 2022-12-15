@@ -19,6 +19,7 @@
 package org.apache.maven.project;
 
 import java.util.List;
+
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 

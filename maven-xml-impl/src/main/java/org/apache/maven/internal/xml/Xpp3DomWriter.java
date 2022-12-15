@@ -21,6 +21,7 @@ package org.apache.maven.internal.xml;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Map;
+
 import org.apache.maven.api.xml.Dom;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;

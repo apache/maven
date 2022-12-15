@@ -18,10 +18,12 @@
  */
 package org.apache.maven.model.building;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.io.IOException;
+import java.nio.file.Path;
+
 import org.apache.maven.model.transform.BuildToRawPomXMLFilterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 

@@ -18,10 +18,10 @@
  */
 package org.apache.maven.model.path;
 
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-
-import org.junit.jupiter.api.Test;
 
 /**
  * @author Benjamin Bentmann

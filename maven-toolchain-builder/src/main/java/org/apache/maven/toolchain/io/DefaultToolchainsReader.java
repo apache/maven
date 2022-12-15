@@ -18,14 +18,16 @@
  */
 package org.apache.maven.toolchain.io;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 import java.util.Objects;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Reader;
 import org.codehaus.plexus.util.ReaderFactory;

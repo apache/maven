@@ -19,6 +19,7 @@
 package org.apache.maven.toolchain;
 
 import java.util.Map;
+
 import org.apache.maven.toolchain.model.ToolchainModel;
 
 /**

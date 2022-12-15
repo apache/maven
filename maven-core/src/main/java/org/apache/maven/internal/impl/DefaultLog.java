@@ -18,11 +18,12 @@
  */
 package org.apache.maven.internal.impl;
 
-import static java.util.Objects.requireNonNull;
-
 import java.util.function.Supplier;
+
 import org.apache.maven.api.plugin.Log;
 import org.slf4j.Logger;
+
+import static java.util.Objects.requireNonNull;
 
 public class DefaultLog implements Log {
     private final Logger logger;

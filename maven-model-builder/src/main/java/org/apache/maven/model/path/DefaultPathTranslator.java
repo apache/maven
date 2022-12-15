@@ -18,9 +18,10 @@
  */
 package org.apache.maven.model.path;
 
-import java.io.File;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.io.File;
 
 /**
  * Resolves relative paths against a specific base directory.

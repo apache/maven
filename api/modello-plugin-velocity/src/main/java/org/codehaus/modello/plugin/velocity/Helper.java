@@ -21,6 +21,7 @@ package org.codehaus.modello.plugin.velocity;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.codehaus.modello.ModelloRuntimeException;
 import org.codehaus.modello.model.ModelAssociation;
 import org.codehaus.modello.model.ModelClass;

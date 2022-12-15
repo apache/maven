@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.maven.api.Service;
 
 public interface Lookup extends Service {

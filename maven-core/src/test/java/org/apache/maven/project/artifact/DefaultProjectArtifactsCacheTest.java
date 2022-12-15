@@ -18,14 +18,15 @@
  */
 package org.apache.maven.project.artifact;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 public class DefaultProjectArtifactsCacheTest {
 

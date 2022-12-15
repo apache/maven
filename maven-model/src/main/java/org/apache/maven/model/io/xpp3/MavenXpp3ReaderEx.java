@@ -21,6 +21,7 @@ package org.apache.maven.model.io.xpp3;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.ReaderFactory;

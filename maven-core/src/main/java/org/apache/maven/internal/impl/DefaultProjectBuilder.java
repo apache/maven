@@ -18,6 +18,10 @@
  */
 package org.apache.maven.internal.impl;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,9 +29,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinate;

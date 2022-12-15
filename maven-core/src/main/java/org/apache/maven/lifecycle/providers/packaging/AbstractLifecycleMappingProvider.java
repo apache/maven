@@ -18,15 +18,17 @@
  */
 package org.apache.maven.lifecycle.providers.packaging;
 
-import static java.util.Objects.requireNonNull;
+import javax.inject.Provider;
 
 import java.util.Collections;
 import java.util.HashMap;
-import javax.inject.Provider;
+
 import org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping;
 import org.apache.maven.lifecycle.mapping.Lifecycle;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Base lifecycle mapping provider, ie per-packaging plugin bindings for {@code default} lifecycle.

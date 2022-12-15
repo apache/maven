@@ -18,9 +18,11 @@
  */
 package org.apache.maven.internal.impl;
 
-import java.util.Objects;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.Objects;
+
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.MessageBuilder;

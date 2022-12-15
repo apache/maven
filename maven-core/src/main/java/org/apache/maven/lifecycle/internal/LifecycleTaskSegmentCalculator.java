@@ -19,6 +19,7 @@
 package org.apache.maven.lifecycle.internal;
 
 import java.util.List;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;

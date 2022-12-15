@@ -19,6 +19,7 @@
 package org.apache.maven.project.path;
 
 import java.io.File;
+
 import org.apache.maven.model.Model;
 
 /**

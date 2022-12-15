@@ -21,6 +21,7 @@ package org.apache.maven.cli.logging.impl;
 import java.net.URL;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -18,10 +18,9 @@
  */
 package org.apache.maven.api.services;
 
-import static org.apache.maven.api.services.BaseRequest.nonNull;
-
 import java.util.Collection;
 import java.util.Collections;
+
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
@@ -29,6 +28,8 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
+
+import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
  * A request for installing one or more artifacts in the local repository.

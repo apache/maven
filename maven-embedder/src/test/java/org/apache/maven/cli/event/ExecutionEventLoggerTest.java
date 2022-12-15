@@ -18,14 +18,9 @@
  */
 package org.apache.maven.cli.event;
 
-import static org.mockito.ArgumentMatchers.matches;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.when;
+import java.io.File;
 
 import com.google.common.collect.ImmutableList;
-import java.io.File;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
@@ -38,6 +33,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
+
+import static org.mockito.ArgumentMatchers.matches;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.when;
 
 class ExecutionEventLoggerTest {
 

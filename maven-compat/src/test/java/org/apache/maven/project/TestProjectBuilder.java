@@ -18,11 +18,13 @@
  */
 package org.apache.maven.project;
 
-import java.io.File;
-import java.util.Collections;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.io.File;
+import java.util.Collections;
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.model.building.ModelBuilder;

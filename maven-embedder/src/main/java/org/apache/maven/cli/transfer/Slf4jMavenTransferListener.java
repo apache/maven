@@ -19,6 +19,7 @@
 package org.apache.maven.cli.transfer;
 
 import java.util.Locale;
+
 import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;

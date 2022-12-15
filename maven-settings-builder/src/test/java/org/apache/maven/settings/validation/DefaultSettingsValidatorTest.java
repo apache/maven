@@ -18,13 +18,11 @@
  */
 package org.apache.maven.settings.validation;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import org.apache.maven.api.settings.Mirror;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Proxy;
@@ -36,6 +34,9 @@ import org.apache.maven.settings.building.SettingsProblemCollector;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author mkleint

@@ -18,15 +18,13 @@
  */
 package org.apache.maven.settings;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
 import org.apache.maven.api.settings.Activation;
 import org.apache.maven.api.settings.ActivationFile;
 import org.apache.maven.api.settings.ActivationOS;
@@ -35,6 +33,9 @@ import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.Settings;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class SettingsUtilsTest {
 

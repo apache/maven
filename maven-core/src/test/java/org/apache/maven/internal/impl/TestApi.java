@@ -18,13 +18,12 @@
  */
 package org.apache.maven.internal.impl;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import javax.inject.Inject;
 
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Optional;
-import javax.inject.Inject;
+
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Node;
@@ -51,6 +50,9 @@ import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @PlexusTest
 public class TestApi {

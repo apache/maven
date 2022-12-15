@@ -18,9 +18,8 @@
  */
 package org.apache.maven.internal.impl;
 
-import static org.apache.maven.internal.impl.Utils.nonNull;
-
 import java.util.Collection;
+
 import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.Scope;
@@ -30,6 +29,8 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.TypeRegistry;
 import org.eclipse.aether.artifact.ArtifactProperties;
+
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultDependencyCoordinate implements DependencyCoordinate {
     private final AbstractSession session;

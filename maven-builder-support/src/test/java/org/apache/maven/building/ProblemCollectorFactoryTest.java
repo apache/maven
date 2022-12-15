@@ -18,11 +18,12 @@
  */
 package org.apache.maven.building;
 
+import java.util.Collections;
+
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-
-import java.util.Collections;
-import org.junit.jupiter.api.Test;
 
 public class ProblemCollectorFactoryTest {
 

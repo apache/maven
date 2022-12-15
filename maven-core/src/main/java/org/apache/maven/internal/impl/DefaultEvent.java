@@ -19,6 +19,7 @@
 package org.apache.maven.internal.impl;
 
 import java.util.Optional;
+
 import org.apache.maven.api.Event;
 import org.apache.maven.api.EventType;
 import org.apache.maven.api.MojoExecution;

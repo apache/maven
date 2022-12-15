@@ -20,6 +20,7 @@ package org.apache.maven.plugin.internal;
 
 import java.util.Arrays;
 import java.util.List;
+
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.shared.utils.logging.MessageBuilder;
 import org.apache.maven.shared.utils.logging.MessageUtils;

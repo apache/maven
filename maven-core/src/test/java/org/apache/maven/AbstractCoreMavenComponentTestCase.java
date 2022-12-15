@@ -18,14 +18,14 @@
  */
 package org.apache.maven;
 
-import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
+import javax.inject.Inject;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import javax.inject.Inject;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -53,6 +53,8 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.DefaultRepositorySystem;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+
+import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 
 @PlexusTest
 public abstract class AbstractCoreMavenComponentTestCase {

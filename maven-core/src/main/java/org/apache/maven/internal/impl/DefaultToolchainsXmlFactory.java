@@ -18,13 +18,15 @@
  */
 package org.apache.maven.internal.impl;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Objects;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.services.xml.ToolchainsXmlFactory;

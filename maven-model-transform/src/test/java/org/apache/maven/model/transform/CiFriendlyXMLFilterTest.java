@@ -18,10 +18,10 @@
  */
 package org.apache.maven.model.transform;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CiFriendlyXMLFilterTest extends AbstractXMLFilterTests {
     @Override

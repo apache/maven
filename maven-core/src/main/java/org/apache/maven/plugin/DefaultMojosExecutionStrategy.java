@@ -18,9 +18,11 @@
  */
 package org.apache.maven.plugin;
 
-import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.List;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 

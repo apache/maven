@@ -21,6 +21,7 @@ package org.apache.maven.model.building;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.BuildBase;
 import org.apache.maven.api.model.CiManagement;

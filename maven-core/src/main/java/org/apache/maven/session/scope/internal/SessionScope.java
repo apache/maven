@@ -18,15 +18,16 @@
  */
 package org.apache.maven.session.scope.internal;
 
-import com.google.inject.Key;
-import com.google.inject.OutOfScopeException;
-import com.google.inject.Provider;
-import com.google.inject.Scope;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import com.google.inject.Key;
+import com.google.inject.OutOfScopeException;
+import com.google.inject.Provider;
+import com.google.inject.Scope;
 
 /**
  * SessionScope

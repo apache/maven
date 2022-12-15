@@ -18,14 +18,15 @@
  */
 package org.apache.maven.toolchain.merge;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.io.InputStream;
+
 import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.api.toolchain.TrackableBase;
 import org.apache.maven.api.xml.Dom;
 import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Reader;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MavenToolchainMergerTest {
     private MavenToolchainMerger merger = new MavenToolchainMerger();

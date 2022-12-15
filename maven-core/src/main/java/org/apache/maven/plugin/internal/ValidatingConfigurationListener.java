@@ -21,6 +21,7 @@ package org.apache.maven.plugin.internal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;

@@ -19,6 +19,7 @@
 package org.apache.maven.model.interpolation;
 
 import java.io.File;
+
 import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;

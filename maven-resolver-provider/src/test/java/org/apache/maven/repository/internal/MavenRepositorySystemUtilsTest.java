@@ -18,10 +18,10 @@
  */
 package org.apache.maven.repository.internal;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import org.eclipse.aether.RepositorySystemSession;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class MavenRepositorySystemUtilsTest {
 

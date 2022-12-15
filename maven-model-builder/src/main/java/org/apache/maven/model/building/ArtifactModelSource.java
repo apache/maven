@@ -20,6 +20,7 @@ package org.apache.maven.model.building;
 
 import java.io.File;
 import java.util.Objects;
+
 import org.apache.maven.building.FileSource;
 
 /**

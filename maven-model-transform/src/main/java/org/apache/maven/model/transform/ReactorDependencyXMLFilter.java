@@ -20,6 +20,7 @@ package org.apache.maven.model.transform;
 
 import java.util.List;
 import java.util.function.BiFunction;
+
 import org.apache.maven.model.transform.pull.NodeBufferingParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
