@@ -61,6 +61,6 @@ public class IssueManagementTest
 
         String s = im.toString();
 
-        assert "IssueManagement(system=Velociraptor, url=https://velo.localdomain)".equals( s ) : s;
+        assert "IssueManagement {system=Velociraptor, url=https://velo.localdomain}".equals( s ) : s;
     }
 }

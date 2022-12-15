@@ -1312,11 +1312,13 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
-     @Override
-     public String toString()
-     {
-         return String.format( "IssueManagement(system=%s, url=%s)", system, url );
-     }
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "IssueManagement {system=" + system + ", url=" + url + "}";
+    }
             ]]>
           </code>
         </codeSegment>
