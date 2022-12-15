@@ -59,6 +59,6 @@ public class BuildTest
 
         String s = build.toString();
 
-        assert "Build(super=BuildBase(super=PluginConfiguration(super=PluginContainer())))".equals( s ) : s;
+        assert "Build {BuildBase {PluginConfiguration {PluginContainer {}}}}".equals( s ) : s;
     }
 }

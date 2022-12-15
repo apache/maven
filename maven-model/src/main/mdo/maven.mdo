@@ -625,7 +625,7 @@
      @Override
      public String toString()
      {
-         return String.format( "PluginContainer()" );
+         return "PluginContainer {}";
      }
             ]]>
           </code>
@@ -658,11 +658,13 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
-     @Override
-     public String toString()
-     {
-         return String.format( "PluginConfiguration(super=%s)", super.toString() );
-     }
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "PluginConfiguration {" + super.toString() + "}";
+    }
             ]]>
           </code>
         </codeSegment>
@@ -746,11 +748,13 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
-     @Override
-     public String toString()
-     {
-         return String.format( "BuildBase(super=%s)", super.toString() );
-     }
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "BuildBase {" + super.toString() + "}";
+    }
             ]]>
           </code>
         </codeSegment>
@@ -837,11 +841,13 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
-     @Override
-     public String toString()
-     {
-         return String.format( "Build(super=%s)", super.toString() );
-     }
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "Build {" + super.toString() + "}";
+    }
             ]]>
           </code>
         </codeSegment>
