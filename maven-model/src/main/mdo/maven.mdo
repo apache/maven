@@ -1532,7 +1532,7 @@
         and maybe even a specific element for the user and scm mailing lists. Then leave the more
         lose structure for any other type of mailing list.</comment>
     </class>
-    <class java.clone="deep" java.toString="true">
+    <class java.clone="deep">
       <name>Organization</name>
       <description>Specifies the organization that produces this project.</description>
       <version>3.0.0+</version>
@@ -1550,6 +1550,22 @@
           <type>String</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "Organization {name=" + name + ", url=" + url + "}";
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class java.clone="deep">
       <name>PatternSet</name>
