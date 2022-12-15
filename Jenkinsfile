@@ -54,12 +54,13 @@ node(jenkinsEnv.nodeSelection(osNode)) {
                          "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
                          "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {                   
                     sh "mvn clean ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore -PversionlessMavenDist -Dmaven.repo.local=${WORK_DIR}/.repository"
-                    sh "mv apache-maven/target/apache-maven-bin.zip apache-maven-dist.zip"
-                    stash includes: 'apache-maven-dist.zip', name: 'dist'
                 }
             } finally {
                 junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true                
             }
+            dir ('apache-maven/target') {
+                stash includes: 'apache-maven-bin.zip', name: 'maven-dist'
+            }             
         }
     }
 }
@@ -93,7 +94,7 @@ for (String os in runITsOses) {
                             bat "if exist it-local-repo rmdir /s /q it-local-repo"
                             bat "if exist apache-maven-dist.zip del /q apache-maven-dist.zip"
                         }
-                        unstash 'dist'
+                        unstash 'maven-dist'
                         try {
                             withEnv(["JAVA_HOME=${ tool "$jdkName" }",
                                         "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
