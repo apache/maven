@@ -1447,11 +1447,13 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
-     @Override
-     public String toString()
-     {
-         return String.format( "License(name=%s, url=%s)", name, url );
-     }
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "License {name=" + name + ", url=" + url + "}";
+    }
             ]]>
           </code>
         </codeSegment>
