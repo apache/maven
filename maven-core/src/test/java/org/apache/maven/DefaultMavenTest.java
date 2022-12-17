@@ -80,6 +80,14 @@ public class DefaultMavenTest
         return "src/test/projects/default-maven";
     }
 
+    public void testMavenProjectEditArtifacts()
+        throws Exception
+    {
+        MavenProject mavenProject = new MavenProject();
+        DefaultArtifact artifact = new DefaultArtifact( "g", "a", "1.0", Artifact.SCOPE_TEST, "jar", "", null );
+        mavenProject.getAttachedArtifacts().add( artifact );
+        mavenProject.getAttachedArtifacts().remove( artifact );
+    }
 
     public void testMavenProjectNoDuplicateArtifacts()
         throws Exception

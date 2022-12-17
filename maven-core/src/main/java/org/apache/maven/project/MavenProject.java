@@ -945,13 +945,21 @@ public class MavenProject
         }
     }
 
+    /**
+     * Returns a mutable list of the attached artifacts to this project. It is highly advised <em>not</em>
+     * to modify this list, but rather use the {@link MavenProjectHelper}.
+     * <p>
+     * <strong>Note</strong>: This list will be made read-only in Maven 4.</p>
+     *
+     * @return the attached artifacts of this project
+     */
     public List<Artifact> getAttachedArtifacts()
     {
         if ( attachedArtifacts == null )
         {
             attachedArtifacts = new ArrayList<>();
         }
-        return Collections.unmodifiableList( attachedArtifacts );
+        return attachedArtifacts;
     }
 
     public Xpp3Dom getGoalConfiguration( String pluginGroupId, String pluginArtifactId, String executionId,
@@ -1484,7 +1492,6 @@ public class MavenProject
     // Everything below will be removed for Maven 4.0.0
     //
     // ----------------------------------------------------------------------------------------------------------------
-
     private ProjectBuildingRequest projectBuilderConfiguration;
 
     private Map<String, String> moduleAdjustments;
@@ -1889,7 +1896,6 @@ public class MavenProject
         // we have a limitation in modello that will be remedied shortly. So
         // for now I have to iterate through and see what we have.
         // ----------------------------------------------------------------------
-
         if ( getReportPlugins() != null )
         {
             for ( ReportPlugin plugin : getReportPlugins() )
