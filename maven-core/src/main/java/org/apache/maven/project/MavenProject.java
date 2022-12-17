@@ -794,11 +794,19 @@ public class MavenProject implements Cloneable {
         }
     }
 
+    /**
+     * Returns a mutable list of the attached artifacts to this project. It is highly advised <em>not</em>
+     * to modify this list, but rather use the {@link MavenProjectHelper}.
+     * <p>
+     * <strong>Note</strong>: This list will be made read-only in Maven 4.</p>
+     *
+     * @return the attached artifacts of this project
+     */
     public List<Artifact> getAttachedArtifacts() {
         if (attachedArtifacts == null) {
             attachedArtifacts = new ArrayList<>();
         }
-        return Collections.unmodifiableList(attachedArtifacts);
+        return attachedArtifacts;
     }
 
     public Xpp3Dom getGoalConfiguration(
