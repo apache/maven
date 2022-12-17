@@ -253,8 +253,11 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 modelRequest.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
                 modelRequest.setProcessPlugins(false);
                 modelRequest.setTwoPhaseBuilding(false);
-                modelRequest.setSystemProperties(toProperties(session.getSystemProperties()));
-                modelRequest.setUserProperties(toProperties(session.getUserProperties()));
+                // This merge is on purpose because otherwise user properties would override model
+                // properties in dependencies the user does not know. See MNG-7563 for details.
+                modelRequest.setSystemProperties(
+                        toProperties(session.getUserProperties(), session.getSystemProperties()));
+                modelRequest.setUserProperties(new Properties());
                 modelRequest.setModelCache(modelCacheFactory.createCache(session));
                 modelRequest.setModelResolver(new DefaultModelResolver(
                         session,
@@ -303,9 +306,14 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         }
     }
 
-    private Properties toProperties(Map<String, String> map) {
+    private Properties toProperties(Map<String, String> dominant, Map<String, String> recessive) {
         Properties props = new Properties();
-        props.putAll(map);
+        if (recessive != null) {
+            props.putAll(recessive);
+        }
+        if (dominant != null) {
+            props.putAll(dominant);
+        }
         return props;
     }
 
