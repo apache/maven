@@ -798,6 +798,11 @@ public class MavenProject implements Cloneable {
         }
     }
 
+    /**
+     * Returns a read-only list of the attached artifacts to this project.
+     *
+     * @return the attached artifacts of this project
+     */
     public List<Artifact> getAttachedArtifacts() {
         if (attachedArtifacts == null) {
             attachedArtifacts = new ArrayList<>();
