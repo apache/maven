@@ -903,11 +903,7 @@ public class MavenProject implements Cloneable {
 
     @Override
     public int hashCode() {
-        int hash = 17;
-        hash = 31 * hash + getGroupId().hashCode();
-        hash = 31 * hash + getArtifactId().hashCode();
-        hash = 31 * hash + getVersion().hashCode();
-        return hash;
+        return Objects.hash(getGroupId(), getArtifactId(), getVersion());
     }
 
     public List<Extension> getBuildExtensions() {
