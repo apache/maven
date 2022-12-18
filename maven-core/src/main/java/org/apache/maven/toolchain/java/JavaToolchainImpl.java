@@ -71,9 +71,9 @@ class JavaToolchainImpl
         return null;
     }
 
-    private static File findTool( String toolName, File installFolder )
+    private static File findTool( String toolName, File installDir )
     {
-        File bin = new File( installFolder, "bin" ); //NOI18N
+        File bin = new File( installDir, "bin" ); //NOI18N
         if ( bin.exists() )
         {
             File tool = new File( bin, toolName + ( Os.isFamily( "windows" ) ? ".exe" : "" ) ); // NOI18N
