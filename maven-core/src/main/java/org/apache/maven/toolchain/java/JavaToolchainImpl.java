@@ -60,8 +60,8 @@ class JavaToolchainImpl extends DefaultToolchain implements JavaToolchain {
         return null;
     }
 
-    private static File findTool(String toolName, File installFolder) {
-        File bin = new File(installFolder, "bin"); // NOI18N
+    private static File findTool(String toolName, File installDir) {
+        File bin = new File(installDir, "bin"); // NOI18N
         if (bin.exists()) {
             File tool = new File(bin, toolName + (Os.isFamily("windows") ? ".exe" : "")); // NOI18N
             if (tool.exists()) {
