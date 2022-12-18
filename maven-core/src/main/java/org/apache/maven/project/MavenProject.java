@@ -1073,18 +1073,14 @@ public class MavenProject
         MavenProject that = (MavenProject) other;
 
         return Objects.equals( getArtifactId(), that.getArtifactId() )
-            && Objects.equals( getGroupId(), that.getGroupId() ) 
+            && Objects.equals( getGroupId(), that.getGroupId() )
             && Objects.equals( getVersion(), that.getVersion() );
     }
 
     @Override
     public int hashCode()
     {
-        int hash = 17;
-        hash = 31 * hash + getGroupId().hashCode();
-        hash = 31 * hash + getArtifactId().hashCode();
-        hash = 31 * hash + getVersion().hashCode();
-        return hash;
+        return Objects.hash( getGroupId(), getArtifactId(), getVersion() );
     }
 
     public List<Extension> getBuildExtensions()
