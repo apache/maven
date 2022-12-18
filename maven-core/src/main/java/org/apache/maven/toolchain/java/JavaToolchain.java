@@ -60,5 +60,5 @@ public interface JavaToolchain extends Toolchain {
     //     *
     //     * @return List
     //     */
-    //    List getJavadocFolders();
+    //    List getJavadocDirectories();
 }
