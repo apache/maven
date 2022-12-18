@@ -41,25 +41,28 @@ import java.util.Properties;
  *     <code>1.0alpha1 =&gt; [1, 0, alpha, 1]</code></li>
  * <li>unlimited number of version components,</li>
  * <li>version components in the text can be digits or strings,</li>
- * <li>strings are checked for well-known qualifiers and the qualifier ordering is used for version ordering.
- *     Well-known qualifiers (case insensitive) are:<ul>
- *     <li><code>alpha</code> or <code>a</code></li>
- *     <li><code>beta</code> or <code>b</code></li>
- *     <li><code>milestone</code> or <code>m</code></li>
- *     <li><code>rc</code> or <code>cr</code></li>
- *     <li><code>snapshot</code></li>
- *     <li><code>(the empty string)</code> or <code>ga</code> or <code>final</code></li>
- *     <li><code>sp</code></li>
- *     </ul>
- *     Unknown qualifiers are considered after known qualifiers, with lexical order (always case insensitive),
- *   </li>
+ * <li>
+ *   Following semver rules is encouraged, and some qualifiers are discouraged (no matter the case):
+ *   <ul>
+ *     <li> The usage of 'CR' qualifier is discouraged. Use 'RC' instead. </li>
+ *     <li> The usage of 'Final', 'GA', and 'Release' qualifiers is discouraged. Use no qualifier instead. </li>
+ *     <li> The usage of 'SP' qualifier is discouraged. Increment the patch version instead. </li>
+ *   </ul>
+ *   String qualifiers are ordered lexically (case insensitive), with the following exceptions:
+ *   <ul>
+ *     <li><code> alpha = a &lt; beta = b &lt; milestone = m &lt; rc = cr
+ *         &lt; snapshot &lt; '' = final = ga = release &lt; sp </code></li>
+ *     <li>Other qualifiers are ordered lexically (case insensitive),
+ *         and considered less than Snapshot and Release.</li>
+ *   </ul>
+ * </li>
  * <li>a hyphen usually precedes a qualifier, and is always less important than digits/number, for example
  *   {@code 1.0.RC2 < 1.0-RC3 < 1.0.1}; but prefer {@code 1.0.0-RC1} over {@code 1.0.0.RC1}, and more
  *   generally: {@code 1.0.X2 < 1.0-X3 < 1.0.1} for any string {@code X}; but prefer {@code 1.0.0-X1}
  *   over {@code 1.0.0.X1}.</li>
  * </ul>
  *
- * @see <a href="https://cwiki.apache.org/confluence/display/MAVENOLD/Versioning">"Versioning" on Maven Wiki</a>
+ * @see <a href="https://maven.apache.org/pom.html#Version_Order_Specification">Version Order Specification</a>
  * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
  * @author <a href="mailto:hboutemy@apache.org">Hervé Boutemy</a>
  */
@@ -135,7 +138,7 @@ public class ComparableVersion
             {
                 case INT_ITEM:
                     int itemValue = ( (IntItem) item ).value;
-                    return ( value < itemValue ) ? -1 : ( ( value == itemValue ) ? 0 : 1 );
+                    return Integer.compare( value, itemValue );
                 case LONG_ITEM:
                 case BIGINTEGER_ITEM:
                     return -1;
@@ -221,7 +224,7 @@ public class ComparableVersion
                     return 1;
                 case LONG_ITEM:
                     long itemValue = ( (LongItem) item ).value;
-                    return ( value < itemValue ) ? -1 : ( ( value == itemValue ) ? 0 : 1 );
+                    return Long.compare( value, itemValue );
                 case BIGINTEGER_ITEM:
                     return -1;
 
@@ -356,23 +359,23 @@ public class ComparableVersion
     private static class StringItem
         implements Item
     {
-        private static final List<String> QUALIFIERS =
-                Arrays.asList( "alpha", "beta", "milestone", "rc", "snapshot", "", "sp"  );
+        private static final List<String> QUALIFIERS = Arrays.asList( "snapshot", "", "sp" );
 
         private static final Properties ALIASES = new Properties();
+
         static
         {
-            ALIASES.put( "ga", "" );
-            ALIASES.put( "final", "" );
-            ALIASES.put( "release", "" );
             ALIASES.put( "cr", "rc" );
+            ALIASES.put( "final", "" );
+            ALIASES.put( "ga", "" );
+            ALIASES.put( "release", "" );
         }
 
         /**
-         * A comparable value for the empty-string qualifier. This one is used to determine if a given qualifier makes
+         * An index value for the empty-string qualifier. This one is used to determine if a given qualifier makes
          * the version older than one without a qualifier, or more recent.
          */
-        private static final String RELEASE_VERSION_INDEX = String.valueOf( QUALIFIERS.indexOf( "" ) );
+        private static final int RELEASE_VERSION_INDEX = QUALIFIERS.indexOf( "" );
 
         private final String value;
 
@@ -407,7 +410,7 @@ public class ComparableVersion
         @Override
         public boolean isNull()
         {
-            return ( comparableQualifier( value ).compareTo( RELEASE_VERSION_INDEX ) == 0 );
+            return QUALIFIERS.indexOf( value ) == RELEASE_VERSION_INDEX;
         }
 
         /**
@@ -422,12 +425,37 @@ public class ComparableVersion
          *
          * @param qualifier
          * @return an equivalent value that can be used with lexical comparison
+         * @deprecated Use {@link #compareQualifiers(String, String)} instead
          */
+        @Deprecated
         public static String comparableQualifier( String qualifier )
         {
-            int i = QUALIFIERS.indexOf( qualifier );
+            int index = QUALIFIERS.indexOf( qualifier ) + 1;
 
-            return i == -1 ? ( QUALIFIERS.size() + "-" + qualifier ) : String.valueOf( i );
+            return index == 0 ? ( "0-" + qualifier ) : String.valueOf( index );
+        }
+
+        /**
+         * Compare the qualifiers of two artifact versions.
+         *
+         * @param qualifier1 qualifier of first artifact
+         * @param qualifier2 qualifier of second artifact
+         * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or
+         * greater than the second
+         */
+        public static int compareQualifiers( String qualifier1, String qualifier2 )
+        {
+            int i1 = QUALIFIERS.indexOf( qualifier1 );
+            int i2 = QUALIFIERS.indexOf( qualifier2 );
+
+            // if both pre-release, then use natural lexical ordering
+            if ( i1 == -1 && i2 == -1 )
+            {
+                return qualifier1.compareTo( qualifier2 );
+            }
+
+            // 'other qualifier' < 'snapshot' < '' < 'sp'
+            return Integer.compare( i1, i2 );
         }
 
         @Override
@@ -436,7 +464,7 @@ public class ComparableVersion
             if ( item == null )
             {
                 // 1-rc < 1, 1-ga > 1
-                return comparableQualifier( value ).compareTo( RELEASE_VERSION_INDEX );
+                return Integer.compare( QUALIFIERS.indexOf( value ), RELEASE_VERSION_INDEX );
             }
             switch ( item.getType() )
             {
@@ -446,7 +474,7 @@ public class ComparableVersion
                     return -1; // 1.any < 1.1 ?
 
                 case STRING_ITEM:
-                    return comparableQualifier( value ).compareTo( comparableQualifier( ( (StringItem) item ).value ) );
+                    return compareQualifiers( value, ( ( StringItem ) item ).value );
 
                 case LIST_ITEM:
                     return -1; // 1.any < 1-1
