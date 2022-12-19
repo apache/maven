@@ -23,11 +23,10 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Properties;
 
 /**
  * <p>
@@ -41,39 +40,22 @@ import java.util.Map;
  *     <code>1.0alpha1 =&gt; [1, 0, alpha, 1]</code></li>
  * <li>unlimited number of version components,</li>
  * <li>version components in the text can be digits or strings,</li>
- * <li>
- *   String qualifiers are ordered lexically (case insensitive), with the following exceptions:
- *   <ul>
- *     <li> 'snapshot' &lt; '' &lt; 'sp' </li>
- *   </ul>
- *   and alias -&gt; replacement (all case insensitive):
- *   <ul>
- *     <li> 'a' -&gt; 'alpha' </li>
- *     <li> 'b' -&gt; 'beta' </li>
- *     <li> 'm' -&gt; 'milestone' </li>
- *     <li> 'cr' -&gt; 'rc' </li>
- *     <li> 'final' -&gt; '' </li>
- *     <li> 'final' -&gt; '' </li>
- *     <li> 'final' -&gt; '' </li>
- *   </ul>
- * </li>
- * <li>
- *   Following semver rules is encouraged, and some qualifiers are discouraged (no matter the case):
- *   <ul>
- *     <li> The usage of 'CR' qualifier is discouraged. Use 'RC' instead. </li>
- *     <li> The usage of 'final', 'ga', and 'release' qualifiers is discouraged. Use no qualifier instead. </li>
- *     <li> The usage of 'SP' qualifier is discouraged. Increment the patch version instead. </li>
- *   </ul>
- *   For other qualifiers, natural ordering is used (case insensitive):
- *   <ul>
- *     <li> alpha = a &lt; beta = b &lt; milestone = m &lt; rc = cr &lt; snapshot &lt; '' = final = ga = release &lt; sp </li>
- *   </ul>
- * </li>
- * <li>a hyphen usually precedes a qualifier, and is always less important than digits/number, for example
- *   1.0.RC2 &lt; 1.0-RC3 &lt; 1.0.1 ; but prefer '1.0.0-RC1' over '1.0.0.RC1' </li>
+ * <li>strings are checked for well-known qualifiers and the qualifier ordering is used for version ordering.
+ *     Well-known qualifiers (case insensitive) are:<ul>
+ *     <li><code>alpha</code> or <code>a</code></li>
+ *     <li><code>beta</code> or <code>b</code></li>
+ *     <li><code>milestone</code> or <code>m</code></li>
+ *     <li><code>rc</code> or <code>cr</code></li>
+ *     <li><code>snapshot</code></li>
+ *     <li><code>(the empty string)</code> or <code>ga</code> or <code>final</code></li>
+ *     <li><code>sp</code></li>
+ *     </ul>
+ *     Unknown qualifiers are considered after known qualifiers, with lexical order (always case insensitive),
+ *   </li>
+ * <li>a hyphen usually precedes a qualifier, and is always less important than something preceded with a dot.</li>
  * </ul>
  *
- * @see <a href="https://maven.apache.org/pom.html#Version_Order_Specification">Version Order Specification</a>
+ * @see <a href="https://cwiki.apache.org/confluence/display/MAVENOLD/Versioning">"Versioning" on Maven Wiki</a>
  * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
  * @author <a href="mailto:hboutemy@apache.org">Hervé Boutemy</a>
  */
@@ -322,22 +304,23 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
      * Represents a string in the version item list, usually a qualifier.
      */
     private static class StringItem implements Item {
-        private static final List<String> QUALIFIERS = Arrays.asList("snapshot", "", "sp");
+        private static final List<String> QUALIFIERS =
+                Arrays.asList("alpha", "beta", "milestone", "rc", "snapshot", "", "sp");
 
-        private static final Map<String, String> ALIASES = new HashMap<>(4);
+        private static final Properties ALIASES = new Properties();
 
         static {
-            ALIASES.put("cr", "rc");
-            ALIASES.put("final", "");
             ALIASES.put("ga", "");
+            ALIASES.put("final", "");
             ALIASES.put("release", "");
+            ALIASES.put("cr", "rc");
         }
 
         /**
-         * An index value for the empty-string qualifier. This one is used to determine if a given qualifier makes
+         * A comparable value for the empty-string qualifier. This one is used to determine if a given qualifier makes
          * the version older than one without a qualifier, or more recent.
          */
-        private static final int RELEASE_VERSION_INDEX = QUALIFIERS.indexOf("");
+        private static final String RELEASE_VERSION_INDEX = String.valueOf(QUALIFIERS.indexOf(""));
 
         private final String value;
 
@@ -357,7 +340,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     default:
                 }
             }
-            this.value = ALIASES.getOrDefault(value, value);
+            this.value = ALIASES.getProperty(value, value);
         }
 
         @Override
@@ -367,7 +350,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 
         @Override
         public boolean isNull() {
-            return QUALIFIERS.indexOf(value) == RELEASE_VERSION_INDEX;
+            return (comparableQualifier(value).compareTo(RELEASE_VERSION_INDEX) == 0);
         }
 
         /**
@@ -382,42 +365,18 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
          *
          * @param qualifier
          * @return an equivalent value that can be used with lexical comparison
-         * @deprecated Use {@link #compareQualifiers(String, String)} instead
          */
-        @Deprecated
         public static String comparableQualifier(String qualifier) {
-            int index = QUALIFIERS.indexOf(qualifier) + 1;
+            int i = QUALIFIERS.indexOf(qualifier);
 
-            return index == 0 ? ("0-" + qualifier) : String.valueOf(index);
-        }
-
-        /**
-         * Compare the qualifiers of two artifact versions.
-         *
-         * @param qualifier1 qualifier of first artifact
-         * @param qualifier2 qualifier of second artifact
-         * @return a negative integer, zero, or a positive integer as the first argument is less than, equal to, or
-         * greater than the second
-         */
-        public static int compareQualifiers(String qualifier1, String qualifier2) {
-            int i1 = QUALIFIERS.indexOf(qualifier1);
-            int i2 = QUALIFIERS.indexOf(qualifier2);
-
-            // if both pre-release, then use natural lexical ordering
-            if (i1 == -1 && i2 == -1) {
-                // alpha < beta < ea < milestone < preview < rc
-                return qualifier1.compareTo(qualifier2);
-            }
-
-            // 'other qualifier' < 'snapshot' < '' < 'sp'
-            return Integer.compare(i1, i2);
+            return i == -1 ? (QUALIFIERS.size() + "-" + qualifier) : String.valueOf(i);
         }
 
         @Override
         public int compareTo(Item item) {
             if (item == null) {
                 // 1-rc < 1, 1-ga > 1
-                return Integer.compare(QUALIFIERS.indexOf(value), RELEASE_VERSION_INDEX);
+                return comparableQualifier(value).compareTo(RELEASE_VERSION_INDEX);
             }
             switch (item.getType()) {
                 case INT_ITEM:
@@ -426,7 +385,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     return -1; // 1.any < 1.1 ?
 
                 case STRING_ITEM:
-                    return compareQualifiers(value, ((StringItem) item).value);
+                    return comparableQualifier(value).compareTo(comparableQualifier(((StringItem) item).value));
 
                 case LIST_ITEM:
                     return -1; // 1.any < 1-1
@@ -611,13 +570,6 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                 stack.push(list);
             } else if (Character.isDigit(c)) {
                 if (!isDigit && i > startIndex) {
-                    // 1.0.0.RC1 < 1.0.0-RC2
-                    // treat .RC as -RC
-                    if (!list.isEmpty()) {
-                        list.add(list = new ListItem());
-                        stack.push(list);
-                    }
-
                     list.add(new StringItem(version.substring(startIndex, i), true));
                     startIndex = i;
 
@@ -640,13 +592,6 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
         }
 
         if (version.length() > startIndex) {
-            // 1.0.0.RC1 < 1.0.0-RC2
-            // treat .RC as -RC
-            if (!isDigit && !list.isEmpty()) {
-                list.add(list = new ListItem());
-                stack.push(list);
-            }
-
             list.add(parseItem(isDigit, version.substring(startIndex)));
         }
 
