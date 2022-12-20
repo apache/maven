@@ -18,6 +18,7 @@
  */
 package org.apache.maven.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -52,5 +53,14 @@ public class ScmTest {
     @Test
     public void testToStringNullSafe() {
         assertNotNull(new Scm().toString());
+    }
+
+    public void testToStringNotNonsense() {
+        Scm scm = new Scm();
+        scm.setConnection("scm:git:git://git.localdomain/model");
+
+        String s = scm.toString();
+
+        assertEquals("Scm {connection=scm:git:git://git.localdomain/model}", s);
     }
 }

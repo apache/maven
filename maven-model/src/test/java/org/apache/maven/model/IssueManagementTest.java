@@ -53,4 +53,14 @@ public class IssueManagementTest {
     public void testToStringNullSafe() {
         assertNotNull(new IssueManagement().toString());
     }
+
+    public void testToStringNotNonsense() {
+        IssueManagement im = new IssueManagement();
+        im.setSystem("Velociraptor");
+        im.setUrl("https://velo.localdomain");
+
+        String s = im.toString();
+
+        assert "IssueManagement {system=Velociraptor, url=https://velo.localdomain}".equals(s) : s;
+    }
 }
