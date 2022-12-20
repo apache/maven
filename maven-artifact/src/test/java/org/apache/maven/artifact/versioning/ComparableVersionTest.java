@@ -71,8 +71,8 @@ public class ComparableVersionTest {
     };
 
     private static final String[] VERSIONS_NUMBER = {
-        "2.0", "2-1", "2.0.a", "2.0.0.a", "2.0.2", "2.0.123", "2.1.0", "2.1-a", "2.1b", "2.1-c", "2.1-1", "2.1.0.1",
-        "2.2", "2.123", "11.a2", "11.a11", "11.b2", "11.b11", "11.m2", "11.m11", "11", "11.a", "11b", "11c", "11m"
+        "2.0", "2.0.a", "2-1", "2.0.2", "2.0.123", "2.1.0", "2.1-a", "2.1b", "2.1-c", "2.1-1", "2.1.0.1", "2.2",
+        "2.123", "11.a2", "11.a11", "11.b2", "11.b11", "11.m2", "11.m11", "11", "11.a", "11b", "11c", "11m"
     };
 
     private void checkVersionsOrder(String[] versions) {
@@ -345,5 +345,22 @@ public class ComparableVersionTest {
         Comparable c2 = newComparable("2");
 
         assertEquals(c1, c2, "reused instance should be equivalent to new instance");
+    }
+
+    /**
+     * Test <a href="https://issues.apache.org/jira/browse/MNG-7644">MNG-7644</a> edge cases
+     * 1.0.0.RC1 < 1.0.0-RC2 and more generally:
+     * 1.0.0.X1 < 1.0.0-X2 for any string X
+     */
+    @Test
+    public void testMng7644() {
+        for (String x : new String[] {"abc", "alpha", "a", "beta", "b", "def", "milestone", "m", "RC"}) {
+            // 1.0.0.X1 < 1.0.0-X2 for any string x
+            checkVersionsOrder("1.0.0." + x + "1", "1.0.0-" + x + "2");
+            // 2.0.X == 2-X == 2.0.0.X for any string x
+            checkVersionsEqual("2-" + x, "2.0." + x); // previously ordered, now equals
+            checkVersionsEqual("2-" + x, "2.0.0." + x); // previously ordered, now equals
+            checkVersionsEqual("2.0." + x, "2.0.0." + x); // previously ordered, now equals
+        }
     }
 }
