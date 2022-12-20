@@ -52,7 +52,10 @@ import java.util.Properties;
  *     </ul>
  *     Unknown qualifiers are considered after known qualifiers, with lexical order (always case insensitive),
  *   </li>
- * <li>a hyphen usually precedes a qualifier, and is always less important than something preceded with a dot.</li>
+ * <li>a hyphen usually precedes a qualifier, and is always less important than digits/number, for example
+ *   {@code 1.0.RC2 < 1.0-RC3 < 1.0.1}; but prefer {@code 1.0.0-RC1} over {@code 1.0.0.RC1}, and more
+ *   generally: {@code 1.0.X2 < 1.0-X3 < 1.0.1} for any string {@code X}; but prefer {@code 1.0.0-X1}
+ *   over {@code 1.0.0.X1}.</li>
  * </ul>
  *
  * @see <a href="https://cwiki.apache.org/confluence/display/MAVENOLD/Versioning">"Versioning" on Maven Wiki</a>
@@ -570,6 +573,13 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                 stack.push(list);
             } else if (Character.isDigit(c)) {
                 if (!isDigit && i > startIndex) {
+                    // 1.0.0.X1 < 1.0.0-X2
+                    // treat .X as -X for any string qualifier X
+                    if (!list.isEmpty()) {
+                        list.add(list = new ListItem());
+                        stack.push(list);
+                    }
+
                     list.add(new StringItem(version.substring(startIndex, i), true));
                     startIndex = i;
 
@@ -592,6 +602,13 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
         }
 
         if (version.length() > startIndex) {
+            // 1.0.0.X1 < 1.0.0-X2
+            // treat .X as -X for any string qualifier X
+            if (!isDigit && !list.isEmpty()) {
+                list.add(list = new ListItem());
+                stack.push(list);
+            }
+
             list.add(parseItem(isDigit, version.substring(startIndex)));
         }
 
