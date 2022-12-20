@@ -18,6 +18,7 @@
  */
 package org.apache.maven.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -52,5 +53,14 @@ public class MailingListTest {
     @Test
     public void testToStringNullSafe() {
         assertNotNull(new MailingList().toString());
+    }
+
+    public void testToStringNotNonsense() {
+        MailingList list = new MailingList();
+        list.setName("modello-dev");
+
+        String s = list.toString();
+
+        assertEquals("MailingList {name=modello-dev, archive=null}", s);
     }
 }
