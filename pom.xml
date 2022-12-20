@@ -162,7 +162,7 @@ under the License.
     <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>30.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
-    <wagonVersion>3.5.2</wagonVersion>
+    <wagonVersion>3.5.3</wagonVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <cipherVersion>2.0</cipherVersion>
     <jxpathVersion>1.3</jxpathVersion>
@@ -348,13 +348,6 @@ under the License.
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-http</artifactId>
         <version>${wagonVersion}</version>
-        <exclusions>
-          <!-- Not used at all -->
-          <exclusion>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <!--  Repository -->
       <dependency>
