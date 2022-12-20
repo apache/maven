@@ -56,9 +56,9 @@ public class MavenITmng4913UserPropertyVsDependencyPomPropertyTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4913" );
-        verifier.setSystemProperty( "mng4913.version", "98.76" );
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
+        verifier.addCliOption( "-Dmng4913.version=98.76" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
