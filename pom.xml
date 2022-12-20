@@ -59,7 +59,7 @@ under the License.
     <plexusUtilsVersion>3.3.1</plexusUtilsVersion>
     <guiceVersion>4.2.2</guiceVersion>
     <sisuVersion>0.3.5</sisuVersion>
-    <wagonVersion>3.5.2</wagonVersion>
+    <wagonVersion>3.5.3</wagonVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
     <cipherVersion>2.0</cipherVersion>
     <modelloVersion>1.11</modelloVersion>
@@ -341,12 +341,6 @@ under the License.
         <artifactId>wagon-http</artifactId>
         <version>${wagonVersion}</version>
         <classifier>shaded</classifier>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <!--  Repository -->
       <dependency>
