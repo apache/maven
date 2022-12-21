@@ -20,40 +20,33 @@ package org.apache.maven;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Function;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.eventspy.EventSpy;
+import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.repository.internal.MavenWorkspaceReader;
+import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
 
 /**
  * An implementation of a workspace reader that knows how to search the Maven reactor for artifacts, either as packaged
@@ -72,24 +65,13 @@ class ReactorReader implements MavenWorkspaceReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReactorReader.class);
 
     private final MavenSession session;
-    private final Map<String, MavenProject> projectsByGAV;
-    private final Map<String, List<MavenProject>> projectsByGA;
     private final WorkspaceRepository repository;
-
-    private Function<MavenProject, String> projectIntoKey =
-            s -> ArtifactUtils.key(s.getGroupId(), s.getArtifactId(), s.getVersion());
-
-    private Function<MavenProject, String> projectIntoVersionlessKey =
-            s -> ArtifactUtils.versionlessKey(s.getGroupId(), s.getArtifactId());
+    private Map<String, Map<String, Map<String, MavenProject>>> projects;
 
     @Inject
     ReactorReader(MavenSession session) {
         this.session = session;
-        this.projectsByGAV = session.getAllProjects().stream().collect(toMap(projectIntoKey, identity()));
-
-        this.projectsByGA = projectsByGAV.values().stream().collect(groupingBy(projectIntoVersionlessKey));
-
-        repository = new WorkspaceRepository("reactor", new HashSet<>(projectsByGAV.keySet()));
+        this.repository = new WorkspaceRepository("reactor", null);
     }
 
     //
@@ -101,9 +83,7 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     public File findArtifact(Artifact artifact) {
-        String projectKey = ArtifactUtils.key(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
-
-        MavenProject project = projectsByGAV.get(projectKey);
+        MavenProject project = getProject(artifact);
 
         if (project != null) {
             File file = find(project, artifact);
@@ -117,18 +97,32 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     public List<String> findVersions(Artifact artifact) {
-        String key = ArtifactUtils.versionlessKey(artifact.getGroupId(), artifact.getArtifactId());
-
-        return Optional.ofNullable(projectsByGA.get(key)).orElse(Collections.emptyList()).stream()
-                .filter(s -> Objects.nonNull(find(s, artifact)))
-                .map(MavenProject::getVersion)
-                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        List<String> versions = new ArrayList<>();
+        String artifactId = artifact.getArtifactId();
+        String groupId = artifact.getGroupId();
+        Path repo = getProjectLocalRepo().resolve(groupId).resolve(artifactId);
+        String classifier = artifact.getClassifier();
+        String extension = artifact.getExtension();
+        Pattern pattern = Pattern.compile("\\Q" + artifactId + "\\E-(.*)"
+                + (classifier != null ? "-\\Q" + classifier + "\\E" : "")
+                + (extension != null ? "." + extension : ""));
+        try (Stream<Path> paths = Files.list(repo)) {
+            paths.forEach(p -> {
+                String filename = p.getFileName().toString();
+                Matcher matcher = pattern.matcher(filename);
+                if (matcher.matches()) {
+                    versions.add(matcher.group(1));
+                }
+            });
+        } catch (IOException e) {
+            // ignore
+        }
+        return Collections.unmodifiableList(versions);
     }
 
     @Override
     public Model findModel(Artifact artifact) {
-        String projectKey = ArtifactUtils.key(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
-        MavenProject project = projectsByGAV.get(projectKey);
+        MavenProject project = getProject(artifact);
         return project == null ? null : project.getModel();
     }
 
@@ -195,6 +189,10 @@ class ReactorReader implements MavenWorkspaceReader {
     private File determinePreviouslyPackagedArtifactFile(MavenProject project, Artifact artifact) {
         if (artifact == null) {
             return null;
+        }
+        File file = find(artifact);
+        if (file != null) {
+            return file;
         }
 
         String fileName = String.format("%s.%s", project.getBuild().getFinalName(), artifact.getExtension());
@@ -323,5 +321,110 @@ class ReactorReader implements MavenWorkspaceReader {
     private static boolean isTestArtifact(Artifact artifact) {
         return ("test-jar".equals(artifact.getProperty("type", "")))
                 || ("jar".equals(artifact.getExtension()) && "tests".equals(artifact.getClassifier()));
+    }
+
+    private File find(Artifact artifact) {
+        Path target = getArtifactPath(artifact);
+        return Files.isRegularFile(target) ? target.toFile() : null;
+    }
+
+    public void processProject(MavenProject project) {
+        List<Artifact> artifacts = new ArrayList<>();
+
+        artifacts.add(RepositoryUtils.toArtifact(new ProjectArtifact(project)));
+        if (!"pom".equals(project.getPackaging())) {
+            org.apache.maven.artifact.Artifact mavenMainArtifact = project.getArtifact();
+            artifacts.add(RepositoryUtils.toArtifact(mavenMainArtifact));
+        }
+        for (org.apache.maven.artifact.Artifact attached : project.getAttachedArtifacts()) {
+            artifacts.add(RepositoryUtils.toArtifact(attached));
+        }
+
+        for (Artifact artifact : artifacts) {
+            if (artifact.getFile() != null && artifact.getFile().isFile()) {
+                Path target = getArtifactPath(artifact);
+                try {
+                    LOGGER.debug("Copying {} to project local repository", artifact);
+                    Files.createDirectories(target.getParent());
+                    Files.copy(artifact.getFile().toPath(), target, StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    LOGGER.warn("Error while copying artifact to project local repository", e);
+                }
+            }
+        }
+    }
+
+    private Path getArtifactPath(Artifact artifact) {
+        String groupId = artifact.getGroupId();
+        String artifactId = artifact.getArtifactId();
+        String version = artifact.getBaseVersion();
+        String classifier = artifact.getClassifier();
+        String extension = artifact.getExtension();
+        Path repo = getProjectLocalRepo();
+        return repo.resolve(groupId)
+                .resolve(artifactId)
+                .resolve(artifactId
+                        + "-" + version
+                        + (classifier != null && !classifier.isEmpty() ? "-" + classifier : "")
+                        + (extension != null && !extension.isEmpty() ? "." + extension : ""));
+    }
+
+    private Path getProjectLocalRepo() {
+        Path root = session.getRequest().getMultiModuleProjectDirectory().toPath();
+        return root.resolve("target").resolve("project-local-repo");
+    }
+
+    private MavenProject getProject(Artifact artifact) {
+        return getProjects()
+                .getOrDefault(artifact.getGroupId(), Collections.emptyMap())
+                .getOrDefault(artifact.getArtifactId(), Collections.emptyMap())
+                .getOrDefault(artifact.getBaseVersion(), null);
+    }
+
+    private Map<String, Map<String, Map<String, MavenProject>>> getProjects() {
+        // compute the projects mapping
+        if (projects == null) {
+            List<MavenProject> allProjects = session.getAllProjects();
+            if (allProjects != null) {
+                Map<String, Map<String, Map<String, MavenProject>>> map = new HashMap<>();
+                allProjects.forEach(project -> map.computeIfAbsent(project.getGroupId(), k -> new HashMap<>())
+                        .computeIfAbsent(project.getArtifactId(), k -> new HashMap<>())
+                        .put(project.getVersion(), project));
+                this.projects = map;
+            } else {
+                return Collections.emptyMap();
+            }
+        }
+        return projects;
+    }
+
+    @Named
+    @Singleton
+    @SuppressWarnings("unused")
+    static class ReactorReaderSpy implements EventSpy {
+
+        final PlexusContainer container;
+
+        @Inject
+        ReactorReaderSpy(PlexusContainer container) {
+            this.container = container;
+        }
+
+        @Override
+        public void init(Context context) throws Exception {}
+
+        @Override
+        public void onEvent(Object event) throws Exception {
+            if (event instanceof ExecutionEvent) {
+                ExecutionEvent ee = (ExecutionEvent) event;
+                if (ee.getType() == ExecutionEvent.Type.ForkedProjectSucceeded
+                        || ee.getType() == ExecutionEvent.Type.ProjectSucceeded) {
+                    container.lookup(ReactorReader.class).processProject(ee.getProject());
+                }
+            }
+        }
+
+        @Override
+        public void close() throws Exception {}
     }
 }
