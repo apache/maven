@@ -52,8 +52,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Problem;
@@ -77,13 +75,11 @@ import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProfileActivation;
 import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
@@ -117,7 +113,6 @@ import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.DefaultRepositoryCache;
-import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.transfer.TransferListener;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
@@ -292,6 +287,7 @@ public class MavenCli {
             informativeCommands(cliRequest);
             version(cliRequest);
             localContainer = container(cliRequest);
+            status(cliRequest);
             commands(cliRequest);
             configure(cliRequest);
             toolchains(cliRequest);
@@ -407,12 +403,26 @@ public class MavenCli {
             }
             throw new ExitException(0);
         }
+    }
 
+    private void status ( CliRequest cliRequest )
+            throws Exception
+    {
+        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
         if ( cliRequest.commandLine.hasOption( CLIManager.INSTALLATION_STATUS ) )
         {
-            // Handle display? Might be worth the try
-            cliRequest.request.getRemoteRepositories();
+            MavenStatusCommand mavenStatusCommand = new MavenStatusCommand( plexusContainer );
+            final List<String> mavenStatusIssues = mavenStatusCommand.verify( cliRequest );
+            if ( !mavenStatusIssues.isEmpty() )
+            {
+                for ( String issue : mavenStatusIssues )
+                {
+                    slf4jLogger.error( issue );
+                }
+                throw new ExitException( 1 );
+            }
 
+            slf4jLogger.info( "No installation issues found." );
             throw new ExitException( 0 );
         }
     }
@@ -890,68 +900,6 @@ public class MavenCli {
 
         if (cliRequest.request.getRepositoryCache() == null) {
             cliRequest.request.setRepositoryCache(new DefaultRepositoryCache());
-        }
-
-        // TODO move this while block to informativeCommands( ... )
-        if ( cliRequest.commandLine.hasOption( CLIManager.INSTALLATION_STATUS ) )
-        {
-            // We need the default values to verify it
-            boolean canMavenExecute = true;
-            final StringBuilder mavenInstallationErrors = new StringBuilder();
-
-            // TODO move this to a separate class or function. Refactor!
-            if ( !cliRequest.request.getLocalRepositoryPath().isDirectory() )
-            {
-                canMavenExecute = false;
-                mavenInstallationErrors.append( "Local repository is not a directory.\n" );
-            }
-
-            if ( !cliRequest.request.getLocalRepositoryPath().canRead() )
-            {
-                canMavenExecute = false;
-                mavenInstallationErrors.append( "No read permissions on local repository.\n" );
-            }
-
-            if ( !cliRequest.request.getLocalRepositoryPath().canWrite() )
-            {
-                canMavenExecute = false;
-                mavenInstallationErrors.append( "No write permissions on local repository.\n" );
-            }
-
-            final DefaultRepositorySystemSession repoSession =
-                    defaultRepositorySystemSessionFactory.newRepositorySession( request );
-            MavenSession session =
-                    new MavenSession( plexusContainer, repoSession, request, new DefaultMavenExecutionResult() );
-            defaultSessionFactory.getSession( session );
-
-            final DefaultRepositorySystemSession defaultRepositorySystemSession =
-                    defaultRepositorySystemSessionFactory.newRepositorySession( request );
-            defaultRepositorySystemSession.isOffline();
-
-            for ( ArtifactRepository artifactRepository : cliRequest.request.getRemoteRepositories() )
-            {
-                // Need a way to verify proxy connection and remote repository
-                // 1. Verify Proxy
-                // 2. Verify authentication
-                // 3. Verify Mirror
-
-                Authentication authentication = artifactRepository.getAuthentication();
-
-                String path = artifactRepository.getLayout().pathOfRemoteRepositoryMetadata( /* artifact metadata for org.apache.maven:apache-maven:3.8.6 */ null );
-
-                // TODO Idea: open an HTTP connection to the repository based on the connection details.
-                // Do not really attempt to resolve it here, because we don't know if this particular repository has the requested artifact.
-                // As long as return code is not 401, we're probably properly authenticated. This proves point 1 and 2.
-            }
-
-            // TODO Now attempt to resolve org.apache.maven:apache-maven:3.8.6. This proves point 3.
-
-            if ( !canMavenExecute )
-            {
-                slf4jLogger.warn( mavenInstallationErrors.toString() );
-                return 1;
-            }
-            request.getLocalRepository();
         }
 
         eventSpyDispatcher.onEvent(request);
