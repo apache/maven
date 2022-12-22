@@ -91,9 +91,10 @@ public class MavenStatusCommand
         final MavenExecutionRequest mavenExecutionRequest =
                 mavenExecutionRequestPopulator.populateDefaults( cliRequest.request );
         configurationProcessor.process( cliRequest );
+        final String localRepositoryURL = cliRequest.getRequest().getLocalRepository().getUrl();
 
         final List<String> localRepositoryIssues =
-                verifyLocalRepository( cliRequest.getRequest().getLocalRepositoryPath() );
+                verifyLocalRepository( new File(URI.create(localRepositoryURL)) );
         final List<String> remoteRepositoryIssues =
                 verifyRemoteRepositoryConnections( cliRequest.getRequest().getRemoteRepositories(), mavenExecutionRequest );
         final List<String> artifactResolutionIssues = verifyArtifactResolution();
@@ -211,6 +212,7 @@ public class MavenStatusCommand
 
     private List<String> verifyLocalRepository( File localRepositoryPath )
     {
+        // TODO Rewrite using java.nio.file.Path
         final List<String> issues = new ArrayList<>();
         if ( !localRepositoryPath.isDirectory() )
         {
