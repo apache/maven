@@ -21,7 +21,6 @@ package org.apache.maven.cli;
 
 import org.apache.maven.api.services.ArtifactFactoryRequest;
 import org.apache.maven.api.services.ArtifactResolver;
-import org.apache.maven.api.services.ArtifactResolverRequest;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
@@ -33,7 +32,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
-import org.apache.maven.internal.impl.DefaultArtifactCoordinate;
 import org.apache.maven.internal.impl.DefaultArtifactFactory;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.repository.Proxy;
@@ -42,10 +40,13 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
@@ -94,7 +95,7 @@ public class MavenStatusCommand
         final String localRepositoryURL = cliRequest.getRequest().getLocalRepository().getUrl();
 
         final List<String> localRepositoryIssues =
-                verifyLocalRepository( new File(URI.create(localRepositoryURL)) );
+                verifyLocalRepository( URI.create( localRepositoryURL ));
         final List<String> remoteRepositoryIssues =
                 verifyRemoteRepositoryConnections( cliRequest.getRequest().getRemoteRepositories(), mavenExecutionRequest );
         final List<String> artifactResolutionIssues = verifyArtifactResolution();
@@ -210,21 +211,22 @@ public class MavenStatusCommand
                 && responseCode != 407;
     }
 
-    private List<String> verifyLocalRepository( File localRepositoryPath )
+    private List<String> verifyLocalRepository( URI localRepositoryURI )
     {
-        // TODO Rewrite using java.nio.file.Path
         final List<String> issues = new ArrayList<>();
-        if ( !localRepositoryPath.isDirectory() )
+        Path localRepositoryPath = Paths.get( localRepositoryURI );
+
+        if ( !Files.isDirectory( localRepositoryPath ) )
         {
             issues.add( "Local repository is not a directory." );
         }
 
-        if ( !localRepositoryPath.canRead() )
+        if ( !Files.isReadable( localRepositoryPath ) )
         {
             issues.add( "No read permissions on local repository." );
         }
 
-        if ( !localRepositoryPath.canWrite() )
+        if ( !Files.isWritable( localRepositoryPath ) )
         {
             issues.add( "No write permissions on local repository.\n" );
         }
