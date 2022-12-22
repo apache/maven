@@ -287,11 +287,11 @@ public class MavenCli {
             informativeCommands(cliRequest);
             version(cliRequest);
             localContainer = container(cliRequest);
-            status(cliRequest);
             commands(cliRequest);
             configure(cliRequest);
             toolchains(cliRequest);
             populateRequest(cliRequest);
+            status(cliRequest);
             encryption(cliRequest);
             repository(cliRequest);
             return execute(cliRequest);
@@ -405,7 +405,7 @@ public class MavenCli {
         }
     }
 
-    private void status ( CliRequest cliRequest )
+    private void status( CliRequest cliRequest )
             throws Exception
     {
         slf4jLoggerFactory = LoggerFactory.getILoggerFactory();

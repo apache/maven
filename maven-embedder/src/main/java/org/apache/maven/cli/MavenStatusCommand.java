@@ -19,37 +19,37 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import org.apache.maven.api.services.ArtifactFactoryRequest;
+import org.apache.maven.api.services.ArtifactResolverException;
+import org.apache.maven.api.services.ArtifactResolverResult;
+import org.apache.maven.internal.impl.DefaultSession;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.apache.maven.api.ArtifactCoordinate;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.services.ArtifactResolver;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.cli.configuration.ConfigurationProcessor;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
-import org.apache.maven.internal.impl.DefaultArtifactFactory;
+import org.apache.maven.internal.impl.DefaultArtifactCoordinate;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
-import org.apache.maven.repository.Proxy;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -61,7 +61,13 @@ public class MavenStatusCommand
      * artifact. The Apache Maven artifact was chosen as it eventually, be it by proxy, mirror or directly, will be
      * gathered from the central repository. The version is chosen arbitrarily since any listed should work.
      */
-    private final Artifact apacheMavenArtifact;
+    private static final Artifact artifact = new DefaultArtifact(
+            "org.apache.maven",
+            "apache-maven",
+            null,
+            "pom",
+            "3.8.6"
+    );
     private final MavenExecutionRequestPopulator mavenExecutionRequestPopulator;
     private final ConfigurationProcessor configurationProcessor;
     private final ArtifactResolver artifactResolver;
@@ -69,6 +75,7 @@ public class MavenStatusCommand
     private final DefaultRepositorySystemSessionFactory repoSession;
     private final Logger logger;
     private final PlexusContainer container;
+    private final SessionScope sessionScope;
 
     public MavenStatusCommand( PlexusContainer container ) throws ComponentLookupException
     {
@@ -79,27 +86,26 @@ public class MavenStatusCommand
         artifactResolver = container.lookup( ArtifactResolver.class );
         defaultSessionFactory = container.lookup( DefaultSessionFactory.class );
         repoSession = container.lookup( DefaultRepositorySystemSessionFactory.class );
-
-        ArtifactHandlerManager manager = container.lookup( ArtifactHandlerManager.class );
-        apacheMavenArtifact = new DefaultArtifact( "org.apache.maven", "apache-maven", "3.8.6",
-                null, "pom", null, manager.getArtifactHandler( "pom" ) );
+        sessionScope = container.lookup( SessionScope.class );
     }
 
-    public List<String> verify( CliRequest cliRequest )
+    public List<String> verify(CliRequest cliRequest )
             throws Exception
     {
         // Populate the cliRequest with defaults and user settings
         final MavenExecutionRequest mavenExecutionRequest =
                 mavenExecutionRequestPopulator.populateDefaults( cliRequest.request );
-        configurationProcessor.process( cliRequest );
+        // TODO If an active profile defines more remote repositories, they do not yet show in mavenExecutionRequest.
+        // configurationProcessor.process( cliRequest );
 
         final ArtifactRepository localRepository = cliRequest.getRequest().getLocalRepository();
 
         final List<String> localRepositoryIssues =
                 verifyLocalRepository( Paths.get( URI.create( localRepository.getUrl() ) ) );
         final List<String> remoteRepositoryIssues =
-                verifyRemoteRepositoryConnections( cliRequest.getRequest().getRemoteRepositories(), mavenExecutionRequest );
-        final List<String> artifactResolutionIssues = verifyArtifactResolution();
+                verifyRemoteRepositoryConnections();
+        final List<String> artifactResolutionIssues =
+                verifyArtifactResolution( cliRequest.getRequest().getRemoteRepositories(), mavenExecutionRequest );
 
         // Collect all issues into a single list
         return Stream.of( localRepositoryIssues, remoteRepositoryIssues, artifactResolutionIssues )
@@ -107,17 +113,15 @@ public class MavenStatusCommand
                 .collect( Collectors.toList() );
     }
 
-    private List<String> verifyArtifactResolution()
+    private List<String> verifyRemoteRepositoryConnections()
     {
         final List<String> issues = new ArrayList<>();
 
         return issues;
     }
 
-    // TODO: is becoming a large method
-    private List<String> verifyRemoteRepositoryConnections( List<ArtifactRepository> remoteRepositories,
-                                                            MavenExecutionRequest mavenExecutionRequest )
-            throws IOException
+    private List<String> verifyArtifactResolution( List<ArtifactRepository> remoteRepositories,
+                                                   MavenExecutionRequest mavenExecutionRequest )
     {
         final List<String> issues = new ArrayList<>();
 
@@ -132,84 +136,36 @@ public class MavenStatusCommand
                 continue;
             }
 
-            final String artifactPath = artifactRepository.getLayout().pathOf( apacheMavenArtifact );
-            final String urlToRemoteRepository =
-                    String.join( "/", artifactRepository.getUrl(), artifactPath );
+            final Session session = this.defaultSessionFactory.getSession(
+                    new MavenSession(
+                            container,
+                            repoSession.newRepositorySession(mavenExecutionRequest),
+                            mavenExecutionRequest,
+                            new DefaultMavenExecutionResult()
+                    )
+            );
 
+            sessionScope.enter();
+            try {
+                sessionScope.seed(DefaultSession.class, (DefaultSession) session);
 
-            MavenSession session = new MavenSession( container, repoSession.newRepositorySession( mavenExecutionRequest ),
-                    mavenExecutionRequest, new DefaultMavenExecutionResult() );
+                final ArtifactCoordinate artifactCoordinate = new DefaultArtifactCoordinate(session, artifact);
+                final ArtifactResolverResult resolverResult = artifactResolver.resolve(session, Collections.singleton(artifactCoordinate));
 
-            final ArtifactFactoryRequest artifactRequest = ArtifactFactoryRequest.builder()
-                    .groupId( apacheMavenArtifact.getGroupId() )
-                    .artifactId( apacheMavenArtifact.getArtifactId() )
-                    .classifier( apacheMavenArtifact.getClassifier() )
-                    .extension( "pom" )
-                    .version( apacheMavenArtifact.getVersion() )
-                    .type( apacheMavenArtifact.getType() )
-                    .build();
+                resolverResult.getArtifacts().keySet().forEach(entry -> {
+                    logger.info("Successfully resolved {} from {}", entry.toString(), artifactRepository.getUrl());
+                });
 
-            final org.apache.maven.api.Artifact artifact = new DefaultArtifactFactory().create( artifactRequest );
-
-//            new DefaultArtifactCoordinate( session.getSession(),  artifact);
-
-//            new org.eclipse.aether.artifact.DefaultArtifact(
-//                    apacheMavenArtifact.getGroupId(),
-//                    apacheMavenArtifact.getArtifactId(),
-//                    apacheMavenArtifact.getClassifier(),
-//                    "pom",
-//                    apacheMavenArtifact.getVersion(),
-//                     );
-//
-//            artifactResolver.resolve(session,  )
-
-            URL url = new URL( urlToRemoteRepository );
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod( "GET" );
-
-            Authentication auth = artifactRepository.getAuthentication();
-            if ( auth != null )
-            {
-                connection.setRequestProperty( "Authorization",
-                        createAuthorizationHeaderValue( auth.getUsername(), auth.getPassword() ) );
+            } catch (ArtifactResolverException are) {
+                final boolean isArtifactResolutionException = are.getCause() instanceof ArtifactResolutionException;
+                final String message = isArtifactResolutionException ? are.getCause().getMessage() : are.getMessage();
+                issues.add(message);
+            } finally {
+                sessionScope.exit();
             }
-
-            if ( artifactRepository.getProxy() != null )
-            {
-                final Proxy proxy = artifactRepository.getProxy();
-                connection.setRequestProperty( "Proxy-Authorization",
-                        createAuthorizationHeaderValue( proxy.getUserName(), proxy.getPassword() ) );
-            }
-
-            int responseCode = connection.getResponseCode();
-
-            if ( !isAuthenticated( responseCode ) )
-            {
-                final String authenticationIssue =
-                        String.format( "Authentication failed. Remote repository responded with response code %d.",
-                                responseCode );
-                issues.add( authenticationIssue );
-            }
-            connection.disconnect();
         }
 
         return issues;
-    }
-
-    private static String createAuthorizationHeaderValue( String userName, String password )
-    {
-        final String userNamePassword = userName + ":" + password;
-        return "Basic " + Base64.getEncoder().encodeToString( userNamePassword.getBytes() );
-    }
-
-    private boolean isAuthenticated( int responseCode )
-    {
-        // TODO: maybe 404 as well as it might be used to hide the existence of the page to
-        //  a user without adequate privileges or not correctly authenticated.
-        // Just catch entire 400-499 range to avoid missing errors?
-        return responseCode != 401
-                && responseCode != 403
-                && responseCode != 407;
     }
 
     private List<String> verifyLocalRepository( final Path localRepositoryPath )
