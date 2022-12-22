@@ -92,10 +92,11 @@ public class MavenStatusCommand
         final MavenExecutionRequest mavenExecutionRequest =
                 mavenExecutionRequestPopulator.populateDefaults( cliRequest.request );
         configurationProcessor.process( cliRequest );
-        final String localRepositoryURL = cliRequest.getRequest().getLocalRepository().getUrl();
+
+        final ArtifactRepository localRepository = cliRequest.getRequest().getLocalRepository();
 
         final List<String> localRepositoryIssues =
-                verifyLocalRepository( URI.create( localRepositoryURL ));
+                verifyLocalRepository( Paths.get( URI.create( localRepository.getUrl() ) ) );
         final List<String> remoteRepositoryIssues =
                 verifyRemoteRepositoryConnections( cliRequest.getRequest().getRemoteRepositories(), mavenExecutionRequest );
         final List<String> artifactResolutionIssues = verifyArtifactResolution();
@@ -211,10 +212,9 @@ public class MavenStatusCommand
                 && responseCode != 407;
     }
 
-    private List<String> verifyLocalRepository( URI localRepositoryURI )
+    private List<String> verifyLocalRepository( final Path localRepositoryPath )
     {
         final List<String> issues = new ArrayList<>();
-        Path localRepositoryPath = Paths.get( localRepositoryURI );
 
         if ( !Files.isDirectory( localRepositoryPath ) )
         {
@@ -228,7 +228,7 @@ public class MavenStatusCommand
 
         if ( !Files.isWritable( localRepositoryPath ) )
         {
-            issues.add( "No write permissions on local repository.\n" );
+            issues.add( "No write permissions on local repository." );
         }
 
         return issues;
