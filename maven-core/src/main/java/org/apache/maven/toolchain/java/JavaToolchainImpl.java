@@ -33,7 +33,7 @@ import org.codehaus.plexus.util.Os;
  * @author Milos Kleint
  * @since 2.0.9, renamed from DefaultJavaToolChain in 3.2.4
  */
-class JavaToolchainImpl
+public class JavaToolchainImpl
     extends DefaultToolchain
     implements JavaToolchain
 {
