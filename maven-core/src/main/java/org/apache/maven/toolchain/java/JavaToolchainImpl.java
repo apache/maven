@@ -31,7 +31,7 @@ import org.slf4j.Logger;
  * @author Milos Kleint
  * @since 2.0.9, renamed from DefaultJavaToolChain in 3.2.4
  */
-class JavaToolchainImpl extends DefaultToolchain implements JavaToolchain {
+public class JavaToolchainImpl extends DefaultToolchain implements JavaToolchain {
     private String javaHome;
 
     public static final String KEY_JAVAHOME = "jdkHome"; // NOI18N
