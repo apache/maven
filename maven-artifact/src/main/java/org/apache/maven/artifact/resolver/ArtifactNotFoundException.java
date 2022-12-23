@@ -19,6 +19,7 @@
 package org.apache.maven.artifact.resolver;
 
 import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 

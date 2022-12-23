@@ -18,12 +18,14 @@
  */
 package org.apache.maven.internal.impl;
 
-import static org.apache.maven.internal.impl.Utils.nonNull;
+import javax.inject.Inject;
 
 import java.nio.file.Path;
-import javax.inject.Inject;
+
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.annotations.Nonnull;
+
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultLocalRepository implements LocalRepository {
 

@@ -18,12 +18,14 @@
  */
 package org.apache.maven.project.collector;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;

@@ -21,6 +21,7 @@ package org.apache.maven.model.interpolation;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+
 import org.apache.maven.model.path.PathTranslator;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.util.ValueSourceUtils;

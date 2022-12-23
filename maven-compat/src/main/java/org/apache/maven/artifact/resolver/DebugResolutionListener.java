@@ -21,6 +21,7 @@ package org.apache.maven.artifact.resolver;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.logging.Logger;

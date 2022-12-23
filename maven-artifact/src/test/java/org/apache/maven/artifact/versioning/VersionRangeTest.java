@@ -18,16 +18,17 @@
  */
 package org.apache.maven.artifact.versioning;
 
+import java.util.List;
+
+import org.apache.maven.artifact.Artifact;
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-import org.apache.maven.artifact.Artifact;
-import org.junit.jupiter.api.Test;
 
 /**
  * Tests version range construction.

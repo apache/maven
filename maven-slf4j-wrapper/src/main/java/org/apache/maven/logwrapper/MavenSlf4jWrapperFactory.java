@@ -19,6 +19,7 @@
 package org.apache.maven.logwrapper;
 
 import java.util.Optional;
+
 import org.slf4j.ILoggerFactory;
 
 /**

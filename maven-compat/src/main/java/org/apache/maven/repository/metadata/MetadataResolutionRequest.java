@@ -19,6 +19,7 @@
 package org.apache.maven.repository.metadata;
 
 import java.util.List;
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /** @author Oleg Gusakov */

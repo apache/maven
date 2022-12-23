@@ -18,12 +18,10 @@
  */
 package org.eclipse.sisu.plexus;
 
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.Module;
-import com.google.inject.TypeLiteral;
-import com.google.inject.spi.TypeConverter;
-import com.google.inject.spi.TypeConverterBinding;
+import javax.annotation.Priority;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import java.io.StringReader;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
@@ -32,9 +30,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import javax.annotation.Priority;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.Module;
+import com.google.inject.TypeLiteral;
+import com.google.inject.spi.TypeConverter;
+import com.google.inject.spi.TypeConverterBinding;
 import org.apache.maven.api.xml.Dom;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;

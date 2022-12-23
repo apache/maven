@@ -20,6 +20,7 @@ package org.apache.maven.artifact.repository.layout;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;

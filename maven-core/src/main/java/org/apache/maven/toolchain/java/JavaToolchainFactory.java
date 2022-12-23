@@ -18,11 +18,13 @@
  */
 package org.apache.maven.toolchain.java;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.util.Map.Entry;
 import java.util.Properties;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
 import org.apache.maven.toolchain.RequirementMatcher;
 import org.apache.maven.toolchain.RequirementMatcherFactory;

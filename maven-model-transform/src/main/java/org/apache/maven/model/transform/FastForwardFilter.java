@@ -21,6 +21,7 @@ package org.apache.maven.model.transform;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
+
 import org.apache.maven.model.transform.pull.BufferingParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;

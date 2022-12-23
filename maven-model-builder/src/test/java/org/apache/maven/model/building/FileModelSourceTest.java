@@ -18,14 +18,15 @@
  */
 package org.apache.maven.model.building;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.codehaus.plexus.util.Os;
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
-
-import java.io.File;
-import java.io.IOException;
-import org.codehaus.plexus.util.Os;
-import org.junit.jupiter.api.Test;
 
 /**
  * Test that validate the solution of MNG-6261 issue

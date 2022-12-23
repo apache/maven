@@ -21,6 +21,7 @@ package org.codehaus.plexus.util.xml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 

@@ -18,9 +18,11 @@
  */
 package org.apache.maven.plugin.internal;
 
-import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
 import org.eclipse.aether.RepositorySystemSession;

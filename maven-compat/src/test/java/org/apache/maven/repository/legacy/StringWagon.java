@@ -18,13 +18,15 @@
  */
 package org.apache.maven.repository.legacy;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.InputData;
 import org.apache.maven.wagon.OutputData;

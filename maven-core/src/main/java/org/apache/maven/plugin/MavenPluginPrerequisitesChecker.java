@@ -19,6 +19,7 @@
 package org.apache.maven.plugin;
 
 import java.util.function.Consumer;
+
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
 /**

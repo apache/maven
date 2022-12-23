@@ -18,10 +18,10 @@
  */
 package org.apache.maven.repository.internal;
 
-import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
+import javax.inject.Inject;
 
 import java.net.MalformedURLException;
-import javax.inject.Inject;
+
 import org.apache.maven.repository.internal.util.ConsoleRepositoryListener;
 import org.apache.maven.repository.internal.util.ConsoleTransferListener;
 import org.codehaus.plexus.PlexusContainer;
@@ -32,6 +32,8 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.jupiter.api.BeforeEach;
+
+import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
 
 @PlexusTest
 public abstract class AbstractRepositoryTestCase {

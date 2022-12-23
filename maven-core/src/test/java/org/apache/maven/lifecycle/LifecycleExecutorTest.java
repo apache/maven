@@ -18,12 +18,7 @@
  */
 package org.apache.maven.lifecycle;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import javax.inject.Inject;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,7 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import javax.inject.Inject;
+
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.api.xml.Dom;
 import org.apache.maven.execution.MavenSession;
@@ -53,6 +48,13 @@ import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     @Inject

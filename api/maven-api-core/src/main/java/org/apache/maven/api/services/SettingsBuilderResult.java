@@ -19,6 +19,7 @@
 package org.apache.maven.api.services;
 
 import java.util.List;
+
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.settings.Settings;
 

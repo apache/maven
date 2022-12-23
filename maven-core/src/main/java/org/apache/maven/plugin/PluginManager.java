@@ -19,6 +19,7 @@
 package org.apache.maven.plugin;
 
 import java.util.Map;
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;

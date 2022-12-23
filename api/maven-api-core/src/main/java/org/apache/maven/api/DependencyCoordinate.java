@@ -19,6 +19,7 @@
 package org.apache.maven.api;
 
 import java.util.Collection;
+
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;

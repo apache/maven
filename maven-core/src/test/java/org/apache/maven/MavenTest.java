@@ -19,6 +19,7 @@
 package org.apache.maven;
 
 import javax.inject.Inject;
+
 import org.apache.maven.exception.ExceptionHandler;
 import org.junit.jupiter.api.Test;
 

@@ -19,6 +19,7 @@
 package org.apache.maven.project;
 
 import java.io.File;
+
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.metadata.Metadata;

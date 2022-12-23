@@ -18,15 +18,16 @@
  */
 package org.apache.maven.extension.internal;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toMap;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Provides information about artifacts (identified by groupId:artifactId string key) and classpath elements exported by

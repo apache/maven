@@ -20,6 +20,7 @@ package org.apache.maven.plugin;
 
 import java.util.Iterator;
 import java.util.List;
+
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 

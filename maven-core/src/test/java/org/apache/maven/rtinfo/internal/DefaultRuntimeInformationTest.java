@@ -18,15 +18,16 @@
  */
 package org.apache.maven.rtinfo.internal;
 
+import javax.inject.Inject;
+
+import org.apache.maven.rtinfo.RuntimeInformation;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import javax.inject.Inject;
-import org.apache.maven.rtinfo.RuntimeInformation;
-import org.codehaus.plexus.testing.PlexusTest;
-import org.junit.jupiter.api.Test;
 
 @PlexusTest
 public class DefaultRuntimeInformationTest {

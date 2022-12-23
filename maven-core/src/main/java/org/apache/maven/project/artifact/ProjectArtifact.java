@@ -20,6 +20,7 @@ package org.apache.maven.project.artifact;
 
 import java.util.Collections;
 import java.util.List;
+
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.model.Dependency;

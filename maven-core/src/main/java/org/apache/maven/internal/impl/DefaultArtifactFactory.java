@@ -18,17 +18,18 @@
  */
 package org.apache.maven.internal.impl;
 
-import static org.apache.maven.internal.impl.Utils.cast;
-import static org.apache.maven.internal.impl.Utils.nonNull;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
+
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.ArtifactFactory;
 import org.apache.maven.api.services.ArtifactFactoryRequest;
 import org.apache.maven.shared.utils.StringUtils;
 import org.eclipse.aether.artifact.ArtifactType;
+
+import static org.apache.maven.internal.impl.Utils.cast;
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Singleton

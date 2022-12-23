@@ -19,6 +19,7 @@
 package org.apache.maven.artifact.deployer;
 
 import java.io.File;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 

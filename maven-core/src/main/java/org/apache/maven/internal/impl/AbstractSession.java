@@ -18,8 +18,6 @@
  */
 package org.apache.maven.internal.impl;
 
-import static org.apache.maven.internal.impl.Utils.nonNull;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -33,6 +31,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Dependency;
@@ -64,6 +63,8 @@ import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
+
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public abstract class AbstractSession implements Session {
 

@@ -19,6 +19,7 @@
 package org.apache.maven.settings.building;
 
 import java.io.File;
+
 import org.apache.maven.building.FileSource;
 
 /**

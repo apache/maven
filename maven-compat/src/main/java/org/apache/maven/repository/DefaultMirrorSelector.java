@@ -21,6 +21,7 @@ package org.apache.maven.repository;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.settings.Mirror;

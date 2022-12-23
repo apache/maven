@@ -18,10 +18,11 @@
  */
 package org.apache.maven.project.path;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.io.File;
+
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SuppressWarnings("deprecation")
 public class DefaultPathTranslatorTest {

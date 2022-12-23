@@ -20,6 +20,7 @@ package org.apache.maven.lifecycle.internal.builder;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.ProjectBuildList;
 import org.apache.maven.lifecycle.internal.ReactorBuildStatus;

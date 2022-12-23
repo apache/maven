@@ -18,11 +18,13 @@
  */
 package org.apache.maven.internal.impl;
 
-import java.util.List;
-import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.List;
+import java.util.Map;
+
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
 import org.codehaus.plexus.PlexusContainer;

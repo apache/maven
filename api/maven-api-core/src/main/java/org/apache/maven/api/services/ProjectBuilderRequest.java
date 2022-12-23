@@ -18,10 +18,9 @@
  */
 package org.apache.maven.api.services;
 
-import static org.apache.maven.api.services.BaseRequest.nonNull;
-
 import java.nio.file.Path;
 import java.util.Optional;
+
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Session;
@@ -30,6 +29,8 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
+
+import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
  * Request used to build a {@link org.apache.maven.api.Project} using

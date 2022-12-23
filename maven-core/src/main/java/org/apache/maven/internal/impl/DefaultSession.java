@@ -18,8 +18,6 @@
  */
 package org.apache.maven.internal.impl;
 
-import static org.apache.maven.internal.impl.Utils.nonNull;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -31,6 +29,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.LocalRepository;
@@ -55,6 +54,8 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 public class DefaultSession extends AbstractSession {
 

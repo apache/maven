@@ -19,6 +19,7 @@
 package org.apache.maven.lifecycle.internal;
 
 import java.util.Collection;
+
 import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.lifecycle.LifecycleExecutionException;

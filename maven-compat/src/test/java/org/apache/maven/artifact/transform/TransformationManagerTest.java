@@ -18,11 +18,10 @@
  */
 package org.apache.maven.artifact.transform;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import javax.inject.Inject;
 
 import java.util.List;
-import javax.inject.Inject;
+
 import org.apache.maven.repository.legacy.resolver.transform.ArtifactTransformation;
 import org.apache.maven.repository.legacy.resolver.transform.ArtifactTransformationManager;
 import org.apache.maven.repository.legacy.resolver.transform.LatestArtifactTransformation;
@@ -30,6 +29,9 @@ import org.apache.maven.repository.legacy.resolver.transform.ReleaseArtifactTran
 import org.apache.maven.repository.legacy.resolver.transform.SnapshotTransformation;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** @author Jason van Zyl */
 @PlexusTest

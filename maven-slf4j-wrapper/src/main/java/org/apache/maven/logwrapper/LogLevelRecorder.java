@@ -20,6 +20,7 @@ package org.apache.maven.logwrapper;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.slf4j.event.Level;
 
 /**

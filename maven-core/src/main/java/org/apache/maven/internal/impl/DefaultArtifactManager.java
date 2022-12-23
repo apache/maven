@@ -18,13 +18,15 @@
  */
 package org.apache.maven.internal.impl;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.inject.Inject;
-import javax.inject.Named;
+
 import org.apache.maven.SessionScoped;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.annotations.Nonnull;

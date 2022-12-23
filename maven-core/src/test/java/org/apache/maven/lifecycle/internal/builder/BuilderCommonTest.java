@@ -18,11 +18,8 @@
  */
 package org.apache.maven.lifecycle.internal.builder;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
 import java.util.HashSet;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
@@ -32,6 +29,10 @@ import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculator
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Kristian Rosenvold

@@ -18,7 +18,8 @@
  */
 package org.apache.maven.internal.aether;
 
-import static java.util.stream.Collectors.toList;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,8 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Named;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.xml.Dom;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
@@ -82,6 +82,8 @@ import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @since 3.3.0

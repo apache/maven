@@ -20,6 +20,7 @@ package org.apache.maven.execution.scope.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+
 import org.apache.maven.execution.MojoExecutionListener;
 
 /**

@@ -19,6 +19,7 @@
 package org.apache.maven.classrealm;
 
 import java.io.File;
+
 import org.eclipse.aether.artifact.Artifact;
 
 /**

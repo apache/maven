@@ -19,6 +19,7 @@
 package org.apache.maven.api.services;
 
 import java.util.Collection;
+
 import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;

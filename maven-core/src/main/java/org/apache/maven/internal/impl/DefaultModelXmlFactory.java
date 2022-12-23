@@ -18,7 +18,8 @@
  */
 package org.apache.maven.internal.impl;
 
-import static org.apache.maven.internal.impl.Utils.nonNull;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,8 +28,7 @@ import java.io.Writer;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
@@ -40,6 +40,8 @@ import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.apache.maven.model.v4.MavenXpp3ReaderEx;
 import org.apache.maven.model.v4.MavenXpp3WriterEx;
 import org.codehaus.plexus.util.ReaderFactory;
+
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Singleton

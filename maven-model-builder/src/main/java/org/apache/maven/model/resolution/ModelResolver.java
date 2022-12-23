@@ -19,6 +19,7 @@
 package org.apache.maven.model.resolution;
 
 import java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Repository;

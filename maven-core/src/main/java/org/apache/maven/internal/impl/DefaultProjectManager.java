@@ -18,6 +18,9 @@
  */
 package org.apache.maven.internal.impl;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,8 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Named;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.SessionScoped;
 import org.apache.maven.api.Artifact;

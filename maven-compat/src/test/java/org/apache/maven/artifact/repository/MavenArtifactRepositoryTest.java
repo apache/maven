@@ -18,10 +18,10 @@
  */
 package org.apache.maven.artifact.repository;
 
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.Test;
 
 public class MavenArtifactRepositoryTest {
     private static class MavenArtifactRepositorySubclass extends MavenArtifactRepository {

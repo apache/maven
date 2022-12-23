@@ -18,6 +18,10 @@
  */
 package org.slf4j.impl;
 
+import org.apache.maven.logwrapper.LogLevelRecorder;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -26,10 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.apache.maven.logwrapper.LogLevelRecorder;
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
 
 public class MavenLoggerFactoryTest {
     @Test

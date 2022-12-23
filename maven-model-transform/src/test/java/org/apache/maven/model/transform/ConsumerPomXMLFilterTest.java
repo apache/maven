@@ -18,15 +18,16 @@
  */
 package org.apache.maven.model.transform;
 
-import static org.xmlunit.assertj.XmlAssert.assertThat;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.junit.jupiter.api.Test;
+
+import static org.xmlunit.assertj.XmlAssert.assertThat;
 
 public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests {
     @Override

@@ -20,6 +20,7 @@ package org.apache.maven.lifecycle;
 
 import java.util.List;
 import java.util.Set;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;

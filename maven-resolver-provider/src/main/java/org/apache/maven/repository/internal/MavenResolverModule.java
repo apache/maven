@@ -18,14 +18,16 @@
  */
 package org.apache.maven.repository.internal;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import com.google.inject.name.Names;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.name.Names;
 import org.apache.maven.model.building.DefaultModelBuilderFactory;
 import org.apache.maven.model.building.ModelBuilder;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;

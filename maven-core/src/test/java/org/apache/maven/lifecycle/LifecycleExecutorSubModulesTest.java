@@ -18,9 +18,8 @@
  */
 package org.apache.maven.lifecycle;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import javax.inject.Inject;
+
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.lifecycle.internal.LifecycleDependencyResolver;
@@ -29,6 +28,8 @@ import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Just asserts that it's able to create those components. Handy when CDI container gets a nervous breakdown.

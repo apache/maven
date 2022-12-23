@@ -21,6 +21,7 @@ package org.apache.maven.artifact.repository.metadata;
 import java.io.File;
 import java.util.Collections;
 import java.util.Map;
+
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;

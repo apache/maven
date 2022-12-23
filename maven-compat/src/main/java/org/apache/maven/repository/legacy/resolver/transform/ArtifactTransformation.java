@@ -19,6 +19,7 @@
 package org.apache.maven.repository.legacy.resolver.transform;
 
 import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.installer.ArtifactInstallationException;
