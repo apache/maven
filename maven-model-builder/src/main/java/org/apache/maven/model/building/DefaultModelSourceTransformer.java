@@ -20,6 +20,7 @@ package org.apache.maven.model.building;
 
 import java.io.IOException;
 import java.nio.file.Path;
+
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 
 /**

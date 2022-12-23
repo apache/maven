@@ -18,8 +18,6 @@
  */
 package org.apache.maven.repository.internal;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -27,11 +25,14 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RemoteSnapshotMetadataTest {
     private Locale defaultLocale;

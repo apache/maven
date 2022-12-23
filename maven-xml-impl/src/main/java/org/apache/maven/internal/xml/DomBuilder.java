@@ -19,6 +19,7 @@
 package org.apache.maven.internal.xml;
 
 import java.io.Reader;
+
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;

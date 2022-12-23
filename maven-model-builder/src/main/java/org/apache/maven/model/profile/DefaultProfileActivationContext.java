@@ -18,14 +18,14 @@
  */
 package org.apache.maven.model.profile;
 
-import static java.util.stream.Collectors.toMap;
-
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Describes the environmental context used to determine the activation status of profiles.

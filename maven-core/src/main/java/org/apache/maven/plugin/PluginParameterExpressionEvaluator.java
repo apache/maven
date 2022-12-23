@@ -20,6 +20,7 @@ package org.apache.maven.plugin;
 
 import java.io.File;
 import java.util.Properties;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;

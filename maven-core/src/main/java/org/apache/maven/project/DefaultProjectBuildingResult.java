@@ -21,6 +21,7 @@ package org.apache.maven.project;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+
 import org.apache.maven.model.building.ModelProblem;
 
 /**

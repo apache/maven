@@ -21,6 +21,7 @@ package org.apache.maven.plugin;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Plugin;

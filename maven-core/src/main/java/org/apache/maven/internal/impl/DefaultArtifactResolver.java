@@ -18,17 +18,16 @@
  */
 package org.apache.maven.internal.impl;
 
-import static org.apache.maven.internal.impl.Utils.cast;
-import static org.apache.maven.internal.impl.Utils.nonNull;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.ArtifactManager;
@@ -41,6 +40,9 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
+
+import static org.apache.maven.internal.impl.Utils.cast;
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Singleton

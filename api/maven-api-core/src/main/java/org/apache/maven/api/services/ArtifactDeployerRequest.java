@@ -18,15 +18,16 @@
  */
 package org.apache.maven.api.services;
 
-import static org.apache.maven.api.services.BaseRequest.nonNull;
-
 import java.util.Collection;
+
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+
+import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
  * A request for deploying one or more artifacts to a remote repository.

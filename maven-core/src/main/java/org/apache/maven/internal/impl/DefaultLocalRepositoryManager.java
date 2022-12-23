@@ -18,9 +18,11 @@
  */
 package org.apache.maven.internal.impl;
 
-import java.nio.file.Path;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.nio.file.Path;
+
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.RemoteRepository;

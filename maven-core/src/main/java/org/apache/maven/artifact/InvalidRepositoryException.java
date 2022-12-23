@@ -19,6 +19,7 @@
 package org.apache.maven.artifact;
 
 import java.net.MalformedURLException;
+
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**

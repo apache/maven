@@ -18,15 +18,16 @@
  */
 package org.apache.maven.settings;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+
 import org.apache.maven.settings.v4.SettingsXpp3Reader;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests that the global settings.xml shipped with the distribution is in good state.

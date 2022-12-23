@@ -19,6 +19,7 @@
 package org.apache.maven.model.profile.activation;
 
 import java.util.Properties;
+
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.Profile;
 import org.junit.jupiter.api.BeforeEach;

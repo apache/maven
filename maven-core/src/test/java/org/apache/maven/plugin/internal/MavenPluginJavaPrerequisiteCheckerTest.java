@@ -18,10 +18,10 @@
  */
 package org.apache.maven.plugin.internal;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class MavenPluginJavaPrerequisiteCheckerTest {
 

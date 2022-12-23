@@ -18,16 +18,17 @@
  */
 package org.apache.maven.model.v4;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import org.apache.maven.api.model.Model;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ModelXmlTest {
 

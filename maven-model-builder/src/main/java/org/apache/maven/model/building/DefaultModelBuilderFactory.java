@@ -19,6 +19,7 @@
 package org.apache.maven.model.building;
 
 import java.util.Arrays;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.composition.DefaultDependencyManagementImporter;
 import org.apache.maven.model.composition.DependencyManagementImporter;

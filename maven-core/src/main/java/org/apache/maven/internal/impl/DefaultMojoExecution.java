@@ -19,6 +19,7 @@
 package org.apache.maven.internal.impl;
 
 import java.util.Optional;
+
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.xml.Dom;

@@ -18,12 +18,10 @@
  */
 package org.apache.maven.internal.impl;
 
-import static org.apache.maven.internal.impl.Utils.cast;
-import static org.apache.maven.internal.impl.Utils.nonNull;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.ArtifactInstaller;
 import org.apache.maven.api.services.ArtifactInstallerException;
@@ -32,6 +30,9 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.installation.InstallRequest;
 import org.eclipse.aether.installation.InstallResult;
 import org.eclipse.aether.installation.InstallationException;
+
+import static org.apache.maven.internal.impl.Utils.cast;
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Singleton

@@ -18,14 +18,14 @@
  */
 package org.apache.maven.cli.configuration;
 
-import static org.apache.maven.cli.ResolveFile.resolveFile;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.bridge.MavenRepositorySystem;
@@ -49,6 +49,8 @@ import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.apache.maven.cli.ResolveFile.resolveFile;
 
 /**
  * SettingsXmlConfigurationProcessor

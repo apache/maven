@@ -18,10 +18,10 @@
  */
 package org.slf4j.impl;
 
+import java.io.PrintStream;
+
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 import static org.apache.maven.shared.utils.logging.MessageUtils.level;
-
-import java.io.PrintStream;
 
 /**
  * Logger for Maven, that support colorization of levels and stacktraces. This class implements 2 methods introduced in

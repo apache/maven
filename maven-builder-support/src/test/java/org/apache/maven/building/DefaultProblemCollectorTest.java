@@ -18,12 +18,12 @@
  */
 package org.apache.maven.building;
 
+import org.apache.maven.building.Problem.Severity;
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-
-import org.apache.maven.building.Problem.Severity;
-import org.junit.jupiter.api.Test;
 
 public class DefaultProblemCollectorTest {
 

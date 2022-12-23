@@ -18,11 +18,12 @@
  */
 package org.apache.maven.artifact.versioning;
 
+import java.util.Locale;
+
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.Locale;
-import org.junit.jupiter.api.Test;
 
 /**
  * Test ComparableVersion.

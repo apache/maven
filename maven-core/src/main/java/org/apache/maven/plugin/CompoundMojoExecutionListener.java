@@ -19,6 +19,7 @@
 package org.apache.maven.plugin;
 
 import java.util.Collection;
+
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
 

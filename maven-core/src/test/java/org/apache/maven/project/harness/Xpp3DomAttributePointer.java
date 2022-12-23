@@ -19,6 +19,7 @@
 package org.apache.maven.project.harness;
 
 import java.util.Map;
+
 import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.model.NodePointer;
 

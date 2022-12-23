@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.DependencyCoordinate;

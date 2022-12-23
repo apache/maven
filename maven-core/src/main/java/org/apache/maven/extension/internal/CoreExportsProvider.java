@@ -18,11 +18,13 @@
  */
 package org.apache.maven.extension.internal;
 
-import java.util.Objects;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+
+import java.util.Objects;
+
 import org.codehaus.plexus.PlexusContainer;
 
 /**

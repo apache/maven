@@ -21,6 +21,7 @@ package org.apache.maven.properties.internal;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+
 import org.codehaus.plexus.util.Os;
 
 /**

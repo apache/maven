@@ -18,10 +18,10 @@
  */
 package org.apache.maven.plugin.internal;
 
-import static java.util.Objects.requireNonNull;
-
 import org.apache.maven.plugin.logging.Log;
 import org.slf4j.Logger;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author jdcasey

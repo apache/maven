@@ -18,9 +18,10 @@
  */
 package org.apache.maven.session.scope.internal;
 
-import com.google.inject.AbstractModule;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import com.google.inject.AbstractModule;
 import org.apache.maven.SessionScoped;
 import org.apache.maven.api.Session;
 import org.apache.maven.execution.MavenSession;

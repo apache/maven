@@ -19,6 +19,7 @@
 package org.apache.maven.project;
 
 import java.util.List;
+
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
 

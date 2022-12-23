@@ -18,13 +18,12 @@
  */
 package org.apache.maven.internal.impl;
 
-import static org.apache.maven.artifact.versioning.VersionRange.createFromVersionSpec;
-import static org.apache.maven.internal.impl.Utils.nonNull;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.api.Version;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.services.VersionParser;
@@ -32,6 +31,9 @@ import org.apache.maven.api.services.VersionParserException;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+
+import static org.apache.maven.artifact.versioning.VersionRange.createFromVersionSpec;
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Singleton

@@ -20,6 +20,7 @@ package org.apache.maven.api.xml;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;

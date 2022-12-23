@@ -18,11 +18,13 @@
  */
 package org.apache.maven.lifecycle.providers;
 
+import javax.inject.Provider;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import javax.inject.Provider;
+
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 

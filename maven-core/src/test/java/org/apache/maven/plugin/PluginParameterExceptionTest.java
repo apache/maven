@@ -18,13 +18,14 @@
  */
 package org.apache.maven.plugin;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.Collections;
+
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * MNG-3131

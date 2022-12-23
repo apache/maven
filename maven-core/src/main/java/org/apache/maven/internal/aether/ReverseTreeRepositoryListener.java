@@ -18,8 +18,6 @@
  */
 package org.apache.maven.internal.aether;
 
-import static java.util.Objects.requireNonNull;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
@@ -28,6 +26,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.ListIterator;
 import java.util.Objects;
+
 import org.eclipse.aether.AbstractRepositoryListener;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositorySystemSession;
@@ -36,6 +35,8 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.CollectStepData;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * A class building reverse tree using {@link CollectStepData} trace data provided in {@link RepositoryEvent}

@@ -18,21 +18,23 @@
  */
 package org.apache.maven;
 
-import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import javax.inject.Inject;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-import javax.inject.Inject;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
+
+import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ProjectDependenciesResolverTest extends AbstractCoreMavenComponentTestCase {
     @Inject

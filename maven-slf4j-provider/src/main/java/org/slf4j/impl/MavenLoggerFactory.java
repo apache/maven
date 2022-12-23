@@ -19,6 +19,7 @@
 package org.slf4j.impl;
 
 import java.util.Optional;
+
 import org.apache.maven.logwrapper.LogLevelRecorder;
 import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
 import org.slf4j.Logger;

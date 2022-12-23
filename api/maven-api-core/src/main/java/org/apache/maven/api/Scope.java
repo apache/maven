@@ -19,6 +19,7 @@
 package org.apache.maven.api;
 
 import java.util.Locale;
+
 import org.apache.maven.api.annotations.Experimental;
 
 /**

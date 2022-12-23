@@ -18,13 +18,15 @@
  */
 package org.apache.maven.model.inheritance;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;

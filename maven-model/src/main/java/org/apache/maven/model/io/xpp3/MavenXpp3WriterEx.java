@@ -21,6 +21,7 @@ package org.apache.maven.model.io.xpp3;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
 

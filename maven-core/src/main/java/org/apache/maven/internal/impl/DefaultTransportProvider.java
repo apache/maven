@@ -18,13 +18,13 @@
  */
 package org.apache.maven.internal.impl;
 
-import static java.util.Objects.requireNonNull;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.Transport;
@@ -32,6 +32,8 @@ import org.apache.maven.api.services.TransportProvider;
 import org.apache.maven.api.services.TransportProviderException;
 import org.eclipse.aether.spi.connector.transport.TransporterProvider;
 import org.eclipse.aether.transfer.NoTransporterException;
+
+import static java.util.Objects.requireNonNull;
 
 @Named
 @Singleton

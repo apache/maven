@@ -20,6 +20,7 @@ package org.apache.maven.lifecycle;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 
 /**

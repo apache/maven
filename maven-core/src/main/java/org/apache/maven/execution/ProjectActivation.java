@@ -18,8 +18,6 @@
  */
 package org.apache.maven.execution;
 
-import static java.util.stream.Collectors.toSet;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +25,8 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toSet;
 
 /**
  * Container for storing the request from the user to activate or deactivate certain projects and optionally fail the

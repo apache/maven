@@ -18,8 +18,6 @@
  */
 package org.apache.maven.artifact.versioning;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.nio.file.FileVisitResult;
@@ -29,7 +27,10 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.regex.Pattern;
+
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ComparableVersionIT {
 

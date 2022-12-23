@@ -18,14 +18,16 @@
  */
 package org.apache.maven.internal.impl;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.SettingsBuilder;

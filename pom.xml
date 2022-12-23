@@ -25,7 +25,7 @@ under the License.
     <artifactId>maven-parent</artifactId>
     <!-- please also update in maven-bom -->
     <version>39</version>
-    <relativePath/>
+    <relativePath />
   </parent>
 
   <artifactId>maven</artifactId>

@@ -18,10 +18,12 @@
  */
 package org.apache.maven.internal.impl;
 
-import java.util.Collection;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.Collection;
+
 import org.apache.maven.api.Event;
 import org.apache.maven.api.Listener;
 import org.apache.maven.eventspy.EventSpy;

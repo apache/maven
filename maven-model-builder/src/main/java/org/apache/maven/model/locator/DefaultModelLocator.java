@@ -18,9 +18,10 @@
  */
 package org.apache.maven.model.locator;
 
-import java.io.File;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.io.File;
 
 /**
  * Locates a POM file within a project base directory.

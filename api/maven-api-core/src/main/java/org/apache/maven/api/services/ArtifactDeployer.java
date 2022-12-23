@@ -19,6 +19,7 @@
 package org.apache.maven.api.services;
 
 import java.util.Collection;
+
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Service;

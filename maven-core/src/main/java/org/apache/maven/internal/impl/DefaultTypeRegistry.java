@@ -18,16 +18,17 @@
  */
 package org.apache.maven.internal.impl;
 
-import static org.apache.maven.internal.impl.Utils.nonNull;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 @Named
 @Singleton

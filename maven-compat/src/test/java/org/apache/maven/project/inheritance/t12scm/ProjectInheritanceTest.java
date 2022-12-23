@@ -18,12 +18,13 @@
  */
 package org.apache.maven.project.inheritance.t12scm;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.io.File;
+
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Verifies SCM inheritance uses modules statement from parent.

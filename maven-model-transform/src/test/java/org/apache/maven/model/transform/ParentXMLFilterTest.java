@@ -18,15 +18,16 @@
  */
 package org.apache.maven.model.transform;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.Function;
+
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ParentXMLFilterTest extends AbstractXMLFilterTests {
     private Function<XmlPullParser, XmlPullParser> filterCreator;

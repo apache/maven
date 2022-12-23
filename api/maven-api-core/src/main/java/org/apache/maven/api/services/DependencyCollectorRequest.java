@@ -18,13 +18,12 @@
  */
 package org.apache.maven.api.services;
 
-import static org.apache.maven.api.services.BaseRequest.nonNull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.DependencyCoordinate;
 import org.apache.maven.api.Project;
@@ -34,6 +33,8 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
+
+import static org.apache.maven.api.services.BaseRequest.nonNull;
 
 /**
  * A request to collect the transitive dependencies and to build a dependency graph from them. There are three ways to

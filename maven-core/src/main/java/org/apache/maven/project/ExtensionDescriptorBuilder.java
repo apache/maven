@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
+
 import org.apache.maven.api.xml.Dom;
 import org.apache.maven.internal.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.ReaderFactory;

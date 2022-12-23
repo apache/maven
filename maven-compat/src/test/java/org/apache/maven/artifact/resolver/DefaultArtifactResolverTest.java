@@ -18,15 +18,17 @@
  */
 package org.apache.maven.artifact.resolver;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import javax.inject.Inject;
 
 import java.util.Collections;
-import javax.inject.Inject;
+
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.DefaultArtifactResolver.DaemonThreadCreator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultArtifactResolverTest extends AbstractArtifactComponentTestCase {
     @Inject

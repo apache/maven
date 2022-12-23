@@ -18,13 +18,14 @@
  */
 package org.apache.maven.cli.transfer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.util.Locale;
+
 import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat;
 import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat.ScaleUnit;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FileSizeFormatTest {
 

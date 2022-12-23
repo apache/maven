@@ -18,11 +18,13 @@
  */
 package org.apache.maven.eventspy.internal;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.ExecutionListener;
 import org.eclipse.aether.RepositoryListener;

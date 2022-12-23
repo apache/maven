@@ -20,6 +20,7 @@ package org.apache.maven.lifecycle.internal.stub;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.DefaultLifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.GoalTask;

@@ -19,6 +19,7 @@
 package org.apache.maven.profiles;
 
 import java.util.List;
+
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.ActivationProperty;

@@ -18,13 +18,14 @@
  */
 package org.apache.maven.model.building;
 
+import java.io.File;
+import java.util.Properties;
+
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-
-import java.io.File;
-import java.util.Properties;
-import org.junit.jupiter.api.Test;
 
 /**
  * @author Konstantin Perikov

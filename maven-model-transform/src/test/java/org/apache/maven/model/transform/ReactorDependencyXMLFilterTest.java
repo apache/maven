@@ -18,12 +18,13 @@
  */
 package org.apache.maven.model.transform;
 
-import static org.xmlunit.assertj.XmlAssert.assertThat;
-
 import java.util.function.BiFunction;
+
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.xmlunit.assertj.XmlAssert.assertThat;
 
 public class ReactorDependencyXMLFilterTest extends AbstractXMLFilterTests {
     private BiFunction<String, String, String> reactorVersionMapper;

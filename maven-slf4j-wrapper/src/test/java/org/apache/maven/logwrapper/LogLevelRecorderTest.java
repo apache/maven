@@ -18,13 +18,13 @@
  */
 package org.apache.maven.logwrapper;
 
+import org.junit.jupiter.api.Test;
+import org.slf4j.event.Level;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import org.junit.jupiter.api.Test;
-import org.slf4j.event.Level;
 
 public class LogLevelRecorderTest {
     @Test

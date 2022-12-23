@@ -18,12 +18,13 @@
  */
 package org.apache.maven.model.interpolation;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenBuildTimestampTest {
     @Test

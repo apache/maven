@@ -18,9 +18,7 @@
  */
 package org.apache.maven.artifact.resolver;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import javax.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import javax.inject.Inject;
+
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -39,6 +37,10 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // It would be cool if there was a hook that I could use to set up a test environment.
 // I want to set up a local/remote repositories for testing but I don't want to have

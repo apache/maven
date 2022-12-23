@@ -21,6 +21,7 @@ package org.apache.maven.project;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.repository.legacy.LegacyRepositorySystem;
 

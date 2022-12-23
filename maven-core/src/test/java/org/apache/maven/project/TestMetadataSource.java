@@ -18,9 +18,11 @@
  */
 package org.apache.maven.project;
 
-import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;

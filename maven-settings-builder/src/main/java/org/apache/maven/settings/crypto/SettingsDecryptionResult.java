@@ -19,6 +19,7 @@
 package org.apache.maven.settings.crypto;
 
 import java.util.List;
+
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.building.SettingsProblem;

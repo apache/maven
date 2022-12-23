@@ -18,6 +18,9 @@
  */
 package org.apache.maven.settings.io;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,8 +28,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
 import java.util.Objects;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.settings.v4.SettingsXpp3Writer;
 import org.codehaus.plexus.util.WriterFactory;

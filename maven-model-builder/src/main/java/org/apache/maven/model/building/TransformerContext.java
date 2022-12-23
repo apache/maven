@@ -19,6 +19,7 @@
 package org.apache.maven.model.building;
 
 import java.nio.file.Path;
+
 import org.apache.maven.model.Model;
 
 /**

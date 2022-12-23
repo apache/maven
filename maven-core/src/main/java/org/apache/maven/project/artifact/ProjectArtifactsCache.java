@@ -20,6 +20,7 @@ package org.apache.maven.project.artifact;
 
 import java.util.Collection;
 import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.project.MavenProject;

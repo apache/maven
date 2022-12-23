@@ -19,6 +19,7 @@
 package org.apache.maven.settings.building;
 
 import java.net.URL;
+
 import org.apache.maven.building.UrlSource;
 
 /**

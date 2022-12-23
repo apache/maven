@@ -18,12 +18,13 @@
  */
 package org.apache.maven.internal.impl;
 
-import static org.apache.maven.internal.impl.Utils.nonNull;
-
 import java.util.Objects;
+
 import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nonnull;
+
+import static org.apache.maven.internal.impl.Utils.nonNull;
 
 /**
  * A wrapper class around a maven resolver artifact.
