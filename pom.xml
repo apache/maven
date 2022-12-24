@@ -30,7 +30,7 @@ under the License.
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>3.8.7-SNAPSHOT</version>
+  <version>3.8.7</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -76,7 +76,7 @@ under the License.
     <maven.site.path>ref/3-LATEST</maven.site.path>
     <checkstyle.violation.ignore>None</checkstyle.violation.ignore>
     <checkstyle.excludes>**/package-info.java</checkstyle.excludes>
-    <project.build.outputTimestamp>2022-06-06T16:22:18Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2022-12-24T19:07:30Z</project.build.outputTimestamp>
   </properties>
 
   <modules>
@@ -100,7 +100,7 @@ under the License.
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
     <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
-    <tag>maven-3.8.6</tag>
+    <tag>maven-3.8.7</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
