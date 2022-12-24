@@ -349,8 +349,8 @@ public class ComparableVersionTest {
 
     /**
      * Test <a href="https://issues.apache.org/jira/browse/MNG-7644">MNG-7644</a> edge cases
-     * 1.0.0.RC1 < 1.0.0-RC2 and more generally:
-     * 1.0.0.X1 < 1.0.0-X2 for any string X
+     * 1.0.0.RC1 &lt; 1.0.0-RC2 and more generally:
+     * 1.0.0.X1 &lt; 1.0.0-X2 for any string X
      */
     @Test
     public void testMng7644() {
