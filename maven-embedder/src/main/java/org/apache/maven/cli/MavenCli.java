@@ -339,35 +339,33 @@ public class MavenCli {
 
         cliManager = new CLIManager();
 
-        List<String> args = new ArrayList<>();
         CommandLine mavenConfig = null;
         try {
             File configFile = new File(cliRequest.multiModuleProjectDirectory, MVN_MAVEN_CONFIG);
 
             if (configFile.isFile()) {
-                for (String arg : Files.readAllLines(configFile.toPath(), Charset.defaultCharset())) {
-                    if (!arg.isEmpty()) {
-                        args.add(arg);
-                    }
-                }
-
-                mavenConfig = cliManager.parse(args.toArray(new String[0]));
+                String[] args = Files.lines(configFile.toPath(), Charset.defaultCharset())
+                        .filter(arg -> !arg.isEmpty())
+                        .toArray(size -> new String[size]);
+                mavenConfig = cliManager.parse(args);
                 List<?> unrecognized = mavenConfig.getArgList();
                 if (!unrecognized.isEmpty()) {
-                    throw new ParseException("Unrecognized maven.config entries: " + unrecognized);
+                    // This file can only contain options, not args (goals or phases)
+                    throw new ParseException("Unrecognized maven.config file entries: " + unrecognized);
                 }
             }
         } catch (ParseException e) {
-            System.err.println("Unable to parse maven.config: " + e.getMessage());
+            System.err.println("Unable to parse maven.config file options: " + e.getMessage());
             cliManager.displayHelp(System.out);
             throw e;
         }
 
         try {
+            CommandLine mavenCli = cliManager.parse(cliRequest.args);
             if (mavenConfig == null) {
-                cliRequest.commandLine = cliManager.parse(cliRequest.args);
+                cliRequest.commandLine = mavenCli;
             } else {
-                cliRequest.commandLine = cliMerge(cliManager.parse(cliRequest.args), mavenConfig);
+                cliRequest.commandLine = cliMerge(mavenConfig, mavenCli);
             }
         } catch (ParseException e) {
             System.err.println("Unable to parse command line options: " + e.getMessage());
@@ -392,20 +390,26 @@ public class MavenCli {
         }
     }
 
-    private CommandLine cliMerge(CommandLine mavenArgs, CommandLine mavenConfig) {
+    private CommandLine cliMerge(CommandLine mavenConfig, CommandLine mavenCli) {
         CommandLine.Builder commandLineBuilder = new CommandLine.Builder();
 
-        // the args are easy, cli first then config file
-        for (String arg : mavenArgs.getArgs()) {
-            commandLineBuilder.addArg(arg);
-        }
-        for (String arg : mavenConfig.getArgs()) {
+        // the args are easy, CLI only since maven.config file can only contain options
+        for (String arg : mavenCli.getArgs()) {
             commandLineBuilder.addArg(arg);
         }
 
-        // now add all options, except for -D with cli first then config file
+        /* Although this looks wrong in terms of order Commons CLI stores the value of options in
+         * an array and when a value is potentionally overriden it is added to the array. The single
+         * arg option value is retrieved and instead of returning values[values.length-1] it returns
+         * values[0] which means that the original value instead of the overridden one is returned
+         * (first wins). With properties values are truely overriden since at the end a map is used
+         * to merge which means last wins.
+         *
+         * TODO Report this behavioral bug with Commons CLI
+         */
+        // now add all options, except for user properties with CLI first then maven.config file
         List<Option> setPropertyOptions = new ArrayList<>();
-        for (Option opt : mavenArgs.getOptions()) {
+        for (Option opt : mavenCli.getOptions()) {
             if (String.valueOf(CLIManager.SET_USER_PROPERTY).equals(opt.getOpt())) {
                 setPropertyOptions.add(opt);
             } else {
