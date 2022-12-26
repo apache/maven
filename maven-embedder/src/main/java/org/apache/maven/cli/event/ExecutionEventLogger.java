@@ -380,7 +380,11 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     }
 
     private void append(MessageBuilder buffer, MojoExecution me) {
-        buffer.mojo(me.getArtifactId() + ':' + me.getVersion() + ':' + me.getGoal());
+        String prefix = me.getMojoDescriptor().getPluginDescriptor().getGoalPrefix();
+        if (StringUtils.isEmpty(prefix)) {
+            prefix = me.getGroupId() + ":" + me.getArtifactId();
+        }
+        buffer.mojo(prefix + ':' + me.getVersion() + ':' + me.getGoal());
         if (me.getExecutionId() != null) {
             buffer.a(' ').strong('(' + me.getExecutionId() + ')');
         }
