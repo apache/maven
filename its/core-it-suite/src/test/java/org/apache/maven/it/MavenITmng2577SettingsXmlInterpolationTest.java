@@ -68,7 +68,7 @@ public class MavenITmng2577SettingsXmlInterpolationTest
     }
 
     /**
-     * Verify that the settings.xml can be interpolated using system properties.
+     * Verify that the settings.xml can be interpolated using user properties.
      *
      * @throws Exception in case of failure
      */
@@ -85,7 +85,7 @@ public class MavenITmng2577SettingsXmlInterpolationTest
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings-sys.xml" );
-        verifier.setSystemProperty( "usr.MNGIT", "usr-prop-test" );
+        verifier.addCliArgument( "-Dusr.MNGIT=usr-prop-test" );
         verifier.setLogFileName( "log-sys.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

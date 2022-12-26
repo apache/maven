@@ -29,7 +29,7 @@ under the License.
 
   <name>Maven Integration Test :: MNG-4590</name>
   <description>
-    Verify that imported POMs are processed using the same execution properties as the importing POM.
+    Verify that imported POMs are processed using the same system/user properties as the importing POM.
   </description>
 
   <dependencyManagement>

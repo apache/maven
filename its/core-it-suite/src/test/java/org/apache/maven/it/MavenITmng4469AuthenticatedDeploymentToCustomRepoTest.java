@@ -153,12 +153,12 @@ public class MavenITmng4469AuthenticatedDeploymentToCustomRepoTest
         verifier.setAutoclean( false );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.setSystemProperty( "file", "settings.xml" );
-        verifier.setSystemProperty( "groupId", "org.apache.maven.its.mng4469" );
-        verifier.setSystemProperty( "artifactId", "it" );
-        verifier.setSystemProperty( "version", "0.1" );
-        verifier.setSystemProperty( "repositoryId", "mng4469" );
-        verifier.setSystemProperty( "repositoryUrl", "http://localhost:" + port + "/repo" );
+        verifier.addCliArgument( "-Dfile=settings.xml" );
+        verifier.addCliArgument( "-DgroupId=org.apache.maven.its.mng4469" );
+        verifier.addCliArgument( "-DartifactId=it" );
+        verifier.addCliArgument( "-Dversion=0.1" );
+        verifier.addCliArgument( "-DrepositoryId=mng4469" );
+        verifier.addCliArgument( "-DrepositoryUrl=http://localhost:" + port + "/repo" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-artifact:2.1-SNAPSHOT:deploy-file" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

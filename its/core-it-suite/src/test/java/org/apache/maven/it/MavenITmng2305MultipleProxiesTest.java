@@ -111,10 +111,9 @@ public class MavenITmng2305MultipleProxiesTest
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliOption( "--settings" );
             verifier.addCliOption( "settings.xml" );
-            verifier.setSystemProperty( "javax.net.ssl.trustStore", storePath );
-            verifier.setSystemProperty( "javax.net.ssl.trustStorePassword", storePwd );
+            verifier.setEnvironmentVariable( "MAVEN_OPTS", "-Djavax.net.ssl.trustStore=" + storePath + " -Djavax.net.ssl.trustStorePassword=" + storePwd );
             // disable concurrent downloading as not all wagons (e.g. wagon-lightweight-http) are thread-safe regarding proxy settings
-            verifier.setSystemProperty( "maven.artifact.threads", "1" );
+            verifier.addCliArgument( "-Dmaven.artifact.threads=1" );
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();

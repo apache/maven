@@ -28,7 +28,7 @@ under the License.
 
   <name>Maven Integration Test :: MNG-848</name>
   <description>
-    Test that execution/system properties take precedence over default value of plugin parameters.
+    Test that user properties take precedence over default value of plugin parameters.
   </description>
 
   <build>

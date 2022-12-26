@@ -32,17 +32,17 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class MavenITmng4590ImportedPomUsesSystemPropertiesTest
+public class MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng4590ImportedPomUsesSystemPropertiesTest()
+    public MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest()
     {
         super( "[2.0.9,3.0-alpha-1),[3.0-beta-1,)" );
     }
 
     /**
-     * Verify that imported POMs are processed using the same execution properties as the importing POM.
+     * Verify that imported POMs are processed using the same system/user properties as the importing POM.
      *
      * @throws Exception in case of failure
      */
@@ -58,7 +58,7 @@ public class MavenITmng4590ImportedPomUsesSystemPropertiesTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4590" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.setEnvironmentVariable( "MAVEN_OPTS", "-Dtest.file=pom.xml" );
-        verifier.setSystemProperty( "test.dir", testDir.getAbsolutePath() );
+        verifier.addCliArgument( "-Dtest.dir=" + testDir.getAbsolutePath() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );

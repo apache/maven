@@ -56,8 +56,8 @@ public class MavenITmng0786ProfileAwareReactorTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "sub1/target" );
         verifier.deleteDirectory( "sub2/target" );
-        verifier.setSystemProperty( "expression.outputFile", "target/expression.properties" );
-        verifier.setSystemProperty( "activate", "anything" );
+        verifier.addCliArgument( "-Dexpression.outputFile=target/expression.properties" );
+        verifier.addCliArgument( "-Dactivate=anything" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
         verifier.verifyFilePresent( "sub1/target/expression.properties" );
         verifier.verifyFilePresent( "sub2/target/expression.properties" );

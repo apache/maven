@@ -144,8 +144,7 @@ public class MavenITmng4428FollowHttpRedirectTest
             verifier.addCliOption( "-X" );
             verifier.addCliOption( "--settings" );
             verifier.addCliOption( "settings.xml" );
-            verifier.setSystemProperty( "javax.net.ssl.trustStore", storePath );
-            verifier.setSystemProperty( "javax.net.ssl.trustStorePassword", storePwd );
+            verifier.setEnvironmentVariable( "MAVEN_OPTS", "-Djavax.net.ssl.trustStore=" + storePath + " -Djavax.net.ssl.trustStorePassword=" + storePwd );
             verifier.setLogFileName( "log-" + getName().substring( 6 ) + ".txt" );
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();

@@ -30,17 +30,17 @@ import org.junit.jupiter.api.Test;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5011">MNG-5011</a>.
  */
-public class MavenITmng5011ConfigureCollectionArrayFromSystemPropTest
+public class MavenITmng5011ConfigureCollectionArrayFromUserPropertiesTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng5011ConfigureCollectionArrayFromSystemPropTest()
+    public MavenITmng5011ConfigureCollectionArrayFromUserPropertiesTest()
     {
         super( "[3.0.3,)" );
     }
 
     /**
-     * Verify that plugin parameters of type array/collection can be configured using system properties from the CLI.
+     * Verify that plugin parameters of type array/collection can be configured using user properties from the CLI.
      *
      * @throws Exception in case of failure
      */
@@ -53,9 +53,9 @@ public class MavenITmng5011ConfigureCollectionArrayFromSystemPropTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.setSystemProperty( "config.stringParams", "" );
-        verifier.setSystemProperty( "config.fileParams", "foo,bar" );
-        verifier.setSystemProperty( "config.listParam", ",two,,four," );
+        verifier.addCliArgument( "-Dconfig.stringParams=" );
+        verifier.addCliArgument( "-Dconfig.fileParams=foo,bar" );
+        verifier.addCliArgument( "-Dconfig.listParam=,two,,four," );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

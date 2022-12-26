@@ -54,7 +54,7 @@ public class MavenITmng6558ToolchainsBuildingEventTest
         verifier.setForkJvm( true );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.setSystemProperty( "maven.ext.class.path", "spy-0.1.jar" );
+        verifier.addCliArgument( "-Dmaven.ext.class.path=spy-0.1.jar" );
         verifier.addCliOption( "-X" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

@@ -59,7 +59,7 @@ public class MavenITmng0377PluginLookupFromPrefixTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.setSystemProperty( "touch.outputFile", "target/file.txt" );
+        verifier.addCliArgument( "-Dtouch.outputFile=target/file.txt" );
         verifier.executeGoal( "itprefix:touch" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

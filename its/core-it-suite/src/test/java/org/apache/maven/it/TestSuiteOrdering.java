@@ -34,7 +34,7 @@ import org.junit.jupiter.api.ClassOrdererContext;
 /**
  * The Core IT suite.
  */
-public class TestSuiteOrdering implements ClassOrderer 
+public class TestSuiteOrdering implements ClassOrderer
 {
 
     private static PrintStream out = System.out;
@@ -208,7 +208,7 @@ public class TestSuiteOrdering implements ClassOrderer
         suite.addTestSuite( MavenITmng5019StringBasedCompLookupFromChildPluginRealmTest.class );
         suite.addTestSuite( MavenITmng5013ConfigureParamBeanFromScalarValueTest.class );
         suite.addTestSuite( MavenITmng5012CollectionVsArrayParamCoercionTest.class );
-        suite.addTestSuite( MavenITmng5011ConfigureCollectionArrayFromSystemPropTest.class );
+        suite.addTestSuite( MavenITmng5011ConfigureCollectionArrayFromUserPropertiesTest.class );
         suite.addTestSuite( MavenITmng5009AggregationCycleTest.class );
         suite.addTestSuite( MavenITmng5006VersionRangeDependencyParentResolutionTest.class );
         suite.addTestSuite( MavenITmng5000ChildPathAwareUrlInheritanceTest.class );
@@ -276,7 +276,7 @@ public class TestSuiteOrdering implements ClassOrderer
         suite.addTestSuite( MavenITmng4618AggregatorBuiltAfterModulesTest.class );
         suite.addTestSuite( MavenITmng4615ValidateRequiredPluginParameterTest.class );
         suite.addTestSuite( MavenITmng4600DependencyOptionalFlagManagementTest.class );
-        suite.addTestSuite( MavenITmng4590ImportedPomUsesSystemPropertiesTest.class );
+        suite.addTestSuite( MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest.class );
         suite.addTestSuite( MavenITmng4586PluginPrefixResolutionFromVersionlessPluginMgmtTest.class );
         suite.addTestSuite( MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest.class );
         suite.addTestSuite( MavenITmng4572ModelVersionSurroundedByWhitespaceTest.class );
@@ -650,7 +650,7 @@ public class TestSuiteOrdering implements ClassOrderer
         suite.addTestSuite( MavenITmng0947OptionalDependencyTest.class );
         suite.addTestSuite( MavenITmng0870ReactorAwarePluginDiscoveryTest.class );
         suite.addTestSuite( MavenITmng0866EvaluateDefaultValueTest.class );
-        suite.addTestSuite( MavenITmng0848SystemPropOverridesDefaultValueTest.class );
+        suite.addTestSuite( MavenITmng0848UserPropertyOverridesDefaultValueTest.class );
         suite.addTestSuite( MavenITmng0836PluginParentResolutionTest.class );
         suite.addTestSuite( MavenITmng0828PluginConfigValuesInDebugTest.class );
         suite.addTestSuite( MavenITmng0823MojoContextPassingTest.class );

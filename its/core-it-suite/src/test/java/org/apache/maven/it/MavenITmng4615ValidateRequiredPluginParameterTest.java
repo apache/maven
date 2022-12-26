@@ -98,7 +98,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
 
     /**
      * Verify that Maven validates required mojo parameters (and doesn't just have the plugins die with NPEs).
-     * This scenario checks the case of a parameter having its backing system property set.
+     * This scenario checks the case of a parameter having its backing user property set.
      *
      * @throws Exception in case of failure
      */
@@ -111,7 +111,7 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.setSystemProperty( "config.requiredParam", "CLI" );
+        verifier.addCliArgument( "-Dconfig.requiredParam=CLI" );
         verifier.setLogFileName( "log-b.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

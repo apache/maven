@@ -30,7 +30,7 @@ under the License.
   <name>Maven Integration Test :: MNG-4615</name>
   <description>
     Verify that Maven validates required mojo parameters (and doesn't just have the plugins die with NPEs).
-    This scenario checks the case of a parameter missing its backing system property.
+    This scenario checks the case of a parameter missing its backing user property.
   </description>
 
   <build>

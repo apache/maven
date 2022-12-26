@@ -33,11 +33,11 @@ import org.junit.jupiter.api.Test;
  * @author Benjamin Bentmann
  *
  */
-public class MavenITmng0848SystemPropOverridesDefaultValueTest
+public class MavenITmng0848UserPropertyOverridesDefaultValueTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng0848SystemPropOverridesDefaultValueTest()
+    public MavenITmng0848UserPropertyOverridesDefaultValueTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }
@@ -56,7 +56,7 @@ public class MavenITmng0848SystemPropOverridesDefaultValueTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.setSystemProperty( "config.aliasDefaultExpressionParam", "PASSED" );
+        verifier.addCliArgument( "-Dconfig.aliasDefaultExpressionParam=PASSED" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

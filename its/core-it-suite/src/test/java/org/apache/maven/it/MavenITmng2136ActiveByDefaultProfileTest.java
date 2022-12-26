@@ -56,8 +56,8 @@ public class MavenITmng2136ActiveByDefaultProfileTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        verifier.setSystemProperty( "expression.outputFile", new File( testDir, "target/expression.properties" ).getPath() );
-        verifier.setSystemProperty( "expression.expressions", "project/properties" );
+        verifier.addCliArgument( "-Dexpression.outputFile=" + new File( testDir, "target/expression.properties" ).getPath() );
+        verifier.addCliArgument( "-Dexpression.expressions=project/properties" );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );

@@ -55,7 +55,7 @@ public class MavenITmng5208EventSpyParallelTest
         verifier.setForkJvm( true );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.setSystemProperty( "maven.ext.class.path", "../spy/target/event-spy-0.0.1-SNAPSHOT.jar" );
+        verifier.addCliArgument( "-Dmaven.ext.class.path=../spy/target/event-spy-0.0.1-SNAPSHOT.jar" );
         verifier.addCliOption( "-X" );
         verifier.addCliOption( "-T" );
         verifier.addCliOption( "2" );

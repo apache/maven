@@ -57,20 +57,9 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "user-settings.xml" );
-        if ( matchesVersionRange( "[2.1.0-M2,)" ) )
-        {
-            // dedicated CLI option only available since MNG-3914
-            verifier.addCliOption( "--global-settings" );
-            verifier.addCliOption( "global-settings.xml" );
-        }
-        else
-        {
-            verifier.setSystemProperty( "org.apache.maven.global-settings", "global-settings.xml" );
-        }
-        if ( matchesVersionRange( "(3.2.5,)" ) )
-        {
-            verifier.getSystemProperties().put( "maven.multiModuleProjectDirectory", testDir.getAbsolutePath() );
-        }
+        // dedicated CLI option only available since MNG-3914
+        verifier.addCliOption( "--global-settings" );
+        verifier.addCliOption( "global-settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

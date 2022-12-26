@@ -23,7 +23,6 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -174,12 +173,11 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.filterFile( "security-template.xml", "settings~security.xml", "UTF-8", filterProps );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
 
-        verifier.getSystemProperties().setProperty( "settings.security",
-            new File( testDir, "settings~security.xml" ).getAbsolutePath() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         // NOTE: The selection of the Turkish language for the JVM locale is essential part of the test
-        verifier.executeGoal( "validate", Collections.singletonMap( "MAVEN_OPTS", "-Duser.language=tr" ) );
+        verifier.setEnvironmentVariable( "MAVEN_OPTS", "-Dsettings.security=" + new File( testDir, "settings~security.xml" ).getAbsolutePath() + " -Duser.language=tr" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
