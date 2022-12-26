@@ -175,7 +175,7 @@ public class MavenCliTest {
         cli.cli(request);
         cli.properties(request);
 
-        String revision = System.getProperty("revision");
+        String revision = request.getUserProperties().getProperty("revision");
         assertEquals("8.1.0", revision);
     }
 
@@ -204,7 +204,7 @@ public class MavenCliTest {
         cli.cli(request);
         cli.properties(request);
 
-        String revision = System.getProperty("revision");
+        String revision = request.getUserProperties().getProperty("revision");
         assertEquals("8.2.0", revision);
     }
 
@@ -239,7 +239,7 @@ public class MavenCliTest {
 
         assertEquals("3", request.commandLine.getOptionValue(CLIManager.THREADS));
 
-        String revision = System.getProperty("revision");
+        String revision = request.getUserProperties().getProperty("revision");
         assertEquals("8.2.0", revision);
 
         assertEquals("bar ", request.getUserProperties().getProperty("foo"));
