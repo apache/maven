@@ -24,7 +24,6 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-
 import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.execution.MavenSession;
 import org.eclipse.aether.RepositorySystem;
@@ -46,7 +45,7 @@ public final class ResolverLifecycle extends AbstractMavenLifecycleParticipant {
     }
 
     @Override
-    public void afterSessionStart( MavenSession session) {
+    public void afterSessionStart(MavenSession session) {
         repositorySystemProvider.get().sessionStarted(session.getRepositorySession());
     }
 
