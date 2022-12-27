@@ -24,22 +24,35 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+
+import org.apache.maven.AbstractMavenLifecycleParticipant;
+import org.apache.maven.execution.MavenSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.sisu.EagerSingleton;
 
 /**
- * Maven internal component that bridges container "shut down" to {@link RepositorySystem#shutdown()}.
+ * Maven internal component that bridges container "shut down" and "on session end" to {@link RepositorySystem).
  *
  * @since 3.9.0
  */
 @Named
 @EagerSingleton
-public final class ResolverLifecycle {
+public final class ResolverLifecycle extends AbstractMavenLifecycleParticipant {
     private final Provider<RepositorySystem> repositorySystemProvider;
 
     @Inject
     public ResolverLifecycle(Provider<RepositorySystem> repositorySystemProvider) {
         this.repositorySystemProvider = requireNonNull(repositorySystemProvider);
+    }
+
+    @Override
+    public void afterSessionStart( MavenSession session) {
+        repositorySystemProvider.get().sessionStarted(session.getRepositorySession());
+    }
+
+    @Override
+    public void afterSessionEnd(MavenSession session) {
+        repositorySystemProvider.get().sessionEnded(session.getRepositorySession());
     }
 
     @PreDestroy
