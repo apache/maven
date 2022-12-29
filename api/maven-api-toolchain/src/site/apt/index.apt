@@ -23,7 +23,7 @@
  2006-11-04
  -----
 
-Maven 4 API - immutable Toolchains Model
+Maven 4 API - Immutable Toolchains Model
 
  This is strictly the immutable model for Maven toolchains in <<<org.apache.maven.api.toolchain>>> package.
 

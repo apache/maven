@@ -41,6 +41,10 @@
     <module>maven-api-core</module>
   </modules>
 
+  <properties>
+    <project.directory>api</project.directory>
+  </properties>
+
   <profiles>
     <profile>
       <id>reporting</id>

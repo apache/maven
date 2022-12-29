@@ -28,6 +28,6 @@
 
   <artifactId>maven-api-meta</artifactId>
   <name>Maven 4 API Meta annotations</name>
-  <description>Java 5 annotations for Maven 4 Immutable API.</description>
+  <description>Java annotations for Maven 4 Immutable API.</description>
 
 </project>

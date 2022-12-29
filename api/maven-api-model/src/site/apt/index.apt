@@ -25,7 +25,7 @@
  2011-06-12
  -----
 
-Maven 4 API - immutable Maven Model
+Maven 4 API - Immutable Maven Model
 
  This is strictly the immutable model for Maven POM (Project Object Model), so really just plain objects in <<<org.apache.maven.api.model>>> package.
 
