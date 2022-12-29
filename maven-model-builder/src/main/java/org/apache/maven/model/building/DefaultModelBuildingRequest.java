@@ -85,6 +85,7 @@ public class DefaultModelBuildingRequest implements ModelBuildingRequest {
         setValidationLevel(request.getValidationLevel());
         setProcessPlugins(request.isProcessPlugins());
         setTwoPhaseBuilding(request.isTwoPhaseBuilding());
+        setLocationTracking(request.isLocationTracking());
         setProfiles(request.getProfiles());
         setActiveProfileIds(request.getActiveProfileIds());
         setInactiveProfileIds(request.getInactiveProfileIds());

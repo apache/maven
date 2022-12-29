@@ -36,6 +36,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -307,5 +309,32 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         for (Plugin buildPlugin : project.getBuildPlugins()) {
             assertNotNull("Missing version for build plugin " + buildPlugin.getKey(), buildPlugin.getVersion());
         }
+    }
+
+    public void testLocationTrackingResolution() throws Exception {
+        File pom = getProject("MNG-7648");
+
+        MavenSession session = createMavenSession(pom);
+        MavenProject project = session.getCurrentProject();
+
+        InputLocation dependencyLocation = null;
+        for (Dependency dependency : project.getDependencies()) {
+            if (dependency.getManagementKey().equals("org.apache.maven.its:a:jar")) {
+                dependencyLocation = dependency.getLocation("version");
+            }
+        }
+        assertNotNull("missing dependency", dependencyLocation);
+        assertEquals(
+                "org.apache.maven.its:bom:0.1", dependencyLocation.getSource().getModelId());
+
+        InputLocation pluginLocation = null;
+        for (Plugin plugin : project.getBuildPlugins()) {
+            if (plugin.getKey().equals("org.apache.maven.plugins:maven-clean-plugin")) {
+                pluginLocation = plugin.getLocation("version");
+            }
+        }
+        assertNotNull("missing build plugin", pluginLocation);
+        assertEquals(
+                "org.apache.maven.its:parent:0.1", pluginLocation.getSource().getModelId());
     }
 }
