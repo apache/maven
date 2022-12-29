@@ -28,7 +28,8 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.annotations.ThreadSafe;
 
 /**
- * An immutable xml node.
+ * An immutable XML node, based on Plexus Utils mutable
+ * <a href="https://codehaus-plexus.github.io/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3Dom.html">Xpp3Dom</a>.
  *
  * @since 4.0
  */

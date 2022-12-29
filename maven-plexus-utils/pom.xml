@@ -26,7 +26,7 @@ under the License.
   </parent>
 
   <groupId>org.apache.maven</groupId>
-  <artifactId>plexus-utils</artifactId>
+  <artifactId>maven-plexus-utils</artifactId>
   <version>4.0.0-alpha-4-SNAPSHOT</version>
 
   <dependencies>
@@ -37,7 +37,7 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-xml-impl</artifactId>
+      <artifactId>maven-plexus-utils-xml</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>

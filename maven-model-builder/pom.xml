@@ -34,12 +34,12 @@ under the License.
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-xml-impl</artifactId>
+      <artifactId>maven-plexus-utils-xml</artifactId>
       <version>4.0.0-alpha-4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>plexus-utils</artifactId>
+      <artifactId>maven-plexus-utils</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>

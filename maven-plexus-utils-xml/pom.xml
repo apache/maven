@@ -25,9 +25,10 @@ under the License.
     <version>4.0.0-alpha-4-SNAPSHOT</version>
   </parent>
 
-  <artifactId>maven-xml-impl</artifactId>
+  <artifactId>maven-plexus-utils-xml</artifactId>
 
-  <name>Maven XML Implementation</name>
+  <name>Maven Plexus Utils XML Implementation</name>
+  <description>Reimplementation of Plexus Utils XML classes using Maven 4 immutable XML API</description>
 
   <dependencies>
     <dependency>
