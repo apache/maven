@@ -26,8 +26,8 @@ under the License.
   </parent>
 
   <artifactId>maven-xml-impl</artifactId>
-
-  <name>Maven XML Implementation</name>
+  <name>Implementation of Maven API XML</name>
+  <description>To be merged into Maven plexus-utils</description>
 
   <dependencies>
     <dependency>

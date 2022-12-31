@@ -23,17 +23,13 @@
  2006-11-04
  -----
 
-Maven Settings Model
+Maven 4 API - Immutable Toolchains Model
 
- This is the model for Maven settings in <<<org.apache.maven.settings>>> package,
- delegating content to {{{../maven-api/maven-api-settings/index.html}Maven 4 API immutable settings}}. All the effective model
- building logic from multiple settings files is done in {{{../maven-settings-builder/}Maven Settings Builder}}.
+ This is strictly the immutable model for Maven toolchains in <<<org.apache.maven.api.toolchain>>> package.
 
  The following are generated from this model:
 
-   * {{{./apidocs/index.html}Java sources}} with Reader and Writers for the Xpp3 XML parser, <<<ToAPiV3()>>> and <<<ToApiV4()>>> transformers, and <<<v4>>> package
-     for Merger and v4 Reader and Writers for the Xpp3 XML parser,
+   * {{{./apidocs/index.html}Java sources}} with <<<Builder>>> inner classes for immutable instances creation.
 
-   * A {{{./settings.html}Descriptor Reference}}
-
-   * An {{{https://maven.apache.org/xsd/settings-1.2.0.xsd}XSD}}
+ See also corresponding {{{../../maven-toolchain-model/index.html}Maven classical toolchains model documentation}}.
+ 

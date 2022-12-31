@@ -27,7 +27,8 @@
   </parent>
 
   <artifactId>maven-api-xml</artifactId>
-  <name>Maven API XML</name>
+  <name>Maven 4 API XML</name>
+  <description>Maven 4 API immutable XML helper.</description>
 
   <dependencies>
     <dependency>

@@ -28,8 +28,8 @@ under the License.
 
   <artifactId>maven-api-model</artifactId>
 
-  <name>Maven API Model</name>
-  <description>Maven API Model for Maven POM (Project Object Model)</description>
+  <name>Maven 4 API :: Model</name>
+  <description>Maven 4 API - Immutable Model for Maven POM (Project Object Model)</description>
 
   <dependencies>
     <dependency>

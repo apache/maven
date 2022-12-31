@@ -27,8 +27,8 @@ under the License.
 
   <artifactId>maven-api-toolchain</artifactId>
 
-  <name>Maven API Toolchain</name>
-  <description>Maven API Toolchain model.</description>
+  <name>Maven 4 API :: Toolchain</name>
+  <description>Maven 4 API - Immutable Toolchain model.</description>
 
   <dependencies>
     <dependency>

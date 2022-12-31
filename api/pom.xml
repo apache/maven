@@ -28,7 +28,8 @@
 
   <artifactId>maven-api</artifactId>
   <packaging>pom</packaging>
-  <name>Maven API</name>
+  <name>Maven 4 API</name>
+  <description>A new immutable API for Maven 4 to better manage what plugins and extensions can influence.</description>
 
   <modules>
     <module>modello-plugin-velocity</module>
@@ -39,5 +40,54 @@
     <module>maven-api-toolchain</module>
     <module>maven-api-core</module>
   </modules>
+
+  <properties>
+    <project.directory>api</project.directory>
+  </properties>
+
+  <profiles>
+    <profile>
+      <id>reporting</id>
+      <reporting>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <tags>
+                <tag>
+                  <name>provisional</name>
+                  <placement>tf</placement>
+                  <head>Provisional:</head>
+                </tag>
+              </tags>
+            </configuration>
+            <reportSets>
+              <reportSet>
+                <id>aggregate</id>
+                <reports>
+                  <report>aggregate</report>
+                </reports>
+                <inherited>false</inherited>
+              </reportSet>
+            </reportSets>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jxr-plugin</artifactId>
+            <reportSets>
+              <reportSet>
+                <id>aggregate</id>
+                <reports>
+                  <report>aggregate</report>
+                </reports>
+                <inherited>false</inherited>
+              </reportSet>
+            </reportSets>
+          </plugin>
+        </plugins>
+      </reporting>
+    </profile>
+  </profiles>
 
 </project>

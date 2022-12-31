@@ -17,10 +17,10 @@
 Apache Maven Plexus Utils
 =========================
 
-This module is a repackaging of the `org.codehaus.plexus:plexus-utils` jar, which contains a few modified classes to allow a seamless transition between the maven 3.x and 4.x apis.
+This module is a repackaging of the `org.codehaus.plexus:plexus-utils` jar, which contains a few modified classes to allow a seamless transition between the Maven 3.x and 4.x APIs.
 
-The maven 4.x api is based on immutable data objects. The maven model contains a few classes that contain some open xml data (`Plugin`, `PluginExecution`, `ReportPlugin` and `ReportSet`). So the v3 API which was using the `org.codehaus.plexus.utils.xml.Xpp3Dom` class now wraps the `org.apache.maven.api.Dom` node.  This is completely transparent for existing plugins, but the correct (new) classes have to be used.
+The Maven 4.x API is based on immutable data objects. The Maven model contains a few classes that contain some open xml data for configuration (`Plugin`, `PluginExecution`, `ReportPlugin` and `ReportSet`). So the v3 API which was using the `org.codehaus.plexus.utils.xml.Xpp3Dom` class now wraps the `org.apache.maven.api.Dom` interface node.  This is completely transparent for existing plugins, but the correct (new) classes have to be used.
 
-Given the new implementation of `org.codehaus.plexus.utils.xml.Xpp3Dom` now relies on `org.apache.maven.api.Dom`, the modifications can't be made inside the `plexus-utils` project, because maven itself depends on it.
+Given the new implementation of `org.codehaus.plexus.utils.xml.Xpp3Dom` now relies on `org.apache.maven.api.Dom`, the modifications can't be made inside the `plexus-utils` project, because Maven itself depends on it.
 
 This is drop-in replacement for `plexus-utils` 3.4.2.
