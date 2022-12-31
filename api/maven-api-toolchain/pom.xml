@@ -62,26 +62,26 @@ under the License.
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>modello-plugin-velocity</artifactId>
-        <configuration>
-          <version>1.1.0</version>
-          <models>
-            <model>src/main/mdo/toolchains.mdo</model>
-          </models>
-          <templates>
-            <template>src/main/mdo/model.vm</template>
-          </templates>
-          <params>
-            <param>packageModelV4=org.apache.maven.api.toolchain</param>
-          </params>
-        </configuration>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>modello</id>
+            <id>velocity</id>
             <goals>
               <goal>velocity</goal>
             </goals>
+            <configuration>
+              <version>1.1.0</version>
+              <models>
+                <model>src/main/mdo/toolchains.mdo</model>
+              </models>
+              <templates>
+                <template>src/main/mdo/model.vm</template>
+              </templates>
+              <params>
+                <param>packageModelV4=org.apache.maven.api.toolchain</param>
+              </params>
+            </configuration>
           </execution>
         </executions>
       </plugin>
