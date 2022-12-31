@@ -23,7 +23,6 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
-import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -59,10 +58,8 @@ public class SettingsReadItMojo
             dumpFile.delete();
         }
         dumpFile.getParentFile().mkdirs();
-        FileWriter fw = null;
-        try
+        try ( FileWriter fw = new FileWriter( dumpFile ) )
         {
-            fw = new FileWriter( dumpFile );
             SettingsXpp3Writer writer = new SettingsXpp3Writer();
             writer.write( fw, settings );
         }
@@ -70,11 +67,5 @@ public class SettingsReadItMojo
         {
             throw new MojoExecutionException( e.getMessage(), e );
         }
-        finally
-        {
-            IOUtil.close( fw );
-        }
     }
-
-
 }

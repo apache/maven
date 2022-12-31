@@ -39,11 +39,13 @@ under the License.
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
       <version>2.0</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-project</artifactId>
       <version>2.1.0</version>
+      <scope>provided</scope>
     </dependency>
     <!-- Test the resolution of the version -->
     <dependency>
@@ -54,6 +56,10 @@ under the License.
         <exclusion>
           <groupId>org.apache.maven.shared</groupId>
           <artifactId>maven-verifier</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-artifact</artifactId>
         </exclusion>
         <exclusion>
           <groupId>junit</groupId>

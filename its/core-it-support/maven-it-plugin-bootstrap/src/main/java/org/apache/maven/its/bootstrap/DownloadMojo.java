@@ -37,7 +37,6 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
@@ -132,7 +131,7 @@ public class DownloadMojo
             throws MojoFailureException
     {
         Dependency coordinate = new Dependency();
-        String[] tokens = StringUtils.split( artifact, ":" );
+        String[] tokens = artifact.split( ":" );
         if ( tokens.length < 3 || tokens.length > 5 )
         {
             throw new MojoFailureException( "Invalid artifact, you must specify "

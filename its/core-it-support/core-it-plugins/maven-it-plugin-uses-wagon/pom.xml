@@ -39,11 +39,13 @@ under the License.
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
       <version>2.0</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact-manager</artifactId>
       <version>2.0.9</version>
+      <scope>provided</scope>
       <exclusions>
         <exclusion>
           <groupId>org.codehaus.plexus</groupId>
