@@ -86,7 +86,10 @@ under the License.
             </configuration>
           </execution>
           <execution>
-            <id>modello-site-docs</id>
+            <id>modello-site-docs2</id>
+            <goals>
+              <goal>xdoc</goal>
+            </goals>
             <phase>pre-site</phase>
             <configuration>
               <models>

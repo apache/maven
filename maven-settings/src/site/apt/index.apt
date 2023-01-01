@@ -26,7 +26,7 @@
 Maven Settings Model
 
  This is the model for Maven settings in <<<org.apache.maven.settings>>> package,
- delegating content to {{{../maven-api/maven-api-settings/index.html}Maven 4 API immutable settings}}. All the effective model
+ delegating content to {{{../api/maven-api-settings/index.html}Maven 4 API immutable settings}}. All the effective model
  building logic from multiple settings files is done in {{{../maven-settings-builder/}Maven Settings Builder}}.
 
  The following are generated from this model:
