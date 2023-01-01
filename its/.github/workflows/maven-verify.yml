@@ -49,7 +49,7 @@ jobs:
           cache: 'maven'
 
       - name: Set up Maven
-        run: mvn --errors --batch-mode --show-version wrapper:wrapper "-Dmaven=3.8.6"
+        run: mvn --errors --batch-mode --show-version wrapper:wrapper "-Dmaven=3.8.7"
 
       - name: Running integration tests
         run: "./mvnw -B clean install -Prun-its,embedded -Dmaven.repo.local=`pwd`/repo"
