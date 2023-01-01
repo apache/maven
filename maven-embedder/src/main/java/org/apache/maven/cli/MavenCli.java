@@ -1560,6 +1560,8 @@ public class MavenCli
 
         String localRepoProperty = request.getUserProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
 
+        // TODO Investigate why this can also be a Java system property and not just a Maven user property like
+        // other properties
         if ( localRepoProperty == null )
         {
             localRepoProperty = request.getSystemProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
