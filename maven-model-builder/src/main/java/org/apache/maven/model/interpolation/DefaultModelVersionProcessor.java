@@ -44,18 +44,16 @@ public class DefaultModelVersionProcessor implements ModelVersionProcessor {
                 || SHA1_PROPERTY.equals(property);
     }
 
-    // TODO This class MUST test for user properties and THEN for system properties
     @Override
     public void overwriteModelProperties(Properties modelProperties, ModelBuildingRequest request) {
-        if (request.getSystemProperties().containsKey(REVISION_PROPERTY)) {
-            modelProperties.put(REVISION_PROPERTY, request.getSystemProperties().get(REVISION_PROPERTY));
+        if (request.getUserProperties().containsKey(REVISION_PROPERTY)) {
+            modelProperties.put(REVISION_PROPERTY, request.getUserProperties().get(REVISION_PROPERTY));
         }
-        if (request.getSystemProperties().containsKey(CHANGELIST_PROPERTY)) {
-            modelProperties.put(
-                    CHANGELIST_PROPERTY, request.getSystemProperties().get(CHANGELIST_PROPERTY));
+        if (request.getUserProperties().containsKey(CHANGELIST_PROPERTY)) {
+            modelProperties.put(CHANGELIST_PROPERTY, request.getUserProperties().get(CHANGELIST_PROPERTY));
         }
-        if (request.getSystemProperties().containsKey(SHA1_PROPERTY)) {
-            modelProperties.put(SHA1_PROPERTY, request.getSystemProperties().get(SHA1_PROPERTY));
+        if (request.getUserProperties().containsKey(SHA1_PROPERTY)) {
+            modelProperties.put(SHA1_PROPERTY, request.getUserProperties().get(SHA1_PROPERTY));
         }
     }
 }
