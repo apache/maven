@@ -1234,6 +1234,8 @@ public class MavenCli {
             return userDefinedLocalRepo;
         }
 
+        // TODO Investigate why this can also be a Java system property and not just a Maven user property like
+        // other properties
         return request.getSystemProperties().getProperty(MavenCli.LOCAL_REPO_PROPERTY);
     }
 
