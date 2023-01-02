@@ -26,11 +26,11 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 public class DomBuilder {
 
-    public static Xpp3Dom build(Reader reader) throws MavenXmlException {
+    public static XmlNodeImpl build(Reader reader) throws MavenXmlException {
         return build(reader, true);
     }
 
-    public static Xpp3Dom build(Reader reader, boolean trim) throws MavenXmlException {
+    public static XmlNodeImpl build(Reader reader, boolean trim) throws MavenXmlException {
         try {
             MXParser parser = new MXParser();
             parser.setInput(reader);
@@ -40,19 +40,19 @@ public class DomBuilder {
         }
     }
 
-    public static Xpp3Dom build(XmlPullParser parser) {
+    public static XmlNodeImpl build(XmlPullParser parser) {
         return build(parser, true, null);
     }
 
-    public static Xpp3Dom build(XmlPullParser parser, boolean trim) {
+    public static XmlNodeImpl build(XmlPullParser parser, boolean trim) {
         return build(parser, trim, null);
     }
 
-    public static Xpp3Dom build(XmlPullParser parser, boolean trim, LocationBuilder locationBuilder) {
+    public static XmlNodeImpl build(XmlPullParser parser, boolean trim, LocationBuilder locationBuilder) {
         try {
-            Xpp3DomBuilder.InputLocationBuilder ilb =
+            XmlNodeBuilder.InputLocationBuilder ilb =
                     locationBuilder != null ? (p -> locationBuilder.getLocation()) : null;
-            return Xpp3DomBuilder.build(parser, trim, ilb);
+            return XmlNodeBuilder.build(parser, trim, ilb);
         } catch (Exception e) {
             throw new MavenXmlException("Unable to build DOM", e);
         }

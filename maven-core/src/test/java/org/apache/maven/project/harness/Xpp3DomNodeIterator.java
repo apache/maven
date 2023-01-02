@@ -27,7 +27,7 @@ import org.apache.commons.jxpath.ri.compiler.NodeTest;
 import org.apache.commons.jxpath.ri.compiler.NodeTypeTest;
 import org.apache.commons.jxpath.ri.model.NodeIterator;
 import org.apache.commons.jxpath.ri.model.NodePointer;
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -42,21 +42,21 @@ class Xpp3DomNodeIterator implements NodeIterator {
 
     private NodeTest test;
 
-    private Dom node;
+    private XmlNode node;
 
-    private List<Dom> children;
+    private List<XmlNode> children;
 
-    private List<Dom> filteredChildren = new ArrayList<>();
+    private List<XmlNode> filteredChildren = new ArrayList<>();
 
     private int filteredIndex;
 
-    private Dom child;
+    private XmlNode child;
 
     private int position;
 
     public Xpp3DomNodeIterator(NodePointer parent, NodeTest test, boolean reverse, NodePointer startWith) {
         this.parent = parent;
-        this.node = (Dom) parent.getNode();
+        this.node = (XmlNode) parent.getNode();
         this.children = this.node.getChildren();
         if (startWith != null) {
             Xpp3Dom startWithNode = (Xpp3Dom) startWith.getNode();
@@ -93,14 +93,14 @@ class Xpp3DomNodeIterator implements NodeIterator {
 
     private void filterChildren(int position) {
         for (; position > filteredChildren.size() && filteredIndex < children.size(); filteredIndex++) {
-            Dom child = children.get(filteredIndex);
+            XmlNode child = children.get(filteredIndex);
             if (testNode(child)) {
                 filteredChildren.add(child);
             }
         }
     }
 
-    private boolean testNode(Dom node) {
+    private boolean testNode(XmlNode node) {
         if (test == null) {
             return true;
         }

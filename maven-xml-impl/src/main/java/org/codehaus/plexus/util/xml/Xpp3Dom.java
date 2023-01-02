@@ -25,7 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlSerializer;
 
@@ -67,10 +68,10 @@ public class Xpp3Dom implements Serializable {
     public static final String DEFAULT_SELF_COMBINATION_MODE = SELF_COMBINATION_MERGE;
 
     private ChildrenTracking childrenTracking;
-    private Dom dom;
+    private XmlNode dom;
 
     public Xpp3Dom(String name) {
-        this.dom = new org.apache.maven.internal.xml.Xpp3Dom(name);
+        this.dom = new XmlNodeImpl(name);
     }
 
     /**
@@ -79,7 +80,7 @@ public class Xpp3Dom implements Serializable {
      * @param name The name of the Dom.
      */
     public Xpp3Dom(String name, Object inputLocation) {
-        this.dom = new org.apache.maven.internal.xml.Xpp3Dom(name, null, null, null, inputLocation);
+        this.dom = new XmlNodeImpl(name, null, null, null, inputLocation);
     }
 
     /**
@@ -96,24 +97,24 @@ public class Xpp3Dom implements Serializable {
      * @param name The name of the Dom.
      */
     public Xpp3Dom(Xpp3Dom src, String name) {
-        this.dom = new org.apache.maven.internal.xml.Xpp3Dom(src.dom, name);
+        this.dom = new XmlNodeImpl(src.dom, name);
     }
 
-    public Xpp3Dom(Dom dom) {
+    public Xpp3Dom(XmlNode dom) {
         this.dom = dom;
     }
 
-    public Xpp3Dom(Dom dom, Xpp3Dom parent) {
+    public Xpp3Dom(XmlNode dom, Xpp3Dom parent) {
         this.dom = dom;
         this.childrenTracking = parent::replace;
     }
 
-    public Xpp3Dom(Dom dom, ChildrenTracking childrenTracking) {
+    public Xpp3Dom(XmlNode dom, ChildrenTracking childrenTracking) {
         this.dom = dom;
         this.childrenTracking = childrenTracking;
     }
 
-    public Dom getDom() {
+    public XmlNode getDom() {
         return dom;
     }
 
@@ -134,8 +135,7 @@ public class Xpp3Dom implements Serializable {
     }
 
     public void setValue(String value) {
-        update(new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), value, dom.getAttributes(), dom.getChildren(), dom.getInputLocation()));
+        update(new XmlNodeImpl(dom.getName(), value, dom.getAttributes(), dom.getChildren(), dom.getInputLocation()));
     }
 
     // ----------------------------------------------------------------------
@@ -161,7 +161,7 @@ public class Xpp3Dom implements Serializable {
             Map<String, String> attrs = new HashMap<>(dom.getAttributes());
             boolean ret = attrs.remove(name) != null;
             if (ret) {
-                update(new org.apache.maven.internal.xml.Xpp3Dom(
+                update(new XmlNodeImpl(
                         dom.getName(), dom.getValue(), attrs, dom.getChildren(), dom.getInputLocation()));
             }
             return ret;
@@ -184,8 +184,7 @@ public class Xpp3Dom implements Serializable {
         }
         Map<String, String> attrs = new HashMap<>(dom.getAttributes());
         attrs.put(name, value);
-        update(new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), dom.getValue(), attrs, dom.getChildren(), dom.getInputLocation()));
+        update(new XmlNodeImpl(dom.getName(), dom.getValue(), attrs, dom.getChildren(), dom.getInputLocation()));
     }
 
     // ----------------------------------------------------------------------
@@ -197,16 +196,15 @@ public class Xpp3Dom implements Serializable {
     }
 
     public Xpp3Dom getChild(String name) {
-        Dom child = dom.getChild(name);
+        XmlNode child = dom.getChild(name);
         return child != null ? new Xpp3Dom(child, this) : null;
     }
 
     public void addChild(Xpp3Dom xpp3Dom) {
-        List<Dom> children = new ArrayList<>(dom.getChildren());
+        List<XmlNode> children = new ArrayList<>(dom.getChildren());
         children.add(xpp3Dom.dom);
         xpp3Dom.childrenTracking = this::replace;
-        update(new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation()));
+        update(new XmlNodeImpl(dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation()));
     }
 
     public Xpp3Dom[] getChildren() {
@@ -225,17 +223,15 @@ public class Xpp3Dom implements Serializable {
     }
 
     public void removeChild(int i) {
-        List<Dom> children = new ArrayList<>(dom.getChildren());
+        List<XmlNode> children = new ArrayList<>(dom.getChildren());
         children.remove(i);
-        update(new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation()));
+        update(new XmlNodeImpl(dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation()));
     }
 
     public void removeChild(Xpp3Dom child) {
-        List<Dom> children = new ArrayList<>(dom.getChildren());
+        List<XmlNode> children = new ArrayList<>(dom.getChildren());
         children.remove(child.dom);
-        update(new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation()));
+        update(new XmlNodeImpl(dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation()));
     }
 
     // ----------------------------------------------------------------------
@@ -265,8 +261,7 @@ public class Xpp3Dom implements Serializable {
      * @param inputLocation input location to set
      */
     public void setInputLocation(Object inputLocation) {
-        update(new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), dom.getValue(), dom.getAttributes(), dom.getChildren(), inputLocation));
+        update(new XmlNodeImpl(dom.getName(), dom.getValue(), dom.getAttributes(), dom.getChildren(), inputLocation));
     }
 
     // ----------------------------------------------------------------------
@@ -405,7 +400,7 @@ public class Xpp3Dom implements Serializable {
         return ((str == null) || (str.trim().length() == 0));
     }
 
-    private void update(Dom dom) {
+    private void update(XmlNode dom) {
         if (childrenTracking != null) {
             childrenTracking.replace(this.dom, dom);
         }
@@ -413,10 +408,9 @@ public class Xpp3Dom implements Serializable {
     }
 
     private boolean replace(Object prevChild, Object newChild) {
-        List<Dom> children = new ArrayList<>(dom.getChildren());
-        children.replaceAll(d -> d == prevChild ? (Dom) newChild : d);
-        update(new org.apache.maven.internal.xml.Xpp3Dom(
-                dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation()));
+        List<XmlNode> children = new ArrayList<>(dom.getChildren());
+        children.replaceAll(d -> d == prevChild ? (XmlNode) newChild : d);
+        update(new XmlNodeImpl(dom.getName(), dom.getValue(), dom.getAttributes(), children, dom.getInputLocation()));
         return true;
     }
 

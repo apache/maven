@@ -43,7 +43,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.annotations.Generated;
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.name};
 #end
@@ -126,7 +126,7 @@ public class ${className}
       #elseif ( $field.to && $field.multiplicity == "*" )
         builder.${field.name}( transform( target.get${capField}(), this::transform${field.to} ) );
       #elseif ( $field.type == "DOM" )
-        Dom newVal = transform( target.get${capField}() );
+        XmlNode newVal = transform( target.get${capField}() );
         builder.${field.name}( newVal != target.get${capField}() ? newVal : null );
       #elseif ( $field.type == "boolean" || $field.type == "int" || $field.type == "java.nio.file.Path" )
         // nothing to do, the transformer only handles strings
@@ -156,7 +156,7 @@ public class ${className}
         return newList;
     }
 
-    protected Dom transform( Dom node )
+    protected XmlNode transform( XmlNode node )
     {
         if ( node != null )
         {

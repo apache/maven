@@ -18,16 +18,16 @@
  */
 package org.apache.maven.internal.xml;
 
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 public class XmlPlexusConfiguration extends DefaultPlexusConfiguration {
-    public static PlexusConfiguration toPlexusConfiguration(Dom node) {
+    public static PlexusConfiguration toPlexusConfiguration(XmlNode node) {
         return new XmlPlexusConfiguration(node);
     }
 
-    public XmlPlexusConfiguration(Dom node) {
+    public XmlPlexusConfiguration(XmlNode node) {
         super(node.getName(), node.getValue());
         node.getAttributes().forEach(this::setAttribute);
         node.getChildren().forEach(c -> this.addChild(new XmlPlexusConfiguration(c)));

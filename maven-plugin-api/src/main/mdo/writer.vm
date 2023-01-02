@@ -48,7 +48,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import org.apache.maven.api.annotations.Generated;
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.internal.xml.DomBuilder;
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.name};
@@ -138,7 +138,7 @@ public class ${className}
      * @param serializer a serializer object.
      * @throws java.io.IOException java.io.IOException if any.
      */
-    protected void writeDomToSerializer( org.apache.maven.api.xml.Dom dom, XmlSerializer serializer )
+    protected void writeDomToSerializer( org.apache.maven.api.xml.XmlNode dom, XmlSerializer serializer )
         throws java.io.IOException
     {
         serializer.startTag( NAMESPACE, dom.getName() );
@@ -147,7 +147,7 @@ public class ${className}
         {
             serializer.attribute( NAMESPACE, attribute.getKey(), attribute.getValue() );
         }
-        for ( Dom aChild : dom.getChildren() )
+        for ( XmlNode aChild : dom.getChildren() )
         {
             writeDomToSerializer( aChild, serializer );
         }
@@ -160,7 +160,7 @@ public class ${className}
 
         serializer.endTag( NAMESPACE, dom.getName() );
 
-    } //-- void writeDomToSerializer( org.apache.maven.api.xml.Dom, XmlSerializer )
+    } //-- void writeDomToSerializer( org.apache.maven.api.xml.XmlNode, XmlSerializer )
 
 
 #foreach ( $class in $model.allClasses )
@@ -287,7 +287,7 @@ public class ${className}
         }
     }
 
-    private void writeDom( Dom dom, XmlSerializer serializer )
+    private void writeDom( XmlNode dom, XmlSerializer serializer )
             throws IOException
     {
         if ( dom != null )
@@ -297,7 +297,7 @@ public class ${className}
             {
                 serializer.attribute( NAMESPACE, attr.getKey(), attr.getValue() );
             }
-            for ( Dom child : dom.getChildren() )
+            for ( XmlNode child : dom.getChildren() )
             {
                 writeDom( child, serializer );
             }

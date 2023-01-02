@@ -35,7 +35,7 @@ import org.apache.maven.api.annotations.ThreadSafe;
 @Experimental
 @ThreadSafe
 @Immutable
-public interface Dom {
+public interface XmlNode {
 
     String CHILDREN_COMBINATION_MODE_ATTRIBUTE = "combine.children";
 
@@ -90,21 +90,21 @@ public interface Dom {
     String getAttribute(@Nonnull String name);
 
     @Nonnull
-    List<Dom> getChildren();
+    List<XmlNode> getChildren();
 
     @Nullable
-    Dom getChild(String name);
+    XmlNode getChild(String name);
 
     @Nullable
     Object getInputLocation();
 
-    default Dom merge(@Nullable Dom source) {
+    default XmlNode merge(@Nullable XmlNode source) {
         return merge(source, (Boolean) null);
     }
 
-    Dom merge(@Nullable Dom source, @Nullable Boolean childMergeOverride);
+    XmlNode merge(@Nullable XmlNode source, @Nullable Boolean childMergeOverride);
 
-    Dom clone();
+    XmlNode clone();
 
     /**
      * Merge recessive into dominant and return either {@code dominant}
@@ -116,12 +116,13 @@ public interface Dom {
      * @return the merged node
      */
     @Nullable
-    static Dom merge(@Nullable Dom dominant, @Nullable Dom recessive) {
+    static XmlNode merge(@Nullable XmlNode dominant, @Nullable XmlNode recessive) {
         return merge(dominant, recessive, null);
     }
 
     @Nullable
-    static Dom merge(@Nullable Dom dominant, @Nullable Dom recessive, @Nullable Boolean childMergeOverride) {
+    static XmlNode merge(
+            @Nullable XmlNode dominant, @Nullable XmlNode recessive, @Nullable Boolean childMergeOverride) {
         if (recessive == null) {
             return dominant;
         }

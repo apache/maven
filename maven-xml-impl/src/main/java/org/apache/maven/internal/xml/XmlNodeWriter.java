@@ -22,33 +22,33 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Map;
 
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
 
 /**
  *
  */
-public class Xpp3DomWriter {
-    public static void write(Writer writer, Dom dom) {
+public class XmlNodeWriter {
+    public static void write(Writer writer, XmlNode dom) {
         write(new PrettyPrintXMLWriter(writer), dom);
     }
 
-    public static void write(PrintWriter writer, Dom dom) {
+    public static void write(PrintWriter writer, XmlNode dom) {
         write(new PrettyPrintXMLWriter(writer), dom);
     }
 
-    public static void write(XMLWriter xmlWriter, Dom dom) {
+    public static void write(XMLWriter xmlWriter, XmlNode dom) {
         write(xmlWriter, dom, true);
     }
 
-    public static void write(XMLWriter xmlWriter, Dom dom, boolean escape) {
+    public static void write(XMLWriter xmlWriter, XmlNode dom, boolean escape) {
         // TODO: move to XMLWriter?
         xmlWriter.startElement(dom.getName());
         for (Map.Entry<String, String> attr : dom.getAttributes().entrySet()) {
             xmlWriter.addAttribute(attr.getKey(), attr.getValue());
         }
-        for (Dom aChildren : dom.getChildren()) {
+        for (XmlNode aChildren : dom.getChildren()) {
             write(xmlWriter, aChildren, escape);
         }
 

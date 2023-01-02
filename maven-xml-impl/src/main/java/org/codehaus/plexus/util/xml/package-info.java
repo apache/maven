@@ -5,6 +5,6 @@
  * {@link org.codehaus.plexus.util.xml.Xpp3DomBuilder}
  * classes.
  * The modified {@link org.codehaus.plexus.util.xml.Xpp3Dom} wraps
- * an immutable {@link org.apache.maven.api.xml.Dom} instance.
+ * an immutable {@link org.apache.maven.api.xml.XmlNode} instance.
  */
 package org.codehaus.plexus.util.xml;

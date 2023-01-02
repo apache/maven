@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
@@ -35,10 +35,10 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 /**
  *
  */
-public class Xpp3DomBuilder {
+public class XmlNodeBuilder {
     private static final boolean DEFAULT_TRIM = true;
 
-    public static Xpp3Dom build(Reader reader) throws XmlPullParserException, IOException {
+    public static XmlNodeImpl build(Reader reader) throws XmlPullParserException, IOException {
         return build(reader, null);
     }
 
@@ -50,32 +50,32 @@ public class Xpp3DomBuilder {
      * @throws XmlPullParserException xml exception
      * @throws IOException io
      */
-    public static Xpp3Dom build(Reader reader, InputLocationBuilder locationBuilder)
+    public static XmlNodeImpl build(Reader reader, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
         return build(reader, DEFAULT_TRIM, locationBuilder);
     }
 
-    public static Xpp3Dom build(InputStream is, String encoding) throws XmlPullParserException, IOException {
+    public static XmlNodeImpl build(InputStream is, String encoding) throws XmlPullParserException, IOException {
         return build(is, encoding, DEFAULT_TRIM);
     }
 
-    public static Xpp3Dom build(InputStream is, String encoding, boolean trim)
+    public static XmlNodeImpl build(InputStream is, String encoding, boolean trim)
             throws XmlPullParserException, IOException {
         try {
             final XmlPullParser parser = new MXParser();
             parser.setInput(is, encoding);
 
-            final Xpp3Dom xpp3Dom = build(parser, trim);
+            final XmlNodeImpl node = build(parser, trim);
             is.close();
             is = null;
 
-            return xpp3Dom;
+            return node;
         } finally {
             IOUtil.close(is);
         }
     }
 
-    public static Xpp3Dom build(Reader reader, boolean trim) throws XmlPullParserException, IOException {
+    public static XmlNodeImpl build(Reader reader, boolean trim) throws XmlPullParserException, IOException {
         return build(reader, trim, null);
     }
 
@@ -88,27 +88,27 @@ public class Xpp3DomBuilder {
      * @throws XmlPullParserException xml exception
      * @throws IOException io
      */
-    public static Xpp3Dom build(Reader reader, boolean trim, InputLocationBuilder locationBuilder)
+    public static XmlNodeImpl build(Reader reader, boolean trim, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
         try {
             final XmlPullParser parser = new MXParser();
             parser.setInput(reader);
 
-            final Xpp3Dom xpp3Dom = build(parser, trim, locationBuilder);
+            final XmlNodeImpl node = build(parser, trim, locationBuilder);
             reader.close();
             reader = null;
 
-            return xpp3Dom;
+            return node;
         } finally {
             IOUtil.close(reader);
         }
     }
 
-    public static Xpp3Dom build(XmlPullParser parser) throws XmlPullParserException, IOException {
+    public static XmlNodeImpl build(XmlPullParser parser) throws XmlPullParserException, IOException {
         return build(parser, DEFAULT_TRIM);
     }
 
-    public static Xpp3Dom build(XmlPullParser parser, boolean trim) throws XmlPullParserException, IOException {
+    public static XmlNodeImpl build(XmlPullParser parser, boolean trim) throws XmlPullParserException, IOException {
         return build(parser, trim, null);
     }
 
@@ -121,14 +121,14 @@ public class Xpp3DomBuilder {
      * @throws XmlPullParserException xml exception
      * @throws IOException io
      */
-    public static Xpp3Dom build(XmlPullParser parser, boolean trim, InputLocationBuilder locationBuilder)
+    public static XmlNodeImpl build(XmlPullParser parser, boolean trim, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
         boolean spacePreserve = false;
         String name = null;
         String value = null;
         Object location = null;
         Map<String, String> attrs = null;
-        List<Dom> children = null;
+        List<XmlNode> children = null;
         int eventType = parser.getEventType();
         boolean emptyTag = false;
         while (eventType != XmlPullParser.END_DOCUMENT) {
@@ -151,7 +151,7 @@ public class Xpp3DomBuilder {
                     if (children == null) {
                         children = new ArrayList<>();
                     }
-                    Dom child = build(parser, trim, locationBuilder);
+                    XmlNode child = build(parser, trim, locationBuilder);
                     children.add(child);
                 }
             } else if (eventType == XmlPullParser.TEXT) {
@@ -161,7 +161,7 @@ public class Xpp3DomBuilder {
                 }
                 value = value != null ? value + text : text;
             } else if (eventType == XmlPullParser.END_TAG) {
-                return new Xpp3Dom(
+                return new XmlNodeImpl(
                         name,
                         children == null ? (value != null ? value : emptyTag ? null : "") : null,
                         attrs,
