@@ -49,7 +49,7 @@ import java.util.Properties;
 import java.util.Set;
 import org.apache.maven.api.annotations.Generated;
 import org.apache.maven.api.xml.XmlNode;
-import org.apache.maven.internal.xml.DomBuilder;
+import org.apache.maven.internal.xml.XmlNodeBuilder;
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.name};
 #end
