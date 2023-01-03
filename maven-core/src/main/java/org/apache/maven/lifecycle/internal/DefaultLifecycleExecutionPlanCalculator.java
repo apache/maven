@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.xml.Xpp3Dom;
+import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleMappingDelegate;
@@ -291,23 +291,23 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
         org.codehaus.plexus.util.xml.Xpp3Dom config = mojoExecution.getConfiguration();
-        Dom executionConfiguration = config != null ? config.getDom() : null;
+        XmlNode executionConfiguration = config != null ? config.getDom() : null;
         if (executionConfiguration == null) {
-            executionConfiguration = new Xpp3Dom("configuration");
+            executionConfiguration = new XmlNodeImpl("configuration");
         }
 
-        Dom defaultConfiguration = getMojoConfiguration(mojoDescriptor);
+        XmlNode defaultConfiguration = getMojoConfiguration(mojoDescriptor);
 
-        List<Dom> children = new ArrayList<>();
+        List<XmlNode> children = new ArrayList<>();
         if (mojoDescriptor.getParameters() != null) {
             for (Parameter parameter : mojoDescriptor.getParameters()) {
-                Dom parameterConfiguration = executionConfiguration.getChild(parameter.getName());
+                XmlNode parameterConfiguration = executionConfiguration.getChild(parameter.getName());
 
                 if (parameterConfiguration == null) {
                     parameterConfiguration = executionConfiguration.getChild(parameter.getAlias());
                 }
 
-                Dom parameterDefaults = defaultConfiguration.getChild(parameter.getName());
+                XmlNode parameterDefaults = defaultConfiguration.getChild(parameter.getName());
 
                 if (parameterConfiguration != null) {
                     parameterConfiguration = parameterConfiguration.merge(parameterDefaults, Boolean.TRUE);
@@ -323,7 +323,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                         attributes.put("implementation", parameter.getImplementation());
                     }
 
-                    parameterConfiguration = new Xpp3Dom(
+                    parameterConfiguration = new XmlNodeImpl(
                             parameter.getName(),
                             parameterConfiguration.getValue(),
                             attributes,
@@ -334,12 +334,12 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                 }
             }
         }
-        Dom finalConfiguration = new Xpp3Dom("configuration", null, null, children, null);
+        XmlNode finalConfiguration = new XmlNodeImpl("configuration", null, null, children, null);
 
         mojoExecution.setConfiguration(finalConfiguration);
     }
 
-    private Dom getMojoConfiguration(MojoDescriptor mojoDescriptor) {
+    private XmlNode getMojoConfiguration(MojoDescriptor mojoDescriptor) {
         return MojoDescriptorCreator.convert(mojoDescriptor).getDom();
     }
 
@@ -490,7 +490,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                         MojoExecution forkedExecution =
                                 new MojoExecution(forkedMojoDescriptor, mojoExecution.getExecutionId());
 
-                        Xpp3Dom forkedConfiguration = (Xpp3Dom) execution.getConfiguration();
+                        XmlNodeImpl forkedConfiguration = (XmlNodeImpl) execution.getConfiguration();
 
                         forkedExecution.setConfiguration(forkedConfiguration);
 
@@ -500,14 +500,14 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                     }
                 }
 
-                Xpp3Dom phaseConfiguration = (Xpp3Dom) phase.getConfiguration();
+                XmlNodeImpl phaseConfiguration = (XmlNodeImpl) phase.getConfiguration();
 
                 if (phaseConfiguration != null) {
                     for (MojoExecution forkedExecution : forkedExecutions) {
                         org.codehaus.plexus.util.xml.Xpp3Dom config = forkedExecution.getConfiguration();
 
                         if (config != null) {
-                            Dom forkedConfiguration = config.getDom();
+                            XmlNode forkedConfiguration = config.getDom();
 
                             forkedConfiguration = phaseConfiguration.merge(forkedConfiguration);
 

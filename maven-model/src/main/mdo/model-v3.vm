@@ -294,7 +294,7 @@ public class ${class.name}
       #elseif ( $field.type == "DOM" )
         if ( getDelegate().get${cap}() == oldDelegate )
         {
-            update( getDelegate().with${cap}( ( org.apache.maven.api.xml.Dom ) newDelegate ) );
+            update( getDelegate().with${cap}( ( org.apache.maven.api.xml.XmlNode ) newDelegate ) );
         }
       #end
     #end

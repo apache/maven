@@ -22,7 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
@@ -102,7 +102,7 @@ public class MojoExecution {
         this.executionId = null;
     }
 
-    public MojoExecution(MojoDescriptor mojoDescriptor, Dom configuration) {
+    public MojoExecution(MojoDescriptor mojoDescriptor, XmlNode configuration) {
         this.mojoDescriptor = mojoDescriptor;
         this.configuration = new org.codehaus.plexus.util.xml.Xpp3Dom(configuration);
         this.executionId = null;
@@ -141,7 +141,7 @@ public class MojoExecution {
         this.configuration = configuration;
     }
 
-    public void setConfiguration(Dom configuration) {
+    public void setConfiguration(XmlNode configuration) {
         this.configuration = configuration != null ? new org.codehaus.plexus.util.xml.Xpp3Dom(configuration) : null;
     }
 

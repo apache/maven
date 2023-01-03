@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
@@ -559,7 +559,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 ((Mojo) mojo).setLog(new MojoLogWrapper(mojoLogger));
             }
 
-            Dom dom = mojoExecution.getConfiguration() != null
+            XmlNode dom = mojoExecution.getConfiguration() != null
                     ? mojoExecution.getConfiguration().getDom()
                     : null;
 

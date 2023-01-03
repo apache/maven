@@ -51,8 +51,8 @@
           #set ( $dummy = $imports.add( "java.util.List" ) )
           #set ( $dummy = $types.put( $field, "List<" + $field.to + ">" ) )
       #elseif ( $field.type == "DOM" )
-        #set ( $dummy = $imports.add( "org.apache.maven.api.xml.Dom" ) )
-        #set ( $dummy = $types.put( $field, "Dom" ) )
+        #set ( $dummy = $imports.add( "org.apache.maven.api.xml.XmlNode" ) )
+        #set ( $dummy = $types.put( $field, "XmlNode" ) )
       #else
         #set ( $fieldType = ${types.getOrDefault($field.type,$field.type)} )
         #set ( $idx = $fieldType.lastIndexOf('.') )

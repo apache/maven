@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.api.toolchain.ToolchainModel;
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 
 /**
  *
@@ -72,9 +72,9 @@ public class MavenToolchainMerger {
     }
 
     protected ToolchainModel mergeToolchainModelConfiguration(ToolchainModel target, ToolchainModel source) {
-        Dom src = source.getConfiguration();
-        Dom tgt = target.getConfiguration();
-        Dom merged = Dom.merge(tgt, src);
+        XmlNode src = source.getConfiguration();
+        XmlNode tgt = target.getConfiguration();
+        XmlNode merged = XmlNode.merge(tgt, src);
         return target.withConfiguration(merged);
     }
 

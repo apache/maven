@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 
+import org.apache.maven.internal.xml.XmlNodeBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -49,7 +50,7 @@ public class Xpp3DomBuilder {
 
     public static Xpp3Dom build(InputStream is, String encoding, boolean trim)
             throws XmlPullParserException, IOException {
-        return new Xpp3Dom(org.apache.maven.internal.xml.Xpp3DomBuilder.build(is, encoding, trim));
+        return new Xpp3Dom(XmlNodeBuilder.build(is, encoding, trim));
     }
 
     public static Xpp3Dom build(Reader reader, boolean trim) throws XmlPullParserException, IOException {
@@ -61,8 +62,8 @@ public class Xpp3DomBuilder {
      */
     public static Xpp3Dom build(Reader reader, boolean trim, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
-        return new Xpp3Dom(org.apache.maven.internal.xml.Xpp3DomBuilder.build(
-                reader, trim, locationBuilder != null ? locationBuilder::toInputLocation : null));
+        return new Xpp3Dom(
+                XmlNodeBuilder.build(reader, trim, locationBuilder != null ? locationBuilder::toInputLocation : null));
     }
 
     public static Xpp3Dom build(XmlPullParser parser) throws XmlPullParserException, IOException {
@@ -78,8 +79,8 @@ public class Xpp3DomBuilder {
      */
     public static Xpp3Dom build(XmlPullParser parser, boolean trim, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
-        return new Xpp3Dom(org.apache.maven.internal.xml.Xpp3DomBuilder.build(
-                parser, trim, locationBuilder != null ? locationBuilder::toInputLocation : null));
+        return new Xpp3Dom(
+                XmlNodeBuilder.build(parser, trim, locationBuilder != null ? locationBuilder::toInputLocation : null));
     }
 
     /**

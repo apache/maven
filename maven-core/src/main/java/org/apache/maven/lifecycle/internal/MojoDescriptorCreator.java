@@ -28,9 +28,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.xml.Xpp3Dom;
+import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
@@ -99,14 +99,14 @@ public class MojoDescriptorCreator {
     public static org.codehaus.plexus.util.xml.Xpp3Dom convert(MojoDescriptor mojoDescriptor) {
         PlexusConfiguration c = mojoDescriptor.getMojoConfiguration();
 
-        List<Dom> children = new ArrayList<>();
+        List<XmlNode> children = new ArrayList<>();
         PlexusConfiguration[] ces = c.getChildren();
         if (ces != null) {
             for (PlexusConfiguration ce : ces) {
                 String value = ce.getValue(null);
                 String defaultValue = ce.getAttribute("default-value", null);
                 if (value != null || defaultValue != null) {
-                    Xpp3Dom e = new Xpp3Dom(
+                    XmlNodeImpl e = new XmlNodeImpl(
                             ce.getName(),
                             value,
                             defaultValue != null ? Collections.singletonMap("default-value", defaultValue) : null,
@@ -117,7 +117,7 @@ public class MojoDescriptorCreator {
             }
         }
 
-        Xpp3Dom dom = new Xpp3Dom("configuration", null, null, children, null);
+        XmlNodeImpl dom = new XmlNodeImpl("configuration", null, null, children, null);
         return new org.codehaus.plexus.util.xml.Xpp3Dom(dom);
     }
 

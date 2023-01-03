@@ -22,7 +22,7 @@ import java.io.InputStream;
 
 import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.api.toolchain.TrackableBase;
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Reader;
 import org.junit.jupiter.api.Test;
 
@@ -94,10 +94,10 @@ public class MavenToolchainMergerTest {
 
             PersistedToolchains merged = merger.merge(jdks, jdksExtend, TrackableBase.USER_LEVEL);
             assertEquals(2, merged.getToolchains().size());
-            Dom config0 = merged.getToolchains().get(0).getConfiguration();
+            XmlNode config0 = merged.getToolchains().get(0).getConfiguration();
             assertEquals("lib/tools.jar", config0.getChild("toolsJar").getValue());
             assertEquals(2, config0.getChildren().size());
-            Dom config1 = merged.getToolchains().get(1).getConfiguration();
+            XmlNode config1 = merged.getToolchains().get(1).getConfiguration();
             assertEquals(2, config1.getChildren().size());
             assertEquals("lib/classes.jar", config1.getChild("toolsJar").getValue());
             assertEquals(2, jdks.getToolchains().size());
@@ -112,10 +112,10 @@ public class MavenToolchainMergerTest {
             // switch dominant with recessive
             PersistedToolchains merged = merger.merge(jdksExtend, jdks, TrackableBase.USER_LEVEL);
             assertEquals(2, merged.getToolchains().size());
-            Dom config0 = merged.getToolchains().get(0).getConfiguration();
+            XmlNode config0 = merged.getToolchains().get(0).getConfiguration();
             assertEquals("lib/tools.jar", config0.getChild("toolsJar").getValue());
             assertEquals(2, config0.getChildren().size());
-            Dom config1 = merged.getToolchains().get(1).getConfiguration();
+            XmlNode config1 = merged.getToolchains().get(1).getConfiguration();
             assertEquals(2, config1.getChildren().size());
             assertEquals("lib/classes.jar", config1.getChild("toolsJar").getValue());
             assertEquals(2, jdks.getToolchains().size());

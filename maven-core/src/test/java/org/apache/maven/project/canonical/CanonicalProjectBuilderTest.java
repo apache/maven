@@ -21,7 +21,7 @@ package org.apache.maven.project.canonical;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.AbstractMavenProjectTestCase;
@@ -69,7 +69,7 @@ public class CanonicalProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         assertEquals("1.0", plugin.getVersion());
 
-        Dom configuration = plugin.getDelegate().getConfiguration();
+        XmlNode configuration = plugin.getDelegate().getConfiguration();
 
         assertEquals(
                 "src/conf/plexus.conf",

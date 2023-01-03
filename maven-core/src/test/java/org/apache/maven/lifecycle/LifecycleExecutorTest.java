@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
@@ -309,7 +309,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
         MavenSession session = createMavenSession(pom);
         MojoDescriptor mojoDescriptor = mojoDescriptorCreator.getMojoDescriptor(
                 "org.apache.maven.its.plugins:maven-it-plugin:0.1:java", session, session.getCurrentProject());
-        Dom dom = MojoDescriptorCreator.convert(mojoDescriptor).getDom();
+        XmlNode dom = MojoDescriptorCreator.convert(mojoDescriptor).getDom();
         System.out.println(dom);
     }
 

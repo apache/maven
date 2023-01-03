@@ -23,7 +23,7 @@ import java.util.Locale;
 import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.model.NodePointer;
 import org.apache.commons.jxpath.ri.model.NodePointerFactory;
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 
 /**
  * A node pointer factory for JXPath to support <code>Xpp3Dom</code>.
@@ -40,8 +40,8 @@ public class Xpp3DomPointerFactory implements NodePointerFactory {
         if (object instanceof org.codehaus.plexus.util.xml.Xpp3Dom) {
             object = ((org.codehaus.plexus.util.xml.Xpp3Dom) object).getDom();
         }
-        if (object instanceof Dom) {
-            return new Xpp3DomNodePointer((Dom) object);
+        if (object instanceof XmlNode) {
+            return new Xpp3DomNodePointer((XmlNode) object);
         }
         return null;
     }
@@ -50,8 +50,8 @@ public class Xpp3DomPointerFactory implements NodePointerFactory {
         if (object instanceof org.codehaus.plexus.util.xml.Xpp3Dom) {
             object = ((org.codehaus.plexus.util.xml.Xpp3Dom) object).getDom();
         }
-        if (object instanceof Dom) {
-            return new Xpp3DomNodePointer(parent, (Dom) object);
+        if (object instanceof XmlNode) {
+            return new Xpp3DomNodePointer(parent, (XmlNode) object);
         }
         return null;
     }

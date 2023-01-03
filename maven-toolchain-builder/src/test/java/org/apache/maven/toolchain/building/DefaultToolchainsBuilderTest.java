@@ -27,7 +27,7 @@ import java.util.Map;
 import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.api.toolchain.ToolchainModel;
 import org.apache.maven.building.StringSource;
-import org.apache.maven.internal.xml.Xpp3Dom;
+import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.toolchain.io.DefaultToolchainsReader;
 import org.apache.maven.toolchain.io.DefaultToolchainsWriter;
 import org.apache.maven.toolchain.io.ToolchainsParseException;
@@ -236,9 +236,9 @@ public class DefaultToolchainsBuilderTest {
 
         Map<String, String> props = new HashMap<>();
         props.put("key", "${env.testKey}");
-        Xpp3Dom configurationChild = new Xpp3Dom("jdkHome", "${env.testKey}", null, null, null);
-        Xpp3Dom configuration =
-                new Xpp3Dom("configuration", null, null, Collections.singletonList(configurationChild), null);
+        XmlNodeImpl configurationChild = new XmlNodeImpl("jdkHome", "${env.testKey}", null, null, null);
+        XmlNodeImpl configuration =
+                new XmlNodeImpl("configuration", null, null, Collections.singletonList(configurationChild), null);
         ToolchainModel toolchain = ToolchainModel.newBuilder()
                 .type("TYPE")
                 .provides(props)

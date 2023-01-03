@@ -26,8 +26,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.api.xml.Dom;
-import org.apache.maven.internal.xml.Xpp3Dom;
+import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -67,7 +67,7 @@ public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurat
             PluginExecution pluginExecution =
                     findPluginExecution(mojoExecution.getExecutionId(), plugin.getExecutions());
 
-            Dom pomConfiguration = null;
+            XmlNode pomConfiguration = null;
 
             if (pluginExecution != null) {
                 pomConfiguration = pluginExecution.getDelegate().getConfiguration();
@@ -75,11 +75,11 @@ public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurat
                 pomConfiguration = plugin.getDelegate().getConfiguration();
             }
 
-            Dom mojoConfiguration = mojoExecution.getConfiguration() != null
+            XmlNode mojoConfiguration = mojoExecution.getConfiguration() != null
                     ? mojoExecution.getConfiguration().getDom()
                     : null;
 
-            Dom mergedConfiguration = Xpp3Dom.merge(mojoConfiguration, pomConfiguration);
+            XmlNode mergedConfiguration = XmlNodeImpl.merge(mojoConfiguration, pomConfiguration);
 
             mojoExecution.setConfiguration(mergedConfiguration);
 

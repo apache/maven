@@ -22,7 +22,7 @@ import java.util.Optional;
 
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.model.Plugin;
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 public class DefaultMojoExecution implements MojoExecution {
@@ -52,7 +52,7 @@ public class DefaultMojoExecution implements MojoExecution {
     }
 
     @Override
-    public Optional<Dom> getConfiguration() {
+    public Optional<XmlNode> getConfiguration() {
         return Optional.of(delegate.getConfiguration()).map(Xpp3Dom::getDom);
     }
 

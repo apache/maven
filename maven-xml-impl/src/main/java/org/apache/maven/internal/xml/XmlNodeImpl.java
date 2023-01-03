@@ -34,7 +34,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.SerializerXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
@@ -43,7 +43,7 @@ import org.codehaus.plexus.util.xml.pull.XmlSerializer;
 /**
  *  NOTE: remove all the util code in here when separated, this class should be pure data.
  */
-public class Xpp3Dom implements Serializable, Dom {
+public class XmlNodeImpl implements Serializable, XmlNode {
     private static final long serialVersionUID = 2567894443061173996L;
 
     protected final String name;
@@ -52,23 +52,24 @@ public class Xpp3Dom implements Serializable, Dom {
 
     protected final Map<String, String> attributes;
 
-    protected final List<Dom> children;
+    protected final List<XmlNode> children;
 
     protected final Object location;
 
-    public Xpp3Dom(String name) {
+    public XmlNodeImpl(String name) {
         this(name, null, null, null, null);
     }
 
-    public Xpp3Dom(String name, String value) {
+    public XmlNodeImpl(String name, String value) {
         this(name, value, null, null, null);
     }
 
-    public Xpp3Dom(Dom from, String name) {
+    public XmlNodeImpl(XmlNode from, String name) {
         this(name, from.getValue(), from.getAttributes(), from.getChildren(), from.getInputLocation());
     }
 
-    public Xpp3Dom(String name, String value, Map<String, String> attributes, List<Dom> children, Object location) {
+    public XmlNodeImpl(
+            String name, String value, Map<String, String> attributes, List<XmlNode> children, Object location) {
         this.name = Objects.requireNonNull(name);
         this.value = value;
         this.attributes =
@@ -79,11 +80,11 @@ public class Xpp3Dom implements Serializable, Dom {
     }
 
     @Override
-    public Dom merge(Dom source, Boolean childMergeOverride) {
+    public XmlNode merge(XmlNode source, Boolean childMergeOverride) {
         return merge(this, source, childMergeOverride);
     }
 
-    public Dom clone() {
+    public XmlNode clone() {
         return this;
     }
 
@@ -120,11 +121,11 @@ public class Xpp3Dom implements Serializable, Dom {
     // Child handling
     // ----------------------------------------------------------------------
 
-    public Dom getChild(String name) {
+    public XmlNode getChild(String name) {
         if (name != null) {
-            ListIterator<Dom> it = children.listIterator(children.size());
+            ListIterator<XmlNode> it = children.listIterator(children.size());
             while (it.hasPrevious()) {
-                Dom child = it.previous();
+                XmlNode child = it.previous();
                 if (name.equals(child.getName())) {
                     return child;
                 }
@@ -133,7 +134,7 @@ public class Xpp3Dom implements Serializable, Dom {
         return null;
     }
 
-    public List<Dom> getChildren() {
+    public List<XmlNode> getChildren() {
         return children;
     }
 
@@ -161,7 +162,7 @@ public class Xpp3Dom implements Serializable, Dom {
         // TODO: WARNING! Later versions of plexus-utils psit out an <?xml ?> header due to thinking this is a new
         // document - not the desired behaviour!
         SerializerXMLWriter xmlWriter = new SerializerXMLWriter(namespace, serializer);
-        Xpp3DomWriter.write(xmlWriter, this);
+        XmlNodeWriter.write(xmlWriter, this);
         if (xmlWriter.getExceptions().size() > 0) {
             throw (IOException) xmlWriter.getExceptions().get(0);
         }
@@ -203,7 +204,7 @@ public class Xpp3Dom implements Serializable, Dom {
      * </ol>
      */
     @SuppressWarnings("checkstyle:MethodLength")
-    public static Dom merge(Dom dominant, Dom recessive, Boolean childMergeOverride) {
+    public static XmlNode merge(XmlNode dominant, XmlNode recessive, Boolean childMergeOverride) {
         // TODO: share this as some sort of assembler, implement a walk interface?
         if (recessive == null) {
             return dominant;
@@ -225,7 +226,7 @@ public class Xpp3Dom implements Serializable, Dom {
             String value = dominant.getValue();
             Object location = dominant.getInputLocation();
             Map<String, String> attrs = null;
-            List<Dom> children = null;
+            List<XmlNode> children = null;
 
             for (Map.Entry<String, String> attr : recessive.getAttributes().entrySet()) {
                 String key = attr.getKey();
@@ -250,12 +251,12 @@ public class Xpp3Dom implements Serializable, Dom {
 
                 String keysValue = recessive.getAttribute(KEYS_COMBINATION_MODE_ATTRIBUTE);
 
-                for (Dom recessiveChild : recessive.getChildren()) {
+                for (XmlNode recessiveChild : recessive.getChildren()) {
                     String idValue = recessiveChild.getAttribute(ID_COMBINATION_MODE_ATTRIBUTE);
 
-                    Dom childDom = null;
+                    XmlNode childDom = null;
                     if (isNotEmpty(idValue)) {
-                        for (Dom dominantChild : dominant.getChildren()) {
+                        for (XmlNode dominantChild : dominant.getChildren()) {
                             if (idValue.equals(dominantChild.getAttribute(ID_COMBINATION_MODE_ATTRIBUTE))) {
                                 childDom = dominantChild;
                                 // we have a match, so don't append but merge
@@ -268,7 +269,7 @@ public class Xpp3Dom implements Serializable, Dom {
                                 .collect(Collectors.toMap(
                                         k -> k, k -> Optional.ofNullable(recessiveChild.getAttribute(k))));
 
-                        for (Dom dominantChild : dominant.getChildren()) {
+                        for (XmlNode dominantChild : dominant.getChildren()) {
                             Map<String, Optional<String>> dominantKeyValues = Stream.of(keys)
                                     .collect(Collectors.toMap(
                                             k -> k, k -> Optional.ofNullable(dominantChild.getAttribute(k))));
@@ -284,12 +285,12 @@ public class Xpp3Dom implements Serializable, Dom {
                     }
 
                     if (mergeChildren && childDom != null) {
-                        Map<String, Iterator<Dom>> commonChildren = new HashMap<>();
+                        Map<String, Iterator<XmlNode>> commonChildren = new HashMap<>();
                         Set<String> names = recessive.getChildren().stream()
-                                .map(Dom::getName)
+                                .map(XmlNode::getName)
                                 .collect(Collectors.toSet());
                         for (String name : names) {
-                            List<Dom> dominantChildren = dominant.getChildren().stream()
+                            List<XmlNode> dominantChildren = dominant.getChildren().stream()
                                     .filter(n -> n.getName().equals(name))
                                     .collect(Collectors.toList());
                             if (dominantChildren.size() > 0) {
@@ -298,7 +299,7 @@ public class Xpp3Dom implements Serializable, Dom {
                         }
 
                         String name = recessiveChild.getName();
-                        Iterator<Dom> it =
+                        Iterator<XmlNode> it =
                                 commonChildren.computeIfAbsent(name, n1 -> Stream.of(dominant.getChildren().stream()
                                                 .filter(n2 -> n2.getName().equals(n1))
                                                 .collect(Collectors.toList()))
@@ -312,7 +313,7 @@ public class Xpp3Dom implements Serializable, Dom {
                             }
                             children.add(recessiveChild);
                         } else if (it.hasNext()) {
-                            Dom dominantChild = it.next();
+                            XmlNode dominantChild = it.next();
 
                             String dominantChildCombinationMode =
                                     dominantChild.getAttribute(SELF_COMBINATION_MODE_ATTRIBUTE);
@@ -323,7 +324,7 @@ public class Xpp3Dom implements Serializable, Dom {
                                 children.remove(dominantChild);
                             } else {
                                 int idx = dominant.getChildren().indexOf(dominantChild);
-                                Dom merged = merge(dominantChild, recessiveChild, childMergeOverride);
+                                XmlNode merged = merge(dominantChild, recessiveChild, childMergeOverride);
                                 if (merged != dominantChild) {
                                     if (children == null) {
                                         children = new ArrayList<>(dominant.getChildren());
@@ -355,7 +356,7 @@ public class Xpp3Dom implements Serializable, Dom {
                 if (children == null) {
                     children = dominant.getChildren();
                 }
-                return new Xpp3Dom(
+                return new XmlNodeImpl(
                         dominant.getName(), value != null ? value : dominant.getValue(), attrs, children, location);
             }
         }
@@ -372,7 +373,7 @@ public class Xpp3Dom implements Serializable, Dom {
      * @param recessive The recessive DOM, which will be merged into the dominant DOM
      * @return merged DOM
      */
-    public static Dom merge(Dom dominant, Dom recessive) {
+    public static XmlNode merge(XmlNode dominant, XmlNode recessive) {
         return merge(dominant, recessive, null);
     }
 
@@ -388,11 +389,11 @@ public class Xpp3Dom implements Serializable, Dom {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Xpp3Dom xpp3Dom = (Xpp3Dom) o;
-        return name.equals(xpp3Dom.name)
-                && Objects.equals(value, xpp3Dom.value)
-                && attributes.equals(xpp3Dom.attributes)
-                && children.equals(xpp3Dom.children);
+        XmlNodeImpl that = (XmlNodeImpl) o;
+        return Objects.equals(this.name, that.name)
+                && Objects.equals(this.value, that.value)
+                && Objects.equals(this.attributes, that.attributes)
+                && Objects.equals(this.children, that.children);
     }
 
     @Override
@@ -403,14 +404,14 @@ public class Xpp3Dom implements Serializable, Dom {
     @Override
     public String toString() {
         StringWriter writer = new StringWriter();
-        Xpp3DomWriter.write(writer, this);
+        XmlNodeWriter.write(writer, this);
         return writer.toString();
     }
 
     public String toUnescapedString() {
         StringWriter writer = new StringWriter();
         XMLWriter xmlWriter = new PrettyPrintXMLWriter(writer);
-        Xpp3DomWriter.write(xmlWriter, this, false);
+        XmlNodeWriter.write(xmlWriter, this, false);
         return writer.toString();
     }
 

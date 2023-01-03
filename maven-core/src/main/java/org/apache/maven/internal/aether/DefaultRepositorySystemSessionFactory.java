@@ -36,14 +36,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.feature.Features;
+import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
-import org.apache.maven.internal.xml.Xpp3Dom;
 import org.apache.maven.model.ModelBase;
 import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
@@ -254,11 +254,11 @@ public class DefaultRepositorySystemSessionFactory {
             authSelector.add(server.getId(), authBuilder.build());
 
             if (server.getConfiguration() != null) {
-                Dom dom = ((org.codehaus.plexus.util.xml.Xpp3Dom) server.getConfiguration()).getDom();
-                List<Dom> children = dom.getChildren().stream()
+                XmlNode dom = ((org.codehaus.plexus.util.xml.Xpp3Dom) server.getConfiguration()).getDom();
+                List<XmlNode> children = dom.getChildren().stream()
                         .filter(c -> !"wagonProvider".equals(c.getName()))
                         .collect(Collectors.toList());
-                dom = new Xpp3Dom(dom.getName(), null, null, children, null);
+                dom = new XmlNodeImpl(dom.getName(), null, null, children, null);
                 PlexusConfiguration config = XmlPlexusConfiguration.toPlexusConfiguration(dom);
                 configProps.put("aether.connector.wagon.config." + server.getId(), config);
 

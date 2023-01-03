@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.internal.xml.Xpp3Dom;
+import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
@@ -219,7 +219,7 @@ public class LifecycleExecutionPlanCalculatorStub implements LifecycleExecutionP
         final Plugin plugin = mojoDescriptor.getPluginDescriptor().getPlugin();
         plugin.setLocation("version", new InputLocation(12, 34, defaultBindings));
         MojoExecution result = new MojoExecution(plugin, goal, executionId);
-        result.setConfiguration(new Xpp3Dom(executionId + "-" + goal));
+        result.setConfiguration(new XmlNodeImpl(executionId + "-" + goal));
         result.setMojoDescriptor(mojoDescriptor);
         result.setLifecyclePhase(mojoDescriptor.getPhase());
 

@@ -20,7 +20,7 @@ package org.apache.maven.lifecycle.mapping;
 
 import java.util.List;
 
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.model.Dependency;
 
 /**
@@ -31,14 +31,14 @@ import org.apache.maven.model.Dependency;
 public class LifecycleMojo {
 
     private String goal;
-    private Dom configuration;
+    private XmlNode configuration;
     private List<Dependency> dependencies;
 
     public String getGoal() {
         return goal;
     }
 
-    public Dom getConfiguration() {
+    public XmlNode getConfiguration() {
         return configuration;
     }
 
@@ -50,7 +50,7 @@ public class LifecycleMojo {
         this.goal = goal;
     }
 
-    public void setConfiguration(Dom configuration) {
+    public void setConfiguration(XmlNode configuration) {
         this.configuration = configuration;
     }
 

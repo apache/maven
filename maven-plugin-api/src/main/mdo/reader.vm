@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import org.apache.maven.api.annotations.Generated;
-import org.apache.maven.internal.xml.DomBuilder;
+import org.apache.maven.internal.xml.XmlNodeBuilder;
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.name};
 #end
@@ -751,7 +751,7 @@ public class ${className}
                     ${classLcapName}.${field.name}( getIntegerValue( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ), "${fieldTagName}", parser, strict, ${field.defaultValue} ) );
                     break;
       #elseif ( $field.type == "DOM" )
-                    ${classLcapName}.${field.name}( DomBuilder.build( parser, true ) );
+                    ${classLcapName}.${field.name}( XmlNodeBuilder.build( parser, true ) );
                     break;
       #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
                     List<String> ${field.name} = new ArrayList<>();

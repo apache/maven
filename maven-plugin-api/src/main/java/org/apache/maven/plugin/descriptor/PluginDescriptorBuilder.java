@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.maven.internal.xml.XmlNodeBuilder;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
-import org.apache.maven.internal.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
@@ -369,7 +369,7 @@ public class PluginDescriptorBuilder {
 
     public PlexusConfiguration buildConfiguration(Reader configuration) throws PlexusConfigurationException {
         try {
-            return XmlPlexusConfiguration.toPlexusConfiguration(Xpp3DomBuilder.build(configuration));
+            return XmlPlexusConfiguration.toPlexusConfiguration(XmlNodeBuilder.build(configuration));
         } catch (IOException | XmlPullParserException e) {
             throw new PlexusConfigurationException(e.getMessage(), e);
         }

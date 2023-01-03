@@ -23,7 +23,7 @@ import java.util.Optional;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Plugin;
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 
 /**
  * A {@code MojoExecution}
@@ -40,5 +40,5 @@ public interface MojoExecution {
     String getGoal();
 
     @Nonnull
-    Optional<Dom> getConfiguration();
+    Optional<XmlNode> getConfiguration();
 }

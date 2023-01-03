@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-import org.apache.maven.api.xml.Dom;
-import org.apache.maven.internal.xml.Xpp3DomBuilder;
+import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.internal.xml.XmlNodeBuilder;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -86,9 +86,9 @@ public class ExtensionDescriptorBuilder {
     public ExtensionDescriptor build(InputStream is) throws IOException {
         ExtensionDescriptor extensionDescriptor = new ExtensionDescriptor();
 
-        Dom dom;
+        XmlNode dom;
         try {
-            dom = Xpp3DomBuilder.build(ReaderFactory.newXmlReader(is));
+            dom = XmlNodeBuilder.build(ReaderFactory.newXmlReader(is));
         } catch (XmlPullParserException e) {
             throw new IOException(e.getMessage(), e);
         }
@@ -104,13 +104,13 @@ public class ExtensionDescriptorBuilder {
         return extensionDescriptor;
     }
 
-    private List<String> parseStrings(Dom dom) {
+    private List<String> parseStrings(XmlNode dom) {
         List<String> strings = null;
 
         if (dom != null) {
             strings = new ArrayList<>();
 
-            for (Dom child : dom.getChildren()) {
+            for (XmlNode child : dom.getChildren()) {
                 String string = child.getValue();
                 if (string != null) {
                     string = string.trim();
