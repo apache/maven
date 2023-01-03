@@ -52,10 +52,9 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.2.0</version>
         <executions>
           <execution>
-            <id>copy-model</id>
+            <id>copy-toolchains.mdo</id>
             <goals>
               <goal>copy</goal>
             </goals>
@@ -76,8 +75,14 @@ under the License.
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>modello-plugin-velocity</artifactId>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <configuration>
+          <version>1.1.0</version>
+          <models>
+            <model>target/mdo/toolchains.mdo</model>
+          </models>
+        </configuration>
         <executions>
           <execution>
             <id>velocity</id>
@@ -86,10 +91,6 @@ under the License.
             </goals>
             <phase>generate-sources</phase>
             <configuration>
-              <version>4.0.0</version>
-              <models>
-                <model>target/mdo/toolchains.mdo</model>
-              </models>
               <templates>
                 <template>src/main/mdo/model-v3.vm</template>
                 <template>src/main/mdo/merger.vm</template>

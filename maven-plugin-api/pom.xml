@@ -59,7 +59,6 @@ under the License.
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
-        <version>2.0.0</version>
         <configuration>
           <models>
             <model>src/main/mdo/lifecycle.mdo</model>
@@ -68,36 +67,12 @@ under the License.
         </configuration>
         <executions>
           <execution>
-            <id>modello</id>
-            <phase>none</phase>
-          </execution>
-          <execution>
-            <id>modello-site-docs</id>
-            <phase>pre-site</phase>
-            <configuration>
-              <models>
-                <model>src/main/mdo/plugin.mdo</model>
-              </models>
-              <version>1.1.0</version>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>modello-plugin-velocity</artifactId>
-        <executions>
-          <execution>
             <id>velocity</id>
             <goals>
               <goal>velocity</goal>
             </goals>
             <phase>generate-sources</phase>
             <configuration>
-              <version>1.0.0</version>
-              <models>
-                <model>src/main/mdo/lifecycle.mdo</model>
-              </models>
               <templates>
                 <template>src/main/mdo/model.vm</template>
                 <template>src/main/mdo/reader.vm</template>
@@ -108,6 +83,19 @@ under the License.
                 <param>packageModelV4=org.apache.maven.plugin.lifecycle</param>
                 <param>packageToolV4=org.apache.maven.plugin.lifecycle.io.xpp3</param>
               </params>
+            </configuration>
+          </execution>
+          <execution>
+            <id>modello-site-docs2</id>
+            <goals>
+              <goal>xdoc</goal>
+            </goals>
+            <phase>pre-site</phase>
+            <configuration>
+              <models>
+                <model>src/main/mdo/plugin.mdo</model>
+              </models>
+              <version>1.1.0</version>
             </configuration>
           </execution>
         </executions>

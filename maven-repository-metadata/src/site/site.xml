@@ -28,7 +28,7 @@ under the License.
     <menu name="Overview">
       <item name="Introduction" href="index.html"/>
       <item name="Javadocs" href="apidocs/index.html"/>
-      <!--item name="Source Xref" href="xref/index.html"/-->
+      <item name="Source Xref" href="xref/index.html"/>
       <!--item name="FAQ" href="faq.html"/-->
     </menu>
 

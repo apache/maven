@@ -32,7 +32,6 @@
   <description>A new immutable API for Maven 4 to better manage what plugins and extensions can influence.</description>
 
   <modules>
-    <module>modello-plugin-velocity</module>
     <module>maven-api-meta</module>
     <module>maven-api-xml</module>
     <module>maven-api-model</module>
@@ -44,6 +43,27 @@
   <properties>
     <project.directory>api</project.directory>
   </properties>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.modello</groupId>
+          <artifactId>modello-maven-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>modello-site-docs</id>
+              <goals>
+                <goal>xdoc</goal>
+                <goal>xsd</goal>
+              </goals>
+              <phase>none</phase>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
   <profiles>
     <profile>

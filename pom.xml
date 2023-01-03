@@ -493,11 +493,6 @@ under the License.
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>modello-plugin-velocity</artifactId>
-          <version>${project.version}</version>
-        </plugin>
-        <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
           <version>${plexusVersion}</version>
@@ -530,6 +525,7 @@ under the License.
         <plugin>
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
+          <version>2.1.0</version>
           <executions>
             <execution>
               <id>modello-site-docs</id>
@@ -538,14 +534,6 @@ under the License.
                 <goal>xsd</goal>
               </goals>
               <phase>pre-site</phase>
-            </execution>
-            <execution>
-              <id>modello</id>
-              <goals>
-                <goal>java</goal>
-                <goal>xpp3-reader</goal>
-                <goal>xpp3-writer</goal>
-              </goals>
             </execution>
           </executions>
         </plugin>
