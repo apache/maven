@@ -88,9 +88,6 @@ public class DefaultMaven implements Maven {
     @Requirement
     private DefaultRepositorySystemSessionFactory repositorySessionFactory;
 
-    @Requirement(hint = GraphBuilder.HINT)
-    private GraphBuilder graphBuilder;
-
     @Override
     public MavenExecutionResult execute(MavenExecutionRequest request) {
         MavenExecutionResult result;
@@ -449,7 +446,14 @@ public class DefaultMaven implements Maven {
     }
 
     private Result<? extends ProjectDependencyGraph> buildGraph(MavenSession session, MavenExecutionResult result) {
-        Result<? extends ProjectDependencyGraph> graphResult = graphBuilder.build(session);
+        Result<? extends ProjectDependencyGraph> graphResult;
+        try {
+            graphResult =
+                    container.lookup(GraphBuilder.class, GraphBuilder.HINT).build(session);
+        } catch (ComponentLookupException e) {
+            logger.error("Internal error GraphBuilder can not be fetched!", e);
+            return Result.error();
+        }
         for (ModelProblem problem : graphResult.getProblems()) {
             if (problem.getSeverity() == ModelProblem.Severity.WARNING) {
                 logger.warn(problem.toString());
