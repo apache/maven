@@ -53,8 +53,8 @@ public class MavenITmng3482DependencyPomInterpolationTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3482" );
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

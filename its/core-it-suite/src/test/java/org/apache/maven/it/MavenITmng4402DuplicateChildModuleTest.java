@@ -55,7 +55,7 @@ public class MavenITmng4402DuplicateChildModuleTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "-N" );
+        verifier.addCliArgument( "-N" );
         try
         {
             verifier.addCliArgument( "validate" );

@@ -150,8 +150,8 @@ public class MavenITmng4469AuthenticatedDeploymentToCustomRepoTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "-Dfile=settings.xml" );
         verifier.addCliArgument( "-DgroupId=org.apache.maven.its.mng4469" );
         verifier.addCliArgument( "-DartifactId=it" );

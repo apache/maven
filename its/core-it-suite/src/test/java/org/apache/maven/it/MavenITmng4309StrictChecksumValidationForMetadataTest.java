@@ -59,7 +59,7 @@ public class MavenITmng4309StrictChecksumValidationForMetadataTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4309" );
         FileUtils.copyDirectoryStructure( new File( testDir, "repo" ), new File( testDir, "target/repo" ) );
-        verifier.addCliOption( "--strict-checksums" );
+        verifier.addCliArgument( "--strict-checksums" );
         try
         {
           verifier.addCliArgument( "validate" );

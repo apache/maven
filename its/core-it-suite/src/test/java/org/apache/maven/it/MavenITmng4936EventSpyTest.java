@@ -57,7 +57,7 @@ public class MavenITmng4936EventSpyTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.addCliArgument( "-Dmaven.ext.class.path=spy-0.1.jar" );
-        verifier.addCliOption( "-X" );
+        verifier.addCliArgument( "-X" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -136,8 +136,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         setUserHome( verifier, new File( testDir, "userhome" ) );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -172,8 +172,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.filterFile( "security-template.xml", "settings~security.xml", "UTF-8", filterProps );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
 
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         // NOTE: The selection of the Turkish language for the JVM locale is essential part of the test
         verifier.setEnvironmentVariable( "MAVEN_OPTS", "-Dsettings.security=" + new File( testDir, "settings~security.xml" ).getAbsolutePath() + " -Duser.language=tr" );
         verifier.addCliArgument( "validate" );
@@ -199,8 +199,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         setUserHome( verifier, new File( testDir, "userhome" ) );
-        verifier.addCliOption( "--encrypt-master-password" );
-        verifier.addCliOption( "test" );
+        verifier.addCliArgument( "--encrypt-master-password" );
+        verifier.addCliArgument( "test" );
         verifier.setLogFileName( "log-emp.txt" );
         verifier.addCliArgument( "-e" );
         verifier.execute();
@@ -212,8 +212,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         setUserHome( verifier, new File( testDir, "userhome" ) );
-        verifier.addCliOption( "--encrypt-password" );
-        verifier.addCliOption( "testpass" );
+        verifier.addCliArgument( "--encrypt-password" );
+        verifier.addCliArgument( "testpass" );
         verifier.setLogFileName( "log-ep.txt" );
         verifier.addCliArgument( "-e" );
         verifier.execute();

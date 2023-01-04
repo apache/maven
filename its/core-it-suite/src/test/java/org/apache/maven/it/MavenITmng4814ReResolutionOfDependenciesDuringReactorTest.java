@@ -59,8 +59,8 @@ public class MavenITmng4814ReResolutionOfDependenciesDuringReactorTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "consumer/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4814" );
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliArguments( "validate",
             "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:aggregate-test" );

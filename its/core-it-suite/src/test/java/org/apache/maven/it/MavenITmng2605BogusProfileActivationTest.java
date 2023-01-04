@@ -57,8 +57,8 @@ public class MavenITmng2605BogusProfileActivationTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

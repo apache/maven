@@ -63,8 +63,8 @@ public class MavenITmng3372DirectInvocationOfPluginsTest
 
         verifier = newVerifier( project.getAbsolutePath() );
 
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( "\"" + settingsFile.getAbsolutePath() + "\"" );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( "\"" + settingsFile.getAbsolutePath() + "\"" );
 
         verifier.addCliArgument( "mng3372:test" );
         verifier.execute();
@@ -82,7 +82,7 @@ public class MavenITmng3372DirectInvocationOfPluginsTest
 
         Verifier verifier = newVerifier( testBaseDir.getAbsolutePath(), "remote" );
 
-        verifier.addCliOption( "-U" );
+        verifier.addCliArgument( "-U" );
 
         verifier.addCliArgument( "dependency:tree" );
         verifier.execute();

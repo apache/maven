@@ -48,8 +48,8 @@ public class MavenITmng7051OptionalProfileActivationTest
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
 
-        verifier.addCliOption( "-P" );
-        verifier.addCliOption( "non-existing-profile" );
+        verifier.addCliArgument( "-P" );
+        verifier.addCliArgument( "non-existing-profile" );
         verifier.setLogFileName( "test-breaking.txt" );
 
         try
@@ -76,8 +76,8 @@ public class MavenITmng7051OptionalProfileActivationTest
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
 
-        verifier.addCliOption( "-P" );
-        verifier.addCliOption( "?non-existing-profile" );
+        verifier.addCliArgument( "-P" );
+        verifier.addCliArgument( "?non-existing-profile" );
         verifier.setLogFileName( "test-non-breaking.txt" );
 
         verifier.addCliArgument( "validate" );
@@ -97,8 +97,8 @@ public class MavenITmng7051OptionalProfileActivationTest
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
 
-        verifier.addCliOption( "-P" );
-        verifier.addCliOption( "?non-existing-profile,existing" );
+        verifier.addCliArgument( "-P" );
+        verifier.addCliArgument( "?non-existing-profile,existing" );
         verifier.setLogFileName( "test-non-breaking-mixed.txt" );
 
         verifier.addCliArgument( "validate" );
@@ -118,8 +118,8 @@ public class MavenITmng7051OptionalProfileActivationTest
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
 
-        verifier.addCliOption( "-P" );
-        verifier.addCliOption( "!?non-existing-profile" );
+        verifier.addCliArgument( "-P" );
+        verifier.addCliArgument( "!?non-existing-profile" );
         verifier.setLogFileName( "test-deactivating-non-breaking.txt" );
 
         verifier.addCliArgument( "validate" );
@@ -139,8 +139,8 @@ public class MavenITmng7051OptionalProfileActivationTest
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
 
-        verifier.addCliOption( "-P" );
-        verifier.addCliOption( "!?non-existing-profile,!existing" );
+        verifier.addCliArgument( "-P" );
+        verifier.addCliArgument( "!?non-existing-profile,!existing" );
         verifier.setLogFileName( "test-deactivating-non-breaking-mixed.txt" );
 
         verifier.addCliArgument( "validate" );

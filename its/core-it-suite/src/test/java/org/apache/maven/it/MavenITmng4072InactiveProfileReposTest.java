@@ -59,8 +59,8 @@ public class MavenITmng4072InactiveProfileReposTest
         verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", filterProps );
         verifier.filterFile( "profiles-template.xml", "profiles.xml", "UTF-8", filterProps );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         try
         {
             verifier.addCliArgument( "validate" );

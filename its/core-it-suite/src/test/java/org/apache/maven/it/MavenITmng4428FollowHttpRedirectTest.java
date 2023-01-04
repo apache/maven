@@ -141,9 +141,9 @@ public class MavenITmng4428FollowHttpRedirectTest
             filterProps.setProperty( "@protocol@", fromHttp ? "http" : "https" );
             filterProps.setProperty( "@port@", Integer.toString( ( (NetworkConnector) from ).getLocalPort() ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.addCliOption( "-X" );
-            verifier.addCliOption( "--settings" );
-            verifier.addCliOption( "settings.xml" );
+            verifier.addCliArgument( "-X" );
+            verifier.addCliArgument( "--settings" );
+            verifier.addCliArgument( "settings.xml" );
             verifier.setEnvironmentVariable( "MAVEN_OPTS", "-Djavax.net.ssl.trustStore=" + storePath + " -Djavax.net.ssl.trustStorePassword=" + storePwd );
             verifier.setLogFileName( "log-" + getName().substring( 6 ) + ".txt" );
             verifier.addCliArgument( "validate" );

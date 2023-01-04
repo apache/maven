@@ -51,8 +51,8 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
 
         // Clean up target files from earlier runs (verifier.setAutoClean does not work, as we are reducing the reactor)
         final Verifier verifier = newVerifier( moduleADir.getAbsolutePath() );
-        verifier.addCliOption( "-f" );
-        verifier.addCliOption( ".." );
+        verifier.addCliArgument( "-f" );
+        verifier.addCliArgument( ".." );
         verifier.addCliArgument( "clean" );
         verifier.execute();
     }
@@ -62,8 +62,8 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
     {
         final Verifier verifier = newVerifier( moduleADir.getAbsolutePath() );
 
-        verifier.addCliOption( "-pl" );
-        verifier.addCliOption( ":module-b" );
+        verifier.addCliArgument( "-pl" );
+        verifier.addCliArgument( ":module-b" );
         verifier.setLogFileName( "log-module-by-coordinate.txt" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
@@ -77,8 +77,8 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
     {
         final Verifier verifier = newVerifier( moduleADir.getAbsolutePath() );
 
-        verifier.addCliOption( "-pl" );
-        verifier.addCliOption( ":module-b,:module-a" );
+        verifier.addCliArgument( "-pl" );
+        verifier.addCliArgument( ":module-b,:module-a" );
         verifier.setLogFileName( "log-modules-by-coordinate.txt" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
@@ -92,8 +92,8 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
     {
         final Verifier verifier = newVerifier( moduleADir.getAbsolutePath() );
 
-        verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "../module-b" );
+        verifier.addCliArgument( "-pl" );
+        verifier.addCliArgument( "../module-b" );
         verifier.setLogFileName( "log-module-by-relative-path.txt" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
@@ -107,8 +107,8 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
     {
         final Verifier verifier = newVerifier( moduleADir.getAbsolutePath() );
 
-        verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "../module-b,." );
+        verifier.addCliArgument( "-pl" );
+        verifier.addCliArgument( "../module-b,." );
         verifier.setLogFileName( "log-modules-by-relative-path.txt" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
@@ -128,8 +128,8 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
         final File noDotMvnDir = ResourceExtractor.simpleExtractResources( getClass(), noDotMvnPath );
         final Verifier verifier = newVerifier( noDotMvnDir.getAbsolutePath() );
 
-        verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "../module-b" );
+        verifier.addCliArgument( "-pl" );
+        verifier.addCliArgument( "../module-b" );
         verifier.setLogFileName( "log-modules-by-relative-path-no-dotmvn.txt" );
         try
         {

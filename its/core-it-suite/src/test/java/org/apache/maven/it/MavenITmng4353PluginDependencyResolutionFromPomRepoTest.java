@@ -62,8 +62,8 @@ public class MavenITmng4353PluginDependencyResolutionFromPomRepoTest
                              "repo-1/org/apache/maven/its/mng4353/maven-mng4353-plugin/0.1/maven-mng4353-plugin-0.1"
                                  + ".pom",
                              "UTF-8", filterProps );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

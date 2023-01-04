@@ -55,8 +55,8 @@ public class MavenITmng4408NonExistentSettingsFileTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setLogFileName( "log-user.txt" );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "non-existing-settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "non-existing-settings.xml" );
         try
         {
             verifier.addCliArgument( "validate" );
@@ -84,8 +84,8 @@ public class MavenITmng4408NonExistentSettingsFileTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setLogFileName( "log-global.txt" );
-        verifier.addCliOption( "--global-settings" );
-        verifier.addCliOption( "non-existing-settings.xml" );
+        verifier.addCliArgument( "--global-settings" );
+        verifier.addCliArgument( "non-existing-settings.xml" );
         try
         {
             verifier.addCliArgument( "validate" );

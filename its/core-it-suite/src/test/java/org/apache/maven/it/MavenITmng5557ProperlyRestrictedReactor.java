@@ -57,8 +57,8 @@ public class MavenITmng5557ProperlyRestrictedReactor
         // from the reactor.
         //
         verifier.deleteArtifacts( "org.apache.maven.its.mng5557" );
-        verifier.addCliOption( "--projects" );
-        verifier.addCliOption( "project-0,project-1" );
+        verifier.addCliArgument( "--projects" );
+        verifier.addCliArgument( "project-0,project-1" );
         try
         {
             verifier.addCliArgument( "package" );

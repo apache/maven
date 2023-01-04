@@ -55,7 +55,7 @@ public class MavenITmng4386DebugLoggingTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "-X" );
+        verifier.addCliArgument( "-X" );
         verifier.setLogFileName( "log.txt" );
         verifier.addCliArgument( "validate" );
         verifier.execute();

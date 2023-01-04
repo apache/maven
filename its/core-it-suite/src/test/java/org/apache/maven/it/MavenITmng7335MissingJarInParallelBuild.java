@@ -25,7 +25,6 @@ import org.apache.maven.shared.verifier.VerificationException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
@@ -44,7 +43,7 @@ public class MavenITmng7335MissingJarInParallelBuild
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
-        verifier.addCliOption( "-T1C" );
+        verifier.addCliArgument( "-T1C" );
         verifier.addCliArguments( "clean", "package" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -35,8 +35,8 @@ class MavenITmng7566JavaPrerequisiteTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng7566" );
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         try
         {
@@ -67,8 +67,8 @@ class MavenITmng7566JavaPrerequisiteTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng7566" );
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliArgument( "org.apache.maven.its.mng7566:maven-mng7566-plugin:touch" );
         verifier.execute();

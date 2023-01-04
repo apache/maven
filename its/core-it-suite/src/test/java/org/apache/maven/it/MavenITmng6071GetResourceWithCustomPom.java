@@ -31,8 +31,8 @@ public class MavenITmng6071GetResourceWithCustomPom
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6071" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliOption( "-f" );
-        verifier.addCliOption( "./pom.xml" );
+        verifier.addCliArgument( "-f" );
+        verifier.addCliArgument( "./pom.xml" );
         verifier.setForkJvm( true );
         verifier.addCliArgument( "verify" );
         verifier.execute();

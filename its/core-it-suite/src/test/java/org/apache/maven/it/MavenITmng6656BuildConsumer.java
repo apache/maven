@@ -75,7 +75,7 @@ public class MavenITmng6656BuildConsumer
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setMavenDebug( false );
         verifier.setAutoclean( false );
-        verifier.addCliOption( "-Dchangelist=MNG6656" );
+        verifier.addCliArgument( "-Dchangelist=MNG6656" );
 
         verifier.addCliArgument( "install" );
         verifier.execute();

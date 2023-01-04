@@ -23,7 +23,6 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -60,8 +59,8 @@ public class MavenITmng4379TransitiveSystemPathInterpolatedWithEnvVarTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4379" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.setEnvironmentVariable( "MNG_4379_HOME", testDir.getAbsolutePath() );
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArguments( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -104,9 +104,9 @@ public class MavenITmng5222MojoDeprecatedTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5222-mojo-deprecated-params" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliOption( "-Dconfig.deprecatedParam2=deprecatedValueInProps" );
-        verifier.addCliOption( "-Dconfig.deprecatedArray=3,2,4,deprecated" );
-        verifier.addCliOption( "-Dconfig.deprecatedList=4,5,deprecated" );
+        verifier.addCliArgument( "-Dconfig.deprecatedParam2=deprecatedValueInProps" );
+        verifier.addCliArgument( "-Dconfig.deprecatedArray=3,2,4,deprecated" );
+        verifier.addCliArgument( "-Dconfig.deprecatedList=4,5,deprecated" );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-deprecated-property.txt" );
@@ -174,7 +174,7 @@ public class MavenITmng5222MojoDeprecatedTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5222-mojo-deprecated-params" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliOption( "-Pconfig-values" );
+        verifier.addCliArgument( "-Pconfig-values" );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-deprecated-config.txt" );

@@ -101,8 +101,8 @@ public class MavenITmng4991NonProxyHostsTest
             filterProps.setProperty( "@proxyPort@", Integer.toString( proxyPort ) );
             filterProps.setProperty( "@localhost@", InetAddress.getLoopbackAddress().getCanonicalHostName() );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.addCliOption( "-s" );
-            verifier.addCliOption( "settings.xml" );
+            verifier.addCliArgument( "-s" );
+            verifier.addCliArgument( "settings.xml" );
             verifier.addCliArgument( "validate" );
             verifier.execute();
             verifier.verifyErrorFreeLog();

@@ -88,14 +88,14 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride
     {
         final File settingsFile = new File( testDir, "settings-override.xml" );
         final String path = settingsFile.getAbsolutePath();
-        verifier.addCliOption( "--global-settings" );
+        verifier.addCliArgument( "--global-settings" );
         if ( path.indexOf( ' ' ) < 0 )
         {
-            verifier.addCliOption( path );
+            verifier.addCliArgument( path );
         }
         else
         {
-            verifier.addCliOption( '"' + path + '"' );
+            verifier.addCliArgument( '"' + path + '"' );
         }
     }
 

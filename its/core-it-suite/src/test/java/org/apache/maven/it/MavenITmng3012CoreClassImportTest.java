@@ -58,8 +58,8 @@ public class MavenITmng3012CoreClassImportTest
         verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "0.1-mng3012", "jar" );
         verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "0.1-mng3012", "pom" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

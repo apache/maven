@@ -60,8 +60,8 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng3379.c" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3379.d" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "-Dmaven.artifact.threads=16" );
         verifier.addCliArgument( "validate" );
         verifier.execute();

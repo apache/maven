@@ -61,8 +61,8 @@ public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4465" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.setLogFileName( "log1.txt" );
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "mng4465:touch" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -77,8 +77,8 @@ public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8",
             Collections.singletonMap( "@baseurl@", "bad://localhost:63412" ) );
         verifier.setLogFileName( "log2.txt" );
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "mng4465:touch" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

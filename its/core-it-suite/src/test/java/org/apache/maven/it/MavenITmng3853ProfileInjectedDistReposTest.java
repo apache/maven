@@ -60,7 +60,7 @@ public class MavenITmng3853ProfileInjectedDistReposTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "-Pcoreit" );
+        verifier.addCliArgument( "-Pcoreit" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -49,7 +49,7 @@ public class MavenIT0051ReleaseProfileTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "-DperformRelease=true" );
+        verifier.addCliArgument( "-DperformRelease=true" );
         verifier.addCliArgument( "package" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

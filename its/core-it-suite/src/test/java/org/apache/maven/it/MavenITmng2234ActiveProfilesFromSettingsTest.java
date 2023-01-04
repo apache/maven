@@ -54,8 +54,8 @@ public class MavenITmng2234ActiveProfilesFromSettingsTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

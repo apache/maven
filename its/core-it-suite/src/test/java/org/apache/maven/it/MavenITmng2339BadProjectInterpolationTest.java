@@ -48,7 +48,7 @@ public class MavenITmng2339BadProjectInterpolationTest
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
 
-        verifier.addCliOption( "-Dversion=foo" );
+        verifier.addCliArgument( "-Dversion=foo" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
 
@@ -82,7 +82,7 @@ public class MavenITmng2339BadProjectInterpolationTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        verifier.addCliOption( "-Dversion=2" );
+        verifier.addCliArgument( "-Dversion=2" );
         verifier.setLogFileName( "log-cli-specified.txt" );
         verifier.addCliArgument( "initialize" );
         verifier.execute();

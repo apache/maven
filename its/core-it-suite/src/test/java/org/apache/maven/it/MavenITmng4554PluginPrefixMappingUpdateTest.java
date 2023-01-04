@@ -117,8 +117,8 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             filterProps.setProperty( "@port@", Integer.toString( connector.getLocalPort() ) );
             filterProps.setProperty( "@repo@", "repo-1" );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.addCliOption( "-s" );
-            verifier.addCliOption( "settings.xml" );
+            verifier.addCliArgument( "-s" );
+            verifier.addCliArgument( "settings.xml" );
 
             verifier.setLogFileName( "log-cached-1.txt" );
             verifier.addCliArgument( "a:touch" );
@@ -205,9 +205,9 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             filterProps.setProperty( "@port@", Integer.toString( connector.getLocalPort() ) );
             filterProps.setProperty( "@repo@", "repo-1" );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.addCliOption( "-U" );
-            verifier.addCliOption( "-s" );
-            verifier.addCliOption( "settings.xml" );
+            verifier.addCliArgument( "-U" );
+            verifier.addCliArgument( "-s" );
+            verifier.addCliArgument( "settings.xml" );
 
             verifier.setLogFileName( "log-forced-1.txt" );
             verifier.addCliArgument( "a:touch" );
@@ -296,8 +296,8 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             filterProps.setProperty( "@port@", Integer.toString( connector.getLocalPort() ) );
             filterProps.setProperty( "@repo@", "repo-it" );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.addCliOption( "-s" );
-            verifier.addCliOption( "settings.xml" );
+            verifier.addCliArgument( "-s" );
+            verifier.addCliArgument( "settings.xml" );
 
             FileUtils.copyDirectoryStructure( new File( testDir, "repo-1" ), new File( testDir, "repo-it" ) );
 

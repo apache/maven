@@ -51,8 +51,8 @@ public class MavenITmng6065FailOnSeverityTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setForkJvm( true );
-        verifier.addCliOption( "--fail-on-severity" );
-        verifier.addCliOption( "WARN" );
+        verifier.addCliArgument( "--fail-on-severity" );
+        verifier.addCliArgument( "WARN" );
 
         boolean failed = false;
 
@@ -79,8 +79,8 @@ public class MavenITmng6065FailOnSeverityTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setForkJvm( true );
-        verifier.addCliOption( "--fail-on-severity" );
-        verifier.addCliOption( "ERROR" );
+        verifier.addCliArgument( "--fail-on-severity" );
+        verifier.addCliArgument( "ERROR" );
 
         verifier.addCliArgument( "compile" );
         verifier.execute();

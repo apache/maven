@@ -60,8 +60,8 @@ public class MavenITmng3314OfflineSnapshotsTest
             verifier.deleteArtifacts( "org.apache.maven.its.mng3314" );
             verifier.setLogFileName( "log1.txt" );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-            verifier.addCliOption( "--settings" );
-            verifier.addCliOption( "settings.xml" );
+            verifier.addCliArgument( "--settings" );
+            verifier.addCliArgument( "settings.xml" );
             verifier.addCliArgument( "validate" );
             verifier.execute();
             verifier.verifyFilePresent( "target/compile.txt" );
@@ -72,9 +72,9 @@ public class MavenITmng3314OfflineSnapshotsTest
             // phase 2: run build in offline mode to check it still passes
             Verifier verifier = newVerifier( testDir.getAbsolutePath() );
             verifier.setLogFileName( "log2.txt" );
-            verifier.addCliOption( "-o" );
-            verifier.addCliOption( "--settings" );
-            verifier.addCliOption( "settings.xml" );
+            verifier.addCliArgument( "-o" );
+            verifier.addCliArgument( "--settings" );
+            verifier.addCliArgument( "settings.xml" );
             verifier.addCliArgument( "validate" );
             verifier.execute();
             verifier.verifyFilePresent( "target/compile.txt" );

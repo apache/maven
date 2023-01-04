@@ -62,7 +62,7 @@ public class MavenITmng6057CheckReactorOrderTest
         verifier.setAutoclean( false );
 
         verifier.setLogFileName( "log-only.txt" );
-        verifier.addCliOption( "-Drevision=1.3.0-SNAPSHOT" );
+        verifier.addCliArgument( "-Drevision=1.3.0-SNAPSHOT" );
         verifier.addCliArgument( "clean" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

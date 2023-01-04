@@ -61,8 +61,8 @@ public class MavenITmng3284UsingCachedPluginsTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3284" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -74,8 +74,8 @@ public class MavenITmng3284UsingCachedPluginsTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "mod-a/target" );
         verifier.deleteDirectory( "mod-b/target" );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

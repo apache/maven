@@ -55,11 +55,11 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "user-settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "user-settings.xml" );
         // dedicated CLI option only available since MNG-3914
-        verifier.addCliOption( "--global-settings" );
-        verifier.addCliOption( "global-settings.xml" );
+        verifier.addCliArgument( "--global-settings" );
+        verifier.addCliArgument( "global-settings.xml" );
         verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

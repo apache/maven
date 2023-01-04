@@ -56,8 +56,8 @@ public class MavenITmng4317PluginVersionResolutionFromMultiReposTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4317" );
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliArgument( "org.apache.maven.its.mng4317:maven-mng4317-plugin:touch" );
         verifier.execute();

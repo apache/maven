@@ -59,8 +59,8 @@ public class MavenITmng5224InjectedSettings
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         //verifier.
         verifier.addCliArgument( "validate" );
         verifier.execute();

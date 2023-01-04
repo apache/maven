@@ -56,8 +56,8 @@ public class MavenITmng5576CdFriendlyVersions
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "-Dchangelist=changelist" );
-        verifier.addCliOption( "-Dmaven.experimental.buildconsumer=false" );
+        verifier.addCliArgument( "-Dchangelist=changelist" );
+        verifier.addCliArgument( "-Dmaven.experimental.buildconsumer=false" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -88,8 +88,8 @@ public class MavenITmng5576CdFriendlyVersions
         verifier.setLogFileName( "log-bc.txt" );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "-Dchangelist=changelist" );
-        verifier.addCliOption( "-Dmaven.experimental.buildconsumer=true" );
+        verifier.addCliArgument( "-Dchangelist=changelist" );
+        verifier.addCliArgument( "-Dmaven.experimental.buildconsumer=true" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

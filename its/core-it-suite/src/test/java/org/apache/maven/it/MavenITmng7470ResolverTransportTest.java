@@ -79,13 +79,13 @@ public class MavenITmng7470ResolverTransportTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.resolver.resolver-demo-maven-plugin" );
         verifier.deleteArtifacts( "org.apache.maven.its.resolver-transport" );
-        verifier.addCliOption( "-X" );
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( new File( projectDir, "settings.xml" ).getAbsolutePath() );
-        verifier.addCliOption( "-Pmaven-core-it-repo" );
+        verifier.addCliArgument( "-X" );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( new File( projectDir, "settings.xml" ).getAbsolutePath() );
+        verifier.addCliArgument( "-Pmaven-core-it-repo" );
         if ( transport != null )
         {
-            verifier.addCliOption( "-Dmaven.resolver.transport=" + transport );
+            verifier.addCliArgument( "-Dmaven.resolver.transport=" + transport );
         }
         // Maven will fail if project dependencies cannot be resolved.
         // As dependency exists ONLY in HTTP repo, it MUST be reached using selected transport and

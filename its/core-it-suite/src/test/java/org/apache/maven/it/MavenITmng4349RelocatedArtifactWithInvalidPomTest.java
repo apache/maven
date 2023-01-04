@@ -59,8 +59,8 @@ public class MavenITmng4349RelocatedArtifactWithInvalidPomTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4349" );
         verifier.deleteDirectory( "target" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

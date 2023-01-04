@@ -55,17 +55,17 @@ public class MavenITmng2309ProfileInjectionOrderTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         if ( matchesVersionRange( "[4.0.0-alpha-1,)" ) )
         {
-            verifier.addCliOption( "-P"
+            verifier.addCliArgument( "-P"
                     + "pom-a,pom-b,pom-e,pom-c,pom-d"
                     + ",settings-a,settings-b,settings-e,settings-c,settings-d" );
         }
         else
         {
-            verifier.addCliOption( "-P"
+            verifier.addCliArgument( "-P"
                     + "pom-a,pom-b,pom-e,pom-c,pom-d"
                     + ",profiles-a,profiles-b,profiles-e,profiles-c,profiles-d"
                     + ",settings-a,settings-b,settings-e,settings-c,settings-d" );

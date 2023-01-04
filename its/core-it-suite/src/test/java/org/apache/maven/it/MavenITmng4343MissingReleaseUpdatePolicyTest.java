@@ -153,8 +153,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4343" );
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( "settings.xml" );
 
         Properties filterProps = verifier.newDefaultFilterProperties();
         filterProps.setProperty( "@updates@", "always" );
@@ -209,8 +209,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4343" );
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( "settings.xml" );
 
         Properties filterProps = verifier.newDefaultFilterProperties();
         filterProps.setProperty( "@updates@", "never" );
@@ -257,7 +257,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
         verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "pom" );
 
         verifier.setLogFileName( "log-never-3.txt" );
-        verifier.addCliOption( "-U" );
+        verifier.addCliArgument( "-U" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -270,7 +270,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
         requestedUris.clear();
 
         verifier.setLogFileName( "log-never-4.txt" );
-        verifier.addCliOption( "-U" );
+        verifier.addCliArgument( "-U" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -62,8 +62,8 @@ public class MavenITmng2695OfflinePluginSnapshotsTest
             verifier.setAutoclean( false );
             verifier.setLogFileName( "log1.txt" );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-            verifier.addCliOption( "--settings" );
-            verifier.addCliOption( "settings.xml" );
+            verifier.addCliArgument( "--settings" );
+            verifier.addCliArgument( "settings.xml" );
             verifier.addCliArgument( "validate" );
             verifier.execute();
             verifier.verifyFilePresent( "target/a.txt" );
@@ -77,9 +77,9 @@ public class MavenITmng2695OfflinePluginSnapshotsTest
             verifier.deleteDirectory( "target" );
             verifier.setAutoclean( false );
             verifier.setLogFileName( "log2.txt" );
-            verifier.addCliOption( "--settings" );
-            verifier.addCliOption( "settings.xml" );
-            verifier.addCliOption( "--offline" );
+            verifier.addCliArgument( "--settings" );
+            verifier.addCliArgument( "settings.xml" );
+            verifier.addCliArgument( "--offline" );
             verifier.addCliArgument( "validate" );
             verifier.execute();
             verifier.verifyFilePresent( "target/a.txt" );

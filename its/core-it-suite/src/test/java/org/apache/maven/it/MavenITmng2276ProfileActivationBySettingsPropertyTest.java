@@ -55,8 +55,8 @@ public class MavenITmng2276ProfileActivationBySettingsPropertyTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.setLogFileName( "log-1.txt" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
@@ -81,9 +81,9 @@ public class MavenITmng2276ProfileActivationBySettingsPropertyTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
-        verifier.addCliOption( "-DsettingsProperty=cli" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
+        verifier.addCliArgument( "-DsettingsProperty=cli" );
         verifier.setLogFileName( "log-2.txt" );
         verifier.addCliArgument( "validate" );
         verifier.execute();

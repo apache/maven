@@ -56,7 +56,7 @@ public class MavenITmng4387QuietLoggingTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.addCliOption( "-q" );
+        verifier.addCliArgument( "-q" );
         verifier.setLogFileName( "log.txt" );
         verifier.addCliArgument( "validate" );
         verifier.execute();

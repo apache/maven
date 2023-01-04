@@ -58,8 +58,8 @@ public class MavenITmng4459InMemorySettingsKeptEncryptedTest
         verifier.deleteDirectory( "target" );
         verifier.getSystemProperties().setProperty( "settings.security",
             new File( testDir, "settings-security.xml" ).getAbsolutePath() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

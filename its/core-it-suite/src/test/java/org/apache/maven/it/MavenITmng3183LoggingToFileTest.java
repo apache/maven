@@ -56,8 +56,8 @@ public class MavenITmng3183LoggingToFileTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.addCliOption( "-l" );
-        verifier.addCliOption( "maven.log" );
+        verifier.addCliArgument( "-l" );
+        verifier.addCliArgument( "maven.log" );
         verifier.setLogFileName( "stdout.txt" );
         new File( testDir, "stdout.txt" ).delete();
         new File( testDir, "maven.log" ).delete();

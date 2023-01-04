@@ -54,7 +54,7 @@ public class MavenITmng1415QuotedSystemPropertiesTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "-Dtest.property=Test Property" );
+        verifier.addCliArgument( "-Dtest.property=Test Property" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

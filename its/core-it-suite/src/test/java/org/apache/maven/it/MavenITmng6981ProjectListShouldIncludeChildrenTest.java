@@ -46,8 +46,8 @@ public class MavenITmng6981ProjectListShouldIncludeChildrenTest
         final File testDir = ResourceExtractor.simpleExtractResources( getClass(), RESOURCE_PATH );
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier.addCliOption( "-pl" );
-        verifier.addCliOption( ":module-a" );
+        verifier.addCliArgument( "-pl" );
+        verifier.addCliArgument( ":module-a" );
         verifier.addCliArgument( "compile" );
         verifier.execute();
         verifier.verifyTextInLog( "Building module-a-1 1.0" );
@@ -65,9 +65,9 @@ public class MavenITmng6981ProjectListShouldIncludeChildrenTest
         final File testDir = ResourceExtractor.simpleExtractResources( getClass(), RESOURCE_PATH );
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier.addCliOption( "-f" );
-        verifier.addCliOption( "module-a" );
-        verifier.addCliOption( "--non-recursive" );
+        verifier.addCliArgument( "-f" );
+        verifier.addCliArgument( "module-a" );
+        verifier.addCliArgument( "--non-recursive" );
         verifier.setLogFileName( "log-non-recursive.txt" );
         verifier.addCliArgument( "compile" );
         verifier.execute();

@@ -64,8 +64,8 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest
         verifier.setAutoclean( false );
 
         //verifier.setLogFileName( "log-only.txt" );
-        verifier.addCliOption( "-Drevision=1.2" );
-        verifier.addCliOption( "-Dmaven.experimental.buildconsumer=false" );
+        verifier.addCliArgument( "-Drevision=1.2" );
+        verifier.addCliArgument( "-Dmaven.experimental.buildconsumer=false" );
         verifier.addCliArgument( "clean" );
         verifier.execute();
         verifier.addCliArgument( "package" );
@@ -85,8 +85,8 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest
         verifier.setAutoclean( false );
 
         verifier.setLogFileName( "log-bc.txt" );
-        verifier.addCliOption( "-Drevision=1.2" );
-        verifier.addCliOption( "-Dmaven.experimental.buildconsumer=true" );
+        verifier.addCliArgument( "-Drevision=1.2" );
+        verifier.addCliArgument( "-Dmaven.experimental.buildconsumer=true" );
         verifier.addCliArgument( "clean" );
         verifier.execute();
         verifier.addCliArgument( "package" );

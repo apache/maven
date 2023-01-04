@@ -60,7 +60,7 @@ public class MavenITmng4565MultiConditionProfileActivationTest
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "-Dprofile1.on=true" );
+        verifier.addCliArgument( "-Dprofile1.on=true" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
 

@@ -49,7 +49,7 @@ public class MavenITmng3355TranslatedPathInterpolationTest
 
         verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier.addCliOption( "-Dversion=foo" );
+        verifier.addCliArgument( "-Dversion=foo" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
 

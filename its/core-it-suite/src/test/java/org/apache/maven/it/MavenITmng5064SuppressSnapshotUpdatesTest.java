@@ -110,9 +110,9 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.setProperty( "@port@", Integer.toString( port ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.addCliOption( "-nsu" );
-            verifier.addCliOption( "-s" );
-            verifier.addCliOption( "settings.xml" );
+            verifier.addCliArgument( "-nsu" );
+            verifier.addCliArgument( "-s" );
+            verifier.addCliArgument( "settings.xml" );
 
             verifier.setLogFileName( "log-1.txt" );
             verifier.addCliArgument( "validate" );

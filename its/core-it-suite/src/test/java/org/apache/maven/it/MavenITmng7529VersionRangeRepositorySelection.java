@@ -50,8 +50,8 @@ public class MavenITmng7529VersionRangeRepositorySelection
     verifier.setAutoclean(false);
     verifier.deleteDirectory("target");
     verifier.deleteArtifacts("org.apache.maven.its.mng7529");
-    verifier.addCliOption("--settings");
-    verifier.addCliOption("settings.xml");
+    verifier.addCliArgument("--settings");
+    verifier.addCliArgument("settings.xml");
 
     verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties());
     verifier.addCliArgument("validate");

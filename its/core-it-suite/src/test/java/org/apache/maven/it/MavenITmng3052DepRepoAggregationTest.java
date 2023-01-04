@@ -64,8 +64,8 @@ public class MavenITmng3052DepRepoAggregationTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.filterFile( "repo-d/org/apache/maven/its/mng3052/direct/0.1-SNAPSHOT/template.pom",
             "repo-d/org/apache/maven/its/mng3052/direct/0.1-SNAPSHOT/direct-0.1-20090517.133956-1.pom", "UTF-8", filterProps );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

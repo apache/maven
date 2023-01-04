@@ -88,8 +88,8 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setLogFileName( "log-withfile.txt" );
-        verifier.addCliOption( "-f" );
-        verifier.addCliOption( "app/pom.xml" );
+        verifier.addCliArgument( "-f" );
+        verifier.addCliArgument( "app/pom.xml" );
         verifier.addCliArgument( "compile" );
         verifier.execute();
     }
@@ -103,9 +103,9 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     public void testWithFileAndAlsoMake() throws Exception
     {
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliOption( "-am" );
-        verifier.addCliOption( "-f" );
-        verifier.addCliOption( "app/pom.xml" );
+        verifier.addCliArgument( "-am" );
+        verifier.addCliArgument( "-f" );
+        verifier.addCliArgument( "app/pom.xml" );
         verifier.setLogFileName( "log-withfilealsomake.txt" );
         verifier.addCliArgument( "compile" );
         verifier.execute();
@@ -122,7 +122,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     {
         File submoduleDirectory = new File( testDir, "app" );
         Verifier verifier = newVerifier( submoduleDirectory.getAbsolutePath() );
-        verifier.addCliOption( "-am" );
+        verifier.addCliArgument( "-am" );
         verifier.setLogFileName( "log-insubmodulealsomake.txt" );
         verifier.addCliArgument( "compile" );
         verifier.execute();

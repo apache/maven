@@ -57,8 +57,8 @@ public class MavenITmng4586PluginPrefixResolutionFromVersionlessPluginMgmtTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4586" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "mng4586:touch" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

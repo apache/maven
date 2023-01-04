@@ -57,8 +57,8 @@ public class MavenITmng0507ArtifactRelocationTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven", "maven-core-it-support", "1.1" );
         verifier.deleteArtifacts( "org.apache.maven", "maven-core-it-support-old-location", "1.1" );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

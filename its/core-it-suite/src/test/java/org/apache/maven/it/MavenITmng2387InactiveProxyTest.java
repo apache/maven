@@ -134,8 +134,8 @@ public class MavenITmng2387InactiveProxyTest
 
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2387" );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

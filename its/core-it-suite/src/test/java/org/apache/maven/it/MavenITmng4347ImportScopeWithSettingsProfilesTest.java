@@ -60,8 +60,8 @@ public class MavenITmng4347ImportScopeWithSettingsProfilesTest
 
         verifier.setAutoclean( false );
 
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( "settings.xml" );
 
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
 

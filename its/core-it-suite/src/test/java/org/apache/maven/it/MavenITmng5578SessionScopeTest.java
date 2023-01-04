@@ -52,7 +52,7 @@ public class MavenITmng5578SessionScopeTest
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
-        verifier.addCliOption( "-Dit-build-extensions=false" );
+        verifier.addCliArgument( "-Dit-build-extensions=false" );
         verifier.addCliArgument( "package" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -76,11 +76,11 @@ public class MavenITmng5578SessionScopeTest
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
-        verifier.addCliOption( "-Dit-build-extensions=false" );
-        verifier.addCliOption( "--builder" );
-        verifier.addCliOption( "multithreaded" );
-        verifier.addCliOption( "-T" );
-        verifier.addCliOption( "1" );
+        verifier.addCliArgument( "-Dit-build-extensions=false" );
+        verifier.addCliArgument( "--builder" );
+        verifier.addCliArgument( "multithreaded" );
+        verifier.addCliArgument( "-T" );
+        verifier.addCliArgument( "1" );
         verifier.addCliArgument( "package" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -104,7 +104,7 @@ public class MavenITmng5578SessionScopeTest
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
-        verifier.addCliOption( "-Dit-build-extensions=true" );
+        verifier.addCliArgument( "-Dit-build-extensions=true" );
         verifier.addCliArgument( "package" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -135,7 +135,7 @@ public class MavenITmng5578SessionScopeTest
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
-        verifier.addCliOption( "-Dmaven.ext.class.path=" + new File( extensionDir, "target/classes" ).getAbsolutePath() );
+        verifier.addCliArgument( "-Dmaven.ext.class.path=" + new File( extensionDir, "target/classes" ).getAbsolutePath() );
         verifier.setForkJvm( true ); // verifier does not support custom realms in embedded mode
         verifier.addCliArgument( "package" );
         verifier.execute();

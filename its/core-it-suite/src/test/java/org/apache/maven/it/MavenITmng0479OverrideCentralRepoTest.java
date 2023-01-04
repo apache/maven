@@ -70,8 +70,8 @@ public class MavenITmng0479OverrideCentralRepoTest
         verifier.deleteDirectory( "target" );
 
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -135,8 +135,8 @@ public class MavenITmng0479OverrideCentralRepoTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng0479" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -153,8 +153,8 @@ public class MavenITmng0479OverrideCentralRepoTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         try
         {
             verifier.addCliArgument( "validate" );
@@ -173,8 +173,8 @@ public class MavenITmng0479OverrideCentralRepoTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         try
         {
             verifier.addCliArgument( "org.apache.maven.its.mng0479:maven-mng0479-plugin:0.1-SNAPSHOT:touch" );
@@ -194,8 +194,8 @@ public class MavenITmng0479OverrideCentralRepoTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         try
         {
             verifier.addCliArgument( "org.apache.maven.its.mng0479:maven-mng0479-plugin:0.1-SNAPSHOT:touch" );

@@ -65,8 +65,8 @@ public class MavenITmng0449PluginVersionResolutionTest
         {
             // when we run Maven embedded, the plugin class realm locks the artifacts so we can't delete them
         }
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliArgument( "validate" );
         verifier.execute();
@@ -110,8 +110,8 @@ public class MavenITmng0449PluginVersionResolutionTest
         {
             // when we run Maven embedded, the plugin class realm locks the artifacts so we can't delete them
         }
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliArgument( "org.apache.maven.its.mng0449:maven-it-plugin-a:touch" );
         verifier.execute();

@@ -55,7 +55,7 @@ public class MavenITmng4208InterpolationPrefersCliOverProjectPropsTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "-DtestProperty=PASSED" );
+        verifier.addCliArgument( "-DtestProperty=PASSED" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -88,8 +88,8 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         FileUtils.fileWrite( fileToWrite.toString(), "x=42" );
 
         verifier2.setAutoclean( false );
-        verifier2.addCliOption( "--projects" );
-        verifier2.addCliOption( ":module-a" );
+        verifier2.addCliArgument( "--projects" );
+        verifier2.addCliArgument( ":module-a" );
         verifier2.addCliArgument( "compile" );
         verifier2.execute();
 
@@ -109,8 +109,8 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         // is no longer in sync with its compiled artifacts.
         final Verifier verifier3 = newVerifier( testDir.getAbsolutePath() );
         verifier3.setAutoclean( false );
-        verifier3.addCliOption( "--resume-from" );
-        verifier3.addCliOption( ":module-b" );
+        verifier3.addCliArgument( "--resume-from" );
+        verifier3.addCliArgument( ":module-b" );
         verifier3.addCliArgument( "compile" );
         verifier3.execute();
 

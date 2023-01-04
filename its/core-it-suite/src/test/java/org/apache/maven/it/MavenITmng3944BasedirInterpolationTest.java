@@ -56,8 +56,8 @@ public class MavenITmng3944BasedirInterpolationTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "-f" );
-        verifier.addCliOption( "pom-with-unusual-name.xml" );
+        verifier.addCliArgument( "-f" );
+        verifier.addCliArgument( "pom-with-unusual-name.xml" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

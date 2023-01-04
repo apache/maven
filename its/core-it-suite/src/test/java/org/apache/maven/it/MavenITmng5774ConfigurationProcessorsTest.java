@@ -29,8 +29,8 @@ public class MavenITmng5774ConfigurationProcessorsTest
         verifier = newVerifier( new File( testDir, "build-with-one-processor-valid" ).getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it-configuration-processors" );
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( new File( testDir, "settings.xml" ).getAbsolutePath() );
         verifier.addCliArgument( "process-resources" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -54,8 +54,8 @@ public class MavenITmng5774ConfigurationProcessorsTest
         verifier = newVerifier( new File( testDir, "build-with-two-processors-invalid" ).getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it-configuration-processors" );
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( new File( testDir, "settings.xml" ).getAbsolutePath() );
         try
         {
             verifier.addCliArgument( "process-resources" );

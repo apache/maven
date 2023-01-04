@@ -59,8 +59,8 @@ public class MavenITmng2432PluginPrefixOrderTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng2432.pom" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2432.settings" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "it:touch" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

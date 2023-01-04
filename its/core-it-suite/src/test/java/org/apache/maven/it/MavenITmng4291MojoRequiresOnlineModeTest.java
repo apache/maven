@@ -57,7 +57,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-direct.txt" );
-        verifier.addCliOption( "--offline" );
+        verifier.addCliArgument( "--offline" );
         try
         {
             verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-online:2.1-SNAPSHOT:touch" );
@@ -87,7 +87,7 @@ public class MavenITmng4291MojoRequiresOnlineModeTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-lifecycle.txt" );
-        verifier.addCliOption( "--offline" );
+        verifier.addCliArgument( "--offline" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

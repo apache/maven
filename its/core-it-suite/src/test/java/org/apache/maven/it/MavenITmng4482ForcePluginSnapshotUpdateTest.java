@@ -55,8 +55,8 @@ public class MavenITmng4482ForcePluginSnapshotUpdateTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4482" );
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( "settings.xml" );
 
         /*
          * NOTE: The update of the extension plugin while still being referenced by a class loader from the first test
@@ -82,8 +82,8 @@ public class MavenITmng4482ForcePluginSnapshotUpdateTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-force-2.txt" );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "-X" );
-        verifier.addCliOption( "-U" );
+        verifier.addCliArgument( "-X" );
+        verifier.addCliArgument( "-U" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

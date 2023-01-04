@@ -84,7 +84,7 @@ public class MavenITmng4331DependencyCollectionTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4331" );
-        verifier.addCliOption( "-Ddepres.projectArtifacts=target/@artifactId@.txt" );
+        verifier.addCliArgument( "-Ddepres.projectArtifacts=target/@artifactId@.txt" );
         verifier.setLogFileName( "log-aggregator.txt" );
         verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-dependency-collection:2.1-SNAPSHOT:aggregate-test" );
         verifier.execute();

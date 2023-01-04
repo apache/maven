@@ -100,9 +100,9 @@ public class MavenITmng4772PluginVersionResolutionDoesntTouchDisabledRepoTest
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.setProperty( "@port@", Integer.toString( port ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.addCliOption( "-U" );
-            verifier.addCliOption( "-s" );
-            verifier.addCliOption( "settings.xml" );
+            verifier.addCliArgument( "-U" );
+            verifier.addCliArgument( "-s" );
+            verifier.addCliArgument( "settings.xml" );
             verifier.addCliArgument( "org.apache.maven.its.mng4772:maven-it-plugin:touch" );
             verifier.execute();
             verifier.verifyErrorFreeLog();

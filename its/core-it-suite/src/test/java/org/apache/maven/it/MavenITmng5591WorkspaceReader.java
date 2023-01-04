@@ -60,7 +60,7 @@ public class MavenITmng5591WorkspaceReader
 
         // compile the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
-        verifier.addCliOption( "-Dmaven.ext.class.path="
+        verifier.addCliArgument( "-Dmaven.ext.class.path="
             + new File( extensionDir, "target/mng-5591-workspace-reader-extension-0.1.jar" ).getCanonicalPath() );
         verifier.addCliArgument( "compile" );
         verifier.execute();

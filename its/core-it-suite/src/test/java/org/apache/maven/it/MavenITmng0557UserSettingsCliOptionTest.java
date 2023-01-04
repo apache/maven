@@ -54,8 +54,8 @@ public class MavenITmng0557UserSettingsCliOptionTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

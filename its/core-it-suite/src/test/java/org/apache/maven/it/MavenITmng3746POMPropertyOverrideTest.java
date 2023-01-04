@@ -88,9 +88,9 @@ public class MavenITmng3746POMPropertyOverrideTest
         verifier = newVerifier( projectDir.getAbsolutePath() );
         verifier.setLogFileName( "log-cli.txt" );
 
-        verifier.addCliOption( "-Dtest.verification=cli" );
-        verifier.addCliOption( "-Dtest.usingCliValue=true" );
-        verifier.addCliOption( "-Djava.version=cli" );
+        verifier.addCliArgument( "-Dtest.verification=cli" );
+        verifier.addCliArgument( "-Dtest.usingCliValue=true" );
+        verifier.addCliArgument( "-Djava.version=cli" );
 
         verifier.addCliArgument( "validate" );
         verifier.execute();

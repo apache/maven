@@ -137,7 +137,7 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.addCliOption( "-DdeploymentPort=" + port );
+        verifier.addCliArgument( "-DdeploymentPort=" + port );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

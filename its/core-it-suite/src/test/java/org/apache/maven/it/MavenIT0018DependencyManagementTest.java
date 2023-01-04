@@ -50,8 +50,8 @@ public class MavenIT0018DependencyManagementTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.it0018" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
         verifier.execute();
         verifier.verifyArtifactPresent( "org.apache.maven.its.it0018", "managed-dep", "1.0.3", "jar" );

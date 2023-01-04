@@ -45,9 +45,8 @@ public class MavenITmng2199ParentVersionRangeTest
                                                       "/mng-2199-parent-version-range/valid-inclusive-upper-bound" );
 
         verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-        verifier.addCliOption( "-U" );
+        verifier.addCliArgument( "-U" );
         verifier.setAutoclean( false );
-
         verifier.addCliArgument( "verify" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -70,7 +69,7 @@ public class MavenITmng2199ParentVersionRangeTest
             getClass(), "/mng-2199-parent-version-range/valid-exclusive-upper-bound" );
 
         verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-        verifier.addCliOption( "-U" );
+        verifier.addCliArgument( "-U" );
         verifier.setAutoclean( false );
         verifier.addCliArgument( "verify" );
         verifier.execute();
@@ -95,7 +94,7 @@ public class MavenITmng2199ParentVersionRangeTest
         {
             verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
             verifier.setAutoclean( false );
-            verifier.addCliOption( "-U" );
+            verifier.addCliArgument( "-U" );
             verifier.addCliArgument( "verify" );
             verifier.execute();
             fail( "Expected 'VerificationException' not thrown." );
@@ -122,7 +121,7 @@ public class MavenITmng2199ParentVersionRangeTest
         {
             verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
             verifier.setAutoclean( false );
-            verifier.addCliOption( "-U" );
+            verifier.addCliArgument( "-U" );
             verifier.addCliArgument( "verify" );
             verifier.execute();
             fail( "Expected 'VerificationException' not thrown." );
@@ -148,7 +147,7 @@ public class MavenITmng2199ParentVersionRangeTest
         {
             verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
             verifier.setAutoclean( false );
-            verifier.addCliOption( "-U" );
+            verifier.addCliArgument( "-U" );
             verifier.addCliArgument( "verify" );
             verifier.execute();
             fail( "Expected 'VerificationException' not thrown." );

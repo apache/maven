@@ -87,8 +87,8 @@ public class MavenITmng6256SpecialCharsAlternatePOMLocation
         testDir.mkdir();
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliOption( option ); // -f/--file
-        verifier.addCliOption( "\"" + new File( resourceDir, subDir ).getAbsolutePath() + "\"" ); // "<path>"
+        verifier.addCliArgument( option ); // -f/--file
+        verifier.addCliArgument( "\"" + new File( resourceDir, subDir ).getAbsolutePath() + "\"" ); // "<path>"
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

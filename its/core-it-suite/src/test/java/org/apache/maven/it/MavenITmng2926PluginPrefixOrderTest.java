@@ -71,8 +71,8 @@ public class MavenITmng2926PluginPrefixOrderTest
         verifier.setLogFileName( "log-default.txt" );
         verifier.filterFile( "settings-default-template.xml", "settings-default.xml", "UTF-8",
             verifier.newDefaultFilterProperties() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings-default.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings-default.xml" );
         verifier.addCliArgument( "mng-2926:apache" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -82,8 +82,8 @@ public class MavenITmng2926PluginPrefixOrderTest
         verifier.setLogFileName( "log-custom.txt" );
         verifier.filterFile( "settings-custom-template.xml", "settings-custom.xml", "UTF-8",
             verifier.newDefaultFilterProperties() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings-custom.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings-custom.xml" );
         verifier.addCliArgument( "mng-2926:custom" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

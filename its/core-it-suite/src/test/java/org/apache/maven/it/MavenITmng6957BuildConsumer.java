@@ -75,7 +75,7 @@ public class MavenITmng6957BuildConsumer
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setMavenDebug( false );
         verifier.setAutoclean( false );
-        verifier.addCliOption( "-Dchangelist=MNG6957" );
+        verifier.addCliArgument( "-Dchangelist=MNG6957" );
 
         verifier.addCliArgument( "install" );
         verifier.execute();

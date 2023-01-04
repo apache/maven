@@ -74,7 +74,7 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7464-mojo-read-only-params" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliOption( "-Duser.property=value" );
+        verifier.addCliArgument( "-Duser.property=value" );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-read-only-property.txt" );
@@ -103,7 +103,7 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-read-only-configuration.txt" );
-        verifier.addCliOption( "-Pconfig-values" );
+        verifier.addCliArgument( "-Pconfig-values" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

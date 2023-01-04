@@ -56,7 +56,7 @@ public class MavenITmng3581PluginUsesWagonDependencyTest
         verifier.setAutoclean( false );
         verifier.addCliArgument( "initialize" );
         verifier.execute();
-        verifier.addCliOption( "-B" );
+        verifier.addCliArgument( "-B" );
         verifier.verifyErrorFreeLog();
     }
 

@@ -55,8 +55,8 @@ public class MavenIT0085TransitiveSystemScopeTest
         verifier.deleteArtifacts( "org.apache.maven.its.it0085" );
         verifier.getSystemProperties().setProperty( "test.home", testDir.getAbsolutePath() );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

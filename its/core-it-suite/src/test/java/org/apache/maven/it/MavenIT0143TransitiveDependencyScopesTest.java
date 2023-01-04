@@ -254,8 +254,8 @@ public class MavenIT0143TransitiveDependencyScopesTest
         filterProps.setProperty( "@scope@", scope );
         verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", filterProps );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.setLogFileName( "log-" + scope + ".txt" );
         verifier.addCliArgument( "validate" );
         verifier.execute();

@@ -108,8 +108,8 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.setProperty( "@port@", Integer.toString( port ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.addCliOption( "-s" );
-            verifier.addCliOption( "settings.xml" );
+            verifier.addCliArgument( "-s" );
+            verifier.addCliArgument( "settings.xml" );
 
             verifier.setLogFileName( "log-1.txt" );
             verifier.addCliArgument( "validate" );

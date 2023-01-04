@@ -102,9 +102,9 @@ public class MavenITmng4555MetaversionResolutionOfflineTest
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.setProperty( "@port@", Integer.toString( port ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.addCliOption( "--offline" );
-            verifier.addCliOption( "--settings" );
-            verifier.addCliOption( "settings.xml" );
+            verifier.addCliArgument( "--offline" );
+            verifier.addCliArgument( "--settings" );
+            verifier.addCliArgument( "settings.xml" );
             verifier.addCliArgument( "validate" );
             verifier.execute();
         }

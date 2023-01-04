@@ -55,8 +55,8 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log-select-existing.txt" );
-        verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "?existing-module" );
+        verifier.addCliArgument( "-pl" );
+        verifier.addCliArgument( "?existing-module" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -72,8 +72,8 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log-select-existing-artifact-id.txt" );
-        verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "?:existing-module" );
+        verifier.addCliArgument( "-pl" );
+        verifier.addCliArgument( "?:existing-module" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -89,8 +89,8 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log-select-non-existing.txt" );
-        verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "?non-existing-module" );
+        verifier.addCliArgument( "-pl" );
+        verifier.addCliArgument( "?non-existing-module" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -106,8 +106,8 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log-deselect-existing.txt" );
-        verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "!?existing-module" );
+        verifier.addCliArgument( "-pl" );
+        verifier.addCliArgument( "!?existing-module" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -123,8 +123,8 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log-deselect-non-existing.txt" );
-        verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "!?non-existing-module" );
+        verifier.addCliArgument( "-pl" );
+        verifier.addCliArgument( "!?non-existing-module" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

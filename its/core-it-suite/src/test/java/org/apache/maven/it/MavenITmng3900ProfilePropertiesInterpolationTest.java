@@ -56,7 +56,7 @@ public class MavenITmng3900ProfilePropertiesInterpolationTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "-Pinterpolation-profile" );
+        verifier.addCliArgument( "-Pinterpolation-profile" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

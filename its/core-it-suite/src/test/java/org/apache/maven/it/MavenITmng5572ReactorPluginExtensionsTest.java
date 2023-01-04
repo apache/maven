@@ -56,8 +56,8 @@ public class MavenITmng5572ReactorPluginExtensionsTest
         // plugin must be available in local repo, otherwise the project couldn't be built
         Verifier setup = newVerifier( testDir.getAbsolutePath() );
         setup.setAutoclean( true );
-        setup.addCliOption( "-f" );
-        setup.addCliOption( "plugin/pom.xml" );
+        setup.addCliArgument( "-f" );
+        setup.addCliArgument( "plugin/pom.xml" );
         setup.addCliArgument( "install" );
         setup.execute();
         setup.verifyErrorFreeLog();

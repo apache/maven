@@ -66,8 +66,8 @@ public class MavenITmng4281PreferLocalSnapshotTest
 
         verifier = newVerifier( new File( testDir, "project" ).getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.addCliOption( "-s" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "-s" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliArgument( "validate" );
         verifier.execute();

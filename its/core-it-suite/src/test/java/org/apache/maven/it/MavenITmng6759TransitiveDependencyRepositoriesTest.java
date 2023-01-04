@@ -64,11 +64,11 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
         verifier.deleteDirectory( "target" );
         if ( getMavenVersion().getMajorVersion() <= 3 )
         {
-            verifier.addCliOption( "-DaltDeploymentRepository=customRepo::default::" + customRepoUri );
+            verifier.addCliArgument( "-DaltDeploymentRepository=customRepo::default::" + customRepoUri );
         }
         else
         {
-            verifier.addCliOption( "-DaltDeploymentRepository=customRepo::" + customRepoUri );
+            verifier.addCliArgument( "-DaltDeploymentRepository=customRepo::" + customRepoUri );
         }
         verifier.addCliArgument( "deploy" );
         verifier.execute();

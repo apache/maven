@@ -44,10 +44,10 @@ public class MavenITmng7443ConsistencyOfOptionalProjectsAndProfilesTest extends 
                 "/mng-7443-consistency-of-optional-profiles-and-projects" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "?:does-not-exist" );
-        verifier.addCliOption( "-P" );
-        verifier.addCliOption( "?does-not-exist-either" );
+        verifier.addCliArgument( "-pl" );
+        verifier.addCliArgument( "?:does-not-exist" );
+        verifier.addCliArgument( "-P" );
+        verifier.addCliArgument( "?does-not-exist-either" );
 
         verifier.addCliArguments( "clean", "verify" );
         verifier.execute();

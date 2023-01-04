@@ -53,7 +53,7 @@ public class MavenITmng5214DontMapWsdlToJar
         setupVerifier.deleteDirectory( "target" );
         setupVerifier.deleteArtifacts( "org.apache.maven.its.mng5214" );
         setupVerifier.setLogFileName( "log-setup.txt" );
-        setupVerifier.addCliOption( "-PcreateWsdl" );
+        setupVerifier.addCliArgument( "-PcreateWsdl" );
         setupVerifier.addCliArgument( "generate-resources" );
         setupVerifier.execute();
 

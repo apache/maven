@@ -36,7 +36,7 @@ public class MavenITmng5965ParallelBuildMultipliesWorkTest
         verifier.setAutoclean( false );
 
         verifier.setLogFileName( "log-only.txt" );
-        verifier.addCliOption( "-T1" );
+        verifier.addCliArgument( "-T1" );
         // include an aggregator task so that the two goals end up in different task segments
         verifier.addCliArguments( "clean", "install:help" );
         verifier.execute();

@@ -55,7 +55,7 @@ public class MavenITmng4684DistMgmtOverriddenByProfileTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "-Pmng4684" );
+        verifier.addCliArgument( "-Pmng4684" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

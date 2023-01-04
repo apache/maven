@@ -127,11 +127,11 @@ public class MavenITmng5175WagonHttpTest
 
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
 
-        verifier.addCliOption( "-U" );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
-        verifier.addCliOption( "--fail-never" );
-        verifier.addCliOption( "--errors" );
+        verifier.addCliArgument( "-U" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
+        verifier.addCliArgument( "--fail-never" );
+        verifier.addCliArgument( "--errors" );
         verifier.setMavenDebug( true );
         verifier.addCliArgument( "validate" );
         verifier.execute();

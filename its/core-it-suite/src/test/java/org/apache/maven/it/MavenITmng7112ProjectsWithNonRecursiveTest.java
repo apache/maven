@@ -49,9 +49,9 @@ public class MavenITmng7112ProjectsWithNonRecursiveTest
 
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
 
-        verifier.addCliOption( "-pl" );
-        verifier.addCliOption( ":aggregator-a,:aggregator-b" );
-        verifier.addCliOption( "-N" );
+        verifier.addCliArgument( "-pl" );
+        verifier.addCliArgument( ":aggregator-a,:aggregator-b" );
+        verifier.addCliArgument( "-N" );
         verifier.setLogFileName( "selected-non-recursive.txt" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
@@ -74,9 +74,9 @@ public class MavenITmng7112ProjectsWithNonRecursiveTest
 
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
 
-        verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "!:aggregator-a,!:aggregator-b" );
-        verifier.addCliOption( "-N" );
+        verifier.addCliArgument( "-pl" );
+        verifier.addCliArgument( "!:aggregator-a,!:aggregator-b" );
+        verifier.addCliArgument( "-N" );
         verifier.setLogFileName( "excluded-non-recursive.txt" );
         verifier.addCliArgument( "validate" );
         verifier.execute();

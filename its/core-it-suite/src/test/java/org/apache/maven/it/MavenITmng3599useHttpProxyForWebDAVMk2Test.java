@@ -180,9 +180,9 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
 
         verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
-        verifier.addCliOption( "-X" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
+        verifier.addCliArgument( "-X" );
 
         verifier.deleteArtifacts( "org.apache.maven.its.mng3599" );
 
@@ -225,9 +225,9 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
 
         verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
-        verifier.addCliOption( "-X" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
+        verifier.addCliArgument( "-X" );
 
         verifier.deleteArtifacts( "org.apache.maven.its.mng3599" );
 

@@ -59,15 +59,15 @@ public class MavenITmng3732ActiveProfilesTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         if ( matchesVersionRange( "[4.0.0-alpha-1,)" ) )
         {
-            verifier.addCliOption( "-Ppom,settings" );
+            verifier.addCliArgument( "-Ppom,settings" );
         }
         else
         {
-            verifier.addCliOption( "-Ppom,profiles,settings" );
+            verifier.addCliArgument( "-Ppom,profiles,settings" );
         }
         verifier.addCliArgument( "validate" );
         verifier.execute();

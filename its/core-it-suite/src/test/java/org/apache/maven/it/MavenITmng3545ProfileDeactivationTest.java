@@ -85,9 +85,9 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.setLogFileName( "log2.txt" );
 
         // Deactivate active by default profiles
-        verifier.addCliOption( "-P-profile1" );
-        verifier.addCliOption( "-P" );
-        verifier.addCliOption( "-profile2" );
+        verifier.addCliArgument( "-P-profile1" );
+        verifier.addCliArgument( "-P" );
+        verifier.addCliArgument( "-profile2" );
 
         verifier.addCliArgument( "validate" );
         verifier.execute();
@@ -109,9 +109,9 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.setLogFileName( "log3.txt" );
 
         // Deactivate active by default profiles
-        verifier.addCliOption( "-P!profile1" );
-        verifier.addCliOption( "-P" );
-        verifier.addCliOption( "!profile2" );
+        verifier.addCliArgument( "-P!profile1" );
+        verifier.addCliArgument( "-P" );
+        verifier.addCliArgument( "!profile2" );
 
         verifier.addCliArgument( "validate" );
         verifier.execute();
@@ -139,8 +139,8 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.setLogFileName( "log4.txt" );
 
         // Activate with a prop, then deactivate
-        verifier.addCliOption( "-Dprofile3-active-by-property=true" );
-        verifier.addCliOption( "-P-profile3" );
+        verifier.addCliArgument( "-Dprofile3-active-by-property=true" );
+        verifier.addCliArgument( "-P-profile3" );
 
         verifier.addCliArgument( "validate" );
         verifier.execute();
@@ -171,8 +171,8 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.setLogFileName( "log5.txt" );
 
         // Activate then deactivate
-        verifier.addCliOption( "-Pprofile4" );
-        verifier.addCliOption( "-P-profile4" );
+        verifier.addCliArgument( "-Pprofile4" );
+        verifier.addCliArgument( "-P-profile4" );
 
         verifier.addCliArgument( "validate" );
         verifier.execute();
@@ -203,7 +203,7 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.setLogFileName( "log6.txt" );
 
         // Activate
-        verifier.addCliOption( "-Pprofile4" );
+        verifier.addCliArgument( "-Pprofile4" );
 
         verifier.addCliArgument( "validate" );
         verifier.execute();

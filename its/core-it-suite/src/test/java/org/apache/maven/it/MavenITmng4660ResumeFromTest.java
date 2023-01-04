@@ -69,8 +69,8 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
 
         final Verifier verifier2 = newVerifier( testDir.getAbsolutePath() );
         verifier2.setAutoclean( false );
-        verifier2.addCliOption( "--resume-from" );
-        verifier2.addCliOption( ":module-b" );
+        verifier2.addCliArgument( "--resume-from" );
+        verifier2.addCliArgument( ":module-b" );
         verifier2.addCliArgument( "compile" );
         verifier2.execute(); // to prevent the unit test from failing (again)
 
@@ -106,8 +106,8 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
 
         final Verifier verifier2 = newVerifier( testDir.getAbsolutePath() );
         verifier2.setAutoclean( false );
-        verifier2.addCliOption( "--resume-from" );
-        verifier2.addCliOption( ":module-b" );
+        verifier2.addCliArgument( "--resume-from" );
+        verifier2.addCliArgument( ":module-b" );
         verifier2.addCliArgument( "compile" ); // to prevent the unit test from failing (again)
         verifier2.execute();
 

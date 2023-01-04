@@ -55,8 +55,8 @@ public class MavenITmng3220ImportScopeTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng3220" );
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8",
                              verifier.newDefaultFilterProperties() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -76,8 +76,8 @@ public class MavenITmng3220ImportScopeTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng3220" );
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8",
                              verifier.newDefaultFilterProperties() );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
 
         try
         {

@@ -50,10 +50,10 @@ public class MavenITmng3268MultipleHyphenPCommandLineTest
 
         verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
 
-        verifier.addCliOption( "-Pprofile1,profile2" );
-        verifier.addCliOption( "-Pprofile3" );
-        verifier.addCliOption( "-P" );
-        verifier.addCliOption( "profile4" );
+        verifier.addCliArgument( "-Pprofile1,profile2" );
+        verifier.addCliArgument( "-Pprofile3" );
+        verifier.addCliArgument( "-P" );
+        verifier.addCliArgument( "profile4" );
         verifier.addCliArgument( "package" );
         verifier.execute();
 

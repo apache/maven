@@ -61,8 +61,8 @@ public class MavenITmng6173GetAllProjectsInReactorTest
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "module-1/target" );
         verifier.deleteDirectory( "module-2/target" );
-        verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "module-1" );
+        verifier.addCliArgument( "-pl" );
+        verifier.addCliArgument( "module-1" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

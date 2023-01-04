@@ -56,8 +56,8 @@ public class MavenITmng4189UniqueVersionSnapshotTest
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.setLogFileName( "log-1.txt" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
@@ -70,10 +70,10 @@ public class MavenITmng4189UniqueVersionSnapshotTest
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
-        verifier.addCliOption( "-f" );
-        verifier.addCliOption( "dependent-on-newer-timestamp-pom.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
+        verifier.addCliArgument( "-f" );
+        verifier.addCliArgument( "dependent-on-newer-timestamp-pom.xml" );
         verifier.setLogFileName( "log-2.txt" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
@@ -86,8 +86,8 @@ public class MavenITmng4189UniqueVersionSnapshotTest
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.addCliOption( "--settings" );
-        verifier.addCliOption( "settings.xml" );
+        verifier.addCliArgument( "--settings" );
+        verifier.addCliArgument( "settings.xml" );
         verifier.setLogFileName( "log-3.txt" );
         verifier.addCliArgument( "validate" );
         verifier.execute();

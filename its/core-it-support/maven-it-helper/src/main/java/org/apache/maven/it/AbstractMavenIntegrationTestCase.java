@@ -580,14 +580,14 @@ public abstract class AbstractMavenIntegrationTestCase
             // dedicated CLI option only available since MNG-3914
             if ( matchesVersionRange( "[2.1.0,)" ) )
             {
-                verifier.addCliOption( "--global-settings" );
+                verifier.addCliArgument( "--global-settings" );
                 if ( path.indexOf( ' ' ) < 0 )
                 {
-                    verifier.addCliOption( path );
+                    verifier.addCliArgument( path );
                 }
                 else
                 {
-                    verifier.addCliOption( '"' + path + '"' );
+                    verifier.addCliArgument( '"' + path + '"' );
                 }
             }
             else
@@ -601,7 +601,7 @@ public abstract class AbstractMavenIntegrationTestCase
             // Java7 TLS protocol
             if ( VersionRange.createFromVersionSpec( "(,1.8.0)" ).containsVersion( getJavaVersion() ) )
             {
-                verifier.addCliOption( "-Dhttps.protocols=TLSv1.2" );
+                verifier.addCliArgument( "-Dhttps.protocols=TLSv1.2" );
             }
 
             // auto set source+target to lowest reasonable java version

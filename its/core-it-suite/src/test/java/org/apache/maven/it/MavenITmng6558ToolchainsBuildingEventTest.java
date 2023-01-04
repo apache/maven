@@ -55,7 +55,7 @@ public class MavenITmng6558ToolchainsBuildingEventTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.addCliArgument( "-Dmaven.ext.class.path=spy-0.1.jar" );
-        verifier.addCliOption( "-X" );
+        verifier.addCliArgument( "-X" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
