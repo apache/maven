@@ -44,6 +44,10 @@ under the License.
   </description>
   <inceptionYear>2008</inceptionYear>
 
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>

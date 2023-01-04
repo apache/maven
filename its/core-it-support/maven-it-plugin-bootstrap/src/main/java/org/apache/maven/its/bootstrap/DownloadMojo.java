@@ -74,7 +74,7 @@ public class DownloadMojo
     @Component
     private RepositorySystem repositorySystem;
 
-    @Component
+    @Parameter( defaultValue = "${session}", readonly = true )
     private MavenSession session;
 
     @Override
