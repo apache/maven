@@ -30,6 +30,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
  * i.e. <code>reportPlugins</code> and <code>outputDirectory</code> parameters.
  *
  * @author Benjamin Bentmann
+ * @deprecated since maven 4.0, this class is not used anymore and is only here for compatibility
  */
 @Named
 @Singleton

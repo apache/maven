@@ -97,7 +97,6 @@ public class DefaultModelBuilderFactory {
     private LifecycleBindingsInjector lifecycleBindingsInjector;
     private PluginConfigurationExpander pluginConfigurationExpander;
     private ReportConfigurationExpander reportConfigurationExpander;
-    private ReportingConverter reportingConverter;
     private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private ModelVersionProcessor versionProcessor;
 
@@ -186,8 +185,8 @@ public class DefaultModelBuilderFactory {
         return this;
     }
 
+    @Deprecated
     public DefaultModelBuilderFactory setReportingConverter(ReportingConverter reportingConverter) {
-        this.reportingConverter = reportingConverter;
         return this;
     }
 
