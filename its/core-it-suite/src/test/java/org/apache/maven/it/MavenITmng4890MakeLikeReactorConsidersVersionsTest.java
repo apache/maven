@@ -63,7 +63,6 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest
         verifier.setLogFileName( "log-am.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "mod-b/target/touch.txt" );
         verifier.verifyFileNotPresent( "mod-a/target/touch.txt" );
@@ -93,7 +92,6 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest
         verifier.setLogFileName( "log-amd.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "mod-a/target/touch.txt" );
         verifier.verifyFileNotPresent( "mod-b/target/touch.txt" );

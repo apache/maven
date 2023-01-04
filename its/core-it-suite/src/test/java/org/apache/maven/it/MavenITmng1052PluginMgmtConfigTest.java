@@ -59,7 +59,6 @@ public class MavenITmng1052PluginMgmtConfigTest
         verifier.verifyFilePresent( "target/plugin-management.txt" );
         verifier.verifyFileNotPresent( "target/resources-resources.txt" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

@@ -59,7 +59,6 @@ public class MavenITmng3941ExecutionProjectRestrictedToForkingMojoTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/fork.properties" );
         assertEquals( "test-0.1", props.getProperty( "executedProject.build.finalName" ) );

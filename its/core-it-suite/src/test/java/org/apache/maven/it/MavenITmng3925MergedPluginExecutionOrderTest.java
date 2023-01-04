@@ -79,7 +79,6 @@ public class MavenITmng3925MergedPluginExecutionOrderTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> lines = verifier.loadLines( "target/exec.log", "UTF-8" );
         // Order is parent first and child appended, unless child overrides parent execution via equal id

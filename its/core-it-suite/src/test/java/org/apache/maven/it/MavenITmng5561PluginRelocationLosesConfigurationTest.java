@@ -50,17 +50,14 @@ public class MavenITmng5561PluginRelocationLosesConfigurationTest
 
         verifier = newVerifier( oldPluginWithRelocationDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( newPluginDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
         verifier.executeGoal( "verify" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
         verifier.verifyTextInLog( "[WARNING] Hello from Maven!" );
     }

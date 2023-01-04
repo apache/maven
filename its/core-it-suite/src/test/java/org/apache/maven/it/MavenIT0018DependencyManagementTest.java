@@ -55,7 +55,6 @@ public class MavenIT0018DependencyManagementTest
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
         verifier.verifyArtifactPresent( "org.apache.maven.its.it0018", "managed-dep", "1.0.3", "jar" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

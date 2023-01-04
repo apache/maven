@@ -63,7 +63,6 @@ public class MavenITmng3183LoggingToFileTest
         new File( testDir, "maven.log" ).delete();
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> stdout = verifier.loadLines( "stdout.txt", "UTF-8" );
 

@@ -61,7 +61,6 @@ public class MavenITmng4895PluginDepWithNonRelocatedMavenApiTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/classpath.txt" );
     }

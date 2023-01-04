@@ -58,7 +58,6 @@ public class MavenIT0144LifecycleExecutionOrderTest
         verifier.setAutoclean( false );
         verifier.executeGoals( Arrays.asList( new String[]{ "post-clean", "deploy", "site-deploy" } ) );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> expected = new ArrayList<>();
 

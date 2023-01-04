@@ -71,7 +71,6 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         Path module1Jar = testDir.toPath().resolve( "module-a/target/module-a-1.0.jar" ).toAbsolutePath();
         verifier1.verifyErrorFreeLog();
         verifier1.verifyFilePresent( module1Jar.toString() );
-        verifier1.resetStreams();
 
         if ( System.getProperty( "java.version", "" ).startsWith( "1." ) )
         {
@@ -103,7 +102,6 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
                         .toAbsolutePath();
         verifier2.verifyErrorFreeLog();
         verifier2.verifyFilePresent( module1Class.toString() );
-        verifier2.resetStreams();
 
         // 3. Resume project build from module B, that depends on module A we just touched. Its packaged artifact
         // is no longer in sync with its compiled artifacts.
@@ -173,6 +171,5 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
 
             throw new VerificationException( message.toString(), e.getCause() );
         }
-        verifier3.resetStreams();
     }
 }

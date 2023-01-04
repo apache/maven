@@ -59,7 +59,6 @@ public class MavenITmng4464PlatformIndependentFileSeparatorTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4464" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "../sub/target/path.properties" );
         Properties props = verifier.loadProperties( "../sub/target/path.properties" );

@@ -76,10 +76,6 @@ public class MavenITmng3023ReactorDependencyResolutionTest
         {
             // expected.
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
     /**
@@ -108,7 +104,6 @@ public class MavenITmng3023ReactorDependencyResolutionTest
 
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> compileClassPath = verifier.loadLines( "consumer/target/compile.classpath", "UTF-8" );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "dependency-classes" ) );
@@ -144,7 +139,6 @@ public class MavenITmng3023ReactorDependencyResolutionTest
         verifier.setLogFileName( "log-c-1.txt" );
         verifier.executeGoal( "generate-sources" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> compileClassPath = verifier.loadLines( "consumer/target/compile.classpath", "UTF-8" );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "dependency-1.jar" ) );
@@ -155,7 +149,6 @@ public class MavenITmng3023ReactorDependencyResolutionTest
         verifier.setLogFileName( "log-c-2.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         compileClassPath = verifier.loadLines( "consumer/target/compile.classpath", "UTF-8" );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "dependency-1.jar" ) );

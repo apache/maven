@@ -69,7 +69,6 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest
         verifier.executeGoal( "clean" );
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
     }
 
@@ -89,7 +88,6 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest
         verifier.executeGoal( "clean" );
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
     }
 

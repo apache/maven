@@ -71,7 +71,6 @@ public class MavenITmng4199CompileMeetsRuntimeScopeTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> compileArtifacts = verifier.loadLines( "target/compile-artifacts.txt", "UTF-8" );
         assertTrue( compileArtifacts.toString(), compileArtifacts.contains( "org.apache.maven.its.mng4199:system:jar:0.1" ) );

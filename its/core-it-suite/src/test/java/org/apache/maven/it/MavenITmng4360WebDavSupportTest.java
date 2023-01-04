@@ -145,7 +145,6 @@ public class MavenITmng4360WebDavSupportTest
             verifier.addCliOption( "settings.xml" );
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
         }
         finally
         {

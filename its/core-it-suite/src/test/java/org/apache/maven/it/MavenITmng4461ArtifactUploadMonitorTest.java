@@ -56,7 +56,6 @@ public class MavenITmng4461ArtifactUploadMonitorTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyTextInLog( "/target/repo/org/apache/maven/its/mng4461/release/1.0/release-1.0.jar" );
     }

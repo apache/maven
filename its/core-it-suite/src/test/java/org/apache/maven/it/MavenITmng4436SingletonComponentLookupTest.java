@@ -57,7 +57,6 @@ public class MavenITmng4436SingletonComponentLookupTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/comp.properties" );
 

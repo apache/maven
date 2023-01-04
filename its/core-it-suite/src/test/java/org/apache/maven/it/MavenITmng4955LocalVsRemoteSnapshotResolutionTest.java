@@ -59,7 +59,6 @@ public class MavenITmng4955LocalVsRemoteSnapshotResolutionTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4955" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -69,7 +68,6 @@ public class MavenITmng4955LocalVsRemoteSnapshotResolutionTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
 

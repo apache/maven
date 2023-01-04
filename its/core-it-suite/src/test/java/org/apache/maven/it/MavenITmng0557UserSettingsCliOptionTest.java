@@ -58,7 +58,6 @@ public class MavenITmng0557UserSettingsCliOptionTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/test.txt" );
     }

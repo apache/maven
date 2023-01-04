@@ -83,12 +83,6 @@ public class MavenITmng3642DynamicResourcesTest
          */
         verifier.verifyErrorFreeLog();
 
-        /*
-         * Reset the streams before executing the verifier
-         * again.
-         */
-        verifier.resetStreams();
-
         File first = new File( testDir, "target/test-classes/one.txt" );
         assertTrue( "First resource file was not present: " + first, first.exists() );
 

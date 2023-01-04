@@ -25,12 +25,10 @@ public class MavenITmng5783PluginDependencyFiltering
         Verifier verifier = newVerifier( new File( testDir, "plugin" ).getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( new File( testDir, "slf4j" ).getAbsolutePath(), "remote" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         // Note that plugin dependencies always include plugin itself and plexus-utils
 

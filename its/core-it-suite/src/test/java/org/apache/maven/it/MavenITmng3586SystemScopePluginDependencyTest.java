@@ -64,7 +64,6 @@ public class MavenITmng3586SystemScopePluginDependencyTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/it.properties" );
         assertEquals( "PASSED", props.getProperty( "test" ) );
@@ -88,7 +87,6 @@ public class MavenITmng3586SystemScopePluginDependencyTest
         verifier.getSystemProperties().setProperty( "test.home", testDir.getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pcl.properties" );
         assertEquals( "1", props.getProperty( "maven-core-it.properties.count" ) );

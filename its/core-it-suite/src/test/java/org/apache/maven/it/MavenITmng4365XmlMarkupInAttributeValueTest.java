@@ -55,7 +55,6 @@ public class MavenITmng4365XmlMarkupInAttributeValueTest
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

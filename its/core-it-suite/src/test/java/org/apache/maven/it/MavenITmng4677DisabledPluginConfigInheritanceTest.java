@@ -60,7 +60,6 @@ public class MavenITmng4677DisabledPluginConfigInheritanceTest
         verifier.deleteDirectory( "child-2/target" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-log-file:2.1-SNAPSHOT:log-string" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> log = verifier.loadLines( "target/log.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "parent-only" } ), log );

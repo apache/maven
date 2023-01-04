@@ -58,7 +58,6 @@ public class MavenITmng1957JdkActivationWithVersionRangeTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/jdk.properties" );
         assertEquals( "PASSED", props.getProperty( "project.properties.jdkProperty1" ) );

@@ -190,7 +190,6 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "jar" );
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "pom" );
 
-        verifier.resetStreams();
     }
 
     /**
@@ -273,7 +272,6 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
         //noinspection unchecked
         assertTrue( requestedUris.isEmpty() );
 
-        verifier.resetStreams();
     }
 
 }

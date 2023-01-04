@@ -48,7 +48,6 @@ public class MavenITmng7045DropUselessAndOutdatedCdiApiTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath()) ;
 
         verifier.executeGoal( "process-classes" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
     }
 

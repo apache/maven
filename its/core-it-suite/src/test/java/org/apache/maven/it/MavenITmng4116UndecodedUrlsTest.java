@@ -57,7 +57,6 @@ public class MavenITmng4116UndecodedUrlsTest
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
 

@@ -60,7 +60,6 @@ public class MavenITmng2362DeployedPomEncodingTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng2362" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         File pomFile;
 

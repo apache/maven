@@ -54,7 +54,6 @@ public class MavenITmng5445LegacyStringSearchModelInterpolatorTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

@@ -62,7 +62,6 @@ public class MavenITmng4459InMemorySettingsKeptEncryptedTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/settings.properties" );
         assertEquals( "{BteqUEnqHecHM7MZfnj9FwLcYbdInWxou1C929Txa0A=}",

@@ -62,7 +62,6 @@ public class MavenITmng3288SystemScopeDirTest
         {
             // expected, <systemPath> of a system-scoped dependency should be a file, not a directory
         }
-        verifier.resetStreams();
     }
 
 }

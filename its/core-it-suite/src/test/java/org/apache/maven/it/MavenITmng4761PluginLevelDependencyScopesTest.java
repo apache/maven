@@ -66,7 +66,6 @@ public class MavenITmng4761PluginLevelDependencyScopesTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

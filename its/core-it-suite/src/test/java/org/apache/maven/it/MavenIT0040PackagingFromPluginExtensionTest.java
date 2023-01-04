@@ -57,7 +57,6 @@ public class MavenIT0040PackagingFromPluginExtensionTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/maven-it-it0040-1.0-it.jar" );
     }

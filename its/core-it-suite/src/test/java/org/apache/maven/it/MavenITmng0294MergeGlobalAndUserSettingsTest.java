@@ -62,7 +62,6 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest
         verifier.addCliOption( "global-settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/test.txt" );
     }

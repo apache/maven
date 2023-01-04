@@ -62,7 +62,6 @@ public class MavenITmng4112MavenVersionPropertyTest
         assertTrue( testMavenBuildVersion, testMavenBuildVersion.contains( testMavenVersion ) );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

@@ -60,7 +60,6 @@ public class MavenITmng4400RepositoryOrderTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties checksums = verifier.loadProperties( "target/checksum.properties" );
         assertChecksum( "d0a4998ff37a55f8de1dffccdff826eca365400f", checksums );
@@ -85,7 +84,6 @@ public class MavenITmng4400RepositoryOrderTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties checksums = verifier.loadProperties( "target/checksum.properties" );
         assertChecksum( "d0a4998ff37a55f8de1dffccdff826eca365400f", checksums );

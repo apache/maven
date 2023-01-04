@@ -115,7 +115,6 @@ public class MavenITmng5889FindBasedir
         verifier.setForkJvm( true ); // force forked JVM since we need the shell script to detect .mvn/ location
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "expression.properties" );
         assertEquals( "ok", props.getProperty( "project.properties.jvm-config" ) );

@@ -62,7 +62,6 @@ public class MavenITmng4421DeprecatedPomInterpolationExpressionsTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "0.1", props.getProperty( "project.properties.property1" ) );

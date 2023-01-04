@@ -64,7 +64,6 @@ public class MavenITmng3667ResolveDepsWithBadPomVersionTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> cp = verifier.loadLines( "target/classpath.txt", "UTF-8" );
         assertTrue( cp.toString(), cp.contains( "dep-0.1.jar" ) );

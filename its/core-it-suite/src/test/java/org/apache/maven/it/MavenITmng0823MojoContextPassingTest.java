@@ -61,7 +61,6 @@ public class MavenITmng0823MojoContextPassingTest
         verifier.executeGoals( goals );
         verifier.verifyFilePresent( "target/thrown-value" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

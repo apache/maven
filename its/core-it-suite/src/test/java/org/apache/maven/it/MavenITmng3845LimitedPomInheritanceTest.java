@@ -58,7 +58,6 @@ public class MavenITmng3845LimitedPomInheritanceTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "child-org", props.getProperty( "project.organization.name", "" ) );

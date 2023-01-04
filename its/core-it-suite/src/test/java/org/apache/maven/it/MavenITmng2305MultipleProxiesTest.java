@@ -116,7 +116,6 @@ public class MavenITmng2305MultipleProxiesTest
             verifier.addCliArgument( "-Dmaven.artifact.threads=1" );
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
         }
         finally
         {

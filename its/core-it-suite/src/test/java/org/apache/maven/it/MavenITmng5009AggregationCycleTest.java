@@ -62,10 +62,6 @@ public class MavenITmng5009AggregationCycleTest
         {
             verifier.verifyTextInLog( " cycle " );
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
 }

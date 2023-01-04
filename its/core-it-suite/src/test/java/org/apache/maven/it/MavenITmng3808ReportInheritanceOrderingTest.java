@@ -59,7 +59,6 @@ public class MavenITmng3808ReportInheritanceOrderingTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/model.properties" );
         Properties props = verifier.loadProperties( "target/model.properties" );

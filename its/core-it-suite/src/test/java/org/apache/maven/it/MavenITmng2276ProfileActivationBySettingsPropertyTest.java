@@ -60,7 +60,6 @@ public class MavenITmng2276ProfileActivationBySettingsPropertyTest
         verifier.setLogFileName( "log-1.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
         assertEquals( "settings", props.getProperty( "project.properties.settingsProperty" ) );
@@ -87,7 +86,6 @@ public class MavenITmng2276ProfileActivationBySettingsPropertyTest
         verifier.setLogFileName( "log-2.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
         assertEquals( "settings", props.getProperty( "project.properties.settingsProperty" ) );

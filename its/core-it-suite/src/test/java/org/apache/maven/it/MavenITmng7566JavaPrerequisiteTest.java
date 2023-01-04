@@ -48,10 +48,6 @@ class MavenITmng7566JavaPrerequisiteTest
         {
             // expected, unsolvable version conflict
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
     /**
@@ -75,7 +71,6 @@ class MavenITmng7566JavaPrerequisiteTest
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "org.apache.maven.its.mng7566:maven-mng7566-plugin:touch" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch-1.txt" );
         verifier.verifyFileNotPresent( "target/touch-2.txt" );

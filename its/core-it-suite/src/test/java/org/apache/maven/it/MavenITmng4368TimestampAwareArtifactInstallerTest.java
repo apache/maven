@@ -67,7 +67,6 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4368" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         File installedPom =
             new File( verifier.getArtifactPath( "org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "pom" ) );
@@ -85,7 +84,6 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         pom = FileUtils.fileRead( installedPom, "UTF-8" );
         assertFalse( pom.contains( "Branch-A" ) );
@@ -122,7 +120,6 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4368" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         File installedArtifact =
             new File( verifier.getArtifactPath( "org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "jar" ) );
@@ -140,7 +137,6 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         data = FileUtils.fileRead( installedArtifact, "UTF-8" );
         assertFalse( data.contains( "Branch-A" ) );
@@ -156,7 +152,6 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         verifier.setLogFileName( "log-b.txt" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         data = FileUtils.fileRead( installedArtifact, "UTF-8" );
         assertFalse( data.contains( "Branch-B" ) );

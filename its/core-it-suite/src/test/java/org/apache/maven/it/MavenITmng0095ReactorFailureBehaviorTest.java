@@ -70,7 +70,6 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         {
             // expected
         }
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
@@ -99,7 +98,6 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         verifier.addCliOption( "--fail-never" );
         verifier.setLogFileName( "log-fn.txt" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
@@ -137,7 +135,6 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         {
             // expected
         }
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );

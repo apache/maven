@@ -74,7 +74,6 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         final Deque<String> uris = new ConcurrentLinkedDeque<>();
 
@@ -187,7 +186,6 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest
         }
         finally
         {
-            verifier.resetStreams();
             server.stop();
         }
     }

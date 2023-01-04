@@ -62,7 +62,6 @@ public class MavenITmng4526MavenProjectArtifactsScopeTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "generate-sources" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> artifacts;
 

@@ -52,7 +52,6 @@ public class MavenITmng6189SiteReportPluginsWarningTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyTextInLog( "[WARNING] Reporting configuration should be done in <reporting> section" );
-        verifier.resetStreams();
     }
 
 }

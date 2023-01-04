@@ -60,7 +60,6 @@ public class MavenITmng4023ParentProfileOneTimeInjectionTest
         verifier.deleteDirectory( "sub/target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "sub/target/config.properties" );
         assertEquals( "1", props.getProperty( "stringParams" ) );

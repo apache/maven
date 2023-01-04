@@ -61,7 +61,6 @@ public class MavenITmng0507ArtifactRelocationTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.1", "jar" );
         verifier.verifyArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.1", "pom" );

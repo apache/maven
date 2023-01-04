@@ -55,7 +55,6 @@ public class MavenITmng4410UsageHelpTest
         verifier.setAutoclean( false );
         verifier.executeGoal( "--help" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyTextInLog( "--version" );
         verifier.verifyTextInLog( "--debug" );

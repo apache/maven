@@ -59,7 +59,6 @@ public class MavenITmng4341PluginExecutionOrderTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> lines = verifier.loadLines( "target/log.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "first", "second" } ), lines );

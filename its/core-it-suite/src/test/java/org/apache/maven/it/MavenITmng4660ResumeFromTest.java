@@ -65,10 +65,6 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
         {
             verifier1.verifyTextInLog( "Deliberately fail test case" );
         }
-        finally
-        {
-            verifier1.resetStreams();
-        }
 
         final Verifier verifier2 = newVerifier( testDir.getAbsolutePath() );
         verifier2.setAutoclean( false );
@@ -77,7 +73,6 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
         verifier2.executeGoal( "compile" ); // to prevent the unit test from failing (again)
 
         verifier2.verifyErrorFreeLog();
-        verifier2.resetStreams();
     }
 
     /**
@@ -105,10 +100,6 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
         {
             verifier1.verifyTextInLog( "Deliberately fail test case" );
         }
-        finally
-        {
-            verifier1.resetStreams();
-        }
 
         final Verifier verifier2 = newVerifier( testDir.getAbsolutePath() );
         verifier2.setAutoclean( false );
@@ -117,6 +108,5 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
         verifier2.executeGoal( "compile" ); // to prevent the unit test from failing (again)
 
         verifier2.verifyErrorFreeLog();
-        verifier2.resetStreams();
     }
 }

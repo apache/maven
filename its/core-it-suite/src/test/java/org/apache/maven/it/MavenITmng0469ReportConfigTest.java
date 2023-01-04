@@ -60,7 +60,6 @@ public class MavenITmng0469ReportConfigTest
         verifier.verifyFilePresent( "target/build.txt" );
         verifier.verifyFileNotPresent( "target/reporting.txt" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     /**
@@ -90,7 +89,6 @@ public class MavenITmng0469ReportConfigTest
             assertNotEquals( "fail.properties", props.getProperty( "project.reporting.plugins.0.configuration.children.infoFile.0.value" ) );
         }
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

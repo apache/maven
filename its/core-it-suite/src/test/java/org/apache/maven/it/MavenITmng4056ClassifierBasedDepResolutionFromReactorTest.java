@@ -59,7 +59,6 @@ public class MavenITmng4056ClassifierBasedDepResolutionFromReactorTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4056" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> artifacts = verifier.loadLines( "consumer/target/artifacts.txt", "UTF-8" );
         if ( matchesVersionRange( "[3.0-alpha-3,)" ) )

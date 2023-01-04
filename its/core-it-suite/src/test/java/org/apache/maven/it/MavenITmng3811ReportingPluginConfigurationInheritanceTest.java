@@ -58,7 +58,6 @@ public class MavenITmng3811ReportingPluginConfigurationInheritanceTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
         String p = "project.reporting.plugins.0.configuration.children.";

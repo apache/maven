@@ -62,7 +62,6 @@ public class MavenITmng3805ExtensionClassPathOrderingTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties wclProps = verifier.loadProperties( "target/wcl.properties" );
         String prefix = "org/apache/maven/its/mng3805/a.properties.";

@@ -59,7 +59,6 @@ public class MavenITmng0814ExplicitProfileActivationTest
         verifier.addCliOption( "test-profile" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
         assertEquals( "PASSED", props.getProperty( "project.properties.testProp" ) );

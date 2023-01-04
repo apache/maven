@@ -72,7 +72,6 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         {
             // expected
         }
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
@@ -102,7 +101,6 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.setLogFileName( "log-fn-mt1.txt" );
         verifier.addCliArgument( "-Dmaven.threads.experimental=1" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
@@ -141,7 +139,6 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         {
             // expected
         }
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
@@ -171,7 +168,6 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.setLogFileName( "log-fn-mt2.txt" );
         verifier.addCliArgument( "-Dmaven.threads.experimental=2" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
@@ -210,7 +206,6 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         {
             // expected
         }
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );

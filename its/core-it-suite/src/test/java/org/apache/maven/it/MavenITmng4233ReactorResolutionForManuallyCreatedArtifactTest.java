@@ -60,7 +60,6 @@ public class MavenITmng4233ReactorResolutionForManuallyCreatedArtifactTest
         verifier.deleteDirectory( "consumer/target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "consumer/target/artifact.properties" );
         assertEquals( new File( testDir.getCanonicalFile(), "producer/pom.xml" ), new File(

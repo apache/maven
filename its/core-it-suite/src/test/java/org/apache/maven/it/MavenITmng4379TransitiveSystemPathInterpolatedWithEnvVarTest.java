@@ -63,7 +63,6 @@ public class MavenITmng4379TransitiveSystemPathInterpolatedWithEnvVarTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate", Collections.singletonMap( "MNG_4379_HOME", testDir.getAbsolutePath() ) );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
         assertTrue( classpath.toString(), classpath.contains( "pom.xml" ) );

@@ -68,10 +68,6 @@ public class MavenITmng4291MojoRequiresOnlineModeTest
         {
             // expected
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
     /**
@@ -93,7 +89,6 @@ public class MavenITmng4291MojoRequiresOnlineModeTest
         verifier.addCliOption( "--offline" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFileNotPresent( "target/touch.txt" );
     }

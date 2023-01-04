@@ -63,7 +63,6 @@ public class MavenITmng0828PluginConfigValuesInDebugTest
         verifier.setMavenDebug( true );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         String log = FileUtils.fileRead( new File( verifier.getBasedir(), verifier.getLogFileName() ) );
 

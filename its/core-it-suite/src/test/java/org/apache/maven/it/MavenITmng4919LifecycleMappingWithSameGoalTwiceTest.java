@@ -58,7 +58,6 @@ public class MavenITmng4919LifecycleMappingWithSameGoalTwiceTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoals( Arrays.asList( new String[] { "clean", "validate" } ) );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> lines = verifier.loadLines( "target/log.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "check", "check" } ), lines );

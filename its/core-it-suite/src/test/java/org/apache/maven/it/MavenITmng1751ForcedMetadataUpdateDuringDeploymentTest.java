@@ -67,7 +67,6 @@ public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng1751" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         // phase 2: resolve snapshot, if the previous deployment didn't update the metadata, we get the wrong file
         verifier = newVerifier( new File( testDir, "test" ).getAbsolutePath() );
@@ -78,7 +77,6 @@ public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties checksums = verifier.loadProperties( "target/checksum.properties" );
         String sha1 = checksums.getProperty( "dep-0.1-SNAPSHOT.jar", "" ).toLowerCase( java.util.Locale.ENGLISH );

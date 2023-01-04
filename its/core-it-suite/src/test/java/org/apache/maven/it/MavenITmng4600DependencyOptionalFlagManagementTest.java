@@ -59,7 +59,6 @@ public class MavenITmng4600DependencyOptionalFlagManagementTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "dep", props.getProperty( "project.dependencies.0.artifactId" ) );
@@ -87,7 +86,6 @@ public class MavenITmng4600DependencyOptionalFlagManagementTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
         assertTrue( classpath.toString(), classpath.contains( "direct-0.2.jar" ) );

@@ -61,7 +61,6 @@ public class MavenITmng4633DualCompilerExecutionsWeaveModeTest
         verifier.addCliOption( "2W" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

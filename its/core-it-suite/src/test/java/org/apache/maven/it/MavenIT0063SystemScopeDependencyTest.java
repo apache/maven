@@ -52,7 +52,6 @@ public class MavenIT0063SystemScopeDependencyTest
         verifier.getSystemProperties().setProperty( "jre.home", new File( testDir, "jdk/jre" ).getPath() );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> lines = verifier.loadLines( "target/compile.txt", "UTF-8" );
         assertEquals( 2, lines.size() );

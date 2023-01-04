@@ -259,7 +259,6 @@ public class MavenIT0143TransitiveDependencyScopesTest
         verifier.setLogFileName( "log-" + scope + ".txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         return verifier;
     }

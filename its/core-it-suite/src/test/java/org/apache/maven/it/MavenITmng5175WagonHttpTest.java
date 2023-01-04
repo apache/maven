@@ -138,6 +138,5 @@ public class MavenITmng5175WagonHttpTest
         verifier.verifyTextInLog(
                 "Could not transfer artifact org.apache.maven.its.mng5175:fake-dependency:pom:1.0-SNAPSHOT" );
         verifier.verifyTextInLog( "Read timed out" );
-        verifier.resetStreams();
     }
 }

@@ -63,7 +63,6 @@ public class MavenITmng2432PluginPrefixOrderTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "it:touch" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFileNotPresent( "target/touch-settings.txt" );
         verifier.verifyFilePresent( "target/touch-pom.txt" );

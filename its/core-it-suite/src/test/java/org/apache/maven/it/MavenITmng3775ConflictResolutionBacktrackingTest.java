@@ -102,7 +102,6 @@ public class MavenITmng3775ConflictResolutionBacktrackingTest
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> test = verifier.loadLines( "target/test.txt", "UTF-8" );
 

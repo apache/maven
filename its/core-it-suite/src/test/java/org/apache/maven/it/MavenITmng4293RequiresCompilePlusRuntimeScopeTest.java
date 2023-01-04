@@ -68,7 +68,6 @@ public class MavenITmng4293RequiresCompilePlusRuntimeScopeTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> compileClassPath = verifier.loadLines( "target/compile-cp.txt", "UTF-8" );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "system-0.1.jar" ) );

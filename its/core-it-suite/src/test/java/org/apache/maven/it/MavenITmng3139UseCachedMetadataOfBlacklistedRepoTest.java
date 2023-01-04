@@ -65,7 +65,6 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         // phase 2: trigger blacklisting of repo (by invalid URL) and check previously downloaded metadata is still used
 
@@ -79,7 +78,6 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

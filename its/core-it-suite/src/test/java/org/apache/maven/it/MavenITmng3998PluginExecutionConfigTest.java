@@ -60,7 +60,6 @@ public class MavenITmng3998PluginExecutionConfigTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> executions = verifier.loadLines( "target/exec.log", "UTF-8" );
         // NOTE: Ordering of executions is another issue (MNG-3887), so ignore/normalize order

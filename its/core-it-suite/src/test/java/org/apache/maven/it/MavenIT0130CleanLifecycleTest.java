@@ -57,7 +57,6 @@ public class MavenIT0130CleanLifecycleTest
         verifier.executeGoal( "clean" );
         verifier.verifyFilePresent( "target/clean-clean.txt" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

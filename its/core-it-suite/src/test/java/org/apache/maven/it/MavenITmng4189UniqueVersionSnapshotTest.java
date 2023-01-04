@@ -60,7 +60,6 @@ public class MavenITmng4189UniqueVersionSnapshotTest
         verifier.addCliOption( "settings.xml" );
         verifier.setLogFileName( "log-1.txt" );
         verifier.executeGoal( "validate" );
-        verifier.resetStreams();
 
         verifier.verifyErrorFreeLog();
         Properties checksums = verifier.loadProperties( "target/checksum.properties" );
@@ -76,7 +75,6 @@ public class MavenITmng4189UniqueVersionSnapshotTest
         verifier.addCliOption( "dependent-on-newer-timestamp-pom.xml" );
         verifier.setLogFileName( "log-2.txt" );
         verifier.executeGoal( "validate" );
-        verifier.resetStreams();
 
         verifier.verifyErrorFreeLog();
         checksums = verifier.loadProperties( "target/checksum.properties" );
@@ -90,7 +88,6 @@ public class MavenITmng4189UniqueVersionSnapshotTest
         verifier.addCliOption( "settings.xml" );
         verifier.setLogFileName( "log-3.txt" );
         verifier.executeGoal( "validate" );
-        verifier.resetStreams();
 
         verifier.verifyErrorFreeLog();
         checksums = verifier.loadProperties( "target/checksum.properties" );

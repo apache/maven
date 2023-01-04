@@ -60,7 +60,6 @@ public class MavenITmng0956ComponentInjectionViaProjectLevelPluginDepTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties apiProps = verifier.loadProperties( "target/component.properties" );
         assertEquals( "true", apiProps.getProperty( "org.apache.maven.plugin.coreit.DefaultComponent" ) );

@@ -78,7 +78,6 @@ public class MavenITmng3401CLIDefaultExecIdTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-configuration:2.1-SNAPSHOT:config" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
 

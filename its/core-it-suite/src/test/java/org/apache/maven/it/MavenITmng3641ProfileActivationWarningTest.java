@@ -60,7 +60,6 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.setLogFileName( "log-1.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         assertNull( findWarning( logFile, "mng-3641-it-provided-profile" ) );
@@ -72,7 +71,6 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.setLogFileName( "log-2.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         assertNotNull( findWarning( logFile, "mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p" ) );
@@ -85,7 +83,6 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.setLogFileName( "log-3.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         assertNull( findWarning( logFile, "mng-3641-it-provided-profile" ) );
@@ -98,7 +95,6 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.setLogFileName( "log-4.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         assertNull( findWarning( logFile, "mng-3641-it-provided-profile-child" ) );
@@ -110,7 +106,6 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.setLogFileName( "log-5.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         assertNull( findWarning( logFile, "mng-3641-it-provided-profile-child" ) );
@@ -122,7 +117,6 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.setLogFileName( "log-6.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         assertNull( findWarning( logFile, "mng-3641-it-provided-profile" ) );

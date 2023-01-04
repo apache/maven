@@ -58,7 +58,6 @@ public class MavenITmng3821EqualPluginExecIdsTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

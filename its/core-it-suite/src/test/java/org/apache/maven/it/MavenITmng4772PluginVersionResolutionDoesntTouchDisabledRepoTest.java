@@ -113,7 +113,6 @@ public class MavenITmng4772PluginVersionResolutionDoesntTouchDisabledRepoTest
         }
         finally
         {
-            verifier.resetStreams();
             server.stop();
             server.join();
         }

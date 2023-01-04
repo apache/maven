@@ -59,7 +59,6 @@ public class MavenITmng3297DependenciesNotLeakedToMojoTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertEquals( artifacts.toString(), 1, artifacts.size() );

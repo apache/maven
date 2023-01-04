@@ -108,7 +108,6 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         assertTrue( repoHandler.artifactRequestedFromRepo2 );
         assertTrue( repoHandler.artifactRequestedFromRepo1Last );
@@ -144,7 +143,6 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.mng5280:fake-maven-plugin:1.0:fake" );
-        verifier.resetStreams();
 
         assertTrue( pluginRepoHandler.pluginRequestedFromRepo2 );
         assertTrue( pluginRepoHandler.pluginRequestedFromRepo1Last );

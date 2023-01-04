@@ -61,7 +61,6 @@ public class MavenITmng5135AggregatorDepResolutionModuleExtensionTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:aggregate-test" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> compile = verifier.loadLines( "target/module.txt", "UTF-8" );
 

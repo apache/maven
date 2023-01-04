@@ -59,7 +59,6 @@ public class MavenITmng5503ZipInReactorTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "verify" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

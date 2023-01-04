@@ -61,7 +61,6 @@ public class MavenITmng2972OverridePluginDependencyTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
         verify( pclProps );
@@ -93,7 +92,6 @@ public class MavenITmng2972OverridePluginDependencyTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-class-loader:2.1-SNAPSHOT:load" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
         verify( pclProps );

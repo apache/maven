@@ -61,7 +61,6 @@ public class MavenITmng1233WarDepWithProvidedScopeTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Collection<String> compileArtifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
         assertTrue( compileArtifacts.toString(),

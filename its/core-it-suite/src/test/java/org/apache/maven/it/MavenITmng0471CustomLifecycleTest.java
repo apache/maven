@@ -60,7 +60,6 @@ public class MavenITmng0471CustomLifecycleTest
             "org.apache.maven.its.plugins:maven-it-plugin-fork:fork-goal"} );
         verifier.executeGoals( goals );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/forked/touch.txt" );
         verifier.verifyFilePresent( "target/forked2/touch.txt" );

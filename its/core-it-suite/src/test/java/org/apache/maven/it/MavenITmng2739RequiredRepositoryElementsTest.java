@@ -66,7 +66,6 @@ public class MavenITmng2739RequiredRepositoryElementsTest
             // expected
         }
 
-        verifier.resetStreams();
 
         List<String> listing = verifier.loadFile( new File( testDir, "log.txt" ), false );
         boolean foundNpe = false;
@@ -107,7 +106,6 @@ public class MavenITmng2739RequiredRepositoryElementsTest
             // expected
         }
 
-        verifier.resetStreams();
 
         List<String> listing = verifier.loadFile( new File( testDir, "log.txt" ), false );
         boolean foundNpe = false;

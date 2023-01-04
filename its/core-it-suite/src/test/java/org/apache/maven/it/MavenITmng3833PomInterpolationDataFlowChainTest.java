@@ -59,7 +59,6 @@ public class MavenITmng3833PomInterpolationDataFlowChainTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/interpolated.properties" );
 

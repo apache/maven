@@ -62,7 +62,6 @@ public class MavenITmng5208EventSpyParallelTest
         verifier.addCliOption( "-fn" );
         verifier.executeGoal( "compile" );
         verifier.verifyTextInLog( "ProjectFailed/org.apache.maven.its.mng5208:sub-2" );
-        verifier.resetStreams();
     }
 
 }

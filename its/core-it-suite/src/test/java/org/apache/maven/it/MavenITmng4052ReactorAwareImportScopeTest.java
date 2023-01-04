@@ -58,7 +58,6 @@ public class MavenITmng4052ReactorAwareImportScopeTest
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

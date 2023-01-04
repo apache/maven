@@ -50,7 +50,6 @@ public class MavenIT0019PluginVersionMgmtBySuperPomTest
         verifier.executeGoal( "process-resources" );
         verifier.verifyFilePresent( "target/classes/test.txt" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

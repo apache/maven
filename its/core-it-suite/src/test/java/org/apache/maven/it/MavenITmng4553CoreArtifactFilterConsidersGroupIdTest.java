@@ -61,7 +61,6 @@ public class MavenITmng4553CoreArtifactFilterConsidersGroupIdTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
         assertNotNull( pclProps.getProperty( "mng4553.properties" ) );

@@ -61,7 +61,6 @@ public class MavenITmng4314DirectInvocationOfAggregatorTest
         verifier.executeGoals( Arrays.asList( new String[] { "validate",
             "org.apache.maven.its.plugins:maven-it-plugin-all:2.1-SNAPSHOT:aggregator-dependencies" } ) );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "consumer/target/touch.txt" );

@@ -133,7 +133,6 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest
         }
         finally
         {
-            verifier.resetStreams();
             server.stop();
             server.join();
         }

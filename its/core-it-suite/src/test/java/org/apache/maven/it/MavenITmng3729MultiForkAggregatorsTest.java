@@ -71,12 +71,10 @@ public class MavenITmng3729MultiForkAggregatorsTest
 
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
 
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }

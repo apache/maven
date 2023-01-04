@@ -82,7 +82,6 @@ public class MavenITmng4666CoreRealmImportTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/type.properties" );
         List<String> types = getTypes( props );

@@ -58,7 +58,6 @@ public class MavenITmng4162ReportingMigrationTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         String p = "project.build.plugins.0.executions.0.configuration.children.";
 

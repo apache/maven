@@ -65,7 +65,6 @@ public class MavenITmng3284UsingCachedPluginsTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         /*
          * Phase 2: Now that the plugin versions have been downloaded to the local repo, run the actual test.
@@ -78,7 +77,6 @@ public class MavenITmng3284UsingCachedPluginsTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "mod-a/target/version-0.1.txt" );
         verifier.verifyFileNotPresent( "mod-a/target/version-0.2.txt" );

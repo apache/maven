@@ -118,7 +118,6 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         assertMetadataMissing( verifier );
     }
@@ -228,7 +227,6 @@ public class MavenITmng3415JunkRepositoryMetadataTest
             verifier.executeGoal( "validate" );
 
             verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
 
             assertFalse( requestUris.toString(), requestUris.contains(
                 "/org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT/maven-metadata.xml" ) );

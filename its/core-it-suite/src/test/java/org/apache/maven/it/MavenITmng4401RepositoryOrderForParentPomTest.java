@@ -61,7 +61,6 @@ public class MavenITmng4401RepositoryOrderForParentPomTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/passed.txt" );
         verifier.verifyFileNotPresent( "target/failed.txt" );

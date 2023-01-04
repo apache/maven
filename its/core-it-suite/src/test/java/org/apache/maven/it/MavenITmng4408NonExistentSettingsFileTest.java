@@ -67,10 +67,6 @@ public class MavenITmng4408NonExistentSettingsFileTest
         {
             // expected
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
     /**
@@ -98,10 +94,6 @@ public class MavenITmng4408NonExistentSettingsFileTest
         catch ( VerificationException e )
         {
             // expected
-        }
-        finally
-        {
-            verifier.resetStreams();
         }
     }
 

@@ -62,7 +62,6 @@ public class MavenITmng4785TransitiveResolutionInForkedThreadTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/artifacts.properties" );
         String path = props.getProperty( "org.apache.maven.its.mng4785:dep:jar:0.1-SNAPSHOT", "" );

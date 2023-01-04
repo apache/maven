@@ -81,7 +81,6 @@ public class MavenITmng3938MergePluginExecutionsTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> lines = verifier.loadLines( "target/default.log", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "child" } ), lines );

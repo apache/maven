@@ -64,7 +64,6 @@ public class MavenITmng2921ActiveAttachedArtifactsTest
         verifier.deleteDirectory( "consumer/target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Collection<String> compileArtifacts = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
         assertTrue( compileArtifacts.toString(),

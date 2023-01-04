@@ -58,7 +58,6 @@ public class MavenITmng3621UNCInheritedPathsTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "file:////host/site/test-child", props.getProperty( "project.distributionManagement.site.url" ) );

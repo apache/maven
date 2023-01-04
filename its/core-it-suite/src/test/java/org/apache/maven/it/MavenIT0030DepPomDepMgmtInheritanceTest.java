@@ -53,7 +53,6 @@ public class MavenIT0030DepPomDepMgmtInheritanceTest
         verifier.executeGoal( "install" );
         verifier.verifyFilePresent( "child-hierarchy/project2/target/classes/org/apache/maven/it0001/Person.class" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
     }
 }

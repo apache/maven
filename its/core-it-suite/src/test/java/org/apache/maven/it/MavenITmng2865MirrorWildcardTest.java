@@ -104,7 +104,6 @@ public class MavenITmng2865MirrorWildcardTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng2865", "a", "0.1", "jar" );
     }

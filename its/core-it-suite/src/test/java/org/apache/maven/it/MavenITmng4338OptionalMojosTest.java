@@ -57,7 +57,6 @@ public class MavenITmng4338OptionalMojosTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

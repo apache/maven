@@ -51,7 +51,6 @@ public class MavenIT0056MultipleGoalExecutionsTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/first-exec.txt" );
         verifier.verifyFilePresent( "target/second-exec.txt" );

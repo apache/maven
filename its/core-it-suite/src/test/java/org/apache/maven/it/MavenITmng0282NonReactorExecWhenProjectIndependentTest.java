@@ -59,7 +59,6 @@ public class MavenITmng0282NonReactorExecWhenProjectIndependentTest
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "subproject/target/touch.txt" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

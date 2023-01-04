@@ -59,7 +59,6 @@ public class MavenITmng4273RestrictedCoreRealmAccessForPluginTest
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/class.properties" );
 

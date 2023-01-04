@@ -62,7 +62,6 @@ public class MavenITmng2068ReactorRelativeParentsTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng2068" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     /**
@@ -82,7 +81,6 @@ public class MavenITmng2068ReactorRelativeParentsTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng2068" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     /**
@@ -102,7 +100,6 @@ public class MavenITmng2068ReactorRelativeParentsTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng2068" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

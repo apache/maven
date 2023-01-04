@@ -81,7 +81,6 @@ public class MavenITmng4102InheritedPropertyInterpolationTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "CHILD", props.getProperty( "project.properties.overridden" ) );

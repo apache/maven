@@ -58,7 +58,6 @@ public class MavenITmng4765LocalPomProjectBuilderTest
         verifier.addCliArgument( "-Duser.prop=OK" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "PASSED - OK", props.get( "test.xml.project.name" ) );

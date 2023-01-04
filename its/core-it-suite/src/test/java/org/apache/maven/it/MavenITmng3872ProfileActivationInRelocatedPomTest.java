@@ -63,7 +63,6 @@ public class MavenITmng3872ProfileActivationInRelocatedPomTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> compileClassPath = verifier.loadLines( "target/compile.txt", "UTF-8" );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "a-0.1.jar" ) );

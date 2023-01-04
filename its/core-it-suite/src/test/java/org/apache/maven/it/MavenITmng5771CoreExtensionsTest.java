@@ -37,7 +37,6 @@ public class MavenITmng5771CoreExtensionsTest
         verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     @Test
@@ -56,7 +55,6 @@ public class MavenITmng5771CoreExtensionsTest
         verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     //
@@ -100,7 +98,6 @@ public class MavenITmng5771CoreExtensionsTest
         verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         server.stop();
     }
@@ -127,7 +124,6 @@ public class MavenITmng5771CoreExtensionsTest
         verifier.addCliOption( "-Dtest-extension-version=0.1" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     //
@@ -152,6 +148,5 @@ public class MavenITmng5771CoreExtensionsTest
         verifier.setForkJvm( true ); // force forked JVM since we need the shell script to detect .mvn/
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }

@@ -62,7 +62,6 @@ public class MavenITmng4415InheritedPluginOrderTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/it.properties" );
         assertNotNull( props.getProperty( "project.build.plugins" ) );

@@ -65,7 +65,6 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
         verifier.addCliArgument( "-Dmaven.artifact.threads=16" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         String gid = "org.apache.maven.its.mng3379.";
         assertArtifact( verifier, gid + "a", "x", "0.2-SNAPSHOT", "", "jar",

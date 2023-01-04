@@ -60,13 +60,11 @@ public class MavenITmng3498ForkToOtherMojoTest
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
 
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }

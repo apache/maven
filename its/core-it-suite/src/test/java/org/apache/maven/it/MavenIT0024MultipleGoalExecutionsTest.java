@@ -57,7 +57,6 @@ public class MavenIT0024MultipleGoalExecutionsTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/plugin-exec-configuration.txt" );
     }

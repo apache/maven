@@ -57,7 +57,6 @@ public class MavenITmng4429CompRequirementOnNonDefaultImplTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/comp.properties" );
         assertEquals( "concrete", props.getProperty( "id" ) );

@@ -65,10 +65,6 @@ public class MavenITmng4383ValidDependencyVersionTest
         {
             // expected
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
 }

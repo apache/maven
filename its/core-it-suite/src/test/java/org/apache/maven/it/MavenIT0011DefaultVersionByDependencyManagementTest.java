@@ -54,7 +54,6 @@ public class MavenIT0011DefaultVersionByDependencyManagementTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> artifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.it0011:a:jar:0.1" ) );

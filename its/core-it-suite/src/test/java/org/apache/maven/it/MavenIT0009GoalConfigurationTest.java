@@ -57,7 +57,6 @@ public class MavenIT0009GoalConfigurationTest
         verifier.verifyFilePresent( "target/goalItem" );
         verifier.verifyFileNotPresent( "target/bad-item" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

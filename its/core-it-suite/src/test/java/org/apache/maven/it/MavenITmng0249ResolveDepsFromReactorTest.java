@@ -56,7 +56,6 @@ public class MavenITmng0249ResolveDepsFromReactorTest
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> ccp = verifier.loadLines( "test-component-c/target/compile.txt", "UTF-8" );
         assertTrue( ccp.toString(), ccp.contains( "test-component-c/classes" ) );

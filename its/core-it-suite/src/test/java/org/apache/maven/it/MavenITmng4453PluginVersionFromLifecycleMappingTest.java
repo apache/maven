@@ -57,7 +57,6 @@ public class MavenITmng4453PluginVersionFromLifecycleMappingTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "process-resources" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/resources-resources.txt" );
     }

@@ -59,7 +59,6 @@ public class MavenITmng4381ExtensionSingletonComponentTest
         verifier.deleteDirectory( "sub-b/target" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "sub-b/target/singleton.properties" );
         assertEquals( "called", props.getProperty( "sub-a-provider" ) );

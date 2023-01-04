@@ -54,7 +54,6 @@ public class MavenITmng2130ParentLookupFromReactorCacheTest
         verifier.deleteArtifacts( "org.apache.maven.mng2130" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

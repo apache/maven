@@ -55,7 +55,6 @@ public class MavenITmng2318LocalParentResolutionTest
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

@@ -59,7 +59,6 @@ public class MavenITmng3208ProfileAwareReactorSortingTest
         verifier.addCliOption( "-Pmng3208" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> order = verifier.loadLines( "target/order.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "mod-b", "mod-a" } ), order );

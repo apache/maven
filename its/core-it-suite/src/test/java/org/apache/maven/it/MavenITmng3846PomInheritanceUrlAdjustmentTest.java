@@ -58,7 +58,6 @@ public class MavenITmng3846PomInheritanceUrlAdjustmentTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "http://parent.url/child", props.getProperty( "project.url" ) );
@@ -92,7 +91,6 @@ public class MavenITmng3846PomInheritanceUrlAdjustmentTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "http://parent.url/ap/child", props.getProperty( "project.url" ) );

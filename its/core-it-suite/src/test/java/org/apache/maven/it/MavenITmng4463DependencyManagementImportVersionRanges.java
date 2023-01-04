@@ -52,7 +52,6 @@ public class MavenITmng4463DependencyManagementImportVersionRanges
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         final List<String> artifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven:maven-plugin-api:jar:3.0" ) );
@@ -68,7 +67,6 @@ public class MavenITmng4463DependencyManagementImportVersionRanges
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> artifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven:maven-plugin-api:jar:3.0" ) );
@@ -93,10 +91,6 @@ public class MavenITmng4463DependencyManagementImportVersionRanges
             final List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
             assertTrue( "Expected error message not found.",
                         indexOf( lines, ".*dependency version range.*does not specify an upper bound.*" ) >= 0 );
-        }
-        finally
-        {
-            verifier.resetStreams();
         }
     }
 

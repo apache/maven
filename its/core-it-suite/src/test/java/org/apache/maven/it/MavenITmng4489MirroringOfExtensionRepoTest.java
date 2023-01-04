@@ -117,7 +117,6 @@ public class MavenITmng4489MirroringOfExtensionRepoTest
             verifier.addCliOption( "settings.xml" );
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
 
             verifier.verifyArtifactPresent( "org.apache.maven.its.mng4489", "ext-dep", "0.1", "jar" );
             verifier.verifyArtifactPresent( "org.apache.maven.its.mng4489", "ext-dep", "0.1", "pom" );

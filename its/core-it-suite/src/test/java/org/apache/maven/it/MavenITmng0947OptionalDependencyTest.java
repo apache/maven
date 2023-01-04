@@ -64,7 +64,6 @@ public class MavenITmng0947OptionalDependencyTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
         assertTrue( compile.toString(), compile.contains( "org.apache.maven.its.mng0947:d:jar:0.1 (optional)" ) );

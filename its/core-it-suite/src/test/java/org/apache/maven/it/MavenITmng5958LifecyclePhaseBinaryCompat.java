@@ -27,7 +27,6 @@ public class MavenITmng5958LifecyclePhaseBinaryCompat
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.verifyTextInLog( "CLASS_NAME=java.lang.String" );
-        verifier.resetStreams();
     }
 
     @Test
@@ -48,6 +47,5 @@ public class MavenITmng5958LifecyclePhaseBinaryCompat
             verifier.verifyTextInLog( "[ERROR] Internal error: java.lang.ClassCastException: " );
             verifier.verifyTextInLog( "org.apache.maven.lifecycle.mapping.LifecyclePhase cannot be cast to " );
         }
-        verifier.resetStreams();
     }
 }

@@ -62,7 +62,6 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride
 
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     // This will test the behavior using DefaultModelResolver
@@ -80,7 +79,6 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride
 
         verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     // central must not be defined in any settings.xml or super POM will never be in play.

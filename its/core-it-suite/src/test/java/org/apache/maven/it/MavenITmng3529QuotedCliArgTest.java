@@ -59,7 +59,6 @@ public class MavenITmng3529QuotedCliArgTest
         verifier.addCliOption( "-Dtest.a=  " );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "-  -", props.getProperty( "project.properties.propA" ) );

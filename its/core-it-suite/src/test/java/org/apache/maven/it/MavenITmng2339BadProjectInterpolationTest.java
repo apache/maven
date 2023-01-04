@@ -52,7 +52,6 @@ public class MavenITmng2339BadProjectInterpolationTest
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     // test that -Dversion=1.0 is still available for interpolation.
@@ -76,7 +75,6 @@ public class MavenITmng2339BadProjectInterpolationTest
                     new File( testDir, "target/touch-1.txt" ).exists() );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -87,7 +85,6 @@ public class MavenITmng2339BadProjectInterpolationTest
         verifier.executeGoal( "initialize" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         assertTrue( "Touchfile using CLI-specified ${version} does not exist.",
                     new File( testDir, "target/touch-2.txt" ).exists() );

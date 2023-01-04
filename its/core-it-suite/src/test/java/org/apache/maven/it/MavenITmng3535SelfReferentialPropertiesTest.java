@@ -55,7 +55,6 @@ public class MavenITmng3535SelfReferentialPropertiesTest
         verifier.executeGoal( "verify" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     @Test
@@ -82,7 +81,5 @@ public class MavenITmng3535SelfReferentialPropertiesTest
         {
             // should fail this verification, because there truly is a self-referential property.
         }
-
-        verifier.resetStreams();
     }
 }

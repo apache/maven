@@ -60,7 +60,6 @@ public class MavenITmng3607ClassLoadersUseValidUrlsTest
         verifier.getSystemProperties().setProperty( "test.home", testDir.getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pcl.properties" );
         String url = props.getProperty( "maven-core-it.properties" );

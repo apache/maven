@@ -65,7 +65,6 @@ public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "mng4465:touch" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.properties" );
 
@@ -81,7 +80,6 @@ public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "mng4465:touch" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.properties" );
     }

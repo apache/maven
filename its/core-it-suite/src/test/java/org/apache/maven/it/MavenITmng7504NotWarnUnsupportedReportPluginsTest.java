@@ -54,7 +54,6 @@ public class MavenITmng7504NotWarnUnsupportedReportPluginsTest extends AbstractM
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "site" );
-        verifier.resetStreams();
 
         List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
 

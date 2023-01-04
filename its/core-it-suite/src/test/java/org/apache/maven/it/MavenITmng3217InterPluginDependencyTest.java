@@ -63,7 +63,6 @@ public class MavenITmng3217InterPluginDependencyTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "sub-1/target/touch-1.txt" );
         verifier.verifyFilePresent( "sub-2/target/touch-2.txt" );

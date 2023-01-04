@@ -77,7 +77,6 @@ public class MavenITmng2591MergeInheritedPluginConfigTest
         verifier.deleteDirectory( "subproject/target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "subproject/target/config.properties" );
 

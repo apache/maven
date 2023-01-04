@@ -60,7 +60,6 @@ public class MavenITmng4393ParseExternalParenPomLenientTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

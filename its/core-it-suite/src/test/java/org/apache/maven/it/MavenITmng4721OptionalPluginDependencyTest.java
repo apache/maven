@@ -60,7 +60,6 @@ public class MavenITmng4721OptionalPluginDependencyTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pcl.properties" );
         assertEquals( "1", props.get( "org/apache/maven/plugin/coreit/c.properties.count" ) );

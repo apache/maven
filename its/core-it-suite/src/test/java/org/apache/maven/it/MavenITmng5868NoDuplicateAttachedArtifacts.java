@@ -135,7 +135,6 @@ public class MavenITmng5868NoDuplicateAttachedArtifacts
         verifier.displayStreamBuffers();
         verifier.executeGoals( Arrays.asList("org.apache.maven.its.plugins:maven-it-plugin-artifact:2.1-SNAPSHOT:attach", "deploy" ) );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
         assertEquals("deployedJarArtifactNumber: " + deployedJarArtifactNumber, 1, deployedJarArtifactNumber );
     }
 

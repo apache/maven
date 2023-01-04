@@ -66,7 +66,6 @@ public class MavenITmng4274PluginRealmArtifactsTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/class.properties" );
         assertNotNull( props.getProperty( "org.apache.maven.its.mng4274.CoreIt" ) );

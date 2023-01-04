@@ -65,7 +65,6 @@ public class MavenITmng5338FileOptionToDirectory
         verifier.addCliOption( "project" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
     }
 

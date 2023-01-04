@@ -113,7 +113,6 @@ public class MavenITmng4555MetaversionResolutionOfflineTest
         }
         finally
         {
-            verifier.resetStreams();
             server.stop();
             server.join();
         }

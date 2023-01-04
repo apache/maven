@@ -40,7 +40,6 @@ public class MavenITmng5965ParallelBuildMultipliesWorkTest
         // include an aggregator task so that the two goals end up in different task segments
         verifier.executeGoals( Arrays.asList( "clean", "install:help" ) );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> logLines = verifier.loadLines( "log-only.txt", "UTF-8" );
 

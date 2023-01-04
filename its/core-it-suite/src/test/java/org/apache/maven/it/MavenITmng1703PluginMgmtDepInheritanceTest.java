@@ -63,7 +63,6 @@ public class MavenITmng1703PluginMgmtDepInheritanceTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng1703" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
         assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassA" ) );

@@ -57,7 +57,6 @@ public class MavenITmng1415QuotedSystemPropertiesTest
         verifier.addCliOption( "-Dtest.property=Test Property" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/cli.properties" );
         assertEquals( "Test Property", props.getProperty( "stringParam" ) );

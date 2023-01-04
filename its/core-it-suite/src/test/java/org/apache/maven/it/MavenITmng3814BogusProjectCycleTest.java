@@ -60,7 +60,6 @@ public class MavenITmng3814BogusProjectCycleTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

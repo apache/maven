@@ -57,7 +57,6 @@ public class MavenIT0139InterpolationWithProjectPrefixTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/interpolated.properties" );
         String prefix = "project.properties.";

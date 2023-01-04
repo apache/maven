@@ -138,7 +138,6 @@ public class MavenITmng2387InactiveProxyTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng2387", "a", "0.1", "jar" );
     }

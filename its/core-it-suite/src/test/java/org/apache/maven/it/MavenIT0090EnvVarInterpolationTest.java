@@ -56,7 +56,6 @@ public class MavenIT0090EnvVarInterpolationTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate", envVars );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/env.properties" );
         assertEquals( "MAVEN_TEST_ENVAR_VALUE", props.getProperty( "stringParam" ) );

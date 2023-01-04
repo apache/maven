@@ -58,7 +58,6 @@ public class MavenITmng3839PomParsingCoalesceTextTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/xml.properties" );
         assertEquals( "A  Test  Project Property", props.getProperty( "project.properties.prop0" ) );

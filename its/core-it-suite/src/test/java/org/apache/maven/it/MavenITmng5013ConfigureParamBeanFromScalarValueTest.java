@@ -55,7 +55,6 @@ public class MavenITmng5013ConfigureParamBeanFromScalarValueTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertEquals( "PASSED", props.getProperty( "beanParam.fieldParam" ) );

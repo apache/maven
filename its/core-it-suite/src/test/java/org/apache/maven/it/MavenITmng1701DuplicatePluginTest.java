@@ -62,7 +62,6 @@ public class MavenITmng1701DuplicatePluginTest
         {
             // expected with Maven 4+
         }
-        verifier.resetStreams();
 
         String logLevel;
         if ( matchesVersionRange( "(,4.0.0-alpha-1)" ) )

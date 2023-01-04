@@ -59,36 +59,30 @@ public class MavenITmng3470StrictChecksumVerificationOfDependencyPomTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
+
         try
         {
-            try
-            {
-                verifier.setLogFileName( "log-1.txt" );
-                verifier.executeGoal( "validate" );
-                verifier.verifyErrorFreeLog();
-                fail( "Build did not fail despite broken checksum of dependency POM." );
-            }
-            catch ( VerificationException e )
-            {
-                // expected
-            }
-
-            // NOTE: This second try is to make sure the state caching in the local repo properly replays the error
-            try
-            {
-                verifier.setLogFileName( "log-2.txt" );
-                verifier.executeGoal( "validate" );
-                verifier.verifyErrorFreeLog();
-                fail( "Build did not fail despite broken checksum of dependency POM." );
-            }
-            catch ( VerificationException e )
-            {
-                // expected
-            }
+            verifier.setLogFileName( "log-1.txt" );
+            verifier.executeGoal( "validate" );
+            verifier.verifyErrorFreeLog();
+            fail( "Build did not fail despite broken checksum of dependency POM." );
         }
-        finally
+        catch ( VerificationException e )
         {
-            verifier.resetStreams();
+            // expected
+        }
+
+        // NOTE: This second try is to make sure the state caching in the local repo properly replays the error
+        try
+        {
+            verifier.setLogFileName( "log-2.txt" );
+            verifier.executeGoal( "validate" );
+            verifier.verifyErrorFreeLog();
+            fail( "Build did not fail despite broken checksum of dependency POM." );
+        }
+        catch ( VerificationException e )
+        {
+            // expected
         }
     }
 

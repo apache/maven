@@ -58,13 +58,11 @@ public class MavenITmng3259DepsDroppedInMultiModuleBuildTest
 
         verifier.verifyErrorFreeLog();
 
-        verifier.resetStreams();
 
         verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
 
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }

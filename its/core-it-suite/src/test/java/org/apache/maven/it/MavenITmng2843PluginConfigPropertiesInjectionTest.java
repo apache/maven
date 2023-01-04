@@ -58,7 +58,6 @@ public class MavenITmng2843PluginConfigPropertiesInjectionTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/project.properties" );
         assertEquals( "PASSED", props.getProperty( "key" ) );

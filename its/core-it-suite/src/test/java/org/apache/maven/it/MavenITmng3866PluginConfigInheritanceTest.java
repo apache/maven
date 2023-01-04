@@ -59,7 +59,6 @@ public class MavenITmng3866PluginConfigInheritanceTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/plugin-config.properties" );
         assertEquals( "PASSED", props.getProperty( "stringParam" ) );

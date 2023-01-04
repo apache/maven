@@ -64,10 +64,6 @@ public class MavenITmng4283ParentPomPackagingTest
         {
             // expected
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
 }

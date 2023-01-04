@@ -61,7 +61,6 @@ public class MavenITmng1992SystemPropOverridesPomPropTest
         verifier.getSystemProperties().setProperty( "config.stringParam", "PASSED" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties configProps = verifier.loadProperties( "target/config.properties" );
         assertEquals( "PASSED", configProps.getProperty( "stringParam" ) );

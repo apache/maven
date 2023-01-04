@@ -50,7 +50,6 @@ public class MavenITmng6562WarnDefaultBindings
         verifier.addCliOption( "-fos" );
         verifier.addCliOption( "WARN" ); // ALSO NO WARNINGS
         verifier.executeGoals( Arrays.asList( phase ) );
-        verifier.resetStreams();
 
         verifier.verifyErrorFreeLog();
     }
@@ -70,7 +69,6 @@ public class MavenITmng6562WarnDefaultBindings
         verifier.addCliOption( "-fos" );
         verifier.addCliOption( "WARN" ); // ALSO NO WARNINGS
         verifier.executeGoals( Arrays.asList( phase ) );
-        verifier.resetStreams();
 
         verifier.verifyErrorFreeLog();
     }
@@ -86,7 +84,6 @@ public class MavenITmng6562WarnDefaultBindings
         verifier.setAutoclean( false );
         verifier.setLogFileName( phase +".txt" );
         verifier.executeGoals( Arrays.asList( phase ) );
-        verifier.resetStreams();
 
         verifier.verifyTextInLog( "Version not locked for default bindings plugins [maven-compiler-plugin]"
                 + ", you should define versions in pluginManagement section of your pom.xml or parent" );
@@ -103,7 +100,6 @@ public class MavenITmng6562WarnDefaultBindings
         verifier.setAutoclean( false );
         verifier.setLogFileName( phase +".txt" );
         verifier.executeGoals( Arrays.asList( phase ) );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyTextInLog( "Version not locked for default bindings plugins [maven-compiler-plugin]"
@@ -121,7 +117,6 @@ public class MavenITmng6562WarnDefaultBindings
         verifier.setAutoclean( false );
         verifier.setLogFileName( phase +".txt" );
         verifier.executeGoals( Arrays.asList( phase ) );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyTextInLog( "Version not locked for default bindings plugins [maven-compiler-plugin]"
@@ -139,7 +134,6 @@ public class MavenITmng6562WarnDefaultBindings
         verifier.setAutoclean( false );
         verifier.setLogFileName( phase +".txt" );
         verifier.executeGoals( Arrays.asList( phase ) );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyTextInLog( "Version not locked for default bindings plugins [maven-compiler-plugin, maven-surefire-plugin]"

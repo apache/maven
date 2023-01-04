@@ -57,12 +57,10 @@ public class MavenITmng3716AggregatorForkingTest
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( projectsDir.getAbsolutePath() );
         verifier.executeGoal( "org.apache.maven.its.mng3716:mavenit-mng3716-plugin:1:run" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }

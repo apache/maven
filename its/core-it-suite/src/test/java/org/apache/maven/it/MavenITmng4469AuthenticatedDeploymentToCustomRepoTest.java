@@ -161,7 +161,6 @@ public class MavenITmng4469AuthenticatedDeploymentToCustomRepoTest
         verifier.addCliArgument( "-DrepositoryUrl=http://localhost:" + port + "/repo" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-artifact:2.1-SNAPSHOT:deploy-file" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         assertTrue( deployed );
     }

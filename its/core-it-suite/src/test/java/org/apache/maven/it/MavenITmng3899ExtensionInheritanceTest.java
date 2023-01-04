@@ -62,7 +62,6 @@ public class MavenITmng3899ExtensionInheritanceTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/extension.properties" );
         assertEquals( "3", props.getProperty( "project.build.extensions" ) );

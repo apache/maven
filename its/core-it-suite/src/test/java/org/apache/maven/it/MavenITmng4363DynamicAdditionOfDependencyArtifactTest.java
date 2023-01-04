@@ -62,7 +62,6 @@ public class MavenITmng4363DynamicAdditionOfDependencyArtifactTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "generate-sources" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
         assertTrue( classpath.toString(), classpath.contains( "a-0.1.jar" ) );

@@ -69,7 +69,6 @@ public class MavenITmng4335SettingsOfflineModeTest
         {
             // expected, should fail
         }
-        verifier.resetStreams();
     }
 
 }

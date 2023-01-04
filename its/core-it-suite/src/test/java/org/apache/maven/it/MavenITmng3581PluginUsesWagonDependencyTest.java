@@ -57,7 +57,6 @@ public class MavenITmng3581PluginUsesWagonDependencyTest
         verifier.executeGoal( "initialize" );
         verifier.addCliOption( "-B" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

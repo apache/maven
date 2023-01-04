@@ -68,10 +68,6 @@ public class MavenITmng4840MavenPrerequisiteTest
         {
             // expected, unsolvable version conflict
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
     /**
@@ -95,7 +91,6 @@ public class MavenITmng4840MavenPrerequisiteTest
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "org.apache.maven.its.mng4840:maven-mng4840-plugin:touch" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch-1.txt" );
         verifier.verifyFileNotPresent( "target/touch-2.txt" );

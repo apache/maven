@@ -58,7 +58,6 @@ public class MavenITmng2135PluginBuildInReactorTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng2135" );
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "project/target/touch.txt" );
     }

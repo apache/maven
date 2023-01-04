@@ -51,7 +51,6 @@ public class MavenIT0064MojoConfigViaSettersTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-setter:setter-touch" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/fooValue" );
         verifier.verifyFilePresent( "target/barValue.baz" );

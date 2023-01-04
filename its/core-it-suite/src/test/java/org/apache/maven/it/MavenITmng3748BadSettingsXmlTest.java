@@ -89,8 +89,6 @@ public class MavenITmng3748BadSettingsXmlTest
             }
             assertTrue( foundWarning );
         }
-
-        verifier.resetStreams();
     }
 
 }

@@ -60,7 +60,6 @@ public class MavenITmng5663NestedImportScopePomResolutionTest
 
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng5663", "c", "0.1", "jar" );
 

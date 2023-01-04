@@ -64,7 +64,6 @@ public class MavenIT0136RarLifecycleTest
         verifier.verifyFilePresent( "target/install-install.txt" );
         verifier.verifyFilePresent( "target/deploy-deploy.txt" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

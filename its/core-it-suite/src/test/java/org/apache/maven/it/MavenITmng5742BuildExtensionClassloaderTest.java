@@ -49,13 +49,11 @@ public class MavenITmng5742BuildExtensionClassloaderTest
         // install the test plugin
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "validate" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent( "target/execution-success.txt" );
 

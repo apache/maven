@@ -71,7 +71,6 @@ public class MavenITmng3732ActiveProfilesTest
         }
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
         List<String> ids = new ArrayList<>();

@@ -59,7 +59,6 @@ public class MavenITmng3924XmlMarkupInterpolationTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/xml.properties" );
         assertEquals( "<?xml version='1.0'?>Tom&Jerry", props.getProperty( "project.properties.xmlMarkup" ) );

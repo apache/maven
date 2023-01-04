@@ -62,7 +62,6 @@ public class MavenITmng3012CoreClassImportTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties xpp3domProps = verifier.loadProperties( "target/xpp3dom.properties" );
         assertEquals( "true", xpp3domProps.getProperty( "project.reporting.plugins.0.configuration" ) );

@@ -61,7 +61,6 @@ public class MavenITmng6084Jsr250PluginTest
         v0.deleteArtifacts( "org.apache.maven.its.mng6084" );
         v0.executeGoal( "install" );
         v0.verifyErrorFreeLog();
-        v0.resetStreams();
 
         //
         // Execute the JSR 250 plugin
@@ -70,7 +69,6 @@ public class MavenITmng6084Jsr250PluginTest
         v1.setAutoclean( false );
         v1.executeGoal( "org.apache.maven.its.mng6084:jsr250-maven-plugin:0.0.1-SNAPSHOT:hello" );
         v1.verifyErrorFreeLog();
-        v1.resetStreams();
         v1.verifyTextInLog( "Hello! I am a component using JSR 250 with @PostConstruct support" );
 
     }

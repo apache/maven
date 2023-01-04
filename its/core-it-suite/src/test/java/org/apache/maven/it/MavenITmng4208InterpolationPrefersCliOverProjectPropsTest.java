@@ -58,7 +58,6 @@ public class MavenITmng4208InterpolationPrefersCliOverProjectPropsTest
         verifier.addCliOption( "-DtestProperty=PASSED" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "PASSED", props.getProperty( "project.properties.interpolatedProperty" ) );

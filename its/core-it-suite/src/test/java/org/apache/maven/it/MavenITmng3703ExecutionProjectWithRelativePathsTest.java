@@ -57,7 +57,6 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
         verifier.setLogFileName( "log-mojo.txt" );
@@ -65,7 +64,6 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
         verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     @Test
@@ -83,7 +81,6 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
         verifier.setLogFileName( "log-report.txt" );
@@ -91,6 +88,5 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
         verifier.executeGoal( "site" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }

@@ -52,7 +52,6 @@ public class MavenIT0051ReleaseProfileTest
         verifier.addCliOption( "-DperformRelease=true" );
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/source-jar.txt" );
         verifier.verifyFilePresent( "target/javadoc-jar.txt" );

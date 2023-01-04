@@ -62,7 +62,6 @@ public class MavenITmng4834ParentProjectResolvedFromRemoteReposTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "PASSED", props.getProperty( "project.parent.description" ) );

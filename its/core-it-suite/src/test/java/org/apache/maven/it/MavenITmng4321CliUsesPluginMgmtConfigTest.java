@@ -58,7 +58,6 @@ public class MavenITmng4321CliUsesPluginMgmtConfigTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-log-file:2.1-SNAPSHOT:reset" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/passed.log" );
     }

@@ -68,7 +68,6 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
         verifier.setLogFileName( "log-a.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng4367", "dep", "0.1", "jar" );
     }
@@ -99,7 +98,6 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
         verifier.setLogFileName( "log-b.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng4367", "dep", "0.1", "jar" );
     }
@@ -130,7 +128,6 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
         verifier.setLogFileName( "log-c.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng4367", "dep", "0.1", "jar" );
     }

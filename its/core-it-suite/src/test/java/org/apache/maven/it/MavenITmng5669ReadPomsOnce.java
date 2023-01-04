@@ -67,7 +67,6 @@ public class MavenITmng5669ReadPomsOnce
         verifier.addCliOption( "-U" );
         verifier.addCliOption( "-Dmaven.experimental.buildconsumer=false" );
         verifier.executeGoals( Arrays.asList( "verify" ) );
-        verifier.resetStreams();
 
         List<String> logTxt = verifier.loadLines( "log.txt", "utf-8" );
         for ( String line : logTxt )
@@ -122,7 +121,6 @@ public class MavenITmng5669ReadPomsOnce
         verifier.addCliOption( "-U" );
         verifier.addCliOption( "-Dmaven.experimental.buildconsumer=true" );
         verifier.executeGoals( Arrays.asList( "verify" ) );
-        verifier.resetStreams();
 
         List<String> logTxt = verifier.loadLines( "log-bc.txt", "utf-8" );
         for ( String line : logTxt )

@@ -55,7 +55,6 @@ public class MavenITmng4992MapStylePropertiesParamConfigTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertEquals( "mapValue", props.getProperty( "mapParam.mapKey" ) );

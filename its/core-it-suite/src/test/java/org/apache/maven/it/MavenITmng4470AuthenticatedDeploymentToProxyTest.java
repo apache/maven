@@ -228,7 +228,6 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         for ( DeployedResource deployedResource : deployedResources )
         {

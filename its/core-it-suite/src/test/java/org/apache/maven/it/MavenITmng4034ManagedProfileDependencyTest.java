@@ -61,7 +61,6 @@ public class MavenITmng4034ManagedProfileDependencyTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> artifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[0] ), artifacts );

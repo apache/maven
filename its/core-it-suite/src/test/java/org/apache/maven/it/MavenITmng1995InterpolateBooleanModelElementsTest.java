@@ -58,7 +58,6 @@ public class MavenITmng1995InterpolateBooleanModelElementsTest
 
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/expression.properties" );
         assertEquals( "true", props.getProperty( "project.build.resources.0.filtering" ) );

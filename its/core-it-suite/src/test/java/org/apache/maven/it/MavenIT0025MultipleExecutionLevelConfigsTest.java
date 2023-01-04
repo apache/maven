@@ -56,7 +56,6 @@ public class MavenIT0025MultipleExecutionLevelConfigsTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/test.txt" );
         verifier.verifyFilePresent( "target/test2.txt" );

@@ -58,7 +58,6 @@ public class MavenITmng4342IndependentMojoParameterDefaultValuesTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props1 = verifier.loadProperties( "target/config1.properties" );
         assertEquals( "maven-core-it", props1.getProperty( "defaultParam" ) );

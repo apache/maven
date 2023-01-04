@@ -63,7 +63,6 @@ public class MavenITmng5137ReactorResolutionInForkedBuildTest
         verifier.executeGoal(
                 "org.apache.maven.its.plugins:maven-it-plugin-fork:2.1-SNAPSHOT:fork-lifecycle-aggregator" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> compile = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
 

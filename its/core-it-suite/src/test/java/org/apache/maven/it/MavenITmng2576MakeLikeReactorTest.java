@@ -69,7 +69,6 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.setLogFileName( "log-only.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFileNotPresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
@@ -98,7 +97,6 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.setLogFileName( "log-upstream.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFilePresent( "sub-a/target/touch.txt" );
@@ -127,7 +125,6 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.setLogFileName( "log-downstream.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFileNotPresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
@@ -157,7 +154,6 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.setLogFileName( "log-both.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFilePresent( "sub-a/target/touch.txt" );
@@ -186,7 +182,6 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.setLogFileName( "log-basedir.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFileNotPresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
@@ -218,7 +213,6 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.setLogFileName( "log-basedir-plus.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFileNotPresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
@@ -245,7 +239,6 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.setLogFileName( "log-id.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFileNotPresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
@@ -276,7 +269,6 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.setLogFileName( "log-artifact-id.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFileNotPresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );
@@ -304,7 +296,6 @@ public class MavenITmng2576MakeLikeReactorTest
         verifier.setLogFileName( "log-resume.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFileNotPresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "sub-a/target/touch.txt" );

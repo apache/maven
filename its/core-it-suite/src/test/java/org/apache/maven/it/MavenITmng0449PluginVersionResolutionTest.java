@@ -70,7 +70,6 @@ public class MavenITmng0449PluginVersionResolutionTest
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         // Maven 3.x prefers RELEASE over LATEST (see MNG-4206)
         if ( matchesVersionRange( "(,3.0-alpha-3)" ) )
@@ -115,7 +114,6 @@ public class MavenITmng0449PluginVersionResolutionTest
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "org.apache.maven.its.mng0449:maven-it-plugin-a:touch" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         // Maven 3.x prefers RELEASE over LATEST (see MNG-4206)
         if ( matchesVersionRange( "(,3.0-alpha-3)" ) )

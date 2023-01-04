@@ -59,7 +59,6 @@ public class MavenITmng2363BasedirAwareFileActivatorTest
         verifier.deleteDirectory( "sub-b/target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/parent1.txt" );
         verifier.verifyFilePresent( "target/parent2.txt" );

@@ -86,7 +86,6 @@ public class MavenITmng4482ForcePluginSnapshotUpdateTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
 
-        verifier.resetStreams();
 
         Properties props2 = verifier.loadProperties( "target/touch.properties" );
         assertEquals( "new", props2.getProperty( "two" ) );

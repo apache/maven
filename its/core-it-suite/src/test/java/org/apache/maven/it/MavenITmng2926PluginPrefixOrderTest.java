@@ -65,7 +65,6 @@ public class MavenITmng2926PluginPrefixOrderTest
         verifier.deleteArtifacts( "org.codehaus.mojo", "mng-2926", "0.1" );
         new File( verifier.getArtifactMetadataPath( "org.codehaus.mojo", null, null, "maven-metadata-maven-core-it.xml" ) ).delete();
         new File( verifier.getArtifactMetadataPath( "org.codehaus.mojo", null, null, "resolver-status.properties" ) ).delete();
-        verifier.resetStreams();
 
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -76,7 +75,6 @@ public class MavenITmng2926PluginPrefixOrderTest
         verifier.addCliOption( "settings-default.xml" );
         verifier.executeGoal( "mng-2926:apache" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -87,7 +85,6 @@ public class MavenITmng2926PluginPrefixOrderTest
         verifier.addCliOption( "settings-custom.xml" );
         verifier.executeGoal( "mng-2926:custom" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

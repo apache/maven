@@ -63,7 +63,6 @@ public class MavenITmng5382Jsr330Plugin
         v0.deleteArtifacts( "org.apache.maven.its.mng5382" );
         v0.executeGoal( "install" );
         v0.verifyErrorFreeLog();
-        v0.resetStreams();
 
         //
         // Execute the JSR330 plugin
@@ -72,7 +71,6 @@ public class MavenITmng5382Jsr330Plugin
         v1.setAutoclean( false );
         v1.executeGoal( "org.apache.maven.its.mng5382:jsr330-maven-plugin:0.0.1-SNAPSHOT:hello" );
         v1.verifyErrorFreeLog();
-        v1.resetStreams();
         v1.verifyTextInLog( "Hello! I am a component that is being used via constructor injection! That's right, I'm a JSR330 badass." );
 
     }

@@ -62,7 +62,6 @@ public class MavenITmng2098VersionRangeSatisfiedFromWrongRepoTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng2098", "dep", "0.1", "jar" );
     }

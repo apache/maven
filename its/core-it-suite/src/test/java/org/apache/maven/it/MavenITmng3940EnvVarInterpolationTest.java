@@ -76,7 +76,6 @@ public class MavenITmng3940EnvVarInterpolationTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate", envVars );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/PASSED.properties" );
         Properties props = verifier.loadProperties( "target/PASSED.properties" );

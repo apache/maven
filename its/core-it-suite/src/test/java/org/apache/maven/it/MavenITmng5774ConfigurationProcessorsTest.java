@@ -39,7 +39,6 @@ public class MavenITmng5774ConfigurationProcessorsTest
         verifier.verifyFilePresent( "target/classes/result.properties" );
         Properties result = verifier.loadProperties( "target/classes/result.properties" );
         assertEquals( "yes", result.getProperty( "configurationProcessorContributedValue" ) );
-        verifier.resetStreams();
     }
 
     @Test
@@ -65,6 +64,5 @@ public class MavenITmng5774ConfigurationProcessorsTest
         {
             verifier.verifyTextInLog( "There can only be one user supplied ConfigurationProcessor" );
         }
-        verifier.resetStreams();
     }
 }

@@ -59,7 +59,6 @@ public class MavenIT0085TransitiveSystemScopeTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Collection<String> lines = verifier.loadLines( "target/test.txt", "UTF-8" );
         assertTrue( lines.toString(), lines.contains( "system.jar" ) );

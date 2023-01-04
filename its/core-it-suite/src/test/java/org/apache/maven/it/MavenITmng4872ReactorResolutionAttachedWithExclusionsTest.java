@@ -58,7 +58,6 @@ public class MavenITmng4872ReactorResolutionAttachedWithExclusionsTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4872" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> artifacts = verifier.loadLines( "consumer/target/artifacts.txt", "UTF-8" );
 

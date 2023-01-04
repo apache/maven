@@ -57,7 +57,6 @@ public class MavenITmng2054PluginExecutionInheritanceTest
         verifier.deleteDirectory( "project/project-level2/project-level3/project-jar/target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> executions =
             verifier.loadLines( "project/project-level2/project-level3/project-jar/target/exec.log", "UTF-8" );

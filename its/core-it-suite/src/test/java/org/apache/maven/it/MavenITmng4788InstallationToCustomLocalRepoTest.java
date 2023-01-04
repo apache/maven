@@ -56,7 +56,6 @@ public class MavenITmng4788InstallationToCustomLocalRepoTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/local-repo/test-0.1-SNAPSHOT.jar" );
         verifier.verifyFileNotPresent( "target/local-repo/org/apache/maven/its/mng4788/test/0.1-SNAPSHOT/test-0.1-SNAPSHOT.jar" );

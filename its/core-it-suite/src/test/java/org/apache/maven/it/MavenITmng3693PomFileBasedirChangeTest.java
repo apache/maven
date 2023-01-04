@@ -58,7 +58,6 @@ public class MavenITmng3693PomFileBasedirChangeTest
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         String depPath = verifier.getArtifactPath( "org.apache.maven.its.mng3693", "dep", "1", "pom" );
 
@@ -73,7 +72,6 @@ public class MavenITmng3693PomFileBasedirChangeTest
         verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
     }
 }

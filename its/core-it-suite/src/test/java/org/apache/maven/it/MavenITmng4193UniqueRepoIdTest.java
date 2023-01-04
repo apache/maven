@@ -65,10 +65,6 @@ public class MavenITmng4193UniqueRepoIdTest
         {
             // expected
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
 }

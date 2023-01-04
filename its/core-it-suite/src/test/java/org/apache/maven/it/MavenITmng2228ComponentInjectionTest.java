@@ -62,7 +62,6 @@ public class MavenITmng2228ComponentInjectionTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties apiProps = verifier.loadProperties( "target/api.properties" );
         assertEquals( "true", apiProps.getProperty( "org.apache.maven.its.mng2228.DefaultComponent" ) );

@@ -65,7 +65,6 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.verifyFileNotPresent( "target/profile3/touch.txt" );
         verifier.verifyFileNotPresent( "target/profile4/touch.txt" );
         verifier.verifyFileNotPresent( "target/profile5/touch.txt" );
-        verifier.resetStreams();
     }
 
     /**
@@ -94,7 +93,6 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.verifyErrorFreeLog();
         verifier.verifyFileNotPresent( "target/profile1/touch.txt" );
         verifier.verifyFileNotPresent( "target/profile2/touch.txt" );
-        verifier.resetStreams();
     }
 
     @Test
@@ -118,7 +116,6 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.verifyErrorFreeLog();
         verifier.verifyFileNotPresent( "target/profile1/touch.txt" );
         verifier.verifyFileNotPresent( "target/profile2/touch.txt" );
-        verifier.resetStreams();
     }
 
     /**
@@ -150,7 +147,6 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.verifyFileNotPresent( "target/profile3/touch.txt" );
         verifier.verifyFileNotPresent( "target/profile4/touch.txt" );
         verifier.verifyFileNotPresent( "target/profile5/touch.txt" );
-        verifier.resetStreams();
     }
 
     /**
@@ -182,7 +178,6 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.verifyFileNotPresent( "target/profile3/touch.txt" );
         verifier.verifyFileNotPresent( "target/profile4/touch.txt" );
         verifier.verifyFileNotPresent( "target/profile5/touch.txt" );
-        verifier.resetStreams();
     }
 
     /**
@@ -213,7 +208,6 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.verifyFileNotPresent( "target/profile3/touch.txt" );
         verifier.verifyFilePresent( "target/profile4/touch.txt" );
         verifier.verifyFileNotPresent( "target/profile5/touch.txt" );
-        verifier.resetStreams();
     }
 
 }

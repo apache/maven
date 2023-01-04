@@ -61,7 +61,6 @@ public class MavenITmng4654ArtifactHandlerForMainArtifactTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFileNotPresent( "target/repo/org/apache/maven/its/mng4654/test/1.0/test-1.0.mng4654" );
         verifier.verifyFilePresent( "target/repo/org/apache/maven/its/mng4654/test/1.0/test-1.0.jar" );

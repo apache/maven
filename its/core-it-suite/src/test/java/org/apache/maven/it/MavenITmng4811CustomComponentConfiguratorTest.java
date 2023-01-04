@@ -55,7 +55,6 @@ public class MavenITmng4811CustomComponentConfiguratorTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertEquals( "PASSED", props.getProperty( "stringParam" ) );

@@ -58,12 +58,10 @@ public class MavenITmng3740SelfReferentialReactorProjectsTest
         verifier = newVerifier( v1.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( v2.getAbsolutePath() );
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
     }
 }

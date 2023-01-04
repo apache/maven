@@ -51,7 +51,6 @@ public class MavenIT0052ReleaseProfileTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/jar-jar.txt" );
         verifier.verifyFileNotPresent( "target/source-jar.txt" );

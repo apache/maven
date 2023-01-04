@@ -61,7 +61,6 @@ public class MavenITmng2577SettingsXmlInterpolationTest
         verifier.setLogFileName( "log-env.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/settings.properties" );
         assertEquals( "env-var-test", props.getProperty( "settings.servers.0.username" ) );
@@ -89,7 +88,6 @@ public class MavenITmng2577SettingsXmlInterpolationTest
         verifier.setLogFileName( "log-sys.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/settings.properties" );
         assertEquals( "usr-prop-test", props.getProperty( "settings.servers.0.username" ) );

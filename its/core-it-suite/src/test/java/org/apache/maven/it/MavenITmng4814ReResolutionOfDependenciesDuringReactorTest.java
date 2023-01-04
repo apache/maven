@@ -67,7 +67,6 @@ public class MavenITmng4814ReResolutionOfDependenciesDuringReactorTest
         goals.add( "validate" );
         verifier.executeGoals( goals );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> compile = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
 

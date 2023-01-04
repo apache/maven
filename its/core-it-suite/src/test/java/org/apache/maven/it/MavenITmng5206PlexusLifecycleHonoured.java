@@ -59,7 +59,6 @@ public class MavenITmng5206PlexusLifecycleHonoured
         verifier.deleteArtifacts( "org.apache.maven.its.mng5206" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyTextInLog( "MojoWithPlexusLifecycle :: contextualize" );
         verifier.verifyTextInLog( "DefaultFakeComponent :: contextualize" );

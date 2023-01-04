@@ -64,7 +64,6 @@ public class MavenITmng1088ReactorPluginResolutionTest
         // NOTE: It's essential part of the test to invoke a phase before "compile"
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "client/target/touch.txt" );
     }

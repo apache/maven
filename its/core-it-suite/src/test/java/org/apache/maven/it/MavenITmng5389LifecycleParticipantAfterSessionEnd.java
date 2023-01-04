@@ -48,13 +48,11 @@ public class MavenITmng5389LifecycleParticipantAfterSessionEnd
         // install the test plugin
         verifier = newVerifier( extensionDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "package" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/afterSessionEnd.txt" );

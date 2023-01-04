@@ -66,7 +66,6 @@ public class MavenITmng2790LastUpdatedMetadataTest
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         File metadataArtifactVersionFile =
             new File( verifier.getArtifactMetadataPath( "org.apache.maven.its.mng2790", "project", "1.0-SNAPSHOT" ) );
@@ -92,7 +91,6 @@ public class MavenITmng2790LastUpdatedMetadataTest
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Date artifactVersionLastUpdated2 = getLastUpdated( metadataArtifactVersionFile );
         Date artifactLastUpdated2 = getLastUpdated( metadataArtifactFile );

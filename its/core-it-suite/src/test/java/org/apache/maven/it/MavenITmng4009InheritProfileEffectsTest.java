@@ -59,7 +59,6 @@ public class MavenITmng4009InheritProfileEffectsTest
         verifier.addCliOption( "-Pparent-profile" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
 

@@ -51,7 +51,6 @@ public class MavenITmng5935OptionalLostInTranstiveManagedDependenciesTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> dependencies = verifier.loadLines( "target/dependencies.txt", "UTF-8" );
         assertEquals( 5, dependencies.size() );

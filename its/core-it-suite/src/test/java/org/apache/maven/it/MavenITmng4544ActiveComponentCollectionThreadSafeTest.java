@@ -57,7 +57,6 @@ public class MavenITmng4544ActiveComponentCollectionThreadSafeTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/thread.properties" );
         assertEquals( 0, Integer.parseInt( props.getProperty( "exceptions" ) ) );

@@ -47,14 +47,12 @@ public class MavenITmng5578SessionScopeTest
         // install the test plugin
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         verifier.addCliOption( "-Dit-build-extensions=false" );
         verifier.executeGoal( "package" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
     }
 
@@ -71,7 +69,6 @@ public class MavenITmng5578SessionScopeTest
         // install the test plugin
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         // build the test project
@@ -82,7 +79,6 @@ public class MavenITmng5578SessionScopeTest
         verifier.addCliOption( "-T" );
         verifier.addCliOption( "1" );
         verifier.executeGoal( "package" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
     }
 
@@ -99,14 +95,12 @@ public class MavenITmng5578SessionScopeTest
         // install the test plugin
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         verifier.addCliOption( "-Dit-build-extensions=true" );
         verifier.executeGoal( "package" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
     }
 
@@ -124,13 +118,11 @@ public class MavenITmng5578SessionScopeTest
         // install the test extension
         verifier = newVerifier( extensionDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         // install the test plugin
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         // build the test project
@@ -138,7 +130,6 @@ public class MavenITmng5578SessionScopeTest
         verifier.addCliOption( "-Dmaven.ext.class.path=" + new File( extensionDir, "target/classes" ).getAbsolutePath() );
         verifier.setForkJvm( true ); // verifier does not support custom realms in embedded mode
         verifier.executeGoal( "package" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
     }

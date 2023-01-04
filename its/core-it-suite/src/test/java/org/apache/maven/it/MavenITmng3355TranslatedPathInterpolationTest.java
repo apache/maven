@@ -53,7 +53,6 @@ public class MavenITmng3355TranslatedPathInterpolationTest
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

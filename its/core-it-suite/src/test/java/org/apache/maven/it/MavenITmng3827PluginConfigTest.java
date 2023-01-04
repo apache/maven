@@ -58,7 +58,6 @@ public class MavenITmng3827PluginConfigTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/plugin-config.properties" );
 

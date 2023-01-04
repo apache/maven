@@ -72,7 +72,6 @@ public class MavenITmng2309ProfileInjectionOrderTest
         }
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "e", props.getProperty( "project.properties.pomProperty" ) );

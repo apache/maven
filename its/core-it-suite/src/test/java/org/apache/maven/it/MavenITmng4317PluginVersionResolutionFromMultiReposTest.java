@@ -61,7 +61,6 @@ public class MavenITmng4317PluginVersionResolutionFromMultiReposTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "org.apache.maven.its.mng4317:maven-mng4317-plugin:touch" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.txt" );
     }

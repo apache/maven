@@ -63,7 +63,6 @@ public class MavenITmng3769ExclusionRelocatedTransdepsTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertEquals( Collections.singletonList( "org.apache.maven.its.mng3769:dependency:jar:1.0" ), artifacts );

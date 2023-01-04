@@ -94,7 +94,6 @@ public class MavenITmng6255FixConcatLines
         verifier.setForkJvm( true );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "expression.properties" );
         assertEquals( "ok", props.getProperty( "project.properties.jvm-config" ) );

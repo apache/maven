@@ -61,7 +61,6 @@ public class MavenITmng0479OverrideCentralRepoTest
 
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         // Phase 2: Now run the test
         File child2 = new File( testDir, "test" );
@@ -74,7 +73,6 @@ public class MavenITmng0479OverrideCentralRepoTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/expression.properties" );
         Properties props = verifier.loadProperties( "target/expression.properties" );
@@ -139,7 +137,6 @@ public class MavenITmng0479OverrideCentralRepoTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng0479", "parent", "0.1-SNAPSHOT", "pom" );
@@ -165,7 +162,6 @@ public class MavenITmng0479OverrideCentralRepoTest
         {
             // expected
         }
-        verifier.resetStreams();
 
         verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng0479", "parent", "0.1", "pom" );
 
@@ -185,7 +181,6 @@ public class MavenITmng0479OverrideCentralRepoTest
         {
             // expected
         }
-        verifier.resetStreams();
 
         verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng0479", "a", "0.1", "jar" );
         verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng0479", "a", "0.1", "pom" );
@@ -206,7 +201,6 @@ public class MavenITmng0479OverrideCentralRepoTest
         {
             // expected
         }
-        verifier.resetStreams();
 
         verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng0479", "b", "0.1", "jar" );
         verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng0479", "b", "0.1", "pom" );

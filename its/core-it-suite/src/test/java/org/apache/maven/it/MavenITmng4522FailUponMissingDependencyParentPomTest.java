@@ -69,10 +69,6 @@ public class MavenITmng4522FailUponMissingDependencyParentPomTest
         {
             // expected
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
 }

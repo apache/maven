@@ -64,7 +64,6 @@ public class MavenITmng4270ArtifactHandlersFromPluginDepsTest
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         // Now, if everything worked, we have .pom and a .jar in the local repo.
         // IF IT DIDN'T, we have a .pom and a .coreit in the local repo...

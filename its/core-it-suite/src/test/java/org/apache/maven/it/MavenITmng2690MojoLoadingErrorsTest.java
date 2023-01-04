@@ -67,10 +67,6 @@ public class MavenITmng2690MojoLoadingErrorsTest
         {
             // expected...it'd be nice if we could get the specifics of the exception right here...
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
 
         List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
 
@@ -99,10 +95,6 @@ public class MavenITmng2690MojoLoadingErrorsTest
         catch ( VerificationException e )
         {
             // expected...it'd be nice if we could get the specifics of the exception right here...
-        }
-        finally
-        {
-            verifier.resetStreams();
         }
 
         List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
@@ -133,10 +125,6 @@ public class MavenITmng2690MojoLoadingErrorsTest
         {
             // expected...it'd be nice if we could get the specifics of the exception right here...
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
 
         List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
 
@@ -165,10 +153,6 @@ public class MavenITmng2690MojoLoadingErrorsTest
         catch ( VerificationException e )
         {
             // expected...it'd be nice if we could get the specifics of the exception right here...
-        }
-        finally
-        {
-            verifier.resetStreams();
         }
 
         List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );

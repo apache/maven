@@ -60,7 +60,6 @@ public class MavenITmng3944BasedirInterpolationTest
         verifier.addCliOption( "pom-with-unusual-name.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/basedir.properties" );
         Properties props = verifier.loadProperties( "target/basedir.properties" );

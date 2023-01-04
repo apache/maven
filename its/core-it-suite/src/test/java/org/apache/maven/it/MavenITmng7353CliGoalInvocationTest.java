@@ -46,7 +46,6 @@ public class MavenITmng7353CliGoalInvocationTest
         verifier.setLogFileName( id + ".txt" );
         verifier.executeGoal( goal );
         verifier.verifyTextInLog( "[INFO] --- " + expectedInvocation );
-        verifier.resetStreams();
     }
 
     @Test

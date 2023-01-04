@@ -58,7 +58,6 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
         // install the test plugin
         verifier = newVerifier( extensionDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         // build the test project
@@ -72,7 +71,6 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
         {
             // expected, as the build will fail due to always failing UT
         }
-        verifier.resetStreams();
         verifier.verifyTextInLog("testApp(org.apache.maven.its.mng5640.FailingTest)");
 
         verifier.verifyFilePresent( "target/afterProjectsRead.txt" );
@@ -100,7 +98,6 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
         // install the test plugin
         verifier = newVerifier( extensionDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         // build the test project
@@ -114,7 +111,6 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
         {
             // expected, as the build will fail due to always failing UT
         }
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/afterProjectsRead.txt" );
         // See https://issues.apache.org/jira/browse/MNG-5641
@@ -142,13 +138,11 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
         // install the test plugin
         verifier = newVerifier( extensionDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         // install the bad plugin
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         // build the test project
@@ -162,7 +156,6 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
         {
             // expected, as the build will fail due to always failing UT
         }
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/afterProjectsRead.txt" );
         // See https://issues.apache.org/jira/browse/MNG-5641
@@ -190,13 +183,11 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
         // install the test plugin
         verifier = newVerifier( extensionDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         // install the bad plugin
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         // build the test project
@@ -210,7 +201,6 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
         {
             // expected, as the build will fail due to always failing UT
         }
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/afterProjectsRead.txt" );
         // See https://issues.apache.org/jira/browse/MNG-5641

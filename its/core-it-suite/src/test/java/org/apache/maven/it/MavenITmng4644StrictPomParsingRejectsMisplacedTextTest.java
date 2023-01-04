@@ -65,10 +65,6 @@ public class MavenITmng4644StrictPomParsingRejectsMisplacedTextTest
         {
             // expected
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
 }

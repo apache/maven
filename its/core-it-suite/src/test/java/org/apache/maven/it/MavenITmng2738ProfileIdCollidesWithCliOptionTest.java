@@ -58,7 +58,6 @@ public class MavenITmng2738ProfileIdCollidesWithCliOptionTest
         verifier.addCliOption( "-Pe" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.txt" );
     }

@@ -65,7 +65,6 @@ public class MavenITmng4357LifecycleMappingDiscoveryInReactorTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "mod-a/target/old.txt" );
         verifier.verifyFileNotPresent( "mod-a/target/new.txt" );

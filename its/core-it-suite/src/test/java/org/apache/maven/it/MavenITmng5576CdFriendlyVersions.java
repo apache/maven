@@ -60,7 +60,6 @@ public class MavenITmng5576CdFriendlyVersions
         verifier.addCliOption( "-Dmaven.experimental.buildconsumer=false" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "1.0.0.changelist", props.getProperty( "project.version" ) );
@@ -92,7 +91,6 @@ public class MavenITmng5576CdFriendlyVersions
         verifier.addCliOption( "-Dmaven.experimental.buildconsumer=true" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "1.0.0.changelist", props.getProperty( "project.version" ) );

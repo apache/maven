@@ -58,7 +58,6 @@ public class MavenITmng2871PrePackageSubartifactResolutionTest
         verifier.deleteDirectory( "consumer/target" );
         verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> compileClassPath = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
         assertEquals( 2, compileClassPath.size() );

@@ -62,7 +62,6 @@ public class MavenITmng3099SettingsProfilesWithNoPomTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.mng3099:maven-mng3099-plugin:0.1:touch" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/PASSED.txt" );
         verifier.verifyFileNotPresent( "target/touch.txt" );

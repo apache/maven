@@ -174,7 +174,6 @@ public class MavenITmng3953AuthenticatedDeploymentTest
         verifier.addCliOption( "-DdeploymentPort=" + port );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         assertTrue( deployed );
     }

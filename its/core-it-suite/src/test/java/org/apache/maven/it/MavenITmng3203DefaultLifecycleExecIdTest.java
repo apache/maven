@@ -56,6 +56,5 @@ public class MavenITmng3203DefaultLifecycleExecIdTest
 
         verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }

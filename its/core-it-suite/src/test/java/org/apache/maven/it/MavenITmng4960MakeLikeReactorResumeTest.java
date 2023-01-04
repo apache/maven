@@ -65,7 +65,6 @@ public class MavenITmng4960MakeLikeReactorResumeTest
         verifier.setLogFileName( "log-up.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "mod-a/target/touch.txt" );
         verifier.verifyFilePresent( "mod-b/target/touch.txt" );
@@ -97,7 +96,6 @@ public class MavenITmng4960MakeLikeReactorResumeTest
         verifier.setLogFileName( "log-down.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFileNotPresent( "mod-a/target/touch.txt" );
         verifier.verifyFilePresent( "mod-b/target/touch.txt" );

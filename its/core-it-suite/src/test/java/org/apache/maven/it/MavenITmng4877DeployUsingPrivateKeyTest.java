@@ -59,7 +59,6 @@ public class MavenITmng4877DeployUsingPrivateKeyTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/wagon.properties" );
         assertEquals( "testuser", props.get( "username" ) );

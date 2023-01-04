@@ -64,7 +64,6 @@ public class MavenITmng3038TransitiveDepManVersionTest
         verifier.deleteArtifact( "org.apache.maven.its.it0121", "D", "1.0", "jar" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     private void compileDDep( File testDirBase, String projectDDepDir, String version )
@@ -76,6 +75,5 @@ public class MavenITmng3038TransitiveDepManVersionTest
         verifierOtherDep.deleteArtifact( "org.apache.maven.its.it0121", "D", version, "pom" );
         verifierOtherDep.executeGoal( "install" );
         verifierOtherDep.verifyErrorFreeLog();
-        verifierOtherDep.resetStreams();
     }
 }

@@ -75,7 +75,6 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest
         assertEquals( "other-plugin", plugins[0].getChild( "prefix" ).getValue() );
         assertEquals( "test-artifact", plugins[1].getChild( "prefix" ).getValue() );
 
-        verifier.resetStreams();
     }
 
     private Xpp3Dom readDom( File file )

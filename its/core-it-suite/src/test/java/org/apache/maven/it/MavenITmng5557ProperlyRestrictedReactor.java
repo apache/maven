@@ -67,7 +67,6 @@ public class MavenITmng5557ProperlyRestrictedReactor
         {
             // the execution should fail due to a resolution error.
         }
-        verifier.resetStreams();
         verifier.verifyTextInLog( "Could not resolve dependencies for project org.apache.maven.its.mng5557:project-0:jar:1.0: Could not find artifact org.apache.maven.its.mng5557:project-4:jar:1.0" );
     }
 }

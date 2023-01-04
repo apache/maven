@@ -62,7 +62,6 @@ public class MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/artifact.properties" );
         assertEquals( "1", props.getProperty( "project.dependencyArtifacts.size" ) );

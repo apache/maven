@@ -63,7 +63,6 @@ public class MavenITmng3853ProfileInjectedDistReposTest
         verifier.addCliOption( "-Pcoreit" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/dist.properties" );
         assertEquals( "1", props.getProperty( "listParam" ) );

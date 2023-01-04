@@ -58,7 +58,6 @@ public class MavenITmng4048VersionRangeReactorResolutionTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4048" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> artifacts = verifier.loadLines( "sub-2/target/compile.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4048:sub-1:jar:1.1-SNAPSHOT" ) );

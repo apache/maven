@@ -57,7 +57,6 @@ public class MavenIT0010DependencyClosureResolutionTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.it0010", "a", "0.1", "jar" );
         verifier.verifyArtifactPresent( "org.apache.maven.its.it0010", "b", "0.2", "jar" );

@@ -60,7 +60,6 @@ public class MavenITmng4755FetchRemoteMetadataForVersionRangeTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         // test: resolve remote version
         verifier = newVerifier( new File( testDir, "test" ).getAbsolutePath() );
@@ -71,7 +70,6 @@ public class MavenITmng4755FetchRemoteMetadataForVersionRangeTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> cp = verifier.loadLines( "target/classpath.txt", "UTF-8" );
         assertTrue( cp.toString(), cp.contains( "dep-1.jar" ) );

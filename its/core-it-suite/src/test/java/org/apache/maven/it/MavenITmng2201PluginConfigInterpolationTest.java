@@ -56,7 +56,6 @@ public class MavenITmng2201PluginConfigInterpolationTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertCanonicalFileEquals( new File( testDir, "target" ), new File( props.getProperty( "stringParam" ) ) );

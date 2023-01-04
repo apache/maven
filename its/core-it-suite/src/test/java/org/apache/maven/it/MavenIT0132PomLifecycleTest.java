@@ -62,7 +62,6 @@ public class MavenIT0132PomLifecycleTest
         verifier.verifyFilePresent( "target/install-install.txt" );
         verifier.verifyFilePresent( "target/deploy-deploy.txt" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

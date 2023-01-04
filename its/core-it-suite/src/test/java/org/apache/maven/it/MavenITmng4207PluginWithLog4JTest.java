@@ -59,7 +59,6 @@ public class MavenITmng4207PluginWithLog4JTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

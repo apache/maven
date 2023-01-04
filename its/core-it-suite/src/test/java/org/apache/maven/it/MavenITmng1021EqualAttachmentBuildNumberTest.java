@@ -57,7 +57,6 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng1021" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng1021", "test", "1-SNAPSHOT", "pom" );
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng1021", "test", "1-SNAPSHOT", "jar" );

@@ -55,7 +55,6 @@ public class MavenITmng5898BuildMultimoduleWithEARFailsToResolveWARTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "test" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

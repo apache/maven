@@ -62,7 +62,6 @@ public class MavenITmng0786ProfileAwareReactorTest
         verifier.verifyFilePresent( "sub1/target/expression.properties" );
         verifier.verifyFilePresent( "sub2/target/expression.properties" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

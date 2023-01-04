@@ -61,7 +61,6 @@ public class MavenITmng4747JavaAgentUsedByPluginTest
         verifier.setEnvironmentVariable( "MAVEN_OPTS", "-javaagent:agent.jar" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props1 = verifier.loadProperties( "target/agent.properties" );
         Properties props2 = verifier.loadProperties( "target/plugin.properties" );

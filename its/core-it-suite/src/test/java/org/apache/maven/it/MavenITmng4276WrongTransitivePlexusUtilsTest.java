@@ -64,7 +64,6 @@ public class MavenITmng4276WrongTransitivePlexusUtilsTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/class.properties" );
         assertNotNull( props.getProperty( "org.apache.maven.its.mng4276.CoreIt" ) );

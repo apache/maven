@@ -60,7 +60,6 @@ public class MavenITmng4344ManagedPluginExecutionOrderTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "process-resources" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> lines = verifier.loadLines( "target/log.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "first", "second" } ), lines );

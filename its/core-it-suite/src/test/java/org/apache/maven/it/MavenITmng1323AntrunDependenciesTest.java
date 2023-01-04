@@ -66,7 +66,6 @@ public class MavenITmng1323AntrunDependenciesTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties pclProps;
 

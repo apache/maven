@@ -62,7 +62,6 @@ public class MavenITmng4320AggregatorAndDependenciesTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:aggregate-test" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> classpath;
 

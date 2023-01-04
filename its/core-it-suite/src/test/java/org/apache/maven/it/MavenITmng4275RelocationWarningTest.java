@@ -61,7 +61,6 @@ public class MavenITmng4275RelocationWarningTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
         boolean foundWarning = false;

@@ -78,7 +78,6 @@ public class MavenITmng4679SnapshotUpdateInPluginTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
 
-        verifier.resetStreams();
 
         assertChecksum( verifier, "jar", "f3d46277c2ab45ff9bbd97605c942bed7fc27f97" );
         assertChecksum( verifier, "pom", "127f0dc26035352bb54890315ad7d2ada067756a" );

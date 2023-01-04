@@ -86,7 +86,6 @@ public class MavenIT0108SnapshotUpdateTest
         verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifyArtifactContent( "originalArtifact" );
 
@@ -100,7 +99,6 @@ public class MavenIT0108SnapshotUpdateTest
         verifyArtifactContent( "updatedArtifact" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     @Test
@@ -115,7 +113,6 @@ public class MavenIT0108SnapshotUpdateTest
         verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifyArtifactContent( "originalArtifact" );
 
@@ -128,7 +125,6 @@ public class MavenIT0108SnapshotUpdateTest
         verifyArtifactContent( "updatedArtifact" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     @Test
@@ -149,7 +145,6 @@ public class MavenIT0108SnapshotUpdateTest
         verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifyArtifactContent( "originalArtifact" );
         assertFalse( localMetadata.exists() );
@@ -167,7 +162,6 @@ public class MavenIT0108SnapshotUpdateTest
         verifyArtifactContent( "localArtifact" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Calendar cal = Calendar.getInstance();
         cal.add( Calendar.YEAR, -1 );
@@ -183,7 +177,6 @@ public class MavenIT0108SnapshotUpdateTest
         verifyArtifactContent( "originalArtifact" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     @Test
@@ -199,7 +192,6 @@ public class MavenIT0108SnapshotUpdateTest
         verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifyArtifactContent( "originalArtifact" );
 
@@ -212,7 +204,6 @@ public class MavenIT0108SnapshotUpdateTest
         verifyArtifactContent( "updatedArtifact" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     private File getMetadataFile( String groupId, String artifactId, String version )

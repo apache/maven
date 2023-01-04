@@ -58,7 +58,6 @@ public class MavenITmng3133UrlNormalizationNotBeforeInterpolationTest
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/url.properties" );
         String url;

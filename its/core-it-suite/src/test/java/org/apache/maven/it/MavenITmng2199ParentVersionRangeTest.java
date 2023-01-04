@@ -44,30 +44,19 @@ public class MavenITmng2199ParentVersionRangeTest
             ResourceExtractor.simpleExtractResources( getClass(),
                                                       "/mng-2199-parent-version-range/valid-inclusive-upper-bound" );
 
-        try
-        {
-            verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-            verifier.addCliOption( "-U" );
-            verifier.setAutoclean( false );
+        verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
+        verifier.addCliOption( "-U" );
+        verifier.setAutoclean( false );
 
-            verifier.executeGoal( "verify" );
-            verifier.verifyErrorFreeLog();
+        verifier.executeGoal( "verify" );
+        verifier.verifyErrorFreeLog();
 
-            // All Maven versions not supporting remote parent version ranges will log a warning message whenever
-            // building a parent fails. The build succeeds without any parent. If that warning message appears in the
-            // log, parent resolution failed.
-            final List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
-            assertFalse( "Unexpected error message found.",
-                         indexOf( lines, ".*Failed to build parent project.*" ) >= 0 );
-
-        }
-        finally
-        {
-            if ( verifier != null )
-            {
-                verifier.resetStreams();
-            }
-        }
+        // All Maven versions not supporting remote parent version ranges will log a warning message whenever
+        // building a parent fails. The build succeeds without any parent. If that warning message appears in the
+        // log, parent resolution failed.
+        final List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        assertFalse( "Unexpected error message found.",
+                     indexOf( lines, ".*Failed to build parent project.*" ) >= 0 );
     }
 
     @Test
@@ -79,30 +68,20 @@ public class MavenITmng2199ParentVersionRangeTest
         File testDir = ResourceExtractor.simpleExtractResources(
             getClass(), "/mng-2199-parent-version-range/valid-exclusive-upper-bound" );
 
-        try
-        {
-            verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-            verifier.addCliOption( "-U" );
-            verifier.setAutoclean( false );
 
-            verifier.executeGoal( "verify" );
-            verifier.verifyErrorFreeLog();
+        verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
+        verifier.addCliOption( "-U" );
+        verifier.setAutoclean( false );
 
-            // All Maven versions not supporting remote parent version ranges will log a warning message whenever
-            // building a parent fails. The build succeeds without any parent. If that warning message appears in the
-            // log, parent resolution failed.
-            final List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
-            assertFalse( "Unexpected error message found.",
-                         indexOf( lines, ".*Failed to build parent project.*" ) >= 0 );
+        verifier.executeGoal( "verify" );
+        verifier.verifyErrorFreeLog();
 
-        }
-        finally
-        {
-            if ( verifier != null )
-            {
-                verifier.resetStreams();
-            }
-        }
+        // All Maven versions not supporting remote parent version ranges will log a warning message whenever
+        // building a parent fails. The build succeeds without any parent. If that warning message appears in the
+        // log, parent resolution failed.
+        final List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        assertFalse( "Unexpected error message found.",
+                     indexOf( lines, ".*Failed to build parent project.*" ) >= 0 );
     }
 
     @Test
@@ -127,13 +106,6 @@ public class MavenITmng2199ParentVersionRangeTest
             assertTrue( "Expected error message not found.",
                         indexOf( lines, ".*(parent)? version range.*does not specify an upper bound.*" ) >= 0 );
 
-        }
-        finally
-        {
-            if ( verifier != null )
-            {
-                verifier.resetStreams();
-            }
         }
     }
 
@@ -160,13 +132,6 @@ public class MavenITmng2199ParentVersionRangeTest
             int msg = indexOf( lines, ".*Version must be a constant.*org.apache.maven.its.mng2199:expression.*" );
             assertTrue( "Expected error message not found.", msg >= 0 );
         }
-        finally
-        {
-            if ( verifier != null )
-            {
-                verifier.resetStreams();
-            }
-        }
     }
 
     @Test
@@ -192,13 +157,6 @@ public class MavenITmng2199ParentVersionRangeTest
             int msg = indexOf( lines, ".*Version must be a constant.*org.apache.maven.its.mng2199:inherited.*" );
             assertTrue( "Expected error message not found.", msg >= 0 );
         }
-        finally
-        {
-            if ( verifier != null )
-            {
-                verifier.resetStreams();
-            }
-        }
     }
 
     @Test
@@ -210,29 +168,19 @@ public class MavenITmng2199ParentVersionRangeTest
         File testDir = ResourceExtractor.simpleExtractResources(
             getClass(), "/mng-2199-parent-version-range/valid-local/child" );
 
-        try
-        {
-            verifier = newVerifier( testDir.getAbsolutePath() );
-            verifier.executeGoal( "verify" );
-            verifier.verifyErrorFreeLog();
 
-            // All Maven versions not supporting remote parent version ranges will log a warning message whenever
-            // building a parent fails. The build succeeds without any parent. If that warning message appears in the
-            // log, parent resolution failed. For this test, this really just tests the project on disk getting tested
-            // is not corrupt. It's expected to find the local parent and not fall back to remote resolution. If it
-            // falls back to remote resolution, this just catches the test project to be broken.
-            final List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
-            assertFalse( "Unexpected error message found.",
-                         indexOf( lines, ".*Failed to build parent project.*" ) >= 0 );
+        verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.executeGoal( "verify" );
+        verifier.verifyErrorFreeLog();
 
-        }
-        finally
-        {
-            if ( verifier != null )
-            {
-                verifier.resetStreams();
-            }
-        }
+        // All Maven versions not supporting remote parent version ranges will log a warning message whenever
+        // building a parent fails. The build succeeds without any parent. If that warning message appears in the
+        // log, parent resolution failed. For this test, this really just tests the project on disk getting tested
+        // is not corrupt. It's expected to find the local parent and not fall back to remote resolution. If it
+        // falls back to remote resolution, this just catches the test project to be broken.
+        final List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        assertFalse( "Unexpected error message found.",
+                     indexOf( lines, ".*Failed to build parent project.*" ) >= 0 );
     }
 
     @Test
@@ -259,13 +207,6 @@ public class MavenITmng2199ParentVersionRangeTest
                                ".*Non-resolvable parent POM org.apache.maven.its.mng2199:local-parent:\\[2,3\\].*" );
             assertTrue( "Expected error message not found.", msg >= 0 );
         }
-        finally
-        {
-            if ( verifier != null )
-            {
-                verifier.resetStreams();
-            }
-        }
     }
 
     @Test
@@ -277,29 +218,18 @@ public class MavenITmng2199ParentVersionRangeTest
         File testDir = ResourceExtractor.simpleExtractResources(
             getClass(), "/mng-2199-parent-version-range/local-fallback-to-remote/child" );
 
-        try
-        {
-            verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-            verifier.executeGoal( "verify" );
-            verifier.verifyErrorFreeLog();
+        verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
+        verifier.executeGoal( "verify" );
+        verifier.verifyErrorFreeLog();
 
-            // All Maven versions not supporting remote parent version ranges will log a warning message whenever
-            // building a parent fails. The build succeeds without any parent. If that warning message appears in the
-            // log, parent resolution failed. For this test, local parent resolution falls back to remote parent
-            // resolution with a version range in use. If the warning message is in the logs, that remote parent
-            // resolution failed unexpectedly.
-            final List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
-            assertFalse( "Unexpected error message found.",
-                         indexOf( lines, ".*Failed to build parent project.*" ) >= 0 );
-
-        }
-        finally
-        {
-            if ( verifier != null )
-            {
-                verifier.resetStreams();
-            }
-        }
+        // All Maven versions not supporting remote parent version ranges will log a warning message whenever
+        // building a parent fails. The build succeeds without any parent. If that warning message appears in the
+        // log, parent resolution failed. For this test, local parent resolution falls back to remote parent
+        // resolution with a version range in use. If the warning message is in the logs, that remote parent
+        // resolution failed unexpectedly.
+        final List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        assertFalse( "Unexpected error message found.",
+                     indexOf( lines, ".*Failed to build parent project.*" ) >= 0 );
     }
 
     @Test
@@ -324,13 +254,6 @@ public class MavenITmng2199ParentVersionRangeTest
             int msg = indexOf( lines, ".*Version must be a constant.*org.apache.maven.its.mng2199:expression.*" );
             assertTrue( "Expected error message not found.", msg >= 0 );
         }
-        finally
-        {
-            if ( verifier != null )
-            {
-                verifier.resetStreams();
-            }
-        }
     }
 
     @Test
@@ -354,13 +277,6 @@ public class MavenITmng2199ParentVersionRangeTest
             final List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
             int msg = indexOf( lines, ".*Version must be a constant.*org.apache.maven.its.mng2199:inherited.*" );
             assertTrue( "Expected error message not found.", msg >= 0 );
-        }
-        finally
-        {
-            if ( verifier != null )
-            {
-                verifier.resetStreams();
-            }
         }
     }
 

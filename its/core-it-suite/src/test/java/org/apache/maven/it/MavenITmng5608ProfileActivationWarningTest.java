@@ -51,7 +51,6 @@ public class MavenITmng5608ProfileActivationWarningTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         // check expected profiles activated, just for sanity (or build should have failed, given other profiles)
         assertFileExists( testDir, "target/exists-basedir" );

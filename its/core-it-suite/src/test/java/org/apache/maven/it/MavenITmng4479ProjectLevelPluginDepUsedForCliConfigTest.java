@@ -63,7 +63,6 @@ public class MavenITmng4479ProjectLevelPluginDepUsedForCliConfigTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-parameter-implementation:2.1-SNAPSHOT:param-implementation" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/param.properties" );
         assertEquals( "org.apache.maven.plugin.coreit.ItImpl-passed", props.getProperty( "theParameter.string" ) );

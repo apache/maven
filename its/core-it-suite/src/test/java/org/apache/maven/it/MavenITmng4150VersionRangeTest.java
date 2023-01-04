@@ -61,7 +61,6 @@ public class MavenITmng4150VersionRangeTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Collection<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertEquals( 4, artifacts.size() );

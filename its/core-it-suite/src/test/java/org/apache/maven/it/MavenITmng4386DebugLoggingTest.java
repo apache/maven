@@ -59,7 +59,6 @@ public class MavenITmng4386DebugLoggingTest
         verifier.setLogFileName( "log.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> lines = verifier.loadLines( "log.txt", "UTF-8" );
 

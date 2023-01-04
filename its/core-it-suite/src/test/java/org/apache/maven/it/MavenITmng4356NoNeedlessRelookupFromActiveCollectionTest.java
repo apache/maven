@@ -60,7 +60,6 @@ public class MavenITmng4356NoNeedlessRelookupFromActiveCollectionTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/component.properties" );
         assertEquals( "2", props.getProperty( "count" ) );

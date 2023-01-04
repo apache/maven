@@ -59,7 +59,6 @@ public class MavenITmng3701ImplicitProfileIdTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

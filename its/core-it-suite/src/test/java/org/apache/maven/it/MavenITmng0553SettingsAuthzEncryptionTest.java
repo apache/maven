@@ -141,7 +141,6 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
     }
@@ -179,7 +178,6 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.setEnvironmentVariable( "MAVEN_OPTS", "-Dsettings.security=" + new File( testDir, "settings~security.xml" ).getAbsolutePath() + " -Duser.language=tr" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
     }
@@ -205,7 +203,6 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.setLogFileName( "log-emp.txt" );
         verifier.executeGoal( "-e" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> log = verifier.loadLines( verifier.getLogFileName(), null );
         assertNotNull( findPassword( log ) );
@@ -218,7 +215,6 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.setLogFileName( "log-ep.txt" );
         verifier.executeGoal( "-e" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         log = verifier.loadLines( verifier.getLogFileName(), null );
         assertNotNull( findPassword( log ) );

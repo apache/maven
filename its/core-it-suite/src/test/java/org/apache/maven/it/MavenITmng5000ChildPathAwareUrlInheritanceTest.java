@@ -60,7 +60,6 @@ public class MavenITmng5000ChildPathAwareUrlInheritanceTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "http://project.url/child", props.getProperty( "project.url" ) );

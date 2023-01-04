@@ -56,7 +56,6 @@ public class MavenITmng4040ProfileInjectedModulesTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

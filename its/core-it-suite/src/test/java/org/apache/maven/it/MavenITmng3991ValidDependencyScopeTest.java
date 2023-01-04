@@ -66,10 +66,6 @@ public class MavenITmng3991ValidDependencyScopeTest
         {
             // expected
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
 }

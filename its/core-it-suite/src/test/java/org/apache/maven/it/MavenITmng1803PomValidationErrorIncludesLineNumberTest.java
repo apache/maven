@@ -62,10 +62,6 @@ public class MavenITmng1803PomValidationErrorIncludesLineNumberTest
         {
             // expected
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
 
         boolean foundError = false;
 

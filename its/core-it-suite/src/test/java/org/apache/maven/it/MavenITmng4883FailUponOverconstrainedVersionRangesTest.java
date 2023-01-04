@@ -68,10 +68,6 @@ public class MavenITmng4883FailUponOverconstrainedVersionRangesTest
         {
             // expected, unsolvable version conflict
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
 }

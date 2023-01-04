@@ -61,10 +61,6 @@ public class MavenITmng4091BadPluginDescriptorTest
         {
             // expected...it'd be nice if we could get the specifics of the exception right here...
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
 
         List<String> logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
 
@@ -94,7 +90,6 @@ public class MavenITmng4091BadPluginDescriptorTest
 
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/plugin-dependency.properties" );
         assertTrue( props.isEmpty() );

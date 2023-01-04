@@ -60,7 +60,6 @@ public class MavenITmng5572ReactorPluginExtensionsTest
         setup.addCliOption( "plugin/pom.xml" );
         setup.executeGoal( "install" );
         setup.verifyErrorFreeLog();
-        setup.resetStreams();
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log2.txt" );
@@ -75,7 +74,6 @@ public class MavenITmng5572ReactorPluginExtensionsTest
         {
             verifier.verifyTextInLog( "[WARNING] 'project' uses 'org.apache.maven.its.mng5572:plugin' as extension which is not possible within the same reactor build. This plugin was pulled from the local repository!" );
         }
-        verifier.resetStreams();
     }
 
 }

@@ -55,7 +55,6 @@ public class MavenITmng4411VersionInfoTest
         verifier.setAutoclean( false );
         verifier.executeGoal( "--version" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyTextInLog( "Maven" );
     }

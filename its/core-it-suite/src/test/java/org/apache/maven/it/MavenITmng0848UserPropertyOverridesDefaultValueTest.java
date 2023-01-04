@@ -59,7 +59,6 @@ public class MavenITmng0848UserPropertyOverridesDefaultValueTest
         verifier.addCliArgument( "-Dconfig.aliasDefaultExpressionParam=PASSED" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties configProps = verifier.loadProperties( "target/config.properties" );
         assertEquals( "maven-core-it", configProps.getProperty( "defaultParam" ) );

@@ -70,7 +70,6 @@ public class MavenITmng4565MultiConditionProfileActivationTest
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent( "target/profile1/touch.txt" );
         verifier.verifyFileNotPresent( "target/profile2/touch.txt" );
-        verifier.resetStreams();
     }
 
 }

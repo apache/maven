@@ -55,7 +55,6 @@ public class MavenITmng3503Xpp3ShadingTest
 
         verifier.verifyErrorFreeLog();
 
-        verifier.resetStreams();
 
         assertEquals( "<root />", FileUtils.fileRead( new File( dir, "target/serialized.xml" ), "UTF-8" ) );
     }
@@ -72,7 +71,6 @@ public class MavenITmng3503Xpp3ShadingTest
 
         verifier.verifyErrorFreeLog();
 
-        verifier.resetStreams();
 
         assertEquals( "root", FileUtils.fileRead( new File( dir, "target/serialized.xml" ), "UTF-8" ) );
     }

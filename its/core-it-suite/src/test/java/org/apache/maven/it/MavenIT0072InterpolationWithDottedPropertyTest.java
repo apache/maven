@@ -58,7 +58,6 @@ public class MavenIT0072InterpolationWithDottedPropertyTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "1.0-SNAPSHOT", props.getProperty( "project.version" ) );

@@ -65,10 +65,6 @@ public class MavenITmng4404UniqueProfileIdTest
         {
             // expected
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
 }

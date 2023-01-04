@@ -58,7 +58,6 @@ public class MavenITmng3118TestClassPathOrderTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> testClassPath = verifier.loadLines( "target/test-classpath.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "test-classes", "classes" } ), testClassPath );

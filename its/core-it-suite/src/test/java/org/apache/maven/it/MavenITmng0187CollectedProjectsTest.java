@@ -64,7 +64,6 @@ public class MavenITmng0187CollectedProjectsTest
         verifier.deleteDirectory( "sub-1/sub-2/target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props;
 

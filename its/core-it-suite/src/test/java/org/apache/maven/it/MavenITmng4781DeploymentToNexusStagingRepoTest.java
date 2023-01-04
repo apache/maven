@@ -140,7 +140,6 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest
         verifier.addCliOption( "-DdeploymentPort=" + port );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         assertTrue( deployedUris.contains( "/repo/org/apache/maven/its/mng4781/release/1.0/release-1.0.jar" ) );
         assertTrue( deployedUris.contains( "/repo/org/apache/maven/its/mng4781/release/1.0/release-1.0.pom" ) );

@@ -133,7 +133,6 @@ public class MavenITmng0768OfflineModeTest
                 verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
                 verifier.verifyFilePresent( "target/compile.txt" );
                 verifier.verifyErrorFreeLog();
-                verifier.resetStreams();
             }
 
             requestedUris.clear();
@@ -150,7 +149,6 @@ public class MavenITmng0768OfflineModeTest
                 verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
                 verifier.verifyFilePresent( "target/compile.txt" );
                 verifier.verifyErrorFreeLog();
-                verifier.resetStreams();
             }
 
             assertTrue( requestedUris.toString(), requestedUris.isEmpty() );
@@ -176,7 +174,6 @@ public class MavenITmng0768OfflineModeTest
                 {
                     // expected, should fail
                 }
-                verifier.resetStreams();
             }
 
             System.out.println( "Bound server socket to the port " + port );

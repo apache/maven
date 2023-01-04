@@ -58,7 +58,6 @@ public class MavenITmng2848ProfileActivationByEnvironmentVariableTest
         verifier.setEnvironmentVariable( "MNG2848", "GO" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
         assertEquals( "PASSED", props.getProperty( "project.properties.testProp" ) );

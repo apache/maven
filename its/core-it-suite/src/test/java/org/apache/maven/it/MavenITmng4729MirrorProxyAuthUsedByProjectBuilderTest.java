@@ -117,7 +117,6 @@ public class MavenITmng4729MirrorProxyAuthUsedByProjectBuilderTest
             verifier.addCliOption( "settings.xml" );
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
 
             Properties props = verifier.loadProperties( "target/pom.properties" );
             assertEquals( "PASSED", props.get( "org.apache.maven.its.mng4729:a:jar:0.1.project.name" ) );

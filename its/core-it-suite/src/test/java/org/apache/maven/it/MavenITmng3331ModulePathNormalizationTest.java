@@ -63,12 +63,6 @@ public class MavenITmng3331ModulePathNormalizationTest
          * http://maven.apache.org/shared/maven-verifier/apidocs/index.html
          */
         verifier.verifyErrorFreeLog();
-
-        /*
-         * Reset the streams before executing the verifier
-         * again.
-         */
-        verifier.resetStreams();
     }
 
     @Test
@@ -94,12 +88,6 @@ public class MavenITmng3331ModulePathNormalizationTest
          * http://maven.apache.org/shared/maven-verifier/apidocs/index.html
          */
         verifier.verifyErrorFreeLog();
-
-        /*
-         * Reset the streams before executing the verifier
-         * again.
-         */
-        verifier.resetStreams();
     }
 
 }

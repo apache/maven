@@ -57,7 +57,6 @@ public class MavenITmng4474PerLookupWagonInstantiationTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/wagon.properties" );
         String hash1 = props.getProperty( "coreit://one.hash" );

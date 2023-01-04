@@ -60,7 +60,6 @@ public class MavenITmng2744checksumVerificationTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng2744", "a", "1", "jar" );
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng2744", "a", "1", "pom" );

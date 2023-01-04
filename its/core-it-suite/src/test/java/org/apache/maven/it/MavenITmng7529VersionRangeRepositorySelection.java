@@ -56,6 +56,5 @@ public class MavenITmng7529VersionRangeRepositorySelection
     verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties());
     verifier.executeGoal("validate");
     verifier.verifyErrorFreeLog();
-    verifier.resetStreams();
   }
 }

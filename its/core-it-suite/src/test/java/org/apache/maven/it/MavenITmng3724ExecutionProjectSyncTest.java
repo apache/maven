@@ -57,12 +57,10 @@ public class MavenITmng3724ExecutionProjectSyncTest
 
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
 
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }

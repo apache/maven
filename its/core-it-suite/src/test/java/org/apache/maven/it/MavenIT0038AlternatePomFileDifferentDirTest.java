@@ -58,7 +58,6 @@ public class MavenIT0038AlternatePomFileDifferentDirTest
         verifier.addCliOption( "project/pom2.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "project/target/passed.log" );
         verifier.verifyFileNotPresent( "target/failed.log" );

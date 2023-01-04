@@ -58,7 +58,6 @@ public class MavenITmng5418FileProjectPropertiesActivatorTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/path1.txt" );
         verifier.verifyFilePresent( "target/file1.txt" );

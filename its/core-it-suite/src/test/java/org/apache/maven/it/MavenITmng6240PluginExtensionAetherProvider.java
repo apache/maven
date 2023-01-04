@@ -63,12 +63,10 @@ public class MavenITmng6240PluginExtensionAetherProvider
 
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "deploy" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         List<String> lines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );

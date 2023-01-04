@@ -53,7 +53,6 @@ public class MavenITmng3679PluginExecIdInterpolationTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/check.txt" );
     }

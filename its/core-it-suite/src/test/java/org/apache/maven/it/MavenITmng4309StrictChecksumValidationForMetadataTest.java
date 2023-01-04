@@ -70,7 +70,6 @@ public class MavenITmng4309StrictChecksumValidationForMetadataTest
         {
             // expected
         }
-        verifier.resetStreams();
     }
 
 }

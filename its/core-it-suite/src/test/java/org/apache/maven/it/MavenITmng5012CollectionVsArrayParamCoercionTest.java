@@ -56,7 +56,6 @@ public class MavenITmng5012CollectionVsArrayParamCoercionTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertEquals( new File( testDir, "src/main/java" ).getCanonicalFile(),

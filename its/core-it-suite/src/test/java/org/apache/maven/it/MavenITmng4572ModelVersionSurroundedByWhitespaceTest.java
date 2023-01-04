@@ -55,7 +55,6 @@ public class MavenITmng4572ModelVersionSurroundedByWhitespaceTest
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

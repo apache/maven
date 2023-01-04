@@ -62,7 +62,6 @@ public class MavenITmng1073AggregatorForksReactorTest
         verifier.setLogFileName( "log-lifecycle.txt" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-fork:2.1-SNAPSHOT:fork-lifecycle-aggregator" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/forked/touch.txt" );
         verifier.verifyFilePresent( "sub-1/target/forked/touch.txt" );
@@ -88,7 +87,6 @@ public class MavenITmng1073AggregatorForksReactorTest
         verifier.setLogFileName( "log-goal.txt" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-fork:2.1-SNAPSHOT:fork-goal-aggregator" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFilePresent( "sub-1/target/touch.txt" );

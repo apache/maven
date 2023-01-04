@@ -63,7 +63,6 @@ public class MavenITmng4973ExtensionVisibleToPluginInReactorTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "sub-b/target/artifact.properties" );
         assertNotNull( props.get( "org.apache.maven.its.mng4973:dep:it-artifact:it:0.1" ) );

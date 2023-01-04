@@ -71,7 +71,6 @@ public class MavenITmng3951AbsolutePathsTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/path.properties" );
         Properties props = verifier.loadProperties( "target/path.properties" );

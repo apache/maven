@@ -58,7 +58,6 @@ public class MavenITmng3864PerExecPluginConfigTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/plugin-config.properties" );
 

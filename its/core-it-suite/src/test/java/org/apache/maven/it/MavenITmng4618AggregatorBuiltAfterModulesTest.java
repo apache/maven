@@ -58,7 +58,6 @@ public class MavenITmng4618AggregatorBuiltAfterModulesTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> mods = verifier.loadLines( "target/log.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "mod-a", "mod-b", "mod-c", "aggregator" } ), mods );

@@ -66,7 +66,6 @@ public class MavenITmng0836PluginParentResolutionTest
         {
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
         }
         else
         {
@@ -79,7 +78,6 @@ public class MavenITmng0836PluginParentResolutionTest
             catch ( VerificationException e )
             {
                 // expected
-                verifier.resetStreams();
             }
         }
     }

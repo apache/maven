@@ -52,7 +52,6 @@ public class MavenITmng2562Timestamp322Test
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Date now = new Date();
 
@@ -78,7 +77,6 @@ public class MavenITmng2562Timestamp322Test
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Date now = new Date();
 
@@ -103,7 +101,6 @@ public class MavenITmng2562Timestamp322Test
         verifier.deleteDirectory( "child-3/target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         String timestamp = props.getProperty( "project.properties.timestamp", "" );

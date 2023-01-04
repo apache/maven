@@ -59,7 +59,6 @@ public class MavenITmng0866EvaluateDefaultValueTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties configProps = verifier.loadProperties( "target/config.properties" );
         assertEquals( "maven-core-it", configProps.getProperty( "defaultParam" ) );

@@ -58,7 +58,6 @@ public class MavenITmng6558ToolchainsBuildingEventTest
         verifier.addCliOption( "-X" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> lines = verifier.loadLines( "target/spy.log", "UTF-8" );
         assertTrue( lines.toString(), lines.get( 0 ).startsWith( "init" ) );

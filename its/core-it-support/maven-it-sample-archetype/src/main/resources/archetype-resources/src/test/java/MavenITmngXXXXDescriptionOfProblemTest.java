@@ -104,12 +104,6 @@ public class MavenITmngXXXXDescriptionOfProblemTest
         verifier.verifyErrorFreeLog();
 
         /*
-         * Reset the streams before executing the verifier
-         * again.
-         */
-        verifier.resetStreams();
-
-        /*
          * This particular test requires an extension
          * containing resources to be installed that is then
          * used by the actual IT test. Here we invoker Maven
@@ -119,7 +113,6 @@ public class MavenITmngXXXXDescriptionOfProblemTest
         verifier = new Verifier( new File( testDir.getAbsolutePath(), "checkstyle-assembly" ).getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         /*
          * Now we are running the actual test. This
@@ -132,7 +125,6 @@ public class MavenITmngXXXXDescriptionOfProblemTest
         verifier = new Verifier( new File( testDir.getAbsolutePath(), "checkstyle-test" ).getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         /*
          * The verifier also supports beanshell scripts for

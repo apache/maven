@@ -111,7 +111,6 @@ public class MavenITmng4348NoUnnecessaryRepositoryAccessTest
             verifier.addCliOption( "settings.xml" );
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
         }
         finally
         {

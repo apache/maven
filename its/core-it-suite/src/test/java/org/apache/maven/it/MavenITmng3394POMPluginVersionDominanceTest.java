@@ -57,7 +57,6 @@ public class MavenITmng3394POMPluginVersionDominanceTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "process-resources" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/resources-resources.txt" );
     }
@@ -75,7 +74,6 @@ public class MavenITmng3394POMPluginVersionDominanceTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "clean" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/clean-clean.txt" );
     }

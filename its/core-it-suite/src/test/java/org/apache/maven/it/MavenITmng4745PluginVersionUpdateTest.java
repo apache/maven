@@ -72,7 +72,6 @@ public class MavenITmng4745PluginVersionUpdateTest
         verifier.executeGoal( "org.apache.maven.its.mng4745:maven-it-plugin:touch" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/plugin.properties" );
         assertEquals( "1.1", props.get( "plugin.version" ) );
@@ -108,7 +107,6 @@ public class MavenITmng4745PluginVersionUpdateTest
         verifier.executeGoal( "org.apache.maven.its.mng4745:maven-it-plugin:touch" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/plugin.properties" );
         assertEquals( "1.0", props.get( "plugin.version" ) );
@@ -145,7 +143,6 @@ public class MavenITmng4745PluginVersionUpdateTest
         verifier.executeGoal( "org.apache.maven.its.mng4745:maven-it-plugin:touch" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/plugin.properties" );
         assertEquals( "1.1", props.get( "plugin.version" ) );

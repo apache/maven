@@ -59,7 +59,6 @@ public class MavenITmng4312TypeAwarePluginParameterExpressionInjectionTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
 

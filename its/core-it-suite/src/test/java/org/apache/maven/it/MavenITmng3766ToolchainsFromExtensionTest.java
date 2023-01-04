@@ -59,7 +59,6 @@ public class MavenITmng3766ToolchainsFromExtensionTest
         verifier.addCliOption( "toolchains.xml" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/tool.properties" );
         Properties toolProps = verifier.loadProperties( "target/tool.properties" );

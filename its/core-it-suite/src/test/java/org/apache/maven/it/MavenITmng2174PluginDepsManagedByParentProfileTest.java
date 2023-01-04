@@ -63,7 +63,6 @@ public class MavenITmng2174PluginDepsManagedByParentProfileTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pcl.properties" );
         assertEquals( "1", props.getProperty( "mng-2174.properties.count" ) );

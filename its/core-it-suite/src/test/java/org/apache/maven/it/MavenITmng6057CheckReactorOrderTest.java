@@ -65,7 +65,6 @@ public class MavenITmng6057CheckReactorOrderTest
         verifier.addCliOption( "-Drevision=1.3.0-SNAPSHOT" );
         verifier.executeGoal( "clean" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> loadedLines = verifier.loadLines( "log-only.txt", "UTF-8" );
         List<String> resultingLines = extractReactorBuildOrder( loadedLines );

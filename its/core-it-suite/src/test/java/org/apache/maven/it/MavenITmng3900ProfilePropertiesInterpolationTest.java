@@ -59,7 +59,6 @@ public class MavenITmng3900ProfilePropertiesInterpolationTest
         verifier.addCliOption( "-Pinterpolation-profile" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "PASSED", props.getProperty( "project.properties.test" ) );

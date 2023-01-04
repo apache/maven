@@ -108,7 +108,6 @@ public class MavenITmng4991NonProxyHostsTest
         }
         finally
         {
-            verifier.resetStreams();
             server.stop();
             proxy.stop();
             server.join();

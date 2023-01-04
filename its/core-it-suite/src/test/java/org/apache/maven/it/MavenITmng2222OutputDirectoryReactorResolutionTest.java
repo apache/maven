@@ -61,7 +61,6 @@ public class MavenITmng2222OutputDirectoryReactorResolutionTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng2222" );
         verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> classpath = verifier.loadLines( "mod-b/target/compile.txt", "UTF-8" );
         assertTrue( classpath.toString(), classpath.contains( "mod-a/target/classes" ) );

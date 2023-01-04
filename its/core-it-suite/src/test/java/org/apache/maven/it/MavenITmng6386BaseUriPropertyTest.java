@@ -52,7 +52,6 @@ public class MavenITmng6386BaseUriPropertyTest
         verifier.setLogFileName( "log-basic.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
         String pomProperty = props.getProperty( "project.properties.pomProperty" );
@@ -83,7 +82,6 @@ public class MavenITmng6386BaseUriPropertyTest
             verifier.setLogFileName( "log-basic.txt" );
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
 
             Properties props = verifier.loadProperties( "target/profile.properties" );
             String pomProperty = props.getProperty( "project.properties.pomProperty" );

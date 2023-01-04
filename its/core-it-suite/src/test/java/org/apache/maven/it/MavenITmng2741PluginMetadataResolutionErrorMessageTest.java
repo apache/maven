@@ -107,10 +107,6 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest
             }
             assertTrue( "Transfer error cause was not found: " +  sb, foundCause );
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
 }

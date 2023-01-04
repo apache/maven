@@ -36,6 +36,5 @@ public class MavenITmng6071GetResourceWithCustomPom
         verifier.setForkJvm( true );
         verifier.executeGoal( "verify" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }

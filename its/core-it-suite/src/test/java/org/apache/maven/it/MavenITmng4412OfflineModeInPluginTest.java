@@ -73,10 +73,6 @@ public class MavenITmng4412OfflineModeInPluginTest
         {
             // expected
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
     /**
@@ -103,7 +99,6 @@ public class MavenITmng4412OfflineModeInPluginTest
         verifier.setLogFileName( "log-collector.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng4412", "dep", "0.1", "pom" );
     }

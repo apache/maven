@@ -162,7 +162,6 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
         Verifier verifier = newVerifier( new File( testDir, project ).getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         return findUnknownWarning( logLines );

@@ -55,7 +55,6 @@ public class MavenITmng3838EqualPluginDepsTest
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

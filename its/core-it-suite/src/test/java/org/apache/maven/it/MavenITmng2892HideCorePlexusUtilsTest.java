@@ -63,7 +63,6 @@ public class MavenITmng2892HideCorePlexusUtilsTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
         assertEquals( "methodStub", pclProps.getProperty( "org.codehaus.plexus.util.StringUtils.methods" ) );

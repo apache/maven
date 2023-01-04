@@ -58,7 +58,6 @@ public class MavenITmng4423SessionDataFromPluginParameterExpressionTest
         verifier.getSystemProperties().setProperty( "mng4423", "PASSED" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertEquals( "PASSED", props.getProperty( "propertiesParam.mng4423" ) );

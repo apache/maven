@@ -58,7 +58,6 @@ public class MavenITmng4305LocalRepoBasedirTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/basedir.properties" );
 

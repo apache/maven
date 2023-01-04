@@ -74,7 +74,6 @@ public class MavenITmng4452ResolutionOfSnapshotWithClassifierTest
         verifier.setLogFileName( "log-3.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( new File( testDir, "consumer" ).getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -85,7 +84,6 @@ public class MavenITmng4452ResolutionOfSnapshotWithClassifierTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertTrue( artifacts.toString(),

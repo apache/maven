@@ -72,7 +72,6 @@ public class MavenITmng3461MirrorMatchingTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng3461", "a", "0.1", "jar" );
     }
@@ -147,7 +146,6 @@ public class MavenITmng3461MirrorMatchingTest
             verifier.addCliOption( "settings.xml" );
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
         }
         finally
         {
@@ -181,7 +179,6 @@ public class MavenITmng3461MirrorMatchingTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng3461", "a", "0.1", "jar" );
     }

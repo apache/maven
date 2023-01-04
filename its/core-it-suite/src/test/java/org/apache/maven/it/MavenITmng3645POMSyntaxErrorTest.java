@@ -70,10 +70,6 @@ public class MavenITmng3645POMSyntaxErrorTest
         {
             // expect this.
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
 }

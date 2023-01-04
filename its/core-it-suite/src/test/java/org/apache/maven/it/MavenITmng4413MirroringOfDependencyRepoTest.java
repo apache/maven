@@ -117,7 +117,6 @@ public class MavenITmng4413MirroringOfDependencyRepoTest
             verifier.addCliOption( "settings.xml" );
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
 
             verifier.verifyArtifactPresent( "org.apache.maven.its.mng4413", "a", "0.1", "jar" );
         }

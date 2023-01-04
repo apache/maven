@@ -49,7 +49,6 @@ public class MavenIT0032MavenPrerequisiteTest
         verifier.setAutoclean( false );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

@@ -58,7 +58,6 @@ public class MavenITmng4196ExclusionOnPluginDepTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
         assertNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassA" ) );

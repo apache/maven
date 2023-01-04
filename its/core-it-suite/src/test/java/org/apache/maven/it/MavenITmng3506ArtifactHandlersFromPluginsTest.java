@@ -63,7 +63,6 @@ public class MavenITmng3506ArtifactHandlersFromPluginsTest
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         // Now, if everything worked, we have .pom and a .jar in the local repo for each child, and a pom for the parent.
         // IF IT DIDN'T, we have a .pom and a .coreit-1 for child 1 AND/OR .pom and .coreit-2 for child 2 in the local repo...

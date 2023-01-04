@@ -53,7 +53,6 @@ public class MavenITmng3600DeploymentModeDefaultsTest
         verifier.setLogFileName( "log-no-settings.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "wagon.properties" );
         Properties props = verifier.loadProperties( "wagon.properties" );
@@ -75,7 +74,6 @@ public class MavenITmng3600DeploymentModeDefaultsTest
         verifier.setLogFileName( "log-server-defaults.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "wagon.properties" );
         Properties props = verifier.loadProperties( "wagon.properties" );
@@ -97,7 +95,6 @@ public class MavenITmng3600DeploymentModeDefaultsTest
         verifier.setLogFileName( "log-modes-set.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "wagon.properties" );
         Properties props = verifier.loadProperties( "wagon.properties" );

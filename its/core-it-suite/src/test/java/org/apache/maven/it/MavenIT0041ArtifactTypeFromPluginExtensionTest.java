@@ -58,7 +58,6 @@ public class MavenIT0041ArtifactTypeFromPluginExtensionTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.2", "coreit-artifact" );
         verifier.verifyArtifactPresent( "org.apache.maven", "maven-core-it-support", "1.2", "pom" );

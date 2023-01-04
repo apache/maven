@@ -64,7 +64,6 @@ public class MavenIT0135EjbLifecycleTest
         verifier.verifyFilePresent( "target/install-install.txt" );
         verifier.verifyFilePresent( "target/deploy-deploy.txt" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

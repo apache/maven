@@ -58,13 +58,11 @@ public class MavenITmng3746POMPropertyOverrideTest
         verifier.setLogFileName( "log-sys.txt" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
         verifier.setLogFileName( "log-sys.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     @Test
@@ -83,7 +81,6 @@ public class MavenITmng3746POMPropertyOverrideTest
         verifier.setLogFileName( "log-cli.txt" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
         verifier.setLogFileName( "log-cli.txt" );
@@ -94,6 +91,5 @@ public class MavenITmng3746POMPropertyOverrideTest
 
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }

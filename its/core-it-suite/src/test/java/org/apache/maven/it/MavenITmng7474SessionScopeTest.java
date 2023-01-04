@@ -47,12 +47,10 @@ public class MavenITmng7474SessionScopeTest
         Verifier verifier = newVerifier( new File( testDir, "plugin" ).getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( new File( testDir, "project" ).getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

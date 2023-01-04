@@ -59,7 +59,6 @@ public class MavenITmng4022IdempotentPluginConfigMergingTest
         verifier.addCliOption( "-Pmng4022a,mng4022b" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertEquals( "5", props.getProperty( "stringParams" ) );

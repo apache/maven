@@ -54,6 +54,5 @@ public class MavenITmng3485OverrideWagonExtensionTest
         verifier.verifyFilePresent( "target/wagon.properties" );
         verifier.verifyErrorFreeLog();
 
-        verifier.resetStreams();
     }
 }

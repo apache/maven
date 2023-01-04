@@ -55,7 +55,6 @@ public class MavenITmng3575HexadecimalOctalPluginParameterConfigTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertEquals( "64", props.getProperty( "byteParam" ) );

@@ -63,7 +63,6 @@ public class MavenITmng5096ExclusionAtDependencyWithImpliedClassifierTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
 

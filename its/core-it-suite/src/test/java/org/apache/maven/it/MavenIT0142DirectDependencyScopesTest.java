@@ -68,7 +68,6 @@ public class MavenIT0142DirectDependencyScopesTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> compileArtifacts = verifier.loadLines( "target/compile-artifacts.txt", "UTF-8" );
         assertTrue( compileArtifacts.toString(), compileArtifacts.contains( "org.apache.maven.its.it0142:system:jar:0.1" ) );

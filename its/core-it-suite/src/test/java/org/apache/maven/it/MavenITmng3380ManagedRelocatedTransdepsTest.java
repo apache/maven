@@ -68,7 +68,6 @@ public class MavenITmng3380ManagedRelocatedTransdepsTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertEquals( 4, artifacts.size() );

@@ -65,7 +65,6 @@ public class MavenITmng3314OfflineSnapshotsTest
             verifier.executeGoal( "validate" );
             verifier.verifyFilePresent( "target/compile.txt" );
             verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
         }
 
         {
@@ -78,7 +77,6 @@ public class MavenITmng3314OfflineSnapshotsTest
             verifier.executeGoal( "validate" );
             verifier.verifyFilePresent( "target/compile.txt" );
             verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
         }
     }
 

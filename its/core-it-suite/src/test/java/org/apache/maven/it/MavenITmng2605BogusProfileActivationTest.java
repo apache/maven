@@ -61,7 +61,6 @@ public class MavenITmng2605BogusProfileActivationTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
         assertNull( props.getProperty( "project.properties.pomProperty" ) );

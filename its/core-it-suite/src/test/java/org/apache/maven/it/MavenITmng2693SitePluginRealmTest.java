@@ -56,7 +56,6 @@ public class MavenITmng2693SitePluginRealmTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "pre-site" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
         assertNotNull( pclProps.getProperty( "org.apache.maven.plugin.coreit.ClassA" ) );

@@ -60,7 +60,6 @@ public class MavenITmng3948ParentResolutionFromProfileReposTest
         verifier.filterFile( "pom.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng3948", "parent", "0.2", "pom" );
     }

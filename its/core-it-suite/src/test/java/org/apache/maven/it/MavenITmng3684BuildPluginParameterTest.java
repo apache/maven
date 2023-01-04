@@ -53,19 +53,16 @@ public class MavenITmng3684BuildPluginParameterTest
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         verifier.setLogFileName( "log-validate.txt" );
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.setLogFileName( "log-site.txt" );
         verifier.executeGoal( "site" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }

@@ -59,7 +59,6 @@ public class MavenITmng4795DepResolutionInReactorProjectForkedByLifecycleTest
         verifier.deleteDirectory( "sub/target" );
         verifier.executeGoal( "process-sources" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> compile0 = verifier.loadLines( "sub/target/compile-0.txt", "UTF-8" );
         assertTrue( compile0.toString(), compile0.contains( "maven-core-it-support-1.0.jar" ) );

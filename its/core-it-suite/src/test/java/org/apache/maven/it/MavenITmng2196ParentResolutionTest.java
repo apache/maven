@@ -60,7 +60,6 @@ public class MavenITmng2196ParentResolutionTest
         {
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
         }
         else
         {
@@ -73,7 +72,6 @@ public class MavenITmng2196ParentResolutionTest
             catch ( VerificationException e )
             {
                 // expected
-                verifier.resetStreams();
             }
         }
     }

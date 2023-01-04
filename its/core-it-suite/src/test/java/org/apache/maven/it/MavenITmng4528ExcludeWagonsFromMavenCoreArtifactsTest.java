@@ -61,7 +61,6 @@ public class MavenITmng4528ExcludeWagonsFromMavenCoreArtifactsTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/wagon.properties" );
         String version = props.getProperty( "version", "" );

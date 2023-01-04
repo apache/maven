@@ -69,7 +69,6 @@ public class MavenITmng6090CIFriendlyTest
         verifier.setLogFileName( "install-log.txt" );
         verifier.executeGoals( Arrays.asList( "clean", "install" ) );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setMavenDebug( false );
@@ -80,7 +79,6 @@ public class MavenITmng6090CIFriendlyTest
         verifier.addCliOption( "module-3" );
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     @Test
@@ -99,7 +97,6 @@ public class MavenITmng6090CIFriendlyTest
         verifier.setLogFileName( "install-log.txt" );
         verifier.executeGoals( Arrays.asList( "clean", "install" ) );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setMavenDebug( false );
@@ -111,7 +108,6 @@ public class MavenITmng6090CIFriendlyTest
         verifier.addCliOption( "module-3" );
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

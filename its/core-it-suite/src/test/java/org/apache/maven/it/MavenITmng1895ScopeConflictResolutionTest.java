@@ -63,7 +63,6 @@ public class MavenITmng1895ScopeConflictResolutionTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
         assertTrue( compile.toString(), compile.contains( "a-0.1.jar" ) );
@@ -249,7 +248,6 @@ public class MavenITmng1895ScopeConflictResolutionTest
         verifier.setLogFileName( "log-" + scopeB + "-vs-" + scopeA + ".txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         return verifier;
     }

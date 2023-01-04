@@ -68,8 +68,6 @@ public class MavenITmng3372DirectInvocationOfPluginsTest
         verifier.executeGoal( "mng3372:test" );
 
         verifier.verifyErrorFreeLog();
-
-        verifier.resetStreams();
     }
 
     @Test
@@ -87,7 +85,5 @@ public class MavenITmng3372DirectInvocationOfPluginsTest
         verifier.executeGoal( "dependency:tree" );
 
         verifier.verifyErrorFreeLog();
-
-        verifier.resetStreams();
     }
 }

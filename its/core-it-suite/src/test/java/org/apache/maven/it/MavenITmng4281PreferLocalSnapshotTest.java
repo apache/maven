@@ -59,7 +59,6 @@ public class MavenITmng4281PreferLocalSnapshotTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4281" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng4281", "dependency", "0.1-SNAPSHOT", "jar" );
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng4281", "dependency", "0.1-SNAPSHOT", "pom" );
@@ -71,7 +70,6 @@ public class MavenITmng4281PreferLocalSnapshotTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties checksums = verifier.loadProperties( "target/checksum.properties" );
         assertChecksum( "7c564b3fbeda6db61b62c35e58a8ef672e712400", checksums );

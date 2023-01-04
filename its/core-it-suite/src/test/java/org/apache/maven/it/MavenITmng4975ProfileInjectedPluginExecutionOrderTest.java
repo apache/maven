@@ -59,7 +59,6 @@ public class MavenITmng4975ProfileInjectedPluginExecutionOrderTest
         verifier.addCliOption( "-Pprofile2,profile1" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> lines = verifier.loadLines( "target/exec.log", "UTF-8" );
         List<String> expected = Arrays.asList( new String[] { "1", "2", "3", "4", "5" } );

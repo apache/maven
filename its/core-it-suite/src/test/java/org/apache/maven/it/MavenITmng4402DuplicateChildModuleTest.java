@@ -66,10 +66,6 @@ public class MavenITmng4402DuplicateChildModuleTest
         {
             // expected
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
 }

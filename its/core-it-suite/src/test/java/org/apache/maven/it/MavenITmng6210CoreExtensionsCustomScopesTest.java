@@ -56,6 +56,5 @@ public class MavenITmng6210CoreExtensionsCustomScopesTest
         verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }

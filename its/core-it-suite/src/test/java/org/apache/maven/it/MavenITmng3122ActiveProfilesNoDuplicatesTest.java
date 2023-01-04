@@ -61,7 +61,6 @@ public class MavenITmng3122ActiveProfilesNoDuplicatesTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
         int count = 0;

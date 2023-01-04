@@ -141,15 +141,8 @@ public abstract class AbstractMavenIntegrationTestCase
                 try
                 {
                     Verifier verifier = new Verifier( "" );
-                    try
-                    {
-                        version = verifier.getMavenVersion();
-                        System.setProperty( "maven.version", version );
-                    }
-                    finally
-                    {
-                        verifier.resetStreams();
-                    }
+                    version = verifier.getMavenVersion();
+                    System.setProperty( "maven.version", version );
                 }
                 catch ( VerificationException e )
                 {

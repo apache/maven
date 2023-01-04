@@ -59,7 +59,6 @@ public class MavenITmng3220ImportScopeTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
     @Test
@@ -90,7 +89,6 @@ public class MavenITmng3220ImportScopeTest
             // expected
         }
 
-        verifier.resetStreams();
 
         List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
 

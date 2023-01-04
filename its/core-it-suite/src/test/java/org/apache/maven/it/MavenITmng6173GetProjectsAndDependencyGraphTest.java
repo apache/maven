@@ -62,7 +62,6 @@ public class MavenITmng6173GetProjectsAndDependencyGraphTest
         verifier.addCliOption( "module-1" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties properties = verifier.loadProperties( "module-1/target/session.properties" );
         assertEquals( "1", properties.getProperty( "session.projects.size" ) );

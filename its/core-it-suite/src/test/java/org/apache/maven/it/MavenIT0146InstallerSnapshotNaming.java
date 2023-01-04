@@ -108,7 +108,6 @@ public class MavenIT0146InstallerSnapshotNaming
 
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/appassembler/repo/dep-0.1-20110726.105319-1.jar" );
     }
@@ -127,7 +126,6 @@ public class MavenIT0146InstallerSnapshotNaming
 
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( testDir.getAbsolutePath() );
 
@@ -148,7 +146,6 @@ public class MavenIT0146InstallerSnapshotNaming
 
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/appassembler/repo/dep-0.1-SNAPSHOT.jar" );
     }

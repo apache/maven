@@ -60,7 +60,6 @@ public class MavenITmng3719PomExecutionOrderingTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Pattern pattern = Pattern.compile( ".*step-([0-9])\\.properties.*" );
 

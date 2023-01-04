@@ -66,10 +66,6 @@ public class MavenITmng4430DistributionManagementStatusTest
         {
             // expected
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
 }

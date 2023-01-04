@@ -58,7 +58,6 @@ public class MavenITmng0496IgnoreUnknownPluginParametersTest
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-log-file:2.1-SNAPSHOT:reset" );
         verifier.verifyFilePresent( "target/file.txt" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

@@ -58,7 +58,6 @@ public class MavenITmng4007PlatformFileSeparatorTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties modelProps = verifier.loadProperties( "target/model.properties" );
 

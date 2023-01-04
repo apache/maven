@@ -134,7 +134,6 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest
         }
         finally
         {
-            verifier.resetStreams();
             server.stop();
             server.join();
         }

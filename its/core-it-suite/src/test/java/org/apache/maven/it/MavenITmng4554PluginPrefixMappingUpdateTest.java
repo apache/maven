@@ -137,7 +137,6 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
         }
         finally
         {
-            verifier.resetStreams();
             server.stop();
             server.join();
         }
@@ -225,7 +224,6 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
         }
         finally
         {
-            verifier.resetStreams();
             server.stop();
             server.join();
         }
@@ -319,7 +317,6 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
         }
         finally
         {
-            verifier.resetStreams();
             server.stop();
             server.join();
         }

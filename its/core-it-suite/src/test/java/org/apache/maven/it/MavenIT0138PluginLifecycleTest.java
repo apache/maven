@@ -70,7 +70,6 @@ public class MavenIT0138PluginLifecycleTest
         }
         verifier.verifyFilePresent( "target/deploy-deploy.txt" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

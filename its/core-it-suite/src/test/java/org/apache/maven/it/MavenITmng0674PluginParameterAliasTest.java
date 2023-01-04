@@ -60,7 +60,6 @@ public class MavenITmng0674PluginParameterAliasTest
         verifier.setLogFileName( "log-lifecycle.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertEquals( "MNG-674-1", props.getProperty( "aliasParam" ) );
@@ -85,7 +84,6 @@ public class MavenITmng0674PluginParameterAliasTest
         verifier.setLogFileName( "log-cli.txt" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-configuration:config" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertEquals( "MNG-674-1", props.getProperty( "aliasParam" ) );

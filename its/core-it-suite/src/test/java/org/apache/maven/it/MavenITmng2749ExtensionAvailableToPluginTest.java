@@ -61,7 +61,6 @@ public class MavenITmng2749ExtensionAvailableToPluginTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
         assertNotNull( pclProps.getProperty( "org.apache.maven.its.mng2749.ExtensionClass" ) );

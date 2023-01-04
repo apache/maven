@@ -62,7 +62,6 @@ public class MavenITmng0666IgnoreLegacyPomTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         // don't verify error free log
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.it0059", "test", "3.8.1", "jar" );
 

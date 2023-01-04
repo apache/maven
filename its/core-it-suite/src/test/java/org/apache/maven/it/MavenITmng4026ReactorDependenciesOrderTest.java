@@ -60,7 +60,6 @@ public class MavenITmng4026ReactorDependenciesOrderTest
         verifier.deleteDirectory( "consumer/target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> classpath1 = verifier.loadLines( "consumer/target/classpath-1.txt", "UTF-8" );
         assertEquals( 5, classpath1.size() );

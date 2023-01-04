@@ -68,7 +68,6 @@ public class MavenITmng3843PomInheritanceTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props;
         File basedir;

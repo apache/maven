@@ -58,7 +58,6 @@ public class MavenITmng0985NonExecutedPluginMgmtGoalsTest
         verifier.executeGoal( "initialize" );
         verifier.verifyFileNotPresent( "target/unexpected.txt" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

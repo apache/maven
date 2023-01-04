@@ -57,7 +57,6 @@ public class MavenITmng3796ClassImportInconsistencyTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
         assertNotNull( pclProps.getProperty( "org.codehaus.plexus.util.xml.Xpp3Dom" ) );

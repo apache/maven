@@ -59,13 +59,11 @@ public class MavenITmng3710PollutedClonedPluginsTest
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( projectsDir.getAbsolutePath() );
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         File topLevelTouchFile = new File( projectsDir, "target/touch.txt" );
         assertFalse( "Top-level touch file should NOT be created in projects tree.", topLevelTouchFile.exists() );
@@ -92,7 +90,6 @@ public class MavenITmng3710PollutedClonedPluginsTest
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
 
@@ -103,6 +100,5 @@ public class MavenITmng3710PollutedClonedPluginsTest
         verifier.executeGoals( goals );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }

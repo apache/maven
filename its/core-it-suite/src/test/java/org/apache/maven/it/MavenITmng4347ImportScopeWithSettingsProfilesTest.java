@@ -68,7 +68,6 @@ public class MavenITmng4347ImportScopeWithSettingsProfilesTest
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

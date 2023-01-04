@@ -71,10 +71,6 @@ public class MavenITmng4072InactiveProfileReposTest
         {
             // expected, all profiles are inactive, hence the repos inaccessible
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
 }

@@ -148,7 +148,6 @@ public class MavenITmng4428FollowHttpRedirectTest
             verifier.setLogFileName( "log-" + getName().substring( 6 ) + ".txt" );
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
         }
         finally
         {

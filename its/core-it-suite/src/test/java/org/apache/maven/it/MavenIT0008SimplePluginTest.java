@@ -56,7 +56,6 @@ public class MavenIT0008SimplePluginTest
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFilePresent( "target/test-basedir-alignment/touch.txt" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

@@ -66,7 +66,6 @@ public class MavenITmng4190MirrorRepoMergingTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         Collections.sort( artifacts );

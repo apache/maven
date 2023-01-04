@@ -58,7 +58,6 @@ public class MavenITmng2234ActiveProfilesFromSettingsTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.txt" );
     }

@@ -72,7 +72,6 @@ public class MavenITmng4952MetadataReleaseInfoUpdateTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
 
-        verifier.resetStreams();
 
         File metadataFile = new File( testDir, "target/repo/org/apache/maven/its/mng4952/test/maven-metadata.xml" );
         String xml = FileUtils.fileRead( metadataFile, "UTF-8" );

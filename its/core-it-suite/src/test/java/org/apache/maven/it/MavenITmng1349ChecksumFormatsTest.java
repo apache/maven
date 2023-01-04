@@ -60,7 +60,6 @@ public class MavenITmng1349ChecksumFormatsTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng1349", "md5-a", "0.1", "jar" );
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng1349", "md5-a", "0.1", "pom" );

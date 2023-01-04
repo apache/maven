@@ -66,7 +66,6 @@ public class MavenITmng3863AutoPluginGroupIdTest
         {
             // expected
         }
-        verifier.resetStreams();
     }
 
 }

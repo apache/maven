@@ -78,7 +78,6 @@ public class MavenITmng4433ForceParentSnapshotUpdateTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
 
-        verifier.resetStreams();
 
         verifier.verifyFileNotPresent( "target/old.txt" );
         verifier.verifyFilePresent( "target/new.txt" );

@@ -94,7 +94,6 @@ public class MavenITmng7470ResolverTransportTest
         verifier.verifyErrorFreeLog();
         // verify maven console output contains "[DEBUG] Using transporter XXXTransporter"
         verifier.verifyTextInLog( logSnippet );
-        verifier.resetStreams();
     }
 
     private static final String WAGON_LOG_SNIPPET = "[DEBUG] Using transporter WagonTransporter";

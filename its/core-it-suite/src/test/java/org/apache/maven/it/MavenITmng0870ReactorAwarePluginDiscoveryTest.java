@@ -62,7 +62,6 @@ public class MavenITmng0870ReactorAwarePluginDiscoveryTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "project/target/touch.txt" );
     }

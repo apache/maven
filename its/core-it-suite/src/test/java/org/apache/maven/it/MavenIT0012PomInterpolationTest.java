@@ -52,7 +52,6 @@ public class MavenIT0012PomInterpolationTest
         verifier.verifyFilePresent( "target/touch-3.8.1.txt" );
         verifier.verifyFilePresent( "child-project/target/child-touch-3.0.3.txt" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

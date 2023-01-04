@@ -49,12 +49,10 @@ public class MavenITmng6506PackageAnnotationTest
 
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "verify" );
-        verifier.resetStreams();
         verifier.verifyErrorFreeLog();
         verifier.verifyTextInLog( "MNG-6506 check succeeded" );
     }

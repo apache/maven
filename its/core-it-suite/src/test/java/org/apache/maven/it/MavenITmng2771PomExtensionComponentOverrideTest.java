@@ -55,18 +55,15 @@ public class MavenITmng2771PomExtensionComponentOverrideTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2771/plugin" );
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2771/project" );
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "verify" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }

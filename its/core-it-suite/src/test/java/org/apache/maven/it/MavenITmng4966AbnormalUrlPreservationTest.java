@@ -57,7 +57,6 @@ public class MavenITmng4966AbnormalUrlPreservationTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "file:////UNC/server/dir/", props.getProperty( "project.url" ) );

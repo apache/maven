@@ -58,7 +58,6 @@ public class MavenITmng2820PomCommentsTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng2820" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         File installed = new File( verifier.getArtifactPath( "org.apache.maven.its.mng2820", "test", "0.1", "pom" ) );
         assertPomComments( installed );

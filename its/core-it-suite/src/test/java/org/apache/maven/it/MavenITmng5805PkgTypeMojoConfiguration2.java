@@ -29,6 +29,5 @@ public class MavenITmng5805PkgTypeMojoConfiguration2
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.verifyTextInLog( "CLASS_NAME=org.apache.maven.its.mng5805.TestClass1" );
-        verifier.resetStreams();
     }
 }

@@ -59,7 +59,6 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertEquals( "one", props.get( "requiredParam" ) );
@@ -93,7 +92,6 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
             // expected
         }
 
-        verifier.resetStreams();
     }
 
     /**
@@ -115,7 +113,6 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
         verifier.setLogFileName( "log-b.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertEquals( "CLI", props.get( "requiredParam" ) );
@@ -151,7 +148,6 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
             // expected
         }
 
-        verifier.resetStreams();
     }
 
     /**
@@ -171,7 +167,6 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertEquals( "one", props.get( "requiredParam" ) );

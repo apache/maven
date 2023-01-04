@@ -62,7 +62,6 @@ public class MavenITmng4789ScopeInheritanceMeetsConflictTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
         assertFalse( compile.toString(), compile.contains( "a-0.1.jar" ) );

@@ -58,7 +58,6 @@ public class MavenIT0131SiteLifecycleTest
         verifier.verifyFilePresent( "target/site-site.txt" );
         verifier.verifyFilePresent( "target/site-deploy.txt" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

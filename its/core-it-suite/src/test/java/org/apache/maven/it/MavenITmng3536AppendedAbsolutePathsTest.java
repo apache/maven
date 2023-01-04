@@ -52,13 +52,11 @@ public class MavenITmng3536AppendedAbsolutePathsTest
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         File projectDir = new File( testDir, "project" );
         verifier = newVerifier( projectDir.getAbsolutePath() );
 
         verifier.executeGoal( "verify" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }

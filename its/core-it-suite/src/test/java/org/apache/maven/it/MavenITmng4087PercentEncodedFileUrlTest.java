@@ -58,7 +58,6 @@ public class MavenITmng4087PercentEncodedFileUrlTest
         verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFileNotPresent( "target/%72%65%70%6F" );
         verifier.verifyFilePresent( "target/repo" );

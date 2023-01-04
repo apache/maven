@@ -75,10 +75,6 @@ public class MavenITmng3477DependencyResolutionErrorMessageTest
             }
             assertTrue( "Transfer error cause was not found", foundCause );
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
 }

@@ -60,7 +60,6 @@ public class MavenITmng4359LocallyReachableParentOutsideOfReactorTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4359" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> cp = verifier.loadLines( "mod-c/target/classpath.txt", "UTF-8" );
         assertTrue( cp.toString(), cp.contains( "mod-b/pom.xml" ) );

@@ -62,7 +62,6 @@ public class MavenITmng4355ExtensionAutomaticVersionResolutionTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

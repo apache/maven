@@ -123,7 +123,6 @@ public class MavenITmng3652UserAgentHeaderTest
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
 
@@ -133,7 +132,6 @@ public class MavenITmng3652UserAgentHeaderTest
         verifier.setLogFileName( "log-unConfiguredHttp.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         String userAgent = this.userAgent;
         assertNotNull( userAgent );
@@ -166,7 +164,6 @@ public class MavenITmng3652UserAgentHeaderTest
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
 
@@ -178,7 +175,6 @@ public class MavenITmng3652UserAgentHeaderTest
         verifier.setLogFileName( "log-unConfiguredDAV.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         File touchFile = new File( projectDir, "target/touch.txt" );
         assertTrue( touchFile.exists() );
@@ -211,7 +207,6 @@ public class MavenITmng3652UserAgentHeaderTest
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
 
@@ -225,7 +220,6 @@ public class MavenITmng3652UserAgentHeaderTest
         verifier.setLogFileName( "log-configWithoutUserAgent.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         File touchFile = new File( projectDir, "target/touch.txt" );
         assertTrue( touchFile.exists() );
@@ -258,7 +252,6 @@ public class MavenITmng3652UserAgentHeaderTest
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
 
@@ -272,7 +265,6 @@ public class MavenITmng3652UserAgentHeaderTest
         verifier.setLogFileName( "log-configWithUserAgent.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         String userAgent = this.userAgent;
         assertNotNull( userAgent );
@@ -292,7 +284,6 @@ public class MavenITmng3652UserAgentHeaderTest
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
 
@@ -306,7 +297,6 @@ public class MavenITmng3652UserAgentHeaderTest
         verifier.setLogFileName( "log-configWithUserAgent.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         String userAgent = this.userAgent;
         assertNotNull( userAgent );

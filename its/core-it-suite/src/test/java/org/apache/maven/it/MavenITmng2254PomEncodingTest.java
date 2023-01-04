@@ -60,7 +60,6 @@ public class MavenITmng2254PomEncodingTest
         verifier.deleteDirectory( "latin-1/target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties utf8 = verifier.loadProperties( "utf-8/target/pom.properties" );
         assertEquals( "TEST-CHARS: \u00DF\u0131\u03A3\u042F\u05D0\u20AC", utf8.getProperty( "project.description" ) );

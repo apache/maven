@@ -59,7 +59,6 @@ public class MavenITmng3904NestedBuildDirInterpolationTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertCanonicalFileEquals( new File( testDir, "target/classes/dir0" ),

@@ -51,7 +51,6 @@ public class MavenITmng2668UsePluginDependenciesForSortingTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng2668" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng2668", "project", "1.0-SNAPSHOT", "jar" );
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng2668", "tools", "1.0-SNAPSHOT", "jar" );

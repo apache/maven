@@ -67,11 +67,5 @@ public class MavenITmng3671PluginLevelDepInterpolationTest
          * http://maven.apache.org/shared/maven-verifier/apidocs/index.html
          */
         verifier.verifyErrorFreeLog();
-
-        /*
-         * Reset the streams before executing the verifier
-         * again.
-         */
-        verifier.resetStreams();
     }
 }

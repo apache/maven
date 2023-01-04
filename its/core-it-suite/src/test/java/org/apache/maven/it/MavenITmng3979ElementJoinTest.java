@@ -59,7 +59,6 @@ public class MavenITmng3979ElementJoinTest
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

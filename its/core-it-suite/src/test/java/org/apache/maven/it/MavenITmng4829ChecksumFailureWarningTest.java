@@ -61,7 +61,6 @@ public class MavenITmng4829ChecksumFailureWarningTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
 

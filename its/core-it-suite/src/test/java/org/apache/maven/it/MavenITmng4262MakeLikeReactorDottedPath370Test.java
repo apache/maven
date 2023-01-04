@@ -66,7 +66,6 @@ public class MavenITmng4262MakeLikeReactorDottedPath370Test
         verifier.setLogFileName( "log-root.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFilePresent( "../sub-a/target/touch.txt" );
@@ -91,7 +90,6 @@ public class MavenITmng4262MakeLikeReactorDottedPath370Test
         verifier.setLogFileName( "log-module.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFileNotPresent( "target/touch.txt" );
         verifier.verifyFilePresent( "../sub-a/target/touch.txt" );

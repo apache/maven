@@ -56,7 +56,6 @@ public class MavenITmng4629NoPomValidationErrorUponMissingSystemDepTest
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

@@ -65,10 +65,6 @@ public class MavenITmng4405ValidPluginVersionTest
         {
             // expected
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
     }
 
 }

@@ -77,7 +77,6 @@ public class MavenITmng4361ForceDependencySnapshotUpdateTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
 
-        verifier.resetStreams();
 
         Properties checksums = verifier.loadProperties( "target/checksum.properties" );
         assertChecksum( "2a22eeca91211193e927ea3b2ecdf56481585064", "a-0.1-SNAPSHOT.jar", checksums );

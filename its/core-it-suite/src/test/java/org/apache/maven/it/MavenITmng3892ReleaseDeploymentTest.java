@@ -61,7 +61,6 @@ public class MavenITmng3892ReleaseDeploymentTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng3892" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng3892", "test", "1.0", "pom" );
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng3892", "test", "1.0", "jar" );

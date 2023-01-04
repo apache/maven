@@ -60,7 +60,6 @@ public class MavenITmng4000MultiPluginExecutionsTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> executions = verifier.loadLines( "target/exec.log", "UTF-8" );
         List<String> expected = Arrays.asList( new String[] { "exec", "exec" } );
@@ -84,7 +83,6 @@ public class MavenITmng4000MultiPluginExecutionsTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> executions = verifier.loadLines( "target/exec.log", "UTF-8" );
         List<String> expected = Arrays.asList( new String[] { "exec", "exec" } );

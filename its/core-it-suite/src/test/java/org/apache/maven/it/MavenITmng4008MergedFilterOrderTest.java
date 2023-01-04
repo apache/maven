@@ -58,7 +58,6 @@ public class MavenITmng4008MergedFilterOrderTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties modelProps = verifier.loadProperties( "target/model.properties" );
 

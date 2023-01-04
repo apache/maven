@@ -55,7 +55,6 @@ public class MavenIT0199CyclicImportScopeTest extends AbstractMavenIntegrationTe
             verifier.verifyFilePresent(expectedArtifact);
         }
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 
 }

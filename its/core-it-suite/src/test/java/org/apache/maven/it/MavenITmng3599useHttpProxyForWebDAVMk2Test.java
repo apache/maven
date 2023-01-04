@@ -170,7 +170,6 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         String settings = FileUtils.fileRead( new File( testDir, "settings-template.xml" ) );
         settings = StringUtils.replace( settings, "@port@", Integer.toString( port ) );
@@ -189,7 +188,6 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
         verifier.setLogFileName( "logHttp.txt" );
         verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
         verifier.verifyArtifactContent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",
@@ -215,7 +213,6 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         String settings = FileUtils.fileRead( new File( testDir, "settings-template.xml" ) );
         settings = StringUtils.replace( settings, "@port@", Integer.toString( port ) );
@@ -234,7 +231,6 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
         verifier.setLogFileName( "logDAV.txt" );
         verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
         verifier.verifyArtifactContent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar",

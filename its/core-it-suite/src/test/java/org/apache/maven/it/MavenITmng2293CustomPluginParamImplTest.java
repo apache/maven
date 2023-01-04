@@ -57,7 +57,6 @@ public class MavenITmng2293CustomPluginParamImplTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/param.properties" );
         assertEquals( "org.apache.maven.plugin.coreit.sub.AnImplementation-foobar", props.getProperty( "theParameter.string" ) );

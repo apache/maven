@@ -82,10 +82,6 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
             verifier.verifyTextInLog( "mvn [args] -r" );
             verifyTextNotInLog( verifier, "mvn [args] -rf :module-b" );
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
 
         // New build with -r should resume the build from module-b, skipping module-a since it has succeeded already.
         verifier = newVerifier( parentDependentTestDir.getAbsolutePath() );
@@ -94,7 +90,6 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         verifyTextNotInLog( verifier, "Building module-a 1.0" );
         verifier.verifyTextInLog( "Building module-b 1.0" );
         verifier.verifyTextInLog( "Building module-c 1.0" );
-        verifier.resetStreams();
     }
 
     @Test
@@ -113,10 +108,6 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         {
             // Expected to fail.
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
 
         // Let module-b and module-c fail, if they would have been built...
         verifier = newVerifier( parentDependentTestDir.getAbsolutePath() );
@@ -125,14 +116,8 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         // ... but adding -r should exclude those two from the build because the previous Maven invocation
         // marked them as successfully built.
         verifier.addCliOption( "-r" );
-        try
-        {
-            verifier.executeGoal( "test" );
-        }
-        finally
-        {
-            verifier.resetStreams();
-        }
+
+        verifier.executeGoal( "test" );
     }
 
     @Test
@@ -154,17 +139,12 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         {
             verifier.verifyTextInLog( "mvn [args] -r" );
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
 
         verifier = newVerifier( parentIndependentTestDir.getAbsolutePath() );
         verifier.addCliOption( "-r" );
         verifier.executeGoal( "test" );
         verifier.verifyTextInLog( "Building module-a 1.0" );
         verifyTextNotInLog( verifier, "Building module-b 1.0" );
-        verifier.resetStreams();
     }
 
     @Test
@@ -181,10 +161,6 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         catch ( final VerificationException ve )
         {
             verifier.verifyTextInLog( "Goal requires a project to execute but there is no POM in this directory" );
-        }
-        finally
-        {
-            verifier.resetStreams();
         }
     }
 
@@ -215,10 +191,6 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         {
             // Expected to fail.
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
 
         // Let module-b fail, if it would have been built...
         verifier = newVerifier( fourModulesTestDir.getAbsolutePath() );
@@ -231,14 +203,8 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         //   a : success
         //   c : success
         //   d : success
-        try
-        {
-            verifier.executeGoal( "verify" );
-        }
-        finally
-        {
-            verifier.resetStreams();
-        }
+
+        verifier.executeGoal( "verify" );
     }
 
     @Test
@@ -267,10 +233,6 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         {
             // Expected to fail.
         }
-        finally
-        {
-            verifier.resetStreams();
-        }
 
         // Let module-a and module-b fail, if they would have been built...
         verifier = newVerifier( fourModulesTestDir.getAbsolutePath() );
@@ -280,17 +242,11 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         // ... but adding -r should exclude those two from the build because the previous Maven invocation
         // marked them as successfully built.
         verifier.addCliOption( "-r" );
-        try
-        {
-            // The result should be:
-            //   c : success
-            //   d : success
-            verifier.executeGoal( "verify" );
-        }
-        finally
-        {
-            verifier.resetStreams();
-        }
+
+        // The result should be:
+        //   c : success
+        //   d : success
+        verifier.executeGoal( "verify" );
     }
 
     /**

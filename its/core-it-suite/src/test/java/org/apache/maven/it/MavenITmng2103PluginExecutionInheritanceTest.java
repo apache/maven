@@ -59,7 +59,6 @@ public class MavenITmng2103PluginExecutionInheritanceTest
         verifier.deleteDirectory( "child-2/target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> execs = verifier.loadLines( "child-1/target/log.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "inherited" } ), execs );

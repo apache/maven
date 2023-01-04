@@ -57,7 +57,6 @@ public class MavenITmng2140ReactorAwareDepResolutionWhenForkTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> artifacts = verifier.loadLines( "project/target/test.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "dependency/pom.xml" ) );

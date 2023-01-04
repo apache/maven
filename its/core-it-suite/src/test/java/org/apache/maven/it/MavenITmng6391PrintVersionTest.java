@@ -68,7 +68,6 @@ public class MavenITmng6391PrintVersionTest
         verifier.setLogFileName( "version-log.txt" );
         verifier.executeGoals( Arrays.asList( "clean" ) );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> loadedLines = verifier.loadLines( "version-log.txt", "UTF-8" );
         List<String> resultingLines = extractReactorBuildOrder( loadedLines );
@@ -113,7 +112,6 @@ public class MavenITmng6391PrintVersionTest
         verifier.setLogFileName( "version-log.txt" );
         verifier.executeGoals( Arrays.asList( "clean" ) );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> loadedLines = verifier.loadLines( "version-log.txt", "UTF-8" );
         List<String> resultingLines = extractReactorBuildOrder( loadedLines );

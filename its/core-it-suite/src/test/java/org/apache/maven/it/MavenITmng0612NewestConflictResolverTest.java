@@ -55,18 +55,15 @@ public class MavenITmng0612NewestConflictResolverTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0612/plugin" );
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0612/project" );
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "verify" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }

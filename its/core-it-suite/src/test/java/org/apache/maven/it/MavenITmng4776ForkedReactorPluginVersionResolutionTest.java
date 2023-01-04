@@ -60,7 +60,6 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest
         verifier.setLogFileName( "log-lifecycle.txt" );
         verifier.executeGoal( "test" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "sub/target/log.txt" );
     }
@@ -85,7 +84,6 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest
         verifier.setLogFileName( "log-cli.txt" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-fork:2.1-SNAPSHOT:fork-lifecycle-aggregator" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "sub/target/log.txt" );
     }

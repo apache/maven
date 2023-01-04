@@ -63,7 +63,6 @@ public class MavenITmng3043BestEffortReactorResolutionTest
         verifier.setLogFileName( "log-test.txt" );
         verifier.executeGoal( "test" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> classpath;
 
@@ -120,7 +119,6 @@ public class MavenITmng3043BestEffortReactorResolutionTest
         verifier.setLogFileName( "log-package.txt" );
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> classpath;
 

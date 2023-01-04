@@ -75,7 +75,6 @@ public class MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
         assertEquals( "&x=y<>", props.getProperty( "project.properties.jdbcUrl" ) );

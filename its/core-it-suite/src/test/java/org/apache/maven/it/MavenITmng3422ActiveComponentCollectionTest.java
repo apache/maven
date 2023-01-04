@@ -58,7 +58,6 @@ public class MavenITmng3422ActiveComponentCollectionTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/layout.properties" );
         assertNotEquals( "0", props.getProperty( "layouts", "0" ) );

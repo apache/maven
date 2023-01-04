@@ -61,7 +61,6 @@ public class MavenITmng4331DependencyCollectionTest
         verifier.setLogFileName( "log-lifecycle.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> artifacts = verifier.loadLines( "sub-2/target/compile.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4331:sub-1:jar:0.1" ) );
@@ -88,7 +87,6 @@ public class MavenITmng4331DependencyCollectionTest
         verifier.setLogFileName( "log-aggregator.txt" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-collection:2.1-SNAPSHOT:aggregate-test" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> artifacts = verifier.loadLines( "target/sub-2.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4331:sub-1:jar:0.1" ) );

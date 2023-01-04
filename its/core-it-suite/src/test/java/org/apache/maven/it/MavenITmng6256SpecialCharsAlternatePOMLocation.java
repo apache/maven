@@ -91,6 +91,5 @@ public class MavenITmng6256SpecialCharsAlternatePOMLocation
         verifier.addCliOption( "\"" + new File( resourceDir, subDir ).getAbsolutePath() + "\"" ); // "<path>"
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
     }
 }

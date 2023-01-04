@@ -78,7 +78,6 @@ public class MavenITmng3873MultipleExecutionGoalsTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         /*
          * NOTE: We deliberately don't check the exact order here, that's another issue.

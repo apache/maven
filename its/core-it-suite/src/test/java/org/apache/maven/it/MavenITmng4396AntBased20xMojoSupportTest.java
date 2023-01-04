@@ -57,7 +57,6 @@ public class MavenITmng4396AntBased20xMojoSupportTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyFilePresent( "target/ant.txt" );
     }

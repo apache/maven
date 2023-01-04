@@ -57,7 +57,6 @@ public class MavenITmng4292EnumTypeMojoParametersTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertEquals( "HALF_EVEN", props.getProperty( "listParam.0" ) );

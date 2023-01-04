@@ -62,21 +62,18 @@ public class MavenITmng2486TimestampedDependencyVersionInterpolationTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng2486" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( new File( testDir, "parent" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( new File( testDir, "dep-b" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier = newVerifier( new File( testDir, "test" ).getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -88,7 +85,6 @@ public class MavenITmng2486TimestampedDependencyVersionInterpolationTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> files = verifier.loadLines( "target/classpath.txt", "UTF-8" );
         assertTrue( files.toString(), files.contains( "dep-a-0.1-SNAPSHOT.jar" ) );

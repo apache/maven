@@ -60,7 +60,6 @@ public class MavenITmng4328PrimitiveMojoParameterConfigurationTest
         verifier.addCliOption( "--offline" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props;
 

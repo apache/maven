@@ -57,7 +57,6 @@ public class MavenITmng2045testJarDependenciesBrokenInReactorTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng2045" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> compile = verifier.loadLines( "test-user/target/compile.txt", "UTF-8" );
         assertTestClasses( compile );

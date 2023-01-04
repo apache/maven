@@ -68,7 +68,6 @@ public class MavenITmng2695OfflinePluginSnapshotsTest
             verifier.verifyFilePresent( "target/a.txt" );
             verifier.verifyFilePresent( "target/b.txt" );
             verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
         }
 
         {
@@ -84,7 +83,6 @@ public class MavenITmng2695OfflinePluginSnapshotsTest
             verifier.verifyFilePresent( "target/a.txt" );
             verifier.verifyFilePresent( "target/b.txt" );
             verifier.verifyErrorFreeLog();
-            verifier.resetStreams();
         }
     }
 

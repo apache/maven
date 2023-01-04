@@ -58,7 +58,6 @@ public class MavenITmng1412DependenciesOrderTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         List<String> compileArtifacts = verifier.loadLines( "target/compile-artifacts.txt", "UTF-8" );
         assertArtifactOrder( compileArtifacts );

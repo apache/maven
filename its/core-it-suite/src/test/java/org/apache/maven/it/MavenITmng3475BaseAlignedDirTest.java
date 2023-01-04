@@ -60,7 +60,6 @@ public class MavenITmng3475BaseAlignedDirTest
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties configProps = verifier.loadProperties( "target/config.properties" );
 

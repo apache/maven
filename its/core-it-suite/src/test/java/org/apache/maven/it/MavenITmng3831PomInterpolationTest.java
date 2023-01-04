@@ -57,7 +57,6 @@ public class MavenITmng3831PomInterpolationTest
         Verifier verifier = newVerifier( child.getAbsolutePath() );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/interpolated.properties" );
         String prefix = "project.properties.";

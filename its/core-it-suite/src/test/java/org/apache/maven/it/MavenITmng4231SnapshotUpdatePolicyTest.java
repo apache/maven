@@ -74,7 +74,6 @@ public class MavenITmng4231SnapshotUpdatePolicyTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
 
-        verifier.resetStreams();
 
         Properties checksums = verifier.loadProperties( "target/checksum.properties" );
         assertChecksum( "db3f17644e813af768ae6e82a6d0a2f29aef8988", "a-0.1-SNAPSHOT.jar", checksums );
@@ -114,7 +113,6 @@ public class MavenITmng4231SnapshotUpdatePolicyTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
 
-        verifier.resetStreams();
 
         Properties checksums = verifier.loadProperties( "target/checksum.properties" );
         assertChecksum( "ec6c9ea65766cc272df0ee26076240d6a93047d5", "a-0.1-SNAPSHOT.jar", checksums );

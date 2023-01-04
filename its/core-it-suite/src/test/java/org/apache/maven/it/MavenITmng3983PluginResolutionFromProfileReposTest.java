@@ -62,7 +62,6 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest
         verifier.filterFile( "pom.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng3983", "p", "0.1", "jar" );
     }
@@ -88,7 +87,6 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng3983", "p", "0.1", "jar" );
     }

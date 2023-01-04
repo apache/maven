@@ -61,7 +61,6 @@ public class MavenITmng3268MultipleHyphenPCommandLineTest
         verifier.verifyFilePresent( "target/profile2/touch.txt" );
         verifier.verifyFilePresent( "target/profile3/touch.txt" );
         verifier.verifyFilePresent( "target/profile4/touch.txt" );
-        verifier.resetStreams();
     }
 
 }
