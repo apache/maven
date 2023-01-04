@@ -45,19 +45,23 @@ public class MavenITmng7110ExtensionClassloader
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7110-extensionclassloader" );
         
         final Verifier extensionVerifier = newVerifier( new File( projectDir, "extension" ).getAbsolutePath() );
-        extensionVerifier.executeGoal( "install" );
+        extensionVerifier.addCliArgument( "install" );
+        extensionVerifier.execute();
         extensionVerifier.verifyErrorFreeLog();
 
         final Verifier libVerifier = newVerifier( new File( projectDir, "lib" ).getAbsolutePath() );
-        libVerifier.executeGoal( "install" );
+        libVerifier.addCliArgument( "install" );
+        libVerifier.execute();
         libVerifier.verifyErrorFreeLog();
 
         final Verifier bomVerifier = newVerifier( new File( projectDir, "bom" ).getAbsolutePath() );
-        bomVerifier.executeGoal( "install" );
+        bomVerifier.addCliArgument( "install" );
+        bomVerifier.execute();
         bomVerifier.verifyErrorFreeLog();
         
         final Verifier projectVerifier = newVerifier( new File( projectDir, "module" ).getAbsolutePath() );
-        projectVerifier.executeGoal( "verify" );
+        projectVerifier.addCliArgument( "verify" );
+        projectVerifier.execute();
         projectVerifier.verifyErrorFreeLog();
         
         Properties properties = new Properties();

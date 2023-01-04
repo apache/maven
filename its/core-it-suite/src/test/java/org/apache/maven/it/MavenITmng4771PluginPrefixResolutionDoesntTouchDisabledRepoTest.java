@@ -102,7 +102,8 @@ public class MavenITmng4771PluginPrefixResolutionDoesntTouchDisabledRepoTest
             verifier.addCliOption( "-U" );
             verifier.addCliOption( "-s" );
             verifier.addCliOption( "settings.xml" );
-            verifier.executeGoal( "mng4771:touch" );
+            verifier.addCliArgument( "mng4771:touch" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Build should have failed to resolve unknown prefix" );
         }

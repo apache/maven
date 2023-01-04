@@ -54,7 +54,8 @@ public class MavenIT0137EarLifecycleTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "deploy" );
+        verifier.addCliArgument( "deploy" );
+        verifier.execute();
         verifier.verifyFilePresent( "target/ear-generate-application-xml.txt" );
         verifier.verifyFilePresent( "target/resources-resources.txt" );
         verifier.verifyFilePresent( "target/ear-ear.txt" );

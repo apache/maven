@@ -56,7 +56,8 @@ public class MavenITmng2738ProfileIdCollidesWithCliOptionTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "-Pe" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/touch.txt" );

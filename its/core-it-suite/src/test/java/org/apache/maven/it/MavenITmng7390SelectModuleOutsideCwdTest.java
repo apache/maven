@@ -53,7 +53,8 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
         final Verifier verifier = newVerifier( moduleADir.getAbsolutePath() );
         verifier.addCliOption( "-f" );
         verifier.addCliOption( ".." );
-        verifier.executeGoal( "clean" );
+        verifier.addCliArgument( "clean" );
+        verifier.execute();
     }
 
     @Test
@@ -64,7 +65,8 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( ":module-b" );
         verifier.setLogFileName( "log-module-by-coordinate.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyFileNotPresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "../target/touch.txt" );
         verifier.verifyFilePresent( "../module-b/target/touch.txt" );
@@ -78,7 +80,8 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( ":module-b,:module-a" );
         verifier.setLogFileName( "log-modules-by-coordinate.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "../target/touch.txt" );
         verifier.verifyFilePresent( "../module-b/target/touch.txt" );
@@ -92,7 +95,8 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "../module-b" );
         verifier.setLogFileName( "log-module-by-relative-path.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyFileNotPresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "../target/touch.txt" );
         verifier.verifyFilePresent( "../module-b/target/touch.txt" );
@@ -106,7 +110,8 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "../module-b,." );
         verifier.setLogFileName( "log-modules-by-relative-path.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "../target/touch.txt" );
         verifier.verifyFilePresent( "../module-b/target/touch.txt" );
@@ -128,7 +133,8 @@ public class MavenITmng7390SelectModuleOutsideCwdTest extends AbstractMavenInteg
         verifier.setLogFileName( "log-modules-by-relative-path-no-dotmvn.txt" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             fail( "Expected goal to fail" );
         }
         catch ( VerificationException e )

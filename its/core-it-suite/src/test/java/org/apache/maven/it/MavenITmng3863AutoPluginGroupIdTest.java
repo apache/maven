@@ -58,7 +58,8 @@ public class MavenITmng3863AutoPluginGroupIdTest
         verifier.deleteDirectory( "target" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Validation step did not detect missing groupId for dependency" );
         }

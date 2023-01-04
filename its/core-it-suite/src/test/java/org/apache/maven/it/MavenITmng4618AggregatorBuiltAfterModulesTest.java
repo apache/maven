@@ -56,7 +56,8 @@ public class MavenITmng4618AggregatorBuiltAfterModulesTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> mods = verifier.loadLines( "target/log.txt", "UTF-8" );

@@ -58,7 +58,8 @@ public class MavenITmng3948ParentResolutionFromProfileReposTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3948" );
         verifier.filterFile( "pom.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng3948", "parent", "0.2", "pom" );

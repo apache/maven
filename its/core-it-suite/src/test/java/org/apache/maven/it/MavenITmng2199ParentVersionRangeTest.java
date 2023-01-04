@@ -48,7 +48,8 @@ public class MavenITmng2199ParentVersionRangeTest
         verifier.addCliOption( "-U" );
         verifier.setAutoclean( false );
 
-        verifier.executeGoal( "verify" );
+        verifier.addCliArgument( "verify" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // All Maven versions not supporting remote parent version ranges will log a warning message whenever
@@ -68,12 +69,11 @@ public class MavenITmng2199ParentVersionRangeTest
         File testDir = ResourceExtractor.simpleExtractResources(
             getClass(), "/mng-2199-parent-version-range/valid-exclusive-upper-bound" );
 
-
         verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
         verifier.addCliOption( "-U" );
         verifier.setAutoclean( false );
-
-        verifier.executeGoal( "verify" );
+        verifier.addCliArgument( "verify" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // All Maven versions not supporting remote parent version ranges will log a warning message whenever
@@ -96,7 +96,8 @@ public class MavenITmng2199ParentVersionRangeTest
             verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
             verifier.setAutoclean( false );
             verifier.addCliOption( "-U" );
-            verifier.executeGoal( "verify" );
+            verifier.addCliArgument( "verify" );
+            verifier.execute();
             fail( "Expected 'VerificationException' not thrown." );
         }
         catch ( final VerificationException e )
@@ -122,7 +123,8 @@ public class MavenITmng2199ParentVersionRangeTest
             verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
             verifier.setAutoclean( false );
             verifier.addCliOption( "-U" );
-            verifier.executeGoal( "verify" );
+            verifier.addCliArgument( "verify" );
+            verifier.execute();
             fail( "Expected 'VerificationException' not thrown." );
         }
         catch ( final VerificationException e )
@@ -147,7 +149,8 @@ public class MavenITmng2199ParentVersionRangeTest
             verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
             verifier.setAutoclean( false );
             verifier.addCliOption( "-U" );
-            verifier.executeGoal( "verify" );
+            verifier.addCliArgument( "verify" );
+            verifier.execute();
             fail( "Expected 'VerificationException' not thrown." );
         }
         catch ( final VerificationException e )
@@ -168,9 +171,9 @@ public class MavenITmng2199ParentVersionRangeTest
         File testDir = ResourceExtractor.simpleExtractResources(
             getClass(), "/mng-2199-parent-version-range/valid-local/child" );
 
-
         verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "verify" );
+        verifier.addCliArgument( "verify" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // All Maven versions not supporting remote parent version ranges will log a warning message whenever
@@ -196,7 +199,8 @@ public class MavenITmng2199ParentVersionRangeTest
         try
         {
             verifier = newVerifier( testDir.getAbsolutePath() );
-            verifier.executeGoal( "verify" );
+            verifier.addCliArgument( "verify" );
+            verifier.execute();
             fail( "Expected 'VerificationException' not thrown." );
         }
         catch ( final VerificationException e )
@@ -219,7 +223,8 @@ public class MavenITmng2199ParentVersionRangeTest
             getClass(), "/mng-2199-parent-version-range/local-fallback-to-remote/child" );
 
         verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "verify" );
+        verifier.addCliArgument( "verify" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // All Maven versions not supporting remote parent version ranges will log a warning message whenever
@@ -244,7 +249,8 @@ public class MavenITmng2199ParentVersionRangeTest
         try
         {
             verifier = newVerifier( testDir.getAbsolutePath() );
-            verifier.executeGoal( "verify" );
+            verifier.addCliArgument( "verify" );
+            verifier.execute();
             fail( "Expected 'VerificationException' not thrown." );
         }
         catch ( final VerificationException e )
@@ -268,7 +274,8 @@ public class MavenITmng2199ParentVersionRangeTest
         try
         {
             verifier = newVerifier( testDir.getAbsolutePath() );
-            verifier.executeGoal( "verify" );
+            verifier.addCliArgument( "verify" );
+            verifier.execute();
             fail( "Expected 'VerificationException' not thrown." );
         }
         catch ( final VerificationException e )

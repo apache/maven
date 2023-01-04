@@ -77,7 +77,8 @@ public class MavenITmng3887PluginExecutionOrderTest
         Verifier verifier = newVerifier( new File( testDir, project ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> lines = verifier.loadLines( "target/it.log", "UTF-8" );

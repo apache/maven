@@ -43,7 +43,8 @@ public class MavenITmng7244IgnorePomPrefixInExpressions extends AbstractMavenInt
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifyLogDoesNotContainUnexpectedWarning( verifier );
     }

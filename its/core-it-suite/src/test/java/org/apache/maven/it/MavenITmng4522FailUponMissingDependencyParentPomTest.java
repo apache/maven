@@ -61,7 +61,8 @@ public class MavenITmng4522FailUponMissingDependencyParentPomTest
         verifier.addCliOption( "settings.xml" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Missing parent POM of dependency did not fail the build." );
         }

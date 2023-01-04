@@ -56,7 +56,8 @@ public class MavenITmng4872ReactorResolutionAttachedWithExclusionsTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "consumer/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4872" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> artifacts = verifier.loadLines( "consumer/target/artifacts.txt", "UTF-8" );

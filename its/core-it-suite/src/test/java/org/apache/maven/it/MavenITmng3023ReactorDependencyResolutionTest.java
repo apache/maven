@@ -69,7 +69,8 @@ public class MavenITmng3023ReactorDependencyResolutionTest
 
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             fail( "Expected failure to resolve dependency artifact without at least calling 'compile' phase." );
         }
         catch ( VerificationException e )
@@ -102,7 +103,8 @@ public class MavenITmng3023ReactorDependencyResolutionTest
         verifier.deleteDirectory( "consumer/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3023" );
 
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> compileClassPath = verifier.loadLines( "consumer/target/compile.classpath", "UTF-8" );
@@ -137,7 +139,8 @@ public class MavenITmng3023ReactorDependencyResolutionTest
 
         verifier.deleteDirectory( "consumer/target" );
         verifier.setLogFileName( "log-c-1.txt" );
-        verifier.executeGoal( "generate-sources" );
+        verifier.addCliArgument( "generate-sources" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> compileClassPath = verifier.loadLines( "consumer/target/compile.classpath", "UTF-8" );
@@ -147,7 +150,8 @@ public class MavenITmng3023ReactorDependencyResolutionTest
         verifier.deleteDirectory( "dependency/dependency-classes" );
         verifier.deleteDirectory( "consumer/target" );
         verifier.setLogFileName( "log-c-2.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         compileClassPath = verifier.loadLines( "consumer/target/compile.classpath", "UTF-8" );

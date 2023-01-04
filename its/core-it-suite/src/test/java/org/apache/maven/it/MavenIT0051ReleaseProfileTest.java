@@ -50,7 +50,8 @@ public class MavenIT0051ReleaseProfileTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "-DperformRelease=true" );
-        verifier.executeGoal( "package" );
+        verifier.addCliArgument( "package" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/source-jar.txt" );

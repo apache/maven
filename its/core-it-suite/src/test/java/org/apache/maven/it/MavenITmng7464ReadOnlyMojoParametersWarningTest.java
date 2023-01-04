@@ -54,7 +54,8 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-empty-configuration.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
@@ -77,7 +78,8 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-read-only-property.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
@@ -102,7 +104,8 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-read-only-configuration.txt" );
         verifier.addCliOption( "-Pconfig-values" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );

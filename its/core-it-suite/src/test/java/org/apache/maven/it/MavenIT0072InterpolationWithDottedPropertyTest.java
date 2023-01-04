@@ -56,7 +56,8 @@ public class MavenIT0072InterpolationWithDottedPropertyTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );

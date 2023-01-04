@@ -58,7 +58,8 @@ public class MavenITmng4387QuietLoggingTest
         verifier.setAutoclean( false );
         verifier.addCliOption( "-q" );
         verifier.setLogFileName( "log.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> lines = verifier.loadLines( "log.txt", "UTF-8" );

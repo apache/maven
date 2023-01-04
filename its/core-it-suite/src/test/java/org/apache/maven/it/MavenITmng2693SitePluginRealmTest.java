@@ -54,7 +54,8 @@ public class MavenITmng2693SitePluginRealmTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "pre-site" );
+        verifier.addCliArgument( "pre-site" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );

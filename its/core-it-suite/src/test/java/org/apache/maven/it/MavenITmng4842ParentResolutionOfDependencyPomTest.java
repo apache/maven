@@ -61,7 +61,8 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
@@ -90,7 +91,8 @@ public class MavenITmng4842ParentResolutionOfDependencyPomTest
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng4842", "parent", "0.1", "pom" );

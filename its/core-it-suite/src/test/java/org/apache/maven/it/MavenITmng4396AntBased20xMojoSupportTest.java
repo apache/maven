@@ -55,7 +55,8 @@ public class MavenITmng4396AntBased20xMojoSupportTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/ant.txt" );

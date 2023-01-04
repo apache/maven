@@ -103,7 +103,8 @@ public class MavenITmng4772PluginVersionResolutionDoesntTouchDisabledRepoTest
             verifier.addCliOption( "-U" );
             verifier.addCliOption( "-s" );
             verifier.addCliOption( "settings.xml" );
-            verifier.executeGoal( "org.apache.maven.its.mng4772:maven-it-plugin:touch" );
+            verifier.addCliArgument( "org.apache.maven.its.mng4772:maven-it-plugin:touch" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Build should have failed to resolve version for unknown plugin" );
         }

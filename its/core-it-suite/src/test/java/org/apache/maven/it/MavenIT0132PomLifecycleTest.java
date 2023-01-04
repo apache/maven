@@ -54,7 +54,8 @@ public class MavenIT0132PomLifecycleTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "deploy" );
+        verifier.addCliArgument( "deploy" );
+        verifier.execute();
         if ( matchesVersionRange( "(2.0.1,3.0-alpha-1)" ) )
         {
             verifier.verifyFilePresent( "target/site-attach-descriptor.txt" );

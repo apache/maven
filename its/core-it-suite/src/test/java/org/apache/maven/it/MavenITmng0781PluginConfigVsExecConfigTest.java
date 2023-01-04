@@ -55,7 +55,8 @@ public class MavenITmng0781PluginConfigVsExecConfigTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "process-resources" );
+        verifier.addCliArgument( "process-resources" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/exec-level.txt" );

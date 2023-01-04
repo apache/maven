@@ -54,7 +54,8 @@ public class MavenITmng4788InstallationToCustomLocalRepoTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/local-repo/test-0.1-SNAPSHOT.jar" );

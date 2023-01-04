@@ -257,7 +257,8 @@ public class MavenIT0143TransitiveDependencyScopesTest
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.setLogFileName( "log-" + scope + ".txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         return verifier;

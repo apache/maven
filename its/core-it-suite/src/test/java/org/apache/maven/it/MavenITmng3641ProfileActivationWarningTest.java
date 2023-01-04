@@ -58,7 +58,8 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.addCliOption( "-P" );
         verifier.addCliOption( "mng-3641-it-provided-profile" );
         verifier.setLogFileName( "log-1.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
@@ -69,7 +70,8 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.addCliOption( "-P" );
         verifier.addCliOption( "mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p" );
         verifier.setLogFileName( "log-2.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
@@ -81,7 +83,8 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.addCliOption( "-P" );
         verifier.addCliOption( "mng-3641-it-provided-profile,mng-3641-TWlzdGVyIFQgd2FzIGhlcmUuICheX14p" );
         verifier.setLogFileName( "log-3.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
@@ -93,7 +96,8 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.addCliOption( "-P" );
         verifier.addCliOption( "mng-3641-it-provided-profile-child" );
         verifier.setLogFileName( "log-4.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
@@ -104,7 +108,8 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.addCliOption( "-P" );
         verifier.addCliOption( "mng-3641-it-provided-profile-child" );
         verifier.setLogFileName( "log-5.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
@@ -115,7 +120,8 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.addCliOption( "-P" );
         verifier.addCliOption( "mng-3641-it-provided-profile" );
         verifier.setLogFileName( "log-6.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );

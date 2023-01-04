@@ -57,7 +57,8 @@ public class MavenITmng4385LifecycleMappingFromExtensionInReactorTest
         verifier.setAutoclean( false );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Build leaked lifecycle mapping from extension of first project into second project!" );
         }

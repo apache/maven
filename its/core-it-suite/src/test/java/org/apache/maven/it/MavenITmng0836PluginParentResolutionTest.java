@@ -64,14 +64,16 @@ public class MavenITmng0836PluginParentResolutionTest
         // Maven 3.x aims to separate plugins and project dependencies (MNG-4191)
         if ( matchesVersionRange( "(,3.0-alpha-1),(3.0-alpha-1,3.0-alpha-7)" ) )
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
         }
         else
         {
             try
             {
-                verifier.executeGoal( "validate" );
+                verifier.addCliArgument( "validate" );
+                verifier.execute();
                 verifier.verifyErrorFreeLog();
                 fail( "Plugin parent POM was erroneously resolved from non-plugin repository." );
             }

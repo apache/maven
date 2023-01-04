@@ -57,7 +57,8 @@ public class MavenITmng4381ExtensionSingletonComponentTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "sub-a/target" );
         verifier.deleteDirectory( "sub-b/target" );
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "sub-b/target/singleton.properties" );

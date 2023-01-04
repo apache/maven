@@ -60,7 +60,8 @@ public class MavenITmng0666IgnoreLegacyPomTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         // don't verify error free log
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.it0059", "test", "3.8.1", "jar" );

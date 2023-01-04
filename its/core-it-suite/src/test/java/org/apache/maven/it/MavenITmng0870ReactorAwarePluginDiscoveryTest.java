@@ -60,7 +60,8 @@ public class MavenITmng0870ReactorAwarePluginDiscoveryTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "project/target/touch.txt" );

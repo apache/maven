@@ -54,7 +54,8 @@ public class MavenITmng6210CoreExtensionsCustomScopesTest
         verifier.deleteArtifacts( "org.apache.maven.its.it-core-extensions-custom-scopes" );
         verifier.addCliOption( "-s" );
         verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 }

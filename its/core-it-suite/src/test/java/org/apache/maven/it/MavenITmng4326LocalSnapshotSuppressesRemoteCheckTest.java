@@ -72,7 +72,8 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4326" );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         final Deque<String> uris = new ConcurrentLinkedDeque<>();
@@ -160,7 +161,8 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest
             verifier.addCliOption( "settings.xml" );
             verifier.setLogFileName( "log-daily.txt" );
             verifier.deleteDirectory( "target" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             List<String> cp = verifier.loadLines( "target/classpath.txt", "UTF-8" );
@@ -175,7 +177,8 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest
             verifier.addCliOption( "-U" );
             verifier.setLogFileName( "log-force.txt" );
             verifier.deleteDirectory( "target" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             cp = verifier.loadLines( "target/classpath.txt", "UTF-8" );

@@ -62,7 +62,8 @@ public class MavenITmng3038TransitiveDepManVersionTest
         verifier.deleteArtifact( "org.apache.maven.its.it0121", "B", "1.0", "jar" );
         verifier.deleteArtifact( "org.apache.maven.its.it0121", "C", "1.0", "pom" );
         verifier.deleteArtifact( "org.apache.maven.its.it0121", "D", "1.0", "jar" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 
@@ -73,7 +74,8 @@ public class MavenITmng3038TransitiveDepManVersionTest
         Verifier verifierOtherDep = newVerifier( testOtherDepDir.getAbsolutePath() );
         verifierOtherDep.deleteArtifact( "org.apache.maven.its.it0121", "D", version, "jar" );
         verifierOtherDep.deleteArtifact( "org.apache.maven.its.it0121", "D", version, "pom" );
-        verifierOtherDep.executeGoal( "install" );
+        verifierOtherDep.addCliArgument( "install" );
+        verifierOtherDep.execute();
         verifierOtherDep.verifyErrorFreeLog();
     }
 }

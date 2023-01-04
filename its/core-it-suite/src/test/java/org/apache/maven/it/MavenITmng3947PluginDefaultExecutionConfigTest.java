@@ -56,7 +56,8 @@ public class MavenITmng3947PluginDefaultExecutionConfigTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "org.apache.maven.plugins:maven-resources-plugin:resources" );
+        verifier.addCliArgument( "org.apache.maven.plugins:maven-resources-plugin:resources" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFileNotPresent( "target/failed.txt" );

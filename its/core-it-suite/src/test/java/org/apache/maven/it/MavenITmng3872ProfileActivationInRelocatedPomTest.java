@@ -61,7 +61,8 @@ public class MavenITmng3872ProfileActivationInRelocatedPomTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> compileClassPath = verifier.loadLines( "target/compile.txt", "UTF-8" );

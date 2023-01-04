@@ -70,7 +70,8 @@ public class MavenITmng4482ForcePluginSnapshotUpdateTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-force-1.txt" );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props1 = verifier.loadProperties( "target/touch.properties" );
@@ -83,7 +84,8 @@ public class MavenITmng4482ForcePluginSnapshotUpdateTest
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "-X" );
         verifier.addCliOption( "-U" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
 

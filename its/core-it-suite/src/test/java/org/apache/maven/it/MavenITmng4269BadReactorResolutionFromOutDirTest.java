@@ -64,7 +64,8 @@ public class MavenITmng4269BadReactorResolutionFromOutDirTest
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
         // This should use the previous installation/deployment from the repo, not the invalid output directory
-        verifier.executeGoal( "org.apache.maven.its.mng4269:maven-mng4269-plugin:0.1:touch" );
+        verifier.addCliArgument( "org.apache.maven.its.mng4269:maven-mng4269-plugin:0.1:touch" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/touch.txt" );

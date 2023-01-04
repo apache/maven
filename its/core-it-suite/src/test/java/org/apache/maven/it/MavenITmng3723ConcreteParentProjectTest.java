@@ -60,12 +60,14 @@ public class MavenITmng3723ConcreteParentProjectTest
 
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
 
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 }

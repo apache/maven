@@ -133,7 +133,8 @@ public class MavenITmng5175WagonHttpTest
         verifier.addCliOption( "--fail-never" );
         verifier.addCliOption( "--errors" );
         verifier.setMavenDebug( true );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifier.verifyTextInLog(
                 "Could not transfer artifact org.apache.maven.its.mng5175:fake-dependency:pom:1.0-SNAPSHOT" );

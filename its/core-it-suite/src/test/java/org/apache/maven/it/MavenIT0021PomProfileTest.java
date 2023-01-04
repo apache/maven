@@ -54,7 +54,8 @@ public class MavenIT0021PomProfileTest
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.addCliOption( "-Pprofile-2" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.it0021", "a", "0.1", "jar" );

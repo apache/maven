@@ -58,7 +58,8 @@ public class MavenITmng2276ProfileActivationBySettingsPropertyTest
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.setLogFileName( "log-1.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
@@ -84,7 +85,8 @@ public class MavenITmng2276ProfileActivationBySettingsPropertyTest
         verifier.addCliOption( "settings.xml" );
         verifier.addCliOption( "-DsettingsProperty=cli" );
         verifier.setLogFileName( "log-2.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );

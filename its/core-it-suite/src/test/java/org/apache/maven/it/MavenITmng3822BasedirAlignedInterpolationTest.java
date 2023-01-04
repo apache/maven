@@ -56,7 +56,8 @@ public class MavenITmng3822BasedirAlignedInterpolationTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties pomProps = verifier.loadProperties( "target/interpolated.properties" );

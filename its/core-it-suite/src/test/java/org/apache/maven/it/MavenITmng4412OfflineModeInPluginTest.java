@@ -65,7 +65,8 @@ public class MavenITmng4412OfflineModeInPluginTest
         verifier.setLogFileName( "log-resolver.txt" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Plugin could resolve artifact from remote repository despite Maven being offline" );
         }
@@ -97,7 +98,8 @@ public class MavenITmng4412OfflineModeInPluginTest
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
         verifier.setLogFileName( "log-collector.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyArtifactNotPresent( "org.apache.maven.its.mng4412", "dep", "0.1", "pom" );

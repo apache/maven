@@ -55,7 +55,8 @@ public class MavenITmng3288SystemScopeDirTest
         verifier.setAutoclean( false );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             fail( "Usage of directory instead of file for system-scoped dependency did not fail dependency resolution" );
         }
         catch ( VerificationException e )

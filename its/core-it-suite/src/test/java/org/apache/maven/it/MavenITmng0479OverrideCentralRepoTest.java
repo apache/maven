@@ -59,7 +59,8 @@ public class MavenITmng0479OverrideCentralRepoTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // Phase 2: Now run the test
@@ -71,7 +72,8 @@ public class MavenITmng0479OverrideCentralRepoTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/expression.properties" );
@@ -135,7 +137,8 @@ public class MavenITmng0479OverrideCentralRepoTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/touch.txt" );
@@ -154,7 +157,8 @@ public class MavenITmng0479OverrideCentralRepoTest
         verifier.addCliOption( "settings.xml" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Build should have failed to resolve parent POM" );
         }
@@ -173,7 +177,8 @@ public class MavenITmng0479OverrideCentralRepoTest
         verifier.addCliOption( "settings.xml" );
         try
         {
-            verifier.executeGoal( "org.apache.maven.its.mng0479:maven-mng0479-plugin:0.1-SNAPSHOT:touch" );
+            verifier.addCliArgument( "org.apache.maven.its.mng0479:maven-mng0479-plugin:0.1-SNAPSHOT:touch" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Build should have failed to resolve direct dependency" );
         }
@@ -193,7 +198,8 @@ public class MavenITmng0479OverrideCentralRepoTest
         verifier.addCliOption( "settings.xml" );
         try
         {
-            verifier.executeGoal( "org.apache.maven.its.mng0479:maven-mng0479-plugin:0.1-SNAPSHOT:touch" );
+            verifier.addCliArgument( "org.apache.maven.its.mng0479:maven-mng0479-plugin:0.1-SNAPSHOT:touch" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Build should have failed to resolve transitive dependency" );
         }

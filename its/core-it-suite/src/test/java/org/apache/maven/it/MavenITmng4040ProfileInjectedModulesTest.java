@@ -54,7 +54,8 @@ public class MavenITmng4040ProfileInjectedModulesTest
         Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 

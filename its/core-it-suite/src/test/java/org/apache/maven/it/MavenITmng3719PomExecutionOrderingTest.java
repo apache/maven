@@ -58,7 +58,8 @@ public class MavenITmng3719PomExecutionOrderingTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Pattern pattern = Pattern.compile( ".*step-([0-9])\\.properties.*" );

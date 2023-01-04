@@ -43,7 +43,8 @@ public class MavenITmng5768CliExecutionIdTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-configuration:config@test-execution-id" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-configuration:config@test-execution-id" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/config.properties" );

@@ -49,11 +49,13 @@ public class MavenITmng7349RelocationWarningTest
         Verifier verifier;
 
         verifier = newVerifier( artifactsDir.getAbsolutePath() );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
-        verifier.executeGoal( "verify" );
+        verifier.addCliArgument( "verify" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         List<String> lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
         List<String> relocated = new ArrayList<>();

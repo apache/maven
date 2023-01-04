@@ -53,7 +53,8 @@ public class MavenITmng4411VersionInfoTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "--version" );
+        verifier.addCliArgument( "--version" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyTextInLog( "Maven" );

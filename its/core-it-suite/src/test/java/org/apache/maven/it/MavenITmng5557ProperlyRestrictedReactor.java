@@ -61,7 +61,8 @@ public class MavenITmng5557ProperlyRestrictedReactor
         verifier.addCliOption( "project-0,project-1" );
         try
         {
-            verifier.executeGoal( "package" );
+            verifier.addCliArgument( "package" );
+            verifier.execute();
         }
         catch ( VerificationException e )
         {

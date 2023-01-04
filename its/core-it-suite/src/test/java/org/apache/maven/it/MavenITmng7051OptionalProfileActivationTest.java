@@ -54,7 +54,8 @@ public class MavenITmng7051OptionalProfileActivationTest
 
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             fail( "Activated a non-existing profile without ? prefix should break the build, but it didn't." );
         }
         catch ( VerificationException ve )
@@ -79,7 +80,8 @@ public class MavenITmng7051OptionalProfileActivationTest
         verifier.addCliOption( "?non-existing-profile" );
         verifier.setLogFileName( "test-non-breaking.txt" );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyTextInLog( "[INFO] The requested optional profiles [non-existing-profile] could not be activated or deactivated because they do not exist." );
     }
@@ -99,7 +101,8 @@ public class MavenITmng7051OptionalProfileActivationTest
         verifier.addCliOption( "?non-existing-profile,existing" );
         verifier.setLogFileName( "test-non-breaking-mixed.txt" );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyTextInLog( "[INFO] The requested optional profiles [non-existing-profile] could not be activated or deactivated because they do not exist." );
     }
@@ -119,7 +122,8 @@ public class MavenITmng7051OptionalProfileActivationTest
         verifier.addCliOption( "!?non-existing-profile" );
         verifier.setLogFileName( "test-deactivating-non-breaking.txt" );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyTextInLog( "[INFO] The requested optional profiles [non-existing-profile] could not be activated or deactivated because they do not exist." );
     }
@@ -139,7 +143,8 @@ public class MavenITmng7051OptionalProfileActivationTest
         verifier.addCliOption( "!?non-existing-profile,!existing" );
         verifier.setLogFileName( "test-deactivating-non-breaking-mixed.txt" );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyTextInLog( "[INFO] The requested optional profiles [non-existing-profile] could not be activated or deactivated because they do not exist." );
     }

@@ -64,7 +64,8 @@ public class MavenITmng2790LastUpdatedMetadataTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2790" );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         File metadataArtifactVersionFile =
@@ -89,7 +90,8 @@ public class MavenITmng2790LastUpdatedMetadataTest
          */
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Date artifactVersionLastUpdated2 = getLastUpdated( metadataArtifactVersionFile );

@@ -58,7 +58,8 @@ public class MavenITmng4677DisabledPluginConfigInheritanceTest
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "child-1/target" );
         verifier.deleteDirectory( "child-2/target" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-log-file:2.1-SNAPSHOT:log-string" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-log-file:2.1-SNAPSHOT:log-string" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> log = verifier.loadLines( "target/log.txt", "UTF-8" );

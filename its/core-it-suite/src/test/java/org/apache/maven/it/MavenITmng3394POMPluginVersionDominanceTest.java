@@ -55,7 +55,8 @@ public class MavenITmng3394POMPluginVersionDominanceTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "process-resources" );
+        verifier.addCliArgument( "process-resources" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/resources-resources.txt" );
@@ -72,7 +73,8 @@ public class MavenITmng3394POMPluginVersionDominanceTest
 
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "clean" );
+        verifier.addCliArgument( "clean" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/clean-clean.txt" );

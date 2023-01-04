@@ -23,8 +23,6 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -50,11 +48,11 @@ public class MavenIT0090EnvVarInterpolationTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0090" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        Map<String, String> envVars = new HashMap<>();
-        envVars.put( "MAVEN_TEST_ENVAR", "MAVEN_TEST_ENVAR_VALUE" );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate", envVars );
+        verifier.setEnvironmentVariable( "MAVEN_TEST_ENVAR", "MAVEN_TEST_ENVAR_VALUE" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/env.properties" );

@@ -56,7 +56,8 @@ public class MavenITmng4342IndependentMojoParameterDefaultValuesTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props1 = verifier.loadProperties( "target/config1.properties" );

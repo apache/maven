@@ -53,17 +53,20 @@ public class MavenITmng0612NewestConflictResolverTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0612/dependency" );
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0612/plugin" );
         verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0612/project" );
         verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "verify" );
+        verifier.addCliArgument( "verify" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 }

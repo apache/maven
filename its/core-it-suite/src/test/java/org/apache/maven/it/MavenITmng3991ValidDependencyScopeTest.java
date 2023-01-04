@@ -58,7 +58,8 @@ public class MavenITmng3991ValidDependencyScopeTest
         verifier.deleteDirectory( "target" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Invalid dependency scope did not cause validation error" );
         }

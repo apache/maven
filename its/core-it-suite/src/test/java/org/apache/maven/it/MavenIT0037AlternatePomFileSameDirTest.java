@@ -56,7 +56,8 @@ public class MavenIT0037AlternatePomFileSameDirTest
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "-f" );
         verifier.addCliOption( "pom2.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/passed.log" );

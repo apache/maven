@@ -53,7 +53,8 @@ public class MavenITmng7128BlockExternalHttpReactorTest
 
         try
         {
-            verifier.executeGoal( "compiler:compile" );
+            verifier.addCliArgument( "compiler:compile" );
+            verifier.execute();
             fail( "HTTP repository defined in pom.xml should have failed the build but did not." );
         }
         catch ( VerificationException ve )

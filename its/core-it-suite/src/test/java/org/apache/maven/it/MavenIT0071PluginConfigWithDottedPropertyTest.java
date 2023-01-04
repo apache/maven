@@ -55,7 +55,8 @@ public class MavenIT0071PluginConfigWithDottedPropertyTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/foo2" );

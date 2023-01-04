@@ -57,7 +57,8 @@ public class MavenITmng4281PreferLocalSnapshotTest
         Verifier verifier = newVerifier( new File( testDir, "dependency" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4281" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng4281", "dependency", "0.1-SNAPSHOT", "jar" );
@@ -68,7 +69,8 @@ public class MavenITmng4281PreferLocalSnapshotTest
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties checksums = verifier.loadProperties( "target/checksum.properties" );

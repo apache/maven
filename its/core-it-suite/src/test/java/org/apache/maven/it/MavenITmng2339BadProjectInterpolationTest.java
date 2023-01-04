@@ -49,7 +49,8 @@ public class MavenITmng2339BadProjectInterpolationTest
         verifier.setAutoclean( false );
 
         verifier.addCliOption( "-Dversion=foo" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }
@@ -69,7 +70,8 @@ public class MavenITmng2339BadProjectInterpolationTest
         verifier.deleteDirectory( "target" );
 
         verifier.setLogFileName( "log-pom-specified.txt" );
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
 
         assertTrue( "Touchfile using ${project.version} for ${version} does not exist.",
                     new File( testDir, "target/touch-1.txt" ).exists() );
@@ -82,7 +84,8 @@ public class MavenITmng2339BadProjectInterpolationTest
 
         verifier.addCliOption( "-Dversion=2" );
         verifier.setLogFileName( "log-cli-specified.txt" );
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 

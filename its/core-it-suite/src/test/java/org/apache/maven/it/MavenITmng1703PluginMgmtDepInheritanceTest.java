@@ -61,7 +61,8 @@ public class MavenITmng1703PluginMgmtDepInheritanceTest
         verifier.addCliOption( "settings.xml" );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng1703" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );

@@ -56,7 +56,8 @@ public class MavenITmng4874UpdateLatestPluginVersionTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4874" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         File metadataFile = new File( testDir, "target/repo/org/apache/maven/its/mng4874/test/maven-metadata.xml" );

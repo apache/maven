@@ -70,7 +70,8 @@ public class MavenITmng3642DynamicResourcesTest
          * recurse. We are only installing the parent pom to
          * the local repo here.
          */
-        verifier.executeGoal( "process-test-resources" );
+        verifier.addCliArgument( "process-test-resources" );
+        verifier.execute();
 
         /*
          * This is the simplest way to check a build

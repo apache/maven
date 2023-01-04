@@ -55,7 +55,8 @@ public class MavenITmng1415QuotedSystemPropertiesTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "-Dtest.property=Test Property" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/cli.properties" );

@@ -57,7 +57,8 @@ public class MavenITmng0814ExplicitProfileActivationTest
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "-P" );
         verifier.addCliOption( "test-profile" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );

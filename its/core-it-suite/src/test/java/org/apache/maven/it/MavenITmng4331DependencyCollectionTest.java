@@ -59,7 +59,8 @@ public class MavenITmng4331DependencyCollectionTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4331" );
         verifier.deleteDirectory( "sub-2/target" );
         verifier.setLogFileName( "log-lifecycle.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> artifacts = verifier.loadLines( "sub-2/target/compile.txt", "UTF-8" );
@@ -85,7 +86,8 @@ public class MavenITmng4331DependencyCollectionTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4331" );
         verifier.addCliOption( "-Ddepres.projectArtifacts=target/@artifactId@.txt" );
         verifier.setLogFileName( "log-aggregator.txt" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-collection:2.1-SNAPSHOT:aggregate-test" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-dependency-collection:2.1-SNAPSHOT:aggregate-test" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> artifacts = verifier.loadLines( "target/sub-2.txt", "UTF-8" );

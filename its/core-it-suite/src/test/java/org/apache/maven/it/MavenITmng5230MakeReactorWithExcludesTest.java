@@ -67,7 +67,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "!mod-b" );
         verifier.setLogFileName( "log-only.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/touch.txt" );
@@ -95,7 +96,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.addCliOption( "mod-b,!mod-a" );
         verifier.addCliOption( "-am" );
         verifier.setLogFileName( "log-upstream.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/touch.txt" );
@@ -123,7 +125,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.addCliOption( "mod-b,!mod-c" );
         verifier.addCliOption( "-amd" );
         verifier.setLogFileName( "log-downstream.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFileNotPresent( "target/touch.txt" );
@@ -152,7 +155,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.addCliOption( "-am" );
         verifier.addCliOption( "-amd" );
         verifier.setLogFileName( "log-both.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/touch.txt" );
@@ -180,7 +184,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "!mod-d" );
         verifier.setLogFileName( "log-basedir-exclamation.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/touch.txt" );
@@ -208,7 +213,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "-mod-d" );
         verifier.setLogFileName( "log-basedir-minus.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/touch.txt" );
@@ -236,7 +242,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "!org.apache.maven.its.mng5230:mod-b" );
         verifier.setLogFileName( "log-id.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/touch.txt" );
@@ -263,7 +270,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "!:mod-b" );
         verifier.setLogFileName( "log-artifact-id.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/touch.txt" );
@@ -292,7 +300,8 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "!mod-c" );
         verifier.setLogFileName( "log-resume.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFileNotPresent( "target/touch.txt" );

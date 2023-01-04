@@ -61,7 +61,8 @@ public class MavenITmng4565MultiConditionProfileActivationTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "-Dprofile1.on=true" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         //
         // The property profile1.on = true so only profile1 should be activated. The profile2.on property is not true so profile2

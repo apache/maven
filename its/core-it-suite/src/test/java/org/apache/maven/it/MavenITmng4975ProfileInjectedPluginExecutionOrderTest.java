@@ -57,7 +57,8 @@ public class MavenITmng4975ProfileInjectedPluginExecutionOrderTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "-Pprofile2,profile1" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> lines = verifier.loadLines( "target/exec.log", "UTF-8" );

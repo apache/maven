@@ -58,7 +58,8 @@ public class MavenITmng3998PluginExecutionConfigTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> executions = verifier.loadLines( "target/exec.log", "UTF-8" );

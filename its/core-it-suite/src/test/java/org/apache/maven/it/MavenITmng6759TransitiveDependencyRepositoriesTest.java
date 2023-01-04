@@ -51,7 +51,8 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier.executeGoal( "package"  );
+        verifier.addCliArgument( "package"  );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 
@@ -69,7 +70,8 @@ public class MavenITmng6759TransitiveDependencyRepositoriesTest extends Abstract
         {
             verifier.addCliOption( "-DaltDeploymentRepository=customRepo::" + customRepoUri );
         }
-        verifier.executeGoal( "deploy" );
+        verifier.addCliArgument( "deploy" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 

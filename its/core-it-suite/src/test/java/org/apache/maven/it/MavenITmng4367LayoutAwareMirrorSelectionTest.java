@@ -66,7 +66,8 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
         verifier.addCliOption( "settings-a.xml" );
         verifier.filterFile( "settings-template.xml", "settings-a.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-a.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng4367", "dep", "0.1", "jar" );
@@ -96,7 +97,8 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
         verifier.addCliOption( "settings-b.xml" );
         verifier.filterFile( "settings-template.xml", "settings-b.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-b.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng4367", "dep", "0.1", "jar" );
@@ -126,7 +128,8 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
         verifier.addCliOption( "settings-c.xml" );
         verifier.filterFile( "settings-template.xml", "settings-c.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-c.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng4367", "dep", "0.1", "jar" );

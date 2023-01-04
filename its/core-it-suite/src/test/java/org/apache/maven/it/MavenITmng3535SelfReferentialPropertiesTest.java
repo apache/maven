@@ -52,7 +52,8 @@ public class MavenITmng3535SelfReferentialPropertiesTest
         verifier.addCliOption( "-X" );
 
         verifier.setAutoclean( false );
-        verifier.executeGoal( "verify" );
+        verifier.addCliArgument( "verify" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }
@@ -72,7 +73,8 @@ public class MavenITmng3535SelfReferentialPropertiesTest
 
         try
         {
-            verifier.executeGoal( "verify" );
+            verifier.addCliArgument( "verify" );
+            verifier.execute();
 
             verifier.verifyErrorFreeLog();
             fail( "There is a self-referential property in this build; it should fail." );

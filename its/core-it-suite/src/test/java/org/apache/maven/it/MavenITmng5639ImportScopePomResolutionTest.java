@@ -52,7 +52,8 @@ public class MavenITmng5639ImportScopePomResolutionTest
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
 
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng5639", "b", "0.1", "jar" );

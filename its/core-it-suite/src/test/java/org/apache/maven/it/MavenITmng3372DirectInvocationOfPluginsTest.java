@@ -58,14 +58,16 @@ public class MavenITmng3372DirectInvocationOfPluginsTest
 
         verifier.getSystemProperties().setProperty( "updateReleaseInfo", "true" );
 
-        verifier.executeGoals( Arrays.asList( new String[]{ "clean", "install" } ) );
+        verifier.addCliArguments( "clean", "install" );
+        verifier.execute();
 
         verifier = newVerifier( project.getAbsolutePath() );
 
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "\"" + settingsFile.getAbsolutePath() + "\"" );
 
-        verifier.executeGoal( "mng3372:test" );
+        verifier.addCliArgument( "mng3372:test" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }
@@ -82,7 +84,8 @@ public class MavenITmng3372DirectInvocationOfPluginsTest
 
         verifier.addCliOption( "-U" );
 
-        verifier.executeGoal( "dependency:tree" );
+        verifier.addCliArgument( "dependency:tree" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }

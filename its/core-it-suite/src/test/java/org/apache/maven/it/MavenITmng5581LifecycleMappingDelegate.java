@@ -56,13 +56,15 @@ public class MavenITmng5581LifecycleMappingDelegate
 
         // install the test extension
         verifier = newVerifier( extensionDir.getAbsolutePath() );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // compile the test project
         verifier = newVerifier( projectDir.getAbsolutePath() );
         verifier.setLogFileName( "compile-log.txt" );
-        verifier.executeGoal( "compile" );
+        verifier.addCliArgument( "compile" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // run custom "test-only" build phase
@@ -71,7 +73,8 @@ public class MavenITmng5581LifecycleMappingDelegate
         verifier.setLogFileName( "test-only-log.txt" );
         verifier.setForkJvm( true );
         verifier.setMavenDebug( true );
-        verifier.executeGoal( "test-only" );
+        verifier.addCliArgument( "test-only" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyTextInLog( "maven-surefire-plugin" );
         verifyTextNotInLog( verifier, "maven-compiler-plugin" );

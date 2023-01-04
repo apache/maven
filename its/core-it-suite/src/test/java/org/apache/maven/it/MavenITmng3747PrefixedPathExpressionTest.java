@@ -53,7 +53,8 @@ public class MavenITmng3747PrefixedPathExpressionTest
         Verifier verifier = newVerifier( testDir.getCanonicalPath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/config.properties" );

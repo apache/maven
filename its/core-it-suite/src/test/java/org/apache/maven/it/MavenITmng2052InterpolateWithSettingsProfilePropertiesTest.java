@@ -56,7 +56,8 @@ public class MavenITmng2052InterpolateWithSettingsProfilePropertiesTest
         verifier.setAutoclean( false );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 

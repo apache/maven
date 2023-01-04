@@ -109,7 +109,8 @@ public class MavenITmng4348NoUnnecessaryRepositoryAccessTest
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliOption( "--settings" );
             verifier.addCliOption( "settings.xml" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
         }
         finally

@@ -54,7 +54,8 @@ public class MavenITmng0522InheritedPluginMgmtConfigTest
         Verifier verifier = newVerifier( new File( testDir, "child-project" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "process-resources" );
+        verifier.addCliArgument( "process-resources" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/plugin-mngt-config-1.txt" );

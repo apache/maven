@@ -59,7 +59,8 @@ public class MavenITmng4318ProjectExecutionRootTest
         verifier.deleteDirectory( "sub-1/target" );
         verifier.deleteDirectory( "sub-2/target" );
         verifier.deleteDirectory( "sub-2/sub-3/target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props;

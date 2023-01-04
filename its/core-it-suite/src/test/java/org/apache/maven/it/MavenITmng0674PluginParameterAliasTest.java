@@ -58,7 +58,8 @@ public class MavenITmng0674PluginParameterAliasTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-lifecycle.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
@@ -82,7 +83,8 @@ public class MavenITmng0674PluginParameterAliasTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-cli.txt" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-configuration:config" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-configuration:config" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/config.properties" );

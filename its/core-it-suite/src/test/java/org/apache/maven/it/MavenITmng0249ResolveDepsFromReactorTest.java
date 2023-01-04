@@ -54,7 +54,8 @@ public class MavenITmng0249ResolveDepsFromReactorTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> ccp = verifier.loadLines( "test-component-c/target/compile.txt", "UTF-8" );

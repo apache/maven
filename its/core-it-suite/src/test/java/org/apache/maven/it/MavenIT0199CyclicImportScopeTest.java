@@ -50,7 +50,8 @@ public class MavenIT0199CyclicImportScopeTest extends AbstractMavenIntegrationTe
         Verifier verifier = newVerifier(new File(testDir.getAbsolutePath(), module).getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
-        verifier.executeGoal("install");
+        verifier.addCliArgument("install");
+        verifier.execute();
         if (expectedArtifact != null) {
             verifier.verifyFilePresent(expectedArtifact);
         }

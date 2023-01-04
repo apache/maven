@@ -138,7 +138,8 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.addCliOption( "-DdeploymentPort=" + port );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         assertTrue( deployedUris.contains( "/repo/org/apache/maven/its/mng4781/release/1.0/release-1.0.jar" ) );

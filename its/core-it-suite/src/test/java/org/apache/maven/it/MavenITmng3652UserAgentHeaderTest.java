@@ -121,7 +121,8 @@ public class MavenITmng3652UserAgentHeaderTest
         File projectDir = new File( testDir, "test-project" );
 
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
@@ -130,7 +131,8 @@ public class MavenITmng3652UserAgentHeaderTest
         verifier.addCliOption( "-X" );
 
         verifier.setLogFileName( "log-unConfiguredHttp.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         String userAgent = this.userAgent;
@@ -162,7 +164,8 @@ public class MavenITmng3652UserAgentHeaderTest
         File projectDir = new File( testDir, "test-project" );
 
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
@@ -173,7 +176,8 @@ public class MavenITmng3652UserAgentHeaderTest
         verifier.addCliOption( "-X" );
 
         verifier.setLogFileName( "log-unConfiguredDAV.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         File touchFile = new File( projectDir, "target/touch.txt" );
@@ -205,7 +209,8 @@ public class MavenITmng3652UserAgentHeaderTest
         File projectDir = new File( testDir, "test-project" );
 
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
@@ -218,7 +223,8 @@ public class MavenITmng3652UserAgentHeaderTest
         verifier.addCliOption( "-X" );
 
         verifier.setLogFileName( "log-configWithoutUserAgent.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         File touchFile = new File( projectDir, "target/touch.txt" );
@@ -250,7 +256,8 @@ public class MavenITmng3652UserAgentHeaderTest
         File projectDir = new File( testDir, "test-project" );
 
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
@@ -263,7 +270,8 @@ public class MavenITmng3652UserAgentHeaderTest
         verifier.addCliOption( "-X" );
 
         verifier.setLogFileName( "log-configWithUserAgent.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         String userAgent = this.userAgent;
@@ -282,7 +290,8 @@ public class MavenITmng3652UserAgentHeaderTest
         File projectDir = new File( testDir, "test-project" );
 
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
@@ -295,7 +304,8 @@ public class MavenITmng3652UserAgentHeaderTest
         verifier.addCliOption( "-X" );
 
         verifier.setLogFileName( "log-configWithUserAgent.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         String userAgent = this.userAgent;

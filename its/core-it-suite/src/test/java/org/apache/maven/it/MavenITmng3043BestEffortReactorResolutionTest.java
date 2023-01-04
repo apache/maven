@@ -61,7 +61,8 @@ public class MavenITmng3043BestEffortReactorResolutionTest
         verifier.deleteDirectory( "consumer-c/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3043" );
         verifier.setLogFileName( "log-test.txt" );
-        verifier.executeGoal( "test" );
+        verifier.addCliArgument( "test" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> classpath;
@@ -117,7 +118,8 @@ public class MavenITmng3043BestEffortReactorResolutionTest
         verifier.deleteDirectory( "consumer-c/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3043" );
         verifier.setLogFileName( "log-package.txt" );
-        verifier.executeGoal( "package" );
+        verifier.addCliArgument( "package" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> classpath;

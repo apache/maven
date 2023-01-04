@@ -63,7 +63,8 @@ public class MavenITmng5338FileOptionToDirectory
 
         verifier.addCliOption( "-f" );
         verifier.addCliOption( "project" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
     }

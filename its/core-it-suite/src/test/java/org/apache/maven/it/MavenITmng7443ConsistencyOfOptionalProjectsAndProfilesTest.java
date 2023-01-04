@@ -49,7 +49,8 @@ public class MavenITmng7443ConsistencyOfOptionalProjectsAndProfilesTest extends 
         verifier.addCliOption( "-P" );
         verifier.addCliOption( "?does-not-exist-either" );
 
-        verifier.executeGoals( Arrays.asList( "clean", "verify" ) );
+        verifier.addCliArguments( "clean", "verify" );
+        verifier.execute();
 
         final List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
 

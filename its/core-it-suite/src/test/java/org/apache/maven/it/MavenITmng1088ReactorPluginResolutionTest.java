@@ -62,7 +62,8 @@ public class MavenITmng1088ReactorPluginResolutionTest
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         // NOTE: It's essential part of the test to invoke a phase before "compile"
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "client/target/touch.txt" );

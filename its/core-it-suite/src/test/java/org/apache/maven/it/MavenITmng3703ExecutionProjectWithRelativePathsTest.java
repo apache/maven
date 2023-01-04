@@ -54,14 +54,16 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
 
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
 
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
         verifier.setLogFileName( "log-mojo.txt" );
 
-        verifier.executeGoal( "package" );
+        verifier.addCliArgument( "package" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }
@@ -78,14 +80,16 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
 
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
 
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
         verifier.setLogFileName( "log-report.txt" );
 
-        verifier.executeGoal( "site" );
+        verifier.addCliArgument( "site" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }

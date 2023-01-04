@@ -56,7 +56,8 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log1.txt" );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
         // profile 1 and 2 are active by default
@@ -88,7 +89,8 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.addCliOption( "-P" );
         verifier.addCliOption( "-profile2" );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
         verifier.verifyFileNotPresent( "target/profile1/touch.txt" );
@@ -111,7 +113,8 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.addCliOption( "-P" );
         verifier.addCliOption( "!profile2" );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
         verifier.verifyFileNotPresent( "target/profile1/touch.txt" );
@@ -139,7 +142,8 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.addCliOption( "-Dprofile3-active-by-property=true" );
         verifier.addCliOption( "-P-profile3" );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent( "target/profile1/touch.txt" );
@@ -170,7 +174,8 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.addCliOption( "-Pprofile4" );
         verifier.addCliOption( "-P-profile4" );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent( "target/profile1/touch.txt" );
@@ -200,7 +205,8 @@ public class MavenITmng3545ProfileDeactivationTest
         // Activate
         verifier.addCliOption( "-Pprofile4" );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
         verifier.verifyFileNotPresent( "target/profile1/touch.txt" );

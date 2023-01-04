@@ -50,7 +50,8 @@ public class MavenITmng4112MavenVersionPropertyTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
 

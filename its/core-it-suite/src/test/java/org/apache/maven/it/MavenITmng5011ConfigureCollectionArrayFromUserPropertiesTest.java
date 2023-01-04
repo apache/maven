@@ -56,7 +56,8 @@ public class MavenITmng5011ConfigureCollectionArrayFromUserPropertiesTest
         verifier.addCliArgument( "-Dconfig.stringParams=" );
         verifier.addCliArgument( "-Dconfig.fileParams=foo,bar" );
         verifier.addCliArgument( "-Dconfig.listParam=,two,,four," );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/config.properties" );

@@ -64,14 +64,16 @@ public class MavenITmng4231SnapshotUpdatePolicyTest
         filterProps.setProperty( "@repo@", "repo-1" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-always-1.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         filterProps.setProperty( "@repo@", "repo-2" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-always-2.txt" );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
 
@@ -103,14 +105,16 @@ public class MavenITmng4231SnapshotUpdatePolicyTest
         filterProps.setProperty( "@repo@", "repo-1" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-never-1.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         filterProps.setProperty( "@repo@", "repo-2" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-never-2.txt" );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
 

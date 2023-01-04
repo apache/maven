@@ -50,7 +50,8 @@ public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest
 
         File pluginDir = new File( testDir, "plugin" );
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 
@@ -62,7 +63,8 @@ public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest
 
         Verifier verifier = newVerifier( consumerDir.getAbsolutePath() );
         verifier.setLogFileName( "log-direct-plugin-invocation.txt" );
-        verifier.executeGoal( PLUGIN_KEY + ":require-compile-phase" );
+        verifier.addCliArgument( PLUGIN_KEY + ":require-compile-phase" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         assertCompiledOnce( verifier );
@@ -82,7 +84,8 @@ public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest
 
         Verifier verifier = newVerifier( consumerDir.getAbsolutePath() );
         verifier.setLogFileName( "log-phase-execution.txt" );
-        verifier.executeGoal( "compile" );
+        verifier.addCliArgument( "compile" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         assertCompiledOnce( verifier );

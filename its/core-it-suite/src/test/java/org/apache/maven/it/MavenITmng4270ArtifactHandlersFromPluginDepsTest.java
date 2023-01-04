@@ -61,7 +61,8 @@ public class MavenITmng4270ArtifactHandlersFromPluginDepsTest
 
         verifier.deleteArtifacts( GID );
 
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 

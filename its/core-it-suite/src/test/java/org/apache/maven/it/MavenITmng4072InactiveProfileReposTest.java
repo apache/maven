@@ -63,7 +63,8 @@ public class MavenITmng4072InactiveProfileReposTest
         verifier.addCliOption( "settings.xml" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Dependency resolution succeeded although all profiles are inactive" );
         }

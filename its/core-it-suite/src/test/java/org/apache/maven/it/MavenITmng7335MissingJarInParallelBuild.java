@@ -45,7 +45,8 @@ public class MavenITmng7335MissingJarInParallelBuild
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
         verifier.addCliOption( "-T1C" );
-        verifier.executeGoals( Arrays.asList( "clean", "package" ) );
+        verifier.addCliArguments( "clean", "package" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 }

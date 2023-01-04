@@ -58,7 +58,8 @@ public class MavenITmng3477DependencyResolutionErrorMessageTest
         verifier.addCliOption( "settings.xml" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             fail( "Build should have failed to resolve dependency" );
         }
         catch ( VerificationException e )

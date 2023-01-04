@@ -50,7 +50,8 @@ public class MavenITmng6330RelativePath
 
         try
         {
-            verifier.executeGoal( "validate");
+            verifier.addCliArgument( "validate");
+            verifier.execute();
             fail( "Should fail due to non-resolvable parent" );
         }
         catch ( VerificationException e )

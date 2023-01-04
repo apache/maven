@@ -65,7 +65,8 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
 
         try
         {
-            verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+            verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
         }
         catch ( VerificationException e )
@@ -100,7 +101,8 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.addCliOption( "--fail-never" );
         verifier.setLogFileName( "log-fn-mt1.txt" );
         verifier.addCliArgument( "-Dmaven.threads.experimental=1" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        verifier.execute();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
@@ -132,7 +134,8 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.addCliArgument( "-Dmaven.threads.experimental=1" );
         try
         {
-            verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+            verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
         }
         catch ( VerificationException e )
@@ -167,7 +170,8 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.addCliOption( "--fail-never" );
         verifier.setLogFileName( "log-fn-mt2.txt" );
         verifier.addCliArgument( "-Dmaven.threads.experimental=2" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        verifier.execute();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
@@ -199,7 +203,8 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.addCliArgument( "-Dmaven.threads.experimental=2" );
         try
         {
-            verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+            verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
         }
         catch ( VerificationException e )

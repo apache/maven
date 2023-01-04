@@ -50,7 +50,8 @@ public class MavenITmng6386BaseUriPropertyTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-basic.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
@@ -80,7 +81,8 @@ public class MavenITmng6386BaseUriPropertyTest
             verifier.setAutoclean( false );
             verifier.deleteDirectory( "target" );
             verifier.setLogFileName( "log-basic.txt" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             Properties props = verifier.loadProperties( "target/profile.properties" );

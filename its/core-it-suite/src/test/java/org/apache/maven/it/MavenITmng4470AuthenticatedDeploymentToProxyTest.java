@@ -226,7 +226,8 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
                              Collections.singletonMap( "@port@", Integer.toString( port ) ) );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         for ( DeployedResource deployedResource : deployedResources )

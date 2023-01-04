@@ -51,7 +51,8 @@ public class MavenITmng3331ModulePathNormalizationTest
 
         verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
 
         /*
          * This is the simplest way to check a build
@@ -76,7 +77,8 @@ public class MavenITmng3331ModulePathNormalizationTest
 
         verifier = newVerifier( new File( testDir, "parent" ).getAbsolutePath() );
 
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
 
         /*
          * This is the simplest way to check a build

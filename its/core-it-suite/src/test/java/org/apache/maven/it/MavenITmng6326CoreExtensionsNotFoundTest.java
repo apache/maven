@@ -52,7 +52,8 @@ public class MavenITmng6326CoreExtensionsNotFoundTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             fail( "should have failed ");
         }
         catch ( VerificationException e )

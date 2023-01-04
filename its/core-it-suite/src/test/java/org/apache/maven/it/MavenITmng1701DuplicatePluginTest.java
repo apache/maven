@@ -56,7 +56,8 @@ public class MavenITmng1701DuplicatePluginTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         try {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
         }
         catch ( VerificationException e )
         {

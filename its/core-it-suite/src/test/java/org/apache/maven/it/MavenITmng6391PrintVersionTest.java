@@ -66,7 +66,8 @@ public class MavenITmng6391PrintVersionTest
         verifier.setAutoclean( false );
 
         verifier.setLogFileName( "version-log.txt" );
-        verifier.executeGoals( Arrays.asList( "clean" ) );
+        verifier.addCliArgument( "clean" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> loadedLines = verifier.loadLines( "version-log.txt", "UTF-8" );
@@ -110,7 +111,8 @@ public class MavenITmng6391PrintVersionTest
         verifier.setAutoclean( false );
 
         verifier.setLogFileName( "version-log.txt" );
-        verifier.executeGoals( Arrays.asList( "clean" ) );
+        verifier.addCliArguments( "clean" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> loadedLines = verifier.loadLines( "version-log.txt", "UTF-8" );

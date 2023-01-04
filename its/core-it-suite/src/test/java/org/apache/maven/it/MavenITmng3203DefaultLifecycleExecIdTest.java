@@ -54,7 +54,8 @@ public class MavenITmng3203DefaultLifecycleExecIdTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier.executeGoal( "compile" );
+        verifier.addCliArgument( "compile" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 }

@@ -61,7 +61,8 @@ public class MavenITmng2432PluginPrefixOrderTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "it:touch" );
+        verifier.addCliArgument( "it:touch" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFileNotPresent( "target/touch-settings.txt" );

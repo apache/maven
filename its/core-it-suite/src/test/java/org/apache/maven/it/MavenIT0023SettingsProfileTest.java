@@ -51,7 +51,8 @@ public class MavenIT0023SettingsProfileTest
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/test.txt" );

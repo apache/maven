@@ -56,7 +56,8 @@ public class MavenITmng4048VersionRangeReactorResolutionTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "sub-2/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4048" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> artifacts = verifier.loadLines( "sub-2/target/compile.txt", "UTF-8" );

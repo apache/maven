@@ -103,7 +103,8 @@ public class MavenITmng4991NonProxyHostsTest
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliOption( "-s" );
             verifier.addCliOption( "settings.xml" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
         }
         finally

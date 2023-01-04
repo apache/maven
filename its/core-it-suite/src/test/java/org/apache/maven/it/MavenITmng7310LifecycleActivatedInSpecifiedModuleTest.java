@@ -49,9 +49,11 @@ public class MavenITmng7310LifecycleActivatedInSpecifiedModuleTest
         File projectTestDir = ResourceExtractor.simpleExtractResources( getClass(), BASE_TEST_DIR + "/project" );
 
         Verifier verifier = newVerifier( extensionTestDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
 
         Verifier verifier2 = newVerifier( projectTestDir.getAbsolutePath() );
-        verifier2.executeGoal( "compile" );
+        verifier2.addCliArgument( "compile" );
+        verifier2.execute();
     }
 }

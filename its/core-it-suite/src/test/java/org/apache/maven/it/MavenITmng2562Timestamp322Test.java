@@ -50,7 +50,8 @@ public class MavenITmng2562Timestamp322Test
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Date now = new Date();
@@ -75,7 +76,8 @@ public class MavenITmng2562Timestamp322Test
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Date now = new Date();
@@ -99,7 +101,8 @@ public class MavenITmng2562Timestamp322Test
         verifier.deleteDirectory( "child-1/target" );
         verifier.deleteDirectory( "child-2/target" );
         verifier.deleteDirectory( "child-3/target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );

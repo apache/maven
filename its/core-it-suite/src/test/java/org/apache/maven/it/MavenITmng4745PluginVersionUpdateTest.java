@@ -65,11 +65,13 @@ public class MavenITmng4745PluginVersionUpdateTest
 
         writeMetadata( testDir, "1.0", "20100729123455" );
         verifier.setLogFileName( "log-1a.txt" );
-        verifier.executeGoal( "org.apache.maven.its.mng4745:maven-it-plugin:touch" );
+        verifier.addCliArgument( "org.apache.maven.its.mng4745:maven-it-plugin:touch" );
+        verifier.execute();
 
         writeMetadata( testDir, "1.1", "20100730123456" );
         verifier.setLogFileName( "log-1b.txt" );
-        verifier.executeGoal( "org.apache.maven.its.mng4745:maven-it-plugin:touch" );
+        verifier.addCliArgument( "org.apache.maven.its.mng4745:maven-it-plugin:touch" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
@@ -100,11 +102,13 @@ public class MavenITmng4745PluginVersionUpdateTest
 
         writeMetadata( testDir, "1.0", "20100729123455" );
         verifier.setLogFileName( "log-2a.txt" );
-        verifier.executeGoal( "org.apache.maven.its.mng4745:maven-it-plugin:touch" );
+        verifier.addCliArgument( "org.apache.maven.its.mng4745:maven-it-plugin:touch" );
+        verifier.execute();
 
         writeMetadata( testDir, "1.1", "20100730123456" );
         verifier.setLogFileName( "log-2b.txt" );
-        verifier.executeGoal( "org.apache.maven.its.mng4745:maven-it-plugin:touch" );
+        verifier.addCliArgument( "org.apache.maven.its.mng4745:maven-it-plugin:touch" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
@@ -136,11 +140,13 @@ public class MavenITmng4745PluginVersionUpdateTest
 
         writeMetadata( testDir, "1.0", "20100729123455" );
         verifier.setLogFileName( "log-3a.txt" );
-        verifier.executeGoal( "org.apache.maven.its.mng4745:maven-it-plugin:touch" );
+        verifier.addCliArgument( "org.apache.maven.its.mng4745:maven-it-plugin:touch" );
+        verifier.execute();
 
         writeMetadata( testDir, "1.1", "20100730123456" );
         verifier.setLogFileName( "log-3b.txt" );
-        verifier.executeGoal( "org.apache.maven.its.mng4745:maven-it-plugin:touch" );
+        verifier.addCliArgument( "org.apache.maven.its.mng4745:maven-it-plugin:touch" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 

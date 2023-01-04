@@ -47,7 +47,8 @@ public class MavenITmng7045DropUselessAndOutdatedCdiApiTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7045" );
         Verifier verifier = newVerifier( testDir.getAbsolutePath()) ;
 
-        verifier.executeGoal( "process-classes" );
+        verifier.addCliArgument( "process-classes" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 

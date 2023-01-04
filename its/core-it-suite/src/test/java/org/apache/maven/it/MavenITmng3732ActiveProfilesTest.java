@@ -69,7 +69,8 @@ public class MavenITmng3732ActiveProfilesTest
         {
             verifier.addCliOption( "-Ppom,profiles,settings" );
         }
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );

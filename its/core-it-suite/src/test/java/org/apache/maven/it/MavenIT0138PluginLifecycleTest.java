@@ -54,7 +54,8 @@ public class MavenIT0138PluginLifecycleTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "deploy" );
+        verifier.addCliArgument( "deploy" );
+        verifier.execute();
         verifier.verifyFilePresent( "target/plugin-descriptor.txt" );
         verifier.verifyFilePresent( "target/resources-resources.txt" );
         verifier.verifyFilePresent( "target/compiler-compile.txt" );

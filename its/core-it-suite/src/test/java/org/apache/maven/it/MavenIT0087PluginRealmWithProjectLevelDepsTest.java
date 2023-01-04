@@ -60,7 +60,8 @@ public class MavenIT0087PluginRealmWithProjectLevelDepsTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );

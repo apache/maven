@@ -58,7 +58,8 @@ public class MavenITmng4026ReactorDependenciesOrderTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "consumer/target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> classpath1 = verifier.loadLines( "consumer/target/classpath-1.txt", "UTF-8" );

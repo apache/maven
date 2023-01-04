@@ -57,7 +57,8 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4036" );
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng4036", "parent", "0.2", "pom" );

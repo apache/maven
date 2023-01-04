@@ -61,7 +61,8 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest
         verifier.addCliOption( "mod-b" );
         verifier.addCliOption( "--also-make" );
         verifier.setLogFileName( "log-am.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "mod-b/target/touch.txt" );
@@ -90,7 +91,8 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest
         verifier.addCliOption( "mod-a" );
         verifier.addCliOption( "--also-make-dependents" );
         verifier.setLogFileName( "log-amd.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "mod-a/target/touch.txt" );

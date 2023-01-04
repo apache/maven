@@ -49,7 +49,8 @@ public class MavenITmng6562WarnDefaultBindings
         verifier.setForkJvm( true ); // required due to --fail-on-severity
         verifier.addCliOption( "-fos" );
         verifier.addCliOption( "WARN" ); // ALSO NO WARNINGS
-        verifier.executeGoals( Arrays.asList( phase ) );
+        verifier.addCliArgument( phase );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }
@@ -68,7 +69,8 @@ public class MavenITmng6562WarnDefaultBindings
         verifier.setForkJvm( true ); // required due to --fail-on-severity
         verifier.addCliOption( "-fos" );
         verifier.addCliOption( "WARN" ); // ALSO NO WARNINGS
-        verifier.executeGoals( Arrays.asList( phase ) );
+        verifier.addCliArgument( phase );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }
@@ -83,7 +85,8 @@ public class MavenITmng6562WarnDefaultBindings
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setAutoclean( false );
         verifier.setLogFileName( phase +".txt" );
-        verifier.executeGoals( Arrays.asList( phase ) );
+        verifier.addCliArgument( phase );
+        verifier.execute();
 
         verifier.verifyTextInLog( "Version not locked for default bindings plugins [maven-compiler-plugin]"
                 + ", you should define versions in pluginManagement section of your pom.xml or parent" );
@@ -99,7 +102,8 @@ public class MavenITmng6562WarnDefaultBindings
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setAutoclean( false );
         verifier.setLogFileName( phase +".txt" );
-        verifier.executeGoals( Arrays.asList( phase ) );
+        verifier.addCliArgument( phase );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyTextInLog( "Version not locked for default bindings plugins [maven-compiler-plugin]"
@@ -116,7 +120,8 @@ public class MavenITmng6562WarnDefaultBindings
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setAutoclean( false );
         verifier.setLogFileName( phase +".txt" );
-        verifier.executeGoals( Arrays.asList( phase ) );
+        verifier.addCliArgument( phase );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyTextInLog( "Version not locked for default bindings plugins [maven-compiler-plugin]"
@@ -133,7 +138,8 @@ public class MavenITmng6562WarnDefaultBindings
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         verifier.setAutoclean( false );
         verifier.setLogFileName( phase +".txt" );
-        verifier.executeGoals( Arrays.asList( phase ) );
+        verifier.addCliArgument( phase );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyTextInLog( "Version not locked for default bindings plugins [maven-compiler-plugin, maven-surefire-plugin]"

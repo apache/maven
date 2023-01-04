@@ -58,7 +58,8 @@ public class MavenITmng5222MojoDeprecatedTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-empty-configuration.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
@@ -109,7 +110,8 @@ public class MavenITmng5222MojoDeprecatedTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-deprecated-property.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
@@ -176,7 +178,8 @@ public class MavenITmng5222MojoDeprecatedTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-deprecated-config.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );

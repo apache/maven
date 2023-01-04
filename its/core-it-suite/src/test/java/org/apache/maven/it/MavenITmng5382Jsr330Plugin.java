@@ -61,7 +61,8 @@ public class MavenITmng5382Jsr330Plugin
         v0.setAutoclean( false );
         v0.deleteDirectory( "target" );
         v0.deleteArtifacts( "org.apache.maven.its.mng5382" );
-        v0.executeGoal( "install" );
+        v0.addCliArgument( "install" );
+        v0.execute();
         v0.verifyErrorFreeLog();
 
         //
@@ -69,7 +70,8 @@ public class MavenITmng5382Jsr330Plugin
         //
         Verifier v1 = newVerifier( testDir.getAbsolutePath(), "remote" );
         v1.setAutoclean( false );
-        v1.executeGoal( "org.apache.maven.its.mng5382:jsr330-maven-plugin:0.0.1-SNAPSHOT:hello" );
+        v1.addCliArgument( "org.apache.maven.its.mng5382:jsr330-maven-plugin:0.0.1-SNAPSHOT:hello" );
+        v1.execute();
         v1.verifyErrorFreeLog();
         v1.verifyTextInLog( "Hello! I am a component that is being used via constructor injection! That's right, I'm a JSR330 badass." );
 

@@ -60,7 +60,8 @@ public class MavenITmng3955EffectiveSettingsTest
         verifier.addCliOption( "settings.xml" );
         verifier.addCliOption( "--offline" );
         verifier.addCliOption( "--batch-mode" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/settings.properties" );

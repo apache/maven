@@ -56,7 +56,8 @@ public class MavenITmng0469ReportConfigTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-configuration:2.1-SNAPSHOT:config" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-configuration:2.1-SNAPSHOT:config" );
+        verifier.execute();
         verifier.verifyFilePresent( "target/build.txt" );
         verifier.verifyFileNotPresent( "target/reporting.txt" );
         verifier.verifyErrorFreeLog();
@@ -78,12 +79,14 @@ public class MavenITmng0469ReportConfigTest
         verifier.setAutoclean( false );
         if ( matchesVersionRange( "(,3.0-alpha-1)" ) )
         {
-            verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-site:2.1-SNAPSHOT:generate" );
+            verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-site:2.1-SNAPSHOT:generate" );
+            verifier.execute();
             verifier.verifyFilePresent( "target/site/info.properties" );
         }
         else
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             Properties props = verifier.loadProperties( "target/config.properties" );
             assertEquals( "maven-it-plugin-site", props.getProperty( "project.reporting.plugins.0.artifactId" ) );
             assertNotEquals( "fail.properties", props.getProperty( "project.reporting.plugins.0.configuration.children.infoFile.0.value" ) );

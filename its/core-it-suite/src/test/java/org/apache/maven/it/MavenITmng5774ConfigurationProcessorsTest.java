@@ -31,7 +31,8 @@ public class MavenITmng5774ConfigurationProcessorsTest
         verifier.deleteArtifacts( "org.apache.maven.its.it-configuration-processors" );
         verifier.addCliOption( "-s" );
         verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
-        verifier.executeGoal( "process-resources" );
+        verifier.addCliArgument( "process-resources" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         // Making sure our configuration processor executes
         verifier.verifyTextInLog( "[INFO] ConfigurationProcessorOne.process()" );
@@ -57,7 +58,8 @@ public class MavenITmng5774ConfigurationProcessorsTest
         verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
         try
         {
-            verifier.executeGoal( "process-resources" );
+            verifier.addCliArgument( "process-resources" );
+            verifier.execute();
             fail( "We expected this invocation to fail because of too many user supplied configuration processors being present" );
         }
         catch ( VerificationException e )

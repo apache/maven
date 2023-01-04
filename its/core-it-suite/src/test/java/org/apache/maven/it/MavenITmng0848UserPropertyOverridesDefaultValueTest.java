@@ -57,7 +57,8 @@ public class MavenITmng0848UserPropertyOverridesDefaultValueTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.addCliArgument( "-Dconfig.aliasDefaultExpressionParam=PASSED" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties configProps = verifier.loadProperties( "target/config.properties" );

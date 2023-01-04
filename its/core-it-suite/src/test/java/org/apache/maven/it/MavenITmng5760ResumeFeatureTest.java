@@ -74,7 +74,8 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
 
         try
         {
-            verifier.executeGoal( "test" );
+            verifier.addCliArgument( "test" );
+            verifier.execute();
             fail( "Expected this invocation to fail" );
         }
         catch ( final VerificationException ve )
@@ -86,7 +87,8 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         // New build with -r should resume the build from module-b, skipping module-a since it has succeeded already.
         verifier = newVerifier( parentDependentTestDir.getAbsolutePath() );
         verifier.addCliOption( "-r" );
-        verifier.executeGoal( "test" );
+        verifier.addCliArgument( "test" );
+        verifier.execute();
         verifyTextNotInLog( verifier, "Building module-a 1.0" );
         verifier.verifyTextInLog( "Building module-b 1.0" );
         verifier.verifyTextInLog( "Building module-c 1.0" );
@@ -101,7 +103,8 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
 
         try
         {
-            verifier.executeGoal( "test" );
+            verifier.addCliArgument( "test" );
+            verifier.execute();
             fail( "Expected this invocation to fail" );
         }
         catch ( final VerificationException ve )
@@ -116,8 +119,8 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         // ... but adding -r should exclude those two from the build because the previous Maven invocation
         // marked them as successfully built.
         verifier.addCliOption( "-r" );
-
-        verifier.executeGoal( "test" );
+        verifier.addCliArgument( "test" );
+        verifier.execute();
     }
 
     @Test
@@ -132,7 +135,8 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
 
         try
         {
-            verifier.executeGoal( "test" );
+            verifier.addCliArgument( "test" );
+            verifier.execute();
             fail( "Expected this invocation to fail" );
         }
         catch ( final VerificationException ve )
@@ -142,7 +146,8 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
 
         verifier = newVerifier( parentIndependentTestDir.getAbsolutePath() );
         verifier.addCliOption( "-r" );
-        verifier.executeGoal( "test" );
+        verifier.addCliArgument( "test" );
+        verifier.execute();
         verifier.verifyTextInLog( "Building module-a 1.0" );
         verifyTextNotInLog( verifier, "Building module-b 1.0" );
     }
@@ -156,7 +161,8 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         final Verifier verifier = newVerifier( noProjectTestDir.getAbsolutePath() );
         try
         {
-            verifier.executeGoal( "resources:resources" );
+            verifier.addCliArgument( "resources:resources" );
+            verifier.execute();
         }
         catch ( final VerificationException ve )
         {
@@ -184,7 +190,8 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         verifier.addCliOption( "-Dmodule-c.fail=true" );
         try
         {
-            verifier.executeGoal( "verify" );
+            verifier.addCliArgument( "verify" );
+            verifier.execute();
             fail( "Expected this invocation to fail" );
         }
         catch ( final VerificationException ve )
@@ -204,7 +211,8 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         //   c : success
         //   d : success
 
-        verifier.executeGoal( "verify" );
+        verifier.addCliArgument( "verify" );
+        verifier.execute();
     }
 
     @Test
@@ -226,7 +234,8 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         verifier.addCliOption( "-Dmodule-d.fail=true" );
         try
         {
-            verifier.executeGoal( "verify" );
+            verifier.addCliArgument( "verify" );
+            verifier.execute();
             fail( "Expected this invocation to fail" );
         }
         catch ( final VerificationException ve )
@@ -246,7 +255,8 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         // The result should be:
         //   c : success
         //   d : success
-        verifier.executeGoal( "verify" );
+        verifier.addCliArgument( "verify" );
+        verifier.execute();
     }
 
     /**

@@ -58,7 +58,8 @@ public class MavenITmng2362DeployedPomEncodingTest
         verifier.deleteDirectory( "utf-8/target" );
         verifier.deleteDirectory( "latin-1/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2362" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         File pomFile;

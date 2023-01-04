@@ -58,7 +58,8 @@ public class MavenITmng4359LocallyReachableParentOutsideOfReactorTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "mod-c/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4359" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> cp = verifier.loadLines( "mod-c/target/classpath.txt", "UTF-8" );

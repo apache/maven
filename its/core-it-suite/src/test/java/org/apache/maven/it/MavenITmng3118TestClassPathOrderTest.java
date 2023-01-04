@@ -56,7 +56,8 @@ public class MavenITmng3118TestClassPathOrderTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> testClassPath = verifier.loadLines( "target/test-classpath.txt", "UTF-8" );

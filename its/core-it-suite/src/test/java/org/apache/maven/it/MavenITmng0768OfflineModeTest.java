@@ -130,7 +130,8 @@ public class MavenITmng0768OfflineModeTest
                 verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", props );
                 verifier.addCliOption( "--settings" );
                 verifier.addCliOption( "settings.xml" );
-                verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
+                verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
+                verifier.execute();
                 verifier.verifyFilePresent( "target/compile.txt" );
                 verifier.verifyErrorFreeLog();
             }
@@ -146,7 +147,8 @@ public class MavenITmng0768OfflineModeTest
                 verifier.addCliOption( "--settings" );
                 verifier.addCliOption( "settings.xml" );
                 verifier.setLogFileName( "log2.txt" );
-                verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
+                verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
+                verifier.execute();
                 verifier.verifyFilePresent( "target/compile.txt" );
                 verifier.verifyErrorFreeLog();
             }
@@ -166,7 +168,8 @@ public class MavenITmng0768OfflineModeTest
                 verifier.setLogFileName( "log3.txt" );
                 try
                 {
-                    verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
+                    verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
+                    verifier.execute();
                     verifier.verifyErrorFreeLog();
                     fail( "Build did not fail to resolve missing dependency although Maven ought to work offline!" );
                 }

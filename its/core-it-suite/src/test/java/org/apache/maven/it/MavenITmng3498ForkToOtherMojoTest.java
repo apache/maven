@@ -57,13 +57,15 @@ public class MavenITmng3498ForkToOtherMojoTest
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.deleteArtifact( "org.apache.maven.its.mng3498", "mavenit-mng3498-plugin", "1", "pom" );
 
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }

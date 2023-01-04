@@ -61,7 +61,8 @@ public class MavenITmng4335SettingsOfflineModeTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Build did not fail to resolve missing dependency although Maven ought to work offline!" );
         }

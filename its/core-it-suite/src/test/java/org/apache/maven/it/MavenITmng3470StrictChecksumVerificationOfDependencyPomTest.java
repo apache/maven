@@ -63,7 +63,8 @@ public class MavenITmng3470StrictChecksumVerificationOfDependencyPomTest
         try
         {
             verifier.setLogFileName( "log-1.txt" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Build did not fail despite broken checksum of dependency POM." );
         }
@@ -76,7 +77,8 @@ public class MavenITmng3470StrictChecksumVerificationOfDependencyPomTest
         try
         {
             verifier.setLogFileName( "log-2.txt" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Build did not fail despite broken checksum of dependency POM." );
         }

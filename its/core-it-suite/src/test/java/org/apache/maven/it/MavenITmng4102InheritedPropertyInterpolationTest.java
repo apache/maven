@@ -79,7 +79,8 @@ public class MavenITmng4102InheritedPropertyInterpolationTest
         Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );

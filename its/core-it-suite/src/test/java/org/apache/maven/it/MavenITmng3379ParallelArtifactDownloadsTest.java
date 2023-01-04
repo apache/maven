@@ -63,7 +63,8 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.addCliArgument( "-Dmaven.artifact.threads=16" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         String gid = "org.apache.maven.its.mng3379.";

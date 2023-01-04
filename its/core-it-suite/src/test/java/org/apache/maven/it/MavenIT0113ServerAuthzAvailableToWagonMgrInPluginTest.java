@@ -52,7 +52,8 @@ public class MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/auth.properties" );

@@ -60,7 +60,8 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride
 
         verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 
@@ -77,7 +78,8 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride
 
         verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
 
-        verifier.executeGoal( "compile" );
+        verifier.addCliArgument( "compile" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 

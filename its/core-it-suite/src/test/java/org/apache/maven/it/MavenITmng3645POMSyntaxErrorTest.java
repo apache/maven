@@ -61,7 +61,8 @@ public class MavenITmng3645POMSyntaxErrorTest
 
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             fail( "Should fail to validate the POM syntax due to missing dependency element inside dependencyManagement section." );

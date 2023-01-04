@@ -62,17 +62,20 @@ public class MavenITmng4452ResolutionOfSnapshotWithClassifierTest
         verifier.addCliArgument( "-Dmng4452.type=jar" );
         verifier.addCliArgument( "-Dmng4452.classifier=unix" );
         verifier.setLogFileName( "log-1.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.addCliArgument( "-Dmng4452.type=jar" );
         verifier.addCliArgument( "-Dmng4452.classifier=win" );
         verifier.setLogFileName( "log-2.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.addCliArgument( "-Dmng4452.type=war" );
         verifier.addCliArgument( "-Dmng4452.classifier=win" );
         verifier.setLogFileName( "log-3.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( new File( testDir, "consumer" ).getAbsolutePath() );
@@ -82,7 +85,8 @@ public class MavenITmng4452ResolutionOfSnapshotWithClassifierTest
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );

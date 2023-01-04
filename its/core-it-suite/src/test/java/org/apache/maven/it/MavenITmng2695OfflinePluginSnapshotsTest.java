@@ -64,7 +64,8 @@ public class MavenITmng2695OfflinePluginSnapshotsTest
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
             verifier.addCliOption( "--settings" );
             verifier.addCliOption( "settings.xml" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyFilePresent( "target/a.txt" );
             verifier.verifyFilePresent( "target/b.txt" );
             verifier.verifyErrorFreeLog();
@@ -79,7 +80,8 @@ public class MavenITmng2695OfflinePluginSnapshotsTest
             verifier.addCliOption( "--settings" );
             verifier.addCliOption( "settings.xml" );
             verifier.addCliOption( "--offline" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyFilePresent( "target/a.txt" );
             verifier.verifyFilePresent( "target/b.txt" );
             verifier.verifyErrorFreeLog();

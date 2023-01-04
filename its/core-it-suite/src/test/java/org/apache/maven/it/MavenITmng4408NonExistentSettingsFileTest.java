@@ -59,7 +59,8 @@ public class MavenITmng4408NonExistentSettingsFileTest
         verifier.addCliOption( "non-existing-settings.xml" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Missing settings file did not cause build error" );
         }
@@ -87,7 +88,8 @@ public class MavenITmng4408NonExistentSettingsFileTest
         verifier.addCliOption( "non-existing-settings.xml" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Missing settings file did not cause build error" );
         }

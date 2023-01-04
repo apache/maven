@@ -55,7 +55,8 @@ public class MavenITmng1052PluginMgmtConfigTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "process-resources" );
+        verifier.addCliArgument( "process-resources" );
+        verifier.execute();
         verifier.verifyFilePresent( "target/plugin-management.txt" );
         verifier.verifyFileNotPresent( "target/resources-resources.txt" );
         verifier.verifyErrorFreeLog();

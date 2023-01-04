@@ -54,7 +54,8 @@ public class MavenIT0130CleanLifecycleTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "clean" );
+        verifier.addCliArgument( "clean" );
+        verifier.execute();
         verifier.verifyFilePresent( "target/clean-clean.txt" );
         verifier.verifyErrorFreeLog();
     }

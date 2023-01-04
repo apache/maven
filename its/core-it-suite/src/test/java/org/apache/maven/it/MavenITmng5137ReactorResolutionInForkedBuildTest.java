@@ -60,8 +60,9 @@ public class MavenITmng5137ReactorResolutionInForkedBuildTest
         verifier.deleteDirectory( "producer/target" );
         verifier.deleteDirectory( "consumer/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng5137" );
-        verifier.executeGoal(
+        verifier.addCliArgument(
                 "org.apache.maven.its.plugins:maven-it-plugin-fork:2.1-SNAPSHOT:fork-lifecycle-aggregator" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> compile = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );

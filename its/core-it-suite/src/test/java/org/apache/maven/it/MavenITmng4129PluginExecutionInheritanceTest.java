@@ -60,7 +60,8 @@ public class MavenITmng4129PluginExecutionInheritanceTest
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "child-1/target" );
         verifier.deleteDirectory( "child-2/target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> executions = verifier.loadLines( "target/executions.txt", "UTF-8" );

@@ -56,7 +56,8 @@ public class MavenITmng4162ReportingMigrationTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         String p = "project.build.plugins.0.executions.0.configuration.children.";

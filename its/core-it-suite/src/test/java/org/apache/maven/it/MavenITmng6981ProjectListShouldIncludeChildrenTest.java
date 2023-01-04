@@ -48,7 +48,8 @@ public class MavenITmng6981ProjectListShouldIncludeChildrenTest
 
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( ":module-a" );
-        verifier.executeGoal( "compile" );
+        verifier.addCliArgument( "compile" );
+        verifier.execute();
         verifier.verifyTextInLog( "Building module-a-1 1.0" );
     }
 
@@ -68,7 +69,8 @@ public class MavenITmng6981ProjectListShouldIncludeChildrenTest
         verifier.addCliOption( "module-a" );
         verifier.addCliOption( "--non-recursive" );
         verifier.setLogFileName( "log-non-recursive.txt" );
-        verifier.executeGoal( "compile" );
+        verifier.addCliArgument( "compile" );
+        verifier.execute();
         verifyTextNotInLog( verifier, "Building module-a-1 1.0" );
     }
 

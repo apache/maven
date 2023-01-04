@@ -56,12 +56,14 @@ public class MavenITmng3710PollutedClonedPluginsTest
         Verifier verifier;
 
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectsDir.getAbsolutePath() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
@@ -87,17 +89,16 @@ public class MavenITmng3710PollutedClonedPluginsTest
         Verifier verifier;
 
         verifier = newVerifier( pluginsDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
 
-        List<String> goals = new ArrayList<>();
-        goals.add( "org.apache.maven.its.mng3710:mavenit-mng3710-directInvoke-plugin:1:run" );
-        goals.add( "validate" );
+        verifier.addCliArguments( "org.apache.maven.its.mng3710:mavenit-mng3710-directInvoke-plugin:1:run", "validate" );
 
-        verifier.executeGoals( goals );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }

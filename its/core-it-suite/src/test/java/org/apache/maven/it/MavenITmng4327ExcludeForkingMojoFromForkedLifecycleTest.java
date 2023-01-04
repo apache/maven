@@ -56,7 +56,8 @@ public class MavenITmng4327ExcludeForkingMojoFromForkedLifecycleTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "generate-sources" );
+        verifier.addCliArgument( "generate-sources" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> log = verifier.loadLines( "target/fork-lifecycle.txt", "UTF-8" );

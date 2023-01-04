@@ -57,7 +57,8 @@ public class MavenITmng4404UniqueProfileIdTest
         verifier.deleteDirectory( "target" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Duplicate profile id did not cause validation error" );
         }

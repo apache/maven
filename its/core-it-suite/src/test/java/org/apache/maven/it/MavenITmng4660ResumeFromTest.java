@@ -58,7 +58,8 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
 
         try
         {
-            verifier1.executeGoal( "test" ); // The test goal will not create a packaged artifact
+            verifier1.addCliArgument( "test" ); // The test goal will not create a packaged artifact
+            verifier1.execute();
             fail( "Expected this invocation to fail" ); // See TestCase.java
         }
         catch ( final VerificationException ve )
@@ -70,7 +71,8 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
         verifier2.setAutoclean( false );
         verifier2.addCliOption( "--resume-from" );
         verifier2.addCliOption( ":module-b" );
-        verifier2.executeGoal( "compile" ); // to prevent the unit test from failing (again)
+        verifier2.addCliArgument( "compile" );
+        verifier2.execute(); // to prevent the unit test from failing (again)
 
         verifier2.verifyErrorFreeLog();
     }
@@ -93,7 +95,8 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
 
         try
         {
-            verifier1.executeGoal( "verify" ); // The verify goal will create a packaged artifact
+            verifier1.addCliArgument( "verify" ); // The verify goal will create a packaged artifact
+            verifier1.execute();
             fail( "Expected this invocation to fail" ); // See TestCase.java
         }
         catch ( final VerificationException ve )
@@ -105,7 +108,8 @@ public class MavenITmng4660ResumeFromTest extends AbstractMavenIntegrationTestCa
         verifier2.setAutoclean( false );
         verifier2.addCliOption( "--resume-from" );
         verifier2.addCliOption( ":module-b" );
-        verifier2.executeGoal( "compile" ); // to prevent the unit test from failing (again)
+        verifier2.addCliArgument( "compile" ); // to prevent the unit test from failing (again)
+        verifier2.execute();
 
         verifier2.verifyErrorFreeLog();
     }

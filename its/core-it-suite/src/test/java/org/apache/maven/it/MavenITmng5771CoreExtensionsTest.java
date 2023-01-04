@@ -35,7 +35,8 @@ public class MavenITmng5771CoreExtensionsTest
         verifier.deleteArtifacts( "org.apache.maven.its.it-core-extensions" );
         verifier.addCliOption( "-s" );
         verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 
@@ -53,7 +54,8 @@ public class MavenITmng5771CoreExtensionsTest
         verifier.deleteArtifacts( "org.apache.maven.its.it-core-extensions" );
         verifier.addCliOption( "-s" );
         verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 
@@ -96,7 +98,8 @@ public class MavenITmng5771CoreExtensionsTest
         verifier.deleteArtifacts( "org.apache.maven.its.it-core-extensions" );
         verifier.addCliOption( "-s" );
         verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         server.stop();
@@ -122,7 +125,8 @@ public class MavenITmng5771CoreExtensionsTest
         verifier.addCliOption( "-s" );
         verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
         verifier.addCliOption( "-Dtest-extension-version=0.1" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 
@@ -146,7 +150,8 @@ public class MavenITmng5771CoreExtensionsTest
         verifier.addCliOption( "-s" );
         verifier.addCliOption( new File( testDir, "settings.xml" ).getAbsolutePath() );
         verifier.setForkJvm( true ); // force forked JVM since we need the shell script to detect .mvn/
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 }

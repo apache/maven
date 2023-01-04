@@ -50,7 +50,8 @@ public class MavenITmng2277AggregatorAndResolutionPluginsTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2277" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-all:aggregator-dependencies" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-all:aggregator-dependencies" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 

@@ -61,7 +61,8 @@ public class MavenITmng4479ProjectLevelPluginDepUsedForCliConfigTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-parameter-implementation:2.1-SNAPSHOT:param-implementation" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-parameter-implementation:2.1-SNAPSHOT:param-implementation" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/param.properties" );

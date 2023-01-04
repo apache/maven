@@ -62,7 +62,8 @@ public class MavenITmng3748BadSettingsXmlTest
         {
             try
             {
-                verifier.executeGoal( "validate" );
+                verifier.addCliArgument( "validate" );
+                verifier.execute();
                 verifier.verifyErrorFreeLog();
 
                 fail( "build should fail if settings.xml contains unrecognized elements." );
@@ -74,7 +75,8 @@ public class MavenITmng3748BadSettingsXmlTest
         }
         else
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             List<String> lines = verifier.loadLines( verifier.getLogFileName(), null );

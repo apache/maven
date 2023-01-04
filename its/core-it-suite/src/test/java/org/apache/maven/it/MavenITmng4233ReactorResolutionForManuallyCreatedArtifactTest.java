@@ -58,7 +58,8 @@ public class MavenITmng4233ReactorResolutionForManuallyCreatedArtifactTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "consumer/target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "consumer/target/artifact.properties" );

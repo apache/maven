@@ -22,11 +22,13 @@ public class MavenITmng5840ParentVersionRanges
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5840-relative-path-range-negative" );
 
         Verifier verifier = newVerifier( new File( testDir, "parent-1" ).getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( new File( testDir, "child" ).getAbsolutePath(), "remote" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 
@@ -37,11 +39,13 @@ public class MavenITmng5840ParentVersionRanges
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5840-relative-path-range-positive" );
 
         Verifier verifier = newVerifier( new File( testDir, "parent-1" ).getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( new File( testDir, "child" ).getAbsolutePath(), "remote" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 

@@ -51,7 +51,8 @@ public class MavenITmng3503Xpp3ShadingTest
 
         verifier = newVerifier( dir.getAbsolutePath() );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
@@ -67,7 +68,8 @@ public class MavenITmng3503Xpp3ShadingTest
             ResourceExtractor.simpleExtractResources( getClass(), "/mng-3503/mng-3503-xpp3Shading-pu-new" );
         Verifier verifier = newVerifier( dir.getAbsolutePath() );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 

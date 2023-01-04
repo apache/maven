@@ -57,7 +57,8 @@ public class MavenITmng4779MultipleDepsWithVersionRangeFromLocalRepoTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "test/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4779" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> classpath = verifier.loadLines( "test/target/classpath.txt", "UTF-8" );

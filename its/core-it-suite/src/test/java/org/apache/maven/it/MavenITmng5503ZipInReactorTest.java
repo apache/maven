@@ -57,7 +57,8 @@ public class MavenITmng5503ZipInReactorTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "verify" );
+        verifier.addCliArgument( "verify" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 

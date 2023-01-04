@@ -58,7 +58,8 @@ public class MavenITmng6065FailOnSeverityTest
 
         try
         {
-            verifier.executeGoal( "compile" );
+            verifier.addCliArgument( "compile" );
+            verifier.execute();
         }
         catch ( VerificationException e )
         {
@@ -81,7 +82,8 @@ public class MavenITmng6065FailOnSeverityTest
         verifier.addCliOption( "--fail-on-severity" );
         verifier.addCliOption( "ERROR" );
 
-        verifier.executeGoal( "compile" );
+        verifier.addCliArgument( "compile" );
+        verifier.execute();
 
         verifier.verifyTextInLog( "Enabled to break the build on log level ERROR." );
     }

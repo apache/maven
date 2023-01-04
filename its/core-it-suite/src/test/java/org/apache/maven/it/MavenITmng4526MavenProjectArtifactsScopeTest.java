@@ -60,7 +60,8 @@ public class MavenITmng4526MavenProjectArtifactsScopeTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "generate-sources" );
+        verifier.addCliArgument( "generate-sources" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> artifacts;

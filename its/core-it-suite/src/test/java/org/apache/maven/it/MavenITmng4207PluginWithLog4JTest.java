@@ -57,7 +57,8 @@ public class MavenITmng4207PluginWithLog4JTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4207" );
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 

@@ -54,7 +54,8 @@ public class MavenIT0131SiteLifecycleTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "site-deploy" );
+        verifier.addCliArgument( "site-deploy" );
+        verifier.execute();
         verifier.verifyFilePresent( "target/site-site.txt" );
         verifier.verifyFilePresent( "target/site-deploy.txt" );
         verifier.verifyErrorFreeLog();

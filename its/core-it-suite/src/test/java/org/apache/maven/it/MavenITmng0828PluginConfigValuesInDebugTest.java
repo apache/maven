@@ -61,7 +61,8 @@ public class MavenITmng0828PluginConfigValuesInDebugTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setMavenDebug( true );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         String log = FileUtils.fileRead( new File( verifier.getBasedir(), verifier.getLogFileName() ) );

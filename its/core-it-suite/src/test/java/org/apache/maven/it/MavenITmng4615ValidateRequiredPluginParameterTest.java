@@ -57,7 +57,8 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
@@ -83,7 +84,8 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
         verifier.setLogFileName( "log-a.txt" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Build did not fail despite required plugin parameter missing" );
         }
@@ -111,7 +113,8 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
         verifier.deleteDirectory( "target" );
         verifier.addCliArgument( "-Dconfig.requiredParam=CLI" );
         verifier.setLogFileName( "log-b.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
@@ -139,7 +142,8 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
         verifier.deleteDirectory( "target" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Build did not fail despite required plugin parameter missing" );
         }
@@ -165,7 +169,8 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/config.properties" );

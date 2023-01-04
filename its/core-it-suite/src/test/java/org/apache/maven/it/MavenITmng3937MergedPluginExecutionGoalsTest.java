@@ -77,7 +77,8 @@ public class MavenITmng3937MergedPluginExecutionGoalsTest
         Verifier verifier = newVerifier( new File( new File( testDir, project ), "sub" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> lines = verifier.loadLines( "target/exec.log", "UTF-8" );

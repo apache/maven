@@ -58,7 +58,8 @@ public class MavenITmng4332DefaultPluginExecutionOrderTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "process-resources" );
+        verifier.addCliArgument( "process-resources" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> lines = verifier.loadLines( "target/resources-resources.txt", "UTF-8" );

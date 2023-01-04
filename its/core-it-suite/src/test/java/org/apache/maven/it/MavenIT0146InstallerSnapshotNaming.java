@@ -106,7 +106,8 @@ public class MavenIT0146InstallerSnapshotNaming
 
         verifier.deleteDirectory( "target" );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/appassembler/repo/dep-0.1-20110726.105319-1.jar" );
@@ -124,7 +125,8 @@ public class MavenIT0146InstallerSnapshotNaming
         verifier.deleteDirectory( "project/target" );
         verifier.setLogFileName( "log2.txt" );
 
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( testDir.getAbsolutePath() );
@@ -144,7 +146,8 @@ public class MavenIT0146InstallerSnapshotNaming
 
         verifier.deleteDirectory( "target" );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/appassembler/repo/dep-0.1-SNAPSHOT.jar" );

@@ -48,7 +48,8 @@ public class MavenITmng7360BuildConsumer extends AbstractMavenIntegrationTestCas
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 

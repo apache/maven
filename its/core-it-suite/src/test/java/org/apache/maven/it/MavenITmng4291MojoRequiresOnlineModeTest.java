@@ -60,7 +60,8 @@ public class MavenITmng4291MojoRequiresOnlineModeTest
         verifier.addCliOption( "--offline" );
         try
         {
-            verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-online:2.1-SNAPSHOT:touch" );
+            verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-online:2.1-SNAPSHOT:touch" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Request to execute online mojo during offline mode did not fail the build." );
         }
@@ -87,7 +88,8 @@ public class MavenITmng4291MojoRequiresOnlineModeTest
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-lifecycle.txt" );
         verifier.addCliOption( "--offline" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFileNotPresent( "target/touch.txt" );

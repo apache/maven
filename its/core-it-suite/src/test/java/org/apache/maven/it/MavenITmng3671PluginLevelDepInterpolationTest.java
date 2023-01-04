@@ -55,7 +55,8 @@ public class MavenITmng3671PluginLevelDepInterpolationTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier.executeGoal( "compile" );
+        verifier.addCliArgument( "compile" );
+        verifier.execute();
 
         /*
          * This is the simplest way to check a build

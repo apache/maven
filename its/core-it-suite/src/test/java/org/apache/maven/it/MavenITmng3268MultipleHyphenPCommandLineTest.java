@@ -54,7 +54,8 @@ public class MavenITmng3268MultipleHyphenPCommandLineTest
         verifier.addCliOption( "-Pprofile3" );
         verifier.addCliOption( "-P" );
         verifier.addCliOption( "profile4" );
-        verifier.executeGoal( "package" );
+        verifier.addCliArgument( "package" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent( "target/profile1/touch.txt" );

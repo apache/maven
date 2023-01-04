@@ -43,7 +43,8 @@ public class MavenITmng7112ProjectsWithNonRecursiveTest
             throws IOException, VerificationException
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
-        newVerifier( projectDir.getAbsolutePath() ).executeGoal( "clean" );
+        newVerifier( projectDir.getAbsolutePath() ).addCliArgument( "clean" );
+        newVerifier( projectDir.getAbsolutePath() ).execute();
 
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
 
@@ -51,7 +52,8 @@ public class MavenITmng7112ProjectsWithNonRecursiveTest
         verifier.addCliOption( ":aggregator-a,:aggregator-b" );
         verifier.addCliOption( "-N" );
         verifier.setLogFileName( "selected-non-recursive.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifier.verifyFileNotPresent( "target/touch.txt" );
         verifier.verifyFilePresent( "aggregator-a/target/touch.txt" );
@@ -65,7 +67,8 @@ public class MavenITmng7112ProjectsWithNonRecursiveTest
             throws IOException, VerificationException
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
-        newVerifier( projectDir.getAbsolutePath() ).executeGoal( "clean" );
+        newVerifier( projectDir.getAbsolutePath() ).addCliArgument( "clean" );
+        newVerifier( projectDir.getAbsolutePath() ).execute();
 
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
 
@@ -73,7 +76,8 @@ public class MavenITmng7112ProjectsWithNonRecursiveTest
         verifier.addCliOption( "!:aggregator-a,!:aggregator-b" );
         verifier.addCliOption( "-N" );
         verifier.setLogFileName( "excluded-non-recursive.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "aggregator-a/target/touch.txt" );

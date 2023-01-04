@@ -55,12 +55,14 @@ public class MavenITmng3724ExecutionProjectSyncTest
 
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
 
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
 
-        verifier.executeGoal( "package" );
+        verifier.addCliArgument( "package" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 }

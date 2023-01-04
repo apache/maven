@@ -59,7 +59,8 @@ public class MavenITmng0680ParentBasedirTest
         Verifier verifier = newVerifier( subDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/basedir.properties" );

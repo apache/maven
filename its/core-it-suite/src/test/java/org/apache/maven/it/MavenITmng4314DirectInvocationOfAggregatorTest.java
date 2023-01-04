@@ -58,8 +58,9 @@ public class MavenITmng4314DirectInvocationOfAggregatorTest
         verifier.deleteDirectory( "consumer/target" );
         verifier.deleteDirectory( "dependency/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4314" );
-        verifier.executeGoals( Arrays.asList( new String[] { "validate",
-            "org.apache.maven.its.plugins:maven-it-plugin-all:2.1-SNAPSHOT:aggregator-dependencies" } ) );
+        verifier.addCliArguments( "validate",
+            "org.apache.maven.its.plugins:maven-it-plugin-all:2.1-SNAPSHOT:aggregator-dependencies" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/touch.txt" );

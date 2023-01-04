@@ -64,7 +64,8 @@ public class MavenITmng4361ForceDependencySnapshotUpdateTest
         filterProps.setProperty( "@repo@", "repo-1" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-force-1.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         assertNull( verifier.loadProperties( "target/checksum.properties" ).getProperty( "b-0.1-SNAPSHOT.jar" ) );
@@ -74,7 +75,8 @@ public class MavenITmng4361ForceDependencySnapshotUpdateTest
         verifier.setLogFileName( "log-force-2.txt" );
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "-U" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
 

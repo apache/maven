@@ -58,7 +58,8 @@ public class MavenITmng5576CdFriendlyVersions
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "-Dchangelist=changelist" );
         verifier.addCliOption( "-Dmaven.experimental.buildconsumer=false" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
@@ -89,7 +90,8 @@ public class MavenITmng5576CdFriendlyVersions
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "-Dchangelist=changelist" );
         verifier.addCliOption( "-Dmaven.experimental.buildconsumer=true" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );

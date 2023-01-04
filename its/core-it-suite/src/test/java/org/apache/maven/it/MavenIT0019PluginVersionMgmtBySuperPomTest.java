@@ -47,7 +47,8 @@ public class MavenIT0019PluginVersionMgmtBySuperPomTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "process-resources" );
+        verifier.addCliArgument( "process-resources" );
+        verifier.execute();
         verifier.verifyFilePresent( "target/classes/test.txt" );
         verifier.verifyErrorFreeLog();
     }

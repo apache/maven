@@ -115,7 +115,8 @@ public class MavenITmng4729MirrorProxyAuthUsedByProjectBuilderTest
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliOption( "-s" );
             verifier.addCliOption( "settings.xml" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             Properties props = verifier.loadProperties( "target/pom.properties" );

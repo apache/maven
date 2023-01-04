@@ -52,7 +52,8 @@ public class MavenITmng1491ReactorArtifactIdCollisionTest
 
         try
         {
-            verifier.executeGoal( "initialize" );
+            verifier.addCliArgument( "initialize" );
+            verifier.execute();
 
             verifier.verifyErrorFreeLog();
 

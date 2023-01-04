@@ -57,7 +57,8 @@ public class MavenITmng4795DepResolutionInReactorProjectForkedByLifecycleTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "sub/target" );
-        verifier.executeGoal( "process-sources" );
+        verifier.addCliArgument( "process-sources" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> compile0 = verifier.loadLines( "sub/target/compile-0.txt", "UTF-8" );

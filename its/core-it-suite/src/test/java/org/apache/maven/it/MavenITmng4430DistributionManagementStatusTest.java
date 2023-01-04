@@ -58,7 +58,8 @@ public class MavenITmng4430DistributionManagementStatusTest
         verifier.deleteDirectory( "target" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Distribution management status did not cause validation error" );
         }

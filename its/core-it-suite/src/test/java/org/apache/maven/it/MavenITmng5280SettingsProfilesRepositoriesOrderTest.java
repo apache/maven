@@ -106,7 +106,8 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         assertTrue( repoHandler.artifactRequestedFromRepo2 );
@@ -142,7 +143,8 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "org.apache.maven.its.mng5280:fake-maven-plugin:1.0:fake" );
+        verifier.addCliArgument( "org.apache.maven.its.mng5280:fake-maven-plugin:1.0:fake" );
+        verifier.execute();
 
         assertTrue( pluginRepoHandler.pluginRequestedFromRepo2 );
         assertTrue( pluginRepoHandler.pluginRequestedFromRepo1Last );

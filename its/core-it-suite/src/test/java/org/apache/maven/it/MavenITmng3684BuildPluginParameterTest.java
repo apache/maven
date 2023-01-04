@@ -50,18 +50,21 @@ public class MavenITmng3684BuildPluginParameterTest
         File projectDir = new File( testDir, "project" );
 
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         verifier.setLogFileName( "log-validate.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
         verifier.setLogFileName( "log-site.txt" );
-        verifier.executeGoal( "site" );
+        verifier.addCliArgument( "site" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }

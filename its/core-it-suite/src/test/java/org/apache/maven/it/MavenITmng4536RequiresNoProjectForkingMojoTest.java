@@ -56,7 +56,8 @@ public class MavenITmng4536RequiresNoProjectForkingMojoTest
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "mod-a/target" );
         verifier.deleteDirectory( "mod-b/target" );
-        verifier.executeGoal( "generate-sources" );
+        verifier.addCliArgument( "generate-sources" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         assertEquals( 2, verifier.loadLines( "mod-a/target/touch.log", "UTF-8" ).size() );

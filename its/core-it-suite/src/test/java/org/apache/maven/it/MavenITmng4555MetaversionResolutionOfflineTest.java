@@ -105,7 +105,8 @@ public class MavenITmng4555MetaversionResolutionOfflineTest
             verifier.addCliOption( "--offline" );
             verifier.addCliOption( "--settings" );
             verifier.addCliOption( "settings.xml" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
         }
         catch ( VerificationException e )
         {

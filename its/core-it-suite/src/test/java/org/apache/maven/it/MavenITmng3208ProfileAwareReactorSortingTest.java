@@ -57,7 +57,8 @@ public class MavenITmng3208ProfileAwareReactorSortingTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "-Pmng3208" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> order = verifier.loadLines( "target/order.txt", "UTF-8" );

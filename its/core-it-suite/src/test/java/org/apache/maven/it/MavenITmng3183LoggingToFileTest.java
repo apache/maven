@@ -61,7 +61,8 @@ public class MavenITmng3183LoggingToFileTest
         verifier.setLogFileName( "stdout.txt" );
         new File( testDir, "stdout.txt" ).delete();
         new File( testDir, "maven.log" ).delete();
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> stdout = verifier.loadLines( "stdout.txt", "UTF-8" );

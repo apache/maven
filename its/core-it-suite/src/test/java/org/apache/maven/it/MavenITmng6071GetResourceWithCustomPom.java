@@ -34,7 +34,8 @@ public class MavenITmng6071GetResourceWithCustomPom
         verifier.addCliOption( "-f" );
         verifier.addCliOption( "./pom.xml" );
         verifier.setForkJvm( true );
-        verifier.executeGoal( "verify" );
+        verifier.addCliArgument( "verify" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 }

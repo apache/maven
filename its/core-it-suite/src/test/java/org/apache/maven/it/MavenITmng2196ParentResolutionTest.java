@@ -58,14 +58,16 @@ public class MavenITmng2196ParentResolutionTest
 
         if ( matchesVersionRange( "(,3.0-alpha-1)" ) )
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
         }
         else
         {
             try
             {
-                verifier.executeGoal( "validate" );
+                verifier.addCliArgument( "validate" );
+                verifier.execute();
                 verifier.verifyErrorFreeLog();
                 fail( "Build should have failed due to bad relativePath" );
             }

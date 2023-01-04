@@ -62,7 +62,8 @@ public class MavenITmng2921ActiveAttachedArtifactsTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "consumer/target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Collection<String> compileArtifacts = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );

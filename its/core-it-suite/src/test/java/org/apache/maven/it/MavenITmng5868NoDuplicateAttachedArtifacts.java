@@ -133,7 +133,8 @@ public class MavenITmng5868NoDuplicateAttachedArtifacts
         verifier.addCliOption( "-Dartifact.attachedFile=" + tmp.toFile().getCanonicalPath() );
         verifier.addCliOption( "-DdeploymentPort=" + port );
         verifier.displayStreamBuffers();
-        verifier.executeGoals( Arrays.asList("org.apache.maven.its.plugins:maven-it-plugin-artifact:2.1-SNAPSHOT:attach", "deploy" ) );
+        verifier.addCliArguments( "org.apache.maven.its.plugins:maven-it-plugin-artifact:2.1-SNAPSHOT:attach", "deploy" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         assertEquals("deployedJarArtifactNumber: " + deployedJarArtifactNumber, 1, deployedJarArtifactNumber );
     }

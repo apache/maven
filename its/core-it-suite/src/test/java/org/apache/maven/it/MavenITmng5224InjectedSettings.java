@@ -62,7 +62,8 @@ public class MavenITmng5224InjectedSettings
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         //verifier.
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         File settingsFile = new File( verifier.getBasedir(), "target/settings-dump.xml" );
 

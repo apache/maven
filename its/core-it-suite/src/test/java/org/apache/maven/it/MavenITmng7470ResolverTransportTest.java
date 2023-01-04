@@ -90,7 +90,8 @@ public class MavenITmng7470ResolverTransportTest
         // Maven will fail if project dependencies cannot be resolved.
         // As dependency exists ONLY in HTTP repo, it MUST be reached using selected transport and
         // successfully resolved from it.
-        verifier.executeGoal( "verify" );
+        verifier.addCliArgument( "verify" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         // verify maven console output contains "[DEBUG] Using transporter XXXTransporter"
         verifier.verifyTextInLog( logSnippet );

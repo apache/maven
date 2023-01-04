@@ -35,7 +35,8 @@ class MavenITmng6609ProfileActivationForPackagingTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         Properties props = verifier.loadProperties( "target/profile.properties" );
         assertEquals( "pom", props.getProperty( "project.properties.packaging" ) );

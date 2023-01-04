@@ -61,7 +61,8 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest
 
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "deploy" );
+        verifier.addCliArgument( "deploy" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 

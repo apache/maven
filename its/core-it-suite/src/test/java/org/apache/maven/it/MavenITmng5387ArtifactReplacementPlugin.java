@@ -54,7 +54,8 @@ public class MavenITmng5387ArtifactReplacementPlugin
         v0.setAutoclean( false );
         v0.deleteDirectory( "target" );
         v0.deleteArtifacts( "org.apache.maven.its.mng5387" );
-        v0.executeGoal( "install" );
+        v0.addCliArgument( "install" );
+        v0.execute();
         v0.verifyErrorFreeLog();
 
         String path = v0.getArtifactPath( "org.apache.maven.its.mng5387", "mng5387-it", "0.0.1-SNAPSHOT", "txt", "c" );

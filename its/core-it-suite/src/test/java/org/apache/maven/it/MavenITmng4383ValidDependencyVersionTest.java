@@ -57,7 +57,8 @@ public class MavenITmng4383ValidDependencyVersionTest
         verifier.deleteDirectory( "target" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Invalid dependency version did not cause validation error" );
         }

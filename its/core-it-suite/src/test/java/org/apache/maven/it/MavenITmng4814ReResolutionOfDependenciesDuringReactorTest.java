@@ -62,10 +62,9 @@ public class MavenITmng4814ReResolutionOfDependenciesDuringReactorTest
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        List<String> goals = new ArrayList<>();
-        goals.add( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:aggregate-test" );
-        goals.add( "validate" );
-        verifier.executeGoals( goals );
+        verifier.addCliArguments( "validate",
+            "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:aggregate-test" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> compile = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );

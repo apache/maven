@@ -60,7 +60,8 @@ public class MavenITmng2136ActiveByDefaultProfileTest
         verifier.addCliArgument( "-Dexpression.expressions=project/properties" );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/expression.properties" );

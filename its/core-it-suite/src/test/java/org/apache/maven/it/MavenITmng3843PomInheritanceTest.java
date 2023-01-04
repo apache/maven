@@ -66,7 +66,8 @@ public class MavenITmng3843PomInheritanceTest
         verifier.deleteDirectory( "test-3/sub-parent/child-a/target" );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props;

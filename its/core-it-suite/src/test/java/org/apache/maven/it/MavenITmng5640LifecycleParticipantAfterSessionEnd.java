@@ -57,14 +57,16 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
 
         // install the test plugin
         verifier = newVerifier( extensionDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         try
         {
-            verifier.executeGoal( "package" );
+            verifier.addCliArgument( "package" );
+            verifier.execute();
             fail( "The build should fail" );
         }
         catch ( VerificationException e)
@@ -97,14 +99,16 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
 
         // install the test plugin
         verifier = newVerifier( extensionDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         try
         {
-            verifier.executeGoal( "package" );
+            verifier.addCliArgument( "package" );
+            verifier.execute();
             fail( "The build should fail" );
         }
         catch ( VerificationException e )
@@ -137,19 +141,22 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
 
         // install the test plugin
         verifier = newVerifier( extensionDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // install the bad plugin
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         try
         {
-            verifier.executeGoal( "package" );
+            verifier.addCliArgument( "package" );
+            verifier.execute();
             fail( "The build should fail" );
         }
         catch ( VerificationException e )
@@ -182,19 +189,22 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
 
         // install the test plugin
         verifier = newVerifier( extensionDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // install the bad plugin
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         try
         {
-            verifier.executeGoal( "package" );
+            verifier.addCliArgument( "package" );
+            verifier.execute();
             fail( "The build should fail" );
         }
         catch ( VerificationException e )

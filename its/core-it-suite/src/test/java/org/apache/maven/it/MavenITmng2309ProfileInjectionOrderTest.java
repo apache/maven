@@ -70,7 +70,8 @@ public class MavenITmng2309ProfileInjectionOrderTest
                     + ",profiles-a,profiles-b,profiles-e,profiles-c,profiles-d"
                     + ",settings-a,settings-b,settings-e,settings-c,settings-d" );
         }
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );

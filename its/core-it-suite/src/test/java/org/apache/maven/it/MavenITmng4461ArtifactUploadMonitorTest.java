@@ -54,7 +54,8 @@ public class MavenITmng4461ArtifactUploadMonitorTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyTextInLog( "/target/repo/org/apache/maven/its/mng4461/release/1.0/release-1.0.jar" );

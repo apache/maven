@@ -106,7 +106,8 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         verifier.addCliOption( settings.getName() );
 
         verifier.setLogFileName( "log-" + methodName + "-firstBuild.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
@@ -115,7 +116,8 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         setupDummyDependency( verifier, testDir, true );
 
         verifier.setLogFileName( "log-" + methodName + "-secondBuild.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
@@ -209,7 +211,8 @@ public class MavenITmng3415JunkRepositoryMetadataTest
             setupDummyDependency( verifier, testDir, true );
 
             verifier.setLogFileName( "log-" + methodName + "-firstBuild.txt" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
 
             verifier.verifyErrorFreeLog();
 
@@ -224,7 +227,8 @@ public class MavenITmng3415JunkRepositoryMetadataTest
             setupDummyDependency( verifier, testDir, false );
 
             verifier.setLogFileName( "log-" + methodName + "-secondBuild.txt" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
 
             verifier.verifyErrorFreeLog();
 

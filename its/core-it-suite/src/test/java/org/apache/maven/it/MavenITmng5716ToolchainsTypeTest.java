@@ -66,7 +66,8 @@ public class MavenITmng5716ToolchainsTypeTest
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "--toolchains" );
         verifier.addCliOption( "toolchains.xml" );
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/toolchains.properties" );

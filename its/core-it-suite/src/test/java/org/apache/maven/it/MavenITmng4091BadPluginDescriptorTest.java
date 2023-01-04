@@ -53,7 +53,8 @@ public class MavenITmng4091BadPluginDescriptorTest
 
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
 
             fail( "should throw an error during execution." );
         }
@@ -88,7 +89,8 @@ public class MavenITmng4091BadPluginDescriptorTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
 
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/plugin-dependency.properties" );

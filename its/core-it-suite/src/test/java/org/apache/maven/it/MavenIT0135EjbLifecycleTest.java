@@ -54,7 +54,8 @@ public class MavenIT0135EjbLifecycleTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "deploy" );
+        verifier.addCliArgument( "deploy" );
+        verifier.execute();
         verifier.verifyFilePresent( "target/resources-resources.txt" );
         verifier.verifyFilePresent( "target/compiler-compile.txt" );
         verifier.verifyFilePresent( "target/resources-test-resources.txt" );

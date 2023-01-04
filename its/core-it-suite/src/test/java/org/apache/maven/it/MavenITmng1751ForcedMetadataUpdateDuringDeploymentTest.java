@@ -65,7 +65,8 @@ public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest
         Verifier verifier = newVerifier( new File( testDir, "dep" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng1751" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // phase 2: resolve snapshot, if the previous deployment didn't update the metadata, we get the wrong file
@@ -75,7 +76,8 @@ public class MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties checksums = verifier.loadProperties( "target/checksum.properties" );

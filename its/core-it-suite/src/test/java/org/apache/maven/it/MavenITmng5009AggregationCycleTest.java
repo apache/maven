@@ -54,7 +54,8 @@ public class MavenITmng5009AggregationCycleTest
         verifier.deleteDirectory( "target" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Build did not fail despite cycle in POM aggregation" );
         }

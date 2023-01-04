@@ -52,7 +52,8 @@ public class MavenIT0009GoalConfigurationTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyFilePresent( supportSpaceInXml ? "target/  pluginItem  " : "target/pluginItem");
         verifier.verifyFilePresent( "target/goalItem" );
         verifier.verifyFileNotPresent( "target/bad-item" );

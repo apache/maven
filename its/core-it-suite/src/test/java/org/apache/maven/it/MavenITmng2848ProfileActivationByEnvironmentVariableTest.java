@@ -56,7 +56,8 @@ public class MavenITmng2848ProfileActivationByEnvironmentVariableTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setEnvironmentVariable( "MNG2848", "GO" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );

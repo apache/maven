@@ -66,7 +66,8 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         verifier1.deleteDirectory( "target" );
         verifier1.deleteArtifacts( "org.apache.maven.its.mng4660" );
 
-        verifier1.executeGoal( "package" );
+        verifier1.addCliArgument( "package" );
+        verifier1.execute();
 
         Path module1Jar = testDir.toPath().resolve( "module-a/target/module-a-1.0.jar" ).toAbsolutePath();
         verifier1.verifyErrorFreeLog();
@@ -89,7 +90,8 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         verifier2.setAutoclean( false );
         verifier2.addCliOption( "--projects" );
         verifier2.addCliOption( ":module-a" );
-        verifier2.executeGoal( "compile" );
+        verifier2.addCliArgument( "compile" );
+        verifier2.execute();
 
         Path module1PropertiesFile = testDir.toPath().resolve( "module-a/target/classes/example.properties" )
                 .toAbsolutePath();
@@ -109,7 +111,8 @@ public class MavenITmng4660OutdatedPackagedArtifact extends AbstractMavenIntegra
         verifier3.setAutoclean( false );
         verifier3.addCliOption( "--resume-from" );
         verifier3.addCliOption( ":module-b" );
-        verifier3.executeGoal( "compile" );
+        verifier3.addCliArgument( "compile" );
+        verifier3.execute();
 
         verifier3.verifyErrorFreeLog();
         try

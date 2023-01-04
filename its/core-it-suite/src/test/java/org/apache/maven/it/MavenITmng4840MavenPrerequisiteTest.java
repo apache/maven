@@ -60,7 +60,8 @@ public class MavenITmng4840MavenPrerequisiteTest
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Build did not fail despite unsatisfied prerequisite of plugin on Maven version." );
         }
@@ -89,7 +90,8 @@ public class MavenITmng4840MavenPrerequisiteTest
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.executeGoal( "org.apache.maven.its.mng4840:maven-mng4840-plugin:touch" );
+        verifier.addCliArgument( "org.apache.maven.its.mng4840:maven-mng4840-plugin:touch" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/touch-1.txt" );

@@ -83,7 +83,8 @@ public class MavenIT0108SnapshotUpdateTest
     public void testSnapshotUpdated()
         throws Exception
     {
-        verifier.executeGoal( "package" );
+        verifier.addCliArgument( "package" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
@@ -94,7 +95,8 @@ public class MavenIT0108SnapshotUpdateTest
 
         FileUtils.fileWrite( artifact.getAbsolutePath(), "updatedArtifact" );
 
-        verifier.executeGoal( "package" );
+        verifier.addCliArgument( "package" );
+        verifier.execute();
 
         verifyArtifactContent( "updatedArtifact" );
 
@@ -110,7 +112,8 @@ public class MavenIT0108SnapshotUpdateTest
         FileUtils.fileWrite( metadata.getAbsolutePath(),
                              constructMetadata( "1", System.currentTimeMillis() - TIME_OFFSET, true ) );
 
-        verifier.executeGoal( "package" );
+        verifier.addCliArgument( "package" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
@@ -120,7 +123,8 @@ public class MavenIT0108SnapshotUpdateTest
         metadata = new File( repository, "org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml" );
         FileUtils.fileWrite( metadata.getAbsolutePath(), constructMetadata( "2", System.currentTimeMillis(), true ) );
 
-        verifier.executeGoal( "package" );
+        verifier.addCliArgument( "package" );
+        verifier.execute();
 
         verifyArtifactContent( "updatedArtifact" );
 
@@ -142,7 +146,8 @@ public class MavenIT0108SnapshotUpdateTest
         FileUtils.fileWrite( metadata.getAbsolutePath(),
                              constructMetadata( "1", System.currentTimeMillis() - TIME_OFFSET, true ) );
 
-        verifier.executeGoal( "package" );
+        verifier.addCliArgument( "package" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
@@ -157,7 +162,8 @@ public class MavenIT0108SnapshotUpdateTest
         // update the remote file, but we shouldn't be looking
         artifact.setLastModified( System.currentTimeMillis() );
 
-        verifier.executeGoal( "package" );
+        verifier.addCliArgument( "package" );
+        verifier.execute();
 
         verifyArtifactContent( "localArtifact" );
 
@@ -172,7 +178,8 @@ public class MavenIT0108SnapshotUpdateTest
                              constructMetadata( "2", System.currentTimeMillis() - 2000, true ) );
         artifact.setLastModified( System.currentTimeMillis() );
 
-        verifier.executeGoal( "package" );
+        verifier.addCliArgument( "package" );
+        verifier.execute();
 
         verifyArtifactContent( "originalArtifact" );
 
@@ -189,7 +196,8 @@ public class MavenIT0108SnapshotUpdateTest
                              constructMetadata( "1", System.currentTimeMillis() - TIME_OFFSET, false ) );
         metadata.setLastModified( System.currentTimeMillis() - TIME_OFFSET );
 
-        verifier.executeGoal( "package" );
+        verifier.addCliArgument( "package" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
@@ -199,7 +207,8 @@ public class MavenIT0108SnapshotUpdateTest
         metadata = new File( repository, "org/apache/maven/maven-core-it-support/1.0-SNAPSHOT/maven-metadata.xml" );
         FileUtils.fileWrite( metadata.getAbsolutePath(), constructMetadata( "2", System.currentTimeMillis(), false ) );
 
-        verifier.executeGoal( "package" );
+        verifier.addCliArgument( "package" );
+        verifier.execute();
 
         verifyArtifactContent( "updatedArtifact" );
 

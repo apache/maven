@@ -56,7 +56,8 @@ public class MavenITmng4423SessionDataFromPluginParameterExpressionTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.getSystemProperties().setProperty( "mng4423", "PASSED" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/config.properties" );

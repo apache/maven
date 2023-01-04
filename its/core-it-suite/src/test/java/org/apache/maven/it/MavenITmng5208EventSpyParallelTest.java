@@ -49,7 +49,8 @@ public class MavenITmng5208EventSpyParallelTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5208" );
 
         Verifier spy = newVerifier( testDir.getAbsolutePath() + "/spy");
-        spy.executeGoal( "install" );
+        spy.addCliArgument( "install" );
+        spy.execute();
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() + "/project" );
         verifier.setForkJvm( true );
@@ -60,7 +61,8 @@ public class MavenITmng5208EventSpyParallelTest
         verifier.addCliOption( "-T" );
         verifier.addCliOption( "2" );
         verifier.addCliOption( "-fn" );
-        verifier.executeGoal( "compile" );
+        verifier.addCliArgument( "compile" );
+        verifier.execute();
         verifier.verifyTextInLog( "ProjectFailed/org.apache.maven.its.mng5208:sub-2" );
     }
 

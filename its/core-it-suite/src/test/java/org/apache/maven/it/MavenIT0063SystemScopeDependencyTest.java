@@ -50,7 +50,8 @@ public class MavenIT0063SystemScopeDependencyTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.getSystemProperties().setProperty( "jre.home", new File( testDir, "jdk/jre" ).getPath() );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> lines = verifier.loadLines( "target/compile.txt", "UTF-8" );

@@ -59,7 +59,8 @@ public class MavenITmng4633DualCompilerExecutionsWeaveModeTest
         verifier.setAutoclean( false );
         verifier.addCliOption( "-T" );
         verifier.addCliOption( "2W" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 

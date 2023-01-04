@@ -58,7 +58,8 @@ public class MavenITmng3944BasedirInterpolationTest
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "-f" );
         verifier.addCliOption( "pom-with-unusual-name.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/basedir.properties" );

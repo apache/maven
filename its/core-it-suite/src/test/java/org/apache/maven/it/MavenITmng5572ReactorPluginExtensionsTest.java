@@ -58,13 +58,15 @@ public class MavenITmng5572ReactorPluginExtensionsTest
         setup.setAutoclean( true );
         setup.addCliOption( "-f" );
         setup.addCliOption( "plugin/pom.xml" );
-        setup.executeGoal( "install" );
+        setup.addCliArgument( "install" );
+        setup.execute();
         setup.verifyErrorFreeLog();
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log2.txt" );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         if ( getMavenVersion().getMajorVersion() <= 3 )
         {

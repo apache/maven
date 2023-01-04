@@ -59,7 +59,8 @@ public class MavenITmng2690MojoLoadingErrorsTest
 
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
 
             fail( "should throw an error during execution." );
         }
@@ -88,7 +89,8 @@ public class MavenITmng2690MojoLoadingErrorsTest
 
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
 
             fail( "should throw an error during execution." );
         }
@@ -117,7 +119,8 @@ public class MavenITmng2690MojoLoadingErrorsTest
 
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
 
             fail( "should throw an error during execution." );
         }
@@ -146,7 +149,8 @@ public class MavenITmng2690MojoLoadingErrorsTest
 
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
 
             fail( "should throw an error during execution." );
         }

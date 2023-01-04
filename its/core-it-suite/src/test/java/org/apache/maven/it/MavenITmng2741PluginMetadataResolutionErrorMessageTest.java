@@ -78,7 +78,8 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest
         verifier.addCliOption( "settings.xml" );
         try
         {
-            verifier.executeGoal( goal );
+            verifier.addCliArgument( goal );
+            verifier.execute();
             fail( "Build should have failed to resolve plugin prefix" );
         }
         catch ( VerificationException e )

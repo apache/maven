@@ -61,12 +61,14 @@ public class MavenITmng6972AllowAccessToGraphPackageTest
 
         verifier = newVerifier( new File( testDir.getAbsolutePath(), "build-plugin" ).getAbsolutePath() );
         verifier.getSystemProperties().put( "maven.multiModuleProjectDirectory", testDir.getAbsolutePath() );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( new File( testDir.getAbsolutePath(), "using-module" ).getAbsolutePath() );
         verifier.getSystemProperties().put( "maven.multiModuleProjectDirectory", testDir.getAbsolutePath() );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 }

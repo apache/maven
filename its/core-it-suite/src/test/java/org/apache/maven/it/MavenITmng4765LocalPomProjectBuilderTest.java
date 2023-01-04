@@ -56,7 +56,8 @@ public class MavenITmng4765LocalPomProjectBuilderTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.addCliArgument( "-Duser.prop=OK" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );

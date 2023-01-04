@@ -60,7 +60,8 @@ public class MavenITmng6173GetProjectsAndDependencyGraphTest
         verifier.deleteDirectory( "module-2/target" );
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "module-1" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties properties = verifier.loadProperties( "module-1/target/session.properties" );

@@ -49,14 +49,16 @@ public class MavenITmng3536AppendedAbsolutePathsTest
         File pluginDir = new File( testDir, "plugin" );
         Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
 
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
         File projectDir = new File( testDir, "project" );
         verifier = newVerifier( projectDir.getAbsolutePath() );
 
-        verifier.executeGoal( "verify" );
+        verifier.addCliArgument( "verify" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 }

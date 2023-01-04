@@ -24,7 +24,8 @@ public class MavenITmng5958LifecyclePhaseBinaryCompat
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5958-lifecycle-phases/good" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyTextInLog( "CLASS_NAME=java.lang.String" );
     }
@@ -38,7 +39,8 @@ public class MavenITmng5958LifecyclePhaseBinaryCompat
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
         }
         catch ( VerificationException e )
         {

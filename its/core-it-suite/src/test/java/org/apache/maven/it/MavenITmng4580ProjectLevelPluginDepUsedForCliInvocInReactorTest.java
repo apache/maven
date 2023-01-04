@@ -58,7 +58,8 @@ public class MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "sub/target" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-class-loader:load" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-class-loader:load" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties pclProps;

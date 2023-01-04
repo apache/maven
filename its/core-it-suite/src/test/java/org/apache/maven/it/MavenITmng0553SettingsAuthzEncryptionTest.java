@@ -139,7 +139,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         setUserHome( verifier, new File( testDir, "userhome" ) );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
@@ -176,7 +177,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.addCliOption( "settings.xml" );
         // NOTE: The selection of the Turkish language for the JVM locale is essential part of the test
         verifier.setEnvironmentVariable( "MAVEN_OPTS", "-Dsettings.security=" + new File( testDir, "settings~security.xml" ).getAbsolutePath() + " -Duser.language=tr" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
@@ -201,7 +203,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.addCliOption( "--encrypt-master-password" );
         verifier.addCliOption( "test" );
         verifier.setLogFileName( "log-emp.txt" );
-        verifier.executeGoal( "-e" );
+        verifier.addCliArgument( "-e" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> log = verifier.loadLines( verifier.getLogFileName(), null );
@@ -213,7 +216,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.addCliOption( "--encrypt-password" );
         verifier.addCliOption( "testpass" );
         verifier.setLogFileName( "log-ep.txt" );
-        verifier.executeGoal( "-e" );
+        verifier.addCliArgument( "-e" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         log = verifier.loadLines( verifier.getLogFileName(), null );

@@ -154,7 +154,8 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
         verifier.deleteDirectory( "repo" );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         assertHash( verifier, "repo/org/apache/maven/its/mng4235/test/0.1/test-0.1.jar", ".sha1", "SHA-1" );

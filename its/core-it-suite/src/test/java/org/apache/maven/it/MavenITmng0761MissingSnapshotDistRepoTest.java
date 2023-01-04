@@ -57,7 +57,8 @@ public class MavenITmng0761MissingSnapshotDistRepoTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng0761" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/repo/org/apache/maven/its/mng0761/test/1.0-SNAPSHOT/test-1.0-*.jar" );

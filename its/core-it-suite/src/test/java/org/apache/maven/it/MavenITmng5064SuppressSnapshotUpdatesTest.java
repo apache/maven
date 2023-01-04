@@ -115,7 +115,8 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest
             verifier.addCliOption( "settings.xml" );
 
             verifier.setLogFileName( "log-1.txt" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
@@ -125,7 +126,8 @@ public class MavenITmng5064SuppressSnapshotUpdatesTest
             requestedUris.clear();
 
             verifier.setLogFileName( "log-2.txt" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );

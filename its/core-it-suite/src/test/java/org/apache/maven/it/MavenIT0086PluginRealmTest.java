@@ -56,7 +56,8 @@ public class MavenIT0086PluginRealmTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );

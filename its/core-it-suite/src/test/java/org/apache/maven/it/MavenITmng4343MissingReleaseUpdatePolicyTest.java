@@ -166,7 +166,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
         verifier.setLogFileName( "log-always-1.txt" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Build succeeded despite missing dependency" );
         }
@@ -182,7 +183,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
         blockAccess = false;
 
         verifier.setLogFileName( "log-always-2.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         assertTrue( requestedUris.toString(), requestedUris.contains( "/dep/0.1/dep-0.1.jar" ) );
@@ -220,7 +222,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
         verifier.setLogFileName( "log-never-1.txt" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Build succeeded despite missing dependency" );
         }
@@ -238,7 +241,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
         verifier.setLogFileName( "log-never-2.txt" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Remote repository was accessed despite updatePolicy=never" );
         }
@@ -254,7 +258,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
 
         verifier.setLogFileName( "log-never-3.txt" );
         verifier.addCliOption( "-U" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         assertTrue( requestedUris.contains( "/dep/0.1/dep-0.1.jar" ) );
@@ -266,7 +271,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
 
         verifier.setLogFileName( "log-never-4.txt" );
         verifier.addCliOption( "-U" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         //noinspection unchecked

@@ -52,7 +52,8 @@ public class MavenITmng3810BadProfileActivationTest
         verifier.deleteDirectory( "target" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             fail( "Build should not succeed" );
         }
         catch ( Exception e )

@@ -99,7 +99,8 @@ public class MavenITmng4005UniqueDependencyKeyTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         try {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
         }
         catch ( VerificationException e )
         {

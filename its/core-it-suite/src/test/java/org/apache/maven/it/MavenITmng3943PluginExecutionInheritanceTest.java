@@ -59,7 +59,8 @@ public class MavenITmng3943PluginExecutionInheritanceTest
         Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> executions = verifier.loadLines( "target/exec.log", "UTF-8" );

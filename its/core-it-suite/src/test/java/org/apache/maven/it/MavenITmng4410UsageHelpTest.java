@@ -53,7 +53,8 @@ public class MavenITmng4410UsageHelpTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "--help" );
+        verifier.addCliArgument( "--help" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyTextInLog( "--version" );

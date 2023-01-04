@@ -53,7 +53,8 @@ public class MavenITmng6127PluginExecutionConfigurationInterferenceTest
 
         // install the test plugin
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         File modAconfigurationFile = new File( modAprojectDir, "configuration.txt" );
@@ -65,7 +66,8 @@ public class MavenITmng6127PluginExecutionConfigurationInterferenceTest
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "verify" );
+        verifier.addCliArgument( "verify" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( modAconfigurationFile.getCanonicalPath() );

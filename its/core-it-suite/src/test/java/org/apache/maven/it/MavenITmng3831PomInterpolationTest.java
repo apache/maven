@@ -55,7 +55,8 @@ public class MavenITmng3831PomInterpolationTest
         File child = new File( testDir, "child" );
 
         Verifier verifier = newVerifier( child.getAbsolutePath() );
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/interpolated.properties" );

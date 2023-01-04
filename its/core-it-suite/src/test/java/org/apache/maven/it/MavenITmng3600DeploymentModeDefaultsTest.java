@@ -51,7 +51,8 @@ public class MavenITmng3600DeploymentModeDefaultsTest
 
         new File( testDir, "wagon.properties" ).delete();
         verifier.setLogFileName( "log-no-settings.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "wagon.properties" );
@@ -72,7 +73,8 @@ public class MavenITmng3600DeploymentModeDefaultsTest
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings-server-defaults.xml" );
         verifier.setLogFileName( "log-server-defaults.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "wagon.properties" );
@@ -93,7 +95,8 @@ public class MavenITmng3600DeploymentModeDefaultsTest
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings-modes-set.xml" );
         verifier.setLogFileName( "log-modes-set.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "wagon.properties" );

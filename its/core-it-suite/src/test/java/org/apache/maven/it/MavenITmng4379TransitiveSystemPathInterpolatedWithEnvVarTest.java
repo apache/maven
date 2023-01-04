@@ -59,9 +59,11 @@ public class MavenITmng4379TransitiveSystemPathInterpolatedWithEnvVarTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4379" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.setEnvironmentVariable( "MNG_4379_HOME", testDir.getAbsolutePath() );
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate", Collections.singletonMap( "MNG_4379_HOME", testDir.getAbsolutePath() ) );
+        verifier.addCliArguments( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );

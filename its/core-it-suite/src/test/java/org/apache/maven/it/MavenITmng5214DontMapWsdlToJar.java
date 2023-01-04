@@ -54,7 +54,8 @@ public class MavenITmng5214DontMapWsdlToJar
         setupVerifier.deleteArtifacts( "org.apache.maven.its.mng5214" );
         setupVerifier.setLogFileName( "log-setup.txt" );
         setupVerifier.addCliOption( "-PcreateWsdl" );
-        setupVerifier.executeGoal( "generate-resources" );
+        setupVerifier.addCliArgument( "generate-resources" );
+        setupVerifier.execute();
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5214" );
 
@@ -63,7 +64,8 @@ public class MavenITmng5214DontMapWsdlToJar
         verifier.deleteDirectory( "consumer/target" );
         verifier.deleteDirectory( "dependency/target" );
         verifier.setLogFileName( "log-test.txt" );
-        verifier.executeGoal( "test" );
+        verifier.addCliArgument( "test" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         List<String> lines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         // RESOLVE-ONE-DEPENDENCY org.apache.maven.its.mng5214:dependency:wsdl:1.0-SNAPSHOT $ /tmp/it

@@ -60,7 +60,8 @@ public class MavenITmng4320AggregatorAndDependenciesTest
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:aggregate-test" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:aggregate-test" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> classpath;

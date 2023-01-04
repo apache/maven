@@ -57,7 +57,8 @@ public class MavenITmng3877BasedirAlignedModelTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties modelProps = verifier.loadProperties( "target/model.properties" );

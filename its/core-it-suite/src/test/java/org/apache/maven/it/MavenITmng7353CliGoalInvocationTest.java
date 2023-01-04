@@ -44,7 +44,8 @@ public class MavenITmng7353CliGoalInvocationTest
         File basedir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7353-cli-goal-invocation" );
         Verifier verifier = newVerifier( basedir.getAbsolutePath() );
         verifier.setLogFileName( id + ".txt" );
-        verifier.executeGoal( goal );
+        verifier.addCliArgument( goal );
+        verifier.execute();
         verifier.verifyTextInLog( "[INFO] --- " + expectedInvocation );
     }
 

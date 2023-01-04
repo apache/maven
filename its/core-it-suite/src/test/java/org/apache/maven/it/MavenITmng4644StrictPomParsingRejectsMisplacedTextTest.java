@@ -56,7 +56,8 @@ public class MavenITmng4644StrictPomParsingRejectsMisplacedTextTest
         verifier.setAutoclean( false );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             fail( "Should fail to validate the POM syntax due to misplaced text in <project> element." );

@@ -77,7 +77,8 @@ public class MavenITmng5482AetherNotFoundTest
 
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
 
             fail( "should throw an error during execution." );
         }

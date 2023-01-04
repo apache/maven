@@ -64,7 +64,8 @@ public class MavenITmng4353PluginDependencyResolutionFromPomRepoTest
                              "UTF-8", filterProps );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/touch.properties" );

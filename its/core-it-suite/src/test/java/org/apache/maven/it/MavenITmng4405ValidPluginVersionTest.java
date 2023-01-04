@@ -57,7 +57,8 @@ public class MavenITmng4405ValidPluginVersionTest
         verifier.deleteDirectory( "target" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Invalid plugin version did not cause validation error" );
         }

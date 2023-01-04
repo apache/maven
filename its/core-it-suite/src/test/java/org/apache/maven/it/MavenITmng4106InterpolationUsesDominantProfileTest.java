@@ -67,7 +67,8 @@ public class MavenITmng4106InterpolationUsesDominantProfileTest
         {
             verifier.addCliOption( "-Ppom-a,pom-b,profiles-a,profiles-b,settings-a,settings-b" );
         }
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );

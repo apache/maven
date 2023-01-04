@@ -26,7 +26,8 @@ public class MavenITmng5805PkgTypeMojoConfiguration2
 
 
         verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyTextInLog( "CLASS_NAME=org.apache.maven.its.mng5805.TestClass1" );
     }

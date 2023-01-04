@@ -48,7 +48,8 @@ public class MavenITmng1493NonStandardModulePomNamesTest
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
 
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
 
         /*
          * This is the simplest way to check a build

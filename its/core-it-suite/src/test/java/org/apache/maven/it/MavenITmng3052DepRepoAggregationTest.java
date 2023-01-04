@@ -66,7 +66,8 @@ public class MavenITmng3052DepRepoAggregationTest
             "repo-d/org/apache/maven/its/mng3052/direct/0.1-SNAPSHOT/direct-0.1-20090517.133956-1.pom", "UTF-8", filterProps );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng3052", "direct", "0.1-SNAPSHOT", "jar" );

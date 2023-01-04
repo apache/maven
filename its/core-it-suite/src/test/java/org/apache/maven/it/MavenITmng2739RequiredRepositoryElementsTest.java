@@ -56,7 +56,8 @@ public class MavenITmng2739RequiredRepositoryElementsTest
 
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
 
             fail(
                 "POM should NOT validate: repository <id/> element is missing in: " + new File( testDir, "pom.xml" ) );
@@ -96,7 +97,8 @@ public class MavenITmng2739RequiredRepositoryElementsTest
 
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
 
             fail(
                 "POM should NOT validate: repository <url/> element is missing in: " + new File( testDir, "pom.xml" ) );

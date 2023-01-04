@@ -63,13 +63,15 @@ public class MavenITmng4952MetadataReleaseInfoUpdateTest
         props.put( "@version@", "1.0" );
         verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", props );
         verifier.setLogFileName( "log-1.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         props.put( "@version@", "2.0" );
         verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", props );
         verifier.setLogFileName( "log-2.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
 

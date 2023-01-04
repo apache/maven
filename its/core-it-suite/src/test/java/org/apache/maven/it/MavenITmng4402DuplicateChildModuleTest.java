@@ -58,7 +58,8 @@ public class MavenITmng4402DuplicateChildModuleTest
         verifier.addCliOption( "-N" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Duplicate child module did not cause validation error" );
         }

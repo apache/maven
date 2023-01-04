@@ -56,7 +56,8 @@ public class MavenITmng3133UrlNormalizationNotBeforeInterpolationTest
 
         Verifier verifier = newVerifier( new File( testDir, "child" ).getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/url.properties" );

@@ -58,7 +58,8 @@ public class MavenITmng4755FetchRemoteMetadataForVersionRangeTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4755" );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // test: resolve remote version
@@ -68,7 +69,8 @@ public class MavenITmng4755FetchRemoteMetadataForVersionRangeTest
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> cp = verifier.loadLines( "target/classpath.txt", "UTF-8" );

@@ -64,7 +64,8 @@ public class MavenITmng4262MakeLikeReactorDottedPathTest
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "." );
         verifier.setLogFileName( "log-root.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/touch.txt" );
@@ -88,7 +89,8 @@ public class MavenITmng4262MakeLikeReactorDottedPathTest
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "../sub-a" );
         verifier.setLogFileName( "log-module.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFileNotPresent( "target/touch.txt" );

@@ -62,7 +62,8 @@ public class MavenITmng3586SystemScopePluginDependencyTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/it.properties" );
@@ -85,7 +86,8 @@ public class MavenITmng3586SystemScopePluginDependencyTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.getSystemProperties().setProperty( "test.home", testDir.getAbsolutePath() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/pcl.properties" );

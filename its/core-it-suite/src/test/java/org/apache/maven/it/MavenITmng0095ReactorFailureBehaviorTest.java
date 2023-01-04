@@ -63,7 +63,8 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         verifier.setLogFileName( "log-ff.txt" );
         try
         {
-            verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+            verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
         }
         catch ( VerificationException e )
@@ -97,7 +98,8 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         verifier.deleteDirectory( "subproject3/target" );
         verifier.addCliOption( "--fail-never" );
         verifier.setLogFileName( "log-fn.txt" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        verifier.execute();
 
         verifier.verifyFilePresent( "target/touch.txt" );
         verifier.verifyFileNotPresent( "subproject1/target/touch.txt" );
@@ -128,7 +130,8 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         verifier.setLogFileName( "log-fae.txt" );
         try
         {
-            verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+            verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
         }
         catch ( VerificationException e )

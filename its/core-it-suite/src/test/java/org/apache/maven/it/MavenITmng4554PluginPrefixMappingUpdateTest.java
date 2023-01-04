@@ -121,7 +121,8 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             verifier.addCliOption( "settings.xml" );
 
             verifier.setLogFileName( "log-cached-1.txt" );
-            verifier.executeGoal( "a:touch" );
+            verifier.addCliArgument( "a:touch" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             verifier.verifyFilePresent( "target/touch.txt" );
@@ -130,7 +131,8 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             requestedUris.clear();
 
             verifier.setLogFileName( "log-cached-2.txt" );
-            verifier.executeGoal( "a:touch" );
+            verifier.addCliArgument( "a:touch" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             assertFalse( requestedUris.toString(), requestedUris.contains( metadataUri ) );
@@ -208,7 +210,8 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             verifier.addCliOption( "settings.xml" );
 
             verifier.setLogFileName( "log-forced-1.txt" );
-            verifier.executeGoal( "a:touch" );
+            verifier.addCliArgument( "a:touch" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             verifier.verifyFilePresent( "target/touch.txt" );
@@ -217,7 +220,8 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             requestedUris.clear();
 
             verifier.setLogFileName( "log-forced-2.txt" );
-            verifier.executeGoal( "a:touch" );
+            verifier.addCliArgument( "a:touch" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             assertTrue( requestedUris.toString(), requestedUris.contains( metadataUri ) );
@@ -298,7 +302,8 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             FileUtils.copyDirectoryStructure( new File( testDir, "repo-1" ), new File( testDir, "repo-it" ) );
 
             verifier.setLogFileName( "log-refetched-1.txt" );
-            verifier.executeGoal( "a:touch" );
+            verifier.addCliArgument( "a:touch" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             verifier.verifyFilePresent( "target/touch.txt" );
@@ -310,7 +315,8 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             FileUtils.copyDirectoryStructure( new File( testDir, "repo-2" ), new File( testDir, "repo-it" ) );
 
             verifier.setLogFileName( "log-refetched-2.txt" );
-            verifier.executeGoal( "b:touch" );
+            verifier.addCliArgument( "b:touch" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             assertTrue( requestedUris.toString(), requestedUris.contains( metadataUri ) );

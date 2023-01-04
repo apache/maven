@@ -43,13 +43,15 @@ public class MavenITmng7487DeadlockTest extends AbstractMavenIntegrationTestCase
 
         final File pluginDir = new File( rootDir, "plugin" );
         final Verifier pluginVerifier = newVerifier( pluginDir.getAbsolutePath() );
-        pluginVerifier.executeGoal( "install" );
+        pluginVerifier.addCliArgument( "install" );
+        pluginVerifier.execute();
 
         final File consumerDir = new File( rootDir, "consumer" );
         final Verifier consumerVerifier = newVerifier( consumerDir.getAbsolutePath() );
         consumerVerifier.setForkJvm( true );;
         consumerVerifier.addCliOption( "-T2" );
-        consumerVerifier.executeGoal( "package" );
+        consumerVerifier.addCliArgument( "package" );
+        consumerVerifier.execute();
         consumerVerifier.verifyErrorFreeLog();
         consumerVerifier.verifyTextInLog( "BUILD SUCCESS" );
     }

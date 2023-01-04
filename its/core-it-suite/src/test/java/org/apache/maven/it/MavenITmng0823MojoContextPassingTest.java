@@ -56,9 +56,9 @@ public class MavenITmng0823MojoContextPassingTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        List<String> goals = Arrays.asList( new String[]{"org.apache.maven.its.plugins:maven-it-plugin-context-passing:throw",
-            "org.apache.maven.its.plugins:maven-it-plugin-context-passing:catch"} );
-        verifier.executeGoals( goals );
+        verifier.addCliArguments( "org.apache.maven.its.plugins:maven-it-plugin-context-passing:throw",
+            "org.apache.maven.its.plugins:maven-it-plugin-context-passing:catch" );
+        verifier.execute();
         verifier.verifyFilePresent( "target/thrown-value" );
         verifier.verifyErrorFreeLog();
     }

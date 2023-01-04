@@ -56,7 +56,8 @@ public class MavenITmng4283ParentPomPackagingTest
         verifier.setAutoclean( false );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Invalid packaging of parent POM did not fail the build." );
         }

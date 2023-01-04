@@ -58,7 +58,8 @@ public class MavenITmng3607ClassLoadersUseValidUrlsTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.getSystemProperties().setProperty( "test.home", testDir.getAbsolutePath() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/pcl.properties" );

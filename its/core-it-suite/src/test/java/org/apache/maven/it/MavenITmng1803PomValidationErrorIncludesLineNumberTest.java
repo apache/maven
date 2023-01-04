@@ -56,7 +56,8 @@ public class MavenITmng1803PomValidationErrorIncludesLineNumberTest
         verifier.setAutoclean( false );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
         }
         catch ( Exception e )
         {

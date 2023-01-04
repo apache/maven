@@ -63,7 +63,8 @@ public class MavenITmng6057CheckReactorOrderTest
 
         verifier.setLogFileName( "log-only.txt" );
         verifier.addCliOption( "-Drevision=1.3.0-SNAPSHOT" );
-        verifier.executeGoal( "clean" );
+        verifier.addCliArgument( "clean" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> loadedLines = verifier.loadLines( "log-only.txt", "UTF-8" );

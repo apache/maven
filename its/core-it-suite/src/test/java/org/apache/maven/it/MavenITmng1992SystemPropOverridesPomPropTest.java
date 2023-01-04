@@ -59,7 +59,8 @@ public class MavenITmng1992SystemPropOverridesPomPropTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.getSystemProperties().setProperty( "config.stringParam", "PASSED" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties configProps = verifier.loadProperties( "target/config.properties" );

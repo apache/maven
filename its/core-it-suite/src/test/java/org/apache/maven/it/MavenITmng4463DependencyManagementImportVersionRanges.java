@@ -50,7 +50,8 @@ public class MavenITmng4463DependencyManagementImportVersionRanges
         final Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         final List<String> artifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
@@ -65,7 +66,8 @@ public class MavenITmng4463DependencyManagementImportVersionRanges
         final Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> artifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
@@ -83,7 +85,8 @@ public class MavenITmng4463DependencyManagementImportVersionRanges
         {
             verifier.setAutoclean( false );
             verifier.deleteDirectory( "target" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             fail( "Expected 'VerificationException' not thrown." );
         }
         catch ( final VerificationException e )

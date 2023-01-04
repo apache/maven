@@ -62,7 +62,8 @@ public class MavenITmng4309StrictChecksumValidationForMetadataTest
         verifier.addCliOption( "--strict-checksums" );
         try
         {
-          verifier.executeGoal( "validate" );
+          verifier.addCliArgument( "validate" );
+          verifier.execute();
           verifier.verifyErrorFreeLog();
           fail( "Checksum mismatch for metadata did not fail the build despite strict mode" );
         }

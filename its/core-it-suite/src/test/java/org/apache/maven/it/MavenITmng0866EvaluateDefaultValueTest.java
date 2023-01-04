@@ -57,7 +57,8 @@ public class MavenITmng0866EvaluateDefaultValueTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties configProps = verifier.loadProperties( "target/config.properties" );

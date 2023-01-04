@@ -48,7 +48,8 @@ public class MavenITmng5753CustomMojoExecutionConfiguratorTest
 
         // install the test plugin
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         File configurationFile = new File(projectDir, "configuration.txt");
@@ -56,7 +57,8 @@ public class MavenITmng5753CustomMojoExecutionConfiguratorTest
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( configurationFile.getCanonicalPath() );

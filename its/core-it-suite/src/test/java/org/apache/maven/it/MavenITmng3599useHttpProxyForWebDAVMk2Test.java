@@ -168,7 +168,8 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
          * for the JAR/POM of the extension and its dependencies when run against a vanilla repo.
          */
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         String settings = FileUtils.fileRead( new File( testDir, "settings-template.xml" ) );
@@ -186,7 +187,8 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
         verifier.deleteArtifacts( "org.apache.maven.its.mng3599" );
 
         verifier.setLogFileName( "logHttp.txt" );
-        verifier.executeGoal( "compile" );
+        verifier.addCliArgument( "compile" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
@@ -211,7 +213,8 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
          * for the JAR/POM of the extension and its dependencies when run against a vanilla repo.
          */
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         String settings = FileUtils.fileRead( new File( testDir, "settings-template.xml" ) );
@@ -229,7 +232,8 @@ public class MavenITmng3599useHttpProxyForWebDAVMk2Test
         verifier.deleteArtifacts( "org.apache.maven.its.mng3599" );
 
         verifier.setLogFileName( "logDAV.txt" );
-        verifier.executeGoal( "compile" );
+        verifier.addCliArgument( "compile" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );

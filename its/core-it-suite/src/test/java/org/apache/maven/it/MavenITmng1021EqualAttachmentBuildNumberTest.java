@@ -55,7 +55,8 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "repo" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng1021" );
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng1021", "test", "1-SNAPSHOT", "pom" );

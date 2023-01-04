@@ -77,7 +77,8 @@ public class MavenITmng6957BuildConsumer
         verifier.setAutoclean( false );
         verifier.addCliOption( "-Dchangelist=MNG6957" );
 
-        verifier.executeGoals( Collections.singletonList( "install" ) );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         assertTextEquals( new File( testDir, "expected/parent.pom"),

@@ -112,7 +112,8 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest
             verifier.addCliOption( "settings.xml" );
 
             verifier.setLogFileName( "log-1.txt" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
@@ -123,7 +124,8 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest
             requestedUris.clear();
 
             verifier.setLogFileName( "log-2.txt" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );

@@ -160,7 +160,8 @@ public class MavenITmng7468UnsupportedPluginsParametersTest extends AbstractMave
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7468-unsupported-params" );
 
         Verifier verifier = newVerifier( new File( testDir, project ).getAbsolutePath() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );

@@ -67,7 +67,8 @@ public class MavenITmng6090CIFriendlyTest
         verifier.addCliOption( "-Drevision=1.2" );
         verifier.addCliOption( "-Dmaven.experimental.buildconsumer=false" );
         verifier.setLogFileName( "install-log.txt" );
-        verifier.executeGoals( Arrays.asList( "clean", "install" ) );
+        verifier.addCliArguments( "clean", "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( testDir.getAbsolutePath(), false );
@@ -77,7 +78,8 @@ public class MavenITmng6090CIFriendlyTest
         verifier.addCliOption( "-Drevision=1.2" );
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "module-3" );
-        verifier.executeGoal( "package" );
+        verifier.addCliArgument( "package" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 
@@ -95,7 +97,8 @@ public class MavenITmng6090CIFriendlyTest
         verifier.addCliOption( "-Drevision=1.2" );
         verifier.addCliOption( "-Dmaven.experimental.buildconsumer=true" );
         verifier.setLogFileName( "install-log.txt" );
-        verifier.executeGoals( Arrays.asList( "clean", "install" ) );
+        verifier.addCliArguments( "clean", "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( testDir.getAbsolutePath(), false );
@@ -106,7 +109,8 @@ public class MavenITmng6090CIFriendlyTest
         verifier.addCliOption( "-Drevision=1.2" );
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "module-3" );
-        verifier.executeGoal( "package" );
+        verifier.addCliArgument( "package" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 

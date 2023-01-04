@@ -65,7 +65,8 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4368" );
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         File installedPom =
@@ -82,7 +83,8 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         verifier = newVerifier( bDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         pom = FileUtils.fileRead( installedPom, "UTF-8" );
@@ -118,7 +120,8 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4368" );
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         File installedArtifact =
@@ -135,7 +138,8 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         verifier = newVerifier( bDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         data = FileUtils.fileRead( installedArtifact, "UTF-8" );
@@ -150,7 +154,8 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-b.txt" );
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         data = FileUtils.fileRead( installedArtifact, "UTF-8" );

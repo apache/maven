@@ -59,7 +59,8 @@ public class MavenITmng2972OverridePluginDependencyTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
@@ -90,7 +91,8 @@ public class MavenITmng2972OverridePluginDependencyTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-class-loader:2.1-SNAPSHOT:load" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-class-loader:2.1-SNAPSHOT:load" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );

@@ -45,11 +45,13 @@ public class MavenITmng7474SessionScopeTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-7474-session-scope" );
 
         Verifier verifier = newVerifier( new File( testDir, "plugin" ).getAbsolutePath() );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( new File( testDir, "project" ).getAbsolutePath() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 

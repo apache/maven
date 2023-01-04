@@ -55,7 +55,8 @@ public class MavenITmng3482DependencyPomInterpolationTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng3482" );
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );

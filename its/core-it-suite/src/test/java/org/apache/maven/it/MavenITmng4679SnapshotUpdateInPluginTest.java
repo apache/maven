@@ -64,7 +64,8 @@ public class MavenITmng4679SnapshotUpdateInPluginTest
         filterProps.setProperty( "@repo@", "repo-1" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-force-1.txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         assertChecksum( verifier, "jar", "2ea5c3d713bbaba7b87746449b91cd00e876703d" );
@@ -75,7 +76,8 @@ public class MavenITmng4679SnapshotUpdateInPluginTest
         verifier.setLogFileName( "log-force-2.txt" );
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "-U" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
 

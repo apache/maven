@@ -59,7 +59,8 @@ public class MavenITmng6754TimestampInMultimoduleProject
         verifier.deleteDirectory( "repo" );
         verifier.deleteArtifacts ( "org.apache.maven.its.mng6754" );
         verifier.addCliOption( "-Drepodir=" + remoteRepoDir );
-        verifier.executeGoal( "deploy" );
+        verifier.addCliArgument( "deploy" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         final Properties props = verifier.loadProperties( "target/timestamp.properties" );

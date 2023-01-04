@@ -138,7 +138,8 @@ public class MavenITmng4068AuthenticatedMirrorTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4068" );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyArtifactPresent( "org.apache.maven.its.mng4068", "a", "0.1", "jar" );

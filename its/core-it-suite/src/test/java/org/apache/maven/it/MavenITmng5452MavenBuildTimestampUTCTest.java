@@ -47,7 +47,8 @@ public class MavenITmng5452MavenBuildTimestampUTCTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5452-maven-build-timestamp-utc" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "process-resources" );
+        verifier.addCliArgument( "process-resources" );
+        verifier.execute();
         //
         // We have a timestamp format = yyyyMMdd:HHmm:z, where the final element is the timezone which should be UTC
         //

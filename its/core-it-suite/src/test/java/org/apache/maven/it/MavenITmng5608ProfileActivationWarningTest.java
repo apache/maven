@@ -49,7 +49,8 @@ public class MavenITmng5608ProfileActivationWarningTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5608-profile-activation-warning" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // check expected profiles activated, just for sanity (or build should have failed, given other profiles)

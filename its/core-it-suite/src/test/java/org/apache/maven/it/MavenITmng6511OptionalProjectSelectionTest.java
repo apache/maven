@@ -49,13 +49,16 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
     @Test
     public void testSelectExistingOptionalProfile() throws VerificationException
     {
-        newVerifier( testDir.getAbsolutePath() ).executeGoal( "clean" );
+        Verifier cleaner = newVerifier( testDir.getAbsolutePath() );
+        cleaner.addCliArgument( "clean" );
+        cleaner.execute();
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log-select-existing.txt" );
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "?existing-module" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
     }
@@ -63,13 +66,16 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
     @Test
     public void testSelectExistingOptionalProfileByArtifactId() throws VerificationException
     {
-        newVerifier( testDir.getAbsolutePath() ).executeGoal( "clean" );
+        Verifier cleaner = newVerifier( testDir.getAbsolutePath() );
+        cleaner.addCliArgument( "clean" );
+        cleaner.execute();
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log-select-existing-artifact-id.txt" );
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "?:existing-module" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
     }
@@ -77,13 +83,16 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
     @Test
     public void testSelectNonExistingOptionalProfile() throws VerificationException
     {
-        newVerifier( testDir.getAbsolutePath() ).executeGoal( "clean" );
+        Verifier cleaner = newVerifier( testDir.getAbsolutePath() );
+        cleaner.addCliArgument( "clean" );
+        cleaner.execute();
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log-select-non-existing.txt" );
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "?non-existing-module" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
     }
@@ -91,13 +100,16 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
     @Test
     public void testDeselectExistingOptionalProfile() throws VerificationException
     {
-        newVerifier( testDir.getAbsolutePath() ).executeGoal( "clean" );
+        Verifier cleaner = newVerifier( testDir.getAbsolutePath() );
+        cleaner.addCliArgument( "clean" );
+        cleaner.execute();
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log-deselect-existing.txt" );
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "!?existing-module" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyFileNotPresent( "existing-module/target/touch.txt" ); // existing-module should not have been built.
     }
@@ -105,13 +117,16 @@ public class MavenITmng6511OptionalProjectSelectionTest extends AbstractMavenInt
     @Test
     public void testDeselectNonExistingOptionalProfile() throws VerificationException
     {
-        newVerifier( testDir.getAbsolutePath() ).executeGoal( "clean" );
+        Verifier cleaner = newVerifier( testDir.getAbsolutePath() );
+        cleaner.addCliArgument( "clean" );
+        cleaner.execute();
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log-deselect-non-existing.txt" );
         verifier.addCliOption( "-pl" );
         verifier.addCliOption( "!?non-existing-module" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent( "existing-module/target/touch.txt" ); // existing-module should have been built.
     }

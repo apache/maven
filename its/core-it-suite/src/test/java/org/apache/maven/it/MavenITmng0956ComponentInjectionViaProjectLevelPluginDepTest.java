@@ -58,7 +58,8 @@ public class MavenITmng0956ComponentInjectionViaProjectLevelPluginDepTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties apiProps = verifier.loadProperties( "target/component.properties" );

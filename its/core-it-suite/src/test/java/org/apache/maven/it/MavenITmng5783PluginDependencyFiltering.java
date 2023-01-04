@@ -23,11 +23,13 @@ public class MavenITmng5783PluginDependencyFiltering
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5783-plugin-dependency-filtering" );
         Verifier verifier = newVerifier( new File( testDir, "plugin" ).getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( new File( testDir, "slf4j" ).getAbsolutePath(), "remote" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // Note that plugin dependencies always include plugin itself and plexus-utils

@@ -92,7 +92,8 @@ public class MavenITmng6255FixConcatLines
         Verifier verifier = newVerifier( baseDir.getAbsolutePath() );
         verifier.addCliOption( "-Dexpression.outputFile=" + new File( baseDir, "expression.properties" ).getAbsolutePath() );
         verifier.setForkJvm( true );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "expression.properties" );

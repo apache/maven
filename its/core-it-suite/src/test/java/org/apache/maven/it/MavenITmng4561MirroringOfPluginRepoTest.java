@@ -115,7 +115,8 @@ public class MavenITmng4561MirroringOfPluginRepoTest
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliOption( "-s" );
             verifier.addCliOption( "settings.xml" );
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
 
             verifier.verifyArtifactPresent( "org.apache.maven.its.mng4561", "plugin-dep", "0.1", "jar" );

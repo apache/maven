@@ -63,7 +63,8 @@ public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest
         verifier.setLogFileName( "log1.txt" );
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "mng4465:touch" );
+        verifier.addCliArgument( "mng4465:touch" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/touch.properties" );
@@ -78,7 +79,8 @@ public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest
         verifier.setLogFileName( "log2.txt" );
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "mng4465:touch" );
+        verifier.addCliArgument( "mng4465:touch" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/touch.properties" );

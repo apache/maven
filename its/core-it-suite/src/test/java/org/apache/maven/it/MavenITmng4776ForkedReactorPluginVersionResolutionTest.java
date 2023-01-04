@@ -58,7 +58,8 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "sub/target" );
         verifier.setLogFileName( "log-lifecycle.txt" );
-        verifier.executeGoal( "test" );
+        verifier.addCliArgument( "test" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "sub/target/log.txt" );
@@ -82,7 +83,8 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "sub/target" );
         verifier.setLogFileName( "log-cli.txt" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-fork:2.1-SNAPSHOT:fork-lifecycle-aggregator" );
+        verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-fork:2.1-SNAPSHOT:fork-lifecycle-aggregator" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "sub/target/log.txt" );

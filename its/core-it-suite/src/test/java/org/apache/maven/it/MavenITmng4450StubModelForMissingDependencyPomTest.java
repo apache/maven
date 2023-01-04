@@ -58,7 +58,8 @@ public class MavenITmng4450StubModelForMissingDependencyPomTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4450" );
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "target/pom.properties" );

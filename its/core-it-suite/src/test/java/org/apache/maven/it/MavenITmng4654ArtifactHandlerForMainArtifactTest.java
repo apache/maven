@@ -59,7 +59,8 @@ public class MavenITmng4654ArtifactHandlerForMainArtifactTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFileNotPresent( "target/repo/org/apache/maven/its/mng4654/test/1.0/test-1.0.mng4654" );

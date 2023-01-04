@@ -61,7 +61,8 @@ public class MavenITmng1895ScopeConflictResolutionTest
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
@@ -246,7 +247,8 @@ public class MavenITmng1895ScopeConflictResolutionTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", props );
         verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", props );
         verifier.setLogFileName( "log-" + scopeB + "-vs-" + scopeA + ".txt" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         return verifier;

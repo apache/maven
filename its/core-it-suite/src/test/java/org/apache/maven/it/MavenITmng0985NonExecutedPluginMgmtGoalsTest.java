@@ -55,7 +55,8 @@ public class MavenITmng0985NonExecutedPluginMgmtGoalsTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "initialize" );
+        verifier.addCliArgument( "initialize" );
+        verifier.execute();
         verifier.verifyFileNotPresent( "target/unexpected.txt" );
         verifier.verifyErrorFreeLog();
     }

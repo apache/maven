@@ -114,7 +114,8 @@ public class MavenITmng6223FindBasedir
         verifier.addCliOption( option ); // -f/--file client/pom.xml
         verifier.addCliOption( ( pom ? new File( testDir, "pom.xml" ) : testDir ).getAbsolutePath() );
         verifier.setForkJvm( true ); // force forked JVM since we need the shell script to detect .mvn/ location
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties( "expression.properties" );

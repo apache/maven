@@ -54,12 +54,14 @@ public class MavenITmng3716AggregatorForkingTest
         Verifier verifier;
 
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( projectsDir.getAbsolutePath() );
-        verifier.executeGoal( "org.apache.maven.its.mng3716:mavenit-mng3716-plugin:1:run" );
+        verifier.addCliArgument( "org.apache.maven.its.mng3716:mavenit-mng3716-plugin:1:run" );
+        verifier.execute();
 
         verifier.verifyErrorFreeLog();
     }

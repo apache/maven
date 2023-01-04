@@ -90,7 +90,8 @@ public class MavenITmngXXXXDescriptionOfProblemTest
         List cliOptions = new ArrayList();
         cliOptions.add( "-N" );
         verifier.setCliOptions( cliOptions );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
 
         /*
          * This is the simplest way to check a build
@@ -111,7 +112,8 @@ public class MavenITmngXXXXDescriptionOfProblemTest
          * preparation for the test.
          */
         verifier = new Verifier( new File( testDir.getAbsolutePath(), "checkstyle-assembly" ).getAbsolutePath() );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         /*
@@ -123,7 +125,8 @@ public class MavenITmngXXXXDescriptionOfProblemTest
          * particular test will fail in Maven <2.0.6.
          */
         verifier = new Verifier( new File( testDir.getAbsolutePath(), "checkstyle-test" ).getAbsolutePath() );
-        verifier.executeGoal( "install" );
+        verifier.addCliArgument( "install" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         /*

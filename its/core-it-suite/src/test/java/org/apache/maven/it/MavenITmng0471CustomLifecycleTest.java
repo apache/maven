@@ -56,9 +56,9 @@ public class MavenITmng0471CustomLifecycleTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        List<String> goals = Arrays.asList( new String[]{"org.apache.maven.its.plugins:maven-it-plugin-fork:fork",
-            "org.apache.maven.its.plugins:maven-it-plugin-fork:fork-goal"} );
-        verifier.executeGoals( goals );
+        verifier.addCliArguments( "org.apache.maven.its.plugins:maven-it-plugin-fork:fork",
+            "org.apache.maven.its.plugins:maven-it-plugin-fork:fork-goal" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier.verifyFilePresent( "target/forked/touch.txt" );

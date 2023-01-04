@@ -57,7 +57,8 @@ public class MavenITmng4193UniqueRepoIdTest
         verifier.deleteDirectory( "target" );
         try
         {
-            verifier.executeGoal( "validate" );
+            verifier.addCliArgument( "validate" );
+            verifier.execute();
             verifier.verifyErrorFreeLog();
             fail( "Duplicate repository ids did not cause validation error" );
         }

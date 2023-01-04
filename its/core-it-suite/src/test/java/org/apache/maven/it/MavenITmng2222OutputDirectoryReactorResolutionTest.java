@@ -59,7 +59,8 @@ public class MavenITmng2222OutputDirectoryReactorResolutionTest
         verifier.deleteDirectory( "mod-a/target" );
         verifier.deleteDirectory( "mod-b/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2222" );
-        verifier.executeGoal( "compile" );
+        verifier.addCliArgument( "compile" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> classpath = verifier.loadLines( "mod-b/target/compile.txt", "UTF-8" );

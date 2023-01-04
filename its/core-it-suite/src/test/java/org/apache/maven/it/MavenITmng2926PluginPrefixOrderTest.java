@@ -73,7 +73,8 @@ public class MavenITmng2926PluginPrefixOrderTest
             verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings-default.xml" );
-        verifier.executeGoal( "mng-2926:apache" );
+        verifier.addCliArgument( "mng-2926:apache" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier( testDir.getAbsolutePath() );
@@ -83,7 +84,8 @@ public class MavenITmng2926PluginPrefixOrderTest
             verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings-custom.xml" );
-        verifier.executeGoal( "mng-2926:custom" );
+        verifier.addCliArgument( "mng-2926:custom" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
     }
 

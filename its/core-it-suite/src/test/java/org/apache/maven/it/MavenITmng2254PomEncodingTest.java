@@ -58,7 +58,8 @@ public class MavenITmng2254PomEncodingTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "utf-8/target" );
         verifier.deleteDirectory( "latin-1/target" );
-        verifier.executeGoal( "validate" );
+        verifier.addCliArgument( "validate" );
+        verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Properties utf8 = verifier.loadProperties( "utf-8/target/pom.properties" );
