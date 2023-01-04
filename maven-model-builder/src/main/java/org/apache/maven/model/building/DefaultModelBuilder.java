@@ -76,6 +76,7 @@ import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.plugin.LifecycleBindingsInjector;
 import org.apache.maven.model.plugin.PluginConfigurationExpander;
 import org.apache.maven.model.plugin.ReportConfigurationExpander;
+import org.apache.maven.model.plugin.ReportingConverter;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.apache.maven.model.profile.ProfileInjector;
@@ -623,6 +624,15 @@ public class DefaultModelBuilder implements ModelBuilder {
                 reportConfigurationExpander,
                 profileActivationFilePathInterpolator,
                 versionProcessor);
+    }
+
+    /**
+     * @deprecated since Maven 4
+     * @see DefaultModelBuilderFactory#setReportingConverter(ReportingConverter)
+     */
+    @Deprecated
+    public DefaultModelBuilder setReportingConverter(ReportingConverter reportingConverter) {
+        return this;
     }
 
     @Override
