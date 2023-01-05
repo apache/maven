@@ -58,7 +58,6 @@ public class MavenITmng6057CheckReactorOrderTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6057-check-reactor-order" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
-        verifier.setMavenDebug( false );
         verifier.setAutoclean( false );
 
         verifier.setLogFileName( "log-only.txt" );

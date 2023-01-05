@@ -60,7 +60,7 @@ public class MavenITmng0828PluginConfigValuesInDebugTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.setMavenDebug( true );
+        verifier.addCliArgument( "-X" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -60,7 +60,6 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5895-ci-friendly-usage-with-property" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
-        verifier.setMavenDebug( false );
         verifier.setAutoclean( false );
 
         //verifier.setLogFileName( "log-only.txt" );
@@ -81,7 +80,6 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5895-ci-friendly-usage-with-property" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
-        verifier.setMavenDebug( false );
         verifier.setAutoclean( false );
 
         verifier.setLogFileName( "log-bc.txt" );

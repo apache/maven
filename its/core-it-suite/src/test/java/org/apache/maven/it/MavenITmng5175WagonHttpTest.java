@@ -133,7 +133,7 @@ public class MavenITmng5175WagonHttpTest
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "--fail-never" );
         verifier.addCliArgument( "--errors" );
-        verifier.setMavenDebug( true );
+        verifier.addCliArgument( "-X" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
 

@@ -61,7 +61,7 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230-make-reactor-with-excludes" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), true );
-        verifier.setMavenDebug( true );
+        verifier.addCliArgument( "-X" );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.addCliArgument( "-pl" );

@@ -72,7 +72,7 @@ public class MavenITmng5581LifecycleMappingDelegate
         verifier = newVerifier( projectDir.getAbsolutePath() );
         verifier.setLogFileName( "test-only-log.txt" );
         verifier.setForkJvm( true );
-        verifier.setMavenDebug( true );
+        verifier.addCliArgument( "-X" );
         verifier.addCliArgument( "test-only" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

@@ -32,7 +32,6 @@ public class MavenITmng5965ParallelBuildMultipliesWorkTest
             ResourceExtractor.simpleExtractResources( getClass(), "/mng-5965-parallel-build-multiplies-work" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
-        verifier.setMavenDebug( false );
         verifier.setAutoclean( false );
 
         verifier.setLogFileName( "log-only.txt" );

@@ -49,7 +49,7 @@ public class MavenITmng5214DontMapWsdlToJar
 
         Verifier setupVerifier = newVerifier( setupDir.getAbsolutePath() );
         setupVerifier.setAutoclean( false );
-        setupVerifier.setMavenDebug( true );
+        setupVerifier.addCliArgument( "-X" );
         setupVerifier.deleteDirectory( "target" );
         setupVerifier.deleteArtifacts( "org.apache.maven.its.mng5214" );
         setupVerifier.setLogFileName( "log-setup.txt" );

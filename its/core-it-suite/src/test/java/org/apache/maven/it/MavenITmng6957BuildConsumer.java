@@ -73,7 +73,6 @@ public class MavenITmng6957BuildConsumer
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6957-buildconsumer" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
-        verifier.setMavenDebug( false );
         verifier.setAutoclean( false );
         verifier.addCliArgument( "-Dchangelist=MNG6957" );
 
