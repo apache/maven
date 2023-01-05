@@ -58,7 +58,7 @@ public class MavenITmng3217InterPluginDependencyTest
         verifier.deleteDirectory( "sub-1/target" );
         verifier.deleteDirectory( "sub-2/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3217" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );

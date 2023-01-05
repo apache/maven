@@ -53,8 +53,8 @@ public class MavenITmng5663NestedImportScopePomResolutionTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteArtifacts( "org.apache.maven.its.mng5663" );
 
-        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
 

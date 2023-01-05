@@ -24,7 +24,6 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 import java.util.List;
-import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
@@ -64,9 +63,8 @@ public class MavenITmng4199CompileMeetsRuntimeScopeTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4199" );
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", filterProps );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
+        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );

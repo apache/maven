@@ -99,7 +99,7 @@ public class MavenITmng3775ConflictResolutionBacktrackingTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng3775" );
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

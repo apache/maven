@@ -49,7 +49,7 @@ public class MavenIT0018DependencyManagementTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.it0018" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );

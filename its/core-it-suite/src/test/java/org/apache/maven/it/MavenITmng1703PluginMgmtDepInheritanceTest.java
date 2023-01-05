@@ -56,7 +56,7 @@ public class MavenITmng1703PluginMgmtDepInheritanceTest
 
         Verifier verifier = newVerifier( new File( testDir, "child" ).getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
         verifier.deleteDirectory( "target" );

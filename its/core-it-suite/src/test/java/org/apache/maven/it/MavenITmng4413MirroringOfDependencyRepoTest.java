@@ -23,7 +23,7 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
-import java.util.Properties;
+import java.util.Map;
 
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -109,8 +109,8 @@ public class MavenITmng4413MirroringOfDependencyRepoTest
             verifier.setAutoclean( false );
             verifier.deleteDirectory( "target" );
             verifier.deleteArtifacts( "org.apache.maven.its.mng4413" );
-            Properties filterProps = verifier.newDefaultFilterProperties();
-            filterProps.setProperty( "@port@", Integer.toString( port ) );
+            Map<String, String> filterProps = verifier.newDefaultFilterMap();
+            filterProps.put( "@port@", Integer.toString( port ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliArgument( "-s" );
             verifier.addCliArgument( "settings.xml" );

@@ -23,8 +23,9 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -127,8 +128,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
     {
         testDir = new File( testDir, "test-1" );
 
-        Properties filterProps = new Properties();
-        filterProps.setProperty( "@port@", Integer.toString( port ) );
+        Map<String, String> filterProps = new HashMap<>();
+        filterProps.put( "@port@", Integer.toString( port ) );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -157,11 +158,11 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
     {
         testDir = new File( testDir, "test-2" );
 
-        Properties filterProps = new Properties();
-        filterProps.setProperty( "@port@", Integer.toString( port ) );
+        Map<String, String> filterProps = new HashMap<>();
+        filterProps.put( "@port@", Integer.toString( port ) );
         // NOTE: The upper-case scheme name is essential part of the test
         String secUrl = "FILE://" + new File( testDir, "relocated-settings-security.xml" ).toURI().getRawPath();
-        filterProps.setProperty( "@relocation@", secUrl );
+        filterProps.put( "@relocation@", secUrl );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );

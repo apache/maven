@@ -55,7 +55,7 @@ public class MavenITmng4400RepositoryOrderTest
         Verifier verifier = newVerifier( new File( testDir, "settings" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4400" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
@@ -80,7 +80,7 @@ public class MavenITmng4400RepositoryOrderTest
         Verifier verifier = newVerifier( new File( testDir, "pom" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4400" );
-        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8" );
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );

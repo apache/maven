@@ -29,7 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -138,8 +138,8 @@ public class MavenITmng4360WebDavSupportTest
             verifier.setAutoclean( false );
             verifier.deleteArtifacts( "org.apache.maven.its.mng4360" );
             verifier.deleteDirectory( "target" );
-            Properties filterProps = verifier.newDefaultFilterProperties();
-            filterProps.setProperty( "@port@", Integer.toString( port ) );
+            Map<String, String> filterProps = verifier.newDefaultFilterMap();
+            filterProps.put( "@port@", Integer.toString( port ) );
             verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliArgument( "--settings" );
             verifier.addCliArgument( "settings.xml" );

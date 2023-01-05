@@ -23,7 +23,7 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
-import java.util.Properties;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
@@ -57,10 +57,10 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4367" );
 
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        filterProps.setProperty( "@repourl@", filterProps.getProperty( "@baseurl@" ) + "/void" );
-        filterProps.setProperty( "@mirrorurl@", filterProps.getProperty( "@baseurl@" ) + "/repo" );
-        filterProps.setProperty( "@layouts@", "" );
+        Map<String, String> filterProps = verifier.newDefaultFilterMap();
+        filterProps.put( "@repourl@", filterProps.get( "@baseurl@" ) + "/void" );
+        filterProps.put( "@mirrorurl@", filterProps.get( "@baseurl@" ) + "/repo" );
+        filterProps.put( "@layouts@", "" );
 
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings-a.xml" );
@@ -88,10 +88,10 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4367" );
 
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        filterProps.setProperty( "@repourl@", filterProps.getProperty( "@baseurl@" ) + "/void" );
-        filterProps.setProperty( "@mirrorurl@", filterProps.getProperty( "@baseurl@" ) + "/repo" );
-        filterProps.setProperty( "@layouts@", "default,legacy" );
+        Map<String, String> filterProps = verifier.newDefaultFilterMap();
+        filterProps.put( "@repourl@", filterProps.get( "@baseurl@" ) + "/void" );
+        filterProps.put( "@mirrorurl@", filterProps.get( "@baseurl@" ) + "/repo" );
+        filterProps.put( "@layouts@", "default,legacy" );
 
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings-b.xml" );
@@ -119,10 +119,10 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4367" );
 
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        filterProps.setProperty( "@repourl@", filterProps.getProperty( "@baseurl@" ) + "/repo" );
-        filterProps.setProperty( "@mirrorurl@", filterProps.getProperty( "@baseurl@" ) + "/void" );
-        filterProps.setProperty( "@layouts@", "foo" );
+        Map<String, String> filterProps = verifier.newDefaultFilterMap();
+        filterProps.put( "@repourl@", filterProps.get( "@baseurl@" ) + "/repo" );
+        filterProps.put( "@mirrorurl@", filterProps.get( "@baseurl@" ) + "/void" );
+        filterProps.put( "@layouts@", "foo" );
 
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings-c.xml" );

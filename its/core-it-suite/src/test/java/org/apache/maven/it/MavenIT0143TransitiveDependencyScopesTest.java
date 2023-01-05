@@ -24,7 +24,7 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
@@ -250,8 +250,8 @@ public class MavenIT0143TransitiveDependencyScopesTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target-" + scope );
         verifier.deleteArtifacts( "org.apache.maven.its.it0143" );
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        filterProps.setProperty( "@scope@", scope );
+        Map<String, String> filterProps = verifier.newDefaultFilterMap();
+        filterProps.put( "@scope@", scope );
         verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", filterProps );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.addCliArgument( "--settings" );

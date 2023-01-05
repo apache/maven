@@ -58,7 +58,7 @@ public class MavenITmng5135AggregatorDepResolutionModuleExtensionTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng5135" );
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:aggregate-test" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

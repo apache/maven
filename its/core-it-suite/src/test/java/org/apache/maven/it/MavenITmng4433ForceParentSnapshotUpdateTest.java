@@ -23,7 +23,7 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
-import java.util.Properties;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
@@ -58,9 +58,9 @@ public class MavenITmng4433ForceParentSnapshotUpdateTest
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
 
-        Properties filterProps = verifier.newDefaultFilterProperties();
+        Map<String, String> filterProps = verifier.newDefaultFilterMap();
 
-        filterProps.setProperty( "@repo@", "repo-1" );
+        filterProps.put( "@repo@", "repo-1" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-force-1.txt" );
         verifier.deleteDirectory( "target" );
@@ -71,7 +71,7 @@ public class MavenITmng4433ForceParentSnapshotUpdateTest
         verifier.verifyFilePresent( "target/old.txt" );
         verifier.verifyFileNotPresent( "target/new.txt" );
 
-        filterProps.setProperty( "@repo@", "repo-2" );
+        filterProps.put( "@repo@", "repo-2" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-force-2.txt" );
         verifier.deleteDirectory( "target" );

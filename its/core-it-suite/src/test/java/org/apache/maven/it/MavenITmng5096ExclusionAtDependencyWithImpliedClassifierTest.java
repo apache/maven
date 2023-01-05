@@ -60,7 +60,7 @@ public class MavenITmng5096ExclusionAtDependencyWithImpliedClassifierTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng5096" );
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

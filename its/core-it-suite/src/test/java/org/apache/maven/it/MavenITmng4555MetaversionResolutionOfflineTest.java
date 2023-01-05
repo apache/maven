@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
 import java.util.Deque;
-import java.util.Properties;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.eclipse.jetty.server.Handler;
@@ -99,8 +99,8 @@ public class MavenITmng4555MetaversionResolutionOfflineTest
             }
             int port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
             System.out.println( "Bound server socket to the port " + port );
-            Properties filterProps = verifier.newDefaultFilterProperties();
-            filterProps.setProperty( "@port@", Integer.toString( port ) );
+            Map<String, String> filterProps = verifier.newDefaultFilterMap();
+            filterProps.put( "@port@", Integer.toString( port ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliArgument( "--offline" );
             verifier.addCliArgument( "--settings" );

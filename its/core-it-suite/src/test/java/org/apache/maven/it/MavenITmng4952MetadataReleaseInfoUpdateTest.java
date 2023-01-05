@@ -23,7 +23,7 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.maven.shared.utils.io.FileUtils;
 import org.junit.jupiter.api.Test;
@@ -58,7 +58,7 @@ public class MavenITmng4952MetadataReleaseInfoUpdateTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4952" );
 
-        Properties props = verifier.newDefaultFilterProperties();
+        Map<String, String> props = verifier.newDefaultFilterMap();
 
         props.put( "@version@", "1.0" );
         verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", props );

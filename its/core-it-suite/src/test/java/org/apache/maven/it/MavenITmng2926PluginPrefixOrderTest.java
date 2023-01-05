@@ -69,8 +69,7 @@ public class MavenITmng2926PluginPrefixOrderTest
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setLogFileName( "log-default.txt" );
-        verifier.filterFile( "settings-default-template.xml", "settings-default.xml", "UTF-8",
-            verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-default-template.xml", "settings-default.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings-default.xml" );
         verifier.addCliArgument( "mng-2926:apache" );
@@ -80,8 +79,7 @@ public class MavenITmng2926PluginPrefixOrderTest
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setLogFileName( "log-custom.txt" );
-        verifier.filterFile( "settings-custom-template.xml", "settings-custom.xml", "UTF-8",
-            verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-custom-template.xml", "settings-custom.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings-custom.xml" );
         verifier.addCliArgument( "mng-2926:custom" );

@@ -29,7 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -105,9 +105,9 @@ public class MavenITmng2305MultipleProxiesTest
             verifier.setAutoclean( false );
             verifier.deleteDirectory( "target" );
             verifier.deleteArtifacts( "org.apache.maven.its.mng2305" );
-            Properties filterProps = verifier.newDefaultFilterProperties();
-            filterProps.setProperty( "@proxy.http@", Integer.toString( httpPort ) );
-            filterProps.setProperty( "@proxy.https@", Integer.toString( proxyPort ) );
+            Map<String, String> filterProps = verifier.newDefaultFilterMap();
+            filterProps.put( "@proxy.http@", Integer.toString( httpPort ) );
+            filterProps.put( "@proxy.https@", Integer.toString( proxyPort ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliArgument( "--settings" );
             verifier.addCliArgument( "settings.xml" );

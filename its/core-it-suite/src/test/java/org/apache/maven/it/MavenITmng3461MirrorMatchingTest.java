@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Properties;
+import java.util.Map;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -66,8 +66,7 @@ public class MavenITmng3461MirrorMatchingTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3461" );
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );
@@ -140,8 +139,8 @@ public class MavenITmng3461MirrorMatchingTest
 
             verifier.setAutoclean( false );
             verifier.deleteArtifacts( "org.apache.maven.its.mng3461" );
-            Properties filterProps = verifier.newDefaultFilterProperties();
-            filterProps.setProperty( "@test.port@", Integer.toString( port ) );
+            Map<String, String> filterProps = verifier.newDefaultFilterMap();
+            filterProps.put( "@test.port@", Integer.toString( port ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliArgument( "--settings" );
             verifier.addCliArgument( "settings.xml" );
@@ -175,8 +174,7 @@ public class MavenITmng3461MirrorMatchingTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3461" );
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );

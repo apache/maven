@@ -29,7 +29,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -105,8 +105,8 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest
             verifier.setAutoclean( false );
             verifier.deleteDirectory( "target" );
             verifier.deleteArtifacts( "org.apache.maven.its.mng4500" );
-            Properties filterProps = verifier.newDefaultFilterProperties();
-            filterProps.setProperty( "@port@", Integer.toString( port ) );
+            Map<String, String> filterProps = verifier.newDefaultFilterMap();
+            filterProps.put( "@port@", Integer.toString( port ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliArgument( "-s" );
             verifier.addCliArgument( "settings.xml" );

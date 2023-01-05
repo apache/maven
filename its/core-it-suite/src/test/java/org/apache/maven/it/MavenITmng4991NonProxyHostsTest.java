@@ -25,7 +25,7 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.net.InetAddress;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -94,12 +94,12 @@ public class MavenITmng4991NonProxyHostsTest
             verifier.setAutoclean( false );
             verifier.deleteDirectory( "target" );
             verifier.deleteArtifacts( "org.apache.maven.its.mng4991" );
-            Properties filterProps = verifier.newDefaultFilterProperties();
+            Map<String, String> filterProps = verifier.newDefaultFilterMap();
             int port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
-            filterProps.setProperty( "@port@", Integer.toString( port ) );
+            filterProps.put( "@port@", Integer.toString( port ) );
             int proxyPort = ( (NetworkConnector) proxy.getConnectors()[0] ).getLocalPort();
-            filterProps.setProperty( "@proxyPort@", Integer.toString( proxyPort ) );
-            filterProps.setProperty( "@localhost@", InetAddress.getLoopbackAddress().getCanonicalHostName() );
+            filterProps.put( "@proxyPort@", Integer.toString( proxyPort ) );
+            filterProps.put( "@localhost@", InetAddress.getLoopbackAddress().getCanonicalHostName() );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliArgument( "-s" );
             verifier.addCliArgument( "settings.xml" );

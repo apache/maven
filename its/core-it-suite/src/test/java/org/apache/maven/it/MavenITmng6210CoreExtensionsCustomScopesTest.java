@@ -47,7 +47,7 @@ public class MavenITmng6210CoreExtensionsCustomScopesTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-6210-core-extensions-scopes" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
 
         verifier = newVerifier( new File( testDir, "client" ).getAbsolutePath() );
         verifier.deleteDirectory( "target" );

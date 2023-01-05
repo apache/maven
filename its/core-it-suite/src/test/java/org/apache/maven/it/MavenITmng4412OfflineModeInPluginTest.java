@@ -57,7 +57,7 @@ public class MavenITmng4412OfflineModeInPluginTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4412" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "-Presolver" );
         verifier.addCliArgument( "--offline" );
         verifier.addCliArgument( "-s" );
@@ -92,7 +92,7 @@ public class MavenITmng4412OfflineModeInPluginTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4412" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "-Pcollector" );
         verifier.addCliArgument( "--offline" );
         verifier.addCliArgument( "-s" );

@@ -59,7 +59,7 @@ public class MavenITmng4276WrongTransitivePlexusUtilsTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4276" );
         verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "1.1.4276", "jar" );
         verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "1.1.4276", "pom" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );

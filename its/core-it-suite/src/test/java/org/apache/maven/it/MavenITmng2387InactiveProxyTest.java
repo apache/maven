@@ -24,7 +24,7 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 import java.net.InetAddress;
-import java.util.Properties;
+import java.util.Map;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -126,10 +126,10 @@ public class MavenITmng2387InactiveProxyTest
     {
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        Properties properties = verifier.newDefaultFilterProperties();
-        properties.setProperty( "@host@", InetAddress.getLoopbackAddress().getCanonicalHostName() );
-        properties.setProperty( "@port@", Integer.toString( port ) );
-        properties.setProperty( "@proxyPort@", Integer.toString( proxyPort ) );
+        Map<String, String> properties = verifier.newDefaultFilterMap();
+        properties.put( "@host@", InetAddress.getLoopbackAddress().getCanonicalHostName() );
+        properties.put( "@port@", Integer.toString( port ) );
+        properties.put( "@proxyPort@", Integer.toString( proxyPort ) );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", properties );
 
         verifier.setAutoclean( false );

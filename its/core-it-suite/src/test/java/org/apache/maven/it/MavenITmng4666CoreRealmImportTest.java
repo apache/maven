@@ -77,7 +77,7 @@ public class MavenITmng4666CoreRealmImportTest
         verifier.deleteArtifacts( "org.sonatype.sisu", "sisu-inject-plexus", "0.1-stub" );
         verifier.deleteArtifacts( "org.sonatype.spice", "spice-inject-plexus", "0.1-stub" );
         verifier.deleteArtifacts( "classworlds", "classworlds", "0.1-stub" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );

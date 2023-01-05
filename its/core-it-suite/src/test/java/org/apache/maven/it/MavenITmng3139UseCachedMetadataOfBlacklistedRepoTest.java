@@ -59,7 +59,7 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3139" );
 
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.setLogFileName( "log1.txt" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );

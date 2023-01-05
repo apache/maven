@@ -28,7 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -122,8 +123,8 @@ public class MavenITmng5175WagonHttpTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        Properties filterProps = new Properties();
-        filterProps.setProperty( "@port@", Integer.toString( port ) );
+        Map<String, String> filterProps = new HashMap<>();
+        filterProps.put( "@port@", Integer.toString( port ) );
 
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
 

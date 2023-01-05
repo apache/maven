@@ -37,7 +37,7 @@ class MavenITmng7566JavaPrerequisiteTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng7566" );
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8" );
         try
         {
             verifier.addCliArgument( "validate" );
@@ -69,7 +69,7 @@ class MavenITmng7566JavaPrerequisiteTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng7566" );
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "org.apache.maven.its.mng7566:maven-mng7566-plugin:touch" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

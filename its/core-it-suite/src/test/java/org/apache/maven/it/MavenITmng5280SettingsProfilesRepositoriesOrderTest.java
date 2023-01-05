@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.Properties;
+import java.util.Map;
 
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
@@ -101,8 +101,8 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng5280" );
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        filterProps.setProperty( "@httpserver.port@", Integer.toString( httpPort ) );
+        Map<String, String> filterProps = verifier.newDefaultFilterMap();
+        filterProps.put( "@httpserver.port@", Integer.toString( httpPort ) );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
@@ -138,8 +138,8 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng5280" );
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        filterProps.setProperty( "@httpserver.port@", Integer.toString( httpPort ) );
+        Map<String, String> filterProps = verifier.newDefaultFilterMap();
+        filterProps.put( "@httpserver.port@", Integer.toString( httpPort ) );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );

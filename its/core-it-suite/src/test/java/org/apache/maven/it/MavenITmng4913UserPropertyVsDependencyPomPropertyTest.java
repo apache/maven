@@ -59,7 +59,7 @@ public class MavenITmng4913UserPropertyVsDependencyPomPropertyTest
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "-Dmng4913.version=98.76" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

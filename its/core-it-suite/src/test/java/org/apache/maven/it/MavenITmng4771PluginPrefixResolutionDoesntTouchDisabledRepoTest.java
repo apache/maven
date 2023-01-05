@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
 import java.util.Deque;
-import java.util.Properties;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.eclipse.jetty.server.NetworkConnector;
@@ -96,8 +96,8 @@ public class MavenITmng4771PluginPrefixResolutionDoesntTouchDisabledRepoTest
             System.out.println( "Bound server socket to the port " + port );
             verifier.setAutoclean( false );
             verifier.deleteDirectory( "target" );
-            Properties filterProps = verifier.newDefaultFilterProperties();
-            filterProps.setProperty( "@port@", Integer.toString( port ) );
+            Map<String, String> filterProps = verifier.newDefaultFilterMap();
+            filterProps.put( "@port@", Integer.toString( port ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliArgument( "-U" );
             verifier.addCliArgument( "-s" );

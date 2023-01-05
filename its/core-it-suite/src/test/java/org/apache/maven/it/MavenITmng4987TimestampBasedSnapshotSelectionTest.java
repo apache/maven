@@ -59,7 +59,7 @@ public class MavenITmng4987TimestampBasedSnapshotSelectionTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4987" );
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

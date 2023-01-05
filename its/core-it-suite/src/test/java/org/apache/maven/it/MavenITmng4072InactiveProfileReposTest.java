@@ -23,7 +23,6 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
-import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
@@ -55,10 +54,9 @@ public class MavenITmng4072InactiveProfileReposTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4072" );
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", filterProps );
-        verifier.filterFile( "profiles-template.xml", "profiles.xml", "UTF-8", filterProps );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
+        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8" );
+        verifier.filterFile( "profiles-template.xml", "profiles.xml", "UTF-8" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
         try

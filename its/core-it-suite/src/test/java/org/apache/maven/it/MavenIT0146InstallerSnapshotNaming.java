@@ -25,7 +25,7 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Properties;
+import java.util.Map;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -91,9 +91,9 @@ public class MavenIT0146InstallerSnapshotNaming
     {
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        Properties properties = verifier.newDefaultFilterProperties();
-        properties.setProperty( "@host@", InetAddress.getLoopbackAddress().getCanonicalHostName() );
-        properties.setProperty( "@port@", Integer.toString( port ) );
+        Map<String, String> properties = verifier.newDefaultFilterMap();
+        properties.put( "@host@", InetAddress.getLoopbackAddress().getCanonicalHostName() );
+        properties.put( "@port@", Integer.toString( port ) );
 
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", properties );
 
@@ -131,9 +131,9 @@ public class MavenIT0146InstallerSnapshotNaming
 
         verifier = newVerifier( testDir.getAbsolutePath() );
 
-        Properties properties = verifier.newDefaultFilterProperties();
-        properties.setProperty( "@host@", InetAddress.getLoopbackAddress().getCanonicalHostName() );
-        properties.setProperty( "@port@", Integer.toString( port ) );
+        Map<String, String> properties = verifier.newDefaultFilterMap();
+        properties.put( "@host@", InetAddress.getLoopbackAddress().getCanonicalHostName() );
+        properties.put( "@port@", Integer.toString( port ) );
 
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", properties );
 

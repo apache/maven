@@ -48,7 +48,7 @@ public class MavenITmng5639ImportScopePomResolutionTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteArtifacts( "org.apache.maven.its.mng5639" );
 
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
 

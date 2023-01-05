@@ -50,7 +50,7 @@ public class MavenIT0021PomProfileTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.it0021" );
         verifier.getSystemProperties().setProperty( "includeProfile", "true" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "-Pprofile-2" );

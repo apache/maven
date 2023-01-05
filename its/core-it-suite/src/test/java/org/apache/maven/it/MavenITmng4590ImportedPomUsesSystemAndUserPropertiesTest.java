@@ -56,7 +56,7 @@ public class MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4590" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.setEnvironmentVariable( "MAVEN_OPTS", "-Dtest.file=pom.xml" );
         verifier.addCliArgument( "-Dtest.dir=" + testDir.getAbsolutePath() );
         verifier.addCliArgument( "--settings" );

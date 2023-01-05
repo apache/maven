@@ -61,7 +61,7 @@ public class MavenITmng2695OfflinePluginSnapshotsTest
             verifier.deleteArtifacts( "org.apache.maven.its.mng2695" );
             verifier.setAutoclean( false );
             verifier.setLogFileName( "log1.txt" );
-            verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+            verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
             verifier.addCliArgument( "--settings" );
             verifier.addCliArgument( "settings.xml" );
             verifier.addCliArgument( "validate" );

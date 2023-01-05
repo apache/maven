@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.jetty.server.Connector;
@@ -137,9 +138,9 @@ public class MavenITmng4428FollowHttpRedirectTest
             verifier.setAutoclean( false );
             verifier.deleteArtifacts( "org.apache.maven.its.mng4428" );
             verifier.deleteDirectory( "target" );
-            Properties filterProps = verifier.newDefaultFilterProperties();
-            filterProps.setProperty( "@protocol@", fromHttp ? "http" : "https" );
-            filterProps.setProperty( "@port@", Integer.toString( ( (NetworkConnector) from ).getLocalPort() ) );
+            Map<String, String> filterProps = verifier.newDefaultFilterMap();
+            filterProps.put( "@protocol@", fromHttp ? "http" : "https" );
+            filterProps.put( "@port@", Integer.toString( ( (NetworkConnector) from ).getLocalPort() ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliArgument( "-X" );
             verifier.addCliArgument( "--settings" );

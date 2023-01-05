@@ -57,7 +57,7 @@ public class MavenITmng4840MavenPrerequisiteTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4840" );
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8" );
         try
         {
             verifier.addCliArgument( "validate" );
@@ -89,7 +89,7 @@ public class MavenITmng4840MavenPrerequisiteTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4840" );
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "org.apache.maven.its.mng4840:maven-mng4840-plugin:touch" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

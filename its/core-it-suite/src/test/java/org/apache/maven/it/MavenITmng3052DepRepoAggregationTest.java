@@ -23,7 +23,6 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
-import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
@@ -60,10 +59,9 @@ public class MavenITmng3052DepRepoAggregationTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3052" );
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.filterFile( "repo-d/org/apache/maven/its/mng3052/direct/0.1-SNAPSHOT/template.pom",
-            "repo-d/org/apache/maven/its/mng3052/direct/0.1-SNAPSHOT/direct-0.1-20090517.133956-1.pom", "UTF-8", filterProps );
+            "repo-d/org/apache/maven/its/mng3052/direct/0.1-SNAPSHOT/direct-0.1-20090517.133956-1.pom", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );

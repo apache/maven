@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import org.apache.maven.shared.utils.io.FileUtils;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -112,10 +112,10 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
                 // expected when running test on Windows using embedded Maven (JAR files locked by plugin class realm)
                 assertFalse( new File( verifier.getArtifactMetadataPath( "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml" ) ).exists() );
             }
-            Properties filterProps = verifier.newDefaultFilterProperties();
+            Map<String, String> filterProps = verifier.newDefaultFilterMap();
             NetworkConnector connector = (NetworkConnector) server.getConnectors()[0];
-            filterProps.setProperty( "@port@", Integer.toString( connector.getLocalPort() ) );
-            filterProps.setProperty( "@repo@", "repo-1" );
+            filterProps.put( "@port@", Integer.toString( connector.getLocalPort() ) );
+            filterProps.put( "@repo@", "repo-1" );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliArgument( "-s" );
             verifier.addCliArgument( "settings.xml" );
@@ -200,10 +200,10 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
                 // expected when running test on Windows using embedded Maven (JAR files locked by plugin class realm)
                 assertFalse( new File( verifier.getArtifactMetadataPath( "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml" ) ).exists() );
             }
-            Properties filterProps = verifier.newDefaultFilterProperties();
+            Map<String, String> filterProps = verifier.newDefaultFilterMap();
             NetworkConnector connector = (NetworkConnector) server.getConnectors()[0];
-            filterProps.setProperty( "@port@", Integer.toString( connector.getLocalPort() ) );
-            filterProps.setProperty( "@repo@", "repo-1" );
+            filterProps.put( "@port@", Integer.toString( connector.getLocalPort() ) );
+            filterProps.put( "@repo@", "repo-1" );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliArgument( "-U" );
             verifier.addCliArgument( "-s" );
@@ -291,10 +291,10 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
                 // expected when running test on Windows using embedded Maven (JAR files locked by plugin class realm)
                 assertFalse( new File( verifier.getArtifactMetadataPath( "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml" ) ).exists() );
             }
-            Properties filterProps = verifier.newDefaultFilterProperties();
+            Map<String, String> filterProps = verifier.newDefaultFilterMap();
             NetworkConnector connector = (NetworkConnector) server.getConnectors()[0];
-            filterProps.setProperty( "@port@", Integer.toString( connector.getLocalPort() ) );
-            filterProps.setProperty( "@repo@", "repo-it" );
+            filterProps.put( "@port@", Integer.toString( connector.getLocalPort() ) );
+            filterProps.put( "@repo@", "repo-it" );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliArgument( "-s" );
             verifier.addCliArgument( "settings.xml" );

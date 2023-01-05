@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.Deque;
-import java.util.Properties;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.apache.maven.shared.utils.io.FileUtils;
@@ -96,7 +96,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
 
         setupDummyDependency( verifier, testDir, true );
 
-        Properties filterProps = verifier.newDefaultFilterProperties();
+        Map<String, String> filterProps = verifier.newDefaultFilterMap();
         filterProps.put( "@protocol@", "invalid" );
         filterProps.put( "@port@", "0" );
         File settings = verifier.filterFile( "settings-template.xml", "settings-a.xml", "UTF-8", filterProps );
@@ -199,7 +199,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
             int port = ( (NetworkConnector) server.getConnectors()[0] ).getLocalPort();
             System.out.println( "Bound server socket to the port " + port );
 
-            Properties filterProps = verifier.newDefaultFilterProperties();
+            Map<String, String> filterProps = verifier.newDefaultFilterMap();
             filterProps.put( "@protocol@", "http" );
             filterProps.put( "@port@", Integer.toString( port ) );
             File settings = verifier.filterFile( "settings-template.xml", "settings-b.xml", "UTF-8", filterProps );

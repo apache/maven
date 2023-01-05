@@ -23,7 +23,6 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
-import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
@@ -98,8 +97,7 @@ public class MavenITmng2865MirrorWildcardTest
         Verifier verifier = newVerifier( new File( testDir, project ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2865" );
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );

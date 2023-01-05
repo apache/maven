@@ -58,7 +58,7 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride
         overrideGlobalSettings( testDir, verifier );
         verifier.deleteArtifacts( "org.apache.maven.its.mng6772" );
 
-        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8" );
 
         verifier.addCliArgument( "validate" );
         verifier.execute();
@@ -76,7 +76,7 @@ public class MavenITmng6772NestedImportScopeRepositoryOverride
         overrideGlobalSettings( testDir, verifier );
         verifier.deleteArtifacts( "org.apache.maven.its.mng6772" );
 
-        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8" );
 
         verifier.addCliArgument( "compile" );
         verifier.execute();

@@ -31,7 +31,7 @@ import java.io.PrintWriter;
 import java.util.Date;
 import java.util.Deque;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.eclipse.jetty.server.Handler;
@@ -154,8 +154,8 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest
             // test 1: resolve snapshot, just built local copy should suppress daily remote update check
             verifier = newVerifier( new File( testDir, "test" ).getAbsolutePath() );
             verifier.setAutoclean( false );
-            Properties filterProps = verifier.newDefaultFilterProperties();
-            filterProps.setProperty( "@port@", Integer.toString( port ) );
+            Map<String, String> filterProps = verifier.newDefaultFilterMap();
+            filterProps.put( "@port@", Integer.toString( port ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliArgument( "--settings" );
             verifier.addCliArgument( "settings.xml" );

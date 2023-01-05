@@ -57,7 +57,7 @@ public class MavenITmng0870ReactorAwarePluginDiscoveryTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "project/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng0870" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "initialize" );

@@ -61,7 +61,7 @@ public class MavenITmng1323AntrunDependenciesTest
         verifier.deleteDirectory( "b/target" );
         verifier.deleteDirectory( "c/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng1323" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );

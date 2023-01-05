@@ -67,7 +67,7 @@ public class MavenITmng0449PluginVersionResolutionTest
         }
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -112,7 +112,7 @@ public class MavenITmng0449PluginVersionResolutionTest
         }
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
-        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "org.apache.maven.its.mng0449:maven-it-plugin-a:touch" );
         verifier.execute();
         verifier.verifyErrorFreeLog();

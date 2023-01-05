@@ -24,7 +24,7 @@ public class MavenITmng5774ConfigurationProcessorsTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5774-configuration-processors" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
 
         verifier = newVerifier( new File( testDir, "build-with-one-processor-valid" ).getAbsolutePath() );
         verifier.deleteDirectory( "target" );
@@ -49,7 +49,7 @@ public class MavenITmng5774ConfigurationProcessorsTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5774-configuration-processors" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
 
         verifier = newVerifier( new File( testDir, "build-with-two-processors-invalid" ).getAbsolutePath() );
         verifier.deleteDirectory( "target" );

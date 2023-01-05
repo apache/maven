@@ -50,7 +50,7 @@ public class MavenITmng4189UniqueVersionSnapshotTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4189" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
 
         // depend on org.apache.maven.its.mng4189:dep:1.0-20090608.090416-1:jar
         verifier = newVerifier( testDir.getAbsolutePath() );

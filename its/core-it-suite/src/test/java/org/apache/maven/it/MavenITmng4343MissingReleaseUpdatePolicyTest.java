@@ -30,7 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Deque;
-import java.util.Properties;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.eclipse.jetty.server.Handler;
@@ -156,9 +156,9 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
 
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        filterProps.setProperty( "@updates@", "always" );
-        filterProps.setProperty( "@port@", Integer.toString( port ) );
+        Map<String, String> filterProps = verifier.newDefaultFilterMap();
+        filterProps.put( "@updates@", "always" );
+        filterProps.put( "@port@", Integer.toString( port ) );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
 
         blockAccess = true;
@@ -212,9 +212,9 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
 
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        filterProps.setProperty( "@updates@", "never" );
-        filterProps.setProperty( "@port@", Integer.toString( port ) );
+        Map<String, String> filterProps = verifier.newDefaultFilterMap();
+        filterProps.put( "@updates@", "never" );
+        filterProps.put( "@port@", Integer.toString( port ) );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
 
         blockAccess = true;

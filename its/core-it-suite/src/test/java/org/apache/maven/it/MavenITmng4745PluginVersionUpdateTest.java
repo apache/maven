@@ -23,6 +23,7 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.shared.utils.io.FileUtils;
@@ -59,8 +60,8 @@ public class MavenITmng4745PluginVersionUpdateTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4745" );
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        filterProps.setProperty( "@updates@", "always" );
+        Map<String, String> filterProps = verifier.newDefaultFilterMap();
+        filterProps.put( "@updates@", "always" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
 
         writeMetadata( testDir, "1.0", "20100729123455" );
@@ -96,8 +97,8 @@ public class MavenITmng4745PluginVersionUpdateTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4745" );
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        filterProps.setProperty( "@updates@", "never" );
+        Map<String, String> filterProps = verifier.newDefaultFilterMap();
+        filterProps.put( "@updates@", "never" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
 
         writeMetadata( testDir, "1.0", "20100729123455" );
@@ -134,8 +135,8 @@ public class MavenITmng4745PluginVersionUpdateTest
         verifier.addCliArgument( "-U" );
         verifier.addCliArgument( "-s" );
         verifier.addCliArgument( "settings.xml" );
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        filterProps.setProperty( "@updates@", "never" );
+        Map<String, String> filterProps = verifier.newDefaultFilterMap();
+        filterProps.put( "@updates@", "never" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
 
         writeMetadata( testDir, "1.0", "20100729123455" );

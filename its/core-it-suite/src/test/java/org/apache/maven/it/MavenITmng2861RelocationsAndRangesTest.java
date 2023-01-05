@@ -51,7 +51,7 @@ public class MavenITmng2861RelocationsAndRangesTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "A/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2861" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );

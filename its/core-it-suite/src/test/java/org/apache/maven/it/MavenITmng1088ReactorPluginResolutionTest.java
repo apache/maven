@@ -58,7 +58,7 @@ public class MavenITmng1088ReactorPluginResolutionTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "client/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng1088" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
         // NOTE: It's essential part of the test to invoke a phase before "compile"

@@ -30,7 +30,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Deque;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.apache.maven.it.utils.DeployedResource;
@@ -143,8 +144,8 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
     public void testit()
         throws Exception
     {
-        Properties filterProps = new Properties();
-        filterProps.setProperty( "@port@", Integer.toString( port ) );
+        Map<String, String> filterProps = new HashMap<>();
+        filterProps.put( "@port@", Integer.toString( port ) );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", filterProps );

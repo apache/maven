@@ -23,7 +23,8 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
@@ -128,8 +129,8 @@ public class MavenITmng4068AuthenticatedMirrorTest
     public void testit()
         throws Exception
     {
-        Properties filterProps = new Properties();
-        filterProps.setProperty( "@mirrorPort@", Integer.toString( port ) );
+        Map<String, String> filterProps = new HashMap<>();
+        filterProps.put( "@mirrorPort@", Integer.toString( port ) );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );

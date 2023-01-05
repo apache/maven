@@ -23,7 +23,6 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
-import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
@@ -59,8 +58,7 @@ public class MavenITmng4357LifecycleMappingDiscoveryInReactorTest
         verifier.deleteDirectory( "mod-a/target" );
         verifier.deleteDirectory( "mod-b/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4357" );
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8" );
         verifier.addCliArgument( "--settings" );
         verifier.addCliArgument( "settings.xml" );
         verifier.addCliArgument( "validate" );

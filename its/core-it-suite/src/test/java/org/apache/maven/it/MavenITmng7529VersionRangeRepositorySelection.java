@@ -53,7 +53,7 @@ public class MavenITmng7529VersionRangeRepositorySelection
     verifier.addCliArgument("--settings");
     verifier.addCliArgument("settings.xml");
 
-    verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties());
+    verifier.filterFile("settings-template.xml", "settings.xml", "UTF-8");
     verifier.addCliArgument("validate");
     verifier.execute();
     verifier.verifyErrorFreeLog();

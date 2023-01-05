@@ -23,6 +23,7 @@ import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
+import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -109,8 +110,8 @@ public class MavenITmng4729MirrorProxyAuthUsedByProjectBuilderTest
             verifier.setAutoclean( false );
             verifier.deleteDirectory( "target" );
             verifier.deleteArtifacts( "org.apache.maven.its.mng4729" );
-            Properties filterProps = verifier.newDefaultFilterProperties();
-            filterProps.setProperty( "@port@", Integer.toString( port ) );
+            Map<String, String> filterProps = verifier.newDefaultFilterMap();
+            filterProps.put( "@port@", Integer.toString( port ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
             verifier.addCliArgument( "-s" );
             verifier.addCliArgument( "settings.xml" );
