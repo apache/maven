@@ -50,9 +50,11 @@ import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.path.UrlNormalizer;
 import org.apache.maven.model.plugin.DefaultPluginConfigurationExpander;
 import org.apache.maven.model.plugin.DefaultReportConfigurationExpander;
+import org.apache.maven.model.plugin.DefaultReportingConverter;
 import org.apache.maven.model.plugin.LifecycleBindingsInjector;
 import org.apache.maven.model.plugin.PluginConfigurationExpander;
 import org.apache.maven.model.plugin.ReportConfigurationExpander;
+import org.apache.maven.model.plugin.ReportingConverter;
 import org.apache.maven.model.profile.DefaultProfileInjector;
 import org.apache.maven.model.profile.DefaultProfileSelector;
 import org.apache.maven.model.profile.ProfileInjector;
@@ -183,6 +185,11 @@ public class DefaultModelBuilderFactory {
         return this;
     }
 
+    @Deprecated
+    public DefaultModelBuilderFactory setReportingConverter(ReportingConverter reportingConverter) {
+        return this;
+    }
+
     public DefaultModelBuilderFactory setProfileActivationFilePathInterpolator(
             ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator) {
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
@@ -292,6 +299,11 @@ public class DefaultModelBuilderFactory {
 
     protected ReportConfigurationExpander newReportConfigurationExpander() {
         return new DefaultReportConfigurationExpander();
+    }
+
+    @Deprecated
+    protected ReportingConverter newReportingConverter() {
+        return new DefaultReportingConverter();
     }
 
     private ModelSourceTransformer newModelSourceTransformer() {
