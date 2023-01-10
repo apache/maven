@@ -81,6 +81,7 @@ under the License.
               </templates>
               <params>
                 <param>packageModelV4=org.apache.maven.api.model</param>
+                <param>isMavenModel=true</param>
               </params>
             </configuration>
           </execution>

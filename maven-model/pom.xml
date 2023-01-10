@@ -83,6 +83,7 @@ under the License.
             <param>packageModelV3=org.apache.maven.model</param>
             <param>packageModelV4=org.apache.maven.api.model</param>
             <param>packageToolV4=org.apache.maven.model.v4</param>
+            <param>isMavenModel=true</param>
           </params>
         </configuration>
         <executions>

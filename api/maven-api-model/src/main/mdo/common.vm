@@ -17,6 +17,7 @@
   under the License.
 *#
 #
+#if ( "${isMavenModel}" == "true" )
 ##
 ## The following loop code is required in order to change the type of the
 ## pomFile attribute to a java.nio.file.Path.  Modello does not support this
@@ -28,4 +29,5 @@
   #end
 #end
 #set ( $locationTracking = true )
+#end
 #
