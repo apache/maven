@@ -22,6 +22,10 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 
@@ -30,53 +34,45 @@ import java.io.File;
 /**
  * Attaches a secondary artifact to the current project. This mimics source/javadoc attachments or other assemblies.
  *
- * @goal attach
- * @phase package
- *
+  *
  * @author Benjamin Bentmann
  *
  */
+@Mojo( name = "attach", defaultPhase = LifecyclePhase.PACKAGE )
 public class AttachMojo
     extends AbstractMojo
 {
 
     /**
      * The current Maven project.
-     *
-     * @parameter default-value="${project}"
-     * @readonly
-     * @required
      */
+    @Parameter( defaultValue = "${project}", readonly = true, required = true )
     private MavenProject project;
 
     /**
      * The Maven project helper.
      *
-     * @component
      */
+    @Component
     private MavenProjectHelper helper;
 
     /**
      * The path to the file to attach, relative to the project base directory. The plugin will not validate this path.
-     *
-     * @parameter property="artifact.attachedFile"
-     * @required
      */
+    @Parameter( property = "artifact.attachedFile", required = true )
     private String attachedFile;
 
     /**
      * The type of the artifact to attach.
-     *
-     * @parameter property="artifact.artifactType"
      */
+    @Parameter( property = "artifact.artifactType" )
     private String artifactType;
 
     /**
      * The classifier for the attached artifact. If unspecified, the default classifier for the specified artifact type
      * is used.
-     *
-     * @parameter property="artifact.artifactClassifier"
      */
+    @Parameter( property = "artifact.artifactClassifier" )
     private String artifactClassifier;
 
     /**

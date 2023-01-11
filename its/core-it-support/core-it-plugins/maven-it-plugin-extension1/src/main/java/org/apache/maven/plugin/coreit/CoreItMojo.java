@@ -20,10 +20,11 @@ package org.apache.maven.plugin.coreit;
  */
 
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugins.annotations.Mojo;
 
 /**
- * @goal dummy
- */
+  */
+@Mojo( name = "dummy" )
 public class CoreItMojo
     extends AbstractMojo
 {

@@ -23,6 +23,10 @@ import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 
 import java.io.File;
@@ -35,41 +39,34 @@ import java.util.Properties;
  * Dumps the authentication info registered with the wagon manager for a server to a properties file.
  *
  * @author Benjamin Bentmann
- *
- * @goal dump-auth
- * @phase validate
  */
+@Mojo( name = "dump-auth", defaultPhase = LifecyclePhase.VALIDATE )
 public class DumpAuthMojo
     extends AbstractMojo
 {
 
     /**
      * Project base directory used for manual path alignment.
-     *
-     * @parameter default-value="${basedir}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${basedir}", readonly = true )
     private File basedir;
 
     /**
      * The Wagon manager used to retrieve authentication infos.
-     *
-     * @component
      */
+    @Component
     private WagonManager wagonManager;
 
     /**
      * The path to the properties file used to dump the auth infos.
-     *
-     * @parameter property="wagon.propertiesFile"
      */
+    @Parameter( property = "wagon.propertiesFile" )
     private File propertiesFile;
 
     /**
      * The set of server identifiers whose auth infos should be dumped.
-     *
-     * @parameter
      */
+    @Parameter
     private String[] serverIds;
 
     /**

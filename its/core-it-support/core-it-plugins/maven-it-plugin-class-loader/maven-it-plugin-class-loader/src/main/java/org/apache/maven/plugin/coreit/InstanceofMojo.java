@@ -22,6 +22,10 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.util.HashMap;
@@ -35,48 +39,41 @@ import java.util.Properties;
  *
  * @author Benjamin Bentmann
  *
- * @goal instanceof
- * @phase initialize
- */
+  */
+@Mojo( name = "instanceof", defaultPhase = LifecyclePhase.INITIALIZE )
 public class InstanceofMojo
     extends AbstractMojo
 {
 
     /**
      * The path to the properties file used to track the results of the instanceof tests.
-     *
-     * @parameter property="clsldr.instanceofPropertiesFile"
      */
+    @Parameter( property = "clsldr.instanceofPropertiesFile" )
     private File instanceofPropertiesFile;
 
     /**
      * The qualified name of the type to which the objects should be assignment-compatible. This type will be loaded
      * from the plugin class loader, just like as if it was imported in the plugin source code.
-     *
-     * @parameter property="clsldr.className"
      */
+    @Parameter( property = "clsldr.className" )
     private String className;
 
     /**
      * A list of expressions that denote the object instances that should be type-checked.
-     *
-     * @parameter
      */
+    @Parameter
     private String[] objectExpressions;
 
     /**
      * A list of injected component instances that should be type-checked.
-     *
-     * @component role="org.apache.maven.plugin.coreit.Component"
      */
-    private List components;
+    @Component
+    private List<TestComponent> components;
 
     /**
      * The current Maven project against which expressions are evaluated.
-     *
-     * @parameter default-value="${project}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${project}", readonly = true )
     private Object project;
 
     /**

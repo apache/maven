@@ -29,9 +29,9 @@ under the License.
   <packaging>maven-plugin</packaging>
 
   <properties>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
-    <maven-version>3.1.1</maven-version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven-version>3.8.6</maven-version>
   </properties>
 
   <dependencies>
@@ -60,7 +60,7 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
-        <version>3.3</version>
+        <version>3.6.4</version>
       </plugin>
     </plugins>
   </build>

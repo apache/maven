@@ -105,6 +105,9 @@ under the License.
         <configuration>
           <!-- NOTE: We use a handwritten descriptor to decouple from MPLUGIN-136/MNG-3741 so dump the generated one -->
           <outputDirectory>${project.build.directory}</outputDirectory>
+          <extractors>
+            <extractor>ant</extractor>
+          </extractors>
         </configuration>
       </plugin>
     </plugins>

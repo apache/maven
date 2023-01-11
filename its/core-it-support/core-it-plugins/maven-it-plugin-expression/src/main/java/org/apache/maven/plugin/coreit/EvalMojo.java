@@ -22,6 +22,9 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,82 +58,66 @@ import java.util.Properties;
  *
  * @author Benjamin Bentmann
  *
- * @goal eval
- * @phase initialize
- */
+  */
+@Mojo( name = "eval", defaultPhase = LifecyclePhase.INITIALIZE )
 public class EvalMojo
     extends AbstractMojo
 {
 
     /**
      * The project's base directory, used for manual path translation.
-     *
-     * @parameter default-value="${basedir}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${basedir", readonly = true )
     private File basedir;
 
     /**
      * The path to the output file for the properties with the expression values. For each expression given by the
      * parameter {@link #expressions}, a similar named properties key will be used to save the expression value. If an
      * expression evaluated to <code>null</code>, there will be no corresponding key in the properties file.
-     *
-     * @parameter property="expression.outputFile"
      */
+    @Parameter( property = "expression.outputFile" )
     private File outputFile;
 
     /**
      * The set of expressions to evaluate.
-     *
-     * @parameter
      */
+    @Parameter
     private String[] expressions;
 
     /**
      * The comma separated set of expressions to evaluate.
-     *
-     * @parameter property="expression.expressions"
      */
+    @Parameter( property = "expression.expressions" )
     private String expressionList;
 
     /**
      * The current Maven project against which expressions are evaluated.
-     *
-     * @parameter default-value="${project}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${project}", readonly = true )
     private Object project;
 
     /**
      * The forked Maven project against which expressions are evaluated.
-     *
-     * @parameter default-value="${executedProject}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${executedProject}", readonly = true )
     private Object executedProject;
 
     /**
      * The merged user/global settings of the current build against which expressions are evaluated.
-     *
-     * @parameter default-value="${settings}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${settings}", readonly = true )
     private Object settings;
 
     /**
      * The session context of the current build against which expressions are evaluated.
-     *
-     * @parameter default-value="${session}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${session}", readonly = true )
     private Object session;
 
     /**
      * The local repository of the current build against which expressions are evaluated.
-     *
-     * @parameter default-value="${localRepository}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${localRepository}", readonly = true )
     private Object localRepository;
 
     /**

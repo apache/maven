@@ -20,16 +20,17 @@ package org.apache.maven.plugin.coreit;
  */
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 
 /**
  * Clears the contents of the log file by creating a new empty log file.
  *
- * @goal reset
- * @phase initialize
- *
+  *
  * @author Benjamin Bentmann
  *
  */
+@Mojo( name = "reset", defaultPhase = LifecyclePhase.INITIALIZE )
 public class ResetMojo
     extends AbstractLogMojo
 {

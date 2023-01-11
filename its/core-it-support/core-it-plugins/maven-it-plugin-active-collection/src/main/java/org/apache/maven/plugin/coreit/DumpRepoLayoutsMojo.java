@@ -19,9 +19,14 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,40 +40,34 @@ import java.util.Properties;
  * Dumps the role hints of the available repository layouts to a properties file.
  *
  * @author Benjamin Bentmann
- * @goal dump-repo-layouts
- * @phase validate
- */
+  */
+@Mojo( name = "dump-repo-layouts", defaultPhase = LifecyclePhase.VALIDATE )
 public class DumpRepoLayoutsMojo
     extends AbstractMojo
 {
 
     /**
      * Project base directory used for manual path alignment.
-     *
-     * @parameter default-value="${basedir}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${basedir}", readonly = true )
     private File basedir;
 
     /**
      * The available repository layouts, as a map.
-     *
-     * @component role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout"
      */
-    private Map repositoryLayouts;
+    @Component
+    private Map<String, ArtifactRepositoryLayout> repositoryLayouts;
 
     /**
      * The available repository layouts, as a list.
-     *
-     * @component role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout"
      */
-    private List repoLayouts;
+    @Component
+    private List<ArtifactRepositoryLayout> repoLayouts;
 
     /**
      * The path to the properties file used to dump the repository layouts.
-     *
-     * @parameter property="collections.layoutsFile"
      */
+    @Parameter( property = "collections.layoutsFile" )
     private File layoutsFile;
 
     /**

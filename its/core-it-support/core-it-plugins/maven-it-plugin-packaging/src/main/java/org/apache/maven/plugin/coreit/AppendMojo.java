@@ -21,6 +21,8 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,20 +33,20 @@ import java.io.OutputStreamWriter;
  * Appends a message to a UTF-8 encoded plain text file.
  *
  * @author Benjamin Bentmann
- * @goal append
- */
+  */
+@Mojo( name = "append" )
 public class AppendMojo
     extends AbstractMojo
 {
 
     /**
-     * @parameter property="append.message"
      */
+    @Parameter( property = "append.message" )
     private String message;
 
     /**
-     * @parameter default-value="${project.build.directory}/log.txt"
      */
+    @Parameter( defaultValue = "${project.build.directory}/log.txt" )
     private File outputFile;
 
     public void execute()

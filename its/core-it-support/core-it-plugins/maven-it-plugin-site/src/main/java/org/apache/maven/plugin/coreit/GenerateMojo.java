@@ -23,6 +23,9 @@ import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.reporting.MavenReport;
 
 import java.io.File;
@@ -36,43 +39,34 @@ import java.util.Locale;
  * Generates the available/configured reports.
  *
  * @author Benjamin Bentmann
- *
- * @goal generate
- * @phase site
- * @requiresReports true
  */
+@Mojo( name = "generate", defaultPhase = LifecyclePhase.SITE, requiresReports = true )
 public class GenerateMojo
     extends AbstractMojo
 {
 
     /**
      * The path to the output directory of the site.
-     *
-     * @parameter default-value="${project.reporting.outputDirectory}"
      */
+    @Parameter( defaultValue = "${project.reporting.outputDirectory}" )
     private File outputDirectory;
 
     /**
      * The language for the reports.
-     *
-     * @parameter default-value="en"
      */
+    @Parameter( defaultValue = "en" )
     private String language = "en";
 
     /**
      * A flag whether to ignore errors from reports and continue the generation.
-     *
-     * @parameter default-value="false"
      */
+    @Parameter( defaultValue = "false" )
     private boolean ignoreErrors;
 
     /**
      * The reports configured for the current build.
-     *
-     * @parameter default-value="${reports}"
-     * @required
-     * @readonly
      */
+    @Parameter( defaultValue = "${reports}", required = true, readonly = true )
     private List reports;
 
     /**

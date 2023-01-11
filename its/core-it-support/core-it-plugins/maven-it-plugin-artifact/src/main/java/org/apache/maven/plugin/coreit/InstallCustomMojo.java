@@ -23,29 +23,31 @@ import java.io.File;
 
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Installs the project artifacts into a local repository with a custom base directory and a custom layout.
  *
- * @goal install-custom
  *
  * @author Benjamin Bentmann
  *
  */
+@Mojo( name = "install-custom" )
 public class InstallCustomMojo
     extends InstallMojo
 {
 
     /**
-     * @component
      */
+    @Component
     private ArtifactRepositoryFactory repositoryFactory;
 
     /**
      * The base directory of the local repository to install to.
-     *
-     * @parameter property="install.localRepoDir"
      */
+    @Parameter( property = "install.localRepoDir" )
     private File localRepoDir;
 
     /**

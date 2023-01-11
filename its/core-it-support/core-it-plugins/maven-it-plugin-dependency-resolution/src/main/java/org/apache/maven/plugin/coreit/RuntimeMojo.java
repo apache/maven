@@ -21,18 +21,19 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 /**
  * Creates text files that list the dependencies with scope runtime in the order returned from the Maven core. The path
  * parameters of this mojo support the token <code>&#64;idx&#64;</code> to dynamically insert a running index in order
  * to distinguish multiple executions of the same mojo.
  *
- * @goal runtime
- * @requiresDependencyResolution runtime
- *
  * @author Benjamin Bentmann
  *
  */
+@Mojo( name = "runtime", requiresDependencyResolution = ResolutionScope.RUNTIME )
 public class RuntimeMojo
     extends AbstractDependencyMojo
 {
@@ -42,36 +43,32 @@ public class RuntimeMojo
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk. Unlike the runtime artifacts, the collection of project artifacts additionally contains those artifacts
      * that do not contribute to the class path.
-     *
-     * @parameter property="depres.projectArtifacts"
      */
+    @Parameter( property = "depres.projectArtifacts" )
     private String projectArtifacts;
 
     /**
      * The path to the output file for the runtime artifacts, relative to the project base directory. Each line of this
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk.
-     *
-     * @parameter property="depres.runtimeArtifacts"
      */
+    @Parameter( property = "depres.runtimeArtifacts" )
     private String runtimeArtifacts;
 
     /**
      * The path to the output file for the runtime class path, relative to the project base directory. Each line of
      * this UTF-8 encoded file specifies the absolute path to a class path element. If not specified, the class path
      * will not be written to disk.
-     *
-     * @parameter property="depres.runtimeClassPath"
      */
+    @Parameter( property = "depres.runtimeClassPath" )
     private String runtimeClassPath;
 
     /**
      * The path to the properties file for the checksums of the runtime class path elements, relative to the project
      * base directory. The (trimmed) path to a JAR is used as the property key, the property value is the SHA-1 hash of
      * the JAR. If not specified, the class path checksums will not be calculated.
-     *
-     * @parameter property="depres.runtimeClassPathChecksums"
      */
+    @Parameter( property = "depres.runtimeClassPathChecksums" )
     private String runtimeClassPathChecksums;
 
     /**

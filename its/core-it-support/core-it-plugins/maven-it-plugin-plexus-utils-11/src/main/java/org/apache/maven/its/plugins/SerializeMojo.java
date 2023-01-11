@@ -28,22 +28,24 @@ import java.io.Writer;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.MXSerializer;
 import org.codehaus.plexus.util.xml.pull.XmlSerializer;
 
 /**
- * @goal serialize
- * @phase validate
- */
+  */
+@Mojo( name = "serialize", defaultPhase = LifecyclePhase.VALIDATE )
 public class SerializeMojo
     extends AbstractMojo
 {
 
     /**
-     * @parameter default-value="${project.build.directory}/serialized.xml"
      */
+    @Parameter( defaultValue = "${project.build.directory}/serialized.xml" )
     private File file;
 
     public void execute()

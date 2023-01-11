@@ -21,13 +21,15 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * "Throw" a parameter into the plugin context, for the "catch" mojo to
  * pick up and process.
  *
- * @goal throw
  */
+@Mojo( name = "throw" )
 public class ThrowMojo
     extends AbstractMojo
 {
@@ -35,8 +37,8 @@ public class ThrowMojo
     public static final String THROWN_PARAMETER = "throw-parameter";
 
     /**
-     * @parameter property="value" default-value="thrown"
      */
+    @Parameter( property = "value", defaultValue = "thrown" )
     private String value;
 
     public void setValue( String value )

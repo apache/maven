@@ -26,6 +26,9 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,56 +41,50 @@ import java.util.Properties;
  *
  * @author Benjamin Bentmann
  *
- * @goal resolve
- */
+  */
+@Mojo( name = "resolve" )
 public class ResolveMojo
     extends AbstractMojo
 {
 
     /**
      * The local repository.
-     *
-     * @parameter default-value="${localRepository}"
-     * @readonly
-     * @required
      */
+    @Parameter( defaultValue = "${localRepository}", readonly = true, required = true )
     private ArtifactRepository localRepository;
 
     /**
      * The remote repositories of the current Maven project.
-     *
-     * @parameter default-value="${project.remoteArtifactRepositories}"
-     * @readonly
-     * @required
      */
+    @Parameter( defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true )
     private List remoteRepositories;
 
     /**
      * The artifact resolver.
      *
-     * @component
      */
+    @Component
     private ArtifactResolver resolver;
 
     /**
      * The artifact factory.
      *
-     * @component
      */
+    @Component
     private ArtifactFactory factory;
 
     /**
      * The dependencies to resolve.
      *
-     * @parameter
      */
+    @Parameter
     private Dependency[] dependencies;
 
     /**
      * The path to a properties file to store the resolved artifact paths in.
      *
-     * @parameter
      */
+    @Parameter
     private File propertiesFile;
 
     /**

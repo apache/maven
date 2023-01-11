@@ -37,7 +37,7 @@ under the License.
     <plugins>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.4.0</version>
         <configuration>
           <descriptors>
             <descriptor>src/main/assembly/repo.xml</descriptor>

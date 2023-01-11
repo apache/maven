@@ -24,26 +24,25 @@ import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Marks the project's artifact as the latest version.
  *
- * @goal latest
- * @phase package
- *
+  *
  * @author Benjamin Bentmann
  */
+@Mojo( name = "latest", defaultPhase = LifecyclePhase.PACKAGE )
 public class LatestMojo
     extends AbstractMojo
 {
 
     /**
      * The main project artifact.
-     *
-     * @parameter default-value="${project.artifact}"
-     * @readonly
-     * @required
      */
+    @Parameter( defaultValue = "${project.artifact}", readonly = true, required = true )
     private Artifact projectArtifact;
 
     /**

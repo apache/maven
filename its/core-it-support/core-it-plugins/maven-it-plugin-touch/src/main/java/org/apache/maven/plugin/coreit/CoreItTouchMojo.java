@@ -22,6 +22,9 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
@@ -33,64 +36,54 @@ import java.util.Map;
  * Mojo that creates one <code>touch.txt</code> or more files with configured filenames in <code>target/</code>
  * directory, or cause failure if desired, and set build final name to '<code>coreitified</code>'
  *
- * @goal touch
- * @phase process-sources
- */
+  */
+@Mojo( name = "touch", defaultPhase = LifecyclePhase.PROCESS_SOURCES )
 public class CoreItTouchMojo
     extends AbstractMojo
 {
-    /**
-     * @parameter default-value="${project}"
-     */
+    @Parameter( defaultValue = "${project}" )
     private MavenProject project;
 
     /**
      * Output directory for touched files.
-     *
-     * @parameter default-value="${project.build.directory}"
-     * @required
      */
+    @Parameter( defaultValue = "${project.build.directory}", required = true )
     private String outputDirectory;
 
     /**
      * Test setting of plugin-artifacts on the PluginDescriptor instance.
-     *
-     * @parameter default-value="${plugin.artifactMap}"
-     * @required
      */
+    @Parameter( defaultValue = "${plugin.artifactMap}", required = true )
     private Map<String, Artifact> pluginArtifacts;
 
     /**
      * Parameter to check that File attribute is injected with absolute path, even if parameter
      * value is relative: a <code>touch.txt</code> file will be created in specified directory, to be able
      * to check that absolute value is at right place.
-     *
-     * @parameter default-value="target/test-basedir-alignment"
      */
+    @Parameter( defaultValue = "target/test-basedir-alignment" )
     private File basedirAlignmentDirectory;
 
     /**
-     * @parameter alias="pluginFile"
      */
+    @Parameter( alias = "pluginFile" )
     private String pluginItem = "foo";
 
     /**
-     * @parameter
      */
+    @Parameter
     private String goalItem = "bar";
 
     /**
      * Touch a file named after artifact absolute file name, replacing '/' and ':' by '_' and adding ".txt".
-     *
-     * @parameter property="artifactToFile"
      */
+    @Parameter( property = "artifactToFile" )
     private String artifactToFile;
 
     /**
      * Should the goal cause a failure before doing anything else?
-     *
-     * @parameter property="fail"
      */
+    @Parameter( property = "fail" )
     private boolean fail = false;
 
     public void execute()

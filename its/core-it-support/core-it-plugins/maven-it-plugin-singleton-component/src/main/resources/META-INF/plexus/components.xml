@@ -20,7 +20,7 @@ under the License.
 <component-set>
   <components>
     <component>
-      <role>org.apache.maven.plugin.coreit.Component</role>
+      <role>org.apache.maven.plugin.coreit.TestComponent</role>
       <role-hint>default</role-hint>
       <implementation>org.apache.maven.plugin.coreit.DefaultComponent</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>

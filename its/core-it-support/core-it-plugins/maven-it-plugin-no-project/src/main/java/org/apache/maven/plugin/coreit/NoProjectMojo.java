@@ -21,6 +21,8 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -28,23 +30,19 @@ import java.io.IOException;
 
 /**
  * Mojo which touches a file without requiring a project.
- *
- * @goal light-touch
- * @requiresProject false
- *
  */
+@Mojo( name = "light-touch", requiresProject = false )
 public class NoProjectMojo
     extends AbstractMojo
 {
     /**
-     * @parameter default-value="${project.build.directory}"
-     * @required
      */
+    @Parameter( defaultValue = "${project.build.directory}", required = true )
     private String outputDirectory;
 
     /**
-     * @parameter default-value="target/test-basedir-alignment"
      */
+    @Parameter( defaultValue = "target/test-basedir-alignment" )
     private File basedirAlignmentDirectory;
 
     public void execute()

@@ -25,37 +25,40 @@ import java.io.IOException;
 import org.apache.maven.coreit.component.StatefulSingleton;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Updates the state of the singleton component and optionally dumps the updated state to a properties file.
  *
- * @goal update-singleton
- * @phase initialize
- *
+  *
  * @author Benjamin Bentmann
  */
+@Mojo( name = "update-singleton", defaultPhase = LifecyclePhase.INITIALIZE )
 public class UpdateSingletonMojo
     extends AbstractMojo
 {
 
     /**
-     * @parameter default-value="consumer"
      */
+    @Parameter( defaultValue = "consumer" )
     private String key;
 
     /**
-     * @parameter default-value="passed"
      */
+    @Parameter( defaultValue = "passed" )
     private String value;
 
     /**
-     * @parameter
      */
+    @Parameter
     private File propertiesFile;
 
     /**
-     * @component
      */
+    @Component
     private StatefulSingleton singleton;
 
     /**

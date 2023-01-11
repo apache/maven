@@ -20,6 +20,10 @@ package org.apache.maven.plugin.coreit;
  */
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -31,31 +35,26 @@ import java.util.List;
  * Loads classes and/or resources from a custom class loader that holds the project dependencies and records the results
  * in a properties file.
  *
- * @goal load-dependencies
- * @phase initialize
- * @requiresDependencyResolution compile
- *
  * @author Benjamin Bentmann
  *
  */
+@Mojo( name = "load-dependencies", defaultPhase = LifecyclePhase.INITIALIZE,
+       requiresDependencyResolution = ResolutionScope.COMPILE )
 public class LoadDependenciesMojo
     extends AbstractLoadMojo
 {
 
     /**
      * The project's class path to load classes/resources from.
-     *
-     * @parameter default-value="${project.compileClasspathElements}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${project.compileClasspathElements}", readonly = true )
     private List classPath;
 
     /**
      * The path to the properties file used to track the results of the class/resource loading via the project class
      * loader.
-     *
-     * @parameter property="clsldr.projectClassLoaderOutput"
      */
+    @Parameter( property = "clsldr.projectClassLoaderOutput" )
     private File projectClassLoaderOutput;
 
     /**

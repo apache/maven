@@ -21,6 +21,8 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
@@ -30,33 +32,29 @@ import java.util.Properties;
  * Builds the local POMs.
  *
  * @author Benjamin Bentmann
- * @goal local-pom
- */
+  */
+@Mojo( name = "local-pom" )
 public class BuildLocalPomMojo
     extends AbstractPomMojo
 {
 
     /**
      * The properties file to dump the POM info to.
-     *
-     * @parameter default-value="target/pom.properties"
      */
+    @Parameter( defaultValue = "target/pom.properties" )
     private File propertiesFile;
 
     /**
      * The local repository.
-     *
-     * @parameter default-value="${localRepository}"
-     * @readonly
-     * @required
      */
+    @Parameter( defaultValue = "${localRepository}", readonly = true, required = true )
     private ArtifactRepository localRepository;
 
     /**
      * The POM files to build.
      *
-     * @parameter
      */
+    @Parameter
     private File[] files;
 
     /**

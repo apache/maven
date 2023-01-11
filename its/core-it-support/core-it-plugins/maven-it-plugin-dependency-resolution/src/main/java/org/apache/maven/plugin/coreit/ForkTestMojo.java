@@ -21,16 +21,17 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.Mojo;
 
 /**
  * Forks the "test" mojo to check interplay of forking and dependency resolution.
  *
- * @goal fork-test
- * @execute goal="test"
- *
  * @author Benjamin Bentmann
  *
  */
+@Mojo( name = "fork-test" )
+@Execute( goal = "test" )
 public class ForkTestMojo
     extends AbstractMojo
 {

@@ -28,99 +28,90 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 
 /**
  * Deploys a user-supplied file to some repository. This mimics part of the Maven Deploy Plugin.
  *
- * @goal deploy-file
- * @requiresProject false
- *
  * @author Benjamin Bentmann
  *
  */
+@Mojo( name = "deploy-file", requiresProject = false )
 public class DeployFileMojo
     extends AbstractMojo
 {
 
     /**
      * The file of the artifact to deploy.
-     *
-     * @parameter property="file"
      */
+    @Parameter( property = "file" )
     private File file;
 
     /**
      * The group id of the artifact.
-     *
-     * @parameter property="groupId"
      */
+    @Parameter( property = "groupId" )
     private String groupId;
 
     /**
      * The artifact id of the artifact.
-     *
-     * @parameter property="artifactId"
      */
+    @Parameter( property = "artifactId" )
     private String artifactId;
 
     /**
      * The version of the artifact.
-     *
-     * @parameter property="version"
      */
+    @Parameter( property = "version" )
     private String version;
 
     /**
      * The URL of the repository to deploy to.
-     *
-     * @parameter property="repositoryUrl"
      */
+    @Parameter( property = "repositoryUrl" )
     private String repositoryUrl;
 
     /**
      * The ID of the repository to deploy to.
-     *
-     * @parameter property="repositoryId"
      */
+    @Parameter( property = "repositoryId" )
     private String repositoryId;
 
     /**
      * The repository factory.
      *
-     * @component
      */
+    @Component
     private ArtifactRepositoryFactory repositoryFactory;
 
     /**
      * The repository layout.
-     *
-     * @component roleHint="default"
      */
+    @Component( hint = "default" )
     private ArtifactRepositoryLayout repositoryLayout;
 
     /**
      * The artifact factory.
      *
-     * @component
      */
+    @Component
     private ArtifactFactory artifactFactory;
 
     /**
      * The artifact deployer.
      *
-     * @component
      */
+    @Component
     private ArtifactDeployer deployer;
 
     /**
      * The local repository.
-     *
-     * @parameter default-value="${localRepository}"
-     * @readonly
-     * @required
      */
+    @Parameter( defaultValue = "${localRepository}", readonly = true, required = true )
     private ArtifactRepository localRepository;
 
     /**

@@ -22,6 +22,10 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,42 +39,35 @@ import java.util.Properties;
 /**
  * Checks the general retrieval of components from active component collections.
  *
- * @goal check
- * @phase validate
- *
  * @author Benjamin Bentmann
  */
+@Mojo( name = "check", defaultPhase = LifecyclePhase.VALIDATE )
 public class CheckMojo
     extends AbstractMojo
 {
 
     /**
      * Project base directory used for manual path alignment.
-     *
-     * @parameter default-value="${basedir}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${basedir}", readonly = true )
     private File basedir;
 
     /**
      * The available components, as a map.
-     *
-     * @component role="org.apache.maven.plugin.coreit.Component"
      */
-    private Map componentMap;
+    @Component
+    private Map<String, TestComponent> componentMap;
 
     /**
      * The available components, as a list.
-     *
-     * @component role="org.apache.maven.plugin.coreit.Component"
      */
-    private List componentList;
+    @Component
+    private List<TestComponent> componentList;
 
     /**
      * The path to the properties file to create.
-     *
-     * @parameter property="collections.outputFile"
      */
+    @Parameter( property = "clsldr.pluginClassLoaderOutput" )
     private File outputFile;
 
     /**

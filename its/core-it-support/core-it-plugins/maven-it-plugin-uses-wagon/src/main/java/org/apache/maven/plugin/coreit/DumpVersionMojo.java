@@ -22,6 +22,10 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,56 +37,47 @@ import java.util.Properties;
 /**
  * Dumps the version info for a wagon provider to a properties file.
  *
- * @goal dump-version
- * @phase validate
- *
  * @author Benjamin Bentmann
  */
+@Mojo( name = "dump-version", defaultPhase = LifecyclePhase.VALIDATE )
 public class DumpVersionMojo
     extends AbstractMojo
 {
 
     /**
      * Project base directory used for manual path alignment.
-     *
-     * @parameter default-value="${basedir}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${basedir}", readonly = true )
     private File basedir;
 
     /**
      * The Wagon manager used to look up the wagon of interest.
-     *
-     * @component
      */
+    @Component
     private WagonManager wagonManager;
 
     /**
      * The path to the properties file used to dump the auth infos.
-     *
-     * @parameter property="wagon.propertiesFile"
      */
+    @Parameter( property = "wagon.propertiesFile" )
     private File propertiesFile;
 
     /**
      * The role hint for the provider of interest.
-     *
-     * @parameter property="wagon.providerHint"
      */
+    @Parameter( property = "wagon.providerHint" )
     private String providerHint;
 
     /**
      * The group id for the provider of interest.
-     *
-     * @parameter property="wagon.providerGroupId"
      */
+    @Parameter( property = "wagon.providerGroupId" )
     private String providerGroupId;
 
     /**
      * The artifact id for the provider of interest.
-     *
-     * @parameter property="wagon.providerArtifactId"
      */
+    @Parameter( property = "wagon.providerArtifactId" )
     private String providerArtifactId;
 
     /**

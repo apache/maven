@@ -608,16 +608,16 @@ public abstract class AbstractMavenIntegrationTestCase
             // Java9 requires at least 1.6
             if ( VersionRange.createFromVersionSpec( "[9,12)" ).containsVersion( getJavaVersion() ) )
             {
-                verifier.getSystemProperties().put( "maven.compiler.source", "1.7" );
-                verifier.getSystemProperties().put( "maven.compiler.target", "1.7" );
-                verifier.getSystemProperties().put( "maven.compiler.release", "7" );
+                verifier.getSystemProperties().put( "maven.compiler.source", "1.8" );
+                verifier.getSystemProperties().put( "maven.compiler.target", "1.8" );
+                verifier.getSystemProperties().put( "maven.compiler.release", "8" );
             }
             // Java12 requires at least 7
             if ( VersionRange.createFromVersionSpec( "[12,)" ).containsVersion( getJavaVersion() ) )
             {
-                verifier.getSystemProperties().put( "maven.compiler.source", "7" );
-                verifier.getSystemProperties().put( "maven.compiler.target", "7" );
-                verifier.getSystemProperties().put( "maven.compiler.release", "7" );
+                verifier.getSystemProperties().put( "maven.compiler.source", "8" );
+                verifier.getSystemProperties().put( "maven.compiler.target", "8" );
+                verifier.getSystemProperties().put( "maven.compiler.release", "8" );
             }
         }
         catch ( InvalidVersionSpecificationException e )

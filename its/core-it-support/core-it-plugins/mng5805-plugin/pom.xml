@@ -32,23 +32,22 @@ under the License.
   <artifactId>mng-5805-pkg-type-mojo-configuration-plugin</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <properties>
-    <maven-version>3.0</maven-version>
-  </properties>
-
   <name>Maven IT Plugin :: mng-5805 plugin</name>
 
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
-      <version>${maven-version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
-      <version>${maven-version}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

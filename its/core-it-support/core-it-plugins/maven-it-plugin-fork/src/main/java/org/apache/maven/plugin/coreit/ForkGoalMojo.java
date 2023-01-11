@@ -21,24 +21,22 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 /**
- * @goal fork-goal
- *
- * @execute goal="touch"
  */
+@Mojo( name = "fork-goal" )
+@Execute( goal = "touch" )
 public class ForkGoalMojo
     extends AbstractMojo
 {
-    /**
-     * @parameter default-value="${project}"
-     */
+    @Parameter( defaultValue = "${project}" )
     private MavenProject project;
 
-    /**
-     * @parameter default-value="${executedProject}"
-     */
+    @Parameter( defaultValue = "${executedProject}" )
     private MavenProject executedProject;
 
     public void execute()

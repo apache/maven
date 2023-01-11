@@ -28,6 +28,10 @@ import java.util.Properties;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.toolchain.Toolchain;
 import org.apache.maven.toolchain.ToolchainManager;
 
@@ -35,46 +39,39 @@ import org.apache.maven.toolchain.ToolchainManager;
  * Finds a tool from a previously selected toolchain. This tests the public API just like toolchain-enabled plugins
  * would do.
  *
- * @goal find-tool
- * @phase validate
- */
+  */
+@Mojo( name = "find-tool", defaultPhase = LifecyclePhase.VALIDATE )
 public class FindToolMojo
     extends AbstractMojo
 {
 
     /**
-     * @component
      */
+    @Component
     private ToolchainManager toolchainManager;
 
     /**
      * The current Maven session holding the selected toolchain.
-     *
-     * @parameter default-value="${session}"
-     * @required
-     * @readonly
      */
+    @Parameter( defaultValue = "${session}", required = true, readonly = true )
     private MavenSession session;
 
     /**
      * The path to the output file for the properties.
-     *
-     * @parameter property="toolchain.outputFile" default-value="${project.build.directory}/tool.properties"
      */
+    @Parameter( property = "toolchain.outputFile", defaultValue = "${project.build.directory}/tool.properties" )
     private File outputFile;
 
     /**
      * The type identifier of the toolchain, e.g. "jdk".
-     *
-     * @parameter property="toolchain.type"
      */
+    @Parameter( property = "toolchain.type" )
     private String type;
 
     /**
      * The name of the tool, e.g. "javac".
-     *
-     * @parameter property="toolchain.tool"
      */
+    @Parameter( property = "toolchain.tool" )
     private String tool;
 
     public void execute()

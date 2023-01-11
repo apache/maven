@@ -28,6 +28,9 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -39,56 +42,50 @@ import java.util.Set;
  *
  * @author Benjamin Bentmann
  *
- * @goal collect
- */
+  */
+@Mojo( name = "collect" )
 public class CollectMojo
     extends AbstractMojo
 {
 
     /**
      * The local repository.
-     *
-     * @parameter default-value="${localRepository}"
-     * @readonly
-     * @required
      */
+    @Parameter( defaultValue = "${localRepository}", readonly = true, required = true )
     private ArtifactRepository localRepository;
 
     /**
      * The remote repositories of the current Maven project.
-     *
-     * @parameter default-value="${project.remoteArtifactRepositories}"
-     * @readonly
-     * @required
      */
+    @Parameter( defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true )
     private List remoteRepositories;
 
     /**
      * The artifact collector.
      *
-     * @component
      */
+    @Component
     private ArtifactCollector collector;
 
     /**
      * The artifact factory.
      *
-     * @component
      */
+    @Component
     private ArtifactFactory factory;
 
     /**
      * The metadata source.
      *
-     * @component
      */
+    @Component
     private ArtifactMetadataSource metadataSource;
 
     /**
      * The dependencies to resolve.
      *
-     * @parameter
      */
+    @Parameter
     private Dependency[] dependencies;
 
     /**

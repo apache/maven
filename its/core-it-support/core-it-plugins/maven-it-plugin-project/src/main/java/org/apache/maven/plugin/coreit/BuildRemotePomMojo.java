@@ -24,6 +24,9 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
@@ -35,49 +38,42 @@ import java.util.Properties;
  *
  * @author Benjamin Bentmann
  *
- * @goal remote-pom
- */
+  */
+@Mojo( name = "remote-pom" )
 public class BuildRemotePomMojo
     extends AbstractPomMojo
 {
 
     /**
      * The properties file to dump the POM info to.
-     *
-     * @parameter default-value="target/pom.properties"
      */
+    @Parameter( defaultValue = "target/pom.properties" )
     private File propertiesFile;
 
     /**
      * The local repository.
-     *
-     * @parameter default-value="${localRepository}"
-     * @readonly
-     * @required
      */
+    @Parameter( defaultValue = "${localRepository}", readonly = true, required = true )
     private ArtifactRepository localRepository;
 
     /**
      * The remote repositories of the current Maven project.
-     *
-     * @parameter default-value="${project.remoteArtifactRepositories}"
-     * @readonly
-     * @required
      */
-    private List remoteRepositories;
+    @Parameter( defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true )
+    private List<ArtifactRepository> remoteRepositories;
 
     /**
      * The artifact factory.
      *
-     * @component
      */
+    @Component
     private ArtifactFactory factory;
 
     /**
      * The dependencies to resolve.
      *
-     * @parameter
      */
+    @Parameter
     private Dependency[] dependencies;
 
     /**

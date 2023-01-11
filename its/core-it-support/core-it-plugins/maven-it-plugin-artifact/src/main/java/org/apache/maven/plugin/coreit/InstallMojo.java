@@ -22,24 +22,25 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.installer.ArtifactInstaller;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 
 /**
  * Installs the project artifacts into the local repository. This is the essence of the Maven Install Plugin.
  *
  * @author Benjamin Bentmann
  *
- * @goal install
- * @phase install
- */
+  */
+@Mojo( name = "install", defaultPhase = LifecyclePhase.INSTALL )
 public class InstallMojo
     extends AbstractRepoMojo
 {
 
     /**
      * The artifact installer.
-     *
-     * @component
      */
+    @Component
     private ArtifactInstaller installer;
 
     /**

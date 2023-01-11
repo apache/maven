@@ -294,7 +294,6 @@ public class TestSuiteOrdering implements ClassOrderer
         suite.addTestSuite( MavenITmng4489MirroringOfExtensionRepoTest.class );
         suite.addTestSuite( MavenITmng4488ValidateExternalParenPomLenientTest.class );
         suite.addTestSuite( MavenITmng4482ForcePluginSnapshotUpdateTest.class );
-        suite.addTestSuite( MavenITmng4479ProjectLevelPluginDepUsedForCliConfigTest.class );
         suite.addTestSuite( MavenITmng4474PerLookupWagonInstantiationTest.class );
         suite.addTestSuite( MavenITmng4470AuthenticatedDeploymentToProxyTest.class );
         suite.addTestSuite( MavenITmng4469AuthenticatedDeploymentToCustomRepoTest.class );
@@ -600,7 +599,6 @@ public class TestSuiteOrdering implements ClassOrderer
         suite.addTestSuite( MavenITmng2318LocalParentResolutionTest.class );
         suite.addTestSuite( MavenITmng2309ProfileInjectionOrderTest.class );
         suite.addTestSuite( MavenITmng2305MultipleProxiesTest.class );
-        suite.addTestSuite( MavenITmng2293CustomPluginParamImplTest.class );
         suite.addTestSuite( MavenITmng2277AggregatorAndResolutionPluginsTest.class );
         suite.addTestSuite( MavenITmng2276ProfileActivationBySettingsPropertyTest.class );
         suite.addTestSuite( MavenITmng2254PomEncodingTest.class );

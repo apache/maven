@@ -23,33 +23,33 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Deploys the project artifacts to the distribution repository. This is the essence of the Maven Deploy Plugin.
  *
  * @author Benjamin Bentmann
  *
- * @goal deploy
- * @phase deploy
- */
+  */
+@Mojo( name = "deploy", defaultPhase = LifecyclePhase.DEPLOY )
 public class DeployMojo
     extends AbstractRepoMojo
 {
 
     /**
      * The distribution repository.
-     *
-     * @parameter default-value="${project.distributionManagementArtifactRepository}"
-     * @readonly
-     * @required
      */
+    @Parameter( defaultValue = "${project.distributionManagementArtifactRepository}", readonly = true, required = true )
     private ArtifactRepository deploymentRepository;
 
     /**
      * The artifact deployer.
      *
-     * @component
      */
+    @Component
     private ArtifactDeployer deployer;
 
     /**

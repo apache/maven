@@ -19,7 +19,7 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
-import org.codehaus.classworlds.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.configurator.AbstractComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
@@ -47,7 +47,7 @@ public class CustomComponentConfigurator
     {
         ObjectWithFieldsConverter converter = new ObjectWithFieldsConverter();
 
-        converter.processConfiguration( converterLookup, component, containerRealm.getClassLoader(), configuration,
+        converter.processConfiguration( converterLookup, component, containerRealm, configuration,
                                         expressionEvaluator, listener );
 
         if ( component instanceof CustomConfigMojo )

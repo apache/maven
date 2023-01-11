@@ -38,13 +38,16 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
-      <version>2.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-project</artifactId>
-      <version>2.0</version>
+      <artifactId>maven-compat</artifactId>
       <scope>provided</scope>
     </dependency>
     <!-- Test the resolution of the version -->
@@ -56,10 +59,6 @@ under the License.
         <exclusion>
           <groupId>org.apache.maven.shared</groupId>
           <artifactId>maven-verifier</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-artifact</artifactId>
         </exclusion>
         <exclusion>
           <groupId>junit</groupId>

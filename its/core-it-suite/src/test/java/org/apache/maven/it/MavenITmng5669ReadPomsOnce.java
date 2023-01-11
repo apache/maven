@@ -43,6 +43,8 @@ public class MavenITmng5669ReadPomsOnce
     extends AbstractMavenIntegrationTestCase
 {
 
+    private static final int LOG_SIZE = 233;
+
     public MavenITmng5669ReadPomsOnce()
     {
         super( "[4.0.0-alpha-1,)" );
@@ -57,7 +59,7 @@ public class MavenITmng5669ReadPomsOnce
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         Map<String, String> filterProperties =
             Collections.singletonMap( "${javaAgentJar}",
-                                      verifier.getArtifactPath( "mng-coreit", "javaagent", "1.0-SNAPSHOT", "jar" ) );
+                                      verifier.getArtifactPath( "org.apache.maven.its", "core-it-javaagent", "2.1-SNAPSHOT", "jar" ) );
         verifier.filterFile( ".mvn/jvm.config", ".mvn/jvm.config", null, filterProperties );
 
         verifier.setForkJvm( true ); // pick up agent
@@ -78,10 +80,10 @@ public class MavenITmng5669ReadPomsOnce
                 break;
             }
         }
-        assertEquals( logTxt.toString(), 202, logTxt.size() );
+        assertEquals( logTxt.toString(), LOG_SIZE, logTxt.size() );
 
         // analyze lines. It is a Hashmap, so we can't rely on the order
-        Set<String> uniqueBuildingSources = new HashSet<>( 202 );
+        Set<String> uniqueBuildingSources = new HashSet<>( LOG_SIZE );
         final String buildSourceKey = "org.apache.maven.model.building.source=";
         final int keyLength = buildSourceKey.length();
         for ( String line : logTxt )
@@ -99,7 +101,7 @@ public class MavenITmng5669ReadPomsOnce
             }
             uniqueBuildingSources.add( line.substring( start + keyLength, end ) );
         }
-        assertEquals( uniqueBuildingSources.size(), 201 /* is 202 minus superpom */ );
+        assertEquals( uniqueBuildingSources.size(), LOG_SIZE - 1 /* minus superpom */ );
     }
 
     @Test
@@ -111,7 +113,7 @@ public class MavenITmng5669ReadPomsOnce
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), false );
         Map<String, String> filterProperties =
             Collections.singletonMap( "${javaAgentJar}",
-                                      verifier.getArtifactPath( "mng-coreit", "javaagent", "1.0-SNAPSHOT", "jar" ) );
+                                      verifier.getArtifactPath( "org.apache.maven.its", "core-it-javaagent", "2.1-SNAPSHOT", "jar" ) );
         verifier.filterFile( ".mvn/jvm.config", ".mvn/jvm.config", null, filterProperties );
 
         verifier.setLogFileName( "log-bc.txt" );
@@ -133,11 +135,11 @@ public class MavenITmng5669ReadPomsOnce
                 break;
             }
         }
-        assertEquals( logTxt.toString(), 202 + 4 /* reactor poms are read twice: file + raw (=XMLFilters) */,
+        assertEquals( logTxt.toString(), LOG_SIZE + 4 /* reactor poms are read twice: file + raw (=XMLFilters) */,
                       logTxt.size() );
 
         // analyze lines. It is a Hashmap, so we can't rely on the order
-        Set<String> uniqueBuildingSources = new HashSet<>( 202 );
+        Set<String> uniqueBuildingSources = new HashSet<>( LOG_SIZE );
         final String buildSourceKey = "org.apache.maven.model.building.source=";
         final int keyLength = buildSourceKey.length();
         for ( String line : logTxt )
@@ -155,7 +157,7 @@ public class MavenITmng5669ReadPomsOnce
             }
             uniqueBuildingSources.add( line.substring( start + keyLength, end ) );
         }
-        assertEquals( uniqueBuildingSources.size(), 201 /* is 202 minus superpom */ );
+        assertEquals( uniqueBuildingSources.size(), LOG_SIZE - 1 /* minus superpom */ );
     }
 
 }

@@ -19,23 +19,24 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import junit.framework.TestCase;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
 
 /**
- * @goal requirement-component-lookup-exception
- * @requiresProject false
  */
+@Mojo( name = "requirement-component-lookup-exception", requiresProject = false )
 public class RequirementComponentLookupExceptionMojo
     extends AbstractMojo
 {
 
     /**
-     * @component role="missing-component" roleHint="triggers-error"
      */
-    private Mojo dependency;
+    @Component( role = TestCase.class, hint = "triggers-error" )
+    private org.apache.maven.plugin.Mojo dependency;
 
     public void execute()
         throws MojoExecutionException, MojoFailureException

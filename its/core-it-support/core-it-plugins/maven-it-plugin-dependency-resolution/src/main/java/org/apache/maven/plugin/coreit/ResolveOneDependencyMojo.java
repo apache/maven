@@ -29,6 +29,10 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
@@ -39,93 +43,73 @@ import java.util.Set;
  * Attempts to resolve a single artifact from dependencies, and logs the results for the Verifier to look at.
  *
  * @author bimargulies
- *
- * @goal resolve-one-dependency
- * @requiresDependencyResolution runtime
  */
+@Mojo( name = "resolve-one-dependency", requiresDependencyResolution = ResolutionScope.RUNTIME )
 public class ResolveOneDependencyMojo
     extends AbstractDependencyMojo
 {
 
     /**
      * Group ID of the artifact to resolve.
-     *
-     * @parameter
-     * @required
      */
+    @Parameter( required = true )
     private String groupId;
 
     /**
      * Artifact ID of the artifact to resolve.
-     *
-     * @parameter
-     * @required
      */
+    @Parameter( required = true )
     private String artifactId;
 
     /**
      * Version  of the artifact to resolve.
-     *
-     * @parameter
-     * @required
      */
+    @Parameter( required = true )
     private String version;
 
     /**
      * Type of the artifact to resolve.
-     *
-     * @parameter
-     * @required
      */
+    @Parameter( required = true )
     private String type;
 
     /**
      * Classifier of the artifact to resolve.
-     *
-     * @parameter
      */
+    @Parameter
     private String classifier;
 
     /**
      * The scope to resolve for.
-     *
-     * @parameter
-     * @required
      */
+    @Parameter( required = true )
     private String scope;
 
     /**
-     * @parameter default-value="${project}"
-     * @required
      */
+    @Parameter( defaultValue = "${project}", required = true )
     MavenProject project;
 
     /**
-     * @component
      */
+    @Component
     private ArtifactResolver resolver;
 
     /**
-     * @component
-     * @readonly
-     * @required
      */
+    @Component
     private ArtifactFactory artifactFactory;
 
     /**
      * The Maven session.
-     *
-     * @parameter default-value="${session}"
-     * @readonly
-     * @required
      */
+    @Parameter( defaultValue = "${session}", required = true, readonly = true )
     private MavenSession session;
 
     /**
      * Metadata source object.
-     *
-     * @component
      */
+    @Component
     private ArtifactMetadataSource metadataSource;
 
     /**

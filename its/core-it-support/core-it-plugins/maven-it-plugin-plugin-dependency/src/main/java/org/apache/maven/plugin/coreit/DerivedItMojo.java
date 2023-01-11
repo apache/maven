@@ -21,13 +21,15 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 
 /**
- * @goal test
- * @phase process-sources
- */
+  */
+@Mojo( name = "test", defaultPhase = LifecyclePhase.PROCESS_SOURCES )
 public class DerivedItMojo
     extends EvalMojo
 {
@@ -35,9 +37,8 @@ public class DerivedItMojo
      * The path to the output file for the properties with the expression values. For each expression given by the
      * parameter {@link #expressions}, a similar named properties key will be used to save the expression value. If an
      * expression evaluated to <code>null</code>, there will be no corresponding key in the properties file.
-     *
-     * @parameter
      */
+    @Parameter
     private File file;
 
     public void execute()

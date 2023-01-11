@@ -41,7 +41,7 @@ under the License.
     <plugins>
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.2</version>
+        <version>3.3.0</version>
         <executions>
           <execution>
             <id>tests</id>
@@ -53,7 +53,7 @@ under the License.
       </plugin>
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
-        <version>2.0.4</version>
+        <version>3.2.1</version>
         <executions>
           <execution>
             <id>sources</id>
@@ -65,7 +65,7 @@ under the License.
       </plugin>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.5</version>
+        <version>3.4.0</version>
         <executions>
           <execution>
             <id>apidocs</id>

@@ -21,6 +21,8 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -28,25 +30,22 @@ import java.io.IOException;
 
 /**
  * Mojo to check that attribute injection through setter method (instead of direct parameter injection) works.
- * @goal setter-touch
  */
+@Mojo( name = "setter-touch" )
 public class CoreItMojoWithSetters
     extends AbstractMojo
 {
-    /**
-     * @parameter default-value="${project.build.directory}"
-     * @required
-     */
+    @Parameter( defaultValue = "${project.build.directory}", required = true )
     private String outputDirectoryValue;
 
     /**
-     * @parameter name="foo"
      */
+    @Parameter( name = "foo" )
     private String fooValue;
 
     /**
-     * @parameter
      */
+    @Parameter
     private String bar;
 
     // ----------------------------------------------------------------------

@@ -22,21 +22,23 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.providers.file.FileWagon;
 import org.apache.maven.wagon.providers.ssh.jsch.ScpWagon;
 
 /**
- * @goal use-wagon
- * @phase validate
  */
+@Mojo( name = "use-wagon", defaultPhase = LifecyclePhase.VALIDATE )
 public class UsesWagonMojo
     extends AbstractMojo
 {
 
     /**
-     * @component
      */
+    @Component
     private WagonManager wagonManager;
 
     public void execute()

@@ -21,6 +21,9 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
 import java.util.List;
@@ -31,11 +34,8 @@ import java.util.List;
  * dependencies are dumped.
  *
  * @author Benjamin Bentmann
- *
- * @goal aggregate-test
- * @requiresDependencyResolution test
- * @aggregator true
  */
+@Mojo( name = "aggregate-test", requiresDependencyResolution = ResolutionScope.TEST, aggregator = true )
 public class AggregateTestMojo
     extends AbstractDependencyMojo
 {
@@ -45,36 +45,31 @@ public class AggregateTestMojo
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk. Unlike the test artifacts, the collection of project artifacts additionally contains those artifacts that
      * do not contribute to the class path.
-     *
-     * @parameter property="depres.projectArtifacts"
      */
+    @Parameter( property = "depres.projectArtifacts" )
     private String projectArtifacts;
 
     /**
      * The path to the output file for the test class path, relative to the project base directory. Each line of
      * this UTF-8 encoded file specifies the absolute path to a class path element. If not specified, the class path
      * will not be written to disk.
-     *
-     * @parameter property="depres.testClassPath"
      */
+    @Parameter( property = "depres.testClassPath" )
     private String testClassPath;
 
     /**
      * The path to the properties file for the checksums of the test class path elements, relative to the project base
      * directory. The (trimmed) path to a JAR is used as the property key, the property value is the SHA-1 hash of the
      * JAR. If not specified, the class path checksums will not be calculated.
-     *
-     * @parameter property="depres.testClassPathChecksums"
      */
+    @Parameter( property = "depres.testClassPathChecksums" )
     private String testClassPathChecksums;
 
     /**
      * The Maven projects in the reactor.
-     *
-     * @parameter default-value="${reactorProjects}"
-     * @readonly
      */
-    private List reactorProjects;
+    @Parameter( defaultValue = "${reactorProjects}", readonly = true )
+    private List<MavenProject> reactorProjects;
 
     /**
      * Runs this mojo.
@@ -86,10 +81,8 @@ public class AggregateTestMojo
     {
         try
         {
-            for ( Object reactorProject : reactorProjects )
+            for ( MavenProject project : reactorProjects )
             {
-                MavenProject project = (MavenProject) reactorProject;
-
                 writeArtifacts( filter( projectArtifacts, project ), project.getArtifacts() );
                 writeClassPath( filter( testClassPath, project ), project.getTestClasspathElements() );
                 writeClassPathChecksums( filter( testClassPathChecksums, project ),

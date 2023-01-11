@@ -21,16 +21,17 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 /**
  * Creates text files that list the dependencies with scope runtime in the order returned from the Maven core.
  *
- * @goal runtime
- * @requiresDependencyCollection runtime
- *
  * @author Benjamin Bentmann
  *
  */
+@Mojo( name = "runtime", requiresDependencyCollection = ResolutionScope.RUNTIME )
 public class RuntimeMojo
     extends AbstractDependencyMojo
 {
@@ -40,18 +41,16 @@ public class RuntimeMojo
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk. Unlike the runtime artifacts, the collection of project artifacts additionally contains those artifacts
      * that do not contribute to the class path.
-     *
-     * @parameter property="depres.projectArtifacts"
      */
+    @Parameter( property = "depres.projectArtifacts" )
     private String projectArtifacts;
 
     /**
      * The path to the output file for the runtime artifacts, relative to the project base directory. Each line of this
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk.
-     *
-     * @parameter property="depres.runtimeArtifacts"
      */
+    @Parameter( property = "depres.runtimeArtifacts" )
     private String runtimeArtifacts;
 
     /**

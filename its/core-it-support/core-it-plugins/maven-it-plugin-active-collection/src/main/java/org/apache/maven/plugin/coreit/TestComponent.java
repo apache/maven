@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.coreit.sub;
+package org.apache.maven.plugin.coreit;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.plugin.coreit.sub;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,27 +19,12 @@ package org.apache.maven.plugin.coreit.sub;
  * under the License.
  */
 
-import org.apache.maven.plugin.coreit.AnInterface;
-
 /**
+ * A simple interface for our test components.
+ *
+ * @author Benjamin Bentmann
  */
-public class AnImplementation
-    implements AnInterface
+public interface TestComponent
 {
-    private String field;
 
-    public String getField()
-    {
-        return field;
-    }
-
-    public void setField( String field )
-    {
-        this.field = field;
-    }
-
-    public String toString()
-    {
-        return getClass().getName() + "-" + field;
-    }
 }

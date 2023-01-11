@@ -29,56 +29,45 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Resolves an artifact and has an (unused) dependency on log4j.
  *
- * @goal it
  *
  * @author Benjamin Bentmann
  *
  */
+@Mojo( name = "it" )
 public class ItMojo
     extends AbstractMojo
 {
 
     /**
-     * @component
      */
+    @Component
     private ArtifactFactory artifactFactory;
 
     /**
-     * @component
      */
+    @Component
     private ArtifactResolver artifactResolver;
 
-    /**
-     * @parameter default-value="${localRepository}"
-     * @required
-     * @readonly
-     */
+    @Parameter( defaultValue = "${localRepository}", required = true, readonly = true )
     private ArtifactRepository localRepository;
 
-    /**
-     * @parameter default-value="${project.remoteArtifactRepositories}"
-     * @required
-     * @readonly
-     */
+    @Parameter( defaultValue = "${project.remoteArtifactRepositories}", required = true, readonly = true )
     private List remoteRepositories;
 
-    /**
-     * @parameter default-value="test"
-     */
+    @Parameter( defaultValue = "test" )
     private String groupId;
 
-    /**
-     * @parameter default-value="test"
-     */
+    @Parameter( defaultValue = "test" )
     private String artifactId;
 
-    /**
-     * @parameter default-value="1.0"
-     */
+    @Parameter( defaultValue = "1.0" )
     private String version;
 
     /**

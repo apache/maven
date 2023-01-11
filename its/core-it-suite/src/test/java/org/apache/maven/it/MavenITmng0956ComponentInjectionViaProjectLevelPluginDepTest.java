@@ -63,7 +63,7 @@ public class MavenITmng0956ComponentInjectionViaProjectLevelPluginDepTest
         verifier.verifyErrorFreeLog();
 
         Properties apiProps = verifier.loadProperties( "target/component.properties" );
-        assertEquals( "true", apiProps.getProperty( "org.apache.maven.plugin.coreit.DefaultComponent" ) );
+        assertEquals( "true", apiProps.getProperty( "org.apache.maven.plugin.coreit.DefaultTestComponent" ) );
     }
 
 }

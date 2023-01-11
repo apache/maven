@@ -21,6 +21,8 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,23 +32,20 @@ import java.io.IOException;
  *
  * @author <a href="brett@apache.org">Brett Porter</a>
  *
- * @goal package
- */
+  */
+@Mojo( name = "package" )
 public class PackagingMojo
     extends AbstractMojo
 {
 
     /**
-     * @parameter default-value="${project.build.finalName}"
-     * @required
      */
+    @Parameter( defaultValue = "${project.build.finalName}", required = true )
     private String finalName;
 
     /**
-     * @parameter default-value="${project.build.directory}"
-     * @required
-     * @readonly
      */
+    @Parameter( defaultValue = "${project.build.directory}", required = true, readonly = true )
     private File outputDirectory;
 
     public void execute()

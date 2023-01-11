@@ -26,75 +26,68 @@ import java.util.Set;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Dumps this mojo's configuration into a properties file.
  *
- * @goal cli-config
- * @phase validate
- *
+  *
  * @author Benjamin Bentmann
  *
  */
+@Mojo( name = "cli-config", defaultPhase = LifecyclePhase.VALIDATE )
 public class CliConfigMojo
     extends AbstractMojo
 {
 
     /**
      * The current project's base directory, used for path alignment.
-     *
-     * @parameter default-value="${basedir}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${basedir}", readonly = true )
     private File basedir;
 
     /**
      * The path to the properties file into which to save the mojo configuration.
-     *
-     * @parameter property="config.propertiesFile"
      */
+    @Parameter( property = "config.propertiesFile" )
     private File propertiesFile;
 
     /**
      * A simple parameter of type {@link java.lang.String}.
-     *
-     * @parameter property="config.stringParam"
      */
+    @Parameter( property = "config.stringParam" )
     private String stringParam;
 
     /**
      * A simple parameter of type {@link java.io.File}.
-     *
-     * @parameter property="config.fileParam"
      */
+    @Parameter( property = "config.fileParam" )
     private File fileParam;
 
     /**
      * An array parameter of component type {@link java.lang.String}.
-     *
-     * @parameter property="config.stringParams"
      */
+    @Parameter( property = "config.stringParams" )
     private String[] stringParams;
 
     /**
      * An array parameter of component type {@link java.io.File}.
-     *
-     * @parameter property="config.fileParams"
      */
+    @Parameter( property = "config.fileParams" )
     private File[] fileParams;
 
     /**
      * A collection parameter of type {@link java.util.List}.
-     *
-     * @parameter property="config.listParam"
      */
+    @Parameter( property = "config.listParam" )
     private List listParam;
 
     /**
      * A collection parameter of type {@link java.util.Set}.
-     *
-     * @parameter property="config.setParam"
      */
+    @Parameter( property = "config.setParam" )
     private Set setParam;
 
     /**

@@ -21,18 +21,16 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
- * @goal mojo-execution-exception
- * @requiresProject false
  */
+@Mojo( name = "mojo-execution-exception", requiresProject = false )
 public class MojoExecutionExceptionMojo
     extends AbstractMojo
 {
-    /**
-     * @parameter property="error.message" default-value="Planned MojoExecutionException."
-     * @required
-     */
+    @Parameter( property = "error.message", defaultValue = "Planned MojoExecutionException.", required = true )
     private String message;
 
     public void execute()

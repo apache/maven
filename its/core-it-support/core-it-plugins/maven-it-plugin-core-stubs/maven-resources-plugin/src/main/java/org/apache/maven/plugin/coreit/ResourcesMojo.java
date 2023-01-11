@@ -22,6 +22,9 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
@@ -34,35 +37,31 @@ import java.io.OutputStreamWriter;
  *
  * @author Benjamin Bentmann
  *
- * @goal resources
- * @phase process-resources
- */
+  */
+@Mojo( name = "resources", defaultPhase = LifecyclePhase.PROCESS_RESOURCES )
 public class ResourcesMojo
     extends AbstractMojo
 {
 
     /**
      * The current Maven project.
-     *
-     * @parameter default-value="${project}"
-     * @required
-     * @readonly
      */
+    @Parameter( defaultValue = "${project}", required = true, readonly = true )
     private MavenProject project;
 
     /**
      * The path to the output file, relative to the project base directory.
      *
-     * @parameter
      */
+    @Parameter
     private String pathname = "target/resources-resources.txt";
 
     /**
      * An optional message line to write to the output file (using UTF-8 encoding). If given, the output file will be
      * opened in append mode.
      *
-     * @parameter
      */
+    @Parameter
     private String message;
 
     /**

@@ -23,6 +23,10 @@ import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.wagon.repository.Repository;
 
 import java.io.File;
@@ -39,41 +43,35 @@ import java.util.Properties;
  * class loader it came from which is otherwise not accessible to a plugin.
  *
  * @author Benjamin Bentmann
- *
- * @goal load-resource
- * @phase validate
  */
+@Mojo( name = "load-resource", defaultPhase = LifecyclePhase.VALIDATE )
 public class LoadResourceMojo
     extends AbstractMojo
 {
 
     /**
      * The Wagon manager used to retrieve wagon providers.
-     *
-     * @component
      */
+    @Component
     private WagonManager wagonManager;
 
     /**
      * The path to the properties file used to track the results of the resource loading via the wagon's class loader.
-     *
-     * @parameter property="wagon.wagonClassLoaderOutput"
      */
+    @Parameter( property = "wagon.wagonClassLoaderOutput" )
     private File wagonClassLoaderOutput;
 
     /**
      * The role hint for the wagon provider to load. The class loader of this provider will be used to load the
      * resources.
-     *
-     * @parameter property="wagon.wagonProtocol"
      */
+    @Parameter( property = "wagon.wagonProtocol" )
     private String wagonProtocol;
 
     /**
      * The repository to load the wagon for, if applicable.
-     *
-     * @parameter property="wagon.repositoryId"
      */
+    @Parameter( property = "wagon.repositoryId" )
     private String repositoryId;
 
     /**
@@ -81,9 +79,8 @@ public class LoadResourceMojo
      * loaded, the generated properties files will contain a key named <code>ARP</code> whose value gives the URL to the
      * resource. In addition, the keys <code>ARP.count</code>, <code>ARP.0</code>, <code>ARP.1</code> etc. will
      * enumerate all URLs matching the resource name.
-     *
-     * @parameter
      */
+    @Parameter
     private String[] resourcePaths;
 
     /**

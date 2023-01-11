@@ -19,23 +19,21 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
-import org.apache.maven.plugin.Mojo;
+import junit.framework.TestCase;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 
-import junit.framework.TestCase;
+import org.apache.maven.plugins.annotations.Mojo;
 
 /**
  * Implements a class from a provided-scope dependency, so that the mojo class itself won't be
  * loadable when that dependency is missing (in the runtime environment).
- *
- * @goal no-class-def-found-error-mojo
- * @requiresProject false
  */
+@Mojo( name = "no-class-def-found-error-mojo", requiresProject = false )
 public class NoClassDefFoundErrorInterfaceMojo
-    extends TestCase
-    implements Mojo
+        extends TestCase
+        implements org.apache.maven.plugin.Mojo
 {
 
     private Log log;

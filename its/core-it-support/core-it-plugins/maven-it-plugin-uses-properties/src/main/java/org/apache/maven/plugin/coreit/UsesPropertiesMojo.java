@@ -21,26 +21,28 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.util.Properties;
 import java.io.FileOutputStream;
 import java.io.File;
 
 /**
- * @goal generate-properties
- * @phase validate
  */
+@Mojo( name = "generate-properties", defaultPhase = LifecyclePhase.VALIDATE )
 public class UsesPropertiesMojo
     extends AbstractMojo
 {
     /**
-     * @parameter default-value="${basedir}"
      */
+    @Parameter( defaultValue = "${basedir}" )
     private File basedir;
 
     /**
-     * @parameter default-value="${project.properties}"
      */
+    @Parameter( defaultValue = "${project.properties}" )
     private Properties properties;
 
     public void execute()

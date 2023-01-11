@@ -20,10 +20,10 @@ under the License.
 <component-set>
   <components>
     <component>
-      <role>org.apache.maven.plugin.coreit.Component</role>
+      <role>org.apache.maven.plugin.coreit.TestComponent</role>
       <!-- NOTE: Not using "default" for the role hint is the essential piece here -->
       <role-hint>concrete</role-hint>
-      <implementation>org.apache.maven.plugin.coreit.ConcreteComponent</implementation>
+      <implementation>org.apache.maven.plugin.coreit.ConcreteTestComponent</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
   </components>

@@ -21,6 +21,7 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,9 +50,8 @@ public abstract class AbstractLoadMojo
      * key will be the hash code of the requested class. In addition, a key named <code>QCN.methods</code> holds the
      * comma separated list of all public methods declared directly in that class, in alphabetic order and possibly with
      * duplicates to account for overloaded methods.
-     *
-     * @parameter property="clsldr.classNames"
      */
+    @Parameter( property = "clsldr.classNames" )
     protected String classNames;
 
     /**
@@ -59,9 +59,8 @@ public abstract class AbstractLoadMojo
      * successfully loaded, the generated properties files will contain a key named <code>ARP</code> whose value gives
      * the URL to the resource. In addition, the keys <code>ARP.count</code>, <code>ARP.0</code>, <code>ARP.1</code>
      * etc. will enumerate all URLs matching the resource name.
-     *
-     * @parameter property="clsldr.resourcePaths"
      */
+    @Parameter( property = "clsldr.resourcePaths" )
     protected String resourcePaths;
 
     /**

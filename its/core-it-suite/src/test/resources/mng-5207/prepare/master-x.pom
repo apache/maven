@@ -227,18 +227,18 @@
     <!-- ======= -->
     <!-- Plugins -->
     <!-- ======= -->
-    <version.org.apache.maven.plugins.assembly>2.2.1</version.org.apache.maven.plugins.assembly>
-    <version.org.apache.maven.plugins.clean>2.4.1</version.org.apache.maven.plugins.clean>
-    <version.org.apache.maven.plugins.compiler>2.3.2</version.org.apache.maven.plugins.compiler>
-    <version.org.apache.maven.plugins.dependency>2.3</version.org.apache.maven.plugins.dependency>
-    <version.org.apache.maven.plugins.deploy>2.7</version.org.apache.maven.plugins.deploy>
-    <version.org.apache.maven.plugins.ear>2.6</version.org.apache.maven.plugins.ear>
-    <version.org.apache.maven.plugins.ejb>2.3</version.org.apache.maven.plugins.ejb>
-    <version.org.apache.maven.plugins.install>2.3.1</version.org.apache.maven.plugins.install>
-    <version.org.apache.maven.plugins.jar>2.3.2</version.org.apache.maven.plugins.jar>
-    <version.org.apache.maven.plugins.resources>2.5</version.org.apache.maven.plugins.resources>
-    <version.org.apache.maven.plugins.source>2.1.2</version.org.apache.maven.plugins.source>
-    <version.org.apache.maven.plugins.surefire>2.9</version.org.apache.maven.plugins.surefire>
+    <version.org.apache.maven.plugins.assembly>3.4.0</version.org.apache.maven.plugins.assembly>
+    <version.org.apache.maven.plugins.clean>3.2.0</version.org.apache.maven.plugins.clean>
+    <version.org.apache.maven.plugins.compiler>3.10.1</version.org.apache.maven.plugins.compiler>
+    <version.org.apache.maven.plugins.dependency>3.3.0</version.org.apache.maven.plugins.dependency>
+    <version.org.apache.maven.plugins.deploy>3.0.0</version.org.apache.maven.plugins.deploy>
+    <version.org.apache.maven.plugins.ear>3.2.0</version.org.apache.maven.plugins.ear>
+    <version.org.apache.maven.plugins.ejb>3.1.0</version.org.apache.maven.plugins.ejb>
+    <version.org.apache.maven.plugins.install>3.0.1</version.org.apache.maven.plugins.install>
+    <version.org.apache.maven.plugins.jar>3.3.0</version.org.apache.maven.plugins.jar>
+    <version.org.apache.maven.plugins.resources>3.3.0</version.org.apache.maven.plugins.resources>
+    <version.org.apache.maven.plugins.source>3.2.1</version.org.apache.maven.plugins.source>
+    <version.org.apache.maven.plugins.surefire>3.0.0-M7</version.org.apache.maven.plugins.surefire>
 
     <version.org.codehaus.mojo.build-helper-plugin>1.7</version.org.codehaus.mojo.build-helper-plugin>
 

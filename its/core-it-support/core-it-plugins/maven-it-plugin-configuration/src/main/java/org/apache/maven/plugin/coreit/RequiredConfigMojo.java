@@ -24,48 +24,43 @@ import java.util.Properties;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Dumps this mojo's configuration into a properties file.
  *
- * @goal required-config
- * @phase validate
- *
+  *
  * @author Benjamin Bentmann
  */
+@Mojo( name = "required-config", defaultPhase = LifecyclePhase.VALIDATE )
 public class RequiredConfigMojo
     extends AbstractMojo
 {
 
     /**
      * The current project's base directory, used for path alignment.
-     *
-     * @parameter default-value="${basedir}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${basedir}", readonly = true )
     private File basedir;
 
     /**
      * The path to the properties file into which to save the mojo configuration.
-     *
-     * @parameter property="config.propertiesFile"
      */
+    @Parameter( property = "config.propertiesFile" )
     private File propertiesFile;
 
     /**
      * A required parameter to be set via plugin configuration in POM or system property from CLI.
-     *
-     * @parameter property="config.requiredParam"
-     * @required
      */
+    @Parameter( property = "config.requiredParam", required = true )
     private String requiredParam;
 
     /**
      * A required parameter that defaults to a non-mandatory value from the POM.
-     *
-     * @parameter default-value="${project.url}"
-     * @required
      */
+    @Parameter( defaultValue = "${project.url}", required = true )
     private String requiredParamWithDefault;
 
     /**

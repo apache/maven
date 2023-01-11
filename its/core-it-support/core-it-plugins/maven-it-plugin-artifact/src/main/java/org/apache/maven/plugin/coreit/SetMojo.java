@@ -23,6 +23,9 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
@@ -31,32 +34,26 @@ import java.io.File;
  * Sets the main artifact's file. This is the essence of the Maven JAR Plugin and all the other packaging plugins.
  * Creating the actual file for the main artifact is a specific plugin job and not related to the Maven core.
  *
- * @goal set
- * @phase package
- *
+  *
  * @author Benjamin Bentmann
  *
  */
+@Mojo( name = "set", defaultPhase = LifecyclePhase.PACKAGE )
 public class SetMojo
     extends AbstractMojo
 {
 
     /**
      * The current Maven project.
-     *
-     * @parameter default-value="${project}"
-     * @readonly
-     * @required
      */
+    @Parameter( defaultValue = "${project}", readonly = true, required = true )
     private MavenProject project;
 
     /**
      * The path to the file to set as the main artifact, relative to the project base directory. The plugin will not
      * validate this path.
-     *
-     * @parameter property="artifact.mainFile"
-     * @required
      */
+    @Parameter( property = "artifact.mainFile", required = true )
     private String mainFile;
 
     /**

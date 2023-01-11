@@ -21,31 +21,28 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 
 /**
- * @goal fork
- *
- * @execute phase="generate-sources" lifecycle="foo"
  */
+@Mojo( name = "fork" )
+@Execute( phase = LifecyclePhase.GENERATE_RESOURCES, lifecycle = "foo" )
 public class ForkLifecycleMojo
     extends AbstractMojo
 {
-    /**
-     * @parameter default-value="${project}"
-     */
+    @Parameter( defaultValue = "${project}" )
     private MavenProject project;
 
-    /**
-     * @parameter default-value="${executedProject}"
-     */
+    @Parameter( defaultValue = "${executedProject}" )
     private MavenProject executedProject;
 
-    /**
-     * @parameter default-value="${project.build.directory}"
-     */
+    @Parameter( defaultValue = "${project.build.directory}" )
     private File touchDirectory;
 
     public void execute()

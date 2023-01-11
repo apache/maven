@@ -22,6 +22,10 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.toolchain.ToolchainManagerPrivate;
 import org.apache.maven.toolchain.ToolchainPrivate;
 
@@ -36,53 +40,45 @@ import java.util.Iterator;
 import java.util.Properties;
 
 /**
- * @goal toolchain
- * @phase validate
- */
+  */
+@Mojo( name = "toolchain", defaultPhase = LifecyclePhase.VALIDATE )
 public class CoreItMojo
     extends AbstractMojo
 {
 
     /**
-     * @component
      */
+    @Component
     private ToolchainManagerPrivate toolchainManager;
 
     /**
      * The current Maven session holding the selected toolchain.
-     *
-     * @parameter default-value="${session}"
-     * @required
-     * @readonly
      */
+    @Parameter( defaultValue = "${session}", readonly = true, required = true )
     private MavenSession session;
 
     /**
      * The path to the output file for the properties.
-     *
-     * @parameter property="toolchain.outputFile" default-value="${project.build.directory}/toolchains.properties"
      */
+    @Parameter( property = "toolchain.outputFile", defaultValue = "${project.build.directory}/toolchains.properties" )
     private File outputFile;
 
     /**
      * The type identifier of the toolchain, e.g. "jdk".
-     *
-     * @parameter property="toolchain.type"
      */
+    @Parameter( property = "toolchain.type" )
     private String type;
 
     /**
      * The name of the tool, e.g. "javac".
-     *
-     * @parameter property="toolchain.tool"
      */
+    @Parameter( property = "toolchain.tool" )
     private String tool;
 
     /**
      * The zero-based index of the toolchain to select and store in the build context.
-     *
-     * @parameter property="toolchain.selected"
      */
+    @Parameter( property = "toolchain.selected" )
     private int selected;
 
     public void execute()

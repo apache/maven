@@ -23,6 +23,9 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.util.Arrays;
@@ -35,8 +38,8 @@ import java.util.Set;
  *
  * @author Benjamin Bentmann
  *
- * @goal inject
  */
+@Mojo( name = "inject" )
 public class InjectMojo
     extends AbstractMojo
 {
@@ -44,31 +47,25 @@ public class InjectMojo
     /**
      * The version-less keys in the form <code>groupId:artifactId</code> of the plugin artifacts to inject into
      * dependency artifacts of the project.
-     *
-     * @parameter
      */
+    @Parameter
     private String[] artifacts;
 
     /**
-     * @parameter default-value="${plugin.artifacts}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${plugin.artifacts}", readonly = true )
     private Collection pluginArtifacts;
 
     /**
      * The current Maven project.
-     *
-     * @parameter default-value="${project}"
-     * @required
-     * @readonly
      */
+    @Parameter( defaultValue = "${project}", readonly = true, required = true )
     private MavenProject project;
 
     /**
      * The artifact factory.
-     *
-     * @component
      */
+    @Component
     private ArtifactFactory factory;
 
     /**

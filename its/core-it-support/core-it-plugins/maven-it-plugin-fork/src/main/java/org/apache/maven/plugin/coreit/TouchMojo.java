@@ -21,6 +21,9 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
@@ -29,25 +32,18 @@ import java.io.OutputStreamWriter;
 import java.io.IOException;
 
 /**
- * @goal touch
- *
- * @phase process-sources
  */
+@Mojo( name = "touch", defaultPhase = LifecyclePhase.PROCESS_RESOURCES )
 public class TouchMojo
     extends AbstractMojo
 {
 
     static final String FINAL_NAME = "coreitified";
 
-    /**
-     * @parameter default-value="${project}"
-     */
+    @Parameter( defaultValue = "${project}" )
     private MavenProject project;
 
-    /**
-     * @parameter default-value="${project.build.directory}"
-     * @required
-     */
+    @Parameter( defaultValue = "${project.build.directory}", required = true )
     private File outputDirectory;
 
     public void execute()

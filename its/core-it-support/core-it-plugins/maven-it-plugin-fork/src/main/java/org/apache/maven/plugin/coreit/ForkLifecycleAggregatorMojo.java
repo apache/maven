@@ -21,27 +21,26 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.util.List;
 
 /**
- * @goal fork-lifecycle-aggregator
- * @aggregator true
- * @execute phase="generate-sources" lifecycle="foo"
  */
+@Mojo( name = "fork-lifecycle-aggregator", aggregator = true )
+@Execute( phase = LifecyclePhase.GENERATE_SOURCES, lifecycle = "foo" )
 public class ForkLifecycleAggregatorMojo
     extends AbstractMojo
 {
 
-    /**
-     * @parameter default-value="${project}"
-     */
+    @Parameter( defaultValue = "${project}" )
     private MavenProject project;
 
-    /**
-     * @parameter default-value="${reactorProjects}"
-     */
+    @Parameter( defaultValue = "${reactorProjects}" )
     private List reactorProjects;
 
     public void execute()

@@ -22,6 +22,9 @@ package org.apache.maven.its.plugins.plexuslifecycle;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
@@ -29,18 +32,15 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 
 /**
  * @author Olivier Lamy
- * @goal do-nothing
- * @phase validate
  */
+@Mojo( name = "do-nothing", defaultPhase = LifecyclePhase.VALIDATE )
 public class MojoWithPlexusLifecycle
     extends AbstractMojo
     implements Contextualizable, Disposable
 {
     /**
-     * @component
-     * @throws MojoExecutionException
-     * @throws MojoFailureException
      */
+    @Component
     private FakeComponent fakeComponent;
 
     public void execute()

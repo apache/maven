@@ -23,12 +23,18 @@
         <repository>
           <id>central</id>
           <url>http://central</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
         </repository>
       </repositories>
       <pluginRepositories>
         <pluginRepository>
           <id>central</id>
           <url>http://central</url>
+          <releases>
+            <checksumPolicy>ignore</checksumPolicy>
+          </releases>
         </pluginRepository>
       </pluginRepositories>
     </profile>

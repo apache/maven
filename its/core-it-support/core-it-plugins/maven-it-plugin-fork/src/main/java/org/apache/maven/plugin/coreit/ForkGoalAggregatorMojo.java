@@ -21,34 +21,36 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.util.List;
 
 /**
- * @goal fork-goal-aggregator
- * @aggregator true
- * @execute goal="touch"
  */
+@Mojo( name = "fork-goal-aggregator", aggregator = true )
+@Execute( goal = "touch" )
 public class ForkGoalAggregatorMojo
     extends AbstractMojo
 {
     /**
-     * @parameter default-value="${project}"
      */
+    @Parameter( defaultValue = "${project}" )
     private MavenProject project;
 
     /**
-     * @parameter default-value="${reactorProjects}"
      */
-    private List reactorProjects;
+    @Parameter( defaultValue = "${reactorProjects}" )
+    private List<MavenProject> reactorProjects;
 
     public void execute()
         throws MojoExecutionException
     {
-        for ( Object reactorProject : reactorProjects )
+        for ( MavenProject reactorProject : reactorProjects )
         {
-            MavenProject executedProject = ( (MavenProject) reactorProject ).getExecutionProject();
+            MavenProject executedProject = reactorProject.getExecutionProject();
 
             if ( !executedProject.getBuild().getFinalName().equals( TouchMojo.FINAL_NAME ) )
             {

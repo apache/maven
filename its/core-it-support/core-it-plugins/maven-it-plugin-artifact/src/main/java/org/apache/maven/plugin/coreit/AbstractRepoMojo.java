@@ -22,6 +22,7 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.util.Collection;
@@ -38,47 +39,32 @@ public abstract class AbstractRepoMojo
 
     /**
      * The project's main artifact.
-     *
-     * @parameter default-value="${project.artifact}"
-     * @readonly
-     * @required
      */
+    @Parameter( defaultValue = "${project.artifact}", required = true, readonly = true )
     protected Artifact mainArtifact;
 
     /**
      * The project's attached artifact.
-     *
-     * @parameter default-value="${project.attachedArtifacts}"
-     * @readonly
-     * @required
      */
+    @Parameter( defaultValue = "${project.attachedArtifacts}", required = true, readonly = true )
     protected Collection<Artifact> attachedArtifacts;
 
     /**
      * The packaging of the project.
-     *
-     * @parameter default-value="${project.packaging}"
-     * @required
-     * @readonly
      */
+    @Parameter( defaultValue = "${project.packaging}", required = true, readonly = true )
     protected String packaging;
 
     /**
      * The POM file of the project.
-     *
-     * @parameter default-value="${project.file}"
-     * @required
-     * @readonly
      */
+    @Parameter( defaultValue = "${project.file}", required = true, readonly = true )
     protected File pomFile;
 
     /**
      * The local repository.
-     *
-     * @parameter default-value="${localRepository}"
-     * @readonly
-     * @required
      */
+    @Parameter( defaultValue = "${localRepository}", required = true, readonly = true )
     protected ArtifactRepository localRepository;
 
     protected boolean isPomArtifact()

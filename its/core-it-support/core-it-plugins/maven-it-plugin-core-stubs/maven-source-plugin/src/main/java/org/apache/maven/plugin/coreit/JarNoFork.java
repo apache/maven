@@ -19,12 +19,14 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+
 /**
  * Creates a text file in the project base directory.
  *
- * @goal jar-no-fork
- * @phase package
- */
+  */
+@Mojo( name = "jar-no-fork", defaultPhase = LifecyclePhase.PACKAGE )
 public class JarNoFork extends JarMojo
 {
 }

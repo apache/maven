@@ -23,6 +23,10 @@ import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.repository.Repository;
 
@@ -36,35 +40,30 @@ import java.util.Properties;
  * Loads resources from a class loader used to load a wagon provider. The wagon is merely used to access the extension
  * class loader it came from which is otherwise not accessible to a plugin.
  *
- * @goal lookup-wagon
- * @phase validate
- *
  * @author Benjamin Bentmann
  *
  */
+@Mojo( name = "lookup-wagon", defaultPhase = LifecyclePhase.VALIDATE )
 public class LookupWagonMojo
     extends AbstractMojo
 {
 
     /**
      * The Wagon manager used to retrieve wagon providers.
-     *
-     * @component
      */
+    @Component
     private WagonManager wagonManager;
 
     /**
      * The path to the properties file used to track the results of the wagon lookups.
-     *
-     * @parameter property="wagon.outputFile"
      */
+    @Parameter( property = "wagon.outputFile" )
     private File outputFile;
 
     /**
      * The URLs for which to look up wagons.
-     *
-     * @parameter
      */
+    @Parameter
     private String[] urls;
 
     /**

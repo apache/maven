@@ -21,6 +21,7 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 
@@ -38,9 +39,8 @@ public abstract class AbstractPomMojo
 
     /**
      * The project builder.
-     *
-     * @component
      */
+    @Component
     protected MavenProjectBuilder builder;
 
     protected void dump( Properties props, String key, MavenProject project )

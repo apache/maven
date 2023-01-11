@@ -20,24 +20,25 @@ package org.apache.maven.plugin.coreit;
  */
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Appends a separator line to the log file.
  *
  * @author Benjamin Bentmann
  *
- * @goal log-separator
- * @phase initialize
- */
+  */
+@Mojo( name = "log-separator", defaultPhase = LifecyclePhase.INITIALIZE )
 public class LogSeparatorMojo
     extends AbstractLogMojo
 {
 
     /**
      * The length of the separator line.
-     *
-     * @parameter property="log.length" default-value="80"
      */
+    @Parameter( property = "log.length", defaultValue = "80" )
     private int length;
 
     /**

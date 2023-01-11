@@ -21,6 +21,9 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,21 +31,17 @@ import java.io.IOException;
 /**
  * Creates an empty file with a user-specified name. NOTE: This mojo requires online mode.
  *
- * @goal touch
- * @phase validate
- * @requiresOnline true
- *
  * @author Benjamin Bentmann
  */
+@Mojo( name = "touch", defaultPhase = LifecyclePhase.VALIDATE, requiresOnline = true )
 public class TouchMojo
     extends AbstractMojo
 {
 
     /**
      * The path to the output file.
-     *
-     * @parameter property="touch.outputFile" default-value="target/touch.txt"
      */
+    @Parameter( property = "touch.outputFile", defaultValue = "target/touch.txt" )
     private File outputFile;
 
     /**

@@ -21,6 +21,9 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
 
@@ -31,23 +34,15 @@ import java.io.IOException;
 /**
  * Goal which read settings and dump it to a file
  *
- * @goal settings-read
- * @phase validate
- */
+  */
+@Mojo( name = "settings-read", defaultPhase = LifecyclePhase.VALIDATE )
 public class SettingsReadItMojo
     extends AbstractMojo
 {
-    /**
-     * @parameter default-value="${settings}"
-     * @required
-     * @readonly
-     */
+    @Parameter( defaultValue = "${settings}", required = true, readonly = true )
     private Settings settings;
 
-    /**
-     * @parameter default-value="target/settings-dump.xml"
-     * @required
-     */
+    @Parameter( defaultValue = "target/settings-dump.xml", required = true )
     private File dumpFile;
 
     public void execute()

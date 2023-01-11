@@ -23,31 +23,31 @@ import org.apache.maven.model.Model;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.util.Enumeration;
 import java.util.Properties;
 
 /**
- * @goal verify-property
- * @phase validate
- */
+  */
+@Mojo( name = "verify-property", defaultPhase = LifecyclePhase.VALIDATE )
 public class PropertyInterpolationVerifierMojo
     extends AbstractMojo
 {
 
     /**
      * The current Maven project.
-     *
-     * @parameter default-value="${project}"
      */
+    @Parameter( defaultValue = "${project}" )
     private MavenProject project;
 
     /**
      * The properties.
-     *
-     * @parameter property="properties"
      */
+    @Parameter( property = "clsldr.pluginClassLoaderOutput" )
     private Properties properties;
 
     public void execute()

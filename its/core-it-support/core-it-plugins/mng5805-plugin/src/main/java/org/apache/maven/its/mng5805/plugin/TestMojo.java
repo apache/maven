@@ -21,16 +21,18 @@ package org.apache.maven.its.mng5805.plugin;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
- * @goal test
- */
+  */
+@Mojo( name = "test" )
 public class TestMojo
     extends AbstractMojo
 {
     /**
-     * @parameter default-value="org.apache.maven.its.mng5805.DoesNotExist"
      */
+    @Parameter( defaultValue = "org.apache.maven.its.mng5805.DoesNotExist" )
     private String className;
 
     public void execute()

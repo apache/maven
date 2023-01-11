@@ -21,11 +21,12 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
- * @goal mojo-failure-exception
- * @requiresProject false
  */
+@Mojo( name = "mojo-failure-exception", requiresProject = false )
 public class MojoFailureExceptionMojo
     extends AbstractMojo
 {
@@ -33,23 +34,19 @@ public class MojoFailureExceptionMojo
      * Message used in {@link MojoFailureException#MojoFailureException(String)}, unless longMessage
      * is supplied; then, this becomes the short message in
      * {@link MojoFailureException#MojoFailureException(Object, String, String)}.
-     *
-     * @parameter property="error.message" default-value="Planned MojoExecutionException."
-     * @required
      */
+    @Parameter( property = "error.message", defaultValue = "Planned MojoExecutionException.", required = true )
     private String message;
 
     /**
      * If supplied, The form {@link MojoFailureException#MojoFailureException(Object, String, String)} will be used.
-     *
-     * @parameter property="error.longMessage"
-     * @required
      */
+    @Parameter( property = "error.longMessage", required = true )
     private String longMessage;
 
     /**
-     * @parameter property="error.source"
      */
+    @Parameter( property = "error.source" )
     private String source;
 
     public void execute()

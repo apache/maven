@@ -21,6 +21,9 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
 import java.util.List;
@@ -31,11 +34,8 @@ import java.util.List;
  * dependencies are dumped.
  *
  * @author Benjamin Bentmann
- *
- * @goal aggregate-test
- * @requiresDependencyCollection test
- * @aggregator true
  */
+@Mojo( name = "aggregate-test", requiresDependencyCollection = ResolutionScope.TEST, aggregator = true )
 public class AggregateTestMojo
     extends AbstractDependencyMojo
 {
@@ -45,18 +45,15 @@ public class AggregateTestMojo
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk. Unlike the test artifacts, the collection of project artifacts additionally contains those artifacts that
      * do not contribute to the class path.
-     *
-     * @parameter property="depres.projectArtifacts"
      */
+    @Parameter( property = "depres.projectArtifacts" )
     private String projectArtifacts;
 
     /**
      * The Maven projects in the reactor.
-     *
-     * @parameter default-value="${reactorProjects}"
-     * @readonly
      */
-    private List reactorProjects;
+    @Parameter( defaultValue = "${reactorProjects}", readonly = true )
+    private List<MavenProject> reactorProjects;
 
     /**
      * Runs this mojo.
@@ -68,10 +65,8 @@ public class AggregateTestMojo
     {
         try
         {
-            for ( Object reactorProject : reactorProjects )
+            for ( MavenProject project : reactorProjects )
             {
-                MavenProject project = (MavenProject) reactorProject;
-
                 writeArtifacts( filter( projectArtifacts, project ), project.getArtifacts() );
 
                 // NOTE: We can't make any assumptions about the class path but as a minimum it must not cause an

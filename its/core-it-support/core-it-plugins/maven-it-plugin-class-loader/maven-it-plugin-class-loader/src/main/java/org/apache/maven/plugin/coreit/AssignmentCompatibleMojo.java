@@ -22,6 +22,8 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.util.Properties;
@@ -31,25 +33,23 @@ import java.util.Properties;
  * class loader. In other words, checks that types shared with the core realm are imported into the plugin realm.
  *
  * @author Benjamin Bentmann
- * @goal assignment-compatible
- * @phase initialize
- */
+  */
+@org.apache.maven.plugins.annotations.Mojo( name = "assignment-compatible", defaultPhase = LifecyclePhase.INITIALIZE )
 public class AssignmentCompatibleMojo
     extends AbstractMojo
 {
 
     /**
      * The path to the properties file used to track the results of the assignment compatibility tests.
-     *
-     * @parameter property="clsldr.assigncompatPropertiesFile"
      */
+    @Parameter( property = "clsldr.assigncompatPropertiesFile" )
     private File assigncompatPropertiesFile;
 
     /**
      * The qualified names of the types to check.
      *
-     * @parameter
      */
+    @Parameter
     private String[] classNames;
 
     /**

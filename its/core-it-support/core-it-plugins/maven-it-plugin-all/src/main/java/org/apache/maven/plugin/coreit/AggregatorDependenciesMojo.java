@@ -24,22 +24,23 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 /**
- * @requiresDependencyResolution test
- * @aggregator
- * @goal aggregator-dependencies
- * @phase validate
  */
+@Mojo( name = "aggregator-dependencies", defaultPhase = LifecyclePhase.VALIDATE,
+       requiresDependencyResolution = ResolutionScope.TEST, aggregator = true )
 public class AggregatorDependenciesMojo
     extends AbstractMojo
 {
 
     /**
      * The path to the touch file, relative to the project's base directory.
-     *
-     * @parameter property="aggregator.touchFile" default-value="${project.build.directory}/touch.txt"
      */
+    @Parameter( property = "aggregator.touchFile", defaultValue = "${project.build.directory}/touch.txt" )
     private File touchFile;
 
     public void execute()

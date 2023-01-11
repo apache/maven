@@ -27,98 +27,94 @@ import java.util.Set;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Appends this mojo's configuration into a properties file.
  *
- * @goal append-config
- * @phase validate
- *
+  *
  * @author Benjamin Bentmann
  *
  */
+@Mojo( name = "append-config", defaultPhase = LifecyclePhase.VALIDATE )
 public class AppendConfigMojo
     extends AbstractMojo
 {
 
     /**
      * The current project's base directory, used for path alignment.
-     *
-     * @parameter default-value="${basedir}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${basedir}", readonly = true )
     private File basedir;
 
     /**
      * The path to the properties file into which to save the mojo configuration. <em>Note:</em> This intentionally uses
      * another parameter name for the output file than {@link ConfigMojo}.
-     *
-     * @parameter property="config.outputFile"
      */
+    @Parameter( property = "config.outputFile" )
     private File outputFile;
 
     /**
      * A parameter with a constant default value. <em>Note:</em> This has intentionally a different default value than
      * the equally named parameter from {@link ConfigMojo}.
-     *
-     * @parameter default-value="test"
      */
+    @Parameter( defaultValue = "test" )
     private String defaultParam;
 
     /**
      * A simple parameter of type {@link java.lang.String}.
-     *
-     * @parameter property="config.stringParam"
      */
+    @Parameter( property = "config.stringParam" )
     private String stringParam;
 
     /**
      * A simple parameter of type {@link java.io.File}.
-     *
-     * @parameter property="config.fileParam"
      */
+    @Parameter( property = "config.fileParam" )
     private File fileParam;
 
     /**
      * An array parameter of component type {@link java.lang.String}.
      *
-     * @parameter
      */
+    @Parameter
     private String[] stringParams;
 
     /**
      * An array parameter of component type {@link java.io.File}.
      *
-     * @parameter
      */
+    @Parameter
     private File[] fileParams;
 
     /**
      * A collection parameter of type {@link java.util.List}.
      *
-     * @parameter
      */
-    private List listParam;
+    @Parameter
+    private List<?> listParam;
 
     /**
      * A collection parameter of type {@link java.util.Set}.
      *
-     * @parameter
      */
-    private Set setParam;
+    @Parameter
+    private Set<?> setParam;
 
     /**
      * A collection parameter of type {@link java.util.Map}.
      *
-     * @parameter
      */
-    private Map mapParam;
+    @Parameter
+    private Map<?, ?> mapParam;
 
     /**
      * A collection parameter of type {@link java.util.Properties}.
      *
-     * @parameter
      */
+    @Parameter
     private Properties propertiesParam;
 
     /**

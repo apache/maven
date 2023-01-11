@@ -22,6 +22,9 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,13 +36,10 @@ import java.util.Properties;
 /**
  * Lists the available/configured reports in a properties file.
  *
- * @goal list
- * @phase initialize
- * @requiresReports true
- *
  * @author Benjamin Bentmann
  *
  */
+@Mojo( name = "list", defaultPhase = LifecyclePhase.INITIALIZE, requiresReports = true )
 public class ListMojo
     extends AbstractMojo
 {
@@ -48,19 +48,15 @@ public class ListMojo
      * The path to the properties file used to list the available reports. The properties file will have a key named
      * <code>reports</code> that gives the total count of reports. The keys <code>reports.0</code>,
      * <code>reports.1</code> etc. will be used to denote the qualified class names of the reports.
-     *
-     * @parameter property="site.properties" default-value="target/reports.properties"
      */
+    @Parameter( property = "site.properties", defaultValue = "target/reports.properties" )
     private File reportsFile;
 
     /**
      * The reports configured for the current build.
-     *
-     * @parameter default-value="${reports}"
-     * @required
-     * @readonly
      */
-    private List reports;
+    @Parameter( defaultValue = "${reports}", required = true, readonly = true )
+    private List<?> reports;
 
     /**
      * Runs this mojo.

@@ -52,7 +52,7 @@
       <plugin> <!-- force attaching file during 'mvn install'  -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.2</version>
+        <version>3.3.0</version>
       </plugin>
     </plugins>
   </build>

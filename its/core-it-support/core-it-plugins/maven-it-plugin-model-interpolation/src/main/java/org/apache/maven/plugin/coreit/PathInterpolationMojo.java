@@ -21,6 +21,10 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
@@ -29,23 +33,21 @@ import org.apache.maven.project.interpolation.ModelInterpolator;
 import java.util.Properties;
 
 /**
- * @goal path-interpolation
- * @phase validate
- */
+  */
+@Mojo( name = "path-interpolation", defaultPhase = LifecyclePhase.VALIDATE )
 public class PathInterpolationMojo
     extends AbstractMojo
 {
     /**
      * The model interpolator
-     * @component
      */
+    @Component
     private ModelInterpolator modelInterpolator;
 
     /**
      * The current Maven project.
-     *
-     * @parameter default-value="${project}"
      */
+    @Parameter( defaultValue = "${project}" )
     private MavenProject project;
 
     public void execute()

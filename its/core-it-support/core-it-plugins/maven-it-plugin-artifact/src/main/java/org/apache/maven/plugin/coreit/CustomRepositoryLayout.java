@@ -31,6 +31,11 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 public class CustomRepositoryLayout
     implements ArtifactRepositoryLayout
 {
+    @Override
+    public String getId()
+    {
+        return "id";
+    }
 
     public String pathOf( Artifact artifact )
     {

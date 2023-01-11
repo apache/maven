@@ -20,18 +20,20 @@ package org.apache.maven.plugin.coreit;
  */
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 
 /**
  * Loads classes and/or resources from the plugin class path and records the results in a properties file.
  *
- * @goal load
- * @phase initialize
- *
+  *
  * @author Benjamin Bentmann
  *
  */
+@Mojo( name = "load", defaultPhase = LifecyclePhase.INITIALIZE )
 public class LoadMojo
     extends AbstractLoadMojo
 {
@@ -39,17 +41,15 @@ public class LoadMojo
     /**
      * The path to the properties file used to track the results of the class/resource loading via the plugin class
      * loader.
-     *
-     * @parameter property="clsldr.pluginClassLoaderOutput"
      */
+    @Parameter( property = "clsldr.pluginClassLoaderOutput" )
     private File pluginClassLoaderOutput;
 
     /**
      * The path to the properties file used to track the results of the class/resource loading via the thread's context
      * class loader.
-     *
-     * @parameter property="clsldr.contextClassLoaderOutput"
      */
+    @Parameter( property = "clsldr.contextClassLoaderOutput" )
     private File contextClassLoaderOutput;
 
     /**

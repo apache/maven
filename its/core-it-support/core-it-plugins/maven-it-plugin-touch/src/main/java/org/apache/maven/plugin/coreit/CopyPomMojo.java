@@ -21,6 +21,9 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,21 +33,19 @@ import java.io.IOException;
 /**
  * Mojo which makes a copy of the POM using MavenProject.getFile() to locate the file.
  *
- * @goal copy-pom
- * @phase generate-sources
- */
+  */
+@Mojo( name = "copy-pom", defaultPhase = LifecyclePhase.GENERATE_SOURCES )
 public class CopyPomMojo
     extends AbstractMojo
 {
     /**
-     * @parameter default-value="${project.file}"
      */
+    @Parameter( defaultValue = "${project.file}" )
     private File pomFile;
 
     /**
-     * @parameter default-value="${project.build.directory}/pom-copy.xml"
-     * @required
      */
+    @Parameter( defaultValue = "${project.build.directory}/pom-copy.xml", required = true )
     private String outputFile;
 
     public void execute()

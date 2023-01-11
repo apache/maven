@@ -23,6 +23,7 @@ import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.reporting.MavenReportException;
 
@@ -48,27 +49,22 @@ public class InfoReport
 
     /**
      * The base directory of the current Maven project.
-     *
-     * @parameter default-value="${basedir}"
-     * @required
-     * @readonly
      */
+    @Parameter( defaultValue = "${basedir}", required = true, readonly = true )
     private File basedir;
 
     /**
      * The path to the properties file, relative to the output directory of the site. The keys
      * <code>locale.language</code>, <code>locale.country</code> and <code>locale.variant</code> indicate the report's
      * locale.
-     *
-     * @parameter default-value="info.properties"
      */
+    @Parameter( defaultValue = "info.properties" )
     private String infoFile = "info.properties";
 
     /**
      * The path to the output directory of the site.
-     *
-     * @parameter default-value="${project.reporting.outputDirectory}"
      */
+    @Parameter( defaultValue = "${project.reporting.outputDirectory}" )
     private File outputDirectory;
 
     /**

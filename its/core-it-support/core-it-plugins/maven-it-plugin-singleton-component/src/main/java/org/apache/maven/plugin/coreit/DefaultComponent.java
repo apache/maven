@@ -26,9 +26,9 @@ import org.codehaus.plexus.component.annotations.Component;
  *
  * @author Benjamin Bentmann
  */
-@Component ( role = org.apache.maven.plugin.coreit.Component.class )
+@Component ( role = TestComponent.class )
 public class DefaultComponent
-    implements org.apache.maven.plugin.coreit.Component
+        implements TestComponent
 {
 
     private final String id;

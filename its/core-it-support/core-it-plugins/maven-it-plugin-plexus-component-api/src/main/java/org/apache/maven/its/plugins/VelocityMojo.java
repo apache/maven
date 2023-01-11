@@ -22,18 +22,20 @@ package org.apache.maven.its.plugins;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 import org.codehaus.plexus.velocity.VelocityComponent;
 
 /**
- * @goal velocity
- * @phase validate
- */
+  */
+@Mojo( name = "velocity", defaultPhase = LifecyclePhase.VALIDATE )
 public class VelocityMojo
     extends AbstractMojo
 {
     /**
-     * @component
      */
+    @Component
     protected VelocityComponent velocityComponent;
 
     public void execute()

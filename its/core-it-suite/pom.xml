@@ -99,13 +99,6 @@ under the License.
       <!-- NOTE: Use compile scope for transitivity. -->
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.its</groupId>
-      <artifactId>maven-it-helper</artifactId>
-      <version>2.1-SNAPSHOT</version>
-      <!-- TODO: not transitive in tests artifact, so must be left in main
-        scope <scope>test</scope> -->
-    </dependency>
-    <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-verifier</artifactId>
       <!-- TODO: not transitive in tests artifact, so must be left in main
@@ -139,7 +132,348 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-repository-metadata</artifactId>
-      <version>3.6.3</version>
+    </dependency>
+
+    <!-- project dependencies -->
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>maven-it-plugin-bootstrap</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>core-it-component</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>core-it-toolchain</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>core-it-wagon</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>maven-it-helper</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>core-it-extension</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>core-it-javaagent</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-clean-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-deploy-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-ear-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-ejb-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-install-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-jar-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-javadoc-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-plugin-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-rar-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-resources-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-site-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-source-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-surefire-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-war-plugin</artifactId>
+      <version>0.1-stub-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-active-collection</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-ant-based</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-artifact</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-class-loader</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-configuration</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-context-passing</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-dependency-collection</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-dependency-resolution</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-expression</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-error</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-extension-consumer</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-extension-provider</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-fork</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-invalid-descriptor</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-log-file</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-model-interpolation</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-no-default-comp</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-no-project</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-online</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-optional-mojos</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-packaging</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-plugin-dependency</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-project</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-project-interpolation</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-setter</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-singleton-component</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-site</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-toolchain</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-touch</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-uses-properties</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-uses-wagon</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-all</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-plexus-utils-11</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-plexus-utils-new</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-plexus-component-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-log4j</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-extension1</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-extension2</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-plexus-lifecycle</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>maven-it-plugin-settings</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>mng-5805-pkg-type-mojo-configuration-extension</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>mng-5805-pkg-type-mojo-configuration-extension2</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>mng-5805-pkg-type-mojo-configuration-plugin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>mng-5805-pkg-type-mojo-configuration-plugin-dep</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>mng-5958-pkg-type-extension</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.plugins</groupId>
+      <artifactId>mng-6759-resolves-project-dependencies-plugin</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 
@@ -355,7 +689,6 @@ under the License.
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
-            <version>2.10</version>
             <executions>
               <execution>
                 <id>download-maven-distro</id>
@@ -382,7 +715,6 @@ under the License.
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-antrun-plugin</artifactId>
-            <version>3.0.0</version>
             <executions>
               <execution>
                 <id>unpack-maven-distro</id>
@@ -429,7 +761,6 @@ under the License.
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-antrun-plugin</artifactId>
-            <version>3.0.0</version>
             <executions>
               <execution>
                 <id>unpack-maven-distro</id>
@@ -471,7 +802,6 @@ under the License.
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-antrun-plugin</artifactId>
-            <version>3.0.0</version>
             <executions>
               <execution>
                 <id>copy-maven-distro</id>
@@ -495,7 +825,6 @@ under the License.
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
-            <version>2.0</version>
             <executions>
               <execution>
                 <id>inject-emma-into-core-realm</id>

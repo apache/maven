@@ -20,25 +20,26 @@ package org.apache.maven.plugin.coreit;
  */
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Appends a string to the log file.
  *
- * @goal log-string
- * @phase initialize
- *
+  *
  * @author Benjamin Bentmann
  *
  */
+@Mojo( name = "log-string", defaultPhase = LifecyclePhase.INITIALIZE )
 public class LogStringMojo
     extends AbstractLogMojo
 {
 
     /**
      * The string to append to the log file.
-     *
-     * @parameter property="log.string"
      */
+    @Parameter( property = "log.string" )
     private String string;
 
     /**

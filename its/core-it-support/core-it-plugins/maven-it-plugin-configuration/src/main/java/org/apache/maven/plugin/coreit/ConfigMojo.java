@@ -21,6 +21,9 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 import java.io.File;
@@ -37,222 +40,199 @@ import java.util.Set;
  *
  * @author Benjamin Bentmann
  *
- * @goal config
- * @phase validate
- */
+  */
+@Mojo( name = "config", defaultPhase = LifecyclePhase.VALIDATE )
 public class ConfigMojo
     extends AbstractMojo
 {
 
     /**
      * The current project's base directory, used for path alignment.
-     *
-     * @parameter default-value="${basedir}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${basedir}", readonly = true )
     private File basedir;
 
     /**
      * The path to the properties file into which to save the mojo configuration.
-     *
-     * @parameter property="config.propertiesFile"
      */
+    @Parameter( property = "config.propertiesFile" )
     private File propertiesFile;
 
     /**
      * A parameter with an alias.
-     *
-     * @parameter alias="aliasParamLegacy"
      */
+    @Parameter( alias = "aliasParamLegacy" )
     private String aliasParam;
 
     /**
      * A parameter with a constant default value.
-     *
-     * @parameter default-value="maven-core-it"
      */
+    @Parameter( defaultValue = "maven-core-it" )
     private String defaultParam;
 
     /**
      * A parameter with a default value using multiple expressions.
-     *
-     * @parameter default-value="${project.groupId}:${project.artifactId}:${project.version}"
      */
+    @Parameter( defaultValue = "${project.groupId}:${project.artifactId}:${project.version}" )
     private String defaultParamWithExpression;
 
     /**
      * A parameter that combines all of the annotations.
-     *
-     * @parameter alias="fullyAnnotatedParam" property="config.aliasDefaultExpressionParam" default-value="test"
      */
+    @Parameter( alias = "fullyAnnotatedParam", property = "config.aliasDefaultExpressionParam", defaultValue = "test" )
     private String aliasDefaultExpressionParam;
 
     /**
      * A simple parameter of type {@link java.lang.Boolean}.
-     *
-     * @parameter property="config.booleanParam"
      */
+    @Parameter( property = "config.booleanParam" )
     private Boolean booleanParam;
 
     /**
      * A simple parameter of type {@link java.lang.Boolean#TYPE}.
-     *
-     * @parameter property="config.primitiveBooleanParam"
      */
+    @Parameter( property = "config.primitiveBooleanParam" )
     private boolean primitiveBooleanParam;
 
     /**
      * A simple parameter of type {@link java.lang.Byte}.
-     *
-     * @parameter property="config.byteParam"
      */
+    @Parameter( property = "config.byteParam" )
     private Byte byteParam;
 
     /**
      * A simple parameter of type {@link java.lang.Short}.
-     *
-     * @parameter property="config.shortParam"
      */
+    @Parameter( property = "config.shortParam" )
     private Short shortParam;
 
     /**
      * A simple parameter of type {@link java.lang.Integer}.
-     *
-     * @parameter property="config.integerParam"
      */
+    @Parameter( property = "config.integerParam" )
     private Integer integerParam;
 
     /**
      * A simple parameter of type {@link java.lang.Integer#TYPE}.
-     *
-     * @parameter property="config.primitiveIntegerParam"
      */
+    @Parameter( property = "config.primitiveIntegerParam" )
     private int primitiveIntegerParam;
 
     /**
      * A simple parameter of type {@link java.lang.Long}.
-     *
-     * @parameter property="config.longParam"
      */
+    @Parameter( property = "config.longParam" )
     private Long longParam;
 
     /**
      * A simple parameter of type {@link java.lang.Float}.
-     *
-     * @parameter property="config.floatParam"
      */
+    @Parameter( property = "config.floatParam" )
     private Float floatParam;
 
     /**
      * A simple parameter of type {@link java.lang.Double}.
-     *
-     * @parameter property="config.doubleParam"
      */
+    @Parameter( property = "config.doubleParam" )
     private Double doubleParam;
 
     /**
      * A simple parameter of type {@link java.lang.Character}.
-     *
-     * @parameter property="config.characterParam"
      */
+    @Parameter( property = "config.characterParam" )
     private Character characterParam;
 
     /**
      * A simple parameter of type {@link java.lang.String}.
-     *
-     * @parameter property="config.stringParam"
      */
+    @Parameter( property = "config.stringParam" )
     private String stringParam;
 
     /**
      * A simple parameter of type {@link java.io.File}.
-     *
-     * @parameter property="config.fileParam"
      */
+    @Parameter( property = "config.fileParam" )
     private File fileParam;
 
     /**
      * A simple parameter of type {@link java.util.Date}.
-     *
-     * @parameter property="config.dateParam"
      */
+    @Parameter( property = "config.dateParam" )
     private Date dateParam;
 
     /**
      * A simple parameter of type {@link java.net.URL}.
-     *
-     * @parameter property="config.urlParam"
      */
+    @Parameter( property = "config.urlParam" )
     private URL urlParam;
 
     /**
      * A simple parameter of type {@link java.net.URI} (requires Maven 3.x).
      *
-     * @parameter
      */
+    @Parameter
     private URI uriParam;
 
     /**
      * An array parameter of component type {@link java.lang.String}.
      *
-     * @parameter
      */
+    @Parameter
     private String[] stringParams;
 
     /**
      * An array parameter of component type {@link java.io.File}.
      *
-     * @parameter
      */
+    @Parameter
     private File[] fileParams;
 
     /**
      * A collection parameter of type {@link java.util.List}.
      *
-     * @parameter
      */
+    @Parameter
     private List listParam;
 
     /**
      * A collection parameter of type {@link java.util.Set}.
      *
-     * @parameter
      */
+    @Parameter
     private Set setParam;
 
     /**
      * A collection parameter of type {@link java.util.Map}.
      *
-     * @parameter
      */
+    @Parameter
     private Map mapParam;
 
     /**
      * A collection parameter of type {@link java.util.Properties}.
      *
-     * @parameter
      */
+    @Parameter
     private Properties propertiesParam;
 
     /**
      * A complex parameter with an alias.
-     *
-     * @parameter alias="aliasStringParamsLegacy"
      */
+    @Parameter( alias = "aliasStringParamsLegacy" )
     private String[] aliasStringParams;
 
     /**
      * A complex parameter of type {@link org.apache.maven.plugin.coreit.Bean}.
      *
-     * @parameter
      */
+    @Parameter
     private Bean beanParam;
 
     /**
      * A raw DOM snippet.
      *
-     * @parameter
      */
+    @Parameter
     private PlexusConfiguration domParam;
 
     /**

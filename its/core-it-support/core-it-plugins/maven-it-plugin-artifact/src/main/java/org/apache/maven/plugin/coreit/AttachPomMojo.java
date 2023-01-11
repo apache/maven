@@ -23,6 +23,9 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 
@@ -31,32 +34,26 @@ import java.io.File;
 /**
  * Attaches a POM to the main artifact.
  *
- * @goal attach-pom
- * @phase package
- *
+  *
  * @author Benjamin Bentmann
  *
  */
+@Mojo( name = "attach-pom", defaultPhase = LifecyclePhase.PACKAGE )
 public class AttachPomMojo
     extends AbstractMojo
 {
 
     /**
      * The current Maven project.
-     *
-     * @parameter default-value="${project}"
-     * @readonly
-     * @required
      */
+    @Parameter( defaultValue = "${project}", required = true, readonly = true )
     private MavenProject project;
 
     /**
      * The path to the POM file to attach to the main artifact, relative to the project base directory. The plugin will
      * not validate this path.
-     *
-     * @parameter property="artifact.pomFile" default-value="${project.file.path}"
-     * @required
      */
+    @Parameter( property = "artifact.pomFile", defaultValue = "${project.file.path}", required = true )
     private String pomFile;
 
     /**

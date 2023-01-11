@@ -19,26 +19,26 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import junit.framework.TestCase;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
-import junit.framework.TestCase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Takes a parameter with a class from a provided-scope dependency, so that the mojo class itself won't be
  * loadable when that dependency is missing (in the runtime environment).
- *
- * @goal no-class-def-found-error-param
- * @requiresProject false
  */
+@Mojo( name = "no-class-def-found-error-param", requiresProject = false )
 public class NoClassDefFoundErrorComponentMojo
     extends AbstractMojo
 {
 
     /**
-     * @parameter default-value="foo"
      */
+    @Parameter( defaultValue = "foo" )
     private TestCase value;
 
     public void execute()

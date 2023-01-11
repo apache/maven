@@ -22,15 +22,15 @@ under the License.
 <component-set>
   <components>
     <component>
-      <role>org.apache.maven.plugin.coreit.Component</role>
+      <role>org.apache.maven.plugin.coreit.TestComponent</role>
       <role-hint>stateless</role-hint>
-      <implementation>org.apache.maven.plugin.coreit.DefaultComponent</implementation>
+      <implementation>org.apache.maven.plugin.coreit.DefaultTestComponent</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <component>
-      <role>org.apache.maven.plugin.coreit.Component</role>
+      <role>org.apache.maven.plugin.coreit.TestComponent</role>
       <role-hint>stateful</role-hint>
-      <implementation>org.apache.maven.plugin.coreit.DefaultComponent</implementation>
+      <implementation>org.apache.maven.plugin.coreit.DefaultTestComponent</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
     </component>
   </components>

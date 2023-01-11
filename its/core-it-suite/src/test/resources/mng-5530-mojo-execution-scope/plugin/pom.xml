@@ -29,7 +29,7 @@ under the License.
   <packaging>maven-plugin</packaging>
 
   <properties>
-    <maven-version>3.2.1</maven-version>
+    <maven-version>3.8.6</maven-version>
   </properties>
 
   <dependencies>

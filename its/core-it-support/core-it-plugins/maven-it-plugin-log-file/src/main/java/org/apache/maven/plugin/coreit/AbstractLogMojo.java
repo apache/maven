@@ -21,6 +21,7 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -41,17 +42,14 @@ public abstract class AbstractLogMojo
 
     /**
      * The project's base directory, used for manual path translation.
-     *
-     * @parameter default-value="${basedir}"
-     * @readonly
      */
+    @Parameter( defaultValue = "${basedir}", readonly = true )
     private File basedir;
 
     /**
      * The path to the output file, relative to the project's base directory.
-     *
-     * @parameter property="log.logFile"
      */
+    @Parameter( property = "log.logFile" )
     private File logFile;
 
     /**

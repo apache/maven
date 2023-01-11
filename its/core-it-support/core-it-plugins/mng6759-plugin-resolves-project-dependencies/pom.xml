@@ -32,10 +32,6 @@ under the License.
   <artifactId>mng-6759-resolves-project-dependencies-plugin</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <properties>
-    <maven-version>3.0</maven-version>
-  </properties>
-
   <name>Maven IT Plugin :: mng-6759 plugin</name>
 
   <dependencies>
@@ -47,7 +43,6 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
-      <version>${maven-version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -58,13 +53,11 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
-      <version>${maven-version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
-      <version>${maven-version}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

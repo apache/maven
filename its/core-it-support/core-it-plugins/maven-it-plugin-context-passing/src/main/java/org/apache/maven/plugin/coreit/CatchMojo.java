@@ -21,6 +21,8 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -31,17 +33,15 @@ import java.io.Writer;
  * "Catch" a parameter "thrown" by the ThrowMojo through the plugin context, and
  * write a file based on it's value to the build output directory.
  *
- * @goal catch
  */
+@Mojo( name = "catch" )
 public class CatchMojo
     extends AbstractMojo
 {
 
     /**
-     * @parameter default-value="${project.build.directory}"
-     * @required
-     * @readonly
      */
+    @Parameter( defaultValue = "${project.build.directory}", readonly = true, required = true )
     private File outDir;
 
     public File getOutDir()

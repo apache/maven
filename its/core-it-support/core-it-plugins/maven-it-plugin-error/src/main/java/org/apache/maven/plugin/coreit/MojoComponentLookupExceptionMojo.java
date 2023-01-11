@@ -22,11 +22,11 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
 
 /**
- * @goal mojo-component-lookup-exception
- * @requiresProject false
  */
+@Mojo( name = "mojo-component-lookup-exception", requiresProject = false )
 public class MojoComponentLookupExceptionMojo
     extends AbstractMojo
 {

@@ -21,6 +21,10 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,26 +36,24 @@ import java.util.Properties;
  *
  * @author Benjamin Bentmann
  *
- * @goal it
- * @phase initialize
- */
+  */
+@Mojo( name = "it", defaultPhase = LifecyclePhase.INITIALIZE )
 public class ItMojo
     extends AbstractMojo
 {
 
     /**
      * The path to the output file.
-     *
-     * @parameter property="touch.outputFile" default-value="target/comp.properties"
      */
+    @Parameter( property = "touch.outputFile", defaultValue = "target/comp.properties" )
     private File outputFile;
 
     /**
      * NOTE: We don't specify a role hint here!
      *
-     * @component
      */
-    private Component component;
+    @Component
+    private TestComponent component;
 
     /**
      * Runs this mojo.

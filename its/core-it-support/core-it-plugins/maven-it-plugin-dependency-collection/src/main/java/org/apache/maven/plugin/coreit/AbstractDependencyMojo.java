@@ -22,6 +22,7 @@ package org.apache.maven.plugin.coreit;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 import java.io.BufferedWriter;
@@ -43,11 +44,8 @@ public abstract class AbstractDependencyMojo
 
     /**
      * The current Maven project.
-     *
-     * @parameter default-value="${project}"
-     * @required
-     * @readonly
      */
+    @Parameter( defaultValue = "${project}", required = true, readonly = true )
     protected MavenProject project;
 
     /**

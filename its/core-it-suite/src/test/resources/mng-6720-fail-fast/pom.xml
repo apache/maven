@@ -35,4 +35,15 @@ under the License.
     <module>module-3</module>
   </modules>
 
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.3.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>
