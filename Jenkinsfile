@@ -48,7 +48,7 @@ node(jenkinsEnv.nodeSelection(osNode)) {
 
         stage('Build / Unit Test') {
             String jdkName = jenkinsEnv.jdkFromVersion(buildOs, buildJdk)
-            String mvnName = jenkinsEnv.mvnFromVersion(buildOs, buildMvn)
+            String mvnName = 'maven_latest'
             try {
                 withEnv(["JAVA_HOME=${ tool "$jdkName" }",
                          "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
@@ -56,11 +56,11 @@ node(jenkinsEnv.nodeSelection(osNode)) {
                     sh "mvn clean ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore -PversionlessMavenDist -Dmaven.repo.local=${WORK_DIR}/.repository"
                 }
             } finally {
-                junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true                
+                junit testResults: '**/target/surefire-reports/*.xml,**/target/failsafe-reports/*.xml', allowEmptyResults: true
             }
             dir ('apache-maven/target') {
                 stash includes: 'apache-maven-bin.zip', name: 'maven-dist'
-            }            
+            }
         }
     }
 }
@@ -70,7 +70,7 @@ for (String os in runITsOses) {
     for (def jdk in runITsJdks) {
         String osLabel = jenkinsEnv.labelForOS(os);
         String jdkName = jenkinsEnv.jdkFromVersion(os, "${jdk}")
-        String mvnName = jenkinsEnv.mvnFromVersion(os, "${runITsMvn}")
+        String mvnName = 'maven_latest'
         echo "OS: ${os} JDK: ${jdk} => Label: ${osLabel} JDK: ${jdkName}"
 
         String stageId = "${os}-jdk${jdk}"
@@ -111,7 +111,9 @@ for (String os in runITsOses) {
                                 }
                             }
                         } finally {
-                            //junit testResults: '**/core-it-suite/**/target/surefire-reports/*.xml', allowEmptyResults: true                                            
+                            // in ITs test we need only reports from test itself
+                            // test projects can contain reports with tested failed builds
+                            junit testResults: '**/core-it-suite/target/surefire-reports/*.xml,**/core-it-support/**/target/surefire-reports/*.xml', allowEmptyResults: true
                             archiveDirs(stageId, ['core-it-suite-logs':'core-it-suite/target/test-classes',
                                                   'core-it-suite-reports':'core-it-suite/target/surefire-reports'])
                             deleteDir() // clean up after ourselves to reduce disk space
