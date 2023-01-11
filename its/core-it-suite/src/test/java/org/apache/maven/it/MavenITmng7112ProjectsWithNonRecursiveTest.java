@@ -43,8 +43,9 @@ public class MavenITmng7112ProjectsWithNonRecursiveTest
             throws IOException, VerificationException
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
-        newVerifier( projectDir.getAbsolutePath() ).addCliArgument( "clean" );
-        newVerifier( projectDir.getAbsolutePath() ).execute();
+        Verifier cleaner = newVerifier( projectDir.getAbsolutePath() );
+        cleaner.addCliArgument( "clean" );
+        cleaner.execute();
 
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
 
@@ -67,8 +68,9 @@ public class MavenITmng7112ProjectsWithNonRecursiveTest
             throws IOException, VerificationException
     {
         final File projectDir = ResourceExtractor.simpleExtractResources( getClass(), PROJECT_PATH );
-        newVerifier( projectDir.getAbsolutePath() ).addCliArgument( "clean" );
-        newVerifier( projectDir.getAbsolutePath() ).execute();
+        Verifier cleaner = newVerifier( projectDir.getAbsolutePath() );
+        cleaner.addCliArgument( "clean" );
+        cleaner.execute();
 
         final Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
 
