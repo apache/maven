@@ -21,10 +21,10 @@ properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: e
 
 def buildOs = 'linux'
 def buildJdk = '8'
-def buildMvn = '3.6.3'
+def buildMvn = '3.8.x'
 def runITsOses = ['linux']
 def runITsJdks = ['8', '11', '17']
-def runITsMvn = '3.6.3'
+def runITsMvn = '3.8.x'
 def runITscommand = "mvn clean install -Prun-its,embedded -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
 def tests
 
@@ -48,7 +48,7 @@ node(jenkinsEnv.nodeSelection(osNode)) {
 
         stage('Build / Unit Test') {
             String jdkName = jenkinsEnv.jdkFromVersion(buildOs, buildJdk)
-            String mvnName = 'maven_latest'
+            String mvnName = jenkinsEnv.mvnFromVersion(buildOs, buildMvn)
             try {
                 withEnv(["JAVA_HOME=${ tool "$jdkName" }",
                          "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
@@ -70,7 +70,7 @@ for (String os in runITsOses) {
     for (def jdk in runITsJdks) {
         String osLabel = jenkinsEnv.labelForOS(os);
         String jdkName = jenkinsEnv.jdkFromVersion(os, "${jdk}")
-        String mvnName = 'maven_latest'
+        String mvnName = jenkinsEnv.mvnFromVersion(os, "${runITsMvn}")
         echo "OS: ${os} JDK: ${jdk} => Label: ${osLabel} JDK: ${jdkName}"
 
         String stageId = "${os}-jdk${jdk}"
