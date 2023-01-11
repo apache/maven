@@ -48,7 +48,7 @@ node(jenkinsEnv.nodeSelection(osNode)) {
 
         stage('Build / Unit Test') {
             String jdkName = jenkinsEnv.jdkFromVersion(buildOs, buildJdk)
-            String mvnName = maven_latest
+            String mvnName = 'maven_latest'
             try {
                 withEnv(["JAVA_HOME=${ tool "$jdkName" }",
                          "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
@@ -70,7 +70,7 @@ for (String os in runITsOses) {
     for (def jdk in runITsJdks) {
         String osLabel = jenkinsEnv.labelForOS(os);
         String jdkName = jenkinsEnv.jdkFromVersion(os, "${jdk}")
-        String mvnName = maven_latest
+        String mvnName = 'maven_latest'
         echo "OS: ${os} JDK: ${jdk} => Label: ${osLabel} JDK: ${jdkName}"
 
         String stageId = "${os}-jdk${jdk}"
