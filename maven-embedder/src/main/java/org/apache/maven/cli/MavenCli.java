@@ -119,7 +119,10 @@ import org.sonatype.plexus.components.sec.dispatcher.SecUtil;
 import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
 
 import static java.util.Comparator.comparing;
+import static org.apache.maven.cli.CLIManager.BATCH_MODE;
 import static org.apache.maven.cli.CLIManager.COLOR;
+import static org.apache.maven.cli.CLIManager.FORCE_INTERACTIVE;
+import static org.apache.maven.cli.CLIManager.NON_INTERACTIVE;
 import static org.apache.maven.cli.ResolveFile.resolveFile;
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
@@ -486,10 +489,10 @@ public class MavenCli {
      */
     void logging(CliRequest cliRequest) {
         // LOG LEVEL
-        cliRequest.verbose = cliRequest.commandLine.hasOption(CLIManager.VERBOSE)
-                || cliRequest.commandLine.hasOption(CLIManager.DEBUG);
-        cliRequest.quiet = !cliRequest.verbose && cliRequest.commandLine.hasOption(CLIManager.QUIET);
-        cliRequest.showErrors = cliRequest.verbose || cliRequest.commandLine.hasOption(CLIManager.ERRORS);
+        CommandLine commandLine = cliRequest.commandLine;
+        cliRequest.verbose = commandLine.hasOption(CLIManager.VERBOSE) || commandLine.hasOption(CLIManager.DEBUG);
+        cliRequest.quiet = !cliRequest.verbose && commandLine.hasOption(CLIManager.QUIET);
+        cliRequest.showErrors = cliRequest.verbose || commandLine.hasOption(CLIManager.ERRORS);
 
         slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
         Slf4jConfiguration slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration(slf4jLoggerFactory);
@@ -506,7 +509,7 @@ public class MavenCli {
 
         // LOG COLOR
         String styleColor = cliRequest.getUserProperties().getProperty(STYLE_COLOR_PROPERTY, "auto");
-        styleColor = cliRequest.commandLine.getOptionValue(COLOR, styleColor);
+        styleColor = commandLine.getOptionValue(COLOR, styleColor);
         if ("always".equals(styleColor) || "yes".equals(styleColor) || "force".equals(styleColor)) {
             MessageUtils.setColorEnabled(true);
         } else if ("never".equals(styleColor) || "no".equals(styleColor) || "none".equals(styleColor)) {
@@ -514,14 +517,17 @@ public class MavenCli {
         } else if (!"auto".equals(styleColor) && !"tty".equals(styleColor) && !"if-tty".equals(styleColor)) {
             throw new IllegalArgumentException(
                     "Invalid color configuration value '" + styleColor + "'. Supported are 'auto', 'always', 'never'.");
-        } else if (cliRequest.commandLine.hasOption(CLIManager.BATCH_MODE)
-                || cliRequest.commandLine.hasOption(CLIManager.LOG_FILE)) {
-            MessageUtils.setColorEnabled(false);
+        } else {
+            boolean isBatchMode = !commandLine.hasOption(FORCE_INTERACTIVE)
+                    && (commandLine.hasOption(BATCH_MODE) || commandLine.hasOption(NON_INTERACTIVE));
+            if (isBatchMode || commandLine.hasOption(CLIManager.LOG_FILE)) {
+                MessageUtils.setColorEnabled(false);
+            }
         }
 
         // LOG STREAMS
-        if (cliRequest.commandLine.hasOption(CLIManager.LOG_FILE)) {
-            File logFile = new File(cliRequest.commandLine.getOptionValue(CLIManager.LOG_FILE));
+        if (commandLine.hasOption(CLIManager.LOG_FILE)) {
+            File logFile = new File(commandLine.getOptionValue(CLIManager.LOG_FILE));
             logFile = resolveFile(logFile, cliRequest.workingDirectory);
 
             // redirect stdout and stderr to file
@@ -541,8 +547,8 @@ public class MavenCli {
         plexusLoggerManager = new Slf4jLoggerManager();
         slf4jLogger = slf4jLoggerFactory.getLogger(this.getClass().getName());
 
-        if (cliRequest.commandLine.hasOption(CLIManager.FAIL_ON_SEVERITY)) {
-            String logLevelThreshold = cliRequest.commandLine.getOptionValue(CLIManager.FAIL_ON_SEVERITY);
+        if (commandLine.hasOption(CLIManager.FAIL_ON_SEVERITY)) {
+            String logLevelThreshold = commandLine.getOptionValue(CLIManager.FAIL_ON_SEVERITY);
 
             if (slf4jLoggerFactory instanceof MavenSlf4jWrapperFactory) {
                 LogLevelRecorder logLevelRecorder = new LogLevelRecorder(logLevelThreshold);
@@ -557,7 +563,7 @@ public class MavenCli {
             }
         }
 
-        if (cliRequest.commandLine.hasOption(CLIManager.DEBUG)) {
+        if (commandLine.hasOption(CLIManager.DEBUG)) {
             slf4jLogger.warn("The option '--debug' is deprecated and may be repurposed as Java debug"
                     + " in a future version. Use -X/--verbose instead.");
         }
@@ -1242,7 +1248,7 @@ public class MavenCli {
         request.setShowErrors(cliRequest.showErrors); // default: false
         File baseDirectory = new File(workingDirectory, "").getAbsoluteFile();
 
-        disableOnPresentOption(commandLine, CLIManager.BATCH_MODE, request::setInteractiveMode);
+        disableInteractiveModeIfNeeded(cliRequest, request);
         enableOnPresentOption(commandLine, CLIManager.SUPPRESS_SNAPSHOT_UPDATES, request::setNoSnapshotUpdates);
         request.setGoals(commandLine.getArgList());
         request.setReactorFailureBehavior(determineReactorFailureBehaviour(commandLine));
@@ -1302,6 +1308,27 @@ public class MavenCli {
         request.setBuilderId(commandLine.getOptionValue(CLIManager.BUILDER, request.getBuilderId()));
 
         return request;
+    }
+
+    private void disableInteractiveModeIfNeeded(final CliRequest cliRequest, final MavenExecutionRequest request) {
+        CommandLine commandLine = cliRequest.getCommandLine();
+        if (commandLine.hasOption(FORCE_INTERACTIVE)) {
+            return;
+        }
+
+        boolean runningOnCI = isRunningOnCI(cliRequest.getSystemProperties());
+        if (runningOnCI) {
+            slf4jLogger.info("Making this build non-interactive, because the environment variable CI equals \"true\"."
+                    + " Disable this detection by removing that variable or adding --force-interactive.");
+            request.setInteractiveMode(false);
+        } else if (commandLine.hasOption(BATCH_MODE) || commandLine.hasOption(NON_INTERACTIVE)) {
+            request.setInteractiveMode(false);
+        }
+    }
+
+    private static boolean isRunningOnCI(Properties systemProperties) {
+        String ciEnv = systemProperties.getProperty("env.CI");
+        return ciEnv != null && !"false".equals(ciEnv);
     }
 
     private String determineLocalRepositoryPath(final MavenExecutionRequest request) {
@@ -1424,7 +1451,10 @@ public class MavenCli {
             final boolean verbose,
             final CommandLine commandLine,
             final MavenExecutionRequest request) {
-        if (quiet || commandLine.hasOption(CLIManager.NO_TRANSFER_PROGRESS)) {
+        boolean runningOnCI = isRunningOnCI(request.getSystemProperties());
+        boolean quietCI = runningOnCI && !commandLine.hasOption(FORCE_INTERACTIVE);
+
+        if (quiet || commandLine.hasOption(CLIManager.NO_TRANSFER_PROGRESS) || quietCI) {
             return new QuietMavenTransferListener();
         } else if (request.isInteractiveMode() && !commandLine.hasOption(CLIManager.LOG_FILE)) {
             //
