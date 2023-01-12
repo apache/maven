@@ -28,20 +28,18 @@ import java.util.Properties;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Password;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.jetty.servlet.ServletContextHandler.SECURITY;
-import static org.eclipse.jetty.servlet.ServletContextHandler.SESSIONS;
 import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
 
 /**
@@ -81,11 +79,12 @@ public class MavenITmng4068AuthenticatedMirrorTest
         constraintMapping.setPathSpec( "/*" );
 
         HashLoginService userRealm = new HashLoginService( "TestRealm" );
-        userRealm.putUser( "testuser", new Password( "testtest" ), new String[] { "user" } );
+        UserStore userStore = new UserStore();
+        userStore.addUser( "testuser", new Password( "testtest" ), new String[] { "user" } );
+        userRealm.setUserStore( userStore );
 
         server = new Server( 0 );
-        ServletContextHandler ctx = new ServletContextHandler( server, "/", SESSIONS | SECURITY );
-        ConstraintSecurityHandler securityHandler = (ConstraintSecurityHandler) ctx.getSecurityHandler();
+        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
         securityHandler.setLoginService( userRealm );
         securityHandler.setAuthMethod( __BASIC_AUTH );
         securityHandler.setConstraintMappings( new ConstraintMapping[] { constraintMapping } );

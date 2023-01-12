@@ -4,6 +4,7 @@ import com.google.common.io.ByteStreams;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.NetworkConnector;
@@ -110,7 +111,9 @@ public class HttpServer
         if ( username != null && password != null )
         {
             HashLoginService loginService = new HashLoginService( "Test Server" );
-            loginService.putUser( username, new Password( password ), new String[]{ "user" } );
+            UserStore userStore = new UserStore();
+            userStore.addUser( username, new Password( password ), new String[] { "user" } );
+            loginService.setUserStore( userStore );
             server.addBean( loginService );
 
             ConstraintSecurityHandler security = new ConstraintSecurityHandler();

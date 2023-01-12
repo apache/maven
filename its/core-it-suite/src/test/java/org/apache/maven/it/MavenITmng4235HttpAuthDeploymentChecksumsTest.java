@@ -38,13 +38,13 @@ import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Password;
@@ -53,8 +53,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static org.eclipse.jetty.servlet.ServletContextHandler.SECURITY;
-import static org.eclipse.jetty.servlet.ServletContextHandler.SESSIONS;
 import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
 
 /**
@@ -97,10 +95,11 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
         constraintMapping.setPathSpec( "/*" );
 
         HashLoginService userRealm = new HashLoginService( "TestRealm" );
-        userRealm.putUser( "testuser", new Password( "testpass" ), new String[] { "deployer" } );
+        UserStore userStore = new UserStore();
+        userStore.addUser( "testuser", new Password( "testpass" ), new String[] { "deployer" } );
+        userRealm.setUserStore( userStore );
 
-        ServletContextHandler ctx = new ServletContextHandler( server, "/", SESSIONS | SECURITY );
-        ConstraintSecurityHandler securityHandler = (ConstraintSecurityHandler) ctx.getSecurityHandler();
+        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
         securityHandler.setLoginService( userRealm );
         securityHandler.setAuthMethod( __BASIC_AUTH );
         securityHandler.setConstraintMappings( new ConstraintMapping[] { constraintMapping } );
@@ -201,7 +200,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
 
             if ( "PUT".equals( request.getMethod() ) )
             {
-                Resource resource = getResource( request );
+                Resource resource = getResource( request.getPathInfo() );
 
                 // NOTE: This can get called concurrently but File.mkdirs() isn't thread-safe in all JREs
                 File dir = resource.getFile().getParentFile();
