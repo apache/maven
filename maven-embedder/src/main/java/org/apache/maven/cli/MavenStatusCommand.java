@@ -19,9 +19,15 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.services.ArtifactResolverException;
 import org.apache.maven.api.services.ArtifactResolverResult;
+import org.apache.maven.artifact.repository.Authentication;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.internal.impl.DefaultSession;
+import org.apache.maven.settings.Mirror;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.ArtifactResolver;
@@ -33,22 +39,28 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.internal.impl.DefaultArtifactCoordinate;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
+import org.apache.maven.repository.Proxy;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.Authenticator;
+import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -100,7 +112,7 @@ public class MavenStatusCommand
         final List<String> localRepositoryIssues =
                 verifyLocalRepository( Paths.get( URI.create( localRepository.getUrl() ) ) );
         final List<String> remoteRepositoryIssues =
-                verifyRemoteRepositoryConnections();
+                verifyRemoteRepositoryConnections( cliRequest.getRequest().getRemoteRepositories(), mavenExecutionRequest.getMirrors() );
         final List<String> artifactResolutionIssues = verifyArtifactResolution( mavenExecutionRequest );
 
         // Collect all issues into a single list
@@ -109,11 +121,82 @@ public class MavenStatusCommand
                 .collect( Collectors.toList() );
     }
 
-    private List<String> verifyRemoteRepositoryConnections()
+    private List<String> verifyRemoteRepositoryConnections( List<ArtifactRepository> remoteRepositories,
+                                                            List<Mirror> mirrors )
+            throws IOException
     {
         final List<String> issues = new ArrayList<>();
 
+        for ( ArtifactRepository remoteRepository : remoteRepositories )
+        {
+            // Only support HTTP and HTTPS
+            final String protocol = remoteRepository.getProtocol();
+            if ( !"http".equals( protocol ) && !"https".equals( protocol ) )
+            {
+                final String unsupportedProtocolWarning =
+                        String.format( "No status checks available for protocol %s.", protocol );
+                logger.info( unsupportedProtocolWarning );
+                continue;
+            }
+
+            final Mirror mirror = MavenRepositorySystem.getMirror( remoteRepository, mirrors );
+            //TODO get path of mirror to resolve url
+
+            // Setup connection
+            final String artifactUrl = remoteRepository.getUrl() + "/" + remoteRepository.getLayout().pathOf( RepositoryUtils.toArtifact( artifact ) );
+            URL url = new URL( artifactUrl );
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            if (remoteRepository.getProxy() != null) {
+                // Use proxy
+                final Proxy proxy = remoteRepository.getProxy();
+                final java.net.Proxy javaProxy = new java.net.Proxy(java.net.Proxy.Type.HTTP, new InetSocketAddress(proxy.getHost(), proxy.getPort()));
+                Authenticator authenticator = new Authenticator() {
+                    public PasswordAuthentication getPasswordAuthentication() {
+                        return (new PasswordAuthentication( proxy.getUserName(), proxy.getPassword().toCharArray())); // Password might be encrypted, if so decrypt
+                    }
+                };
+                Authenticator.setDefault(authenticator);
+                connection = (HttpURLConnection) url.openConnection(javaProxy);
+            }
+
+            if (remoteRepository.getAuthentication() != null) {
+                final Authentication authentication = remoteRepository.getAuthentication();
+                if (authentication.getPrivateKey() != null)
+                {
+                    // We probably need to use a certificate, use password if there is one
+                }
+                else
+                {
+                    // Add Basic Authorization header instead
+                    String credentials = authentication.getUsername() + ":" + authentication.getPassword();
+                    connection.setRequestProperty( "Authorization", createAuthorizationHeader( credentials ));
+                }
+            }
+
+            // Send request
+            connection.setRequestMethod("GET");
+            final int responseCode = connection.getResponseCode();
+
+            // Report response
+            if (responseCode == 200 || responseCode == 404)
+            {
+                logger.info( "Successfully connected to {}", remoteRepository.getUrl() );
+            }
+            else
+            {
+                final String issue
+                        = String.format( "%s responded with code %d.", remoteRepository.getUrl(), responseCode );
+                issues.add( issue );
+            }
+
+        }
+
         return issues;
+    }
+
+    private static String createAuthorizationHeader( String credentials )
+    {
+        return "Basic " + Base64.getEncoder().encodeToString( credentials.getBytes());
     }
 
     private List<String> verifyArtifactResolution( final MavenExecutionRequest mavenExecutionRequest )
