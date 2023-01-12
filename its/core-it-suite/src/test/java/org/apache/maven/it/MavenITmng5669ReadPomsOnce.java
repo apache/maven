@@ -19,17 +19,16 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.shared.verifier.util.ResourceExtractor;
-import org.apache.maven.shared.verifier.Verifier;
-
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import org.apache.maven.shared.verifier.Verifier;
+import org.apache.maven.shared.verifier.util.ResourceExtractor;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -42,8 +41,6 @@ import org.junit.jupiter.api.Test;
 public class MavenITmng5669ReadPomsOnce
     extends AbstractMavenIntegrationTestCase
 {
-
-    private static final int LOG_SIZE = 233;
 
     public MavenITmng5669ReadPomsOnce()
     {
@@ -63,45 +60,28 @@ public class MavenITmng5669ReadPomsOnce
         verifier.filterFile( ".mvn/jvm.config", ".mvn/jvm.config", null, filterProperties );
 
         verifier.setForkJvm( true ); // pick up agent
-        verifier.setMavenDebug( false );
         verifier.setAutoclean( false );
-        verifier.addCliOption( "-q" );
-        verifier.addCliOption( "-U" );
-        verifier.addCliOption( "-Dmaven.experimental.buildconsumer=false" );
+        verifier.addCliArgument( "-q" );
+        verifier.addCliArgument( "-U" );
+        verifier.addCliArgument( "-Dmaven.experimental.buildconsumer=false" );
         verifier.addCliArgument( "verify");
         verifier.execute();
 
         List<String> logTxt = verifier.loadLines( "log.txt", "utf-8" );
-        for ( String line : logTxt )
-        {
-            if ( line.startsWith( "Picked up JAVA_TOOL_OPTIONS:" ) )
-            {
-                logTxt.remove( line );
-                break;
-            }
-        }
-        assertEquals( logTxt.toString(), LOG_SIZE, logTxt.size() );
 
-        // analyze lines. It is a Hashmap, so we can't rely on the order
-        Set<String> uniqueBuildingSources = new HashSet<>( LOG_SIZE );
-        final String buildSourceKey = "org.apache.maven.model.building.source=";
-        final int keyLength = buildSourceKey.length();
-        for ( String line : logTxt )
-        {
-            int start = line.indexOf( buildSourceKey );
-            if ( start < 0 )
-            {
-                continue;
-            }
+        // count source items
+        Map<String, Long> sourceMap = logTxt.stream()
+                .map(this::getSourceFromLogLine)
+                .filter(Objects::nonNull)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
-            int end = line.indexOf( ", ", start );
-            if ( end < 0 )
-            {
-                end = line.length() - 1; // is the }
-            }
-            uniqueBuildingSources.add( line.substring( start + keyLength, end ) );
-        }
-        assertEquals( uniqueBuildingSources.size(), LOG_SIZE - 1 /* minus superpom */ );
+        // find duplicates
+        List<String> duplicates = sourceMap.entrySet().stream()
+                .filter(entry -> entry.getValue() > 1)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        assertTrue("Duplicate items: " + String.join(System.lineSeparator(), duplicates), duplicates.isEmpty());
     }
 
     @Test
@@ -118,46 +98,46 @@ public class MavenITmng5669ReadPomsOnce
 
         verifier.setLogFileName( "log-bc.txt" );
         verifier.setForkJvm( true ); // pick up agent
-        verifier.setMavenDebug( false );
         verifier.setAutoclean( false );
-        verifier.addCliOption( "-q" );
-        verifier.addCliOption( "-U" );
-        verifier.addCliOption( "-Dmaven.experimental.buildconsumer=true" );
+        verifier.addCliArgument( "-q" );
+        verifier.addCliArgument( "-U" );
+        verifier.addCliArgument( "-Dmaven.experimental.buildconsumer=true" );
         verifier.addCliArgument( "verify" );
         verifier.execute();
 
         List<String> logTxt = verifier.loadLines( "log-bc.txt", "utf-8" );
-        for ( String line : logTxt )
-        {
-            if ( line.startsWith( "Picked up JAVA_TOOL_OPTIONS:" ) )
-            {
-                logTxt.remove( line );
-                break;
-            }
-        }
-        assertEquals( logTxt.toString(), LOG_SIZE + 4 /* reactor poms are read twice: file + raw (=XMLFilters) */,
-                      logTxt.size() );
 
-        // analyze lines. It is a Hashmap, so we can't rely on the order
-        Set<String> uniqueBuildingSources = new HashSet<>( LOG_SIZE );
-        final String buildSourceKey = "org.apache.maven.model.building.source=";
-        final int keyLength = buildSourceKey.length();
-        for ( String line : logTxt )
-        {
-            int start = line.indexOf( buildSourceKey );
-            if ( start < 0 )
-            {
-                continue;
-            }
+        // count source items
+        Map<String, Long> sourceMap = logTxt.stream()
+                .map(this::getSourceFromLogLine)
+                .filter(Objects::nonNull)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
-            int end = line.indexOf( ", ", start );
-            if ( end < 0 )
-            {
-                end = line.length() - 1; // is the }
-            }
-            uniqueBuildingSources.add( line.substring( start + keyLength, end ) );
-        }
-        assertEquals( uniqueBuildingSources.size(), LOG_SIZE - 1 /* minus superpom */ );
+        // find duplicates
+        List<String> duplicates = sourceMap.entrySet().stream()
+                .filter(entry -> entry.getValue() > 1)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        assertTrue("Duplicate items: " + String.join(System.lineSeparator(), duplicates), duplicates.isEmpty());
     }
 
+    private String getSourceFromLogLine(String line) {
+
+        final String buildSourceKey = "org.apache.maven.model.building.source=";
+        final int keyLength = buildSourceKey.length();
+        int start = line.indexOf( buildSourceKey );
+        if ( start < 0 )
+        {
+            return null;
+        }
+
+        int end = line.indexOf( ", ", start );
+        if ( end < 0 )
+        {
+            end = line.length() - 1; // is the }
+        }
+
+        return line.substring( start + keyLength, end );
+    }
 }
