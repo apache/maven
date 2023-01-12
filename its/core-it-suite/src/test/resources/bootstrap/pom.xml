@@ -33,15 +33,22 @@ under the License.
         plugins cannot be downloaded by Maven from non-default repositories configured in the POM if the plugin is invoked
         directly from the command line. Also, having this in a central place spares us from copying the snapshot repo
         config all around in the IT POMs.
+
+        Each module does:
+        - boostrap - resolves all artifacts provided in bootstrap file
+        - packaging-* - resolves build plugins provided by tested Maven default lifecycle(s)
     </description>
 
-    <properties>
-        <maven.test.skip>true</maven.test.skip>
-    </properties>
+    <modules>
+        <module>bootstrap</module>
+        <module>packaging-jar</module>
+        <module>packaging-maven-plugin</module>
+        <module>packaging-war</module>
+    </modules>
 
     <build>
-        <!-- This merely locks the plugin versions to disable auto-update -->
         <plugins>
+            <!-- This merely locks the plugin versions to disable auto-update -->
             <plugin>
                 <groupId>org.apache.maven.its</groupId>
                 <artifactId>maven-it-plugin-bootstrap</artifactId>
@@ -53,7 +60,7 @@ under the License.
                             <goal>download</goal>
                         </goals>
                         <configuration>
-                            <file>${bootstrap}</file>
+                            <file>${file}</file>
                         </configuration>
                     </execution>
                 </executions>

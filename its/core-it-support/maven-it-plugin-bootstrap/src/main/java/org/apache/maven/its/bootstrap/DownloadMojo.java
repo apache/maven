@@ -23,19 +23,22 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -45,7 +48,8 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.DependencyRequest;
 
 /**
- * Boostrap plugin to download all required dependencies
+ * Boostrap plugin to download all required dependencies (provided in file) or to collect lifecycle bound build plugin
+ * versions.
  */
 @Mojo( name = "download" )
 public class DownloadMojo
@@ -56,13 +60,13 @@ public class DownloadMojo
      * A list of artifacts coordinates.
      */
     @Parameter
-    private List<Dependency> dependencies = new ArrayList<>();
+    private Set<Dependency> dependencies = new HashSet<>();
 
     /**
      * A list of string of the form groupId:artifactId:version[:packaging[:classifier]].
      */
     @Parameter
-    private List<String> artifacts = new ArrayList<>();
+    private Set<String> artifacts = new HashSet<>();
 
     /**
      * A file containing lines of the form groupId:artifactId:version[:packaging[:classifier]].
@@ -82,8 +86,10 @@ public class DownloadMojo
     @Override
     public void execute() throws MojoFailureException
     {
+        // this or that: either resolver file listed artifacts or collect lifecycle packaging plugins
         if ( file != null && file.exists() )
         {
+            System.out.println( "Collecting artifacts from file: " + file );
             try ( BufferedReader reader = new BufferedReader( new FileReader( file ) ) )
             {
                 reader.lines()
@@ -96,6 +102,16 @@ public class DownloadMojo
                 throw new MojoFailureException( "Unable to read dependencies: " + file, e );
             }
         }
+        else
+        {
+            MavenProject project = session.getCurrentProject();
+            System.out.println( "Collecting build plugins from packaging: " + project.getPackaging() );
+            for ( Plugin plugin : project.getBuildPlugins() )
+            {
+                artifacts.add( plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion() );
+            }
+        }
+
         for ( String artifact : artifacts )
         {
             if ( artifact != null )

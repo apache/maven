@@ -57,7 +57,10 @@ public class MavenITBootstrapTest
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.addCliOption( "-Dbootstrap=" + getClass().getResource( "/bootstrap.txt" ).toURI().getPath() );
-        verifier.addCliArgument( "install" );
+
+        // bootstrap plugin is bound to this phase, do not go further
+        // important: maven-plugin packaging will fail at package phase, as there is no Mojo present!
+        verifier.addCliArgument( "process-resources" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
     }
