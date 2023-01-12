@@ -135,8 +135,15 @@ class ReactorReader implements MavenWorkspaceReader {
             return project.getFile();
         }
 
+        File packagedArtifactFile = find(artifact);
+        if (packagedArtifactFile != null
+                && packagedArtifactFile.exists()
+                && isPackagedArtifactUpToDate(project, packagedArtifactFile, artifact)) {
+            return packagedArtifactFile;
+        }
+
         Artifact projectArtifact = findMatchingArtifact(project, artifact);
-        File packagedArtifactFile = determinePreviouslyPackagedArtifactFile(project, projectArtifact);
+        packagedArtifactFile = determinePreviouslyPackagedArtifactFile(project, projectArtifact);
 
         if (hasArtifactFileFromPackagePhase(projectArtifact)) {
             return projectArtifact.getFile();
@@ -190,11 +197,6 @@ class ReactorReader implements MavenWorkspaceReader {
         if (artifact == null) {
             return null;
         }
-        File file = find(artifact);
-        if (file != null) {
-            return file;
-        }
-
         String fileName = String.format("%s.%s", project.getBuild().getFinalName(), artifact.getExtension());
         return new File(project.getBuild().getDirectory(), fileName);
     }
