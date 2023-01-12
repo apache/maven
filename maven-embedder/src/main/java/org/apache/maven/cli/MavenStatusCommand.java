@@ -227,7 +227,7 @@ public class MavenStatusCommand
         }
         catch ( ArtifactResolverException are )
         {
-            return extractErrorMessagesFromArtifactResolverException( are );
+            return extractIssuesFromArtifactResolverException( are );
         }
         finally
         {
@@ -235,7 +235,7 @@ public class MavenStatusCommand
         }
     }
 
-    private List<String> extractErrorMessagesFromArtifactResolverException( final Exception exception )
+    private List<String> extractIssuesFromArtifactResolverException( final Exception exception )
     {
         final boolean isArtifactResolutionException = exception.getCause() instanceof ArtifactResolutionException;
         if ( isArtifactResolutionException )
