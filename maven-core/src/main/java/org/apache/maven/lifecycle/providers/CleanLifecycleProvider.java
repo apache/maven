@@ -33,7 +33,7 @@ public final class CleanLifecycleProvider extends AbstractLifecycleProvider {
     // START SNIPPET: clean
     private static final String[] PHASES = {"pre-clean", "clean", "post-clean"};
 
-    private static final String MAVEN_CLEAN_PLUGIN_VERSION = "3.1.0";
+    private static final String MAVEN_CLEAN_PLUGIN_VERSION = "3.2.0";
 
     private static final String[] BINDINGS = {
         "clean", "org.apache.maven.plugins:maven-clean-plugin:" + MAVEN_CLEAN_PLUGIN_VERSION + ":clean"

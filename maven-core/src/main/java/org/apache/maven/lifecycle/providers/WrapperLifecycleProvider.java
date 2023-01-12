@@ -33,7 +33,7 @@ public final class WrapperLifecycleProvider extends AbstractLifecycleProvider {
     // START SNIPPET: wrapper
     private static final String[] PHASES = {"wrapper"};
 
-    private static final String[] BINDINGS = {"wrapper", "org.apache.maven.plugins:maven-wrapper-plugin:3.1.0:wrapper"};
+    private static final String[] BINDINGS = {"wrapper", "org.apache.maven.plugins:maven-wrapper-plugin:3.1.1:wrapper"};
     // END SNIPPET: wrapper
 
     @Inject

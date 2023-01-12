@@ -34,8 +34,8 @@ public final class SiteLifecycleProvider extends AbstractLifecycleProvider {
     private static final String[] PHASES = {"pre-site", "site", "post-site", "site-deploy"};
 
     private static final String[] BINDINGS = {
-        "site", "org.apache.maven.plugins:maven-site-plugin:3.9.1:site",
-        "site-deploy", "org.apache.maven.plugins:maven-site-plugin:3.9.1:deploy"
+        "site", "org.apache.maven.plugins:maven-site-plugin:3.12.1:site",
+        "site-deploy", "org.apache.maven.plugins:maven-site-plugin:3.12.1:deploy"
     };
     // END SNIPPET: site
 
