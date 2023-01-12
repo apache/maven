@@ -22,13 +22,10 @@ package org.apache.maven.cli;
 import org.apache.maven.api.services.ArtifactResolverException;
 import org.apache.maven.api.services.ArtifactResolverResult;
 import org.apache.maven.internal.impl.DefaultSession;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
 import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.ArtifactResolver;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.cli.configuration.ConfigurationProcessor;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
@@ -39,7 +36,11 @@ import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.transfer.ArtifactNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +70,6 @@ public class MavenStatusCommand
             "3.8.6"
     );
     private final MavenExecutionRequestPopulator mavenExecutionRequestPopulator;
-    private final ConfigurationProcessor configurationProcessor;
     private final ArtifactResolver artifactResolver;
     private final DefaultSessionFactory defaultSessionFactory;
     private final DefaultRepositorySystemSessionFactory repoSession;
@@ -77,12 +77,11 @@ public class MavenStatusCommand
     private final PlexusContainer container;
     private final SessionScope sessionScope;
 
-    public MavenStatusCommand( PlexusContainer container ) throws ComponentLookupException
+    public MavenStatusCommand( final PlexusContainer container ) throws ComponentLookupException
     {
         this.container = container;
         mavenExecutionRequestPopulator = container.lookup( MavenExecutionRequestPopulator.class );
         logger = LoggerFactory.getILoggerFactory().getLogger( MavenStatusCommand.class.getName() );
-        configurationProcessor = container.lookup( ConfigurationProcessor.class );
         artifactResolver = container.lookup( ArtifactResolver.class );
         defaultSessionFactory = container.lookup( DefaultSessionFactory.class );
         repoSession = container.lookup( DefaultRepositorySystemSessionFactory.class );
@@ -95,8 +94,6 @@ public class MavenStatusCommand
         // Populate the cliRequest with defaults and user settings
         final MavenExecutionRequest mavenExecutionRequest =
                 mavenExecutionRequestPopulator.populateDefaults( cliRequest.request );
-        // TODO If an active profile defines more remote repositories, they do not yet show in mavenExecutionRequest.
-        // configurationProcessor.process( cliRequest );
 
         final ArtifactRepository localRepository = cliRequest.getRequest().getLocalRepository();
 
@@ -104,8 +101,7 @@ public class MavenStatusCommand
                 verifyLocalRepository( Paths.get( URI.create( localRepository.getUrl() ) ) );
         final List<String> remoteRepositoryIssues =
                 verifyRemoteRepositoryConnections();
-        final List<String> artifactResolutionIssues =
-                verifyArtifactResolution( cliRequest.getRequest().getRemoteRepositories(), mavenExecutionRequest );
+        final List<String> artifactResolutionIssues = verifyArtifactResolution( mavenExecutionRequest );
 
         // Collect all issues into a single list
         return Stream.of( localRepositoryIssues, remoteRepositoryIssues, artifactResolutionIssues )
@@ -120,52 +116,50 @@ public class MavenStatusCommand
         return issues;
     }
 
-    private List<String> verifyArtifactResolution( List<ArtifactRepository> remoteRepositories,
-                                                   MavenExecutionRequest mavenExecutionRequest )
+    private List<String> verifyArtifactResolution( final MavenExecutionRequest mavenExecutionRequest )
     {
-        final List<String> issues = new ArrayList<>();
+        final Session session = this.defaultSessionFactory.getSession(
+                new MavenSession(
+                        container,
+                        repoSession.newRepositorySession(mavenExecutionRequest),
+                        mavenExecutionRequest,
+                        new DefaultMavenExecutionResult()
+                )
+        );
 
-        for ( ArtifactRepository artifactRepository : remoteRepositories )
-        {
-            final String protocol = artifactRepository.getProtocol();
-            if ( !"http".equals( protocol ) && !"https".equals( protocol ) )
-            {
-                final String unsupportedProtocolWarning =
-                        String.format( "No status checks available for protocol %s.", protocol );
-                logger.info( unsupportedProtocolWarning );
-                continue;
-            }
+        sessionScope.enter();
+        try {
+            sessionScope.seed(DefaultSession.class, (DefaultSession) session);
 
-            final Session session = this.defaultSessionFactory.getSession(
-                    new MavenSession(
-                            container,
-                            repoSession.newRepositorySession(mavenExecutionRequest),
-                            mavenExecutionRequest,
-                            new DefaultMavenExecutionResult()
-                    )
-            );
+            final ArtifactCoordinate artifactCoordinate = new DefaultArtifactCoordinate(session, artifact);
+            final ArtifactResolverResult resolverResult = artifactResolver.resolve(session, Collections.singleton(artifactCoordinate));
 
-            sessionScope.enter();
-            try {
-                sessionScope.seed(DefaultSession.class, (DefaultSession) session);
+            resolverResult.getArtifacts().forEach((key, value) -> {
+                logger.debug("Successfully resolved {} to {}", key.toString(), value.toString());
+            });
 
-                final ArtifactCoordinate artifactCoordinate = new DefaultArtifactCoordinate(session, artifact);
-                final ArtifactResolverResult resolverResult = artifactResolver.resolve(session, Collections.singleton(artifactCoordinate));
-
-                resolverResult.getArtifacts().keySet().forEach(entry -> {
-                    logger.info("Successfully resolved {} from {}", entry.toString(), artifactRepository.getUrl());
-                });
-
-            } catch (ArtifactResolverException are) {
-                final boolean isArtifactResolutionException = are.getCause() instanceof ArtifactResolutionException;
-                final String message = isArtifactResolutionException ? are.getCause().getMessage() : are.getMessage();
-                issues.add(message);
-            } finally {
-                sessionScope.exit();
-            }
+            return Collections.emptyList();
+        } catch (ArtifactResolverException are) {
+            return extractErrorMessagesFromArtifactResolverException(are);
+        } finally {
+            sessionScope.exit();
         }
+    }
 
-        return issues;
+    private List<String> extractErrorMessagesFromArtifactResolverException(final Exception exception) {
+        final boolean isArtifactResolutionException = exception.getCause() instanceof ArtifactResolutionException;
+        if (isArtifactResolutionException)
+        {
+            final ArtifactResolutionException are = (ArtifactResolutionException) exception.getCause();
+            return (are).getResults().stream()
+                    .map(ArtifactResult::getExceptions)
+                    .flatMap(List::stream)
+                    .map(ArtifactNotFoundException.class::cast)
+                    .map(Throwable::getMessage)
+                    .collect(Collectors.toList());
+        } else {
+            return Collections.singletonList(exception.getMessage());
+        }
     }
 
     private List<String> verifyLocalRepository( final Path localRepositoryPath )

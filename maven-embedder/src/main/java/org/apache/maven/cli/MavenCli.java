@@ -1245,7 +1245,7 @@ public class MavenCli {
         performProjectActivation(commandLine, request.getProjectActivation());
         performProfileActivation(commandLine, request.getProfileActivation());
 
-        final String localRepositoryPath = determineLocalRepositoryPath(request);
+        final String localRepositoryPath = determineLocalRepositoryPath(cliRequest);
         if (localRepositoryPath != null) {
             request.setLocalRepositoryPath(localRepositoryPath);
         }
@@ -1276,10 +1276,25 @@ public class MavenCli {
         return request;
     }
 
-    private String determineLocalRepositoryPath(final MavenExecutionRequest request) {
-        String userDefinedLocalRepo = request.getUserProperties().getProperty(MavenCli.LOCAL_REPO_PROPERTY);
-        if (userDefinedLocalRepo != null) {
-            return userDefinedLocalRepo;
+    private String determineLocalRepositoryPath(final CliRequest cliRequest) {
+        final MavenExecutionRequest request = cliRequest.getRequest();
+        if ( cliRequest.commandLine.hasOption( CLIManager.INSTALLATION_STATUS ) )
+        {
+            try {
+                return Files.createTempDirectory("mvn-status").toAbsolutePath().toString();
+            } catch (IOException ioe) {
+                final Logger logger = slf4jLoggerFactory.getLogger(getClass().getName());
+                logger.debug("Could not create temporary local repository", ioe);
+                logger.warn("Artifact resolution test is less accurate as it may user earlier resolution results.");
+            }
+        }
+        else
+        {
+            String userDefinedLocalRepo = request.getUserProperties().getProperty(MavenCli.LOCAL_REPO_PROPERTY);
+            if (userDefinedLocalRepo != null)
+            {
+                return userDefinedLocalRepo;
+            }
         }
 
         // TODO Investigate why this can also be a Java system property and not just a Maven user property like
