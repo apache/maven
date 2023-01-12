@@ -28,14 +28,16 @@ import javax.inject.Singleton;
 @Named(SiteLifecycleProvider.LIFECYCLE_ID)
 @Singleton
 public final class SiteLifecycleProvider extends AbstractLifecycleProvider {
-    protected static final String LIFECYCLE_ID = "site";
+    static final String LIFECYCLE_ID = "site";
 
     // START SNIPPET: site
     private static final String[] PHASES = {"pre-site", "site", "post-site", "site-deploy"};
 
+    private static final String MAVEN_SITE_PLUGIN_VERSION = "3.12.1";
+
     private static final String[] BINDINGS = {
-        "site", "org.apache.maven.plugins:maven-site-plugin:3.12.1:site",
-        "site-deploy", "org.apache.maven.plugins:maven-site-plugin:3.12.1:deploy"
+        "site", "org.apache.maven.plugins:maven-site-plugin:" + MAVEN_SITE_PLUGIN_VERSION + ":site",
+        "site-deploy", "org.apache.maven.plugins:maven-site-plugin:" + MAVEN_SITE_PLUGIN_VERSION + ":deploy"
     };
     // END SNIPPET: site
 

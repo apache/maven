@@ -28,7 +28,7 @@ import javax.inject.Singleton;
 @Named(CleanLifecycleProvider.LIFECYCLE_ID)
 @Singleton
 public final class CleanLifecycleProvider extends AbstractLifecycleProvider {
-    protected static final String LIFECYCLE_ID = "clean";
+    static final String LIFECYCLE_ID = "clean";
 
     // START SNIPPET: clean
     private static final String[] PHASES = {"pre-clean", "clean", "post-clean"};

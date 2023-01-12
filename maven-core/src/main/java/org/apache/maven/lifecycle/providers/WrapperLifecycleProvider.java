@@ -28,12 +28,16 @@ import javax.inject.Singleton;
 @Named(WrapperLifecycleProvider.LIFECYCLE_ID)
 @Singleton
 public final class WrapperLifecycleProvider extends AbstractLifecycleProvider {
-    protected static final String LIFECYCLE_ID = "wrapper";
+    static final String LIFECYCLE_ID = "wrapper";
 
     // START SNIPPET: wrapper
     private static final String[] PHASES = {"wrapper"};
 
-    private static final String[] BINDINGS = {"wrapper", "org.apache.maven.plugins:maven-wrapper-plugin:3.1.1:wrapper"};
+    private static final String MAVEN_WRAPPER_PLUGIN_VERSION = "3.1.1";
+
+    private static final String[] BINDINGS = {
+        "wrapper", "org.apache.maven.plugins:maven-wrapper-plugin:" + MAVEN_WRAPPER_PLUGIN_VERSION + ":wrapper"
+    };
     // END SNIPPET: wrapper
 
     @Inject
