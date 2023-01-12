@@ -74,7 +74,7 @@ public class MavenStatusCommand
      * artifact. The Apache Maven artifact was chosen as it eventually, be it by proxy, mirror or directly, will be
      * gathered from the central repository. The version is chosen arbitrarily since any listed should work.
      */
-    private static final Artifact artifact = new DefaultArtifact(
+    private static final Artifact APACHE_MAVEN_ARTIFACT = new DefaultArtifact(
             "org.apache.maven",
             "apache-maven",
             null,
@@ -100,7 +100,7 @@ public class MavenStatusCommand
         sessionScope = container.lookup( SessionScope.class );
     }
 
-    public List<String> verify(CliRequest cliRequest )
+    public List<String> verify( CliRequest cliRequest )
             throws Exception
     {
         // Populate the cliRequest with defaults and user settings
@@ -204,44 +204,53 @@ public class MavenStatusCommand
         final Session session = this.defaultSessionFactory.getSession(
                 new MavenSession(
                         container,
-                        repoSession.newRepositorySession(mavenExecutionRequest),
+                        repoSession.newRepositorySession( mavenExecutionRequest ),
                         mavenExecutionRequest,
                         new DefaultMavenExecutionResult()
                 )
         );
 
         sessionScope.enter();
-        try {
-            sessionScope.seed(DefaultSession.class, (DefaultSession) session);
+        try
+        {
+            sessionScope.seed( DefaultSession.class, (DefaultSession) session );
 
-            final ArtifactCoordinate artifactCoordinate = new DefaultArtifactCoordinate(session, artifact);
-            final ArtifactResolverResult resolverResult = artifactResolver.resolve(session, Collections.singleton(artifactCoordinate));
+            ArtifactCoordinate artifactCoordinate = new DefaultArtifactCoordinate( session, APACHE_MAVEN_ARTIFACT );
+            ArtifactResolverResult resolverResult = artifactResolver.resolve( session,
+                    Collections.singleton( artifactCoordinate ) );
 
-            resolverResult.getArtifacts().forEach((key, value) -> {
-                logger.debug("Successfully resolved {} to {}", key.toString(), value.toString());
-            });
+            resolverResult.getArtifacts().forEach( ( key, value ) ->
+                logger.debug( "Successfully resolved {} to {}", key.toString(), value.toString() )
+            );
 
             return Collections.emptyList();
-        } catch (ArtifactResolverException are) {
-            return extractErrorMessagesFromArtifactResolverException(are);
-        } finally {
+        }
+        catch ( ArtifactResolverException are )
+        {
+            return extractErrorMessagesFromArtifactResolverException( are );
+        }
+        finally
+        {
             sessionScope.exit();
         }
     }
 
-    private List<String> extractErrorMessagesFromArtifactResolverException(final Exception exception) {
+    private List<String> extractErrorMessagesFromArtifactResolverException( final Exception exception )
+    {
         final boolean isArtifactResolutionException = exception.getCause() instanceof ArtifactResolutionException;
-        if (isArtifactResolutionException)
+        if ( isArtifactResolutionException )
         {
-            final ArtifactResolutionException are = (ArtifactResolutionException) exception.getCause();
-            return (are).getResults().stream()
-                    .map(ArtifactResult::getExceptions)
-                    .flatMap(List::stream)
-                    .map(ArtifactNotFoundException.class::cast)
-                    .map(Throwable::getMessage)
-                    .collect(Collectors.toList());
-        } else {
-            return Collections.singletonList(exception.getMessage());
+            final ArtifactResolutionException are = ( ArtifactResolutionException ) exception.getCause();
+            return are.getResults().stream()
+                    .map( ArtifactResult::getExceptions )
+                    .flatMap( List::stream )
+                    .map( ArtifactNotFoundException.class::cast )
+                    .map( Throwable::getMessage )
+                    .collect( Collectors.toList() );
+        }
+        else
+        {
+            return Collections.singletonList( exception.getMessage() );
         }
     }
 

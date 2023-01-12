@@ -1280,18 +1280,21 @@ public class MavenCli {
         final MavenExecutionRequest request = cliRequest.getRequest();
         if ( cliRequest.commandLine.hasOption( CLIManager.INSTALLATION_STATUS ) )
         {
-            try {
-                return Files.createTempDirectory("mvn-status").toAbsolutePath().toString();
-            } catch (IOException ioe) {
-                final Logger logger = slf4jLoggerFactory.getLogger(getClass().getName());
-                logger.debug("Could not create temporary local repository", ioe);
-                logger.warn("Artifact resolution test is less accurate as it may user earlier resolution results.");
+            try
+            {
+                return Files.createTempDirectory( "mvn-status" ).toAbsolutePath().toString();
+            }
+            catch ( IOException ioe )
+            {
+                final Logger logger = slf4jLoggerFactory.getLogger( getClass().getName() );
+                logger.debug( "Could not create temporary local repository", ioe );
+                logger.warn( "Artifact resolution test is less accurate as it may user earlier resolution results." );
             }
         }
         else
         {
-            String userDefinedLocalRepo = request.getUserProperties().getProperty(MavenCli.LOCAL_REPO_PROPERTY);
-            if (userDefinedLocalRepo != null)
+            String userDefinedLocalRepo = request.getUserProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
+            if ( userDefinedLocalRepo != null )
             {
                 return userDefinedLocalRepo;
             }
