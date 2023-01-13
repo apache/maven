@@ -204,8 +204,9 @@ class ReactorReader implements MavenWorkspaceReader {
             long artifactLastModified =
                     Files.getLastModifiedTime(packagedArtifactFile.toPath()).toMillis();
 
+            long buildStartTime = 0;
             if (session.getProjectBuildingRequest().getBuildStartTime() != null) {
-                long buildStartTime =
+                buildStartTime =
                         session.getProjectBuildingRequest().getBuildStartTime().getTime();
                 if (artifactLastModified > buildStartTime) {
                     return true;
@@ -222,7 +223,7 @@ class ReactorReader implements MavenWorkspaceReader {
 
                 long outputFileLastModified =
                         Files.getLastModifiedTime(outputFile).toMillis();
-                if (outputFileLastModified > artifactLastModified) {
+                if (outputFileLastModified > buildStartTime && outputFileLastModified > artifactLastModified) {
                     File alternative = determineBuildOutputDirectoryForArtifact(project, artifact);
                     if (alternative != null) {
                         LOGGER.warn(
