@@ -204,9 +204,8 @@ class ReactorReader implements MavenWorkspaceReader {
             long artifactLastModified =
                     Files.getLastModifiedTime(packagedArtifactFile.toPath()).toMillis();
 
-            long buildStartTime = 0;
             if (session.getProjectBuildingRequest().getBuildStartTime() != null) {
-                buildStartTime =
+                long buildStartTime =
                         session.getProjectBuildingRequest().getBuildStartTime().getTime();
                 if (artifactLastModified > buildStartTime) {
                     return true;
@@ -223,7 +222,7 @@ class ReactorReader implements MavenWorkspaceReader {
 
                 long outputFileLastModified =
                         Files.getLastModifiedTime(outputFile).toMillis();
-                if (outputFileLastModified > buildStartTime && outputFileLastModified > artifactLastModified) {
+                if (outputFileLastModified > artifactLastModified) {
                     LOGGER.warn(
                             "File '{}' is more recent than the packaged artifact for '{}', please run a full `mvn verify` build",
                             relativizeOutputFile(outputFile),
