@@ -237,6 +237,11 @@ class ReactorReader implements MavenWorkspaceReader {
                                 relativizeOutputFile(outputFile),
                                 project.getArtifactId());
                     }
+                    // TODO: remove the following log
+                    LOGGER.warn(
+                            "{} > {}",
+                            Files.getLastModifiedTime(outputFile),
+                            Files.getLastModifiedTime(packagedArtifactFile.toPath()));
                     return false;
                 }
             }
@@ -334,7 +339,11 @@ class ReactorReader implements MavenWorkspaceReader {
                 try {
                     LOGGER.debug("Copying {} to project local repository", artifact);
                     Files.createDirectories(target.getParent());
-                    Files.copy(artifact.getFile().toPath(), target, StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(
+                            artifact.getFile().toPath(),
+                            target,
+                            StandardCopyOption.REPLACE_EXISTING,
+                            StandardCopyOption.COPY_ATTRIBUTES);
                 } catch (IOException e) {
                     LOGGER.warn("Error while copying artifact to project local repository", e);
                 }
