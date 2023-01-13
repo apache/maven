@@ -21,10 +21,10 @@ properties([buildDiscarder(logRotator(artifactNumToKeepStr: '5', numToKeepStr: e
 
 def buildOs = 'linux'
 def buildJdk = '8'
-def buildMvn = '3.6.3'
+def buildMvn = '3.8.x'
 def runITsOses = ['linux']
 def runITsJdks = ['8', '11', '17']
-def runITsMvn = '3.6.3'
+def runITsMvn = '3.8.x'
 def runITscommand = "mvn clean install -Prun-its,embedded -B -U -V" // -DmavenDistro=... -Dmaven.test.failure.ignore=true
 def tests
 
@@ -56,7 +56,7 @@ node(jenkinsEnv.nodeSelection(osNode)) {
                     sh "mvn clean ${MAVEN_GOAL} -B -U -e -fae -V -Dmaven.test.failure.ignore -PversionlessMavenDist -Dmaven.repo.local=${WORK_DIR}/.repository"
                 }
             } finally {
-                junit testResults: '**/target/surefire-reports/*.xml', allowEmptyResults: true                
+                junit testResults: '**/target/surefire-reports/*.xml,**/target/failsafe-reports/*.xml', allowEmptyResults: true
             }    
             dir ('apache-maven/target') {
                 stash includes: 'apache-maven-bin.zip', name: 'maven-dist'
@@ -112,7 +112,9 @@ for (String os in runITsOses) {
                                 }
                             }
                         } finally {
-                            //junit testResults: '**/core-it-suite/**/target/surefire-reports/*.xml', allowEmptyResults: true                                            
+                            // in ITs test we need only reports from test itself
+                            // test projects can contain reports with tested failed builds
+                            junit testResults: '**/core-it-suite/target/surefire-reports/*.xml,**/core-it-support/**/target/surefire-reports/*.xml', allowEmptyResults: true
                             archiveDirs(stageId, ['core-it-suite-logs':'core-it-suite/target/test-classes',
                                                   'core-it-suite-reports':'core-it-suite/target/surefire-reports'])
                             deleteDir() // clean up after ourselves to reduce disk space
