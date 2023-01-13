@@ -30,8 +30,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.eventspy.EventSpy;
@@ -97,27 +96,14 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     public List<String> findVersions(Artifact artifact) {
-        List<String> versions = new ArrayList<>();
-        String artifactId = artifact.getArtifactId();
-        String groupId = artifact.getGroupId();
-        Path repo = getProjectLocalRepo().resolve(groupId).resolve(artifactId);
-        String classifier = artifact.getClassifier();
-        String extension = artifact.getExtension();
-        Pattern pattern = Pattern.compile("\\Q" + artifactId + "\\E-(.*)"
-                + (classifier != null ? "-\\Q" + classifier + "\\E" : "")
-                + (extension != null ? "." + extension : ""));
-        try (Stream<Path> paths = Files.list(repo)) {
-            paths.forEach(p -> {
-                String filename = p.getFileName().toString();
-                Matcher matcher = pattern.matcher(filename);
-                if (matcher.matches()) {
-                    versions.add(matcher.group(1));
-                }
-            });
-        } catch (IOException e) {
-            // ignore
-        }
-        return Collections.unmodifiableList(versions);
+        return getProjects()
+                .getOrDefault(artifact.getGroupId(), Collections.emptyMap())
+                .getOrDefault(artifact.getArtifactId(), Collections.emptyMap())
+                .values()
+                .stream()
+                .filter(p -> Objects.nonNull(find(p, artifact)))
+                .map(MavenProject::getVersion)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 
     @Override
