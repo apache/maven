@@ -39,6 +39,7 @@
     #set ( $dummy = $imports.add( "java.util.Collections" ) )
     #set ( $dummy = $imports.add( "java.util.HashMap" ) )
     #set ( $dummy = $imports.add( "java.util.Map" ) )
+    #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Experimental" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Generated" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Immutable" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Nonnull" ) )
@@ -46,10 +47,13 @@
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.ThreadSafe" ) )
     #foreach ( $field in $allFields )
       #if ( $field.type == "java.util.List" )
-          #set ( $dummy = $imports.add( "java.util.ArrayList" ) )
-          #set ( $dummy = $imports.add( "java.util.Collection" ) )
-          #set ( $dummy = $imports.add( "java.util.List" ) )
-          #set ( $dummy = $types.put( $field, "List<" + $field.to + ">" ) )
+        #set ( $dummy = $imports.add( "java.util.ArrayList" ) )
+        #set ( $dummy = $imports.add( "java.util.Collection" ) )
+        #set ( $dummy = $imports.add( "java.util.List" ) )
+        #set ( $dummy = $types.put( $field, "List<" + $field.to + ">" ) )
+      #elseif ( $field.type == "java.util.Properties" )
+        #set ( $dummy = $imports.add( "java.util.Map" ) )
+        #set ( $dummy = $types.put( $field, "Map<String, String>" ) )
       #elseif ( $field.type == "DOM" )
         #set ( $dummy = $imports.add( "org.apache.maven.api.xml.XmlNode" ) )
         #set ( $dummy = $types.put( $field, "XmlNode" ) )
@@ -94,6 +98,7 @@ import $imp;
  * ${line.trim()}
     #end
  */
+@Experimental
 @Generated @ThreadSafe @Immutable
 public class ${class.name}
     #if ( $class.superClass )
@@ -150,7 +155,8 @@ public class ${class.name}
     #end
     #if ( $locationTracking )
         Map<Object, InputLocation> locations,
-        InputLocation location,
+      #set ( $sep = "#if(${allFields.size()}>0),#end" )
+        InputLocation location${sep}
       #foreach ( $field in $allFields )
         #set ( $sep = "#if(${locationTracking}&&$field!=${allFields[${allFields.size()} - 1]}),#end" )
         InputLocation ${field.name}Location${sep}
@@ -166,7 +172,8 @@ public class ${class.name}
       #end
       #if ( $locationTracking )
             locations,
-            location,
+        #set ( $sep = "#if(${inheritedFields.size()}>0),#end" )
+            location${sep}
         #foreach ( $field in $inheritedFields )
           #set ( $sep = "#if(${locationTracking}&&$field!=${inheritedFields[${inheritedFields.size()} - 1]}),#end" )
             ${field.name}Location${sep}
@@ -238,6 +245,8 @@ public class ${class.name}
       #foreach ( $line in ${desc.split("\n")} )
      * ${line.trim()}
       #end
+     *
+     * @return a {@code ${type}}
      */
       #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" )
     @Nonnull
@@ -278,6 +287,8 @@ public class ${class.name}
     #end
     /**
      * Creates a new builder with this object as the basis.
+     *
+     * @return a {@code Builder}
      */
     @Nonnull
     public Builder with()
@@ -290,7 +301,12 @@ public class ${class.name}
       #if ( $type.startsWith("List<") )
         #set ( $type = ${type.replace('List<','Collection<')} )
       #end
-    /** Creates a new ${class.name} instance using the specified ${field.name}. */
+    /**
+     * Creates a new {@code ${class.name}} instance using the specified ${field.name}.
+     *
+     * @param ${field.name} the new {@code $type} to use
+     * @return a {@code ${class.name}} with the specified ${field.name}
+     */
     @Nonnull
     public ${class.name} with${cap}( $type $field.name )
     {
@@ -299,9 +315,11 @@ public class ${class.name}
     #end
 
     /**
-     * Creates a new ${class.name} instance.
+     * Creates a new {@code ${class.name}} instance.
      * Equivalent to {@code newInstance( true )}.
      * @see #newInstance(boolean)
+     *
+     * @return a new {@code ${class.name}}
      */
     @Nonnull
     public static ${class.name} newInstance()
@@ -310,8 +328,11 @@ public class ${class.name}
     }
 
     /**
-     * Creates a new ${class.name} instance using default values or not.
+     * Creates a new {@code ${class.name}} instance using default values or not.
      * Equivalent to {@code newBuilder( withDefaults ).build()}.
+     *
+     * @param withDefaults the boolean indicating whether default values should be used
+     * @return a new {@code ${class.name}}
      */
     @Nonnull
     public static ${class.name} newInstance( boolean withDefaults )
@@ -320,9 +341,11 @@ public class ${class.name}
     }
 
     /**
-     * Creates a new ${class.name} builder instance.
+     * Creates a new {@code ${class.name}} builder instance.
      * Equivalent to {@code newBuilder( true )}.
      * @see #newBuilder(boolean)
+     *
+     * @return a new {@code Builder}
      */
     @Nonnull
     public static Builder newBuilder()
@@ -331,7 +354,10 @@ public class ${class.name}
     }
 
     /**
-     * Creates a new ${class.name} builder instance using default values or not.
+     * Creates a new {@code ${class.name}} builder instance using default values or not.
+     *
+     * @param withDefaults the boolean indicating whether default values should be used
+     * @return a new {@code Builder}
      */
     @Nonnull
     public static Builder newBuilder( boolean withDefaults )
@@ -340,8 +366,11 @@ public class ${class.name}
     }
 
     /**
-     * Creates a new ${class.name} builder instance using the specified object as a basis.
+     * Creates a new {@code ${class.name}} builder instance using the specified object as a basis.
      * Equivalent to {@code newBuilder( from, false )}.
+     *
+     * @param from the {@code ${class.name}} instance to use as a basis
+     * @return a new {@code Builder}
      */
     @Nonnull
     public static Builder newBuilder( ${class.name} from )
@@ -350,7 +379,11 @@ public class ${class.name}
     }
 
     /**
-     * Creates a new ${class.name} builder instance using the specified object as a basis.
+     * Creates a new {@code ${class.name}} builder instance using the specified object as a basis.
+     *
+     * @param from the {@code ${class.name}} instance to use as a basis
+     * @param forceCopy the boolean indicating if a copy should be forced
+     * @return a new {@code Builder}
      */
     @Nonnull
     public static Builder newBuilder( ${class.name} from, boolean forceCopy )
@@ -478,11 +511,19 @@ public class ${class.name}
                 return base;
             }
     #if ( $locationTracking )
-            Map<Object, InputLocation> locations = new HashMap<>( this.locations != null ? this.locations : ( base != null ? base.locations : Collections.emptyMap() ) );
-            InputLocation location = locations.remove( "" );
+            Map<Object, InputLocation> locations = null;
+            InputLocation location = null;
       #foreach ( $field in $allFields )
-            InputLocation ${field.name}Location = locations.remove( "${field.name}" );
+            InputLocation ${field.name}Location = null;
       #end
+            if ( this.locations != null )
+            {
+                locations = this.locations;
+                location = locations.remove( "" );
+      #foreach ( $field in $allFields )
+                ${field.name}Location = locations.remove( "${field.name}" );
+      #end
+            }
     #end
             return new ${class.name}(
     #if ( $class == $root )
@@ -497,8 +538,9 @@ public class ${class.name}
       #end
     #end
     #if ( $locationTracking )
-                locations,
-                location != null ? location : ( base != null ? base.location : null ),
+                locations != null ? locations : ( base != null ? base.locations : null ),
+      #set ( $sep = "#if(${allFields.size()}>0),#end" )
+                location != null ? location : ( base != null ? base.location : null )${sep}
       #foreach ( $field in $allFields )
         #set ( $sep = "#if(${locationTracking}&&$field!=${allFields[${allFields.size()} - 1]}),#end" )
                 ${field.name}Location != null ? ${field.name}Location : ( base != null ? base.${field.name}Location : null )${sep}
