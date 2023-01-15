@@ -41,27 +41,6 @@ under the License.
   <build>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.2.0</version>
-        <executions>
-          <execution>
-            <id>attach-mdo</id>
-            <goals>
-              <goal>attach-artifact</goal>
-            </goals>
-            <configuration>
-              <artifacts>
-                <artifact>
-                  <file>src/main/mdo/toolchains.mdo</file>
-                  <type>mdo</type>
-                </artifact>
-              </artifacts>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <executions>
@@ -72,11 +51,13 @@ under the License.
             </goals>
             <configuration>
               <version>1.1.0</version>
+              <!-- use shared root containing models and Velocity templates -->
+              <basedir>${basedir}/../..</basedir>
               <models>
                 <model>src/main/mdo/toolchains.mdo</model>
               </models>
               <templates>
-                <template>src/main/mdo/model.vm</template>
+                <template>src/main/mdo/generators/model.vm</template>
               </templates>
               <params>
                 <param>packageModelV4=org.apache.maven.api.toolchain</param>

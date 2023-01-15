@@ -16,7 +16,7 @@
   specific language governing permissions and limitations
   under the License.
 *#
-#parse ( "src/main/mdo/common.vm" )
+#parse ( "src/main/mdo/generators/common.vm" )
 #
 #set ( $package = "${packageToolV4}" )
 #set ( $className = "${model.name}Xpp3Reader" )

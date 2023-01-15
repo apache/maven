@@ -16,7 +16,7 @@
   specific language governing permissions and limitations
   under the License.
 *#
-#parse ( "src/main/mdo/common.vm" )
+#parse ( "src/main/mdo/generators/common.vm" )
 #
 #set ( $package = "${packageModelV3}" )
 #
@@ -43,6 +43,7 @@
     #set ( $dummy = $imports.add( "java.util.HashMap" ) )
     #set ( $dummy = $imports.add( "java.util.List" ) )
     #set ( $dummy = $imports.add( "java.util.Map" ) )
+    #set ( $dummy = $imports.add( "java.util.Objects" ) )
     #set ( $dummy = $imports.add( "java.util.stream.Collectors" ) )
     #set ( $dummy = $imports.add( "java.util.stream.Stream" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Generated" ) )
@@ -94,13 +95,11 @@ import $imp;
 public class ${class.name}
     #if ( $class.superClass )
     extends ${class.superClass}
-    #end
     implements Serializable, Cloneable
-{
-
-    #if ( ! $class.superClass )
-    ${packageModelV4}.${class.name} delegate;
+    #else
+    extends BaseObject
     #end
+{
 
     public ${class.name}()
     {
@@ -109,11 +108,12 @@ public class ${class.name}
 
     public ${class.name}( ${packageModelV4}.${class.name} delegate )
     {
-    #if ( $class.superClass )
-        super( delegate );
-    #else
-        this.delegate = delegate;
-    #end
+        this( delegate, null );
+    }
+
+    public ${class.name}( ${packageModelV4}.${class.name} delegate, BaseObject parent )
+    {
+        super( delegate, parent );
     }
 
     public ${class.name} clone()
@@ -126,11 +126,7 @@ public class ${class.name}
     #end
     public ${packageModelV4}.${class.name} getDelegate()
     {
-    #if ( $class.superClass )
-        return ( ${packageModelV4}.${class.name} ) delegate;
-    #else
-        return delegate;
-    #end
+        return ( ${packageModelV4}.${class.name} ) super.getDelegate();
     }
 
     #if ( ! $eq.empty )
@@ -178,16 +174,16 @@ public class ${class.name}
     {
       #if ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
         return new WrapperList<${field.to}, ${packageModelV4}.${field.to}>(
-                    getDelegate()::get${cap}, l -> delegate = getDelegate().with${cap}( l ),
-                    ${field.to}::new, ${field.to}::getDelegate );
+                    () -> getDelegate().get${cap}(), l -> update( getDelegate().with${cap}( l ) ),
+                    d -> new ${field.to}( d, this ), ${field.to}::getDelegate );
       #elseif ( $field.to == "String" && $field.type == "java.util.Properties" && $field.multiplicity == "*" )
-        return new WrapperProperties( getDelegate()::get${cap}, this::set${cap} );
+        return new WrapperProperties( () -> getDelegate().get${cap}(), this::set${cap} );
       #elseif ( $field.to == "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
-        return new WrapperList<String, ${field.to}>( getDelegate()::get${cap}, this::set${cap}, s -> s, s -> s );
+        return new WrapperList<String, ${field.to}>( () -> getDelegate().get${cap}(), this::set${cap}, s -> s, s -> s );
       #elseif ( $field.to )
-        return getDelegate().${pfx}${cap}() != null ? new ${field.to}( getDelegate().${pfx}${cap}() ) : null;
+        return getDelegate().${pfx}${cap}() != null ? new ${field.to}( getDelegate().${pfx}${cap}(), this ) : null;
       #elseif ( $field.type == "DOM" )
-        return getDelegate().${pfx}${cap}() != null ? new Xpp3Dom( getDelegate().${pfx}${cap}() ) : null;
+        return getDelegate().${pfx}${cap}() != null ? new Xpp3Dom( getDelegate().${pfx}${cap}(), this::replace ) : null;
       #else
         return getDelegate().${pfx}${cap}();
       #end
@@ -196,18 +192,32 @@ public class ${class.name}
     public void set${cap}( ${type} ${field.name} )
     {
       #if ( $field.type == "DOM" )
-        delegate = getDelegate().with${cap}( ( ( Xpp3Dom ) ${field.name} ).getDom() );
+        if ( ! Objects.equals( ( ( Xpp3Dom ) ${field.name} ).getDom(), getDelegate().${pfx}${cap}() ) )
+        {
+            update( getDelegate().with${cap}( ( ( Xpp3Dom ) ${field.name} ).getDom() ) );
+            ( ( Xpp3Dom ) ${field.name} ).setChildrenTracking( this::replace );
+        }
       #elseif( $field.type == "java.util.Properties" )
         Map<String, String> map = ${field.name}.entrySet().stream()
                 .collect( Collectors.toMap( e -> e.getKey().toString(), e -> e.getValue().toString() ) );
-        delegate = getDelegate().with${cap}( map );
-      #elseif ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
-        delegate = getDelegate().with${cap}(
-                ${field.name}.stream().map( c -> c.getDelegate() ).collect( Collectors.toList() ) );
-      #elseif ( $field.to && $field.to != "String" )
-        delegate = getDelegate().with${cap}( ${field.name}.getDelegate() );
+        if ( !Objects.equals( map, getDelegate().get${cap}() ) )
+        {
+            update( getDelegate().with${cap}( map ) );
+        }
       #else
-        delegate = getDelegate().with${cap}( ${field.name} );
+        if ( !Objects.equals( ${field.name}, getDelegate().${pfx}${cap}() ) )
+        {
+        #if ( $field.to != "String" && $field.type == "java.util.List" && $field.multiplicity == "*" )
+            update( getDelegate().with${cap}(
+                    ${field.name}.stream().map( c -> c.getDelegate() ).collect( Collectors.toList() ) ) );
+            ${field.name}.forEach( e -> e.childrenTracking = this::replace );
+        #elseif ( $field.to && $field.to != "String" )
+            update( getDelegate().with${cap}( ${field.name}.getDelegate() ) );
+            ${field.name}.childrenTracking = this::replace;
+        #else
+            update( getDelegate().with${cap}( ${field.name} ) );
+        #end
+        }
       #end
     }
 
@@ -217,26 +227,80 @@ public class ${class.name}
     public void add${scap}( ${field.to} ${v} )
     {
         #if ( $field.to == "String" )
-        delegate = getDelegate().with${cap}(
+        update( getDelegate().with${cap}(
                 Stream.concat( getDelegate().get${cap}().stream(), Stream.of( ${v} ) )
-                        .collect( Collectors.toList() ) );
+                        .collect( Collectors.toList() ) ) );
         #else
-        delegate = getDelegate().with${cap}(
+        update( getDelegate().with${cap}(
                 Stream.concat( getDelegate().get${cap}().stream(), Stream.of( ${v}.getDelegate() ) )
-                        .collect( Collectors.toList() ) );
+                        .collect( Collectors.toList() ) ) );
+        ${v}.childrenTracking = this::replace;
         #end
     }
 
-      #elseif ( $field.type == "java.util.Properties" && $field.multiplicity == "*" )
-        #set ( $v = $Helper.singular( ${field.name} ) )
-        #set ( $scap = $Helper.capitalise( $v ) )
-    public void add${scap}( String key, String value )
+    public void remove${scap}( ${field.to} ${v} )
     {
-        get${cap}().put( key, value );
+        #if ( $field.to == "String" )
+        update( getDelegate().with${cap}(
+                getDelegate().get${cap}().stream()
+                        .filter( e -> !Objects.equals( e, ${v} ) )
+                        .collect( Collectors.toList() ) ) );
+        #else
+        update( getDelegate().with${cap}(
+                getDelegate().get${cap}().stream()
+                        .filter( e -> !Objects.equals( e, ${v} ) )
+                        .collect( Collectors.toList() ) ) );
+        ${v}.childrenTracking = null;
+        #end
     }
 
       #end
     #end
+    public InputLocation getLocation( Object key )
+    {
+        ${packageModelV4}.InputLocation loc = getDelegate().getLocation( key );
+        return loc != null ? new InputLocation( loc ) : null;
+    }
+
+    public void setLocation( Object key, InputLocation location )
+    {
+        update( ${packageModelV4}.${class.name}.newBuilder( getDelegate(), true )
+                        .location( key, location.toApiLocation() ).build() );
+    }
+
+    protected boolean replace( Object oldDelegate, Object newDelegate )
+    {
+        if ( super.replace( oldDelegate, newDelegate ) )
+        {
+            return true;
+        }
+    #foreach ( $field in $class.getFields($version) )
+      #set ( $cap = $Helper.capitalise( $field.name ) )
+      #set ( $type = ${types.getOrDefault($field,${types.getOrDefault($field.type,$field.type)})} )
+      #if ( $field.to && $field.multiplicity != "*" )
+        if ( oldDelegate == getDelegate().get${cap}() )
+        {
+            update( getDelegate().with${cap}( ( ${packageModelV4}.${field.to} ) newDelegate ) );
+            return true;
+        }
+      #elseif ( $field.type == "java.util.List" && $field.to != "String" )
+        if ( getDelegate().get${cap}().contains( oldDelegate ) )
+        {
+            List<${packageModelV4}.${field.to}> list = new ArrayList<>( getDelegate().get${cap}() );
+            list.replaceAll( d -> d == oldDelegate ? ( ${packageModelV4}.${field.to} ) newDelegate : d );
+            update( getDelegate().with${cap}( list ) );
+            return true;
+        }
+      #elseif ( $field.type == "DOM" )
+        if ( getDelegate().get${cap}() == oldDelegate )
+        {
+            update( getDelegate().with${cap}( ( org.apache.maven.api.xml.XmlNode ) newDelegate ) );
+        }
+      #end
+    #end
+        return false;
+    }
+
     public static List<${packageModelV4}.${class.name}> ${Helper.uncapitalise(${class.name})}ToApiV4( List<${class.name}> list )
     {
         return list != null ? new WrapperList<>( list, ${class.name}::getDelegate, ${class.name}::new ) : null;

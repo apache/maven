@@ -47,37 +47,14 @@ under the License.
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-maven.mdo</id>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <phase>generate-sources</phase>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.apache.maven</groupId>
-                  <artifactId>maven-api-model</artifactId>
-                  <version>${project.version}</version>
-                  <type>mdo</type>
-                  <outputDirectory>target/mdo/</outputDirectory>
-                  <destFileName>maven.mdo</destFileName>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
+          <!-- use shared root containing models and Velocity templates -->
+          <basedir>${basedir}/..</basedir>
           <version>4.0.0</version>
           <models>
-            <model>target/mdo/maven.mdo</model>
+            <model>src/main/mdo/maven.mdo</model>
           </models>
           <params>
             <param>packageModelV3=org.apache.maven.model</param>
@@ -104,7 +81,7 @@ under the License.
             <configuration>
               <version>4.1.0</version>
               <templates>
-                <template>src/main/mdo/model-v3.vm</template>
+                <template>src/main/mdo/generators/model-v3-modified.vm</template>
               </templates>
             </configuration>
           </execution>
@@ -117,12 +94,12 @@ under the License.
             <configuration>
               <version>4.2.0</version>
               <templates>
-                <template>src/main/mdo/merger.vm</template>
-                <template>src/main/mdo/transformer.vm</template>
-                <template>src/main/mdo/reader.vm</template>
-                <template>src/main/mdo/reader-ex.vm</template>
-                <template>src/main/mdo/writer.vm</template>
-                <template>src/main/mdo/writer-ex.vm</template>
+                <template>src/main/mdo/generators/merger.vm</template>
+                <template>src/main/mdo/generators/transformer.vm</template>
+                <template>src/main/mdo/generators/reader-modified.vm</template>
+                <template>src/main/mdo/generators/reader-ex.vm</template>
+                <template>src/main/mdo/generators/writer.vm</template>
+                <template>src/main/mdo/generators/writer-ex.vm</template>
               </templates>
             </configuration>
           </execution>
