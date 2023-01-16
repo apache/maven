@@ -23,13 +23,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
@@ -42,7 +40,6 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.DependencyRequest;
@@ -79,9 +76,6 @@ public class DownloadMojo
 
     @Component
     private MavenSession session;
-
-    @Component
-    private ArtifactHandlerManager artifactHandlerManager;
 
     @Override
     public void execute() throws MojoFailureException
@@ -123,16 +117,17 @@ public class DownloadMojo
         ProjectBuildingRequest projectBuildingRequest = session.getProjectBuildingRequest();
         RepositorySystemSession repositorySystemSession = projectBuildingRequest.getRepositorySession();
         List<RemoteRepository> repos = RepositoryUtils.toRepos( projectBuildingRequest.getRemoteRepositories() );
-        ArtifactTypeRegistry registry = RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager );
+
         for ( Dependency dependency : dependencies )
         {
             try
             {
-                org.eclipse.aether.graph.Dependency dep = RepositoryUtils.toDependency( dependency, registry );
-                DependencyRequest request = new DependencyRequest(
-                        new CollectRequest( Collections.singletonList( dep ), Collections.emptyList(), repos ),
-                        null );
-                System.out.println( "Resolving: " + dep.getArtifact() );
+                org.eclipse.aether.graph.Dependency root = RepositoryUtils.toDependency(
+                        dependency, repositorySystemSession.getArtifactTypeRegistry() );
+                CollectRequest collectRequest = new CollectRequest( root, null, repos );
+                collectRequest.setRequestContext( "bootstrap" );
+                DependencyRequest request = new DependencyRequest( collectRequest, null ) ;
+                System.out.println( "Resolving: " + root.getArtifact() );
                 repositorySystem.resolveDependencies( repositorySystemSession, request );
             }
             catch ( Exception e )
