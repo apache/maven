@@ -111,8 +111,8 @@ public class MavenStatusCommand
 
         final List<String> localRepositoryIssues =
                 verifyLocalRepository( Paths.get( URI.create( localRepository.getUrl() ) ) );
-        final List<String> remoteRepositoryIssues =
-                verifyRemoteRepositoryConnections( cliRequest.getRequest().getRemoteRepositories(), mavenExecutionRequest.getMirrors() );
+        final List<String> remoteRepositoryIssues = verifyRemoteRepositoryConnections(
+                cliRequest.getRequest().getRemoteRepositories(), mavenExecutionRequest.getMirrors() );
         final List<String> artifactResolutionIssues = verifyArtifactResolution( mavenExecutionRequest );
 
         // Collect all issues into a single list
@@ -143,7 +143,8 @@ public class MavenStatusCommand
             //TODO get path of mirror to resolve url
 
             // Setup connection
-            final String artifactUrl = remoteRepository.getUrl() + "/" + remoteRepository.getLayout().pathOf( RepositoryUtils.toArtifact( artifact ) );
+            final String artifactUrl = remoteRepository.getUrl()
+                    + "/" + remoteRepository.getLayout().pathOf( RepositoryUtils.toArtifact( APACHE_MAVEN_ARTIFACT ) );
             URL url = new URL( artifactUrl );
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             if (remoteRepository.getProxy() != null) {
