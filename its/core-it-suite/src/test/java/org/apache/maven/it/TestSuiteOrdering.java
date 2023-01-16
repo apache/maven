@@ -50,6 +50,18 @@ public class TestSuiteOrdering implements ClassOrderer
     {
         try
         {
+            // TODO: workaround for https://github.com/apache/maven-integration-testing/pull/232
+            // The verifier currently uses system properties to configure itself, such as
+            // maven.home (see https://github.com/apache/maven-integration-testing/blob/ba72268198fb4c68890f11bfa0aac3f4889c79b9/core-it-suite/pom.xml#L509-L511)
+            // or other properties to configure the maven that will be launched.  Using system properties
+            // make impossible the detection whether a system property has been set by the maven being run
+            // or by the code that wants to use the verifier to create a new embedded maven, which means
+            // those properties can not be cleared by the verifier.  So clear those properties here, as
+            // we do want to isolate the tests from the outside environment.
+            System.clearProperty( "maven.bootclasspath" );
+            System.clearProperty( "maven.conf" );
+            System.clearProperty( "classworlds.conf" );
+
             Verifier verifier = new Verifier( "" );
             String mavenVersion = verifier.getMavenVersion();
             String executable = verifier.getExecutable();
