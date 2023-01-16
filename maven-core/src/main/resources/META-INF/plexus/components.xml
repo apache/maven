@@ -78,7 +78,7 @@ under the License.
         </phases>
         <default-phases>
           <clean>
-            org.apache.maven.plugins:maven-clean-plugin:2.5:clean
+            org.apache.maven.plugins:maven-clean-plugin:3.2.0:clean
           </clean>
         </default-phases>
         <!-- END SNIPPET: clean -->
@@ -101,10 +101,10 @@ under the License.
         </phases>
         <default-phases>
           <site>
-            org.apache.maven.plugins:maven-site-plugin:3.3:site
+            org.apache.maven.plugins:maven-site-plugin:3.12.1:site
           </site>
           <site-deploy>
-            org.apache.maven.plugins:maven-site-plugin:3.3:deploy
+            org.apache.maven.plugins:maven-site-plugin:3.12.1:deploy
           </site-deploy>
         </default-phases>
         <!-- END SNIPPET: site -->
