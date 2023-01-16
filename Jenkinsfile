@@ -101,7 +101,7 @@ for (String os in runITsOses) {
                             withEnv(["JAVA_HOME=${ tool "$jdkName" }",
                                         "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
                                         "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {                                               
-                                String cmd = "${runITscommand} -DmavenDistro=$WORK_DIR/dists/apache-maven-bin.zip -Dmaven.test.failure.ignore"
+                                String cmd = "${runITscommand} -Dmaven.repo.local=$WORK_DIR/it-local-repo -DmavenDistro=$WORK_DIR/dists/apache-maven-bin.zip -Dmaven.test.failure.ignore"
 
                                 if (isUnix()) {
                                     sh 'df -hT'
