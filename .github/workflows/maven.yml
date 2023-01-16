@@ -106,15 +106,6 @@ jobs:
           ref: ${{ env.REPO_BRANCH }}
           persist-credentials: false
 
-
-      - name: Set up cache for ~/.m2/repository
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: it-m2-repo-${{ matrix.os }}-${{ hashFiles('maven-integration-testing/**/pom.xml') }}
-          restore-keys: |
-            it-m2-repo-${{ matrix.os }}-
-
       - name: Download built Maven
         uses: actions/download-artifact@v3
         with:
@@ -126,8 +117,8 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
-          cache: 'maven'
+#          cache: 'maven' - don't use cache for integration tests
 
       - name: Running integration tests
         shell: bash
-        run: mvn install -e -B -V -Prun-its,embedded -Dmaven.repo.local="$HOME/.m2/repository" -DmavenDistro="$GITHUB_WORKSPACE/built-maven/apache-maven-bin.zip" -f maven-integration-testing/pom.xml
+        run: mvn install -e -B -V -Prun-its,embedded -DmavenDistro="$GITHUB_WORKSPACE/built-maven/apache-maven-bin.zip" -f maven-integration-testing/pom.xml
