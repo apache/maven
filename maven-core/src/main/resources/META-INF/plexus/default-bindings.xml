@@ -161,7 +161,7 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-compiler-plugin:3.10.1:compile
               </compile>
               <process-classes>
-                org.apache.maven.plugins:maven-plugin-plugin:3.7.0:descriptor
+                org.apache.maven.plugins:maven-plugin-plugin:3.7.1:descriptor
               </process-classes>
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:3.3.0:testResources
@@ -174,7 +174,7 @@ Mappings to default lifecycle, specific for each packaging.
               </test>
               <package>
                 org.apache.maven.plugins:maven-jar-plugin:3.3.0:jar,
-                org.apache.maven.plugins:maven-plugin-plugin:3.7.0:addPluginArtifactMetadata
+                org.apache.maven.plugins:maven-plugin-plugin:3.7.1:addPluginArtifactMetadata
               </package>
               <install>
                 org.apache.maven.plugins:maven-install-plugin:3.1.0:install
