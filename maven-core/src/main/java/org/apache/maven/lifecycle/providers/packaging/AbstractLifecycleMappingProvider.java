@@ -52,7 +52,7 @@ public abstract class AbstractLifecycleMappingProvider implements Provider<Lifec
 
     protected static final String EJB_PLUGIN_VERSION = "3.2.1";
 
-    protected static final String PLUGIN_PLUGIN_VERSION = "3.7.0";
+    protected static final String PLUGIN_PLUGIN_VERSION = "3.7.1";
 
     protected static final String RAR_PLUGIN_VERSION = "3.0.0";
 
