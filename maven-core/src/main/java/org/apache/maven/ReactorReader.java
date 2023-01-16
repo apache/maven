@@ -28,7 +28,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -65,6 +73,7 @@ class ReactorReader implements MavenWorkspaceReader {
 
     private final MavenSession session;
     private final WorkspaceRepository repository;
+    // groupId -> (artifactId -> (version -> project)))
     private Map<String, Map<String, Map<String, MavenProject>>> projects;
 
     @Inject
@@ -306,7 +315,15 @@ class ReactorReader implements MavenWorkspaceReader {
         return Files.isRegularFile(target) ? target.toFile() : null;
     }
 
-    public void processProject(MavenProject project) {
+    /**
+     * Copy packaged and attached artifacts from this project to the
+     * project local repository.
+     * This allow a subsequent build to resume while still being able
+     * to locate attached artifacts.
+     *
+     * @param project the project to copy artifacts
+     */
+    private void installIntoProjectLocalRepository(MavenProject project) {
         List<Artifact> artifacts = new ArrayList<>();
 
         artifacts.add(RepositoryUtils.toArtifact(new ProjectArtifact(project)));
@@ -322,7 +339,7 @@ class ReactorReader implements MavenWorkspaceReader {
             if (artifact.getFile() != null && artifact.getFile().isFile()) {
                 Path target = getArtifactPath(artifact);
                 try {
-                    LOGGER.debug("Copying {} to project local repository", artifact);
+                    LOGGER.info("Copying {} to project local repository", artifact);
                     Files.createDirectories(target.getParent());
                     Files.copy(
                             artifact.getFile().toPath(),
@@ -348,7 +365,7 @@ class ReactorReader implements MavenWorkspaceReader {
                 .resolve(artifactId
                         + "-" + version
                         + (classifier != null && !classifier.isEmpty() ? "-" + classifier : "")
-                        + (extension != null && !extension.isEmpty() ? "." + extension : ""));
+                        + "." + extension);
     }
 
     private Path getProjectLocalRepo() {
@@ -363,6 +380,7 @@ class ReactorReader implements MavenWorkspaceReader {
                 .getOrDefault(artifact.getBaseVersion(), null);
     }
 
+    // groupId -> (artifactId -> (version -> project)))
     private Map<String, Map<String, Map<String, MavenProject>>> getProjects() {
         // compute the projects mapping
         if (projects == null) {
@@ -380,6 +398,11 @@ class ReactorReader implements MavenWorkspaceReader {
         return projects;
     }
 
+    /**
+     * Singleton class used to receive events by implementing the EventSpy.
+     * We are only interested in project success events, in which case
+     * we call the {@link #installIntoProjectLocalRepository(MavenProject)} method.
+     */
     @Named
     @Singleton
     @SuppressWarnings("unused")
@@ -401,7 +424,7 @@ class ReactorReader implements MavenWorkspaceReader {
                 ExecutionEvent ee = (ExecutionEvent) event;
                 if (ee.getType() == ExecutionEvent.Type.ForkedProjectSucceeded
                         || ee.getType() == ExecutionEvent.Type.ProjectSucceeded) {
-                    container.lookup(ReactorReader.class).processProject(ee.getProject());
+                    container.lookup(ReactorReader.class).installIntoProjectLocalRepository(ee.getProject());
                 }
             }
         }
