@@ -233,7 +233,7 @@ class ReactorReader implements MavenWorkspaceReader {
                         Files.getLastModifiedTime(outputFile).toMillis();
                 if (outputFileLastModified > artifactLastModified) {
                     LOGGER.warn(
-                            "File '{}' is more recent than the packaged artifact for '{}', please run a full `mvn verify` build",
+                            "File '{}' is more recent than the packaged artifact for '{}', please run a full `mvn package` build",
                             relativizeOutputFile(outputFile),
                             project.getArtifactId());
                     return true;
