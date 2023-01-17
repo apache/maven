@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-7470">MNG-7470</a>:
- * check that Maven two bundled transports works as expected.
+ * check that Maven bundled transports work as expected.
  */
 public class MavenITmng7470ResolverTransportTest
         extends AbstractMavenIntegrationTestCase
@@ -105,14 +105,7 @@ public class MavenITmng7470ResolverTransportTest
     public void testResolverTransportDefault()
             throws Exception
     {
-        if ( matchesVersionRange( "[4.0.0-alpha-3,)" ) )
-        {
-            performTest( null, NATIVE_LOG_SNIPPET );
-        }
-        else // [3.9.0,) but not 4, see above and ctor
-        {
-            performTest( null, WAGON_LOG_SNIPPET );
-        }
+        performTest( null, NATIVE_LOG_SNIPPET );
     }
 
     @Test
