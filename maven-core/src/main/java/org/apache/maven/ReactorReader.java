@@ -324,6 +324,9 @@ class ReactorReader implements MavenWorkspaceReader {
      * @param project the project to copy artifacts
      */
     private void installIntoProjectLocalRepository(MavenProject project) {
+        if (!hasBeenPackagedDuringThisSession(project)) {
+            return;
+        }
         List<Artifact> artifacts = new ArrayList<>();
 
         artifacts.add(RepositoryUtils.toArtifact(new ProjectArtifact(project)));
