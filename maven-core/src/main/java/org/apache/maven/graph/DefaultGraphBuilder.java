@@ -351,10 +351,10 @@ public class DefaultGraphBuilder implements GraphBuilder {
         }
 
         // 2. Collect projects for all modules in the multi-module project.
-        List<MavenProject> projects = multiModuleCollectionStrategy.collectProjects(request);
-        if (!projects.isEmpty()) {
-            return projects;
-        }
+        // List<MavenProject> projects = multiModuleCollectionStrategy.collectProjects(request);
+        // if (!projects.isEmpty()) {
+        //     return projects;
+        // }
 
         // 3. Collect projects for explicitly requested POM.
         return requestPomCollectionStrategy.collectProjects(request);
