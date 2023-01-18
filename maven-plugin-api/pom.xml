@@ -60,8 +60,7 @@ under the License.
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
-          <!-- use shared root containing models and Velocity templates -->
-          <basedir>${basedir}/..</basedir>
+          <velocityBasedir>${project.basedir}/../src/mdo</velocityBasedir>
           <models>
             <model>src/main/mdo/lifecycle.mdo</model>
           </models>
@@ -76,9 +75,9 @@ under the License.
             <phase>generate-sources</phase>
             <configuration>
               <templates>
-                <template>src/main/mdo/generators/model.vm</template>
-                <template>src/main/mdo/generators/reader.vm</template>
-                <template>src/main/mdo/generators/writer.vm</template>
+                <template>model.vm</template>
+                <template>reader.vm</template>
+                <template>writer.vm</template>
               </templates>
               <params>
                 <param>packageModelV3=org.apache.maven.plugin.lifecycle</param>
@@ -94,7 +93,6 @@ under the License.
             </goals>
             <phase>pre-site</phase>
             <configuration>
-              <basedir>${basedir}</basedir>
               <models>
                 <model>src/main/mdo/plugin.mdo</model>
               </models>

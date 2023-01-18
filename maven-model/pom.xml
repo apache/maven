@@ -50,8 +50,8 @@ under the License.
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
-          <!-- use shared root containing models and Velocity templates -->
-          <basedir>${basedir}/..</basedir>
+          <basedir>${project.basedir}/../api/maven-api-model</basedir>
+          <velocityBasedir>${project.basedir}/../src/mdo</velocityBasedir>
           <version>4.0.0</version>
           <models>
             <model>src/main/mdo/maven.mdo</model>
@@ -81,7 +81,7 @@ under the License.
             <configuration>
               <version>4.1.0</version>
               <templates>
-                <template>src/main/mdo/generators/model-v3-modified.vm</template>
+                <template>model-v3-modified.vm</template>
               </templates>
             </configuration>
           </execution>
@@ -94,12 +94,12 @@ under the License.
             <configuration>
               <version>4.2.0</version>
               <templates>
-                <template>src/main/mdo/generators/merger.vm</template>
-                <template>src/main/mdo/generators/transformer.vm</template>
-                <template>src/main/mdo/generators/reader-modified.vm</template>
-                <template>src/main/mdo/generators/reader-ex.vm</template>
-                <template>src/main/mdo/generators/writer.vm</template>
-                <template>src/main/mdo/generators/writer-ex.vm</template>
+                <template>merger.vm</template>
+                <template>transformer.vm</template>
+                <template>reader-modified.vm</template>
+                <template>reader-ex.vm</template>
+                <template>writer.vm</template>
+                <template>writer-ex.vm</template>
               </templates>
             </configuration>
           </execution>

@@ -16,10 +16,10 @@
   specific language governing permissions and limitations
   under the License.
 *#
-#parse ( "src/main/mdo/generators/common.vm" )
+#parse ( "common.vm" )
 #
 #set ( $package = "${packageToolV4}" )
-#set ( $className = "${model.name}Xpp3WriterEx" )
+#set ( $className = "${model.name}Xpp3Writer" )
 #
 #set ( $root = $model.getClass( $model.getRoot($version), $version ) )
 #set ( $rootXml = $Helper.xmlClassMetadata( $root ) )
@@ -48,14 +48,10 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import org.apache.maven.api.annotations.Generated;
-import ${packageModelV4}.InputLocation;
-import ${packageModelV4}.InputLocationTracker;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.internal.xml.XmlNodeBuilder;
 #foreach ( $class in $model.allClasses )
-  #if ( $class.name != "InputLocation" )
 import ${packageModelV4}.${class.name};
-  #end
 #end
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
@@ -82,10 +78,6 @@ public class ${className}
      */
     private String fileComment = null;
 
-    /**
-     * Field stringFormatter.
-     */
-    protected InputLocation.StringFormatter stringFormatter;
 
       //-----------/
      //- Methods -/
@@ -100,16 +92,6 @@ public class ${className}
     {
         this.fileComment = fileComment;
     } //-- void setFileComment( String )
-
-    /**
-     * Method setStringFormatter.
-     *
-     * @param stringFormatter
-     */
-    public void setStringFormatter( InputLocation.StringFormatter stringFormatter )
-    {
-        this.stringFormatter = stringFormatter;
-    } //-- void setStringFormatter( InputLocation.StringFormatter )
 
     /**
      * Method write.
@@ -224,39 +206,36 @@ public class ${className}
       #set ( $def = ${field.defaultValue} )
       #if ( $field.type == "String" )
         #if ( ! $def )
-            writeTag( "$fieldTagName", null, ${classLcapName}.get${fieldCapName}(), serializer, ${classLcapName} );
+            writeTag( "$fieldTagName", null, ${classLcapName}.get${fieldCapName}(), serializer );
         #else
-            writeTag( "$fieldTagName", "${def}", ${classLcapName}.get${fieldCapName}(), serializer, ${classLcapName} );
+            writeTag( "$fieldTagName", "${def}", ${classLcapName}.get${fieldCapName}(), serializer );
         #end
       #elseif ( $field.type == "boolean" || $field.type == "Boolean" )
         #if ( ${def} == "true" )
-            writeTag( "$fieldTagName", "${def}", ${classLcapName}.is${fieldCapName}() ? null : "false", serializer, ${classLcapName} );
+            writeTag( "$fieldTagName", "${def}", ${classLcapName}.is${fieldCapName}() ? null : "false", serializer );
         #else
-            writeTag( "$fieldTagName", "${def}", ${classLcapName}.is${fieldCapName}() ? "true" : null, serializer, ${classLcapName} );
+            writeTag( "$fieldTagName", "${def}", ${classLcapName}.is${fieldCapName}() ? "true" : null, serializer );
         #end
       #elseif ( $field.type == "int" )
-            writeTag( "$fieldTagName", "${def}", Integer.toString( ${classLcapName}.get${fieldCapName}() ), serializer, ${classLcapName} );
+            writeTag( "$fieldTagName", "${def}", Integer.toString( ${classLcapName}.get${fieldCapName}() ), serializer );
       #elseif ( $field.type == "DOM" )
             writeDom( ${classLcapName}.get${fieldCapName}(), serializer );
       #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
         #set( $singularField = ${Helper.singular($fieldTagName)} )
-            writeList( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer, ${classLcapName},
-                    t -> writeTag( "$singularField", null, t, serializer, null ) );
+            writeList( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer, t -> writeTag( "$singularField", "${def}", t, serializer ) );
       #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
-            writeProperties( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer, ${classLcapName} );
+            writeProperties( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer );
       #elseif ( $field.to && $field.multiplicity == "1" )
             write${field.to}( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer );
       #elseif ( $field.to && $field.multiplicity == "*" )
         #set( $singularField = ${Helper.singular($fieldTagName)} )
-            writeList( "$fieldTagName", $Helper.isFlatItems($field), ${classLcapName}.get${fieldCapName}(), serializer, ${classLcapName},
-                    t -> write${field.to}( "$singularField", t, serializer ) );
+            writeList( "$fieldTagName", $Helper.isFlatItems($field), ${classLcapName}.get${fieldCapName}(), serializer, t -> write${field.to}( "$singularField", t, serializer ) );
       #else
             // TODO: name=${field.name} type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
       #end
     #end
   #end
             serializer.endTag( NAMESPACE, tagName );
-            writeLocationTracking( ${classLcapName}, "", serializer );
         }
     }
 
@@ -268,13 +247,13 @@ public class ${className}
         public void write( T t ) throws IOException;
     }
 
-    private <T> void writeList( String tagName, List<T> list, XmlSerializer serializer, InputLocationTracker locationTracker, ElementWriter<T> writer )
+    private <T> void writeList( String tagName, List<T> list, XmlSerializer serializer, ElementWriter<T> writer )
         throws IOException
     {
-        writeList( tagName, false, list, serializer, locationTracker, writer );
+        writeList( tagName, false, list, serializer, writer );
     }
 
-    private <T> void writeList( String tagName, boolean flat, List<T> list, XmlSerializer serializer, InputLocationTracker locationTracker, ElementWriter<T> writer )
+    private <T> void writeList( String tagName, boolean flat, List<T> list, XmlSerializer serializer, ElementWriter<T> writer )
         throws IOException
     {
         if ( list != null && !list.isEmpty() )
@@ -283,36 +262,28 @@ public class ${className}
             {
                 serializer.startTag( NAMESPACE, tagName );
             }
-            int index = 0;
-            InputLocation location = locationTracker != null ? locationTracker.getLocation( tagName ) : null;
             for ( T t : list )
             {
                 writer.write( t );
-                writeLocationTracking( location, Integer.valueOf( index++ ), serializer );
             }
             if ( !flat )
             {
                 serializer.endTag( NAMESPACE, tagName );
-                writeLocationTracking( locationTracker, tagName, serializer );
             }
         }
     }
 
-    private <T> void writeProperties( String tagName, Map<String, String> props, XmlSerializer serializer, InputLocationTracker locationTracker )
+    private <T> void writeProperties( String tagName, Map<String, String> props, XmlSerializer serializer )
             throws IOException
     {
         if ( props != null && !props.isEmpty() )
         {
             serializer.startTag( NAMESPACE, tagName );
-            InputLocation location = locationTracker != null ? locationTracker.getLocation( tagName ) : null;
             for ( Map.Entry<String, String> entry : props.entrySet() )
             {
-                String key = entry.getKey();
-                writeTag( key, null, entry.getValue(), serializer, null );
-                writeLocationTracking( location, key, serializer );
+                writeTag( entry.getKey(), null, entry.getValue(), serializer );
             }
             serializer.endTag( NAMESPACE, tagName );
-            writeLocationTracking( locationTracker, tagName, serializer );
         }
     }
 
@@ -339,13 +310,12 @@ public class ${className}
         }
     }
 
-    private void writeTag( String tagName, String defaultValue, String value, XmlSerializer serializer, InputLocationTracker locationTracker )
+    private void writeTag( String tagName, String defaultValue, String value, XmlSerializer serializer )
         throws IOException
     {
         if ( value != null && !Objects.equals( defaultValue, value ) )
         {
             serializer.startTag( NAMESPACE, tagName ).text( value ).endTag( NAMESPACE, tagName );
-            writeLocationTracking( locationTracker, tagName, serializer );
         }
     }
 
@@ -358,36 +328,4 @@ public class ${className}
         }
     }
 
-    /**
-     * Method writeLocationTracking.
-     *
-     * @param locationTracker
-     * @param serializer
-     * @param key
-     * @throws java.io.IOException
-     */
-    protected void writeLocationTracking( InputLocationTracker locationTracker, Object key, XmlSerializer serializer )
-        throws java.io.IOException
-    {
-        InputLocation location = ( locationTracker == null ) ? null : locationTracker.getLocation( key );
-        if ( location != null )
-        {
-            serializer.comment( toString( location ) );
-        }
-    } //-- void writeLocationTracking( InputLocationTracker, Object, XmlSerializer )
-
-    /**
-     * Method toString.
-     *
-     * @param location
-     * @return String
-     */
-    protected String toString( InputLocation location )
-    {
-        if ( stringFormatter != null )
-        {
-            return stringFormatter.toString( location );
-        }
-        return ' ' + location.getSource().toString() + ':' + location.getLineNumber() + ' ';
-    } //-- String toString( InputLocation )
 }

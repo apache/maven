@@ -16,10 +16,10 @@
   specific language governing permissions and limitations
   under the License.
 *#
-#parse ( "src/main/mdo/generators/common.vm" )
+#parse ( "common.vm" )
 #
 #set ( $package = "${packageToolV4}" )
-#set ( $className = "${model.name}Xpp3ReaderEx" )
+#set ( $className = "${model.name}Xpp3Reader" )
 #
 #set ( $root = $model.getClass( $model.getRoot($version), $version ) )
 #set ( $rootXml = $Helper.xmlClassMetadata( $root ) )
@@ -47,8 +47,6 @@ import java.util.Map;
 import java.util.Set;
 import org.apache.maven.api.annotations.Generated;
 import org.apache.maven.internal.xml.XmlNodeBuilder;
-import ${packageModelV4}.InputSource;
-import ${packageModelV4}.InputLocation;
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.name};
 #end
@@ -103,15 +101,33 @@ public class ${className}
      * @throws IOException IOException if any.
      * @throws XmlPullParserException XmlPullParserException if
      * any.
-     * @return ${root.name}
+     * @return  ${root.name}
      */
-    public ${root.name} read( Reader reader, boolean strict, InputSource source )
+    public  ${root.name} read( Reader reader, boolean strict )
         throws IOException, XmlPullParserException
     {
         XmlPullParser parser = addDefaultEntities ? new MXParser(EntityReplacementMap.defaultEntityReplacementMap) : new MXParser( );
+
         parser.setInput( reader );
-        return read( parser, strict, source );
-    } //-- ${root.name} read( Reader, boolean )
+
+
+        return read( parser, strict );
+    } //--  ${root.name} read( Reader, boolean )
+
+    /**
+     * @see ReaderFactory#newXmlReader
+     *
+     * @param reader a reader object.
+     * @throws IOException IOException if any.
+     * @throws XmlPullParserException XmlPullParserException if
+     * any.
+     * @return  ${root.name}
+     */
+    public  ${root.name} read( Reader reader )
+        throws IOException, XmlPullParserException
+    {
+        return read( reader, true );
+    } //--  ${root.name} read( Reader )
 
     /**
      * Method read.
@@ -121,13 +137,28 @@ public class ${className}
      * @throws IOException IOException if any.
      * @throws XmlPullParserException XmlPullParserException if
      * any.
-     * @return ${root.name}
+     * @return  ${root.name}
      */
-    public ${root.name} read( InputStream in, boolean strict, InputSource source )
+    public  ${root.name} read( InputStream in, boolean strict )
         throws IOException, XmlPullParserException
     {
-        return read( ReaderFactory.newXmlReader( in ), strict, source );
-    } //-- ${root.name} read( InputStream, boolean )
+        return read( ReaderFactory.newXmlReader( in ), strict );
+    } //--  ${root.name} read( InputStream, boolean )
+
+    /**
+     * Method read.
+     *
+     * @param in a in object.
+     * @throws IOException IOException if any.
+     * @throws XmlPullParserException XmlPullParserException if
+     * any.
+     * @return  ${root.name}
+     */
+    public  ${root.name} read( InputStream in )
+        throws IOException, XmlPullParserException
+    {
+        return read( ReaderFactory.newXmlReader( in ) );
+    } //--  ${root.name} read( InputStream )
 
     /**
      * Method read.
@@ -137,9 +168,9 @@ public class ${className}
      * @throws IOException IOException if any.
      * @throws XmlPullParserException XmlPullParserException if
      * any.
-     * @return ${root.name}
+     * @return  ${root.name}
      */
-    public ${root.name} read( XmlPullParser parser, boolean strict, InputSource source )
+    public  ${root.name} read( XmlPullParser parser, boolean strict )
         throws IOException, XmlPullParserException
     {
         $rootUcapName $rootLcapName = null;
@@ -158,7 +189,7 @@ public class ${className}
                     // fallback, already expected a XmlPullParserException due to invalid XML
                     throw new XmlPullParserException( "Duplicated tag: '${rootTag}'", parser, null );
                 }
-                $rootLcapName = parse${rootUcapName}( parser, strict, source );
+                $rootLcapName = parse${rootUcapName}( parser, strict );
                 parsed = true;
             }
             eventType = parser.next();
@@ -168,7 +199,7 @@ public class ${className}
             return $rootLcapName;
         }
         throw new XmlPullParserException( "Expected root element '${rootTag}' but found no element at all: invalid XML document", parser, null );
-    } //-- ${root.name} read( XmlPullParser, boolean )
+    } //--  ${root.name} read( XmlPullParser, boolean )
 
 #foreach ( $class in $model.allClasses )
  #if ( $class.name != "InputSource" && $class.name != "InputLocation" )
@@ -176,12 +207,11 @@ public class ${className}
   #set ( $classLcapName = $Helper.uncapitalise( $class.name ) )
   #set ( $ancestors = $Helper.ancestors( $class ) )
   #set ( $allFields = $Helper.xmlFields( $class ) )
-    private ${classUcapName} parse${classUcapName}( XmlPullParser parser, boolean strict, InputSource source )
+    private ${classUcapName} parse${classUcapName}( XmlPullParser parser, boolean strict )
         throws IOException, XmlPullParserException
     {
         String tagName = parser.getName();
         ${classUcapName}.Builder ${classLcapName} = ${classUcapName}.newBuilder( true );
-        ${classLcapName}.location( "", new InputLocation( parser.getLineNumber(), parser.getColumnNumber(), source ) );
         for ( int i = parser.getAttributeCount() - 1; i >= 0; i-- )
         {
             String name = parser.getAttributeName( i );
@@ -202,11 +232,10 @@ public class ${className}
       #set ( $fieldCapName = $Helper.capitalise( $field.name ) )
             else if ( "$fieldTagName".equals( name ) )
             {
-                ${classLcapName}.location( name, new InputLocation( parser.getLineNumber(), parser.getColumnNumber(), source ) );
       #if ( $field.type == "String" )
                 ${classLcapName}.${field.name}( interpolatedTrimmed( value, "$fieldTagName" ) );
       #elseif ( $field.type == "boolean" || $field.type == "Boolean" )
-                ${classLcapName}.${field.name}( getBooleanValue( interpolatedTrimmed( value, "$fieldTagName" ), "$fieldTagName", parser, strict, "${field.defaultValue}" ) );
+                ${classLcapName}.${field.name}( getBooleanValue( interpolatedTrimmed( value, "$fieldTagName" ), "$fieldTagName", parser, "${field.defaultValue}" ) );
       #else
                 // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
       #end
@@ -226,9 +255,6 @@ public class ${className}
             {
                 throw new XmlPullParserException( "Duplicated tag: '" + childName + "'", parser, null );
             }
-            int line = parser.getLineNumber();
-            int column = parser.getColumnNumber();
-            Map<Object, InputLocation> locations = null;
             switch ( childName )
             {
   #set( $ift = "if" )
@@ -255,12 +281,10 @@ public class ${className}
                     break;
       #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
                     List<String> ${field.name} = new ArrayList<>();
-                    locations = new HashMap<>();
                     while ( parser.nextTag() == XmlPullParser.START_TAG )
                     {
                         if ( "${Helper.singular($fieldTagName)}".equals( parser.getName() ) )
                         {
-                            locations.put( Integer.valueOf( locations.size() ), new InputLocation( parser.getLineNumber(), parser.getColumnNumber(), source ) );
                             ${field.name}.add( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ) );
                         }
                         else
@@ -272,18 +296,16 @@ public class ${className}
                     break;
       #elseif ( $field.type == "java.util.Properties" && $field.to == "String" && $field.multiplicity == "*" )
                     Map<String, String> ${field.name} = new LinkedHashMap<>();
-                    locations = new HashMap<>();
                     while ( parser.nextTag() == XmlPullParser.START_TAG )
                     {
                         String key = parser.getName();
                         String value = parser.nextText().trim();
-                        locations.put( key, new InputLocation( parser.getLineNumber(), parser.getColumnNumber(), source ) );
                         ${field.name}.put( key, value );
                     }
                     ${classLcapName}.${field.name}( ${field.name} );
                     break;
       #elseif ( $field.to && $field.multiplicity == "1" )
-                    ${classLcapName}.${field.name}( parse${field.toClass.name}( parser, strict, source ) );
+                    ${classLcapName}.${field.name}( parse${field.toClass.name}( parser, strict ) );
                     break;
       #elseif ( $field.to && $field.multiplicity == "*" )
                     List<$field.to> ${field.name} = new ArrayList<>();
@@ -291,7 +313,7 @@ public class ${className}
                     {
                         if ( "${Helper.singular($fieldTagName)}".equals( parser.getName() ) )
                         {
-                            ${field.name}.add( parse${field.toClass.name}( parser, strict, source ) );
+                            ${field.name}.add( parse${field.toClass.name}( parser, strict ) );
                         }
                         else
                         {
@@ -314,7 +336,6 @@ public class ${className}
                     break;
                 }
             }
-            ${classLcapName}.location( childName, new InputLocation( line, column, source, locations ) );
         }
   #if ( $class == $root )
         ${classLcapName}.modelEncoding( parser.getInputEncoding() );

@@ -52,13 +52,12 @@ under the License.
             </goals>
             <configuration>
               <version>4.2.0</version>
-              <!-- use shared root containing models and Velocity templates -->
-              <basedir>${basedir}/../..</basedir>
+              <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>
               <models>
                 <model>src/main/mdo/maven.mdo</model>
               </models>
               <templates>
-                <template>src/main/mdo/generators/model.vm</template>
+                <template>model.vm</template>
               </templates>
               <params>
                 <param>packageModelV4=org.apache.maven.api.model</param>
