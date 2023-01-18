@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -353,6 +355,31 @@ class ReactorReader implements MavenWorkspaceReader {
         }
     }
 
+    private void cleanProjectLocalRepository(MavenProject project) {
+        try {
+            Path artifactPath = getProjectLocalRepo()
+                    .resolve(project.getGroupId())
+                    .resolve(project.getArtifactId())
+                    .resolve(project.getVersion());
+            if (Files.isDirectory(artifactPath)) {
+                try (Stream<Path> paths = Files.list(artifactPath)) {
+                    for (Path path : (Iterable<Path>) paths::iterator) {
+                        Files.delete(path);
+                    }
+                }
+                try {
+                    Files.delete(artifactPath);
+                    Files.delete(artifactPath.getParent());
+                    Files.delete(artifactPath.getParent().getParent());
+                } catch (DirectoryNotEmptyException e) {
+                    // ignore
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error while cleaning project local repository", e);
+        }
+    }
+
     private Path getArtifactPath(Artifact artifact) {
         String groupId = artifact.getGroupId();
         String artifactId = artifact.getArtifactId();
@@ -362,6 +389,7 @@ class ReactorReader implements MavenWorkspaceReader {
         Path repo = getProjectLocalRepo();
         return repo.resolve(groupId)
                 .resolve(artifactId)
+                .resolve(version)
                 .resolve(artifactId
                         + "-" + version
                         + (classifier != null && !classifier.isEmpty() ? "-" + classifier : "")
@@ -400,8 +428,11 @@ class ReactorReader implements MavenWorkspaceReader {
 
     /**
      * Singleton class used to receive events by implementing the EventSpy.
-     * We are only interested in project success events, in which case
+     * We are interested in project success events, in which case
      * we call the {@link #installIntoProjectLocalRepository(MavenProject)} method.
+     * The mojo success event is also captured to determine if the project
+     * has been cleaned as the last operation, in which case, we avoid copying
+     * the artifacts.
      */
     @Named
     @Singleton
@@ -409,6 +440,7 @@ class ReactorReader implements MavenWorkspaceReader {
     static class ReactorReaderSpy implements EventSpy {
 
         final PlexusContainer container;
+        final Map<String, String> lastLifecycle = new ConcurrentHashMap<>();
 
         @Inject
         ReactorReaderSpy(PlexusContainer container) {
@@ -419,12 +451,29 @@ class ReactorReader implements MavenWorkspaceReader {
         public void init(Context context) throws Exception {}
 
         @Override
+        @SuppressWarnings("checkstyle:MissingSwitchDefault")
         public void onEvent(Object event) throws Exception {
             if (event instanceof ExecutionEvent) {
                 ExecutionEvent ee = (ExecutionEvent) event;
-                if (ee.getType() == ExecutionEvent.Type.ForkedProjectSucceeded
-                        || ee.getType() == ExecutionEvent.Type.ProjectSucceeded) {
-                    container.lookup(ReactorReader.class).installIntoProjectLocalRepository(ee.getProject());
+                MavenProject project = ee.getProject();
+                ExecutionEvent.Type eeType = ee.getType();
+                switch (ee.getType()) {
+                    case ProjectStarted:
+                    case ForkedProjectStarted:
+                        lastLifecycle.remove(project.getId());
+                        break;
+                    case MojoStarted:
+                        String phase = ee.getMojoExecution().getLifecyclePhase();
+                        lastLifecycle.put(project.getId(), phase);
+                        if ("clean".equals(phase)) {
+                            container.lookup(ReactorReader.class).cleanProjectLocalRepository(project);
+                        }
+                        break;
+                    case ProjectSucceeded:
+                    case ForkedProjectSucceeded:
+                        if (!"clean".equals(lastLifecycle.get(project.getId()))) {
+                            container.lookup(ReactorReader.class).installIntoProjectLocalRepository(project);
+                        }
                 }
             }
         }
