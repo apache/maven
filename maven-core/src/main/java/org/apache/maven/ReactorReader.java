@@ -318,10 +318,10 @@ class ReactorReader implements MavenWorkspaceReader {
     /**
      * Copy packaged and attached artifacts from this project to the
      * project local repository.
-     * This allow a subsequent build to resume while still being able
+     * This allows a subsequent build to resume while still being able
      * to locate attached artifacts.
      *
-     * @param project the project to copy artifacts
+     * @param project the project to copy artifacts from
      */
     private void installIntoProjectLocalRepository(MavenProject project) {
         if (!hasBeenPackagedDuringThisSession(project)) {
