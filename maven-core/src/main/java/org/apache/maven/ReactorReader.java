@@ -146,14 +146,6 @@ class ReactorReader implements MavenWorkspaceReader {
             if (packagedArtifactFile != null && packagedArtifactFile.exists()) {
                 return packagedArtifactFile;
             }
-
-            // Check whether an earlier Maven run might have produced an artifact that is still on disk.
-            packagedArtifactFile = determinePreviouslyPackagedArtifactFile(project, projectArtifact);
-            if (packagedArtifactFile != null
-                    && packagedArtifactFile.exists()
-                    && isPackagedArtifactUpToDate(project, packagedArtifactFile, artifact)) {
-                return packagedArtifactFile;
-            }
         }
 
         if (!hasBeenPackagedDuringThisSession(project)) {
@@ -194,14 +186,6 @@ class ReactorReader implements MavenWorkspaceReader {
         // The fall-through indicates that the artifact cannot be found;
         // for instance if package produced nothing or classifier problems.
         return null;
-    }
-
-    private File determinePreviouslyPackagedArtifactFile(MavenProject project, Artifact artifact) {
-        if (artifact == null) {
-            return null;
-        }
-        String fileName = String.format("%s.%s", project.getBuild().getFinalName(), artifact.getExtension());
-        return new File(project.getBuild().getDirectory(), fileName);
     }
 
     private boolean isPackagedArtifactUpToDate(MavenProject project, File packagedArtifactFile, Artifact artifact) {
