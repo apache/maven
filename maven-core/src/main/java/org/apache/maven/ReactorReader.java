@@ -74,6 +74,7 @@ class ReactorReader implements MavenWorkspaceReader {
     private final WorkspaceRepository repository;
     // groupId -> (artifactId -> (version -> project)))
     private Map<String, Map<String, Map<String, MavenProject>>> projects;
+    private Path projectLocalRepository;
 
     @Inject
     ReactorReader(MavenSession session) {
@@ -370,8 +371,17 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     private Path getProjectLocalRepo() {
-        Path root = session.getRequest().getMultiModuleProjectDirectory().toPath();
-        return root.resolve("target").resolve("project-local-repo");
+        if (projectLocalRepository == null) {
+            Path root = session.getRequest().getMultiModuleProjectDirectory().toPath();
+            projectLocalRepository = session.getProjects().stream()
+                    .filter(project -> root.equals(project.getBasedir().toPath()))
+                    .findFirst()
+                    .map(project -> project.getBuild().getDirectory())
+                    .map(Paths::get)
+                    .orElseGet(() -> root.resolve("target"))
+                    .resolve("project-local-repo");
+        }
+        return projectLocalRepository;
     }
 
     private MavenProject getProject(Artifact artifact) {
