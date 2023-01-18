@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -126,10 +125,12 @@ class ReactorReader implements MavenWorkspaceReader {
     //
 
     private File findArtifact(MavenProject project, Artifact artifact) {
+        // POMs are always returned from the file system
         if ("pom".equals(artifact.getExtension())) {
             return project.getFile();
         }
 
+        // First check in the project local repository
         File packagedArtifactFile = findInProjectLocalRepository(artifact);
         if (packagedArtifactFile != null
                 && packagedArtifactFile.exists()
@@ -137,18 +138,25 @@ class ReactorReader implements MavenWorkspaceReader {
             return packagedArtifactFile;
         }
 
+        // Get the matching artifact from the project
         Artifact projectArtifact = findMatchingArtifact(project, artifact);
-        packagedArtifactFile = determinePreviouslyPackagedArtifactFile(project, projectArtifact);
+        if (projectArtifact != null) {
+            // If the artifact has been associated to a file, use it
+            packagedArtifactFile = projectArtifact.getFile();
+            if (packagedArtifactFile != null && packagedArtifactFile.exists()) {
+                return packagedArtifactFile;
+            }
 
-        if (hasArtifactFileFromPackagePhase(projectArtifact)) {
-            return projectArtifact.getFile();
+            // Check whether an earlier Maven run might have produced an artifact that is still on disk.
+            packagedArtifactFile = determinePreviouslyPackagedArtifactFile(project, projectArtifact);
+            if (packagedArtifactFile != null
+                    && packagedArtifactFile.exists()
+                    && isPackagedArtifactUpToDate(project, packagedArtifactFile, artifact)) {
+                return packagedArtifactFile;
+            }
         }
-        // Check whether an earlier Maven run might have produced an artifact that is still on disk.
-        else if (packagedArtifactFile != null
-                && packagedArtifactFile.exists()
-                && isPackagedArtifactUpToDate(project, packagedArtifactFile, artifact)) {
-            return packagedArtifactFile;
-        } else if (!hasBeenPackagedDuringThisSession(project)) {
+
+        if (!hasBeenPackagedDuringThisSession(project)) {
             // fallback to loose class files only if artifacts haven't been packaged yet
             // and only for plain old jars. Not war files, not ear files, not anything else.
             return determineBuildOutputDirectoryForArtifact(project, artifact);
@@ -194,12 +202,6 @@ class ReactorReader implements MavenWorkspaceReader {
         }
         String fileName = String.format("%s.%s", project.getBuild().getFinalName(), artifact.getExtension());
         return new File(project.getBuild().getDirectory(), fileName);
-    }
-
-    private boolean hasArtifactFileFromPackagePhase(Artifact projectArtifact) {
-        return projectArtifact != null
-                && projectArtifact.getFile() != null
-                && projectArtifact.getFile().exists();
     }
 
     private boolean isPackagedArtifactUpToDate(MavenProject project, File packagedArtifactFile, Artifact artifact) {
@@ -270,31 +272,11 @@ class ReactorReader implements MavenWorkspaceReader {
      */
     private Artifact findMatchingArtifact(MavenProject project, Artifact requestedArtifact) {
         String requestedRepositoryConflictId = ArtifactIdUtils.toVersionlessId(requestedArtifact);
-
-        Artifact mainArtifact = RepositoryUtils.toArtifact(project.getArtifact());
-        if (requestedRepositoryConflictId.equals(ArtifactIdUtils.toVersionlessId(mainArtifact))) {
-            return mainArtifact;
-        }
-
-        return RepositoryUtils.toArtifacts(project.getAttachedArtifacts()).stream()
-                .filter(isRequestedArtifact(requestedArtifact))
+        return getProjectArtifacts(project)
+                .filter(artifact ->
+                        Objects.equals(requestedRepositoryConflictId, ArtifactIdUtils.toVersionlessId(artifact)))
                 .findFirst()
                 .orElse(null);
-    }
-
-    /**
-     * We are taking as much as we can from the DefaultArtifact.equals(). The requested artifact has no file, so we want
-     * to remove that from the comparison.
-     *
-     * @param requestArtifact checked against the given artifact.
-     * @return true if equals, false otherwise.
-     */
-    private Predicate<Artifact> isRequestedArtifact(Artifact requestArtifact) {
-        return s -> s.getArtifactId().equals(requestArtifact.getArtifactId())
-                && s.getGroupId().equals(requestArtifact.getGroupId())
-                && s.getVersion().equals(requestArtifact.getVersion())
-                && s.getExtension().equals(requestArtifact.getExtension())
-                && s.getClassifier().equals(requestArtifact.getClassifier());
     }
 
     /**
