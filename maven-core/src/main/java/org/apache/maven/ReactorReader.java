@@ -29,7 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -326,33 +325,7 @@ class ReactorReader implements MavenWorkspaceReader {
         if (!hasBeenPackagedDuringThisSession(project)) {
             return;
         }
-        List<Artifact> artifacts = new ArrayList<>();
-
-        artifacts.add(RepositoryUtils.toArtifact(new ProjectArtifact(project)));
-        if (!"pom".equals(project.getPackaging())) {
-            org.apache.maven.artifact.Artifact mavenMainArtifact = project.getArtifact();
-            artifacts.add(RepositoryUtils.toArtifact(mavenMainArtifact));
-        }
-        for (org.apache.maven.artifact.Artifact attached : project.getAttachedArtifacts()) {
-            artifacts.add(RepositoryUtils.toArtifact(attached));
-        }
-
-        for (Artifact artifact : artifacts) {
-            if (artifact.getFile() != null && artifact.getFile().isFile()) {
-                Path target = getArtifactPath(artifact);
-                try {
-                    LOGGER.info("Copying {} to project local repository", artifact);
-                    Files.createDirectories(target.getParent());
-                    Files.copy(
-                            artifact.getFile().toPath(),
-                            target,
-                            StandardCopyOption.REPLACE_EXISTING,
-                            StandardCopyOption.COPY_ATTRIBUTES);
-                } catch (IOException e) {
-                    LOGGER.warn("Error while copying artifact to project local repository", e);
-                }
-            }
-        }
+        getProjectArtifacts(project).filter(this::isRegularFile).forEach(this::installIntoProjectLocalRepository);
     }
 
     private void cleanProjectLocalRepository(MavenProject project) {
@@ -377,6 +350,40 @@ class ReactorReader implements MavenWorkspaceReader {
             }
         } catch (IOException e) {
             LOGGER.error("Error while cleaning project local repository", e);
+        }
+    }
+
+    /**
+     * Retrieve a stream of the project's artifacts
+     */
+    private Stream<Artifact> getProjectArtifacts(MavenProject project) {
+        Stream<org.apache.maven.artifact.Artifact> artifacts = Stream.concat(
+                Stream.concat(
+                        // pom artifact
+                        Stream.of(new ProjectArtifact(project)),
+                        // main project artifact if not a pom
+                        "pom".equals(project.getPackaging()) ? Stream.empty() : Stream.of(project.getArtifact())),
+                // attached artifacts
+                project.getAttachedArtifacts().stream());
+        return artifacts.map(RepositoryUtils::toArtifact);
+    }
+
+    private boolean isRegularFile(Artifact artifact) {
+        return artifact.getFile() != null && artifact.getFile().isFile();
+    }
+
+    private void installIntoProjectLocalRepository(Artifact artifact) {
+        Path target = getArtifactPath(artifact);
+        try {
+            LOGGER.info("Copying {} to project local repository", artifact);
+            Files.createDirectories(target.getParent());
+            Files.copy(
+                    artifact.getFile().toPath(),
+                    target,
+                    StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.COPY_ATTRIBUTES);
+        } catch (IOException e) {
+            LOGGER.error("Error while copying artifact to project local repository", e);
         }
     }
 
