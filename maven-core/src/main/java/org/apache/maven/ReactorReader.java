@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -94,9 +93,9 @@ class ReactorReader implements MavenWorkspaceReader {
         MavenProject project = getProject(artifact);
 
         if (project != null) {
-            File file = find(project, artifact);
+            File file = findArtifact(project, artifact);
             if (file == null && project != project.getExecutionProject()) {
-                file = find(project.getExecutionProject(), artifact);
+                file = findArtifact(project.getExecutionProject(), artifact);
             }
             return file;
         }
@@ -110,7 +109,7 @@ class ReactorReader implements MavenWorkspaceReader {
                 .getOrDefault(artifact.getArtifactId(), Collections.emptyMap())
                 .values()
                 .stream()
-                .filter(p -> Objects.nonNull(find(p, artifact)))
+                .filter(p -> Objects.nonNull(findArtifact(p, artifact)))
                 .map(MavenProject::getVersion)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
@@ -125,12 +124,12 @@ class ReactorReader implements MavenWorkspaceReader {
     // Implementation
     //
 
-    private File find(MavenProject project, Artifact artifact) {
+    private File findArtifact(MavenProject project, Artifact artifact) {
         if ("pom".equals(artifact.getExtension())) {
             return project.getFile();
         }
 
-        File packagedArtifactFile = find(artifact);
+        File packagedArtifactFile = findInProjectLocalRepository(artifact);
         if (packagedArtifactFile != null
                 && packagedArtifactFile.exists()
                 && isPackagedArtifactUpToDate(project, packagedArtifactFile, artifact)) {
@@ -221,10 +220,7 @@ class ReactorReader implements MavenWorkspaceReader {
                 }
             }
 
-            Iterator<Path> iterator = outputFiles.iterator();
-            while (iterator.hasNext()) {
-                Path outputFile = iterator.next();
-
+            for (Path outputFile : (Iterable<Path>) outputFiles::iterator) {
                 if (Files.isDirectory(outputFile)) {
                     continue;
                 }
@@ -233,7 +229,8 @@ class ReactorReader implements MavenWorkspaceReader {
                         Files.getLastModifiedTime(outputFile).toMillis();
                 if (outputFileLastModified > artifactLastModified) {
                     LOGGER.warn(
-                            "File '{}' is more recent than the packaged artifact for '{}', please run a full `mvn package` build",
+                            "File '{}' is more recent than the packaged artifact for '{}', "
+                                    + "please run a full `mvn package` build",
                             relativizeOutputFile(outputFile),
                             project.getArtifactId());
                     return true;
@@ -310,7 +307,7 @@ class ReactorReader implements MavenWorkspaceReader {
                 || ("jar".equals(artifact.getExtension()) && "tests".equals(artifact.getClassifier()));
     }
 
-    private File find(Artifact artifact) {
+    private File findInProjectLocalRepository(Artifact artifact) {
         Path target = getArtifactPath(artifact);
         return Files.isRegularFile(target) ? target.toFile() : null;
     }
