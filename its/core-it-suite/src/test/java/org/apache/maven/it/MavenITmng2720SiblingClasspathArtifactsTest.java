@@ -57,6 +57,7 @@ public class MavenITmng2720SiblingClasspathArtifactsTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "child2/target" );
         verifier.deleteDirectory( "child3/target" );
         verifier.addCliArgument( "initialize" );
