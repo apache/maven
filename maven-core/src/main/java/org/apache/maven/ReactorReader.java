@@ -29,9 +29,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +67,8 @@ import org.slf4j.LoggerFactory;
 class ReactorReader implements MavenWorkspaceReader {
     public static final String HINT = "reactor";
 
+    public static final String PROJECT_LOCAL_REPO = "project-local-repo";
+
     private static final Collection<String> COMPILE_PHASE_TYPES =
             Arrays.asList("jar", "ejb-client", "war", "rar", "ejb3", "par", "sar", "wsr", "har", "app-client");
 
@@ -75,6 +79,8 @@ class ReactorReader implements MavenWorkspaceReader {
     // groupId -> (artifactId -> (version -> project)))
     private Map<String, Map<String, Map<String, MavenProject>>> projects;
     private Path projectLocalRepository;
+    // projectId -> Deque<lifecycle>
+    private final Map<String, Deque<String>> lifecycles = new ConcurrentHashMap<>();
 
     @Inject
     ReactorReader(MavenSession session) {
@@ -99,6 +105,12 @@ class ReactorReader implements MavenWorkspaceReader {
                 file = findArtifact(project.getExecutionProject(), artifact);
             }
             return file;
+        }
+
+        // No project, but most certainly a dependency which has been built previously
+        File packagedArtifactFile = findInProjectLocalRepository(artifact);
+        if (packagedArtifactFile != null && packagedArtifactFile.exists()) {
+            return packagedArtifactFile;
         }
 
         return null;
@@ -135,7 +147,7 @@ class ReactorReader implements MavenWorkspaceReader {
         File packagedArtifactFile = findInProjectLocalRepository(artifact);
         if (packagedArtifactFile != null
                 && packagedArtifactFile.exists()
-                && isPackagedArtifactUpToDate(project, packagedArtifactFile, artifact)) {
+                && isPackagedArtifactUpToDate(project, packagedArtifactFile)) {
             return packagedArtifactFile;
         }
 
@@ -189,7 +201,7 @@ class ReactorReader implements MavenWorkspaceReader {
         return null;
     }
 
-    private boolean isPackagedArtifactUpToDate(MavenProject project, File packagedArtifactFile, Artifact artifact) {
+    private boolean isPackagedArtifactUpToDate(MavenProject project, File packagedArtifactFile) {
         Path outputDirectory = Paths.get(project.getBuild().getOutputDirectory());
         if (!outputDirectory.toFile().exists()) {
             return true;
@@ -237,9 +249,22 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     private boolean hasBeenPackagedDuringThisSession(MavenProject project) {
-        return project.hasLifecyclePhase("package")
-                || project.hasLifecyclePhase("install")
-                || project.hasLifecyclePhase("deploy");
+        boolean packaged = false;
+        for (String phase : getLifecycles(project)) {
+            switch (phase) {
+                case "clean":
+                    packaged = false;
+                    break;
+                case "package":
+                case "install":
+                case "deploy":
+                    packaged = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return packaged;
     }
 
     private Path relativizeOutputFile(final Path outputFile) {
@@ -281,6 +306,40 @@ class ReactorReader implements MavenWorkspaceReader {
     }
 
     /**
+     * We are interested in project success events, in which case we call
+     * the {@link #installIntoProjectLocalRepository(MavenProject)} method.
+     * The mojo started event is also captured to determine the lifecycle
+     * phases the project has been through.
+     *
+     * @param event the execution event
+     */
+    private void processEvent(ExecutionEvent event) {
+        MavenProject project = event.getProject();
+        switch (event.getType()) {
+            case MojoStarted:
+                String phase = event.getMojoExecution().getLifecyclePhase();
+                Deque<String> phases = getLifecycles(project);
+                if (!Objects.equals(phase, phases.peekLast())) {
+                    phases.addLast(phase);
+                    if ("clean".equals(phase)) {
+                        cleanProjectLocalRepository(project);
+                    }
+                }
+                break;
+            case ProjectSucceeded:
+            case ForkedProjectSucceeded:
+                installIntoProjectLocalRepository(project);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private Deque<String> getLifecycles(MavenProject project) {
+        return lifecycles.computeIfAbsent(project.getId(), k -> new ArrayDeque<>());
+    }
+
+    /**
      * Copy packaged and attached artifacts from this project to the
      * project local repository.
      * This allows a subsequent build to resume while still being able
@@ -289,10 +348,11 @@ class ReactorReader implements MavenWorkspaceReader {
      * @param project the project to copy artifacts from
      */
     private void installIntoProjectLocalRepository(MavenProject project) {
-        if (!hasBeenPackagedDuringThisSession(project)) {
-            return;
+        if ("pom".equals(project.getPackaging())
+                        && !"clean".equals(getLifecycles(project).peekLast())
+                || hasBeenPackagedDuringThisSession(project)) {
+            getProjectArtifacts(project).filter(this::isRegularFile).forEach(this::installIntoProjectLocalRepository);
         }
-        getProjectArtifacts(project).filter(this::isRegularFile).forEach(this::installIntoProjectLocalRepository);
     }
 
     private void cleanProjectLocalRepository(MavenProject project) {
@@ -373,13 +433,18 @@ class ReactorReader implements MavenWorkspaceReader {
     private Path getProjectLocalRepo() {
         if (projectLocalRepository == null) {
             Path root = session.getRequest().getMultiModuleProjectDirectory().toPath();
-            projectLocalRepository = session.getProjects().stream()
-                    .filter(project -> root.equals(project.getBasedir().toPath()))
-                    .findFirst()
-                    .map(project -> project.getBuild().getDirectory())
-                    .map(Paths::get)
-                    .orElseGet(() -> root.resolve("target"))
-                    .resolve("project-local-repo");
+            List<MavenProject> projects = session.getProjects();
+            if (projects != null) {
+                projectLocalRepository = projects.stream()
+                        .filter(project -> Objects.equals(root.toFile(), project.getBasedir()))
+                        .findFirst()
+                        .map(project -> project.getBuild().getDirectory())
+                        .map(Paths::get)
+                        .orElseGet(() -> root.resolve("target"))
+                        .resolve(PROJECT_LOCAL_REPO);
+            } else {
+                return root.resolve("target").resolve(PROJECT_LOCAL_REPO);
+            }
         }
         return projectLocalRepository;
     }
@@ -411,11 +476,7 @@ class ReactorReader implements MavenWorkspaceReader {
 
     /**
      * Singleton class used to receive events by implementing the EventSpy.
-     * We are interested in project success events, in which case
-     * we call the {@link #installIntoProjectLocalRepository(MavenProject)} method.
-     * The mojo success event is also captured to determine if the project
-     * has been cleaned as the last operation, in which case, we avoid copying
-     * the artifacts.
+     * It simply forwards all {@code ExecutionEvent}s to the {@code ReactorReader}.
      */
     @Named
     @Singleton
@@ -423,7 +484,6 @@ class ReactorReader implements MavenWorkspaceReader {
     static class ReactorReaderSpy implements EventSpy {
 
         final PlexusContainer container;
-        final Map<String, String> lastLifecycle = new ConcurrentHashMap<>();
 
         @Inject
         ReactorReaderSpy(PlexusContainer container) {
@@ -437,27 +497,8 @@ class ReactorReader implements MavenWorkspaceReader {
         @SuppressWarnings("checkstyle:MissingSwitchDefault")
         public void onEvent(Object event) throws Exception {
             if (event instanceof ExecutionEvent) {
-                ExecutionEvent ee = (ExecutionEvent) event;
-                MavenProject project = ee.getProject();
-                ExecutionEvent.Type eeType = ee.getType();
-                switch (ee.getType()) {
-                    case ProjectStarted:
-                    case ForkedProjectStarted:
-                        lastLifecycle.remove(project.getId());
-                        break;
-                    case MojoStarted:
-                        String phase = ee.getMojoExecution().getLifecyclePhase();
-                        lastLifecycle.put(project.getId(), phase);
-                        if ("clean".equals(phase)) {
-                            container.lookup(ReactorReader.class).cleanProjectLocalRepository(project);
-                        }
-                        break;
-                    case ProjectSucceeded:
-                    case ForkedProjectSucceeded:
-                        if (!"clean".equals(lastLifecycle.get(project.getId()))) {
-                            container.lookup(ReactorReader.class).installIntoProjectLocalRepository(project);
-                        }
-                }
+                ReactorReader reactorReader = container.lookup(ReactorReader.class);
+                reactorReader.processEvent((ExecutionEvent) event);
             }
         }
 
