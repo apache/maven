@@ -525,7 +525,7 @@ under the License.
         <plugin>
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
-          <version>2.1.1-SNAPSHOT</version>
+          <version>2.1.1</version>
           <executions>
             <execution>
               <id>modello-site-docs</id>
