@@ -17,10 +17,11 @@
   under the License.
 *#
 #
+#if ( "${isMavenModel}" == "true" )
 ##
 ## The following loop code is required in order to change the type of the
 ## pomFile attribute to a java.nio.file.Path.  Modello does not support this
-## type and loading a model with such a type would fail the modello validation.
+## type and loading a model with such a type would fail the Modello validation.
 ##
 #foreach ( $field in $model.getClass("Model", $version).allFields )
   #if ( $field.name == "pomFile" )
@@ -28,4 +29,5 @@
   #end
 #end
 #set ( $locationTracking = true )
+#end
 #

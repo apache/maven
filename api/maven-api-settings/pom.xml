@@ -42,27 +42,6 @@ under the License.
   <build>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.2.0</version>
-        <executions>
-          <execution>
-            <id>attach-mdo</id>
-            <goals>
-              <goal>attach-artifact</goal>
-            </goals>
-            <configuration>
-              <artifacts>
-                <artifact>
-                  <file>src/main/mdo/settings.mdo</file>
-                  <type>mdo</type>
-                </artifact>
-              </artifacts>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
         <executions>
@@ -73,11 +52,12 @@ under the License.
             </goals>
             <configuration>
               <version>2.0.0</version>
+              <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>
               <models>
                 <model>src/main/mdo/settings.mdo</model>
               </models>
               <templates>
-                <template>src/main/mdo/model.vm</template>
+                <template>model.vm</template>
               </templates>
               <params>
                 <param>packageModelV4=org.apache.maven.api.settings</param>
