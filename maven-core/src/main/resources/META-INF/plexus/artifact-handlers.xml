@@ -189,6 +189,20 @@ Artifact handlers are required by the dependency resolution mechanism.
         <addedToClasspath>false</addedToClasspath>
       </configuration>
     </component>
-
+    
+    <!--
+     | eclipse-plugin
+     |-->
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>eclipse-plugin</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>eclipse-plugin</type>
+        <extension>jar</extension>
+        <language>java</language>
+        <addedToClasspath>true</addedToClasspath>
+      </configuration>
+    </component>
   </components>
 </component-set>
