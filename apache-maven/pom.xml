@@ -160,10 +160,7 @@ under the License.
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <systemPropertyVariables>
-            <property>
-              <name>basedir</name>
-              <value>${basedir}</value>
-            </property>
+            <basedir>${basedir}</basedir>
           </systemPropertyVariables>
         </configuration>
         <executions>
