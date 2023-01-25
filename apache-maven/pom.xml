@@ -168,12 +168,9 @@ under the License.
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <systemProperties>
-            <property>
-              <name>basedir</name>
-              <value>${basedir}</value>
-            </property>
-          </systemProperties>
+          <systemPropertyVariables>
+            <basedir>${basedir}</basedir>
+          </systemPropertyVariables>
         </configuration>
         <executions>
           <execution>
