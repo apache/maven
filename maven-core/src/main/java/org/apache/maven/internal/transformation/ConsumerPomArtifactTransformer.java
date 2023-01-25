@@ -59,7 +59,7 @@ import org.eclipse.aether.installation.InstallRequest;
 @Named("consumer-pom")
 public final class ConsumerPomArtifactTransformer {
 
-    private static final String CONSUMER_POM_CLASSIFIER = "maven-consumer-pom";
+    private static final String CONSUMER_POM_CLASSIFIER = "consumer";
 
     public void injectTransformedArtifacts(MavenProject project, RepositorySystemSession session) throws IOException {
         if (isActive(session)) {
