@@ -37,6 +37,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -63,7 +64,8 @@ public class LifecycleModuleBuilderTest {
         MavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
         mavenExecutionRequest.setExecutionListener(new AbstractExecutionListener());
         mavenExecutionRequest.setGoals(Arrays.asList("clean"));
-        final MavenSession session = new MavenSession(null, null, mavenExecutionRequest, defaultMavenExecutionResult);
+        final MavenSession session = new MavenSession(
+                null, new DefaultRepositorySystemSession(), mavenExecutionRequest, defaultMavenExecutionResult);
         final ProjectDependencyGraphStub dependencyGraphStub = new ProjectDependencyGraphStub();
         session.setProjectDependencyGraph(dependencyGraphStub);
         session.setProjects(dependencyGraphStub.getSortedProjects());

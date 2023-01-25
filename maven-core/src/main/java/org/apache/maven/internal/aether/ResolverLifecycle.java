@@ -35,11 +35,11 @@ import static java.util.Objects.requireNonNull;
  */
 @Named
 @EagerSingleton
-public final class ResolverLifecycle {
+final class ResolverLifecycle {
     private final Provider<RepositorySystem> repositorySystemProvider;
 
     @Inject
-    public ResolverLifecycle(Provider<RepositorySystem> repositorySystemProvider) {
+    ResolverLifecycle(Provider<RepositorySystem> repositorySystemProvider) {
         this.repositorySystemProvider = requireNonNull(repositorySystemProvider);
     }
 

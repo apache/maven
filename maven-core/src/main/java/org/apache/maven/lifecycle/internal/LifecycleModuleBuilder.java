@@ -30,6 +30,7 @@ import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
+import org.apache.maven.internal.transformation.ConsumerPomArtifactTransformer;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
@@ -55,6 +56,7 @@ public class LifecycleModuleBuilder {
     private final BuilderCommon builderCommon;
     private final ExecutionEventCatapult eventCatapult;
     private final ProjectExecutionListener projectExecutionListener;
+    private final ConsumerPomArtifactTransformer consumerPomArtifactTransformer;
     private final SessionScope sessionScope;
 
     @Inject
@@ -63,11 +65,13 @@ public class LifecycleModuleBuilder {
             BuilderCommon builderCommon,
             ExecutionEventCatapult eventCatapult,
             List<ProjectExecutionListener> listeners,
+            ConsumerPomArtifactTransformer consumerPomArtifactTransformer,
             SessionScope sessionScope) {
         this.mojoExecutor = mojoExecutor;
         this.builderCommon = builderCommon;
         this.eventCatapult = eventCatapult;
         this.projectExecutionListener = new CompoundProjectExecutionListener(listeners);
+        this.consumerPomArtifactTransformer = consumerPomArtifactTransformer;
         this.sessionScope = sessionScope;
     }
 
@@ -92,6 +96,8 @@ public class LifecycleModuleBuilder {
                 eventCatapult.fire(ExecutionEvent.Type.ProjectSkipped, session, null);
                 return;
             }
+
+            consumerPomArtifactTransformer.injectTransformedArtifacts(currentProject, session.getRepositorySession());
 
             BuilderCommon.attachToThread(currentProject);
 
