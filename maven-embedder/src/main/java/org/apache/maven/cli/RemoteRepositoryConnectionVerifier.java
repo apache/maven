@@ -67,7 +67,7 @@ public class RemoteRepositoryConnectionVerifier {
             artifactPath = artifactRepository.getLayout().pathOf(RepositoryUtils.toArtifact(APACHE_MAVEN_ARTIFACT));
         } else {
             // We cannot be sure about any artifact that lives here.
-            artifactPath = "/";
+            artifactPath = "";
         }
 
         try {
@@ -100,27 +100,31 @@ public class RemoteRepositoryConnectionVerifier {
 
     private Optional<String> classifyException(final RemoteRepository remoteRepository, final Exception e) {
         final String message = e.getMessage();
+        final String repositoryId = remoteRepository.getId();
         final String repositoryUrl = remoteRepository.getUrl();
+        final String repository = String.format("%s [%s]", repositoryId, repositoryUrl);
 
-        final boolean resourceMissing = StringUtils.contains(message, "resource missing");
+        final boolean notFound = StringUtils.contains(message, "status code: 404");
+        final boolean unauthorized = StringUtils.contains(message, "status code: 401");
+        final boolean forbidden = StringUtils.contains(message, "status code: 403");
 
-        if (isCentralOrMirrorOfCentral(remoteRepository) && resourceMissing) {
+        if (isCentralOrMirrorOfCentral(remoteRepository) && notFound) {
             final String issue = String.format(
                     "Connection to %s possible, but expected artifact %s cannot be resolved",
-                    repositoryUrl, APACHE_MAVEN_ARTIFACT);
+                    repository, APACHE_MAVEN_ARTIFACT);
             return Optional.of(issue);
 
-        } else if (resourceMissing) {
+        } else if (notFound) {
             // We tried to resolve the artifact from a repository that does not necessarily host it.
-            logger.warn("Connection to {} possible, but artifact {} not found", repositoryUrl, APACHE_MAVEN_ARTIFACT);
+            logger.warn("Connection to {} possible, but artifact {} not found", repository, APACHE_MAVEN_ARTIFACT);
             return Optional.empty();
 
-        } else if (StringUtils.contains(message, "authentication failed")) {
-            final String issue = String.format("Connection to %s possible, but authentication failed", repositoryUrl);
+        } else if (unauthorized || forbidden) {
+            final String issue = String.format("Connection to %s possible, but access denied", repository);
             return Optional.of(issue);
         }
 
-        logger.error("Error connecting to repository {} [{}]", remoteRepository.getId(), repositoryUrl, e);
+        logger.error("Error connecting to repository {}", repository, e);
         return Optional.of("Unknown issue: " + e.getMessage());
     }
 }
