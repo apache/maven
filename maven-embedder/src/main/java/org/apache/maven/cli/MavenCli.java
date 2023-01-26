@@ -1241,6 +1241,8 @@ public class MavenCli {
         performProjectActivation(commandLine, request.getProjectActivation());
         performProfileActivation(commandLine, request.getProfileActivation());
 
+        // TODO: With --status we download to a newly created temp directory to ensure the artifact is not available,
+        // TODO: but we then validate that temp directory and not the actual artifact directory
         final String localRepositoryPath = determineLocalRepositoryPath(cliRequest);
         if (localRepositoryPath != null) {
             request.setLocalRepositoryPath(localRepositoryPath);
