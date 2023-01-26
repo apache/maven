@@ -114,7 +114,7 @@ public class CLIManager {
 
     public static final String COLOR = "color";
 
-    public static final String INSTALLATION_STATUS =  "status";
+    public static final String INSTALLATION_STATUS = "status";
 
     /** This option is deprecated and may be repurposed as Java debug in a future version.
      * Use {@code -X/--verbose} instead. */

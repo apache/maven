@@ -405,25 +405,20 @@ public class MavenCli {
         }
     }
 
-    private void status( CliRequest cliRequest )
-            throws Exception
-    {
+    private void status(CliRequest cliRequest) throws Exception {
         slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
-        if ( cliRequest.commandLine.hasOption( CLIManager.INSTALLATION_STATUS ) )
-        {
-            MavenStatusCommand mavenStatusCommand = new MavenStatusCommand( plexusContainer );
-            final List<String> mavenStatusIssues = mavenStatusCommand.verify( cliRequest );
-            if ( !mavenStatusIssues.isEmpty() )
-            {
-                for ( String issue : mavenStatusIssues )
-                {
-                    slf4jLogger.error( issue );
+        if (cliRequest.commandLine.hasOption(CLIManager.INSTALLATION_STATUS)) {
+            MavenStatusCommand mavenStatusCommand = new MavenStatusCommand(plexusContainer);
+            final List<String> mavenStatusIssues = mavenStatusCommand.verify(cliRequest);
+            if (!mavenStatusIssues.isEmpty()) {
+                for (String issue : mavenStatusIssues) {
+                    slf4jLogger.error(issue);
                 }
-                throw new ExitException( 1 );
+                throw new ExitException(1);
             }
 
-            slf4jLogger.info( "No installation issues found." );
-            throw new ExitException( 0 );
+            slf4jLogger.info("No installation issues found.");
+            throw new ExitException(0);
         }
     }
 
@@ -675,14 +670,14 @@ public class MavenCli {
 
         dispatcher = (DefaultSecDispatcher) container.lookup(SecDispatcher.class, "maven");
 
-        defaultRepositorySystemSessionFactory = container.lookup( DefaultRepositorySystemSessionFactory.class );
-        defaultSessionFactory = container.lookup( DefaultSessionFactory.class );
-        mavenRepositorySystem = container.lookup( MavenRepositorySystem.class );
-//
-//        private DefaultSessionFactory defaultSessionFactory;
-//
-//        private MavenRepositorySystem mavenRepositorySystem;
-//        private DefaultRepositorySystemSessionFactory defaultRepositorySystemSessionFactory;
+        defaultRepositorySystemSessionFactory = container.lookup(DefaultRepositorySystemSessionFactory.class);
+        defaultSessionFactory = container.lookup(DefaultSessionFactory.class);
+        mavenRepositorySystem = container.lookup(MavenRepositorySystem.class);
+        //
+        //        private DefaultSessionFactory defaultSessionFactory;
+        //
+        //        private MavenRepositorySystem mavenRepositorySystem;
+        //        private DefaultRepositorySystemSessionFactory defaultRepositorySystemSessionFactory;
 
         plexusContainer = container;
 
@@ -896,7 +891,8 @@ public class MavenCli {
     }
 
     private int execute(CliRequest cliRequest) throws MavenExecutionRequestPopulationException {
-        MavenExecutionRequest request = executionRequestPopulator.populateDefaults(cliRequest.request); // Populate request
+        MavenExecutionRequest request =
+                executionRequestPopulator.populateDefaults(cliRequest.request); // Populate request
 
         if (cliRequest.request.getRepositoryCache() == null) {
             cliRequest.request.setRepositoryCache(new DefaultRepositoryCache());
@@ -1278,24 +1274,17 @@ public class MavenCli {
 
     private String determineLocalRepositoryPath(final CliRequest cliRequest) {
         final MavenExecutionRequest request = cliRequest.getRequest();
-        if ( cliRequest.commandLine.hasOption( CLIManager.INSTALLATION_STATUS ) )
-        {
-            try
-            {
-                return Files.createTempDirectory( "mvn-status" ).toAbsolutePath().toString();
+        if (cliRequest.commandLine.hasOption(CLIManager.INSTALLATION_STATUS)) {
+            try {
+                return Files.createTempDirectory("mvn-status").toAbsolutePath().toString();
+            } catch (IOException ioe) {
+                final Logger logger = slf4jLoggerFactory.getLogger(getClass().getName());
+                logger.debug("Could not create temporary local repository", ioe);
+                logger.warn("Artifact resolution test is less accurate as it may user earlier resolution results.");
             }
-            catch ( IOException ioe )
-            {
-                final Logger logger = slf4jLoggerFactory.getLogger( getClass().getName() );
-                logger.debug( "Could not create temporary local repository", ioe );
-                logger.warn( "Artifact resolution test is less accurate as it may user earlier resolution results." );
-            }
-        }
-        else
-        {
-            String userDefinedLocalRepo = request.getUserProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
-            if ( userDefinedLocalRepo != null )
-            {
+        } else {
+            String userDefinedLocalRepo = request.getUserProperties().getProperty(MavenCli.LOCAL_REPO_PROPERTY);
+            if (userDefinedLocalRepo != null) {
                 return userDefinedLocalRepo;
             }
         }
