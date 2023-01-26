@@ -38,6 +38,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
+import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.internal.impl.DefaultArtifactCoordinate;
@@ -84,7 +85,7 @@ public class MavenStatusCommand {
         sessionScope = container.lookup(SessionScope.class);
     }
 
-    public List<String> verify(CliRequest cliRequest) throws Exception {
+    public List<String> verify(CliRequest cliRequest) throws MavenExecutionRequestPopulationException {
         // Populate the cliRequest with defaults and user settings
         final MavenExecutionRequest mavenExecutionRequest =
                 mavenExecutionRequestPopulator.populateDefaults(cliRequest.request);
