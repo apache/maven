@@ -61,7 +61,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     {
         // Compile the whole project first.
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliArgument( "compile" );
+        verifier.addCliArgument( "package" );
         verifier.execute();
 
         final File submoduleDirectory = new File( testDir, "app" );
@@ -82,7 +82,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     {
         // Compile the whole project first.
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.addCliArgument( "compile" );
+        verifier.addCliArgument( "package" );
         verifier.execute();
 
         verifier = newVerifier( testDir.getAbsolutePath() );
