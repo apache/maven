@@ -21,6 +21,7 @@ package org.apache.maven.lifecycle.internal;
 
 import java.io.File;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -96,7 +97,9 @@ public class LifecycleDependencyResolver
     {
         if ( aggregator )
         {
-            return session.getProjects();
+            List<MavenProject> projects = new ArrayList<>();
+            addProjectAndSubModules( projects, project );
+            return projects;
         }
         else
         {
@@ -104,11 +107,22 @@ public class LifecycleDependencyResolver
         }
     }
 
+    private static void addProjectAndSubModules( List<MavenProject> projects, MavenProject project )
+    {
+        projects.add( project );
+        for ( MavenProject submodule : project.getCollectedProjects() )
+        {
+            addProjectAndSubModules( projects, submodule );
+        }
+    }
+
+
     public void resolveProjectDependencies( MavenProject project, Collection<String> scopesToCollect,
                                             Collection<String> scopesToResolve, MavenSession session,
                                             boolean aggregating, Set<Artifact> projectArtifacts )
         throws LifecycleExecutionException
     {
+
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         try
         {
