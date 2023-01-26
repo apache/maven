@@ -242,6 +242,13 @@ public class DefaultMaven implements Maven {
             return addExceptionToResult(result, e);
         }
 
+        try {
+            WorkspaceReader reactorReader = container.lookup(WorkspaceReader.class, ReactorReader.HINT);
+            repoSession.setWorkspaceReader(reactorReader);
+        } catch (ComponentLookupException e) {
+            return addExceptionToResult(result, e);
+        }
+
         eventCatapult.fire(ExecutionEvent.Type.ProjectDiscoveryStarted, session, null);
 
         Result<? extends ProjectDependencyGraph> graphResult = buildGraph(session);
@@ -332,12 +339,13 @@ public class DefaultMaven implements Maven {
     private void setupWorkspaceReader(MavenSession session, DefaultRepositorySystemSession repoSession)
             throws ComponentLookupException {
         // Desired order of precedence for workspace readers before querying the local artifact repositories
-        List<WorkspaceReader> workspaceReaders = new ArrayList<WorkspaceReader>();
+        List<WorkspaceReader> workspaceReaders = new ArrayList<>();
         // 1) Reactor workspace reader
-        workspaceReaders.add(container.lookup(WorkspaceReader.class, ReactorReader.HINT));
+        WorkspaceReader reactorReader = container.lookup(WorkspaceReader.class, ReactorReader.HINT);
+        workspaceReaders.add(reactorReader);
         // 2) Repository system session-scoped workspace reader
         WorkspaceReader repoWorkspaceReader = repoSession.getWorkspaceReader();
-        if (repoWorkspaceReader != null) {
+        if (repoWorkspaceReader != null && repoWorkspaceReader != reactorReader) {
             workspaceReaders.add(repoWorkspaceReader);
         }
         // 3) .. n) Project-scoped workspace readers
