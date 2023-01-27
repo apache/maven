@@ -263,6 +263,20 @@ public class ${class.name}
 
       #end
     #end
+    #if ( $locationTracking )
+    public InputLocation getLocation( Object key )
+    {
+        ${packageModelV4}.InputLocation loc = getDelegate().getLocation( key );
+        return loc != null ? new InputLocation( loc ) : null;
+    }
+
+    public void setLocation( Object key, InputLocation location )
+    {
+        update( ${packageModelV4}.${class.name}.newBuilder( getDelegate(), true )
+                        .location( key, location.toApiLocation() ).build() );
+    }
+
+    #end
     protected boolean replace( Object oldDelegate, Object newDelegate )
     {
         if ( super.replace( oldDelegate, newDelegate ) )

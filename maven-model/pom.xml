@@ -81,7 +81,7 @@ under the License.
             <configuration>
               <version>4.1.0</version>
               <templates>
-                <template>model-v3-modified.vm</template>
+                <template>model-v3.vm</template>
               </templates>
             </configuration>
           </execution>
