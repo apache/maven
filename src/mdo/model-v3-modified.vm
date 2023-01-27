@@ -130,7 +130,6 @@ public class ${class.name}
         return ( ${packageModelV4}.${class.name} ) super.getDelegate();
     }
 
-    #if ( ! $eq.empty )
     @Override
     public boolean equals( Object o )
     {
@@ -152,7 +151,6 @@ public class ${class.name}
         return getDelegate().hashCode();
     }
 
-    #end
     #if ( $class == $root )
     public String getModelEncoding()
     {

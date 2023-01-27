@@ -2527,6 +2527,13 @@
         return groupId + ":" + artifactId;
     }
 
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.2.0+</version>
+          <code>
+            <![CDATA[
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
@@ -3240,7 +3247,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0+</version>
+          <version>4.2.0+</version>
           <code>
             <![CDATA[
     /**

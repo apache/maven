@@ -43,6 +43,7 @@
     #set ( $dummy = $imports.add( "java.util.HashMap" ) )
     #set ( $dummy = $imports.add( "java.util.List" ) )
     #set ( $dummy = $imports.add( "java.util.Map" ) )
+    #set ( $dummy = $imports.add( "java.util.Objects" ) )
     #set ( $dummy = $imports.add( "java.util.stream.Collectors" ) )
     #set ( $dummy = $imports.add( "java.util.stream.Stream" ) )
     #set ( $dummy = $imports.add( "org.apache.maven.api.annotations.Generated" ) )
@@ -134,7 +135,6 @@ public class ${class.name}
     #end
     }
 
-    #if ( ! $eq.empty )
     @Override
     public boolean equals( Object o )
     {
@@ -156,7 +156,6 @@ public class ${class.name}
         return getDelegate().hashCode();
     }
 
-    #end
     #if ( $class == $root )
     public String getModelEncoding()
     {
