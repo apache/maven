@@ -1,5 +1,3 @@
-package org.apache.maven.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.building;
 
 import java.util.Collections;
 
@@ -26,20 +25,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
-public class ProblemCollectorFactoryTest
-{
+public class ProblemCollectorFactoryTest {
 
     @Test
-    public void testNewInstance()
-    {
-        ProblemCollector collector1 = ProblemCollectorFactory.newInstance( null );
+    public void testNewInstance() {
+        ProblemCollector collector1 = ProblemCollectorFactory.newInstance(null);
 
-        Problem problem = new DefaultProblem( "MESSAGE1", null, null, -1, -1, null );
-        ProblemCollector collector2 = ProblemCollectorFactory.newInstance( Collections.singletonList( problem ) );
+        Problem problem = new DefaultProblem("MESSAGE1", null, null, -1, -1, null);
+        ProblemCollector collector2 = ProblemCollectorFactory.newInstance(Collections.singletonList(problem));
 
-        assertNotSame( collector1, collector2 );
-        assertEquals( 0, collector1.getProblems().size() );
-        assertEquals( 1, collector2.getProblems().size() );
+        assertNotSame(collector1, collector2);
+        assertEquals(0, collector1.getProblems().size());
+        assertEquals(1, collector2.getProblems().size());
     }
-
 }

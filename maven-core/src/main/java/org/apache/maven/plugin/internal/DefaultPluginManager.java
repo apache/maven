@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,13 @@ package org.apache.maven.plugin.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.util.Map;
+package org.apache.maven.plugin.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.Map;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
@@ -66,9 +65,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  */
 @Named
 @Singleton
-public class DefaultPluginManager
-    implements PluginManager
-{
+public class DefaultPluginManager implements PluginManager {
 
     private final PlexusContainer container;
     private final MavenPluginManager pluginManager;
@@ -82,8 +79,7 @@ public class DefaultPluginManager
             MavenPluginManager pluginManager,
             PluginVersionResolver pluginVersionResolver,
             PluginPrefixResolver pluginPrefixResolver,
-            LegacySupport legacySupport )
-    {
+            LegacySupport legacySupport) {
         this.container = container;
         this.pluginManager = pluginManager;
         this.pluginVersionResolver = pluginVersionResolver;
@@ -91,176 +87,137 @@ public class DefaultPluginManager
         this.legacySupport = legacySupport;
     }
 
-    public void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
-        throws MojoExecutionException, ArtifactResolutionException, MojoFailureException, ArtifactNotFoundException,
-        InvalidDependencyVersionException, PluginManagerException, PluginConfigurationException
-    {
+    public void executeMojo(MavenProject project, MojoExecution execution, MavenSession session)
+            throws MojoExecutionException, ArtifactResolutionException, MojoFailureException, ArtifactNotFoundException,
+                    InvalidDependencyVersionException, PluginManagerException, PluginConfigurationException {
         throw new UnsupportedOperationException();
     }
 
-    public Object getPluginComponent( Plugin plugin, String role, String roleHint )
-        throws PluginManagerException, ComponentLookupException
-    {
+    public Object getPluginComponent(Plugin plugin, String role, String roleHint)
+            throws PluginManagerException, ComponentLookupException {
         MavenSession session = legacySupport.getSession();
 
         PluginDescriptor pluginDescriptor;
-        try
-        {
-            pluginDescriptor =
-                pluginManager.getPluginDescriptor( plugin, session.getCurrentProject().getRemotePluginRepositories(),
-                                                   session.getRepositorySession() );
+        try {
+            pluginDescriptor = pluginManager.getPluginDescriptor(
+                    plugin, session.getCurrentProject().getRemotePluginRepositories(), session.getRepositorySession());
 
-            pluginManager.setupPluginRealm( pluginDescriptor, session, null, null, null );
-        }
-        catch ( Exception e )
-        {
-            throw new PluginManagerException( plugin, e.getMessage(), e );
+            pluginManager.setupPluginRealm(pluginDescriptor, session, null, null, null);
+        } catch (Exception e) {
+            throw new PluginManagerException(plugin, e.getMessage(), e);
         }
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        try
-        {
-            Thread.currentThread().setContextClassLoader( pluginDescriptor.getClassRealm() );
+        try {
+            Thread.currentThread().setContextClassLoader(pluginDescriptor.getClassRealm());
 
-            return container.lookup( role, roleHint );
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader( oldClassLoader );
+            return container.lookup(role, roleHint);
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
     }
 
-    public Map<String, Object> getPluginComponents( Plugin plugin, String role )
-        throws ComponentLookupException, PluginManagerException
-    {
+    public Map<String, Object> getPluginComponents(Plugin plugin, String role)
+            throws ComponentLookupException, PluginManagerException {
         MavenSession session = legacySupport.getSession();
 
         PluginDescriptor pluginDescriptor;
-        try
-        {
-            pluginDescriptor =
-                pluginManager.getPluginDescriptor( plugin, session.getCurrentProject().getRemotePluginRepositories(),
-                                                   session.getRepositorySession() );
+        try {
+            pluginDescriptor = pluginManager.getPluginDescriptor(
+                    plugin, session.getCurrentProject().getRemotePluginRepositories(), session.getRepositorySession());
 
-            pluginManager.setupPluginRealm( pluginDescriptor, session, null, null, null );
-        }
-        catch ( Exception e )
-        {
-            throw new PluginManagerException( plugin, e.getMessage(), e );
+            pluginManager.setupPluginRealm(pluginDescriptor, session, null, null, null);
+        } catch (Exception e) {
+            throw new PluginManagerException(plugin, e.getMessage(), e);
         }
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        try
-        {
-            Thread.currentThread().setContextClassLoader( pluginDescriptor.getClassRealm() );
+        try {
+            Thread.currentThread().setContextClassLoader(pluginDescriptor.getClassRealm());
 
-            return container.lookupMap( role );
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader( oldClassLoader );
+            return container.lookupMap(role);
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldClassLoader);
         }
     }
 
-    public Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project )
-    {
-        PluginPrefixRequest request = new DefaultPluginPrefixRequest( prefix, session );
-        request.setPom( project.getModel() );
+    public Plugin getPluginDefinitionForPrefix(String prefix, MavenSession session, MavenProject project) {
+        PluginPrefixRequest request = new DefaultPluginPrefixRequest(prefix, session);
+        request.setPom(project.getModel());
 
-        try
-        {
-            PluginPrefixResult result = pluginPrefixResolver.resolve( request );
+        try {
+            PluginPrefixResult result = pluginPrefixResolver.resolve(request);
 
             Plugin plugin = new Plugin();
-            plugin.setGroupId( result.getGroupId() );
-            plugin.setArtifactId( result.getArtifactId() );
+            plugin.setGroupId(result.getGroupId());
+            plugin.setArtifactId(result.getArtifactId());
 
             return plugin;
-        }
-        catch ( NoPluginFoundForPrefixException e )
-        {
+        } catch (NoPluginFoundForPrefixException e) {
             return null;
         }
     }
 
-    public PluginDescriptor getPluginDescriptorForPrefix( String prefix )
-    {
+    public PluginDescriptor getPluginDescriptorForPrefix(String prefix) {
         MavenSession session = legacySupport.getSession();
 
-        PluginPrefixRequest request = new DefaultPluginPrefixRequest( prefix, session );
+        PluginPrefixRequest request = new DefaultPluginPrefixRequest(prefix, session);
 
-        try
-        {
-            PluginPrefixResult result = pluginPrefixResolver.resolve( request );
+        try {
+            PluginPrefixResult result = pluginPrefixResolver.resolve(request);
 
             Plugin plugin = new Plugin();
-            plugin.setGroupId( result.getGroupId() );
-            plugin.setArtifactId( result.getArtifactId() );
+            plugin.setGroupId(result.getGroupId());
+            plugin.setArtifactId(result.getArtifactId());
 
-            return loadPluginDescriptor( plugin, session.getCurrentProject(), session );
-        }
-        catch ( Exception e )
-        {
+            return loadPluginDescriptor(plugin, session.getCurrentProject(), session);
+        } catch (Exception e) {
             return null;
         }
     }
 
-    public PluginDescriptor loadPluginDescriptor( Plugin plugin, MavenProject project, MavenSession session )
-        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
-        PluginVersionNotFoundException
-    {
-        return verifyPlugin( plugin, project, session.getSettings(), session.getLocalRepository() );
+    public PluginDescriptor loadPluginDescriptor(Plugin plugin, MavenProject project, MavenSession session)
+            throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
+                    InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException,
+                    PluginNotFoundException, PluginVersionNotFoundException {
+        return verifyPlugin(plugin, project, session.getSettings(), session.getLocalRepository());
     }
 
-    public PluginDescriptor loadPluginFully( Plugin plugin, MavenProject project, MavenSession session )
-        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
-        PluginVersionNotFoundException
-    {
-        PluginDescriptor pluginDescriptor = loadPluginDescriptor( plugin, project, session );
+    public PluginDescriptor loadPluginFully(Plugin plugin, MavenProject project, MavenSession session)
+            throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
+                    InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException,
+                    PluginNotFoundException, PluginVersionNotFoundException {
+        PluginDescriptor pluginDescriptor = loadPluginDescriptor(plugin, project, session);
 
-        try
-        {
-            pluginManager.setupPluginRealm( pluginDescriptor, session, null, null, null );
-        }
-        catch ( PluginResolutionException e )
-        {
-            throw new PluginManagerException( plugin, e.getMessage(), e );
+        try {
+            pluginManager.setupPluginRealm(pluginDescriptor, session, null, null, null);
+        } catch (PluginResolutionException e) {
+            throw new PluginManagerException(plugin, e.getMessage(), e);
         }
 
         return pluginDescriptor;
     }
 
-    public PluginDescriptor verifyPlugin( Plugin plugin, MavenProject project, Settings settings,
-                                          ArtifactRepository localRepository )
-        throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
-        InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
-        PluginVersionNotFoundException
-    {
+    public PluginDescriptor verifyPlugin(
+            Plugin plugin, MavenProject project, Settings settings, ArtifactRepository localRepository)
+            throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
+                    InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException,
+                    PluginNotFoundException, PluginVersionNotFoundException {
         MavenSession session = legacySupport.getSession();
 
-        if ( plugin.getVersion() == null )
-        {
-            PluginVersionRequest versionRequest =
-                new DefaultPluginVersionRequest( plugin, session.getRepositorySession(),
-                                                 project.getRemotePluginRepositories() );
-            plugin.setVersion( pluginVersionResolver.resolve( versionRequest ).getVersion() );
+        if (plugin.getVersion() == null) {
+            PluginVersionRequest versionRequest = new DefaultPluginVersionRequest(
+                    plugin, session.getRepositorySession(), project.getRemotePluginRepositories());
+            plugin.setVersion(pluginVersionResolver.resolve(versionRequest).getVersion());
         }
 
-        try
-        {
-            return pluginManager.getPluginDescriptor( plugin, project.getRemotePluginRepositories(),
-                                                      session.getRepositorySession() );
-        }
-        catch ( PluginResolutionException e )
-        {
-            throw new PluginNotFoundException( plugin, project.getPluginArtifactRepositories() );
-        }
-        catch ( PluginDescriptorParsingException | InvalidPluginDescriptorException e )
-        {
-            throw new PluginManagerException( plugin, e.getMessage(), e );
+        try {
+            return pluginManager.getPluginDescriptor(
+                    plugin, project.getRemotePluginRepositories(), session.getRepositorySession());
+        } catch (PluginResolutionException e) {
+            throw new PluginNotFoundException(plugin, project.getPluginArtifactRepositories());
+        } catch (PluginDescriptorParsingException | InvalidPluginDescriptorException e) {
+            throw new PluginManagerException(plugin, e.getMessage(), e);
         }
     }
-
 }

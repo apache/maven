@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
@@ -25,9 +24,7 @@ import org.eclipse.aether.graph.DependencyFilter;
 /**
  * @author Benjamin Bentmann
  */
-public class DefaultDependencyResolutionRequest
-    implements DependencyResolutionRequest
-{
+public class DefaultDependencyResolutionRequest implements DependencyResolutionRequest {
 
     private MavenProject project;
 
@@ -35,48 +32,39 @@ public class DefaultDependencyResolutionRequest
 
     private RepositorySystemSession session;
 
-    public DefaultDependencyResolutionRequest()
-    {
+    public DefaultDependencyResolutionRequest() {
         // enables default constructor
     }
 
-    public DefaultDependencyResolutionRequest( MavenProject project, RepositorySystemSession session )
-    {
-        setMavenProject( project );
-        setRepositorySession( session );
+    public DefaultDependencyResolutionRequest(MavenProject project, RepositorySystemSession session) {
+        setMavenProject(project);
+        setRepositorySession(session);
     }
 
-    public DependencyFilter getResolutionFilter()
-    {
+    public DependencyFilter getResolutionFilter() {
         return filter;
     }
 
-    public MavenProject getMavenProject()
-    {
+    public MavenProject getMavenProject() {
         return project;
     }
 
-    public RepositorySystemSession getRepositorySession()
-    {
+    public RepositorySystemSession getRepositorySession() {
         return session;
     }
 
-    public DependencyResolutionRequest setResolutionFilter( DependencyFilter filter )
-    {
+    public DependencyResolutionRequest setResolutionFilter(DependencyFilter filter) {
         this.filter = filter;
         return this;
     }
 
-    public DependencyResolutionRequest setMavenProject( MavenProject project )
-    {
+    public DependencyResolutionRequest setMavenProject(MavenProject project) {
         this.project = project;
         return this;
     }
 
-    public DependencyResolutionRequest setRepositorySession( RepositorySystemSession repositorySession )
-    {
+    public DependencyResolutionRequest setRepositorySession(RepositorySystemSession repositorySession) {
         this.session = repositorySession;
         return this;
     }
-
 }

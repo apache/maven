@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,85 +17,64 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>maven-api</artifactId>
-        <groupId>org.apache.maven</groupId>
-        <version>4.0.0-alpha-3-SNAPSHOT</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven</groupId>
+    <artifactId>maven-api</artifactId>
+    <version>4.0.0-alpha-4-SNAPSHOT</version>
+  </parent>
 
-    <artifactId>maven-api-toolchain</artifactId>
+  <artifactId>maven-api-toolchain</artifactId>
 
-    <name>Maven API Toolchain</name>
-    <description>Maven API Toolchain model.</description>
+  <name>Maven 4 API :: Toolchain</name>
+  <description>Maven 4 API - Immutable Toolchain model.</description>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-api-xml</artifactId>
-            <version>4.0.0-alpha-3-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-xml</artifactId>
+      <version>4.0.0-alpha-4-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>attach-mdo</id>
-                        <goals>
-                            <goal>attach-artifact</goal>
-                        </goals>
-                        <configuration>
-                            <artifacts>
-                                <artifact>
-                                    <file>src/main/mdo/toolchains.mdo</file>
-                                    <type>mdo</type>
-                                </artifact>
-                            </artifacts>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven</groupId>
-                <artifactId>modello-plugin-velocity</artifactId>
-                <configuration>
-                    <version>1.1.0</version>
-                    <models>
-                        <model>src/main/mdo/toolchains.mdo</model>
-                    </models>
-                    <templates>
-                        <template>src/main/mdo/model.vm</template>
-                    </templates>
-                    <params>
-                        <param>packageModelV4=org.apache.maven.api.toolchain</param>
-                    </params>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>modello</id>
-                        <goals>
-                            <goal>velocity</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>**/package-info.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>velocity</id>
+            <goals>
+              <goal>velocity</goal>
+            </goals>
+            <configuration>
+              <version>1.1.0</version>
+              <velocityBasedir>${project.basedir}/../../src/mdo</velocityBasedir>
+              <models>
+                <model>src/main/mdo/toolchains.mdo</model>
+              </models>
+              <templates>
+                <template>model.vm</template>
+              </templates>
+              <params>
+                <param>packageModelV4=org.apache.maven.api.toolchain</param>
+              </params>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/package-info.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

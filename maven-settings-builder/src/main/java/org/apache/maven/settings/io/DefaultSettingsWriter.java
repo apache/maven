@@ -1,5 +1,3 @@
-package org.apache.maven.settings.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,10 @@ package org.apache.maven.settings.io;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.io;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,9 +28,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
 import java.util.Objects;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.settings.v4.SettingsXpp3Writer;
@@ -41,53 +40,41 @@ import org.codehaus.plexus.util.WriterFactory;
  */
 @Named
 @Singleton
-public class DefaultSettingsWriter
-    implements SettingsWriter
-{
+public class DefaultSettingsWriter implements SettingsWriter {
 
     @Override
-    public void write( File output, Map<String, Object> options, Settings settings )
-        throws IOException
-    {
-        Objects.requireNonNull( output, "output cannot be null" );
-        Objects.requireNonNull( settings, "settings cannot be null" );
+    public void write(File output, Map<String, Object> options, Settings settings) throws IOException {
+        Objects.requireNonNull(output, "output cannot be null");
+        Objects.requireNonNull(settings, "settings cannot be null");
 
         output.getParentFile().mkdirs();
 
-        write( WriterFactory.newXmlWriter( output ), options, settings );
+        write(WriterFactory.newXmlWriter(output), options, settings);
     }
 
     @Override
-    public void write( Writer output, Map<String, Object> options, Settings settings )
-        throws IOException
-    {
-        Objects.requireNonNull( output, "output cannot be null" );
-        Objects.requireNonNull( settings, "settings cannot be null" );
+    public void write(Writer output, Map<String, Object> options, Settings settings) throws IOException {
+        Objects.requireNonNull(output, "output cannot be null");
+        Objects.requireNonNull(settings, "settings cannot be null");
 
-        try ( Writer out = output )
-        {
-            new SettingsXpp3Writer().write( out, settings );
+        try (Writer out = output) {
+            new SettingsXpp3Writer().write(out, settings);
         }
     }
 
     @Override
-    public void write( OutputStream output, Map<String, Object> options, Settings settings )
-        throws IOException
-    {
-        Objects.requireNonNull( output, "output cannot be null" );
-        Objects.requireNonNull( settings, "settings cannot be null" );
+    public void write(OutputStream output, Map<String, Object> options, Settings settings) throws IOException {
+        Objects.requireNonNull(output, "output cannot be null");
+        Objects.requireNonNull(settings, "settings cannot be null");
 
         String encoding = settings.getModelEncoding();
         // TODO Use StringUtils here
-        if ( encoding == null || encoding.length() <= 0 )
-        {
+        if (encoding == null || encoding.length() <= 0) {
             encoding = "UTF-8";
         }
 
-        try ( Writer out = new OutputStreamWriter( output, encoding ) )
-        {
-            write( out, options, settings );
+        try (Writer out = new OutputStreamWriter(output, encoding)) {
+            write(out, options, settings);
         }
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.session.scope.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.session.scope.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.session.scope.internal;
 
 import java.util.Collection;
 import java.util.List;
@@ -33,109 +32,87 @@ import com.google.inject.Scope;
 /**
  * SessionScope
  */
-public class SessionScope
-    implements Scope
-{
+public class SessionScope implements Scope {
 
-    private static final Provider<Object> SEEDED_KEY_PROVIDER = () ->
-    {
+    private static final Provider<Object> SEEDED_KEY_PROVIDER = () -> {
         throw new IllegalStateException();
     };
 
     /**
      * ScopeState
      */
-    protected static final class ScopeState
-    {
+    protected static final class ScopeState {
         private final Map<Key<?>, CachingProvider<?>> provided = new ConcurrentHashMap<>();
 
-        public <T> void seed( Class<T> clazz, Provider<T> value )
-        {
-            provided.put( Key.get( clazz ), new CachingProvider<>( value ) );
+        public <T> void seed(Class<T> clazz, Provider<T> value) {
+            provided.put(Key.get(clazz), new CachingProvider<>(value));
         }
 
-        @SuppressWarnings( "unchecked" )
-        public <T> Provider<T> scope( Key<T> key, Provider<T> unscoped )
-        {
-            Provider<?> provider = provided.computeIfAbsent( key, k -> new CachingProvider<>( unscoped ) );
-            return ( Provider<T> ) provider;
+        @SuppressWarnings("unchecked")
+        public <T> Provider<T> scope(Key<T> key, Provider<T> unscoped) {
+            Provider<?> provider = provided.computeIfAbsent(key, k -> new CachingProvider<>(unscoped));
+            return (Provider<T>) provider;
         }
 
-        public Collection<CachingProvider<?>> providers()
-        {
+        public Collection<CachingProvider<?>> providers() {
             return provided.values();
         }
     }
 
     private final List<ScopeState> values = new CopyOnWriteArrayList<>();
 
-    public void enter()
-    {
-        values.add( 0, new ScopeState() );
+    public void enter() {
+        values.add(0, new ScopeState());
     }
 
-    protected ScopeState getScopeState()
-    {
-        if ( values.isEmpty() )
-        {
-            throw new OutOfScopeException( "Cannot access session scope outside of a scoping block" );
+    protected ScopeState getScopeState() {
+        if (values.isEmpty()) {
+            throw new OutOfScopeException("Cannot access session scope outside of a scoping block");
         }
-        return values.get( 0 );
+        return values.get(0);
     }
 
-    public void exit()
-    {
-        if ( values.isEmpty() )
-        {
+    public void exit() {
+        if (values.isEmpty()) {
             throw new IllegalStateException();
         }
-        values.remove( 0 );
+        values.remove(0);
     }
 
-    public <T> void seed( Class<T> clazz, Provider<T> value )
-    {
-        getScopeState().seed( clazz, value );
+    public <T> void seed(Class<T> clazz, Provider<T> value) {
+        getScopeState().seed(clazz, value);
     }
 
-    public <T> void seed( Class<T> clazz, final T value )
-    {
-        seed( clazz, ( Provider<T> ) () -> value );
+    public <T> void seed(Class<T> clazz, final T value) {
+        seed(clazz, (Provider<T>) () -> value);
     }
 
-    public <T> Provider<T> scope( final Key<T> key, final Provider<T> unscoped )
-    {
+    public <T> Provider<T> scope(final Key<T> key, final Provider<T> unscoped) {
         // Lazy evaluating provider
-        return () -> getScopeState().scope( key, unscoped ).get();
+        return () -> getScopeState().scope(key, unscoped).get();
     }
 
     /**
      * A provider wrapping an existing provider with a cache
      * @param <T> the provided type
      */
-    protected static class CachingProvider<T> implements Provider<T>
-    {
+    protected static class CachingProvider<T> implements Provider<T> {
         private final Provider<T> provider;
         private volatile T value;
 
-        CachingProvider( Provider<T> provider )
-        {
+        CachingProvider(Provider<T> provider) {
             this.provider = provider;
         }
 
-        public T value()
-        {
+        public T value() {
             return value;
         }
 
         @Override
-        public T get()
-        {
-            if ( value == null )
-            {
-                synchronized ( this )
-                {
-                    if ( value == null )
-                    {
+        public T get() {
+            if (value == null) {
+                synchronized (this) {
+                    if (value == null) {
                         value = provider.get();
                     }
                 }
@@ -144,9 +121,8 @@ public class SessionScope
         }
     }
 
-    @SuppressWarnings( { "unchecked" } )
-    public static <T> Provider<T> seededKeyProvider()
-    {
+    @SuppressWarnings({"unchecked"})
+    public static <T> Provider<T> seededKeyProvider() {
         return (Provider<T>) SEEDED_KEY_PROVIDER;
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.logging;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.logging;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.logging;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.logging;
 
 /**
  * This interface supplies the API for providing feedback to the user from the <code>Mojo</code>, using standard
@@ -32,8 +31,7 @@ package org.apache.maven.plugin.logging;
  * @deprecated Use SLF4J directly
  */
 @Deprecated
-public interface Log
-{
+public interface Log {
     /**
      * @return true if the <b>debug</b> error level is enabled
      */
@@ -44,7 +42,7 @@ public interface Log
      *
      * @param content
      */
-    void debug( CharSequence content );
+    void debug(CharSequence content);
 
     /**
      * Send a message (and accompanying exception) to the user in the <b>debug</b> error level.<br>
@@ -53,7 +51,7 @@ public interface Log
      * @param content
      * @param error
      */
-    void debug( CharSequence content, Throwable error );
+    void debug(CharSequence content, Throwable error);
 
     /**
      * Send an exception to the user in the <b>debug</b> error level.<br>
@@ -61,7 +59,7 @@ public interface Log
      *
      * @param error
      */
-    void debug( Throwable error );
+    void debug(Throwable error);
 
     /**
      * @return true if the <b>info</b> error level is enabled
@@ -73,7 +71,7 @@ public interface Log
      *
      * @param content
      */
-    void info( CharSequence content );
+    void info(CharSequence content);
 
     /**
      * Send a message (and accompanying exception) to the user in the <b>info</b> error level.<br>
@@ -82,7 +80,7 @@ public interface Log
      * @param content
      * @param error
      */
-    void info( CharSequence content, Throwable error );
+    void info(CharSequence content, Throwable error);
 
     /**
      * Send an exception to the user in the <b>info</b> error level.<br>
@@ -90,7 +88,7 @@ public interface Log
      *
      * @param error
      */
-    void info( Throwable error );
+    void info(Throwable error);
 
     /**
      * @return true if the <b>warn</b> error level is enabled
@@ -102,7 +100,7 @@ public interface Log
      *
      * @param content
      */
-    void warn( CharSequence content );
+    void warn(CharSequence content);
 
     /**
      * Send a message (and accompanying exception) to the user in the <b>warn</b> error level.<br>
@@ -111,7 +109,7 @@ public interface Log
      * @param content
      * @param error
      */
-    void warn( CharSequence content, Throwable error );
+    void warn(CharSequence content, Throwable error);
 
     /**
      * Send an exception to the user in the <b>warn</b> error level.<br>
@@ -119,7 +117,7 @@ public interface Log
      *
      * @param error
      */
-    void warn( Throwable error );
+    void warn(Throwable error);
 
     /**
      * @return true if the <b>error</b> error level is enabled
@@ -131,7 +129,7 @@ public interface Log
      *
      * @param content
      */
-    void error( CharSequence content );
+    void error(CharSequence content);
 
     /**
      * Send a message (and accompanying exception) to the user in the <b>error</b> error level.<br>
@@ -140,7 +138,7 @@ public interface Log
      * @param content
      * @param error
      */
-    void error( CharSequence content, Throwable error );
+    void error(CharSequence content, Throwable error);
 
     /**
      * Send an exception to the user in the <b>error</b> error level.<br>
@@ -148,5 +146,5 @@ public interface Log
      *
      * @param error
      */
-    void error( Throwable error );
+    void error(Throwable error);
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.classrealm;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.classrealm;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.classrealm;
 
 import java.util.List;
 import java.util.Map;
@@ -27,14 +26,12 @@ import java.util.Map;
  *
  * @author Benjamin Bentmann
  */
-public interface ClassRealmRequest
-{
+public interface ClassRealmRequest {
 
     /**
      * The type of a class realm.
      */
-    enum RealmType
-    {
+    enum RealmType {
         /**
          * The class realm for the public API of the Maven core.
          */
@@ -97,5 +94,4 @@ public interface ClassRealmRequest
      * @return The modifiable list of constituents for the class realm, never {@code null}.
      */
     List<ClassRealmConstituent> getConstituents();
-
 }

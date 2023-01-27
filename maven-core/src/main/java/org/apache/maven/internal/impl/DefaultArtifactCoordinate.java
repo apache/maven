@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import java.util.Objects;
 
@@ -30,84 +29,71 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 /**
  * A wrapper class around a maven resolver artifact.
  */
-public class DefaultArtifactCoordinate implements ArtifactCoordinate
-{
+public class DefaultArtifactCoordinate implements ArtifactCoordinate {
     private final @Nonnull AbstractSession session;
     private final @Nonnull org.eclipse.aether.artifact.Artifact coordinate;
 
-    public DefaultArtifactCoordinate( @Nonnull AbstractSession session,
-                                      @Nonnull org.eclipse.aether.artifact.Artifact coordinate )
-    {
-        this.session = nonNull( session, "session can not be null" );
-        this.coordinate = nonNull( coordinate, "coordinate can not be null" );
+    public DefaultArtifactCoordinate(
+            @Nonnull AbstractSession session, @Nonnull org.eclipse.aether.artifact.Artifact coordinate) {
+        this.session = nonNull(session, "session can not be null");
+        this.coordinate = nonNull(coordinate, "coordinate can not be null");
     }
 
-    public org.eclipse.aether.artifact.Artifact getCoordinate()
-    {
+    public org.eclipse.aether.artifact.Artifact getCoordinate() {
         return coordinate;
     }
 
     @Nonnull
     @Override
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return coordinate.getGroupId();
     }
 
     @Nonnull
     @Override
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return coordinate.getArtifactId();
     }
 
     @Nonnull
     @Override
-    public VersionRange getVersion()
-    {
-        return session.parseVersionRange( coordinate.getVersion() );
+    public VersionRange getVersion() {
+        return session.parseVersionRange(coordinate.getVersion());
     }
 
     @Override
-    public String getExtension()
-    {
+    public String getExtension() {
         return coordinate.getExtension();
     }
 
     @Nonnull
     @Override
-    public String getClassifier()
-    {
+    public String getClassifier() {
         return coordinate.getClassifier();
     }
 
     @Override
-    public boolean equals( Object o )
-    {
-        if ( this == o )
-        {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if ( o == null || getClass() != o.getClass() )
-        {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
         DefaultArtifactCoordinate that = (DefaultArtifactCoordinate) o;
-        return Objects.equals( this.getGroupId(), that.getGroupId() )
-                && Objects.equals( this.getArtifactId(), that.getArtifactId() )
-                && Objects.equals( this.getVersion(), that.getVersion() )
-                && Objects.equals( this.getClassifier(), that.getClassifier() );
+        return Objects.equals(this.getGroupId(), that.getGroupId())
+                && Objects.equals(this.getArtifactId(), that.getArtifactId())
+                && Objects.equals(this.getVersion(), that.getVersion())
+                && Objects.equals(this.getClassifier(), that.getClassifier());
     }
 
     @Override
-    public int hashCode()
-    {
-        return Objects.hash( getGroupId(), getArtifactId(), getVersion(), getClassifier() );
+    public int hashCode() {
+        return Objects.hash(getGroupId(), getArtifactId(), getVersion(), getClassifier());
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return coordinate.toString();
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.cli.logging;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.cli.logging;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli.logging;
 
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
@@ -32,20 +31,16 @@ import org.slf4j.LoggerFactory;
  * @author Jason van Zyl
  * @since 3.1
  */
-public class Slf4jLoggerManager
-    implements LoggerManager
-{
+public class Slf4jLoggerManager implements LoggerManager {
 
     private ILoggerFactory loggerFactory;
 
-    public Slf4jLoggerManager()
-    {
+    public Slf4jLoggerManager() {
         loggerFactory = LoggerFactory.getILoggerFactory();
     }
 
-    public Logger getLoggerForComponent( String role )
-    {
-        return new Slf4jLogger( loggerFactory.getLogger( role ) );
+    public Logger getLoggerForComponent(String role) {
+        return new Slf4jLogger(loggerFactory.getLogger(role));
     }
 
     /**
@@ -53,11 +48,10 @@ public class Slf4jLoggerManager
      * <b>Warning</b>: this does not conform to logger name as class name convention.
      * (and what about <code>null</code> and <code>default</code> hint equivalence?)
      */
-    public Logger getLoggerForComponent( String role, String hint )
-    {
-        return ( null == hint
-            ? getLoggerForComponent( role )
-            : new Slf4jLogger( loggerFactory.getLogger( role + '.' + hint ) ) );
+    public Logger getLoggerForComponent(String role, String hint) {
+        return (null == hint
+                ? getLoggerForComponent(role)
+                : new Slf4jLogger(loggerFactory.getLogger(role + '.' + hint)));
     }
 
     //
@@ -67,45 +61,34 @@ public class Slf4jLoggerManager
     /**
      * <b>Warning</b>: ignored.
      */
-    public void returnComponentLogger( String role )
-    {
-    }
+    public void returnComponentLogger(String role) {}
 
     /**
      * <b>Warning</b>: ignored.
      */
-    public void returnComponentLogger( String role, String hint )
-    {
-    }
+    public void returnComponentLogger(String role, String hint) {}
 
     /**
      * <b>Warning</b>: ignored (always return <code>0</code>).
      */
-    public int getThreshold()
-    {
+    public int getThreshold() {
         return 0;
     }
 
     /**
      * <b>Warning</b>: ignored.
      */
-    public void setThreshold( int threshold )
-    {
-    }
+    public void setThreshold(int threshold) {}
 
     /**
      * <b>Warning</b>: ignored.
      */
-    public void setThresholds( int threshold )
-    {
-    }
+    public void setThresholds(int threshold) {}
 
     /**
      * <b>Warning</b>: ignored (always return <code>0</code>).
      */
-    public int getActiveLoggerCount()
-    {
+    public int getActiveLoggerCount() {
         return 0;
     }
-
 }

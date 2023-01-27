@@ -1,5 +1,3 @@
-package org.apache.maven.api.plugin.annotations;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.plugin.annotations;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.plugin.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -41,11 +40,10 @@ import org.apache.maven.api.annotations.Experimental;
  */
 @Experimental
 @Documented
-@Retention( RetentionPolicy.CLASS )
-@Target( { ElementType.FIELD, ElementType.METHOD } )
+@Retention(RetentionPolicy.CLASS)
+@Target({ElementType.FIELD, ElementType.METHOD})
 @Inherited
-public @interface Parameter
-{
+public @interface Parameter {
     /**
      * name of the bean property used to get/set the field: by default, field name is used.
      * @return the name of the bean property
@@ -69,7 +67,7 @@ public @interface Parameter
      * parameter default value, may contain <code>${...}</code> expressions which will be interpreted at
      * inject time: see
      * <a href="/ref/current/maven-core/apidocs/org/apache/maven/plugin/PluginParameterExpressionEvaluator.html">
-     * PluginParameterExpressionEvaluator</a>. 
+     * PluginParameterExpressionEvaluator</a>.
      * @return the default value
      */
     String defaultValue() default "";
@@ -87,7 +85,7 @@ public @interface Parameter
      * want the user to modify <code>&lt;build&gt;&lt;finalName/&gt;&lt;/build&gt;</code> rather than specifying a value
      * for finalName directly in the plugin configuration section. It is also useful to ensure that - for example - a
      * List-typed parameter which expects items of type Artifact doesn't get a List full of Strings.
-     * 
+     *
      * @return <code>true</code> if the user should not be allowed to configure the parameter directly
      */
     boolean readonly() default false;

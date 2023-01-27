@@ -80,7 +80,7 @@
 
         <field xml.transient="true">
           <name>pomFile</name>
-          <version>5.0.0+</version>
+          <version>4.2.0+</version>
           <required>false</required>
           <description>Originating POM file</description>
           <type>DOM</type> <!-- This is transformed to a File/Path in the template -->
@@ -434,7 +434,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>5.0.0+</version>
+          <version>4.2.0+</version>
           <code>
             <![CDATA[
     /**
@@ -580,6 +580,16 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
+        <field xdoc.separator="blank">
+          <name>reports</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+             <b>Deprecated</b>. Now ignored by Maven.
+             ]]>
+          </description>
+          <type>DOM</type>
+        </field>
         <field>
           <name>reporting</name>
           <version>4.0.0+</version>
@@ -651,6 +661,18 @@
             ]]>
           </code>
         </codeSegment>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+     @Override
+     public String toString()
+     {
+         return "PluginContainer {}";
+     }
+            ]]>
+          </code>
+        </codeSegment>
       </codeSegments>
     </class>
     <class>
@@ -674,6 +696,22 @@
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "PluginConfiguration {" + super.toString() + "}";
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class xdoc.anchorName="profile_build">
       <name>BuildBase</name>
@@ -748,6 +786,22 @@
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "BuildBase {" + super.toString() + "}";
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>Build</name>
@@ -825,6 +879,22 @@
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "Build {" + super.toString() + "}";
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>CiManagement</name>
@@ -1004,6 +1074,22 @@
           </association>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "Contributor {name=" + getName() + ", email=" + getEmail() + "}";
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>Dependency</name>
@@ -1218,6 +1304,22 @@
           <type>String</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "Developer {id=" + getId() + ", " + super.toString() + "}";
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>Exclusion</name>
@@ -1264,6 +1366,22 @@
           <type>String</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "IssueManagement {system=" + getSystem() + ", url=" + getUrl() + "}";
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>DistributionManagement</name>
@@ -1385,6 +1503,22 @@
           <type>String</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "License {name=" + getName() + ", url=" + getUrl() + "}";
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>MailingList</name>
@@ -1460,6 +1594,22 @@
       <comment>We could probably have a specific element for a dev mailing list for things like CI,
         and maybe even a specific element for the user and scm mailing lists. Then leave the more
         lose structure for any other type of mailing list.</comment>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "MailingList {name=" + getName() + ", archive=" + getArchive() + "}";
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>Organization</name>
@@ -1479,6 +1629,22 @@
           <type>String</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "Organization {name=" + getName() + ", url=" + getUrl() + "}";
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>PatternSet</name>
@@ -1758,6 +1924,20 @@
         return ( getChildScmUrlInheritAppendPath() != null ) ? Boolean.parseBoolean( getChildScmUrlInheritAppendPath() ) : true;
     }
 
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return "Scm {connection=" + getConnection() + "}";
+    }
             ]]>
           </code>
         </codeSegment>
@@ -2233,6 +2413,16 @@
           </association>
         </field>
         <field>
+          <name>goals</name>
+          <version>4.0.0</version>
+          <description>
+            <![CDATA[
+             <b>Deprecated</b>. Unused by Maven.
+             ]]>
+          </description>
+          <type>DOM</type>
+        </field>
+        <field>
           <name>dependencies</name>
           <description>Additional dependencies that this project needs to introduce to the plugin's
             classloader.</description>
@@ -2304,7 +2494,7 @@
     /**
      * Gets the identifier of the plugin.
      *
-     * @return The plugin id in the form {@code <groupId>:<artifactId>:<version>}, never {@code null}.
+     * @return the plugin id in the form {@code <groupId>:<artifactId>:<version>}, never {@code null}
      */
     public String getId()
     {
@@ -2598,7 +2788,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>5.0.0+</version>
+          <version>4.2.0+</version>
           <code>
             <![CDATA[
     public static final String SOURCE_POM = "pom";
@@ -2672,7 +2862,7 @@
         <field>
           <name>property</name>
           <version>4.0.0+</version>
-          <description>Specifies that this profile will be activated when this system property is
+          <description>Specifies that this profile will be activated when this property is
             specified.</description>
           <association>
             <type>ActivationProperty</type>
@@ -2774,7 +2964,7 @@
         activated. On the other hand, {@code exists} will test for the existence of the file and if it is
         there, the profile will be activated.<br>
         Variable interpolation for these file specifications is limited to {@code ${basedir}},
-        System properties and request properties.]]></description>
+        system properties and user properties.]]></description>
       <fields>
         <field>
           <name>missing</name>
@@ -2846,7 +3036,7 @@
           <version>4.0.0+</version>
           <description>
             <![CDATA[
-            The version of the reporting plugin to be used. Starting with Maven 3, if no version is defined explicitely,
+            The version of the reporting plugin to be used. Starting with Maven 3, if no version is defined explicitly,
             version is searched in {@code build/plugins} then in {@code build/pluginManagement}.
             ]]>
           </description>

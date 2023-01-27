@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile.activation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.profile.activation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile.activation;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -25,9 +24,9 @@ import javax.inject.Singleton;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.codehaus.plexus.util.StringUtils;
@@ -38,78 +37,64 @@ import org.codehaus.plexus.util.StringUtils;
  * @author Benjamin Bentmann
  * @see ActivationProperty
  */
-@Named( "property" )
+@Named("property")
 @Singleton
-public class PropertyProfileActivator
-    implements ProfileActivator
-{
+public class PropertyProfileActivator implements ProfileActivator {
 
     @Override
-    public boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
-    {
+    public boolean isActive(Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
         Activation activation = profile.getActivation();
 
-        if ( activation == null )
-        {
+        if (activation == null) {
             return false;
         }
 
         ActivationProperty property = activation.getProperty();
 
-        if ( property == null )
-        {
+        if (property == null) {
             return false;
         }
 
         String name = property.getName();
         boolean reverseName = false;
 
-        if ( name != null && name.startsWith( "!" ) )
-        {
+        if (name != null && name.startsWith("!")) {
             reverseName = true;
-            name = name.substring( 1 );
+            name = name.substring(1);
         }
 
-        if ( name == null || name.length() <= 0 )
-        {
-            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "The property name is required to activate the profile " + profile.getId() )
-                    .setLocation( property.getLocation( "" ) ) );
+        if (name == null || name.length() <= 0) {
+            problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                    .setMessage("The property name is required to activate the profile " + profile.getId())
+                    .setLocation(property.getLocation("")));
             return false;
         }
 
-        String sysValue = context.getUserProperties().get( name );
-        if ( sysValue == null )
-        {
-            sysValue = context.getSystemProperties().get( name );
+        String sysValue = context.getUserProperties().get(name);
+        if (sysValue == null) {
+            sysValue = context.getSystemProperties().get(name);
         }
 
         String propValue = property.getValue();
-        if ( StringUtils.isNotEmpty( propValue ) )
-        {
+        if (StringUtils.isNotEmpty(propValue)) {
             boolean reverseValue = false;
-            if ( propValue.startsWith( "!" ) )
-            {
+            if (propValue.startsWith("!")) {
                 reverseValue = true;
-                propValue = propValue.substring( 1 );
+                propValue = propValue.substring(1);
             }
 
             // we have a value, so it has to match the system value...
-            return reverseValue != propValue.equals( sysValue );
-        }
-        else
-        {
-            return reverseName != StringUtils.isNotEmpty( sysValue );
+            return reverseValue != propValue.equals(sysValue);
+        } else {
+            return reverseName != StringUtils.isNotEmpty(sysValue);
         }
     }
 
     @Override
-    public boolean presentInConfig( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
-    {
+    public boolean presentInConfig(Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
         Activation activation = profile.getActivation();
 
-        if ( activation == null )
-        {
+        if (activation == null) {
             return false;
         }
 
@@ -117,5 +102,4 @@ public class PropertyProfileActivator
 
         return property != null;
     }
-
 }

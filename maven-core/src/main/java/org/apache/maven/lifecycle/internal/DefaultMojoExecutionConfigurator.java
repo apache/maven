@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,17 +16,18 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.apache.maven.api.xml.Dom;
-import org.apache.maven.internal.xml.Xpp3Dom;
+import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -49,58 +48,48 @@ import static java.util.Arrays.stream;
  */
 @Named
 @Singleton
-public class DefaultMojoExecutionConfigurator
-    implements MojoExecutionConfigurator
-{
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurator {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public void configure( MavenProject project, MojoExecution mojoExecution, boolean allowPluginLevelConfig )
-    {
+    public void configure(MavenProject project, MojoExecution mojoExecution, boolean allowPluginLevelConfig) {
         String g = mojoExecution.getPlugin().getGroupId();
 
         String a = mojoExecution.getPlugin().getArtifactId();
 
-        Plugin plugin = findPlugin( g, a, project.getBuildPlugins() );
+        Plugin plugin = findPlugin(g, a, project.getBuildPlugins());
 
-        if ( plugin == null && project.getPluginManagement() != null )
-        {
-            plugin = findPlugin( g, a, project.getPluginManagement().getPlugins() );
+        if (plugin == null && project.getPluginManagement() != null) {
+            plugin = findPlugin(g, a, project.getPluginManagement().getPlugins());
         }
 
-        if ( plugin != null )
-        {
+        if (plugin != null) {
             PluginExecution pluginExecution =
-                findPluginExecution( mojoExecution.getExecutionId(), plugin.getExecutions() );
+                    findPluginExecution(mojoExecution.getExecutionId(), plugin.getExecutions());
 
-            Dom pomConfiguration = null;
+            XmlNode pomConfiguration = null;
 
-            if ( pluginExecution != null )
-            {
+            if (pluginExecution != null) {
                 pomConfiguration = pluginExecution.getDelegate().getConfiguration();
-            }
-            else if ( allowPluginLevelConfig )
-            {
+            } else if (allowPluginLevelConfig) {
                 pomConfiguration = plugin.getDelegate().getConfiguration();
             }
 
-            Dom mojoConfiguration = mojoExecution.getConfiguration() != null
-                    ? mojoExecution.getConfiguration().getDom() : null;
+            XmlNode mojoConfiguration = mojoExecution.getConfiguration() != null
+                    ? mojoExecution.getConfiguration().getDom()
+                    : null;
 
-            Dom mergedConfiguration = Xpp3Dom.merge( mojoConfiguration, pomConfiguration );
+            XmlNode mergedConfiguration = XmlNodeImpl.merge(mojoConfiguration, pomConfiguration);
 
-            mojoExecution.setConfiguration( mergedConfiguration );
+            mojoExecution.setConfiguration(mergedConfiguration);
 
-            checkUnknownMojoConfigurationParameters( mojoExecution );
+            checkUnknownMojoConfigurationParameters(mojoExecution);
         }
     }
 
-    private Plugin findPlugin( String groupId, String artifactId, Collection<Plugin> plugins )
-    {
-        for ( Plugin plugin : plugins )
-        {
-            if ( artifactId.equals( plugin.getArtifactId() ) && groupId.equals( plugin.getGroupId() ) )
-            {
+    private Plugin findPlugin(String groupId, String artifactId, Collection<Plugin> plugins) {
+        for (Plugin plugin : plugins) {
+            if (artifactId.equals(plugin.getArtifactId()) && groupId.equals(plugin.getGroupId())) {
                 return plugin;
             }
         }
@@ -108,14 +97,10 @@ public class DefaultMojoExecutionConfigurator
         return null;
     }
 
-    private PluginExecution findPluginExecution( String executionId, Collection<PluginExecution> executions )
-    {
-        if ( StringUtils.isNotEmpty( executionId ) )
-        {
-            for ( PluginExecution execution : executions )
-            {
-                if ( executionId.equals( execution.getId() ) )
-                {
+    private PluginExecution findPluginExecution(String executionId, Collection<PluginExecution> executions) {
+        if (StringUtils.isNotEmpty(executionId)) {
+            for (PluginExecution execution : executions) {
+                if (executionId.equals(execution.getId())) {
                     return execution;
                 }
             }
@@ -124,10 +109,9 @@ public class DefaultMojoExecutionConfigurator
         return null;
     }
 
-    private void checkUnknownMojoConfigurationParameters( MojoExecution mojoExecution )
-    {
-        if ( mojoExecution.getConfiguration() == null || mojoExecution.getConfiguration().getChildCount() == 0 )
-        {
+    private void checkUnknownMojoConfigurationParameters(MojoExecution mojoExecution) {
+        if (mojoExecution.getConfiguration() == null
+                || mojoExecution.getConfiguration().getChildCount() == 0) {
             return;
         }
 
@@ -135,66 +119,58 @@ public class DefaultMojoExecutionConfigurator
 
         // in first step get parameter names of current goal
         Set<String> parametersNamesGoal = mojoDescriptor.getParameters().stream()
-            .flatMap( this::getParameterNames )
-            .collect( Collectors.toSet() );
+                .flatMap(this::getParameterNames)
+                .collect(Collectors.toSet());
 
-        Set<String> unknownParameters = getUnknownParameters( mojoExecution, parametersNamesGoal );
+        Set<String> unknownParameters = getUnknownParameters(mojoExecution, parametersNamesGoal);
 
-        if ( unknownParameters.isEmpty() )
-        {
+        if (unknownParameters.isEmpty()) {
             return;
         }
 
         // second step get parameter names of all plugin goals
         Set<String> parametersNamesAll = mojoDescriptor.getPluginDescriptor().getMojos().stream()
-            .flatMap( m -> m.getParameters().stream() )
-            .flatMap( this::getParameterNames )
-            .collect( Collectors.toSet() );
+                .flatMap(m -> m.getParameters().stream())
+                .flatMap(this::getParameterNames)
+                .collect(Collectors.toSet());
 
-        unknownParameters = getUnknownParameters( mojoExecution, parametersNamesAll );
+        unknownParameters = getUnknownParameters(mojoExecution, parametersNamesAll);
 
-        unknownParameters.forEach(
-            name ->
-            {
-                MessageBuilder messageBuilder = MessageUtils.buffer()
-                    .warning( "Parameter '" )
-                    .warning( name )
-                    .warning( "' is unknown for plugin '" )
-                    .warning( mojoExecution.getArtifactId() ).warning( ":" )
-                    .warning( mojoExecution.getVersion() ).warning( ":" )
-                    .warning( mojoExecution.getGoal() );
+        unknownParameters.forEach(name -> {
+            MessageBuilder messageBuilder = MessageUtils.buffer()
+                    .warning("Parameter '")
+                    .warning(name)
+                    .warning("' is unknown for plugin '")
+                    .warning(mojoExecution.getArtifactId())
+                    .warning(":")
+                    .warning(mojoExecution.getVersion())
+                    .warning(":")
+                    .warning(mojoExecution.getGoal());
 
-                if ( mojoExecution.getExecutionId() != null )
-                {
-                    messageBuilder.warning( " (" );
-                    messageBuilder.warning( mojoExecution.getExecutionId() );
-                    messageBuilder.warning( ")" );
-                }
+            if (mojoExecution.getExecutionId() != null) {
+                messageBuilder.warning(" (");
+                messageBuilder.warning(mojoExecution.getExecutionId());
+                messageBuilder.warning(")");
+            }
 
-                messageBuilder.warning( "'" );
+            messageBuilder.warning("'");
 
-                logger.warn( messageBuilder.toString() );
-            } );
+            logger.warn(messageBuilder.toString());
+        });
     }
 
-    private Stream<String> getParameterNames( Parameter parameter )
-    {
-        if ( parameter.getAlias() != null )
-        {
-            return Stream.of( parameter.getName(), parameter.getAlias() );
-        }
-        else
-        {
-            return Stream.of( parameter.getName() );
+    private Stream<String> getParameterNames(Parameter parameter) {
+        if (parameter.getAlias() != null) {
+            return Stream.of(parameter.getName(), parameter.getAlias());
+        } else {
+            return Stream.of(parameter.getName());
         }
     }
 
-    private Set<String> getUnknownParameters( MojoExecution mojoExecution, Set<String> parameters )
-    {
-        return stream( mojoExecution.getConfiguration().getChildren() )
-            .map( x -> x.getName() )
-            .filter( name -> !parameters.contains( name ) )
-            .collect( Collectors.toSet() );
+    private Set<String> getUnknownParameters(MojoExecution mojoExecution, Set<String> parameters) {
+        return stream(mojoExecution.getConfiguration().getChildren())
+                .map(x -> x.getName())
+                .filter(name -> !parameters.contains(name))
+                .collect(Collectors.toSet());
     }
-
 }

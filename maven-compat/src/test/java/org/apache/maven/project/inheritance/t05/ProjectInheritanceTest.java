@@ -1,5 +1,3 @@
-package org.apache.maven.project.inheritance.t05;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.inheritance.t05;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.inheritance.t05;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.inheritance.t05;
 
 import java.io.File;
 import java.util.Set;
@@ -36,9 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author <a href="rgoers@apache.org">Ralph Goers</a>
  */
-public class ProjectInheritanceTest
-    extends AbstractProjectInheritanceTestCase
-{
+public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
     // p1 inherits from p0
@@ -51,34 +48,29 @@ public class ProjectInheritanceTest
     // ----------------------------------------------------------------------
 
     @Test
-    public void testDependencyManagement()
-        throws Exception
-    {
+    public void testDependencyManagement() throws Exception {
         File localRepo = getLocalRepositoryPath();
-        File pom0 = new File( localRepo, "p0/pom.xml" );
+        File pom0 = new File(localRepo, "p0/pom.xml");
 
         File pom0Basedir = pom0.getParentFile();
 
-        File pom1 = new File( pom0Basedir, "p1/pom.xml" );
+        File pom1 = new File(pom0Basedir, "p1/pom.xml");
 
         // load everything...
-        MavenProject project0 = getProjectWithDependencies( pom0 );
-        MavenProject project1 = getProjectWithDependencies( pom1 );
+        MavenProject project0 = getProjectWithDependencies(pom0);
+        MavenProject project1 = getProjectWithDependencies(pom1);
 
-        assertEquals( pom0Basedir, project1.getParent().getBasedir() );
+        assertEquals(pom0Basedir, project1.getParent().getBasedir());
         Set set = project1.getArtifacts();
-        assertNotNull( set, "No artifacts" );
-        assertTrue( set.size() > 0, "No Artifacts" );
+        assertNotNull(set, "No artifacts");
+        assertTrue(set.size() > 0, "No Artifacts");
 
-        for ( Object aSet : set )
-        {
+        for (Object aSet : set) {
             Artifact artifact = (Artifact) aSet;
-            System.out.println(
-                "Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion() + " Scope: "
-                    + artifact.getScope() );
-            assertTrue( artifact.getVersion().equals( "1.0" ),
-                        "Incorrect version for " + artifact.getDependencyConflictId() );
+            System.out.println("Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion()
+                    + " Scope: " + artifact.getScope());
+            assertTrue(
+                    artifact.getVersion().equals("1.0"), "Incorrect version for " + artifact.getDependencyConflictId());
         }
-
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,16 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+package org.apache.maven.plugin;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -51,86 +50,100 @@ import org.eclipse.aether.repository.WorkspaceRepository;
  */
 @Named
 @Singleton
-public class DefaultPluginDescriptorCache
-    implements PluginDescriptorCache
-{
+public class DefaultPluginDescriptorCache implements PluginDescriptorCache {
 
-    private Map<Key, PluginDescriptor> descriptors = new HashMap<>( 128 );
+    private Map<Key, PluginDescriptor> descriptors = new ConcurrentHashMap<>(128);
 
-    public void flush()
-    {
+    public void flush() {
         descriptors.clear();
     }
 
-    public Key createKey( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
-    {
-        return new CacheKey( plugin, repositories, session );
+    public Key createKey(Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session) {
+        return new CacheKey(plugin, repositories, session);
     }
 
-    public PluginDescriptor get( Key cacheKey )
-    {
-        return clone( descriptors.get( cacheKey ) );
+    public PluginDescriptor get(Key cacheKey) {
+        return clone(descriptors.get(cacheKey));
     }
 
-    public void put( Key cacheKey, PluginDescriptor pluginDescriptor )
-    {
-        descriptors.put( cacheKey, clone( pluginDescriptor ) );
+    @Override
+    public PluginDescriptor get(Key key, PluginDescriptorSupplier supplier)
+            throws PluginDescriptorParsingException, PluginResolutionException, InvalidPluginDescriptorException {
+        try {
+            return clone(descriptors.computeIfAbsent(key, k -> {
+                try {
+                    return clone(supplier.load());
+                } catch (PluginDescriptorParsingException
+                        | PluginResolutionException
+                        | InvalidPluginDescriptorException e) {
+                    throw new RuntimeException(e);
+                }
+            }));
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof PluginDescriptorParsingException) {
+                throw (PluginDescriptorParsingException) e.getCause();
+            }
+            if (e.getCause() instanceof PluginResolutionException) {
+                throw (PluginResolutionException) e.getCause();
+            }
+            if (e.getCause() instanceof InvalidPluginDescriptorException) {
+                throw (InvalidPluginDescriptorException) e.getCause();
+            }
+            throw e;
+        }
     }
 
-    protected static PluginDescriptor clone( PluginDescriptor original )
-    {
+    public void put(Key cacheKey, PluginDescriptor pluginDescriptor) {
+        descriptors.put(cacheKey, clone(pluginDescriptor));
+    }
+
+    protected static PluginDescriptor clone(PluginDescriptor original) {
         PluginDescriptor clone = null;
 
-        if ( original != null )
-        {
+        if (original != null) {
             clone = new PluginDescriptor();
 
-            clone.setGroupId( original.getGroupId() );
-            clone.setArtifactId( original.getArtifactId() );
-            clone.setVersion( original.getVersion() );
-            clone.setGoalPrefix( original.getGoalPrefix() );
-            clone.setInheritedByDefault( original.isInheritedByDefault() );
+            clone.setGroupId(original.getGroupId());
+            clone.setArtifactId(original.getArtifactId());
+            clone.setVersion(original.getVersion());
+            clone.setGoalPrefix(original.getGoalPrefix());
+            clone.setInheritedByDefault(original.isInheritedByDefault());
 
-            clone.setName( original.getName() );
-            clone.setDescription( original.getDescription() );
-            clone.setRequiredMavenVersion( original.getRequiredMavenVersion() );
-            clone.setRequiredJavaVersion( original.getRequiredJavaVersion() );
+            clone.setName(original.getName());
+            clone.setDescription(original.getDescription());
+            clone.setRequiredMavenVersion(original.getRequiredMavenVersion());
+            clone.setRequiredJavaVersion(original.getRequiredJavaVersion());
 
-            clone.setPluginArtifact( ArtifactUtils.copyArtifactSafe( original.getPluginArtifact() ) );
+            clone.setPluginArtifact(ArtifactUtils.copyArtifactSafe(original.getPluginArtifact()));
 
-            clone.setComponents( clone( original.getMojos(), clone ) );
-            clone.setId( original.getId() );
-            clone.setIsolatedRealm( original.isIsolatedRealm() );
-            clone.setSource( original.getSource() );
+            clone.setComponents(clone(original.getMojos(), clone));
+            clone.setId(original.getId());
+            clone.setIsolatedRealm(original.isIsolatedRealm());
+            clone.setSource(original.getSource());
 
-            clone.setDependencies( original.getDependencies() );
+            clone.setDependencies(original.getDependencies());
         }
 
         return clone;
     }
 
-    private static List<ComponentDescriptor<?>> clone( List<MojoDescriptor> mojos, PluginDescriptor pluginDescriptor )
-    {
+    private static List<ComponentDescriptor<?>> clone(List<MojoDescriptor> mojos, PluginDescriptor pluginDescriptor) {
         List<ComponentDescriptor<?>> clones = null;
 
-        if ( mojos != null )
-        {
-            clones = new ArrayList<>( mojos.size() );
+        if (mojos != null) {
+            clones = new ArrayList<>(mojos.size());
 
-            for ( MojoDescriptor mojo : mojos )
-            {
+            for (MojoDescriptor mojo : mojos) {
                 MojoDescriptor clone = mojo.clone();
-                clone.setPluginDescriptor( pluginDescriptor );
-                clones.add( clone );
+                clone.setPluginDescriptor(pluginDescriptor);
+                clones.add(clone);
             }
         }
 
         return clones;
     }
 
-    private static final class CacheKey
-        implements Key
-    {
+    private static final class CacheKey implements Key {
 
         private final String groupId;
 
@@ -146,24 +159,19 @@ public class DefaultPluginDescriptorCache
 
         private final int hashCode;
 
-        CacheKey( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
-        {
+        CacheKey(Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session) {
             groupId = plugin.getGroupId();
             artifactId = plugin.getArtifactId();
             version = plugin.getVersion();
 
-            workspace = RepositoryUtils.getWorkspace( session );
+            workspace = RepositoryUtils.getWorkspace(session);
             localRepo = session.getLocalRepository();
-            this.repositories = new ArrayList<>( repositories.size() );
-            for ( RemoteRepository repository : repositories )
-            {
-                if ( repository.isRepositoryManager() )
-                {
-                    this.repositories.addAll( repository.getMirroredRepositories() );
-                }
-                else
-                {
-                    this.repositories.add( repository );
+            this.repositories = new ArrayList<>(repositories.size());
+            for (RemoteRepository repository : repositories) {
+                if (repository.isRepositoryManager()) {
+                    this.repositories.addAll(repository.getMirroredRepositories());
+                } else {
+                    this.repositories.add(repository);
                 }
             }
 
@@ -171,52 +179,44 @@ public class DefaultPluginDescriptorCache
             hash = hash * 31 + groupId.hashCode();
             hash = hash * 31 + artifactId.hashCode();
             hash = hash * 31 + version.hashCode();
-            hash = hash * 31 + hash( workspace );
+            hash = hash * 31 + hash(workspace);
             hash = hash * 31 + localRepo.hashCode();
-            hash = hash * 31 + RepositoryUtils.repositoriesHashCode( repositories );
+            hash = hash * 31 + RepositoryUtils.repositoriesHashCode(repositories);
             this.hashCode = hash;
         }
 
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return hashCode;
         }
 
         @Override
-        public boolean equals( Object obj )
-        {
-            if ( this == obj )
-            {
+        public boolean equals(Object obj) {
+            if (this == obj) {
                 return true;
             }
 
-            if ( !( obj instanceof CacheKey ) )
-            {
+            if (!(obj instanceof CacheKey)) {
                 return false;
             }
 
             CacheKey that = (CacheKey) obj;
 
-            return Objects.equals( this.artifactId, that.artifactId )
-                && Objects.equals( this.groupId, that.groupId )
-                && Objects.equals( this.version, that.version )
-                && Objects.equals( this.localRepo, that.localRepo )
-                && Objects.equals( this.workspace, that.workspace )
-                && RepositoryUtils.repositoriesEquals( this.repositories, that.repositories );
+            return Objects.equals(this.artifactId, that.artifactId)
+                    && Objects.equals(this.groupId, that.groupId)
+                    && Objects.equals(this.version, that.version)
+                    && Objects.equals(this.localRepo, that.localRepo)
+                    && Objects.equals(this.workspace, that.workspace)
+                    && RepositoryUtils.repositoriesEquals(this.repositories, that.repositories);
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return groupId + ':' + artifactId + ':' + version;
         }
 
-        private static int hash( Object obj )
-        {
+        private static int hash(Object obj) {
             return obj != null ? obj.hashCode() : 0;
         }
-
     }
-
 }

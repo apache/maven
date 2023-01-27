@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository.metadata.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.repository.metadata.io;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.repository.metadata.io;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,8 +31,7 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
  *
  * @author Benjamin Bentmann
  */
-public interface MetadataReader
-{
+public interface MetadataReader {
 
     /**
      * The key for the option to enable strict parsing. This option is of type {@link Boolean} and defaults to {@code
@@ -50,8 +48,7 @@ public interface MetadataReader
      * @throws IOException If the metadata could not be deserialized.
      * @throws MetadataParseException If the input format could not be parsed.
      */
-    Metadata read( File input, Map<String, ?> options )
-        throws IOException, MetadataParseException;
+    Metadata read(File input, Map<String, ?> options) throws IOException, MetadataParseException;
 
     /**
      * Reads the metadata from the specified character reader. The reader will be automatically closed before the method
@@ -63,8 +60,7 @@ public interface MetadataReader
      * @throws IOException If the metadata could not be deserialized.
      * @throws MetadataParseException If the input format could not be parsed.
      */
-    Metadata read( Reader input, Map<String, ?> options )
-        throws IOException, MetadataParseException;
+    Metadata read(Reader input, Map<String, ?> options) throws IOException, MetadataParseException;
 
     /**
      * Reads the metadata from the specified byte stream. The stream will be automatically closed before the method
@@ -76,7 +72,5 @@ public interface MetadataReader
      * @throws IOException If the metadata could not be deserialized.
      * @throws MetadataParseException If the input format could not be parsed.
      */
-    Metadata read( InputStream input, Map<String, ?> options )
-        throws IOException, MetadataParseException;
-
+    Metadata read(InputStream input, Map<String, ?> options) throws IOException, MetadataParseException;
 }

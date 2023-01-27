@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,11 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -25,10 +28,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -52,9 +51,7 @@ import org.apache.maven.repository.RepositorySystem;
 @Deprecated
 @Named
 @Singleton
-public class DefaultProjectDependenciesResolver
-    implements ProjectDependenciesResolver
-{
+public class DefaultProjectDependenciesResolver implements ProjectDependenciesResolver {
 
     private final RepositorySystem repositorySystem;
 
@@ -62,60 +59,63 @@ public class DefaultProjectDependenciesResolver
 
     @Inject
     public DefaultProjectDependenciesResolver(
-            RepositorySystem repositorySystem,
-            ResolutionErrorHandler resolutionErrorHandler )
-    {
+            RepositorySystem repositorySystem, ResolutionErrorHandler resolutionErrorHandler) {
         this.repositorySystem = repositorySystem;
         this.resolutionErrorHandler = resolutionErrorHandler;
     }
 
-    public Set<Artifact> resolve( MavenProject project, Collection<String> scopesToResolve, MavenSession session )
-        throws ArtifactResolutionException, ArtifactNotFoundException
-    {
-        return resolve( Collections.singleton( project ), scopesToResolve, session );
+    public Set<Artifact> resolve(MavenProject project, Collection<String> scopesToResolve, MavenSession session)
+            throws ArtifactResolutionException, ArtifactNotFoundException {
+        return resolve(Collections.singleton(project), scopesToResolve, session);
     }
 
-    public Set<Artifact> resolve( MavenProject project, Collection<String> scopesToCollect,
-                                  Collection<String> scopesToResolve, MavenSession session )
-        throws ArtifactResolutionException, ArtifactNotFoundException
-    {
-        Set<MavenProject> mavenProjects = Collections.singleton( project );
-        return resolveImpl( mavenProjects, scopesToCollect, scopesToResolve, session,
-                            getIgnorableArtifacts( mavenProjects ) );
+    public Set<Artifact> resolve(
+            MavenProject project,
+            Collection<String> scopesToCollect,
+            Collection<String> scopesToResolve,
+            MavenSession session)
+            throws ArtifactResolutionException, ArtifactNotFoundException {
+        Set<MavenProject> mavenProjects = Collections.singleton(project);
+        return resolveImpl(
+                mavenProjects, scopesToCollect, scopesToResolve, session, getIgnorableArtifacts(mavenProjects));
     }
 
-    public Set<Artifact> resolve( Collection<? extends MavenProject> projects, Collection<String> scopesToResolve,
-                                  MavenSession session )
-        throws ArtifactResolutionException, ArtifactNotFoundException
-    {
-        return resolveImpl( projects, null, scopesToResolve, session, getIgnorableArtifacts( projects ) );
+    public Set<Artifact> resolve(
+            Collection<? extends MavenProject> projects, Collection<String> scopesToResolve, MavenSession session)
+            throws ArtifactResolutionException, ArtifactNotFoundException {
+        return resolveImpl(projects, null, scopesToResolve, session, getIgnorableArtifacts(projects));
     }
 
-    public Set<Artifact> resolve( MavenProject project, Collection<String> scopesToCollect,
-                                  Collection<String> scopesToResolve, MavenSession session,
-                                  Set<Artifact> ignorableArtifacts )
-        throws ArtifactResolutionException, ArtifactNotFoundException
-    {
-        return resolveImpl( Collections.singleton( project ), scopesToCollect, scopesToResolve, session,
-                            getIgnorableArtifacts( ignorableArtifacts ) );
+    public Set<Artifact> resolve(
+            MavenProject project,
+            Collection<String> scopesToCollect,
+            Collection<String> scopesToResolve,
+            MavenSession session,
+            Set<Artifact> ignorableArtifacts)
+            throws ArtifactResolutionException, ArtifactNotFoundException {
+        return resolveImpl(
+                Collections.singleton(project),
+                scopesToCollect,
+                scopesToResolve,
+                session,
+                getIgnorableArtifacts(ignorableArtifacts));
     }
 
-
-    private Set<Artifact> resolveImpl( Collection<? extends MavenProject> projects, Collection<String> scopesToCollect,
-                                       Collection<String> scopesToResolve, MavenSession session,
-                                       Set<String> projectIds )
-        throws ArtifactResolutionException, ArtifactNotFoundException
-    {
+    private Set<Artifact> resolveImpl(
+            Collection<? extends MavenProject> projects,
+            Collection<String> scopesToCollect,
+            Collection<String> scopesToResolve,
+            MavenSession session,
+            Set<String> projectIds)
+            throws ArtifactResolutionException, ArtifactNotFoundException {
         Set<Artifact> resolved = new LinkedHashSet<>();
 
-        if ( projects == null || projects.isEmpty() )
-        {
+        if (projects == null || projects.isEmpty()) {
             return resolved;
         }
 
-        if ( ( scopesToCollect == null || scopesToCollect.isEmpty() )
-            && ( scopesToResolve == null || scopesToResolve.isEmpty() ) )
-        {
+        if ((scopesToCollect == null || scopesToCollect.isEmpty())
+                && (scopesToResolve == null || scopesToResolve.isEmpty())) {
             return resolved;
         }
 
@@ -151,82 +151,72 @@ public class DefaultProjectDependenciesResolver
         }
         */
 
-        CumulativeScopeArtifactFilter resolutionScopeFilter = new CumulativeScopeArtifactFilter( scopesToResolve );
+        CumulativeScopeArtifactFilter resolutionScopeFilter = new CumulativeScopeArtifactFilter(scopesToResolve);
 
-        CumulativeScopeArtifactFilter collectionScopeFilter = new CumulativeScopeArtifactFilter( scopesToCollect );
-        collectionScopeFilter = new CumulativeScopeArtifactFilter( collectionScopeFilter, resolutionScopeFilter );
+        CumulativeScopeArtifactFilter collectionScopeFilter = new CumulativeScopeArtifactFilter(scopesToCollect);
+        collectionScopeFilter = new CumulativeScopeArtifactFilter(collectionScopeFilter, resolutionScopeFilter);
 
-        ArtifactResolutionRequest request =
-            new ArtifactResolutionRequest().setResolveRoot( false ).setResolveTransitively( true ).setCollectionFilter(
-                collectionScopeFilter ).setResolutionFilter( resolutionScopeFilter ).setLocalRepository(
-                session.getLocalRepository() ).setOffline( session.isOffline() ).setForceUpdate(
-                session.getRequest().isUpdateSnapshots() );
-        request.setServers( session.getRequest().getServers() );
-        request.setMirrors( session.getRequest().getMirrors() );
-        request.setProxies( session.getRequest().getProxies() );
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
+                .setResolveRoot(false)
+                .setResolveTransitively(true)
+                .setCollectionFilter(collectionScopeFilter)
+                .setResolutionFilter(resolutionScopeFilter)
+                .setLocalRepository(session.getLocalRepository())
+                .setOffline(session.isOffline())
+                .setForceUpdate(session.getRequest().isUpdateSnapshots());
+        request.setServers(session.getRequest().getServers());
+        request.setMirrors(session.getRequest().getMirrors());
+        request.setProxies(session.getRequest().getProxies());
 
-        for ( MavenProject project : projects )
-        {
-            request.setArtifact( new ProjectArtifact( project ) );
-            request.setArtifactDependencies( project.getDependencyArtifacts() );
-            request.setManagedVersionMap( project.getManagedVersionMap() );
-            request.setRemoteRepositories( project.getRemoteArtifactRepositories() );
+        for (MavenProject project : projects) {
+            request.setArtifact(new ProjectArtifact(project));
+            request.setArtifactDependencies(project.getDependencyArtifacts());
+            request.setManagedVersionMap(project.getManagedVersionMap());
+            request.setRemoteRepositories(project.getRemoteArtifactRepositories());
 
-            ArtifactResolutionResult result = repositorySystem.resolve( request );
+            ArtifactResolutionResult result = repositorySystem.resolve(request);
 
-            try
-            {
-                resolutionErrorHandler.throwErrors( request, result );
-            }
-            catch ( MultipleArtifactsNotFoundException e )
-            {
+            try {
+                resolutionErrorHandler.throwErrors(request, result);
+            } catch (MultipleArtifactsNotFoundException e) {
 
-                Collection<Artifact> missing = new HashSet<>( e.getMissingArtifacts() );
+                Collection<Artifact> missing = new HashSet<>(e.getMissingArtifacts());
 
-                for ( Iterator<Artifact> it = missing.iterator(); it.hasNext(); )
-                {
-                    String key = ArtifactUtils.key( it.next() );
-                    if ( projectIds.contains( key ) )
-                    {
+                for (Iterator<Artifact> it = missing.iterator(); it.hasNext(); ) {
+                    String key = ArtifactUtils.key(it.next());
+                    if (projectIds.contains(key)) {
                         it.remove();
                     }
                 }
 
-                if ( !missing.isEmpty() )
-                {
+                if (!missing.isEmpty()) {
                     throw e;
                 }
             }
 
-            resolved.addAll( result.getArtifacts() );
+            resolved.addAll(result.getArtifacts());
         }
 
         return resolved;
     }
 
+    private Set<String> getIgnorableArtifacts(Collection<? extends MavenProject> projects) {
+        Set<String> projectIds = new HashSet<>(projects.size() * 2);
 
-    private Set<String> getIgnorableArtifacts( Collection<? extends MavenProject> projects )
-    {
-        Set<String> projectIds = new HashSet<>( projects.size() * 2 );
-
-        for ( MavenProject p : projects )
-        {
-            String key = ArtifactUtils.key( p.getGroupId(), p.getArtifactId(), p.getVersion() );
-            projectIds.add( key );
+        for (MavenProject p : projects) {
+            String key = ArtifactUtils.key(p.getGroupId(), p.getArtifactId(), p.getVersion());
+            projectIds.add(key);
         }
         return projectIds;
     }
 
-    private Set<String> getIgnorableArtifacts( Iterable<Artifact> artifactIterable )
-    {
+    private Set<String> getIgnorableArtifacts(Iterable<Artifact> artifactIterable) {
         Set<String> projectIds = new HashSet<>();
 
-        for ( Artifact artifact : artifactIterable )
-        {
-            String key = ArtifactUtils.key( artifact );
-            projectIds.add( key );
+        for (Artifact artifact : artifactIterable) {
+            String key = ArtifactUtils.key(artifact);
+            projectIds.add(key);
         }
         return projectIds;
     }
-
 }

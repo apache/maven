@@ -1,5 +1,3 @@
-package org.apache.maven.model.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.io;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.io;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,16 +24,14 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 
-import org.apache.maven.api.model.InputSource;
-import org.apache.maven.api.model.Model;
+import org.apache.maven.model.Model;
 
 /**
  * Handles deserialization of a model from some kind of textual format like XML.
  *
  * @author Benjamin Bentmann
  */
-public interface ModelReader
-{
+public interface ModelReader {
 
     /**
      * The key for the option to enable strict parsing. This option is of type {@link Boolean} and defaults to {@code
@@ -44,7 +41,7 @@ public interface ModelReader
 
     /**
      * The key for the option to enable tracking of line/column numbers. This option is of type
-     * {@link InputSource} and defaults to {@code null}. Providing an input source enables
+     * {@link org.apache.maven.model.InputSource} and defaults to {@code null}. Providing an input source enables
      * location tracking.
      */
     String INPUT_SOURCE = "org.apache.maven.model.io.inputSource";
@@ -64,8 +61,7 @@ public interface ModelReader
      * @throws IOException If the model could not be deserialized.
      * @throws ModelParseException If the input format could not be parsed.
      */
-    Model read( File input, Map<String, ?> options )
-        throws IOException, ModelParseException;
+    Model read(File input, Map<String, ?> options) throws IOException, ModelParseException;
 
     /**
      * Reads the model from the specified character reader. The reader will be automatically closed before the method
@@ -77,8 +73,7 @@ public interface ModelReader
      * @throws IOException If the model could not be deserialized.
      * @throws ModelParseException If the input format could not be parsed.
      */
-    Model read( Reader input, Map<String, ?> options )
-        throws IOException, ModelParseException;
+    Model read(Reader input, Map<String, ?> options) throws IOException, ModelParseException;
 
     /**
      * Reads the model from the specified byte stream. The stream will be automatically closed before the method
@@ -90,7 +85,5 @@ public interface ModelReader
      * @throws IOException If the model could not be deserialized.
      * @throws ModelParseException If the input format could not be parsed.
      */
-    Model read( InputStream input, Map<String, ?> options )
-        throws IOException, ModelParseException;
-
+    Model read(InputStream input, Map<String, ?> options) throws IOException, ModelParseException;
 }

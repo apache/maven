@@ -1,5 +1,3 @@
-package org.apache.maven.model.interpolation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model.interpolation;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,11 +16,12 @@ package org.apache.maven.model.interpolation;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.util.Properties;
+package org.apache.maven.model.interpolation;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.Properties;
 
 import org.apache.maven.model.building.ModelBuildingRequest;
 
@@ -32,9 +31,7 @@ import org.apache.maven.model.building.ModelBuildingRequest;
  */
 @Named
 @Singleton
-public class DefaultModelVersionProcessor
-    implements ModelVersionProcessor
-{
+public class DefaultModelVersionProcessor implements ModelVersionProcessor {
 
     private static final String SHA1_PROPERTY = "sha1";
 
@@ -43,27 +40,22 @@ public class DefaultModelVersionProcessor
     private static final String REVISION_PROPERTY = "revision";
 
     @Override
-    public boolean isValidProperty( String property )
-    {
-        return REVISION_PROPERTY.equals( property ) || CHANGELIST_PROPERTY.equals( property )
-            || SHA1_PROPERTY.equals( property );
+    public boolean isValidProperty(String property) {
+        return REVISION_PROPERTY.equals(property)
+                || CHANGELIST_PROPERTY.equals(property)
+                || SHA1_PROPERTY.equals(property);
     }
 
     @Override
-    public void overwriteModelProperties( Properties modelProperties, ModelBuildingRequest request )
-    {
-        if ( request.getSystemProperties().containsKey( REVISION_PROPERTY ) )
-        {
-            modelProperties.put( REVISION_PROPERTY, request.getSystemProperties().get( REVISION_PROPERTY ) );
+    public void overwriteModelProperties(Properties modelProperties, ModelBuildingRequest request) {
+        if (request.getUserProperties().containsKey(REVISION_PROPERTY)) {
+            modelProperties.put(REVISION_PROPERTY, request.getUserProperties().get(REVISION_PROPERTY));
         }
-        if ( request.getSystemProperties().containsKey( CHANGELIST_PROPERTY ) )
-        {
-            modelProperties.put( CHANGELIST_PROPERTY, request.getSystemProperties().get( CHANGELIST_PROPERTY ) );
+        if (request.getUserProperties().containsKey(CHANGELIST_PROPERTY)) {
+            modelProperties.put(CHANGELIST_PROPERTY, request.getUserProperties().get(CHANGELIST_PROPERTY));
         }
-        if ( request.getSystemProperties().containsKey( SHA1_PROPERTY ) )
-        {
-            modelProperties.put( SHA1_PROPERTY, request.getSystemProperties().get( SHA1_PROPERTY ) );
+        if (request.getUserProperties().containsKey(SHA1_PROPERTY)) {
+            modelProperties.put(SHA1_PROPERTY, request.getUserProperties().get(SHA1_PROPERTY));
         }
-
     }
 }

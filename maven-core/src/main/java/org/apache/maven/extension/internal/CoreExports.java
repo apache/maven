@@ -1,5 +1,3 @@
-package org.apache.maven.extension.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.extension.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.extension.internal;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -36,38 +35,33 @@ import static java.util.stream.Collectors.toMap;
  *
  * @since 3.3.0
  */
-public class CoreExports
-{
+public class CoreExports {
     private final Set<String> artifacts;
 
     private final Map<String, ClassLoader> packages;
 
-    public CoreExports( CoreExtensionEntry entry )
-    {
-        this( entry.getClassRealm(), entry.getExportedArtifacts(), entry.getExportedPackages() );
+    public CoreExports(CoreExtensionEntry entry) {
+        this(entry.getClassRealm(), entry.getExportedArtifacts(), entry.getExportedPackages());
     }
 
-    public CoreExports( ClassRealm realm, Set<String> exportedArtifacts, Set<String> exportedPackages )
-    {
-        this.artifacts = Collections.unmodifiableSet( new HashSet<>( exportedArtifacts ) );
-        this.packages = exportedPackages.stream().collect(
-                collectingAndThen( toMap( identity(), v -> realm ), Collections::unmodifiableMap ) );
+    public CoreExports(ClassRealm realm, Set<String> exportedArtifacts, Set<String> exportedPackages) {
+        this.artifacts = Collections.unmodifiableSet(new HashSet<>(exportedArtifacts));
+        this.packages = exportedPackages.stream()
+                .collect(collectingAndThen(toMap(identity(), v -> realm), Collections::unmodifiableMap));
     }
 
     /**
      * Returns artifacts exported by Maven core and core extensions. Artifacts are identified by their
      * groupId:artifactId string key.
      */
-    public Set<String> getExportedArtifacts()
-    {
+    public Set<String> getExportedArtifacts() {
         return artifacts;
     }
 
     /**
      * Returns packages exported by Maven core and core extensions.
      */
-    public Map<String, ClassLoader> getExportedPackages()
-    {
+    public Map<String, ClassLoader> getExportedPackages() {
         return packages;
     }
 }

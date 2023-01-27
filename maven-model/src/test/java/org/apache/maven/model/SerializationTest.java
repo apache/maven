@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,36 +29,29 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class SerializationTest
-{
+public class SerializationTest {
 
     @Test
-    public void testModelSerialization()
-        throws Exception
-    {
+    public void testModelSerialization() throws Exception {
         Model model;
-        try ( InputStream is = getClass().getResourceAsStream( "/xml/pom.xml" ) )
-        {
-            model = new MavenXpp3Reader().read( is );
+        try (InputStream is = getClass().getResourceAsStream("/xml/pom.xml")) {
+            model = new MavenXpp3Reader().read(is);
         }
 
         // Serialize an inner child here so that the BaseObject.childrenTracking is non null
         Build build = model.getBuild();
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try( ObjectOutputStream oos = new ObjectOutputStream( baos ) )
-        {
-            oos.writeObject( build );
+        try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+            oos.writeObject(build);
         }
 
         Build build2;
-        ByteArrayInputStream bais = new ByteArrayInputStream( baos.toByteArray() );
-        try( ObjectInputStream ois = new ObjectInputStream( bais ) )
-        {
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        try (ObjectInputStream ois = new ObjectInputStream(bais)) {
             build2 = (Build) ois.readObject();
         }
 
-        assertNotNull( build2 );
+        assertNotNull(build2);
     }
-
 }

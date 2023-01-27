@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
@@ -30,34 +29,39 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
-public class DeveloperTest
-{
+public class DeveloperTest {
 
     @Test
-    public void testHashCodeNullSafe()
-    {
+    public void testHashCodeNullSafe() {
         new Developer().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Developer().equals( null ) );
+    public void testEqualsNullSafe() {
+        assertFalse(new Developer().equals(null));
 
-        new Developer().equals( new Developer() );
+        new Developer().equals(new Developer());
     }
 
     @Test
-    public void testEqualsIdentity()
-    {
+    public void testEqualsIdentity() {
         Developer thing = new Developer();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Developer().toString() );
+    public void testToStringNullSafe() {
+        assertNotNull(new Developer().toString());
     }
 
+    public void testToStringNotNonsense() {
+        Developer dev = new Developer();
+        dev.setName("Maven Tester");
+        dev.setEmail("tester@acme.localdomain");
+        dev.setId("20220118");
+
+        String s = dev.toString();
+
+        assert "Developer {id=20220118, Contributor {name=Maven Tester, email=tester@acme.localdomain}}".equals(s) : s;
+    }
 }

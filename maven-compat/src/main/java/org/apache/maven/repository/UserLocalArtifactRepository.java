@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 import java.io.File;
 
@@ -28,50 +27,42 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 /**
  * UserLocalArtifactRepository
  */
-public class UserLocalArtifactRepository
-    extends LocalArtifactRepository
-{
+public class UserLocalArtifactRepository extends LocalArtifactRepository {
     private ArtifactRepository localRepository;
 
-    public UserLocalArtifactRepository( ArtifactRepository localRepository )
-    {
+    public UserLocalArtifactRepository(ArtifactRepository localRepository) {
         this.localRepository = localRepository;
-        setLayout( localRepository.getLayout() );
+        setLayout(localRepository.getLayout());
     }
 
     @Override
-    public Artifact find( Artifact artifact )
-    {
-        File artifactFile = new File( localRepository.getBasedir(), pathOf( artifact ) );
+    public Artifact find(Artifact artifact) {
+        File artifactFile = new File(localRepository.getBasedir(), pathOf(artifact));
 
         // We need to set the file here or the resolver will fail with an NPE, not fully equipped to deal
         // with multiple local repository implementations yet.
-        artifact.setFile( artifactFile );
+        artifact.setFile(artifactFile);
 
         return artifact;
     }
 
     @Override
-    public String getId()
-    {
+    public String getId() {
         return localRepository.getId();
     }
 
     @Override
-    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
-    {
-        return localRepository.pathOfLocalRepositoryMetadata( metadata, repository );
+    public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
+        return localRepository.pathOfLocalRepositoryMetadata(metadata, repository);
     }
 
     @Override
-    public String pathOf( Artifact artifact )
-    {
-        return localRepository.pathOf( artifact );
+    public String pathOf(Artifact artifact) {
+        return localRepository.pathOf(artifact);
     }
 
     @Override
-    public boolean hasLocalMetadata()
-    {
+    public boolean hasLocalMetadata() {
         return true;
     }
 }

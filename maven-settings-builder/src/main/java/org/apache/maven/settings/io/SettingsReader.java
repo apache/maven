@@ -1,5 +1,3 @@
-package org.apache.maven.settings.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.settings.io;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.io;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,8 +31,7 @@ import org.apache.maven.api.settings.Settings;
  *
  * @author Benjamin Bentmann
  */
-public interface SettingsReader
-{
+public interface SettingsReader {
 
     /**
      * The key for the option to enable strict parsing. This option is of type {@link Boolean} and defaults to {@code
@@ -50,8 +48,7 @@ public interface SettingsReader
      * @throws IOException If the settings could not be deserialized.
      * @throws SettingsParseException If the input format could not be parsed.
      */
-    Settings read( File input, Map<String, ?> options )
-        throws IOException, SettingsParseException;
+    Settings read(File input, Map<String, ?> options) throws IOException, SettingsParseException;
 
     /**
      * Reads the settings from the specified character reader. The reader will be automatically closed before the method
@@ -63,8 +60,7 @@ public interface SettingsReader
      * @throws IOException If the settings could not be deserialized.
      * @throws SettingsParseException If the input format could not be parsed.
      */
-    Settings read( Reader input, Map<String, ?> options )
-        throws IOException, SettingsParseException;
+    Settings read(Reader input, Map<String, ?> options) throws IOException, SettingsParseException;
 
     /**
      * Reads the settings from the specified byte stream. The stream will be automatically closed before the method
@@ -76,7 +72,5 @@ public interface SettingsReader
      * @throws IOException If the settings could not be deserialized.
      * @throws SettingsParseException If the input format could not be parsed.
      */
-    Settings read( InputStream input, Map<String, ?> options )
-        throws IOException, SettingsParseException;
-
+    Settings read(InputStream input, Map<String, ?> options) throws IOException, SettingsParseException;
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,21 +16,20 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api;
 
 import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
-
 import org.apache.maven.api.model.Plugin;
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 
 /**
  * A {@code MojoExecution}
  */
 @Experimental
-public interface MojoExecution
-{
+public interface MojoExecution {
     @Nonnull
     Plugin getPlugin();
 
@@ -43,5 +40,5 @@ public interface MojoExecution
     String getGoal();
 
     @Nonnull
-    Optional<Dom> getConfiguration();
+    Optional<XmlNode> getConfiguration();
 }

@@ -19,8 +19,15 @@ name: Java CI
 
 on: [push, pull_request]
 
+# clear all permissions for GITHUB_TOKEN
+permissions: {}
+
 jobs:
   build:
+
+    # execute on any push or pull request from forked repo
+    if: github.event_name == 'push' || ( github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork )
+
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
@@ -29,8 +36,11 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v2
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@v3
         with:
           java-version: 8
           distribution: 'temurin'
@@ -40,7 +50,7 @@ jobs:
         run: mvn verify -e -B -V -DdistributionFileName=apache-maven
 
       - name: Upload built Maven
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: ${{ matrix.os == 'ubuntu-latest' }}
         with:
           name: built-maven
@@ -89,33 +99,26 @@ jobs:
           echo "REPO_USER=$target_user" >> $GITHUB_ENV
 
       - name: Checkout maven-integration-testing
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: ${{ env.REPO_USER }}/maven-integration-testing
           path: maven-integration-testing/
           ref: ${{ env.REPO_BRANCH }}
-
-      - name: Set up cache for ~/.m2/repository
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: it-m2-repo-${{ matrix.os }}-${{ hashFiles('maven-integration-testing/**/pom.xml') }}
-          restore-keys: |
-            it-m2-repo-${{ matrix.os }}-
+          persist-credentials: false
 
       - name: Download built Maven
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: built-maven
           path: built-maven/
 
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
-          cache: 'maven'
+#          cache: 'maven' - don't use cache for integration tests
 
       - name: Running integration tests
         shell: bash
-        run: mvn install -e -B -V -Prun-its,embedded -Dmaven.repo.local="$HOME/.m2/repository" -DmavenDistro="$GITHUB_WORKSPACE/built-maven/apache-maven-bin.zip" -f maven-integration-testing/pom.xml
+        run: mvn install -e -B -V -Prun-its,embedded -DmavenDistro="$GITHUB_WORKSPACE/built-maven/apache-maven-bin.zip" -f maven-integration-testing/pom.xml

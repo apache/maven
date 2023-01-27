@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver.filter;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver.filter;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.resolver.filter;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver.filter;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -28,59 +27,48 @@ import org.apache.maven.artifact.Artifact;
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
-public class ExclusionSetFilter
-    implements ArtifactFilter
-{
+public class ExclusionSetFilter implements ArtifactFilter {
     private Set<String> excludes;
 
-    public ExclusionSetFilter( String[] excludes )
-    {
-        this.excludes = new LinkedHashSet<>( Arrays.asList( excludes ) );
+    public ExclusionSetFilter(String[] excludes) {
+        this.excludes = new LinkedHashSet<>(Arrays.asList(excludes));
     }
 
-    public ExclusionSetFilter( Set<String> excludes )
-    {
+    public ExclusionSetFilter(Set<String> excludes) {
         this.excludes = excludes;
     }
 
-    public boolean include( Artifact artifact )
-    {
+    public boolean include(Artifact artifact) {
         String id = artifact.getArtifactId();
 
-        if ( excludes.contains( id ) )
-        {
+        if (excludes.contains(id)) {
             return false;
         }
 
         id = artifact.getGroupId() + ':' + id;
 
-        return !excludes.contains( id );
-
+        return !excludes.contains(id);
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int hash = 17;
         hash = hash * 31 + excludes.hashCode();
         return hash;
     }
 
     @Override
-    public boolean equals( Object obj )
-    {
-        if ( this == obj )
-        {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
 
-        if ( !( obj instanceof ExclusionSetFilter ) )
-        {
+        if (!(obj instanceof ExclusionSetFilter)) {
             return false;
         }
 
         ExclusionSetFilter other = (ExclusionSetFilter) obj;
 
-        return excludes.equals( other.excludes );
+        return excludes.equals(other.excludes);
     }
 }

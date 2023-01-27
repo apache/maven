@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.legacy.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy.metadata;
 
 import java.util.List;
 
@@ -32,9 +31,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
  *
  * @author Benjamin Bentmann
  */
-public class DefaultMetadataResolutionRequest
-    implements MetadataResolutionRequest
-{
+public class DefaultMetadataResolutionRequest implements MetadataResolutionRequest {
 
     private Artifact artifact;
 
@@ -42,91 +39,75 @@ public class DefaultMetadataResolutionRequest
 
     private RepositoryRequest repositoryRequest;
 
-    public DefaultMetadataResolutionRequest()
-    {
+    public DefaultMetadataResolutionRequest() {
         repositoryRequest = new DefaultRepositoryRequest();
     }
 
-    public DefaultMetadataResolutionRequest( RepositoryRequest repositoryRequest )
-    {
-        this.repositoryRequest = new DefaultRepositoryRequest( repositoryRequest );
+    public DefaultMetadataResolutionRequest(RepositoryRequest repositoryRequest) {
+        this.repositoryRequest = new DefaultRepositoryRequest(repositoryRequest);
     }
 
-    public DefaultMetadataResolutionRequest( ArtifactResolutionRequest resolutionRequest )
-    {
-        this.repositoryRequest = new DefaultRepositoryRequest( resolutionRequest );
+    public DefaultMetadataResolutionRequest(ArtifactResolutionRequest resolutionRequest) {
+        this.repositoryRequest = new DefaultRepositoryRequest(resolutionRequest);
     }
 
-    public Artifact getArtifact()
-    {
+    public Artifact getArtifact() {
         return artifact;
     }
 
-    public DefaultMetadataResolutionRequest setArtifact( Artifact artifact )
-    {
+    public DefaultMetadataResolutionRequest setArtifact(Artifact artifact) {
         this.artifact = artifact;
 
         return this;
     }
 
-    public ArtifactRepository getLocalRepository()
-    {
+    public ArtifactRepository getLocalRepository() {
         return repositoryRequest.getLocalRepository();
     }
 
-    public DefaultMetadataResolutionRequest setLocalRepository( ArtifactRepository localRepository )
-    {
-        repositoryRequest.setLocalRepository( localRepository );
+    public DefaultMetadataResolutionRequest setLocalRepository(ArtifactRepository localRepository) {
+        repositoryRequest.setLocalRepository(localRepository);
 
         return this;
     }
 
-    public List<ArtifactRepository> getRemoteRepositories()
-    {
+    public List<ArtifactRepository> getRemoteRepositories() {
         return repositoryRequest.getRemoteRepositories();
     }
 
-    public DefaultMetadataResolutionRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
-    {
-        repositoryRequest.setRemoteRepositories( remoteRepositories );
+    public DefaultMetadataResolutionRequest setRemoteRepositories(List<ArtifactRepository> remoteRepositories) {
+        repositoryRequest.setRemoteRepositories(remoteRepositories);
 
         return this;
     }
 
-    public boolean isResolveManagedVersions()
-    {
+    public boolean isResolveManagedVersions() {
         return resolveManagedVersions;
     }
 
-    public DefaultMetadataResolutionRequest setResolveManagedVersions( boolean resolveManagedVersions )
-    {
+    public DefaultMetadataResolutionRequest setResolveManagedVersions(boolean resolveManagedVersions) {
         this.resolveManagedVersions = resolveManagedVersions;
 
         return this;
     }
 
-    public boolean isOffline()
-    {
+    public boolean isOffline() {
         return repositoryRequest.isOffline();
     }
 
-    public DefaultMetadataResolutionRequest setOffline( boolean offline )
-    {
-        repositoryRequest.setOffline( offline );
+    public DefaultMetadataResolutionRequest setOffline(boolean offline) {
+        repositoryRequest.setOffline(offline);
 
         return this;
     }
 
-    public boolean isForceUpdate()
-    {
+    public boolean isForceUpdate() {
         return repositoryRequest.isForceUpdate();
     }
 
-    public DefaultMetadataResolutionRequest setForceUpdate( boolean forceUpdate )
-    {
-        repositoryRequest.setForceUpdate( forceUpdate );
+    public DefaultMetadataResolutionRequest setForceUpdate(boolean forceUpdate) {
+        repositoryRequest.setForceUpdate(forceUpdate);
 
         return this;
     }
-
 }

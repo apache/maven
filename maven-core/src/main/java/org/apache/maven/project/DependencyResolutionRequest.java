@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
@@ -27,8 +26,7 @@ import org.eclipse.aether.graph.DependencyFilter;
  *
  * @author Benjamin Bentmann
  */
-public interface DependencyResolutionRequest
-{
+public interface DependencyResolutionRequest {
 
     /**
      * Gets the project to resolve dependencies for.
@@ -43,7 +41,7 @@ public interface DependencyResolutionRequest
      * @param project The project to resolve dependencies for, may be {@code null}.
      * @return This request for chaining, never {@code null}.
      */
-    DependencyResolutionRequest setMavenProject( MavenProject project );
+    DependencyResolutionRequest setMavenProject(MavenProject project);
 
     /**
      * Gets the filter used to exclude some dependencies from resolution.
@@ -61,7 +59,7 @@ public interface DependencyResolutionRequest
      *            dependencies.
      * @return This request for chaining, never {@code null}.
      */
-    DependencyResolutionRequest setResolutionFilter( DependencyFilter filter );
+    DependencyResolutionRequest setResolutionFilter(DependencyFilter filter);
 
     /**
      * Gets the session to use for repository access.
@@ -76,6 +74,5 @@ public interface DependencyResolutionRequest
      * @param repositorySession The repository session to use.
      * @return This request for chaining, never {@code null}.
      */
-    DependencyResolutionRequest setRepositorySession( RepositorySystemSession repositorySession );
-
+    DependencyResolutionRequest setRepositorySession(RepositorySystemSession repositorySession);
 }

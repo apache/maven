@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
@@ -30,34 +29,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
-public class RelocationTest
-{
+public class RelocationTest {
 
     @Test
-    public void testHashCodeNullSafe()
-    {
+    public void testHashCodeNullSafe() {
         new Relocation().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Relocation().equals( null ) );
+    public void testEqualsNullSafe() {
+        assertFalse(new Relocation().equals(null));
 
-        new Relocation().equals( new Relocation() );
+        new Relocation().equals(new Relocation());
     }
 
     @Test
-    public void testEqualsIdentity()
-    {
+    public void testEqualsIdentity() {
         Relocation thing = new Relocation();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Relocation().toString() );
+    public void testToStringNullSafe() {
+        assertNotNull(new Relocation().toString());
     }
-
 }

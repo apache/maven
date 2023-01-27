@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.handler.manager;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.handler.manager;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,14 +16,15 @@ package org.apache.maven.artifact.handler.manager;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+package org.apache.maven.artifact.handler.manager;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
@@ -35,51 +34,40 @@ import org.apache.maven.artifact.handler.DefaultArtifactHandler;
  */
 @Named
 @Singleton
-public class DefaultArtifactHandlerManager
-    implements ArtifactHandlerManager
-{
+public class DefaultArtifactHandlerManager implements ArtifactHandlerManager {
 
     private final Map<String, ArtifactHandler> artifactHandlers;
 
     private final Map<String, ArtifactHandler> allHandlers = new ConcurrentHashMap<>();
 
     @Inject
-    public DefaultArtifactHandlerManager( Map<String, ArtifactHandler> artifactHandlers )
-    {
+    public DefaultArtifactHandlerManager(Map<String, ArtifactHandler> artifactHandlers) {
         this.artifactHandlers = artifactHandlers;
     }
 
-    public ArtifactHandler getArtifactHandler( String type )
-    {
-        ArtifactHandler handler = allHandlers.get( type );
+    public ArtifactHandler getArtifactHandler(String type) {
+        ArtifactHandler handler = allHandlers.get(type);
 
-        if ( handler == null )
-        {
-            handler = artifactHandlers.get( type );
+        if (handler == null) {
+            handler = artifactHandlers.get(type);
 
-            if ( handler == null )
-            {
-                handler = new DefaultArtifactHandler( type );
-            }
-            else
-            {
-                allHandlers.put( type, handler );
+            if (handler == null) {
+                handler = new DefaultArtifactHandler(type);
+            } else {
+                allHandlers.put(type, handler);
             }
         }
 
         return handler;
     }
 
-    public void addHandlers( Map<String, ArtifactHandler> handlers )
-    {
+    public void addHandlers(Map<String, ArtifactHandler> handlers) {
         // legacy support for maven-gpg-plugin:1.0
-        allHandlers.putAll( handlers );
+        allHandlers.putAll(handlers);
     }
 
     @Deprecated
-    public Set<String> getHandlerTypes()
-    {
+    public Set<String> getHandlerTypes() {
         return artifactHandlers.keySet();
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,15 +28,14 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Objects;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
-// remove once createArtifacts() is removed
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
@@ -89,11 +87,9 @@ import org.slf4j.LoggerFactory;
  * directories but I hope to take care of this during the Maven 4.0 release (jvz).
  * </p>
  */
-public class MavenProject
-    implements Cloneable
-{
+public class MavenProject implements Cloneable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger( MavenProject.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger(MavenProject.class);
 
     public static final String EMPTY_PROJECT_GROUP_ID = "unknown";
 
@@ -180,41 +176,35 @@ public class MavenProject
 
     private DependencyFilter extensionDependencyFilter;
 
-    private final Set<String> lifecyclePhases = Collections.synchronizedSet( new LinkedHashSet<>() );
+    private final Set<String> lifecyclePhases = Collections.synchronizedSet(new LinkedHashSet<>());
 
-    public MavenProject()
-    {
+    public MavenProject() {
         Model model = new Model();
 
-        model.setGroupId( EMPTY_PROJECT_GROUP_ID );
-        model.setArtifactId( EMPTY_PROJECT_ARTIFACT_ID );
-        model.setVersion( EMPTY_PROJECT_VERSION );
+        model.setGroupId(EMPTY_PROJECT_GROUP_ID);
+        model.setArtifactId(EMPTY_PROJECT_ARTIFACT_ID);
+        model.setVersion(EMPTY_PROJECT_VERSION);
 
-        setModel( model );
+        setModel(model);
     }
 
-    public MavenProject( org.apache.maven.api.model.Model model )
-    {
-        this( new Model( model ) );
+    public MavenProject(org.apache.maven.api.model.Model model) {
+        this(new Model(model));
     }
 
-    public MavenProject( Model model )
-    {
-        setModel( model );
+    public MavenProject(Model model) {
+        setModel(model);
     }
 
-    public MavenProject( MavenProject project )
-    {
-        deepCopy( project );
+    public MavenProject(MavenProject project) {
+        deepCopy(project);
     }
 
-    public File getParentFile()
-    {
+    public File getParentFile() {
         return parentFile;
     }
 
-    public void setParentFile( File parentFile )
-    {
+    public void setParentFile(File parentFile) {
         this.parentFile = parentFile;
     }
 
@@ -222,19 +212,16 @@ public class MavenProject
     // Accessors
     // ----------------------------------------------------------------------
 
-    public Artifact getArtifact()
-    {
+    public Artifact getArtifact() {
         return artifact;
     }
 
-    public void setArtifact( Artifact artifact )
-    {
+    public void setArtifact(Artifact artifact) {
         this.artifact = artifact;
     }
 
     // TODO I would like to get rid of this. jvz.
-    public Model getModel()
-    {
+    public Model getModel() {
         return model;
     }
 
@@ -243,28 +230,23 @@ public class MavenProject
      *
      * @return the parent, or null if no parent is declared or there was an error building it
      */
-    public MavenProject getParent()
-    {
+    public MavenProject getParent() {
         return parent;
     }
 
-    public void setParent( MavenProject parent )
-    {
+    public void setParent(MavenProject parent) {
         this.parent = parent;
     }
 
-    public boolean hasParent()
-    {
+    public boolean hasParent() {
         return getParent() != null;
     }
 
-    public File getFile()
-    {
+    public File getFile() {
         return file;
     }
 
-    public void setFile( File file )
-    {
+    public void setFile(File file) {
         this.file = file;
         this.basedir = file != null ? file.getParentFile() : null;
     }
@@ -274,28 +256,23 @@ public class MavenProject
      *
      * @since 3.2.4
      */
-    public void setPomFile( File file )
-    {
+    public void setPomFile(File file) {
         this.file = file;
     }
 
-    public File getBasedir()
-    {
+    public File getBasedir() {
         return basedir;
     }
 
-    public void setDependencies( List<Dependency> dependencies )
-    {
-        getModel().setDependencies( dependencies );
+    public void setDependencies(List<Dependency> dependencies) {
+        getModel().setDependencies(dependencies);
     }
 
-    public List<Dependency> getDependencies()
-    {
+    public List<Dependency> getDependencies() {
         return getModel().getDependencies();
     }
 
-    public DependencyManagement getDependencyManagement()
-    {
+    public DependencyManagement getDependencyManagement() {
         return getModel().getDependencyManagement();
     }
 
@@ -303,75 +280,57 @@ public class MavenProject
     // Test and compile source roots.
     // ----------------------------------------------------------------------
 
-    private void addPath( List<String> paths, String path )
-    {
-        if ( path != null )
-        {
+    private void addPath(List<String> paths, String path) {
+        if (path != null) {
             path = path.trim();
-            if ( path.length() > 0 )
-            {
-                File file = new File( path );
-                if ( file.isAbsolute() )
-                {
+            if (path.length() > 0) {
+                File file = new File(path);
+                if (file.isAbsolute()) {
                     path = file.getAbsolutePath();
-                }
-                else if ( ".".equals( path ) )
-                {
+                } else if (".".equals(path)) {
                     path = getBasedir().getAbsolutePath();
-                }
-                else
-                {
-                    path = new File( getBasedir(), path ).getAbsolutePath();
+                } else {
+                    path = new File(getBasedir(), path).getAbsolutePath();
                 }
 
-                if ( !paths.contains( path ) )
-                {
-                    paths.add( path );
+                if (!paths.contains(path)) {
+                    paths.add(path);
                 }
             }
         }
     }
 
-    public void addCompileSourceRoot( String path )
-    {
-        addPath( getCompileSourceRoots(), path );
+    public void addCompileSourceRoot(String path) {
+        addPath(getCompileSourceRoots(), path);
     }
 
-    public void addTestCompileSourceRoot( String path )
-    {
-        addPath( getTestCompileSourceRoots(), path );
+    public void addTestCompileSourceRoot(String path) {
+        addPath(getTestCompileSourceRoots(), path);
     }
 
-    public List<String> getCompileSourceRoots()
-    {
+    public List<String> getCompileSourceRoots() {
         return compileSourceRoots;
     }
 
-    public List<String> getTestCompileSourceRoots()
-    {
+    public List<String> getTestCompileSourceRoots() {
         return testCompileSourceRoots;
     }
 
-    public List<String> getCompileClasspathElements()
-        throws DependencyResolutionRequiredException
-    {
-        List<String> list = new ArrayList<>( getArtifacts().size() + 1 );
+    public List<String> getCompileClasspathElements() throws DependencyResolutionRequiredException {
+        List<String> list = new ArrayList<>(getArtifacts().size() + 1);
 
         String d = getBuild().getOutputDirectory();
-        if ( d != null )
-        {
-            list.add( d );
+        if (d != null) {
+            list.add(d);
         }
 
-        for ( Artifact a : getArtifacts() )
-        {
-            if ( a.getArtifactHandler().isAddedToClasspath() )
-            {
+        for (Artifact a : getArtifacts()) {
+            if (a.getArtifactHandler().isAddedToClasspath()) {
                 // TODO let the scope handler deal with this
-                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() )
-                    || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
-                {
-                    addArtifactPath( a, list );
+                if (Artifact.SCOPE_COMPILE.equals(a.getScope())
+                        || Artifact.SCOPE_PROVIDED.equals(a.getScope())
+                        || Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
+                    addArtifactPath(a, list);
                 }
             }
         }
@@ -381,52 +340,41 @@ public class MavenProject
 
     // TODO this checking for file == null happens because the resolver has been confused about the root
     // artifact or not. things like the stupid dummy artifact coming from surefire.
-    public List<String> getTestClasspathElements()
-        throws DependencyResolutionRequiredException
-    {
-        List<String> list = new ArrayList<>( getArtifacts().size() + 2 );
+    public List<String> getTestClasspathElements() throws DependencyResolutionRequiredException {
+        List<String> list = new ArrayList<>(getArtifacts().size() + 2);
 
         String d = getBuild().getTestOutputDirectory();
-        if ( d != null )
-        {
-            list.add( d );
+        if (d != null) {
+            list.add(d);
         }
 
         d = getBuild().getOutputDirectory();
-        if ( d != null )
-        {
-            list.add( d );
+        if (d != null) {
+            list.add(d);
         }
 
-        for ( Artifact a : getArtifacts() )
-        {
-            if ( a.getArtifactHandler().isAddedToClasspath() )
-            {
-                addArtifactPath( a, list );
+        for (Artifact a : getArtifacts()) {
+            if (a.getArtifactHandler().isAddedToClasspath()) {
+                addArtifactPath(a, list);
             }
         }
 
         return list;
     }
 
-    public List<String> getRuntimeClasspathElements()
-        throws DependencyResolutionRequiredException
-    {
-        List<String> list = new ArrayList<>( getArtifacts().size() + 1 );
+    public List<String> getRuntimeClasspathElements() throws DependencyResolutionRequiredException {
+        List<String> list = new ArrayList<>(getArtifacts().size() + 1);
 
         String d = getBuild().getOutputDirectory();
-        if ( d != null )
-        {
-            list.add( d );
+        if (d != null) {
+            list.add(d);
         }
 
-        for ( Artifact a : getArtifacts() )
-        {
-            if ( a.getArtifactHandler().isAddedToClasspath()
-            // TODO let the scope handler deal with this
-                && ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) ) )
-            {
-                addArtifactPath( a, list );
+        for (Artifact a : getArtifacts()) {
+            if (a.getArtifactHandler().isAddedToClasspath()
+                    // TODO let the scope handler deal with this
+                    && (Artifact.SCOPE_COMPILE.equals(a.getScope()) || Artifact.SCOPE_RUNTIME.equals(a.getScope()))) {
+                addArtifactPath(a, list);
             }
         }
         return list;
@@ -436,270 +384,216 @@ public class MavenProject
     // Delegate to the model
     // ----------------------------------------------------------------------
 
-    public void setModelVersion( String pomVersion )
-    {
-        getModel().setModelVersion( pomVersion );
+    public void setModelVersion(String pomVersion) {
+        getModel().setModelVersion(pomVersion);
     }
 
-    public String getModelVersion()
-    {
+    public String getModelVersion() {
         return getModel().getModelVersion();
     }
 
-    public String getId()
-    {
+    public String getId() {
         return getModel().getId();
     }
 
-    public void setGroupId( String groupId )
-    {
-        getModel().setGroupId( groupId );
+    public void setGroupId(String groupId) {
+        getModel().setGroupId(groupId);
     }
 
-    public String getGroupId()
-    {
+    public String getGroupId() {
         String groupId = getModel().getGroupId();
 
-        if ( ( groupId == null ) && ( getModel().getParent() != null ) )
-        {
+        if ((groupId == null) && (getModel().getParent() != null)) {
             groupId = getModel().getParent().getGroupId();
         }
 
         return groupId;
     }
 
-    public void setArtifactId( String artifactId )
-    {
-        getModel().setArtifactId( artifactId );
+    public void setArtifactId(String artifactId) {
+        getModel().setArtifactId(artifactId);
     }
 
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return getModel().getArtifactId();
     }
 
-    public void setName( String name )
-    {
-        getModel().setName( name );
+    public void setName(String name) {
+        getModel().setName(name);
     }
 
-    public String getName()
-    {
+    public String getName() {
         // TODO this should not be allowed to be null.
-        if ( getModel().getName() != null )
-        {
+        if (getModel().getName() != null) {
             return getModel().getName();
-        }
-        else
-        {
+        } else {
             return getArtifactId();
         }
     }
 
-    public void setVersion( String version )
-    {
-        getModel().setVersion( version );
+    public void setVersion(String version) {
+        getModel().setVersion(version);
     }
 
-    public String getVersion()
-    {
+    public String getVersion() {
         String version = getModel().getVersion();
 
-        if ( ( version == null ) && ( getModel().getParent() != null ) )
-        {
+        if ((version == null) && (getModel().getParent() != null)) {
             version = getModel().getParent().getVersion();
         }
 
         return version;
     }
 
-    public String getPackaging()
-    {
+    public String getPackaging() {
         return getModel().getPackaging();
     }
 
-    public void setPackaging( String packaging )
-    {
-        getModel().setPackaging( packaging );
+    public void setPackaging(String packaging) {
+        getModel().setPackaging(packaging);
     }
 
-    public void setInceptionYear( String inceptionYear )
-    {
-        getModel().setInceptionYear( inceptionYear );
+    public void setInceptionYear(String inceptionYear) {
+        getModel().setInceptionYear(inceptionYear);
     }
 
-    public String getInceptionYear()
-    {
+    public String getInceptionYear() {
         return getModel().getInceptionYear();
     }
 
-    public void setUrl( String url )
-    {
-        getModel().setUrl( url );
+    public void setUrl(String url) {
+        getModel().setUrl(url);
     }
 
-    public String getUrl()
-    {
+    public String getUrl() {
         return getModel().getUrl();
     }
 
-    public Prerequisites getPrerequisites()
-    {
+    public Prerequisites getPrerequisites() {
         return getModel().getPrerequisites();
     }
 
-    public void setIssueManagement( IssueManagement issueManagement )
-    {
-        getModel().setIssueManagement( issueManagement );
+    public void setIssueManagement(IssueManagement issueManagement) {
+        getModel().setIssueManagement(issueManagement);
     }
 
-    public CiManagement getCiManagement()
-    {
+    public CiManagement getCiManagement() {
         return getModel().getCiManagement();
     }
 
-    public void setCiManagement( CiManagement ciManagement )
-    {
-        getModel().setCiManagement( ciManagement );
+    public void setCiManagement(CiManagement ciManagement) {
+        getModel().setCiManagement(ciManagement);
     }
 
-    public IssueManagement getIssueManagement()
-    {
+    public IssueManagement getIssueManagement() {
         return getModel().getIssueManagement();
     }
 
-    public void setDistributionManagement( DistributionManagement distributionManagement )
-    {
-        getModel().setDistributionManagement( distributionManagement );
+    public void setDistributionManagement(DistributionManagement distributionManagement) {
+        getModel().setDistributionManagement(distributionManagement);
     }
 
-    public DistributionManagement getDistributionManagement()
-    {
+    public DistributionManagement getDistributionManagement() {
         return getModel().getDistributionManagement();
     }
 
-    public void setDescription( String description )
-    {
-        getModel().setDescription( description );
+    public void setDescription(String description) {
+        getModel().setDescription(description);
     }
 
-    public String getDescription()
-    {
+    public String getDescription() {
         return getModel().getDescription();
     }
 
-    public void setOrganization( Organization organization )
-    {
-        getModel().setOrganization( organization );
+    public void setOrganization(Organization organization) {
+        getModel().setOrganization(organization);
     }
 
-    public Organization getOrganization()
-    {
+    public Organization getOrganization() {
         return getModel().getOrganization();
     }
 
-    public void setScm( Scm scm )
-    {
-        getModel().setScm( scm );
+    public void setScm(Scm scm) {
+        getModel().setScm(scm);
     }
 
-    public Scm getScm()
-    {
+    public Scm getScm() {
         return getModel().getScm();
     }
 
-    public void setMailingLists( List<MailingList> mailingLists )
-    {
-        getModel().setMailingLists( mailingLists );
+    public void setMailingLists(List<MailingList> mailingLists) {
+        getModel().setMailingLists(mailingLists);
     }
 
-    public List<MailingList> getMailingLists()
-    {
+    public List<MailingList> getMailingLists() {
         return getModel().getMailingLists();
     }
 
-    public void addMailingList( MailingList mailingList )
-    {
-        getModel().addMailingList( mailingList );
+    public void addMailingList(MailingList mailingList) {
+        getModel().addMailingList(mailingList);
     }
 
-    public void setDevelopers( List<Developer> developers )
-    {
-        getModel().setDevelopers( developers );
+    public void setDevelopers(List<Developer> developers) {
+        getModel().setDevelopers(developers);
     }
 
-    public List<Developer> getDevelopers()
-    {
+    public List<Developer> getDevelopers() {
         return getModel().getDevelopers();
     }
 
-    public void addDeveloper( Developer developer )
-    {
-        getModel().addDeveloper( developer );
+    public void addDeveloper(Developer developer) {
+        getModel().addDeveloper(developer);
     }
 
-    public void setContributors( List<Contributor> contributors )
-    {
-        getModel().setContributors( contributors );
+    public void setContributors(List<Contributor> contributors) {
+        getModel().setContributors(contributors);
     }
 
-    public List<Contributor> getContributors()
-    {
+    public List<Contributor> getContributors() {
         return getModel().getContributors();
     }
 
-    public void addContributor( Contributor contributor )
-    {
-        getModel().addContributor( contributor );
+    public void addContributor(Contributor contributor) {
+        getModel().addContributor(contributor);
     }
 
-    public void setBuild( Build build )
-    {
-        getModel().setBuild( build );
+    public void setBuild(Build build) {
+        getModel().setBuild(build);
     }
 
-    public Build getBuild()
-    {
+    public Build getBuild() {
         return getModelBuild();
     }
 
-    public List<Resource> getResources()
-    {
+    public List<Resource> getResources() {
         return getBuild().getResources();
     }
 
-    public List<Resource> getTestResources()
-    {
+    public List<Resource> getTestResources() {
         return getBuild().getTestResources();
     }
 
-    public void addResource( Resource resource )
-    {
-        getBuild().addResource( resource );
+    public void addResource(Resource resource) {
+        getBuild().addResource(resource);
     }
 
-    public void addTestResource( Resource testResource )
-    {
-        getBuild().addTestResource( testResource );
+    public void addTestResource(Resource testResource) {
+        getBuild().addTestResource(testResource);
     }
 
-    public void setLicenses( List<License> licenses )
-    {
-        getModel().setLicenses( licenses );
+    public void setLicenses(List<License> licenses) {
+        getModel().setLicenses(licenses);
     }
 
-    public List<License> getLicenses()
-    {
+    public List<License> getLicenses() {
         return getModel().getLicenses();
     }
 
-    public void addLicense( License license )
-    {
-        getModel().addLicense( license );
+    public void addLicense(License license) {
+        getModel().addLicense(license);
     }
 
-    public void setArtifacts( Set<Artifact> artifacts )
-    {
+    public void setArtifacts(Set<Artifact> artifacts) {
         this.artifacts = artifacts;
 
         // flush the calculated artifactMap
@@ -714,22 +608,15 @@ public class MavenProject
      * @return {@link Set} &lt; {@link Artifact} &gt;
      * @see #getDependencyArtifacts() to get only direct dependencies
      */
-    public Set<Artifact> getArtifacts()
-    {
-        if ( artifacts == null )
-        {
-            if ( artifactFilter == null || resolvedArtifacts == null )
-            {
+    public Set<Artifact> getArtifacts() {
+        if (artifacts == null) {
+            if (artifactFilter == null || resolvedArtifacts == null) {
                 artifacts = new LinkedHashSet<>();
-            }
-            else
-            {
-                artifacts = new LinkedHashSet<>( resolvedArtifacts.size() * 2 );
-                for ( Artifact artifact : resolvedArtifacts )
-                {
-                    if ( artifactFilter.include( artifact ) )
-                    {
-                        artifacts.add( artifact );
+            } else {
+                artifacts = new LinkedHashSet<>(resolvedArtifacts.size() * 2);
+                for (Artifact artifact : resolvedArtifacts) {
+                    if (artifactFilter.include(artifact)) {
+                        artifacts.add(artifact);
                     }
                 }
             }
@@ -737,49 +624,40 @@ public class MavenProject
         return artifacts;
     }
 
-    public Map<String, Artifact> getArtifactMap()
-    {
-        if ( artifactMap == null )
-        {
-            artifactMap = ArtifactUtils.artifactMapByVersionlessId( getArtifacts() );
+    public Map<String, Artifact> getArtifactMap() {
+        if (artifactMap == null) {
+            artifactMap = ArtifactUtils.artifactMapByVersionlessId(getArtifacts());
         }
         return artifactMap;
     }
 
-    public void setPluginArtifacts( Set<Artifact> pluginArtifacts )
-    {
+    public void setPluginArtifacts(Set<Artifact> pluginArtifacts) {
         this.pluginArtifacts = pluginArtifacts;
 
         this.pluginArtifactMap = null;
     }
 
-    public Set<Artifact> getPluginArtifacts()
-    {
+    public Set<Artifact> getPluginArtifacts() {
         return pluginArtifacts;
     }
 
-    public Map<String, Artifact> getPluginArtifactMap()
-    {
-        if ( pluginArtifactMap == null )
-        {
-            pluginArtifactMap = ArtifactUtils.artifactMapByVersionlessId( getPluginArtifacts() );
+    public Map<String, Artifact> getPluginArtifactMap() {
+        if (pluginArtifactMap == null) {
+            pluginArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getPluginArtifacts());
         }
 
         return pluginArtifactMap;
     }
 
-    public void setParentArtifact( Artifact parentArtifact )
-    {
+    public void setParentArtifact(Artifact parentArtifact) {
         this.parentArtifact = parentArtifact;
     }
 
-    public Artifact getParentArtifact()
-    {
+    public Artifact getParentArtifact() {
         return parentArtifact;
     }
 
-    public List<Repository> getRepositories()
-    {
+    public List<Repository> getRepositories() {
         return getModel().getRepositories();
     }
 
@@ -787,124 +665,101 @@ public class MavenProject
     // Plugins
     // ----------------------------------------------------------------------
 
-    public List<Plugin> getBuildPlugins()
-    {
-        if ( getModel().getBuild() == null )
-        {
+    public List<Plugin> getBuildPlugins() {
+        if (getModel().getBuild() == null) {
             return Collections.emptyList();
         }
-        return Collections.unmodifiableList( getModel().getBuild().getPlugins() );
+        return Collections.unmodifiableList(getModel().getBuild().getPlugins());
     }
 
-    public List<String> getModules()
-    {
+    public List<String> getModules() {
         return getModel().getModules();
     }
 
-    public PluginManagement getPluginManagement()
-    {
+    public PluginManagement getPluginManagement() {
         PluginManagement pluginMgmt = null;
 
         Build build = getModel().getBuild();
-        if ( build != null )
-        {
+        if (build != null) {
             pluginMgmt = build.getPluginManagement();
         }
 
         return pluginMgmt;
     }
 
-    private Build getModelBuild()
-    {
+    private Build getModelBuild() {
         Build build = getModel().getBuild();
 
-        if ( build == null )
-        {
+        if (build == null) {
             build = new Build();
 
-            getModel().setBuild( build );
+            getModel().setBuild(build);
         }
 
         return build;
     }
 
-    public void setRemoteArtifactRepositories( List<ArtifactRepository> remoteArtifactRepositories )
-    {
+    public void setRemoteArtifactRepositories(List<ArtifactRepository> remoteArtifactRepositories) {
         this.remoteArtifactRepositories = remoteArtifactRepositories;
-        this.remoteProjectRepositories = RepositoryUtils.toRepos( getRemoteArtifactRepositories() );
+        this.remoteProjectRepositories = RepositoryUtils.toRepos(getRemoteArtifactRepositories());
     }
 
-    public List<ArtifactRepository> getRemoteArtifactRepositories()
-    {
-        if ( remoteArtifactRepositories == null )
-        {
+    public List<ArtifactRepository> getRemoteArtifactRepositories() {
+        if (remoteArtifactRepositories == null) {
             remoteArtifactRepositories = new ArrayList<>();
         }
 
         return remoteArtifactRepositories;
     }
 
-    public void setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifactRepositories )
-    {
+    public void setPluginArtifactRepositories(List<ArtifactRepository> pluginArtifactRepositories) {
         this.pluginArtifactRepositories = pluginArtifactRepositories;
-        this.remotePluginRepositories = RepositoryUtils.toRepos( getPluginArtifactRepositories() );
+        this.remotePluginRepositories = RepositoryUtils.toRepos(getPluginArtifactRepositories());
     }
 
     /**
      * @return a list of ArtifactRepository objects constructed from the Repository objects returned by
      *         getPluginRepositories.
      */
-    public List<ArtifactRepository> getPluginArtifactRepositories()
-    {
-        if ( pluginArtifactRepositories == null )
-        {
+    public List<ArtifactRepository> getPluginArtifactRepositories() {
+        if (pluginArtifactRepositories == null) {
             pluginArtifactRepositories = new ArrayList<>();
         }
 
         return pluginArtifactRepositories;
     }
 
-    public ArtifactRepository getDistributionManagementArtifactRepository()
-    {
-        return getArtifact().isSnapshot() && ( getSnapshotArtifactRepository() != null )
-                        ? getSnapshotArtifactRepository()
-                        : getReleaseArtifactRepository();
+    public ArtifactRepository getDistributionManagementArtifactRepository() {
+        return getArtifact().isSnapshot() && (getSnapshotArtifactRepository() != null)
+                ? getSnapshotArtifactRepository()
+                : getReleaseArtifactRepository();
     }
 
-    public List<Repository> getPluginRepositories()
-    {
+    public List<Repository> getPluginRepositories() {
         return getModel().getPluginRepositories();
     }
 
-    public List<RemoteRepository> getRemoteProjectRepositories()
-    {
+    public List<RemoteRepository> getRemoteProjectRepositories() {
         return remoteProjectRepositories;
     }
 
-    public List<RemoteRepository> getRemotePluginRepositories()
-    {
+    public List<RemoteRepository> getRemotePluginRepositories() {
         return remotePluginRepositories;
     }
 
-    public void setActiveProfiles( List<Profile> activeProfiles )
-    {
+    public void setActiveProfiles(List<Profile> activeProfiles) {
         this.activeProfiles = activeProfiles;
     }
 
-    public List<Profile> getActiveProfiles()
-    {
+    public List<Profile> getActiveProfiles() {
         return activeProfiles;
     }
 
-    public void setInjectedProfileIds( String source, List<String> injectedProfileIds )
-    {
-        if ( injectedProfileIds != null )
-        {
-            this.injectedProfileIds.put( source, new ArrayList<>( injectedProfileIds ) );
-        }
-        else
-        {
-            this.injectedProfileIds.remove( source );
+    public void setInjectedProfileIds(String source, List<String> injectedProfileIds) {
+        if (injectedProfileIds != null) {
+            this.injectedProfileIds.put(source, new ArrayList<>(injectedProfileIds));
+        } else {
+            this.injectedProfileIds.remove(source);
         }
     }
 
@@ -918,8 +773,7 @@ public class MavenProject
      * @return The identifiers of all injected profiles, indexed by the source from which the profiles originated, never
      *         {@code null}.
      */
-    public Map<String, List<String>> getInjectedProfileIds()
-    {
+    public Map<String, List<String>> getInjectedProfileIds() {
         return this.injectedProfileIds;
     }
 
@@ -934,50 +788,41 @@ public class MavenProject
      * @deprecated Please use {@link MavenProjectHelper}
      * @throws DuplicateArtifactAttachmentException will never happen but leave it for backward compatibility
      */
-    public void addAttachedArtifact( Artifact artifact )
-        throws DuplicateArtifactAttachmentException
-    {
+    public void addAttachedArtifact(Artifact artifact) throws DuplicateArtifactAttachmentException {
         // if already there we remove it and add again
-        int index = attachedArtifacts.indexOf( artifact );
-        if ( index >= 0 )
-        {
-            LOGGER.warn( "artifact '{}' already attached, replacing previous instance", artifact );
-            attachedArtifacts.set( index, artifact );
-        }
-        else
-        {
-            attachedArtifacts.add( artifact );
+        int index = attachedArtifacts.indexOf(artifact);
+        if (index >= 0) {
+            LOGGER.warn("artifact '{}' already attached, replacing previous instance", artifact);
+            attachedArtifacts.set(index, artifact);
+        } else {
+            attachedArtifacts.add(artifact);
         }
     }
 
-    public List<Artifact> getAttachedArtifacts()
-    {
-        if ( attachedArtifacts == null )
-        {
+    /**
+     * Returns a read-only list of the attached artifacts to this project.
+     *
+     * @return the attached artifacts of this project
+     */
+    public List<Artifact> getAttachedArtifacts() {
+        if (attachedArtifacts == null) {
             attachedArtifacts = new ArrayList<>();
         }
-        return Collections.unmodifiableList( attachedArtifacts );
+        return Collections.unmodifiableList(attachedArtifacts);
     }
 
-    public Xpp3Dom getGoalConfiguration( String pluginGroupId, String pluginArtifactId, String executionId,
-                                         String goalId )
-    {
+    public Xpp3Dom getGoalConfiguration(
+            String pluginGroupId, String pluginArtifactId, String executionId, String goalId) {
         Xpp3Dom dom = null;
 
-        if ( getBuildPlugins() != null )
-        {
-            for ( Plugin plugin : getBuildPlugins() )
-            {
-                if ( pluginGroupId.equals( plugin.getGroupId() ) && pluginArtifactId.equals( plugin.getArtifactId() ) )
-                {
+        if (getBuildPlugins() != null) {
+            for (Plugin plugin : getBuildPlugins()) {
+                if (pluginGroupId.equals(plugin.getGroupId()) && pluginArtifactId.equals(plugin.getArtifactId())) {
                     dom = (Xpp3Dom) plugin.getConfiguration();
 
-                    if ( executionId != null )
-                    {
-                        for ( PluginExecution execution : plugin.getExecutions() )
-                        {
-                            if ( executionId.equals( execution.getId() ) )
-                            {
+                    if (executionId != null) {
+                        for (PluginExecution execution : plugin.getExecutions()) {
+                            if (executionId.equals(execution.getId())) {
                                 // NOTE: The PluginConfigurationExpander already merged the plugin-level config in
                                 dom = (Xpp3Dom) execution.getConfiguration();
                                 break;
@@ -989,32 +834,27 @@ public class MavenProject
             }
         }
 
-        if ( dom != null )
-        {
+        if (dom != null) {
             // make a copy so the original in the POM doesn't get messed with
-            dom = new Xpp3Dom( dom );
+            dom = new Xpp3Dom(dom);
         }
 
         return dom;
     }
 
-    public MavenProject getExecutionProject()
-    {
-        return ( executionProject == null ? this : executionProject );
+    public MavenProject getExecutionProject() {
+        return (executionProject == null ? this : executionProject);
     }
 
-    public void setExecutionProject( MavenProject executionProject )
-    {
+    public void setExecutionProject(MavenProject executionProject) {
         this.executionProject = executionProject;
     }
 
-    public List<MavenProject> getCollectedProjects()
-    {
+    public List<MavenProject> getCollectedProjects() {
         return collectedProjects;
     }
 
-    public void setCollectedProjects( List<MavenProject> collectedProjects )
-    {
+    public void setCollectedProjects(List<MavenProject> collectedProjects) {
         this.collectedProjects = collectedProjects;
     }
 
@@ -1025,147 +865,116 @@ public class MavenProject
      * @see #getArtifacts() to get all transitive dependencies
      */
     @Deprecated
-    public Set<Artifact> getDependencyArtifacts()
-    {
+    public Set<Artifact> getDependencyArtifacts() {
         return dependencyArtifacts;
     }
 
     @Deprecated
-    public void setDependencyArtifacts( Set<Artifact> dependencyArtifacts )
-    {
+    public void setDependencyArtifacts(Set<Artifact> dependencyArtifacts) {
         this.dependencyArtifacts = dependencyArtifacts;
     }
 
-    public void setReleaseArtifactRepository( ArtifactRepository releaseArtifactRepository )
-    {
+    public void setReleaseArtifactRepository(ArtifactRepository releaseArtifactRepository) {
         this.releaseArtifactRepository = releaseArtifactRepository;
     }
 
-    public void setSnapshotArtifactRepository( ArtifactRepository snapshotArtifactRepository )
-    {
+    public void setSnapshotArtifactRepository(ArtifactRepository snapshotArtifactRepository) {
         this.snapshotArtifactRepository = snapshotArtifactRepository;
     }
 
-    public void setOriginalModel( Model originalModel )
-    {
+    public void setOriginalModel(Model originalModel) {
         this.originalModel = originalModel;
     }
 
-    public Model getOriginalModel()
-    {
+    public Model getOriginalModel() {
         return originalModel;
     }
 
-    public void setManagedVersionMap( Map<String, Artifact> map )
-    {
+    public void setManagedVersionMap(Map<String, Artifact> map) {
         managedVersionMap = map;
     }
 
-    public Map<String, Artifact> getManagedVersionMap()
-    {
+    public Map<String, Artifact> getManagedVersionMap() {
         return managedVersionMap;
     }
 
     @Override
-    public boolean equals( Object other )
-    {
-        if ( other == this )
-        {
+    public boolean equals(Object other) {
+        if (other == this) {
             return true;
-        }
-        else if ( !( other instanceof MavenProject ) )
-        {
+        } else if (!(other instanceof MavenProject)) {
             return false;
         }
 
         MavenProject that = (MavenProject) other;
 
-        return Objects.equals( getArtifactId(), that.getArtifactId() )
-            && Objects.equals( getGroupId(), that.getGroupId() )
-            && Objects.equals( getVersion(), that.getVersion() );
+        return Objects.equals(getArtifactId(), that.getArtifactId())
+                && Objects.equals(getGroupId(), that.getGroupId())
+                && Objects.equals(getVersion(), that.getVersion());
     }
 
     @Override
-    public int hashCode()
-    {
-        int hash = 17;
-        hash = 31 * hash + getGroupId().hashCode();
-        hash = 31 * hash + getArtifactId().hashCode();
-        hash = 31 * hash + getVersion().hashCode();
-        return hash;
+    public int hashCode() {
+        return Objects.hash(getGroupId(), getArtifactId(), getVersion());
     }
 
-    public List<Extension> getBuildExtensions()
-    {
+    public List<Extension> getBuildExtensions() {
         Build build = getBuild();
-        if ( ( build == null ) || ( build.getExtensions() == null ) )
-        {
+        if ((build == null) || (build.getExtensions() == null)) {
             return Collections.emptyList();
-        }
-        else
-        {
-            return Collections.unmodifiableList( build.getExtensions() );
+        } else {
+            return Collections.unmodifiableList(build.getExtensions());
         }
     }
 
-    public void addProjectReference( MavenProject project )
-    {
-        projectReferences.put( getProjectReferenceId( project.getGroupId(), project.getArtifactId(),
-                                                      project.getVersion() ), project );
+    public void addProjectReference(MavenProject project) {
+        projectReferences.put(
+                getProjectReferenceId(project.getGroupId(), project.getArtifactId(), project.getVersion()), project);
     }
 
-    public Properties getProperties()
-    {
+    public Properties getProperties() {
         return getModel().getProperties();
     }
 
-    public List<String> getFilters()
-    {
+    public List<String> getFilters() {
         return getBuild().getFilters();
     }
 
-    public Map<String, MavenProject> getProjectReferences()
-    {
+    public Map<String, MavenProject> getProjectReferences() {
         return projectReferences;
     }
 
-    public boolean isExecutionRoot()
-    {
+    public boolean isExecutionRoot() {
         return executionRoot;
     }
 
-    public void setExecutionRoot( boolean executionRoot )
-    {
+    public void setExecutionRoot(boolean executionRoot) {
         this.executionRoot = executionRoot;
     }
 
-    public String getDefaultGoal()
-    {
+    public String getDefaultGoal() {
         return getBuild() != null ? getBuild().getDefaultGoal() : null;
     }
 
-    public Plugin getPlugin( String pluginKey )
-    {
-        return getBuild().getPluginsAsMap().get( pluginKey );
+    public Plugin getPlugin(String pluginKey) {
+        return getBuild().getPluginsAsMap().get(pluginKey);
     }
 
     /**
      * Default toString
      */
     @Override
-    public String toString()
-    {
-        StringBuilder sb = new StringBuilder( 128 );
-        sb.append( "MavenProject: " );
-        sb.append( getGroupId() );
-        sb.append( ':' );
-        sb.append( getArtifactId() );
-        sb.append( ':' );
-        sb.append( getVersion() );
-        if ( getFile() != null )
-        {
-            sb.append( " @ " );
-            sb.append( getFile().getPath() );
+    public String toString() {
+        StringBuilder sb = new StringBuilder(128);
+        sb.append("MavenProject: ");
+        sb.append(getGroupId());
+        sb.append(':');
+        sb.append(getArtifactId());
+        sb.append(':');
+        sb.append(getVersion());
+        if (getFile() != null) {
+            sb.append(" @ ");
+            sb.append(getFile().getPath());
         }
 
         return sb.toString();
@@ -1175,55 +984,44 @@ public class MavenProject
      * @since 2.0.9
      */
     @Override
-    public MavenProject clone()
-    {
+    public MavenProject clone() {
         MavenProject clone;
-        try
-        {
+        try {
             clone = (MavenProject) super.clone();
-        }
-        catch ( CloneNotSupportedException e )
-        {
-            throw new UnsupportedOperationException( e );
+        } catch (CloneNotSupportedException e) {
+            throw new UnsupportedOperationException(e);
         }
 
-        clone.deepCopy( this );
+        clone.deepCopy(this);
 
         return clone;
     }
 
-    public void setModel( Model model )
-    {
+    public void setModel(Model model) {
         this.model = model;
     }
 
-    protected void setAttachedArtifacts( List<Artifact> attachedArtifacts )
-    {
+    protected void setAttachedArtifacts(List<Artifact> attachedArtifacts) {
         this.attachedArtifacts = attachedArtifacts;
     }
 
-    protected void setCompileSourceRoots( List<String> compileSourceRoots )
-    {
+    protected void setCompileSourceRoots(List<String> compileSourceRoots) {
         this.compileSourceRoots = compileSourceRoots;
     }
 
-    protected void setTestCompileSourceRoots( List<String> testCompileSourceRoots )
-    {
+    protected void setTestCompileSourceRoots(List<String> testCompileSourceRoots) {
         this.testCompileSourceRoots = testCompileSourceRoots;
     }
 
-    protected ArtifactRepository getReleaseArtifactRepository()
-    {
+    protected ArtifactRepository getReleaseArtifactRepository() {
         return releaseArtifactRepository;
     }
 
-    protected ArtifactRepository getSnapshotArtifactRepository()
-    {
+    protected ArtifactRepository getSnapshotArtifactRepository() {
         return snapshotArtifactRepository;
     }
 
-    private void deepCopy( MavenProject project )
-    {
+    private void deepCopy(MavenProject project) {
         // disown the parent
 
         // copy fields
@@ -1232,113 +1030,93 @@ public class MavenProject
 
         // don't need a deep copy, they don't get modified or added/removed to/from - but make them unmodifiable to be
         // sure!
-        if ( project.getDependencyArtifacts() != null )
-        {
-            setDependencyArtifacts( Collections.unmodifiableSet( project.getDependencyArtifacts() ) );
+        if (project.getDependencyArtifacts() != null) {
+            setDependencyArtifacts(Collections.unmodifiableSet(project.getDependencyArtifacts()));
         }
 
-        if ( project.getArtifacts() != null )
-        {
-            setArtifacts( Collections.unmodifiableSet( project.getArtifacts() ) );
+        if (project.getArtifacts() != null) {
+            setArtifacts(Collections.unmodifiableSet(project.getArtifacts()));
         }
 
-        if ( project.getParentFile() != null )
-        {
-            parentFile = new File( project.getParentFile().getAbsolutePath() );
+        if (project.getParentFile() != null) {
+            parentFile = new File(project.getParentFile().getAbsolutePath());
         }
 
-        if ( project.getPluginArtifacts() != null )
-        {
-            setPluginArtifacts( Collections.unmodifiableSet( project.getPluginArtifacts() ) );
+        if (project.getPluginArtifacts() != null) {
+            setPluginArtifacts(Collections.unmodifiableSet(project.getPluginArtifacts()));
         }
 
-        if ( project.getReportArtifacts() != null )
-        {
-            setReportArtifacts( Collections.unmodifiableSet( project.getReportArtifacts() ) );
+        if (project.getReportArtifacts() != null) {
+            setReportArtifacts(Collections.unmodifiableSet(project.getReportArtifacts()));
         }
 
-        if ( project.getExtensionArtifacts() != null )
-        {
-            setExtensionArtifacts( Collections.unmodifiableSet( project.getExtensionArtifacts() ) );
+        if (project.getExtensionArtifacts() != null) {
+            setExtensionArtifacts(Collections.unmodifiableSet(project.getExtensionArtifacts()));
         }
 
-        setParentArtifact( ( project.getParentArtifact() ) );
+        setParentArtifact((project.getParentArtifact()));
 
-        if ( project.getRemoteArtifactRepositories() != null )
-        {
-            setRemoteArtifactRepositories( Collections.unmodifiableList( project.getRemoteArtifactRepositories() ) );
+        if (project.getRemoteArtifactRepositories() != null) {
+            setRemoteArtifactRepositories(Collections.unmodifiableList(project.getRemoteArtifactRepositories()));
         }
 
-        if ( project.getPluginArtifactRepositories() != null )
-        {
-            setPluginArtifactRepositories( Collections.unmodifiableList( project.getPluginArtifactRepositories() ) );
+        if (project.getPluginArtifactRepositories() != null) {
+            setPluginArtifactRepositories(Collections.unmodifiableList(project.getPluginArtifactRepositories()));
         }
 
-        if ( project.getActiveProfiles() != null )
-        {
-            setActiveProfiles( ( Collections.unmodifiableList( project.getActiveProfiles() ) ) );
+        if (project.getActiveProfiles() != null) {
+            setActiveProfiles((Collections.unmodifiableList(project.getActiveProfiles())));
         }
 
-        if ( project.getAttachedArtifacts() != null )
-        {
+        if (project.getAttachedArtifacts() != null) {
             // clone properties modifiable by plugins in a forked lifecycle
-            setAttachedArtifacts( new ArrayList<>( project.getAttachedArtifacts() ) );
+            setAttachedArtifacts(new ArrayList<>(project.getAttachedArtifacts()));
         }
 
-        if ( project.getCompileSourceRoots() != null )
-        {
+        if (project.getCompileSourceRoots() != null) {
             // clone source roots
-            setCompileSourceRoots( ( new ArrayList<>( project.getCompileSourceRoots() ) ) );
+            setCompileSourceRoots((new ArrayList<>(project.getCompileSourceRoots())));
         }
 
-        if ( project.getTestCompileSourceRoots() != null )
-        {
-            setTestCompileSourceRoots( ( new ArrayList<>( project.getTestCompileSourceRoots() ) ) );
+        if (project.getTestCompileSourceRoots() != null) {
+            setTestCompileSourceRoots((new ArrayList<>(project.getTestCompileSourceRoots())));
         }
 
-        if ( project.getScriptSourceRoots() != null )
-        {
-            setScriptSourceRoots( ( new ArrayList<>( project.getScriptSourceRoots() ) ) );
+        if (project.getScriptSourceRoots() != null) {
+            setScriptSourceRoots((new ArrayList<>(project.getScriptSourceRoots())));
         }
 
-        if ( project.getModel() != null )
-        {
-            setModel( project.getModel().clone() );
+        if (project.getModel() != null) {
+            setModel(project.getModel().clone());
         }
 
-        if ( project.getOriginalModel() != null )
-        {
-            setOriginalModel( project.getOriginalModel() );
+        if (project.getOriginalModel() != null) {
+            setOriginalModel(project.getOriginalModel());
         }
 
-        setExecutionRoot( project.isExecutionRoot() );
+        setExecutionRoot(project.isExecutionRoot());
 
-        if ( project.getArtifact() != null )
-        {
-            setArtifact( ArtifactUtils.copyArtifact( project.getArtifact() ) );
+        if (project.getArtifact() != null) {
+            setArtifact(ArtifactUtils.copyArtifact(project.getArtifact()));
         }
 
-        if ( project.getManagedVersionMap() != null )
-        {
-            setManagedVersionMap( project.getManagedVersionMap() );
+        if (project.getManagedVersionMap() != null) {
+            setManagedVersionMap(project.getManagedVersionMap());
         }
 
-        lifecyclePhases.addAll( project.lifecyclePhases );
+        lifecyclePhases.addAll(project.lifecyclePhases);
     }
 
-    private void addArtifactPath( Artifact artifact, List<String> classpath )
-    {
+    private void addArtifactPath(Artifact artifact, List<String> classpath) {
         File file = artifact.getFile();
-        if ( file != null )
-        {
-            classpath.add( file.getPath() );
+        if (file != null) {
+            classpath.add(file.getPath());
         }
     }
 
-    private static String getProjectReferenceId( String groupId, String artifactId, String version )
-    {
-        StringBuilder buffer = new StringBuilder( 128 );
-        buffer.append( groupId ).append( ':' ).append( artifactId ).append( ':' ).append( version );
+    private static String getProjectReferenceId(String groupId, String artifactId, String version) {
+        StringBuilder buffer = new StringBuilder(128);
+        buffer.append(groupId).append(':').append(artifactId).append(':').append(version);
         return buffer.toString();
     }
 
@@ -1347,32 +1125,25 @@ public class MavenProject
      * <code>null</code>, the context value is removed from this project. Context values are intended to allow core
      * extensions to associate derived state with project instances.
      */
-    public void setContextValue( String key, Object value )
-    {
-        if ( context == null )
-        {
+    public void setContextValue(String key, Object value) {
+        if (context == null) {
             context = new HashMap<>();
         }
-        if ( value != null )
-        {
-            context.put( key, value );
-        }
-        else
-        {
-            context.remove( key );
+        if (value != null) {
+            context.put(key, value);
+        } else {
+            context.remove(key);
         }
     }
 
     /**
      * Returns context value of this project associated with the given key or null if this project has no such value.
      */
-    public Object getContextValue( String key )
-    {
-        if ( context == null )
-        {
+    public Object getContextValue(String key) {
+        if (context == null) {
             return null;
         }
-        return context.get( key );
+        return context.get(key);
     }
 
     /**
@@ -1382,8 +1153,7 @@ public class MavenProject
      *
      * @param classRealm The class realm hosting the build extensions of this project, may be {@code null}.
      */
-    public void setClassRealm( ClassRealm classRealm )
-    {
+    public void setClassRealm(ClassRealm classRealm) {
         this.classRealm = classRealm;
     }
 
@@ -1395,8 +1165,7 @@ public class MavenProject
      *
      * @return The project's class realm or {@code null}.
      */
-    public ClassRealm getClassRealm()
-    {
+    public ClassRealm getClassRealm() {
         return classRealm;
     }
 
@@ -1407,8 +1176,7 @@ public class MavenProject
      *
      * @param extensionDependencyFilter The dependency filter to apply to plugins, may be {@code null}.
      */
-    public void setExtensionDependencyFilter( DependencyFilter extensionDependencyFilter )
-    {
+    public void setExtensionDependencyFilter(DependencyFilter extensionDependencyFilter) {
         this.extensionDependencyFilter = extensionDependencyFilter;
     }
 
@@ -1420,8 +1188,7 @@ public class MavenProject
      *
      * @return The dependency filter or {@code null}.
      */
-    public DependencyFilter getExtensionDependencyFilter()
-    {
+    public DependencyFilter getExtensionDependencyFilter() {
         return extensionDependencyFilter;
     }
 
@@ -1433,9 +1200,8 @@ public class MavenProject
      *
      * @param artifacts The set of artifacts, may be {@code null}.
      */
-    public void setResolvedArtifacts( Set<Artifact> artifacts )
-    {
-        this.resolvedArtifacts = ( artifacts != null ) ? artifacts : Collections.<Artifact>emptySet();
+    public void setResolvedArtifacts(Set<Artifact> artifacts) {
+        this.resolvedArtifacts = (artifacts != null) ? artifacts : Collections.<Artifact>emptySet();
         this.artifacts = null;
         this.artifactMap = null;
     }
@@ -1448,8 +1214,7 @@ public class MavenProject
      *
      * @param artifactFilter The artifact filter, may be {@code null} to exclude all artifacts.
      */
-    public void setArtifactFilter( ArtifactFilter artifactFilter )
-    {
+    public void setArtifactFilter(ArtifactFilter artifactFilter) {
         this.artifactFilter = artifactFilter;
         this.artifacts = null;
         this.artifactMap = null;
@@ -1463,9 +1228,8 @@ public class MavenProject
      * @param phase The phase to check for, must not be {@code null}.
      * @return {@code true} if the phase has been seen.
      */
-    public boolean hasLifecyclePhase( String phase )
-    {
-        return lifecyclePhases.contains( phase );
+    public boolean hasLifecyclePhase(String phase) {
+        return lifecyclePhases.contains(phase);
     }
 
     /**
@@ -1475,9 +1239,8 @@ public class MavenProject
      *
      * @param lifecyclePhase The lifecycle phase to add, must not be {@code null}.
      */
-    public void addLifecyclePhase( String lifecyclePhase )
-    {
-        lifecyclePhases.add( lifecyclePhase );
+    public void addLifecyclePhase(String lifecyclePhase) {
+        lifecyclePhases.add(lifecyclePhase);
     }
 
     // ----------------------------------------------------------------------------------------------------------------
@@ -1497,113 +1260,93 @@ public class MavenProject
     private Map<String, String> moduleAdjustments;
 
     @Deprecated // This appears only to be used in test code
-    public String getModulePathAdjustment( MavenProject moduleProject )
-        throws IOException
-    {
+    public String getModulePathAdjustment(MavenProject moduleProject) throws IOException {
         // FIXME: This is hacky. What if module directory doesn't match artifactid, and parent
         // is coming from the repository??
         String module = moduleProject.getArtifactId();
 
         File moduleFile = moduleProject.getFile();
 
-        if ( moduleFile != null )
-        {
+        if (moduleFile != null) {
             File moduleDir = moduleFile.getCanonicalFile().getParentFile();
 
             module = moduleDir.getName();
         }
 
-        if ( moduleAdjustments == null )
-        {
+        if (moduleAdjustments == null) {
             moduleAdjustments = new HashMap<>();
 
             List<String> modules = getModules();
-            if ( modules != null )
-            {
-                for ( String modulePath : modules )
-                {
+            if (modules != null) {
+                for (String modulePath : modules) {
                     String moduleName = modulePath;
 
-                    if ( moduleName.endsWith( "/" ) || moduleName.endsWith( "\\" ) )
-                    {
-                        moduleName = moduleName.substring( 0, moduleName.length() - 1 );
+                    if (moduleName.endsWith("/") || moduleName.endsWith("\\")) {
+                        moduleName = moduleName.substring(0, moduleName.length() - 1);
                     }
 
-                    int lastSlash = moduleName.lastIndexOf( '/' );
+                    int lastSlash = moduleName.lastIndexOf('/');
 
-                    if ( lastSlash < 0 )
-                    {
-                        lastSlash = moduleName.lastIndexOf( '\\' );
+                    if (lastSlash < 0) {
+                        lastSlash = moduleName.lastIndexOf('\\');
                     }
 
                     String adjustment = null;
 
-                    if ( lastSlash > -1 )
-                    {
-                        moduleName = moduleName.substring( lastSlash + 1 );
-                        adjustment = modulePath.substring( 0, lastSlash );
+                    if (lastSlash > -1) {
+                        moduleName = moduleName.substring(lastSlash + 1);
+                        adjustment = modulePath.substring(0, lastSlash);
                     }
 
-                    moduleAdjustments.put( moduleName, adjustment );
+                    moduleAdjustments.put(moduleName, adjustment);
                 }
             }
         }
 
-        return moduleAdjustments.get( module );
+        return moduleAdjustments.get(module);
     }
 
     @Deprecated
-    public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String inheritedScope,
-                                          ArtifactFilter filter )
-        throws InvalidDependencyVersionException
-    {
-        return MavenMetadataSource.createArtifacts( artifactFactory, getModel().getDependencies(),
-                inheritedScope, filter, this );
+    public Set<Artifact> createArtifacts(ArtifactFactory artifactFactory, String inheritedScope, ArtifactFilter filter)
+            throws InvalidDependencyVersionException {
+        return MavenMetadataSource.createArtifacts(
+                artifactFactory, getModel().getDependencies(), inheritedScope, filter, this);
     }
 
     @Deprecated
-    protected void setScriptSourceRoots( List<String> scriptSourceRoots )
-    {
+    protected void setScriptSourceRoots(List<String> scriptSourceRoots) {
         this.scriptSourceRoots = scriptSourceRoots;
     }
 
     @Deprecated
-    public void addScriptSourceRoot( String path )
-    {
-        if ( path != null )
-        {
+    public void addScriptSourceRoot(String path) {
+        if (path != null) {
             path = path.trim();
-            if ( path.length() != 0 )
-            {
-                if ( !getScriptSourceRoots().contains( path ) )
-                {
-                    getScriptSourceRoots().add( path );
+            if (path.length() != 0) {
+                if (!getScriptSourceRoots().contains(path)) {
+                    getScriptSourceRoots().add(path);
                 }
             }
         }
     }
 
     @Deprecated
-    public List<String> getScriptSourceRoots()
-    {
+    public List<String> getScriptSourceRoots() {
         return scriptSourceRoots;
     }
 
     @Deprecated
-    public List<Artifact> getCompileArtifacts()
-    {
-        List<Artifact> list = new ArrayList<>( getArtifacts().size() );
+    public List<Artifact> getCompileArtifacts() {
+        List<Artifact> list = new ArrayList<>(getArtifacts().size());
 
-        for ( Artifact a : getArtifacts() )
-        {
+        for (Artifact a : getArtifacts()) {
             // TODO classpath check doesn't belong here - that's the other method
-            if ( a.getArtifactHandler().isAddedToClasspath() )
-            {
+            if (a.getArtifactHandler().isAddedToClasspath()) {
                 // TODO let the scope handler deal with this
-                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() )
-                    || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
-                {
-                    list.add( a );
+                if (Artifact.SCOPE_COMPILE.equals(a.getScope())
+                        || Artifact.SCOPE_PROVIDED.equals(a.getScope())
+                        || Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
+                    list.add(a);
                 }
             }
         }
@@ -1611,152 +1354,130 @@ public class MavenProject
     }
 
     @Deprecated
-    public List<Dependency> getCompileDependencies()
-    {
+    public List<Dependency> getCompileDependencies() {
         Set<Artifact> artifacts = getArtifacts();
 
-        if ( ( artifacts == null ) || artifacts.isEmpty() )
-        {
+        if ((artifacts == null) || artifacts.isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<Dependency> list = new ArrayList<>( artifacts.size() );
+        List<Dependency> list = new ArrayList<>(artifacts.size());
 
-        for ( Artifact a : getArtifacts() )
-        {
+        for (Artifact a : getArtifacts()) {
             // TODO let the scope handler deal with this
-            if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() )
-                     || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
-            {
+            if (Artifact.SCOPE_COMPILE.equals(a.getScope())
+                    || Artifact.SCOPE_PROVIDED.equals(a.getScope())
+                    || Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
                 Dependency dependency = new Dependency();
 
-                dependency.setArtifactId( a.getArtifactId() );
-                dependency.setGroupId( a.getGroupId() );
-                dependency.setVersion( a.getVersion() );
-                dependency.setScope( a.getScope() );
-                dependency.setType( a.getType() );
-                dependency.setClassifier( a.getClassifier() );
+                dependency.setArtifactId(a.getArtifactId());
+                dependency.setGroupId(a.getGroupId());
+                dependency.setVersion(a.getVersion());
+                dependency.setScope(a.getScope());
+                dependency.setType(a.getType());
+                dependency.setClassifier(a.getClassifier());
 
-                list.add( dependency );
+                list.add(dependency);
             }
         }
-        return Collections.unmodifiableList( list );
+        return Collections.unmodifiableList(list);
     }
 
     @Deprecated
-    public List<Artifact> getTestArtifacts()
-    {
-        List<Artifact> list = new ArrayList<>( getArtifacts().size() );
+    public List<Artifact> getTestArtifacts() {
+        List<Artifact> list = new ArrayList<>(getArtifacts().size());
 
-        for ( Artifact a : getArtifacts() )
-        {
+        for (Artifact a : getArtifacts()) {
             // TODO classpath check doesn't belong here - that's the other method
-            if ( a.getArtifactHandler().isAddedToClasspath() )
-            {
-                list.add( a );
+            if (a.getArtifactHandler().isAddedToClasspath()) {
+                list.add(a);
             }
         }
         return list;
     }
 
     @Deprecated
-    public List<Dependency> getTestDependencies()
-    {
+    public List<Dependency> getTestDependencies() {
         Set<Artifact> artifacts = getArtifacts();
 
-        if ( ( artifacts == null ) || artifacts.isEmpty() )
-        {
+        if ((artifacts == null) || artifacts.isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<Dependency> list = new ArrayList<>( artifacts.size() );
+        List<Dependency> list = new ArrayList<>(artifacts.size());
 
-        for ( Artifact a : getArtifacts() )
-        {
+        for (Artifact a : getArtifacts()) {
             Dependency dependency = new Dependency();
 
-            dependency.setArtifactId( a.getArtifactId() );
-            dependency.setGroupId( a.getGroupId() );
-            dependency.setVersion( a.getVersion() );
-            dependency.setScope( a.getScope() );
-            dependency.setType( a.getType() );
-            dependency.setClassifier( a.getClassifier() );
+            dependency.setArtifactId(a.getArtifactId());
+            dependency.setGroupId(a.getGroupId());
+            dependency.setVersion(a.getVersion());
+            dependency.setScope(a.getScope());
+            dependency.setType(a.getType());
+            dependency.setClassifier(a.getClassifier());
 
-            list.add( dependency );
+            list.add(dependency);
         }
-        return Collections.unmodifiableList( list );
+        return Collections.unmodifiableList(list);
     }
 
     @Deprecated // used by the Maven ITs
-    public List<Dependency> getRuntimeDependencies()
-    {
+    public List<Dependency> getRuntimeDependencies() {
         Set<Artifact> artifacts = getArtifacts();
 
-        if ( ( artifacts == null ) || artifacts.isEmpty() )
-        {
+        if ((artifacts == null) || artifacts.isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<Dependency> list = new ArrayList<>( artifacts.size() );
+        List<Dependency> list = new ArrayList<>(artifacts.size());
 
-        for ( Artifact a : getArtifacts() )
-        {
+        for (Artifact a : getArtifacts()) {
             // TODO let the scope handler deal with this
-            if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
-            {
+            if (Artifact.SCOPE_COMPILE.equals(a.getScope()) || Artifact.SCOPE_RUNTIME.equals(a.getScope())) {
                 Dependency dependency = new Dependency();
 
-                dependency.setArtifactId( a.getArtifactId() );
-                dependency.setGroupId( a.getGroupId() );
-                dependency.setVersion( a.getVersion() );
-                dependency.setScope( a.getScope() );
-                dependency.setType( a.getType() );
-                dependency.setClassifier( a.getClassifier() );
+                dependency.setArtifactId(a.getArtifactId());
+                dependency.setGroupId(a.getGroupId());
+                dependency.setVersion(a.getVersion());
+                dependency.setScope(a.getScope());
+                dependency.setType(a.getType());
+                dependency.setClassifier(a.getClassifier());
 
-                list.add( dependency );
+                list.add(dependency);
             }
         }
-        return Collections.unmodifiableList( list );
+        return Collections.unmodifiableList(list);
     }
 
     @Deprecated
-    public List<Artifact> getRuntimeArtifacts()
-    {
-        List<Artifact> list = new ArrayList<>( getArtifacts().size() );
+    public List<Artifact> getRuntimeArtifacts() {
+        List<Artifact> list = new ArrayList<>(getArtifacts().size());
 
-        for ( Artifact a : getArtifacts()  )
-        {
+        for (Artifact a : getArtifacts()) {
             // TODO classpath check doesn't belong here - that's the other method
-            if ( a.getArtifactHandler().isAddedToClasspath()
-            // TODO let the scope handler deal with this
-                && ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) ) )
-            {
-                list.add( a );
+            if (a.getArtifactHandler().isAddedToClasspath()
+                    // TODO let the scope handler deal with this
+                    && (Artifact.SCOPE_COMPILE.equals(a.getScope()) || Artifact.SCOPE_RUNTIME.equals(a.getScope()))) {
+                list.add(a);
             }
         }
         return list;
     }
 
     @Deprecated
-    public List<String> getSystemClasspathElements()
-        throws DependencyResolutionRequiredException
-    {
-        List<String> list = new ArrayList<>( getArtifacts().size() );
+    public List<String> getSystemClasspathElements() throws DependencyResolutionRequiredException {
+        List<String> list = new ArrayList<>(getArtifacts().size());
 
         String d = getBuild().getOutputDirectory();
-        if ( d != null )
-        {
-            list.add( d );
+        if (d != null) {
+            list.add(d);
         }
 
-        for ( Artifact a : getArtifacts() )
-        {
-            if ( a.getArtifactHandler().isAddedToClasspath() )
-            {
+        for (Artifact a : getArtifacts()) {
+            if (a.getArtifactHandler().isAddedToClasspath()) {
                 // TODO let the scope handler deal with this
-                if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
-                {
-                    addArtifactPath( a, list );
+                if (Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
+                    addArtifactPath(a, list);
                 }
             }
         }
@@ -1764,19 +1485,15 @@ public class MavenProject
     }
 
     @Deprecated
-    public List<Artifact> getSystemArtifacts()
-    {
-        List<Artifact> list = new ArrayList<>( getArtifacts().size() );
+    public List<Artifact> getSystemArtifacts() {
+        List<Artifact> list = new ArrayList<>(getArtifacts().size());
 
-        for ( Artifact a : getArtifacts() )
-        {
+        for (Artifact a : getArtifacts()) {
             // TODO classpath check doesn't belong here - that's the other method
-            if ( a.getArtifactHandler().isAddedToClasspath() )
-            {
+            if (a.getArtifactHandler().isAddedToClasspath()) {
                 // TODO let the scope handler deal with this
-                if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
-                {
-                    list.add( a );
+                if (Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
+                    list.add(a);
                 }
             }
         }
@@ -1784,112 +1501,95 @@ public class MavenProject
     }
 
     @Deprecated
-    public List<Dependency> getSystemDependencies()
-    {
+    public List<Dependency> getSystemDependencies() {
         Set<Artifact> artifacts = getArtifacts();
 
-        if ( ( artifacts == null ) || artifacts.isEmpty() )
-        {
+        if ((artifacts == null) || artifacts.isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<Dependency> list = new ArrayList<>( artifacts.size() );
+        List<Dependency> list = new ArrayList<>(artifacts.size());
 
-        for ( Artifact a : getArtifacts() )
-        {
+        for (Artifact a : getArtifacts()) {
             // TODO let the scope handler deal with this
-            if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
-            {
+            if (Artifact.SCOPE_SYSTEM.equals(a.getScope())) {
                 Dependency dependency = new Dependency();
 
-                dependency.setArtifactId( a.getArtifactId() );
-                dependency.setGroupId( a.getGroupId() );
-                dependency.setVersion( a.getVersion() );
-                dependency.setScope( a.getScope() );
-                dependency.setType( a.getType() );
-                dependency.setClassifier( a.getClassifier() );
+                dependency.setArtifactId(a.getArtifactId());
+                dependency.setGroupId(a.getGroupId());
+                dependency.setVersion(a.getVersion());
+                dependency.setScope(a.getScope());
+                dependency.setType(a.getType());
+                dependency.setClassifier(a.getClassifier());
 
-                list.add( dependency );
+                list.add(dependency);
             }
         }
-        return Collections.unmodifiableList( list );
+        return Collections.unmodifiableList(list);
     }
 
     @Deprecated
-    public void setReporting( Reporting reporting )
-    {
-        getModel().setReporting( reporting );
+    public void setReporting(Reporting reporting) {
+        getModel().setReporting(reporting);
     }
 
     @Deprecated
-    public Reporting getReporting()
-    {
+    public Reporting getReporting() {
         return getModel().getReporting();
     }
 
     @Deprecated
-    public void setReportArtifacts( Set<Artifact> reportArtifacts )
-    {
+    public void setReportArtifacts(Set<Artifact> reportArtifacts) {
         this.reportArtifacts = reportArtifacts;
 
         reportArtifactMap = null;
     }
 
     @Deprecated
-    public Set<Artifact> getReportArtifacts()
-    {
+    public Set<Artifact> getReportArtifacts() {
         return reportArtifacts;
     }
 
     @Deprecated
-    public Map<String, Artifact> getReportArtifactMap()
-    {
-        if ( reportArtifactMap == null )
-        {
-            reportArtifactMap = ArtifactUtils.artifactMapByVersionlessId( getReportArtifacts() );
+    public Map<String, Artifact> getReportArtifactMap() {
+        if (reportArtifactMap == null) {
+            reportArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getReportArtifacts());
         }
 
         return reportArtifactMap;
     }
 
     @Deprecated
-    public void setExtensionArtifacts( Set<Artifact> extensionArtifacts )
-    {
+    public void setExtensionArtifacts(Set<Artifact> extensionArtifacts) {
         this.extensionArtifacts = extensionArtifacts;
 
         extensionArtifactMap = null;
     }
 
     @Deprecated
-    public Set<Artifact> getExtensionArtifacts()
-    {
+    public Set<Artifact> getExtensionArtifacts() {
         return extensionArtifacts;
     }
 
     @Deprecated
-    public Map<String, Artifact> getExtensionArtifactMap()
-    {
-        if ( extensionArtifactMap == null )
-        {
-            extensionArtifactMap = ArtifactUtils.artifactMapByVersionlessId( getExtensionArtifacts() );
+    public Map<String, Artifact> getExtensionArtifactMap() {
+        if (extensionArtifactMap == null) {
+            extensionArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getExtensionArtifacts());
         }
 
         return extensionArtifactMap;
     }
 
     @Deprecated
-    public List<ReportPlugin> getReportPlugins()
-    {
-        if ( getModel().getReporting() == null )
-        {
+    public List<ReportPlugin> getReportPlugins() {
+        if (getModel().getReporting() == null) {
             return Collections.emptyList();
         }
-        return Collections.unmodifiableList( getModel().getReporting().getPlugins() );
+        return Collections.unmodifiableList(getModel().getReporting().getPlugins());
     }
 
     @Deprecated
-    public Xpp3Dom getReportConfiguration( String pluginGroupId, String pluginArtifactId, String reportSetId )
-    {
+    public Xpp3Dom getReportConfiguration(String pluginGroupId, String pluginArtifactId, String reportSetId) {
         Xpp3Dom dom = null;
 
         // ----------------------------------------------------------------------
@@ -1898,24 +1598,18 @@ public class MavenProject
         // for now I have to iterate through and see what we have.
         // ----------------------------------------------------------------------
 
-        if ( getReportPlugins() != null )
-        {
-            for ( ReportPlugin plugin : getReportPlugins() )
-            {
-                if ( pluginGroupId.equals( plugin.getGroupId() ) && pluginArtifactId.equals( plugin.getArtifactId() ) )
-                {
+        if (getReportPlugins() != null) {
+            for (ReportPlugin plugin : getReportPlugins()) {
+                if (pluginGroupId.equals(plugin.getGroupId()) && pluginArtifactId.equals(plugin.getArtifactId())) {
                     dom = (Xpp3Dom) plugin.getConfiguration();
 
-                    if ( reportSetId != null )
-                    {
-                        ReportSet reportSet = plugin.getReportSetsAsMap().get( reportSetId );
-                        if ( reportSet != null )
-                        {
+                    if (reportSetId != null) {
+                        ReportSet reportSet = plugin.getReportSetsAsMap().get(reportSetId);
+                        if (reportSet != null) {
                             Xpp3Dom executionConfiguration = (Xpp3Dom) reportSet.getConfiguration();
-                            if ( executionConfiguration != null )
-                            {
-                                Xpp3Dom newDom = new Xpp3Dom( executionConfiguration );
-                                dom = Xpp3Dom.mergeXpp3Dom( newDom, dom );
+                            if (executionConfiguration != null) {
+                                Xpp3Dom newDom = new Xpp3Dom(executionConfiguration);
+                                dom = Xpp3Dom.mergeXpp3Dom(newDom, dom);
                             }
                         }
                     }
@@ -1924,10 +1618,9 @@ public class MavenProject
             }
         }
 
-        if ( dom != null )
-        {
+        if (dom != null) {
             // make a copy so the original in the POM doesn't get messed with
-            dom = new Xpp3Dom( dom );
+            dom = new Xpp3Dom(dom);
         }
 
         return dom;
@@ -1937,35 +1630,28 @@ public class MavenProject
      * @deprecated Use MavenProjectHelper.attachArtifact(..) instead.
      */
     @Deprecated
-    public void attachArtifact( String type, String classifier, File file )
-    {
+    public void attachArtifact(String type, String classifier, File file) {}
+
+    /**
+     * @deprecated Use {@link org.apache.maven.model.io.ModelWriter}.
+     */
+    @Deprecated
+    public void writeModel(Writer writer) throws IOException {
+        MavenXpp3Writer pomWriter = new MavenXpp3Writer();
+        pomWriter.write(writer, getModel());
     }
 
     /**
      * @deprecated Use {@link org.apache.maven.model.io.ModelWriter}.
      */
     @Deprecated
-    public void writeModel( Writer writer )
-        throws IOException
-    {
+    public void writeOriginalModel(Writer writer) throws IOException {
         MavenXpp3Writer pomWriter = new MavenXpp3Writer();
-        pomWriter.write( writer, getModel() );
-    }
-
-    /**
-     * @deprecated Use {@link org.apache.maven.model.io.ModelWriter}.
-     */
-    @Deprecated
-    public void writeOriginalModel( Writer writer )
-        throws IOException
-    {
-        MavenXpp3Writer pomWriter = new MavenXpp3Writer();
-        pomWriter.write( writer, getOriginalModel() );
+        pomWriter.write(writer, getOriginalModel());
     }
 
     @Deprecated
-    public Artifact replaceWithActiveArtifact( Artifact pluginArtifact )
-    {
+    public Artifact replaceWithActiveArtifact(Artifact pluginArtifact) {
         return pluginArtifact;
     }
 
@@ -1977,8 +1663,7 @@ public class MavenProject
      * @since 2.1
      */
     @Deprecated
-    public ProjectBuildingRequest getProjectBuildingRequest()
-    {
+    public ProjectBuildingRequest getProjectBuildingRequest() {
         return projectBuilderConfiguration;
     }
 
@@ -1991,8 +1676,7 @@ public class MavenProject
      */
     // used by maven-dependency-tree
     @Deprecated
-    public void setProjectBuildingRequest( ProjectBuildingRequest projectBuildingRequest )
-    {
+    public void setProjectBuildingRequest(ProjectBuildingRequest projectBuildingRequest) {
         this.projectBuilderConfiguration = projectBuildingRequest;
     }
 }

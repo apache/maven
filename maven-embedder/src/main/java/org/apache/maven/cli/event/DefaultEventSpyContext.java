@@ -1,5 +1,3 @@
-package org.apache.maven.cli.event;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.cli.event;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli.event;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,15 +26,11 @@ import org.apache.maven.eventspy.EventSpy;
 /**
  * DefaultEventSpyContext
  */
-public class DefaultEventSpyContext
-    implements EventSpy.Context
-{
+public class DefaultEventSpyContext implements EventSpy.Context {
 
     private final Map<String, Object> data = new HashMap<>();
 
-    public Map<String, Object> getData()
-    {
+    public Map<String, Object> getData() {
         return data;
     }
-
 }

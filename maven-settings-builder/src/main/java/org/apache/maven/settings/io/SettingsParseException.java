@@ -1,5 +1,3 @@
-package org.apache.maven.settings.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.settings.io;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.io;
 
 import java.io.IOException;
 
@@ -26,9 +25,7 @@ import java.io.IOException;
  *
  * @author Benjamin Bentmann
  */
-public class SettingsParseException
-    extends IOException
-{
+public class SettingsParseException extends IOException {
 
     /**
      * The one-based index of the line containing the error.
@@ -47,9 +44,8 @@ public class SettingsParseException
      * @param lineNumber The one-based index of the line containing the error or {@code -1} if unknown.
      * @param columnNumber The one-based index of the column containing the error or {@code -1} if unknown.
      */
-    public SettingsParseException( String message, int lineNumber, int columnNumber )
-    {
-        super( message );
+    public SettingsParseException(String message, int lineNumber, int columnNumber) {
+        super(message);
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
     }
@@ -62,10 +58,9 @@ public class SettingsParseException
      * @param columnNumber The one-based index of the column containing the error or {@code -1} if unknown.
      * @param cause The nested cause of this error, may be {@code null}.
      */
-    public SettingsParseException( String message, int lineNumber, int columnNumber, Throwable cause )
-    {
-        super( message );
-        initCause( cause );
+    public SettingsParseException(String message, int lineNumber, int columnNumber, Throwable cause) {
+        super(message);
+        initCause(cause);
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
     }
@@ -75,8 +70,7 @@ public class SettingsParseException
      *
      * @return The one-based index of the line containing the error or a non-positive value if unknown.
      */
-    public int getLineNumber()
-    {
+    public int getLineNumber() {
         return lineNumber;
     }
 
@@ -85,9 +79,7 @@ public class SettingsParseException
      *
      * @return The one-based index of the column containing the error or non-positive value if unknown.
      */
-    public int getColumnNumber()
-    {
+    public int getColumnNumber() {
         return columnNumber;
     }
-
 }

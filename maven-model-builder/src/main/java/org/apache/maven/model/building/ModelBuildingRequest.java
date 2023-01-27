@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.io.File;
 import java.util.Date;
@@ -34,8 +33,7 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
  *
  * @author Benjamin Bentmann
  */
-public interface ModelBuildingRequest
-{
+public interface ModelBuildingRequest {
 
     /**
      * Denotes minimal validation of POMs. This validation level is meant for processing of POMs from repositories
@@ -80,7 +78,7 @@ public interface ModelBuildingRequest
      * @return This request, never {@code null}.
      * @since 4.0.0
      */
-    ModelBuildingRequest setFileModel( Model fileModel );
+    ModelBuildingRequest setFileModel(Model fileModel);
 
     /**
      * @deprecated rawModel is never set, instead the fileModel is set
@@ -92,7 +90,7 @@ public interface ModelBuildingRequest
      * @deprecated setting the rawModel has no effect, instead the fileModel of phase one will be set
      */
     @Deprecated
-    ModelBuildingRequest setRawModel( Model rawModel );
+    ModelBuildingRequest setRawModel(Model rawModel);
 
     /**
      * Gets the source of the POM to process.
@@ -108,7 +106,7 @@ public interface ModelBuildingRequest
      * @param modelSource The source of the POM to process, may be {@code null}.
      * @return This request, never {@code null}.
      */
-    ModelBuildingRequest setModelSource( ModelSource modelSource );
+    ModelBuildingRequest setModelSource(ModelSource modelSource);
 
     /**
      * Gets the POM file of the project to build.
@@ -129,7 +127,7 @@ public interface ModelBuildingRequest
      *            model of some POM from the repository.
      * @return This request, never {@code null}.
      */
-    ModelBuildingRequest setPomFile( File pomFile );
+    ModelBuildingRequest setPomFile(File pomFile);
 
     /**
      * Gets the level of validation to perform on processed models.
@@ -147,7 +145,7 @@ public interface ModelBuildingRequest
      * @param validationLevel The level of validation to perform on processed models.
      * @return This request, never {@code null}.
      */
-    ModelBuildingRequest setValidationLevel( int validationLevel );
+    ModelBuildingRequest setValidationLevel(int validationLevel);
 
     /**
      * Indicates whether plugin executions and configurations should be processed. If enabled, lifecycle-induced plugin
@@ -164,7 +162,7 @@ public interface ModelBuildingRequest
      * @param processPlugins {@code true} to enable plugin processing, {@code false} otherwise.
      * @return This request, never {@code null}.
      */
-    ModelBuildingRequest setProcessPlugins( boolean processPlugins );
+    ModelBuildingRequest setProcessPlugins(boolean processPlugins);
 
     /**
      * Indicates whether the model building should happen in two phases. If enabled, the initial invocation of the model
@@ -185,7 +183,7 @@ public interface ModelBuildingRequest
      *            a single step.
      * @return This request, never {@code null}.
      */
-    ModelBuildingRequest setTwoPhaseBuilding( boolean twoPhaseBuilding );
+    ModelBuildingRequest setTwoPhaseBuilding(boolean twoPhaseBuilding);
 
     /**
      * Indicates whether the model should track the line/column number of the model source from which it was parsed.
@@ -201,7 +199,7 @@ public interface ModelBuildingRequest
      * @param locationTracking {@code true} to enable location tracking, {@code false} to disable it.
      * @return This request, never {@code null}.
      */
-    ModelBuildingRequest setLocationTracking( boolean locationTracking );
+    ModelBuildingRequest setLocationTracking(boolean locationTracking);
 
     /**
      * Gets the external profiles that should be considered for model building.
@@ -216,7 +214,7 @@ public interface ModelBuildingRequest
      * @param profiles The external profiles that should be considered for model building, may be {@code null}.
      * @return This request, never {@code null}.
      */
-    ModelBuildingRequest setProfiles( List<Profile> profiles );
+    ModelBuildingRequest setProfiles(List<Profile> profiles);
 
     /**
      * Gets the identifiers of those profiles that should be activated by explicit demand.
@@ -231,7 +229,7 @@ public interface ModelBuildingRequest
      * @param activeProfileIds The identifiers of those profiles to activate, may be {@code null}.
      * @return This request, never {@code null}.
      */
-    ModelBuildingRequest setActiveProfileIds( List<String> activeProfileIds );
+    ModelBuildingRequest setActiveProfileIds(List<String> activeProfileIds);
 
     /**
      * Gets the identifiers of those profiles that should be deactivated by explicit demand.
@@ -246,7 +244,7 @@ public interface ModelBuildingRequest
      * @param inactiveProfileIds The identifiers of those profiles to deactivate, may be {@code null}.
      * @return This request, never {@code null}.
      */
-    ModelBuildingRequest setInactiveProfileIds( List<String> inactiveProfileIds );
+    ModelBuildingRequest setInactiveProfileIds(List<String> inactiveProfileIds);
 
     /**
      * Gets the system properties to use for interpolation and profile activation. The system properties are collected
@@ -263,7 +261,7 @@ public interface ModelBuildingRequest
      * @param systemProperties The system properties, may be {@code null}.
      * @return This request, never {@code null}.
      */
-    ModelBuildingRequest setSystemProperties( Properties systemProperties );
+    ModelBuildingRequest setSystemProperties(Properties systemProperties);
 
     /**
      * Gets the user properties to use for interpolation and profile activation. The user properties have been
@@ -282,7 +280,7 @@ public interface ModelBuildingRequest
      * @param userProperties The user properties, may be {@code null}.
      * @return This request, never {@code null}.
      */
-    ModelBuildingRequest setUserProperties( Properties userProperties );
+    ModelBuildingRequest setUserProperties(Properties userProperties);
 
     /**
      * Gets the start time of the build.
@@ -297,7 +295,7 @@ public interface ModelBuildingRequest
      * @param buildStartTime The start time of the build, may be {@code null}.
      * @return This request, never {@code null}.
      */
-    ModelBuildingRequest setBuildStartTime( Date buildStartTime );
+    ModelBuildingRequest setBuildStartTime(Date buildStartTime);
 
     /**
      * Gets the model resolver to use for resolution of mixins or parents that are not locally reachable from the
@@ -314,7 +312,7 @@ public interface ModelBuildingRequest
      * @param modelResolver The model resolver to use, never {@code null}.
      * @return This request, never {@code null}.
      */
-    ModelBuildingRequest setModelResolver( ModelResolver modelResolver );
+    ModelBuildingRequest setModelResolver(ModelResolver modelResolver);
 
     /**
      * Gets the model building listener to notify during the build process.
@@ -329,7 +327,7 @@ public interface ModelBuildingRequest
      * @param modelBuildingListener The model building listener to notify, may be {@code null}.
      * @return This request, never {@code null}.
      */
-    ModelBuildingRequest setModelBuildingListener( ModelBuildingListener modelBuildingListener );
+    ModelBuildingRequest setModelBuildingListener(ModelBuildingListener modelBuildingListener);
 
     /**
      * Gets the model cache to use for reuse of previously built models.
@@ -345,14 +343,13 @@ public interface ModelBuildingRequest
      * @param modelCache The model cache to use, may be {@code null}.
      * @return This request, never {@code null}.
      */
-    ModelBuildingRequest setModelCache( ModelCache modelCache );
+    ModelBuildingRequest setModelCache(ModelCache modelCache);
 
     WorkspaceModelResolver getWorkspaceModelResolver();
 
-    ModelBuildingRequest setWorkspaceModelResolver( WorkspaceModelResolver workspaceResolver );
+    ModelBuildingRequest setWorkspaceModelResolver(WorkspaceModelResolver workspaceResolver);
 
     TransformerContextBuilder getTransformerContextBuilder();
 
-    ModelBuildingRequest setTransformerContextBuilder( TransformerContextBuilder contextBuilder );
-
+    ModelBuildingRequest setTransformerContextBuilder(TransformerContextBuilder contextBuilder);
 }

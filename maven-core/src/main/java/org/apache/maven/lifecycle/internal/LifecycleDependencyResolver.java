@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,9 +16,12 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import java.io.File;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,9 +30,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -65,9 +63,8 @@ import org.slf4j.LoggerFactory;
  * @author Kristian Rosenvold (extracted class)
  */
 @Named
-public class LifecycleDependencyResolver
-{
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+public class LifecycleDependencyResolver {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final ProjectDependenciesResolver dependenciesResolver;
 
@@ -82,176 +79,157 @@ public class LifecycleDependencyResolver
             ProjectDependenciesResolver dependenciesResolver,
             ProjectArtifactFactory artifactFactory,
             EventSpyDispatcher eventSpyDispatcher,
-            ProjectArtifactsCache projectArtifactsCache )
-    {
+            ProjectArtifactsCache projectArtifactsCache) {
         this.dependenciesResolver = dependenciesResolver;
         this.artifactFactory = artifactFactory;
         this.eventSpyDispatcher = eventSpyDispatcher;
         this.projectArtifactsCache = projectArtifactsCache;
     }
 
-    public static List<MavenProject> getProjects( MavenProject project, MavenSession session, boolean aggregator )
-    {
-        if ( aggregator )
-        {
+    public static List<MavenProject> getProjects(MavenProject project, MavenSession session, boolean aggregator) {
+        if (aggregator) {
             return session.getProjects();
-        }
-        else
-        {
-            return Collections.singletonList( project );
+        } else {
+            return Collections.singletonList(project);
         }
     }
 
-    public void resolveProjectDependencies( MavenProject project, Collection<String> scopesToCollect,
-                                            Collection<String> scopesToResolve, MavenSession session,
-                                            boolean aggregating, Set<Artifact> projectArtifacts )
-        throws LifecycleExecutionException
-    {
+    public void resolveProjectDependencies(
+            MavenProject project,
+            Collection<String> scopesToCollect,
+            Collection<String> scopesToResolve,
+            MavenSession session,
+            boolean aggregating,
+            Set<Artifact> projectArtifacts)
+            throws LifecycleExecutionException {
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        try
-        {
+        try {
             ClassLoader projectRealm = project.getClassRealm();
-            if ( projectRealm != null && projectRealm != tccl )
-            {
-                Thread.currentThread().setContextClassLoader( projectRealm );
+            if (projectRealm != null && projectRealm != tccl) {
+                Thread.currentThread().setContextClassLoader(projectRealm);
             }
 
-            if ( project.getDependencyArtifacts() == null )
-            {
-                try
-                {
-                    project.setDependencyArtifacts( artifactFactory.createArtifacts( project ) );
-                }
-                catch ( InvalidDependencyVersionException e )
-                {
-                    throw new LifecycleExecutionException( e );
+            if (project.getDependencyArtifacts() == null) {
+                try {
+                    project.setDependencyArtifacts(artifactFactory.createArtifacts(project));
+                } catch (InvalidDependencyVersionException e) {
+                    throw new LifecycleExecutionException(e);
                 }
             }
 
-            Set<Artifact> resolvedArtifacts = resolveProjectArtifacts( project, scopesToCollect, scopesToResolve,
-                    session, aggregating, projectArtifacts );
+            Set<Artifact> resolvedArtifacts = resolveProjectArtifacts(
+                    project, scopesToCollect, scopesToResolve, session, aggregating, projectArtifacts);
 
-            Map<Artifact, File> reactorProjects = new HashMap<>( session.getProjects().size() );
-            for ( MavenProject reactorProject : session.getProjects() )
-            {
-                reactorProjects.put( reactorProject.getArtifact(), reactorProject.getArtifact().getFile() );
+            Map<Artifact, File> reactorProjects =
+                    new HashMap<>(session.getProjects().size());
+            for (MavenProject reactorProject : session.getProjects()) {
+                reactorProjects.put(
+                        reactorProject.getArtifact(),
+                        reactorProject.getArtifact().getFile());
             }
 
             Map<String, Artifact> map = new HashMap<>();
-            for ( Artifact artifact : resolvedArtifacts )
-            {
+            for (Artifact artifact : resolvedArtifacts) {
                 /**
                  * MNG-6300: resolvedArtifacts can be cache result; this ensures reactor files are always up-to-date
                  * During lifecycle the Artifact.getFile() can change from target/classes to the actual jar.
                  * This clearly shows that target/classes should not be abused as artifactFile just for the classpath
                  */
-                File reactorProjectFile = reactorProjects.get( artifact );
-                if ( reactorProjectFile != null )
-                {
-                    artifact.setFile( reactorProjectFile );
+                File reactorProjectFile = reactorProjects.get(artifact);
+                if (reactorProjectFile != null) {
+                    artifact.setFile(reactorProjectFile);
                 }
 
-                map.put( artifact.getDependencyConflictId(), artifact );
+                map.put(artifact.getDependencyConflictId(), artifact);
             }
 
-            project.setResolvedArtifacts( resolvedArtifacts );
+            project.setResolvedArtifacts(resolvedArtifacts);
 
-            for ( Artifact artifact : project.getDependencyArtifacts() )
-            {
-                if ( artifact.getFile() == null )
-                {
-                    Artifact resolved = map.get( artifact.getDependencyConflictId() );
-                    if ( resolved != null )
-                    {
-                        artifact.setFile( resolved.getFile() );
-                        artifact.setDependencyTrail( resolved.getDependencyTrail() );
-                        artifact.setResolvedVersion( resolved.getVersion() );
-                        artifact.setResolved( true );
+            for (Artifact artifact : project.getDependencyArtifacts()) {
+                if (artifact.getFile() == null) {
+                    Artifact resolved = map.get(artifact.getDependencyConflictId());
+                    if (resolved != null) {
+                        artifact.setFile(resolved.getFile());
+                        artifact.setDependencyTrail(resolved.getDependencyTrail());
+                        artifact.setResolvedVersion(resolved.getVersion());
+                        artifact.setResolved(true);
                     }
                 }
             }
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader( tccl );
+        } finally {
+            Thread.currentThread().setContextClassLoader(tccl);
         }
     }
 
-    public Set<Artifact> resolveProjectArtifacts( MavenProject project, Collection<String> scopesToCollect,
-                                                  Collection<String> scopesToResolve, MavenSession session,
-                                                  boolean aggregating, Set<Artifact> projectArtifacts )
-            throws LifecycleExecutionException
-    {
+    public Set<Artifact> resolveProjectArtifacts(
+            MavenProject project,
+            Collection<String> scopesToCollect,
+            Collection<String> scopesToResolve,
+            MavenSession session,
+            boolean aggregating,
+            Set<Artifact> projectArtifacts)
+            throws LifecycleExecutionException {
         Set<Artifact> resolvedArtifacts;
-        ProjectArtifactsCache.Key cacheKey = projectArtifactsCache.createKey( project, scopesToCollect,
-                scopesToResolve, aggregating, session.getRepositorySession() );
+        ProjectArtifactsCache.Key cacheKey = projectArtifactsCache.createKey(
+                project, scopesToCollect, scopesToResolve, aggregating, session.getRepositorySession());
         ProjectArtifactsCache.CacheRecord recordArtifacts;
-        recordArtifacts = projectArtifactsCache.get( cacheKey );
+        recordArtifacts = projectArtifactsCache.get(cacheKey);
 
-        if ( recordArtifacts != null )
-        {
+        if (recordArtifacts != null) {
             resolvedArtifacts = recordArtifacts.getArtifacts();
-        }
-        else
-        {
-            try
-            {
-                resolvedArtifacts = getDependencies( project, scopesToCollect, scopesToResolve, session,
-                        aggregating, projectArtifacts );
-                recordArtifacts = projectArtifactsCache.put( cacheKey, resolvedArtifacts );
-            }
-            catch ( LifecycleExecutionException e )
-            {
-              projectArtifactsCache.put( cacheKey, e );
-              projectArtifactsCache.register( project, cacheKey, recordArtifacts );
+        } else {
+            try {
+                resolvedArtifacts = getDependencies(
+                        project, scopesToCollect, scopesToResolve, session, aggregating, projectArtifacts);
+                recordArtifacts = projectArtifactsCache.put(cacheKey, resolvedArtifacts);
+            } catch (LifecycleExecutionException e) {
+                projectArtifactsCache.put(cacheKey, e);
+                projectArtifactsCache.register(project, cacheKey, recordArtifacts);
                 throw e;
             }
         }
-        projectArtifactsCache.register( project, cacheKey, recordArtifacts );
+        projectArtifactsCache.register(project, cacheKey, recordArtifacts);
         return resolvedArtifacts;
     }
 
-    private Set<Artifact> getDependencies( MavenProject project, Collection<String> scopesToCollect,
-                                           Collection<String> scopesToResolve, MavenSession session,
-                                           boolean aggregating, Set<Artifact> projectArtifacts )
-        throws LifecycleExecutionException
-    {
-        if ( scopesToCollect == null )
-        {
+    private Set<Artifact> getDependencies(
+            MavenProject project,
+            Collection<String> scopesToCollect,
+            Collection<String> scopesToResolve,
+            MavenSession session,
+            boolean aggregating,
+            Set<Artifact> projectArtifacts)
+            throws LifecycleExecutionException {
+        if (scopesToCollect == null) {
             scopesToCollect = Collections.emptySet();
         }
-        if ( scopesToResolve == null )
-        {
+        if (scopesToResolve == null) {
             scopesToResolve = Collections.emptySet();
         }
 
-        if ( scopesToCollect.isEmpty() && scopesToResolve.isEmpty() )
-        {
+        if (scopesToCollect.isEmpty() && scopesToResolve.isEmpty()) {
             return new LinkedHashSet<>();
         }
 
-        scopesToCollect = new HashSet<>( scopesToCollect );
-        scopesToCollect.addAll( scopesToResolve );
+        scopesToCollect = new HashSet<>(scopesToCollect);
+        scopesToCollect.addAll(scopesToResolve);
 
-        DependencyFilter collectionFilter = new ScopeDependencyFilter( null, negate( scopesToCollect ) );
-        DependencyFilter resolutionFilter = new ScopeDependencyFilter( null, negate( scopesToResolve ) );
-        resolutionFilter = AndDependencyFilter.newInstance( collectionFilter, resolutionFilter );
+        DependencyFilter collectionFilter = new ScopeDependencyFilter(null, negate(scopesToCollect));
+        DependencyFilter resolutionFilter = new ScopeDependencyFilter(null, negate(scopesToResolve));
+        resolutionFilter = AndDependencyFilter.newInstance(collectionFilter, resolutionFilter);
         resolutionFilter =
-            AndDependencyFilter.newInstance( resolutionFilter, new ReactorDependencyFilter( projectArtifacts ) );
+                AndDependencyFilter.newInstance(resolutionFilter, new ReactorDependencyFilter(projectArtifacts));
 
         DependencyResolutionResult result;
-        try
-        {
+        try {
             DefaultDependencyResolutionRequest request =
-                new DefaultDependencyResolutionRequest( project, session.getRepositorySession() );
-            request.setResolutionFilter( resolutionFilter );
+                    new DefaultDependencyResolutionRequest(project, session.getRepositorySession());
+            request.setResolutionFilter(resolutionFilter);
 
-            eventSpyDispatcher.onEvent( request );
+            eventSpyDispatcher.onEvent(request);
 
-            result = dependenciesResolver.resolve( request );
-        }
-        catch ( DependencyResolutionException e )
-        {
+            result = dependenciesResolver.resolve(request);
+        } catch (DependencyResolutionException e) {
             result = e.getResult();
 
             /*
@@ -259,47 +237,42 @@ public class LifecycleDependencyResolver
              * plugins that require dependency resolution although they usually run in phases of the build where project
              * artifacts haven't been assembled yet. The prime example of this is "mvn release:prepare".
              */
-            if ( aggregating && areAllDependenciesInReactor( session.getProjects(),
-                                                             result.getUnresolvedDependencies() ) )
-            {
-                logger.warn( "The following dependencies could not be resolved at this point of the build"
-                    + " but seem to be part of the reactor:" );
+            if (aggregating && areAllDependenciesInReactor(session.getProjects(), result.getUnresolvedDependencies())) {
+                logger.warn("The following dependencies could not be resolved at this point of the build"
+                        + " but seem to be part of the reactor:");
 
-                for ( Dependency dependency : result.getUnresolvedDependencies() )
-                {
-                    logger.warn( "o " + dependency );
+                for (Dependency dependency : result.getUnresolvedDependencies()) {
+                    logger.warn("o " + dependency);
                 }
 
-                logger.warn( "Try running the build up to the lifecycle phase \"package\"" );
-            }
-            else
-            {
-                throw new LifecycleExecutionException( null, project, e );
+                logger.warn("Try running the build up to the lifecycle phase \"package\"");
+            } else {
+                throw new LifecycleExecutionException(null, project, e);
             }
         }
 
-        eventSpyDispatcher.onEvent( result );
+        eventSpyDispatcher.onEvent(result);
 
         Set<Artifact> artifacts = new LinkedHashSet<>();
-        if ( result.getDependencyGraph() != null && !result.getDependencyGraph().getChildren().isEmpty() )
-        {
-            RepositoryUtils.toArtifacts( artifacts, result.getDependencyGraph().getChildren(),
-                                         Collections.singletonList( project.getArtifact().getId() ), collectionFilter );
+        if (result.getDependencyGraph() != null
+                && !result.getDependencyGraph().getChildren().isEmpty()) {
+            RepositoryUtils.toArtifacts(
+                    artifacts,
+                    result.getDependencyGraph().getChildren(),
+                    Collections.singletonList(project.getArtifact().getId()),
+                    collectionFilter);
         }
         return artifacts;
     }
 
-    private boolean areAllDependenciesInReactor( Collection<MavenProject> projects,
-                                                 Collection<Dependency> dependencies )
-    {
-        Set<String> projectKeys = getReactorProjectKeys( projects );
+    private boolean areAllDependenciesInReactor(
+            Collection<MavenProject> projects, Collection<Dependency> dependencies) {
+        Set<String> projectKeys = getReactorProjectKeys(projects);
 
-        for ( Dependency dependency : dependencies )
-        {
+        for (Dependency dependency : dependencies) {
             org.eclipse.aether.artifact.Artifact a = dependency.getArtifact();
-            String key = ArtifactUtils.key( a.getGroupId(), a.getArtifactId(), a.getVersion() );
-            if ( !projectKeys.contains( key ) )
-            {
+            String key = ArtifactUtils.key(a.getGroupId(), a.getArtifactId(), a.getVersion());
+            if (!projectKeys.contains(key)) {
                 return false;
             }
         }
@@ -307,50 +280,37 @@ public class LifecycleDependencyResolver
         return true;
     }
 
-    private Set<String> getReactorProjectKeys( Collection<MavenProject> projects )
-    {
-        Set<String> projectKeys = new HashSet<>( projects.size() * 2 );
-        for ( MavenProject project : projects )
-        {
-            String key = ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() );
-            projectKeys.add( key );
+    private Set<String> getReactorProjectKeys(Collection<MavenProject> projects) {
+        Set<String> projectKeys = new HashSet<>(projects.size() * 2);
+        for (MavenProject project : projects) {
+            String key = ArtifactUtils.key(project.getGroupId(), project.getArtifactId(), project.getVersion());
+            projectKeys.add(key);
         }
         return projectKeys;
     }
 
-    private Collection<String> negate( Collection<String> scopes )
-    {
+    private Collection<String> negate(Collection<String> scopes) {
         Collection<String> result = new HashSet<>();
-        Collections.addAll( result, "system", "compile", "provided", "runtime", "test" );
+        Collections.addAll(result, "system", "compile", "provided", "runtime", "test");
 
-        for ( String scope : scopes )
-        {
-            if ( "compile".equals( scope ) )
-            {
-                result.remove( "compile" );
-                result.remove( "system" );
-                result.remove( "provided" );
-            }
-            else if ( "runtime".equals( scope ) )
-            {
-                result.remove( "compile" );
-                result.remove( "runtime" );
-            }
-            else if ( "compile+runtime".equals( scope ) )
-            {
-                result.remove( "compile" );
-                result.remove( "system" );
-                result.remove( "provided" );
-                result.remove( "runtime" );
-            }
-            else if ( "runtime+system".equals( scope ) )
-            {
-                result.remove( "compile" );
-                result.remove( "system" );
-                result.remove( "runtime" );
-            }
-            else if ( "test".equals( scope ) )
-            {
+        for (String scope : scopes) {
+            if ("compile".equals(scope)) {
+                result.remove("compile");
+                result.remove("system");
+                result.remove("provided");
+            } else if ("runtime".equals(scope)) {
+                result.remove("compile");
+                result.remove("runtime");
+            } else if ("compile+runtime".equals(scope)) {
+                result.remove("compile");
+                result.remove("system");
+                result.remove("provided");
+                result.remove("runtime");
+            } else if ("runtime+system".equals(scope)) {
+                result.remove("compile");
+                result.remove("system");
+                result.remove("runtime");
+            } else if ("test".equals(scope)) {
                 result.clear();
             }
         }
@@ -358,33 +318,25 @@ public class LifecycleDependencyResolver
         return result;
     }
 
-    private static class ReactorDependencyFilter
-        implements DependencyFilter
-    {
+    private static class ReactorDependencyFilter implements DependencyFilter {
 
         private Set<String> keys = new HashSet<>();
 
-        ReactorDependencyFilter( Collection<Artifact> artifacts )
-        {
-            for ( Artifact artifact : artifacts )
-            {
-                String key = ArtifactUtils.key( artifact );
-                keys.add( key );
+        ReactorDependencyFilter(Collection<Artifact> artifacts) {
+            for (Artifact artifact : artifacts) {
+                String key = ArtifactUtils.key(artifact);
+                keys.add(key);
             }
         }
 
-        public boolean accept( DependencyNode node, List<DependencyNode> parents )
-        {
+        public boolean accept(DependencyNode node, List<DependencyNode> parents) {
             Dependency dependency = node.getDependency();
-            if ( dependency != null )
-            {
+            if (dependency != null) {
                 org.eclipse.aether.artifact.Artifact a = dependency.getArtifact();
-                String key = ArtifactUtils.key( a.getGroupId(), a.getArtifactId(), a.getVersion() );
-                return !keys.contains( key );
+                String key = ArtifactUtils.key(a.getGroupId(), a.getArtifactId(), a.getVersion());
+                return !keys.contains(key);
             }
             return false;
         }
-
     }
-
 }

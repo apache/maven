@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.toolchain;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,12 +16,12 @@ package org.apache.maven.toolchain;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain;
 
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.execution.MavenSession;
-
 
 /**
  * Public API for a toolchain-aware plugin to get expected toolchain instance.
@@ -32,8 +30,7 @@ import org.apache.maven.execution.MavenSession;
  * @author Robert Scholte
  * @since 2.0.9
  */
-public interface ToolchainManager
-{
+public interface ToolchainManager {
 
     // NOTE: Some plugins like Surefire access this field directly!
     @Deprecated
@@ -48,7 +45,7 @@ public interface ToolchainManager
      * @param context the Maven session, must not be {@code null}
      * @return the toolchain selected by <code>maven-toolchains-plugin</code>
      */
-    Toolchain getToolchainFromBuildContext( String type, MavenSession context );
+    Toolchain getToolchainFromBuildContext(String type, MavenSession context);
 
     /**
      * Select all toolchains available in user settings matching the type and requirements,
@@ -60,5 +57,5 @@ public interface ToolchainManager
      * @return the matching toolchains, never {@code null}
      * @since 3.3.0
      */
-    List<Toolchain> getToolchains( MavenSession session, String type, Map<String, String> requirements );
+    List<Toolchain> getToolchains(MavenSession session, String type, Map<String, String> requirements);
 }

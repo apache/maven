@@ -1,5 +1,3 @@
-package org.apache.maven.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.building;
 
 /**
  * Describes a problem that was encountered during settings building. A problem can either be an exception that was
@@ -27,19 +26,15 @@ package org.apache.maven.building;
  * @author Benjamin Bentmann
  * @author Robert Scholte
  */
-public interface Problem
-{
+public interface Problem {
 
     /**
      * The different severity levels for a problem, in decreasing order.
      */
-    enum Severity
-    {
-
+    enum Severity {
         FATAL, //
         ERROR, //
         WARNING //
-
     }
 
     /**
@@ -97,5 +92,4 @@ public interface Problem
      * @return The severity level of this problem, never {@code null}.
      */
     Severity getSeverity();
-
 }

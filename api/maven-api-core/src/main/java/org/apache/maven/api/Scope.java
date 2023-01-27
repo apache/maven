@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api;
 
 import java.util.Locale;
 
@@ -29,29 +28,25 @@ import org.apache.maven.api.annotations.Experimental;
  * @since 4.0
  */
 @Experimental
-public enum Scope
-{
-    COMPILE( "compile" ),
-    PROVIDED ( "provided" ),
-    SYSTEM( "system" ),
-    RUNTIME( "runtime" ),
-    TEST( "test" ),
-    IMPORT( "import" );
+public enum Scope {
+    COMPILE("compile"),
+    PROVIDED("provided"),
+    SYSTEM("system"),
+    RUNTIME("runtime"),
+    TEST("test"),
+    IMPORT("import");
 
     private final String id;
 
-    Scope( String id )
-    {
+    Scope(String id) {
         this.id = id;
     }
 
-    public String id()
-    {
+    public String id() {
         return this.id;
     }
 
-    public static Scope get( String scope )
-    {
-        return Enum.valueOf( Scope.class, scope.toUpperCase( Locale.ROOT ) );
+    public static Scope get(String scope) {
+        return Enum.valueOf(Scope.class, scope.toUpperCase(Locale.ROOT));
     }
 }

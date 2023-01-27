@@ -1,5 +1,3 @@
-package org.apache.maven.cli.logging;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.cli.logging;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli.logging;
 
 import java.io.IOException;
 import java.net.URL;
@@ -39,41 +38,35 @@ import org.slf4j.ILoggerFactory;
  * @author Hervé Boutemy
  * @since 3.1.0
  */
-public class Slf4jConfigurationFactory
-{
+public class Slf4jConfigurationFactory {
     public static final String RESOURCE = "META-INF/maven/slf4j-configuration.properties";
 
-    public static Slf4jConfiguration getConfiguration( ILoggerFactory loggerFactory )
-    {
+    public static Slf4jConfiguration getConfiguration(ILoggerFactory loggerFactory) {
         Map<URL, Set<Object>> supported = new LinkedHashMap<>();
 
         String slf4jBinding = loggerFactory.getClass().getCanonicalName();
 
-        try
-        {
-            Enumeration<URL> resources = Slf4jConfigurationFactory.class.getClassLoader().getResources( RESOURCE );
+        try {
+            Enumeration<URL> resources =
+                    Slf4jConfigurationFactory.class.getClassLoader().getResources(RESOURCE);
 
-            while ( resources.hasMoreElements() )
-            {
+            while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
 
-                Properties conf = PropertyUtils.loadProperties( resource.openStream() );
+                Properties conf = PropertyUtils.loadProperties(resource.openStream());
 
-                String impl = conf.getProperty( slf4jBinding );
+                String impl = conf.getProperty(slf4jBinding);
 
-                if ( impl != null )
-                {
-                    return (Slf4jConfiguration) Class.forName( impl ).newInstance();
+                if (impl != null) {
+                    return (Slf4jConfiguration) Class.forName(impl).newInstance();
                 }
 
-                supported.put( resource, conf.keySet() );
+                supported.put(resource, conf.keySet());
             }
-        }
-        catch ( IOException | ClassNotFoundException | IllegalAccessException | InstantiationException e )
-        {
+        } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
         }
 
-        return new UnsupportedSlf4jBindingConfiguration( slf4jBinding, supported );
+        return new UnsupportedSlf4jBindingConfiguration(slf4jBinding, supported);
     }
 }

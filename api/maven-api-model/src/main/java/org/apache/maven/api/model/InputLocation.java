@@ -1,5 +1,3 @@
-package org.apache.maven.api.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.model;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -28,71 +27,59 @@ import java.util.Map;
 /**
  * Class InputLocation.
  */
-public class InputLocation
-    implements Serializable, InputLocationTracker
-{
+public class InputLocation implements Serializable, InputLocationTracker {
     private final int lineNumber;
     private final int columnNumber;
     private final InputSource source;
     private final Map<Object, InputLocation> locations;
 
-    public InputLocation( InputSource source )
-    {
+    public InputLocation(InputSource source) {
         this.lineNumber = -1;
         this.columnNumber = -1;
         this.source = source;
-        this.locations = Collections.singletonMap( 0, this );
+        this.locations = Collections.singletonMap(0, this);
     }
 
-    public InputLocation( int lineNumber, int columnNumber )
-    {
-        this( lineNumber, columnNumber, null, null );
+    public InputLocation(int lineNumber, int columnNumber) {
+        this(lineNumber, columnNumber, null, null);
     }
 
-    public InputLocation( int lineNumber, int columnNumber, InputSource source )
-    {
-        this( lineNumber, columnNumber, source, null );
+    public InputLocation(int lineNumber, int columnNumber, InputSource source) {
+        this(lineNumber, columnNumber, source, null);
     }
 
-    public InputLocation( int lineNumber, int columnNumber, InputSource source, Object selfLocationKey )
-    {
+    public InputLocation(int lineNumber, int columnNumber, InputSource source, Object selfLocationKey) {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
-            this.locations = selfLocationKey != null
-                ?  Collections.singletonMap( selfLocationKey, this ) : Collections.emptyMap();
+        this.locations =
+                selfLocationKey != null ? Collections.singletonMap(selfLocationKey, this) : Collections.emptyMap();
     }
 
-    public InputLocation( int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations )
-    {
+    public InputLocation(int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
-        this.locations = ImmutableCollections.copy( locations );
+        this.locations = ImmutableCollections.copy(locations);
     }
 
-    public int getLineNumber()
-    {
+    public int getLineNumber() {
         return lineNumber;
     }
 
-    public int getColumnNumber()
-    {
+    public int getColumnNumber() {
         return columnNumber;
     }
 
-    public InputSource getSource()
-    {
+    public InputSource getSource() {
         return source;
     }
 
-    public InputLocation getLocation( Object key )
-    {
-        return locations != null ? locations.get( key ) : null;
+    public InputLocation getLocation(Object key) {
+        return locations != null ? locations.get(key) : null;
     }
 
-    public Map<Object, InputLocation> getLocations()
-    {
+    public Map<Object, InputLocation> getLocations() {
         return locations;
     }
 
@@ -104,37 +91,28 @@ public class InputLocation
      * @param sourceDominant the boolean indicating of {@code source} is dominant compared to {@code target}
      * @return the merged location
      */
-    public static InputLocation merge( InputLocation target, InputLocation source, boolean sourceDominant )
-    {
-        if ( source == null )
-        {
+    public static InputLocation merge(InputLocation target, InputLocation source, boolean sourceDominant) {
+        if (source == null) {
             return target;
-        }
-        else if ( target == null )
-        {
+        } else if (target == null) {
             return source;
         }
 
         Map<Object, InputLocation> locations;
         Map<Object, InputLocation> sourceLocations = source.locations;
         Map<Object, InputLocation> targetLocations = target.locations;
-        if ( sourceLocations == null )
-        {
+        if (sourceLocations == null) {
             locations = targetLocations;
-        }
-        else if ( targetLocations == null )
-        {
+        } else if (targetLocations == null) {
             locations = sourceLocations;
-        }
-        else
-        {
+        } else {
             locations = new LinkedHashMap<>();
-            locations.putAll( sourceDominant ? targetLocations : sourceLocations );
-            locations.putAll( sourceDominant ? sourceLocations : targetLocations );
+            locations.putAll(sourceDominant ? targetLocations : sourceLocations);
+            locations.putAll(sourceDominant ? sourceLocations : targetLocations);
         }
 
-        return new InputLocation( target.getLineNumber(), target.getColumnNumber(), target.getSource(), locations );
-    } //-- InputLocation merge( InputLocation, InputLocation, boolean )
+        return new InputLocation(target.getLineNumber(), target.getColumnNumber(), target.getSource(), locations);
+    } // -- InputLocation merge( InputLocation, InputLocation, boolean )
 
     /**
      * Merges the {@code source} location into the {@code target} location.
@@ -145,66 +123,50 @@ public class InputLocation
      * @param indices the list of integers for the indices
      * @return the merged location
      */
-    public static InputLocation merge( InputLocation target, InputLocation source, Collection<Integer> indices )
-    {
-        if ( source == null )
-        {
+    public static InputLocation merge(InputLocation target, InputLocation source, Collection<Integer> indices) {
+        if (source == null) {
             return target;
-        }
-        else if ( target == null )
-        {
+        } else if (target == null) {
             return source;
         }
 
         Map<Object, InputLocation> locations;
         Map<Object, InputLocation> sourceLocations = source.locations;
         Map<Object, InputLocation> targetLocations = target.locations;
-        if ( sourceLocations == null )
-        {
+        if (sourceLocations == null) {
             locations = targetLocations;
-        }
-        else if ( targetLocations == null )
-        {
+        } else if (targetLocations == null) {
             locations = sourceLocations;
-        }
-        else
-        {
+        } else {
             locations = new LinkedHashMap<>();
-            for ( int index : indices )
-            {
+            for (int index : indices) {
                 InputLocation location;
-                if ( index < 0 )
-                {
-                    location = sourceLocations.get( ~index );
+                if (index < 0) {
+                    location = sourceLocations.get(~index);
+                } else {
+                    location = targetLocations.get(index);
                 }
-                else
-                {
-                    location = targetLocations.get( index );
-                }
-                locations.put( locations.size(), location );
+                locations.put(locations.size(), location);
             }
         }
 
-        return new InputLocation( target.getLineNumber(), target.getColumnNumber(), target.getSource(), locations );
-    } //-- InputLocation merge( InputLocation, InputLocation, java.util.Collection )
+        return new InputLocation(target.getLineNumber(), target.getColumnNumber(), target.getSource(), locations);
+    } // -- InputLocation merge( InputLocation, InputLocation, java.util.Collection )
 
     /**
      * Class StringFormatter.
      *
      * @version $Revision$ $Date$
      */
-    public interface StringFormatter
-    {
+    public interface StringFormatter {
 
-          //-----------/
-         //- Methods -/
-        //-----------/
+        // -----------/
+        // - Methods -/
+        // -----------/
 
         /**
          * Method toString.
          */
-        String toString( InputLocation location );
-
+        String toString(InputLocation location);
     }
-
 }

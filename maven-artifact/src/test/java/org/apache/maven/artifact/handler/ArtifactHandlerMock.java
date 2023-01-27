@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.handler;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.handler;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,83 +16,66 @@ package org.apache.maven.artifact.handler;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.handler;
 
-public class ArtifactHandlerMock
-    implements ArtifactHandler
-{
+public class ArtifactHandlerMock implements ArtifactHandler {
 
     private String extension, directory, classifier, packaging, language;
-
     private boolean includesDependencies, addedToClasspath;
 
-    public void setExtension( String extension )
-    {
+    public void setExtension(String extension) {
         this.extension = extension;
     }
 
-    public String getExtension()
-    {
+    public String getExtension() {
         return extension;
     }
 
-    public void setDirectory( String directory )
-    {
+    public void setDirectory(String directory) {
         this.directory = directory;
     }
 
-    public String getDirectory()
-    {
+    public String getDirectory() {
         return directory;
     }
 
-    public void setClassifier( String classifier )
-    {
+    public void setClassifier(String classifier) {
         this.classifier = classifier;
     }
 
-    public String getClassifier()
-    {
+    public String getClassifier() {
         return classifier;
     }
 
-    public void setPackaging( String packaging )
-    {
+    public void setPackaging(String packaging) {
         this.packaging = packaging;
     }
 
-    public String getPackaging()
-    {
+    public String getPackaging() {
         return packaging;
     }
 
-    public void setIncludesDependencies( boolean includesDependencies )
-    {
+    public void setIncludesDependencies(boolean includesDependencies) {
         this.includesDependencies = includesDependencies;
     }
 
-    public boolean isIncludesDependencies()
-    {
+    public boolean isIncludesDependencies() {
         return includesDependencies;
     }
 
-    public void setLanguage( String language )
-    {
+    public void setLanguage(String language) {
         this.language = language;
     }
 
-    public String getLanguage()
-    {
+    public String getLanguage() {
         return language;
     }
 
-    public void setAddedToClasspath( boolean addedToClasspath )
-    {
+    public void setAddedToClasspath(boolean addedToClasspath) {
         this.addedToClasspath = addedToClasspath;
     }
 
-    public boolean isAddedToClasspath()
-    {
+    public boolean isAddedToClasspath() {
         return addedToClasspath;
     }
-
 }

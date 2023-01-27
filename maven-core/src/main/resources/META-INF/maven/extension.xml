@@ -136,6 +136,14 @@ under the License.
   </exportedPackages>
 
   <exportedArtifacts>
+    <!-- maven 4 api -->
+    <exportedArtifact>org.apache.maven:maven-api-core</exportedArtifact>
+    <exportedArtifact>org.apache.maven:maven-api-meta</exportedArtifact>
+    <exportedArtifact>org.apache.maven:maven-api-model</exportedArtifact>
+    <exportedArtifact>org.apache.maven:maven-api-settings</exportedArtifact>
+    <exportedArtifact>org.apache.maven:maven-api-toolchain</exportedArtifact>
+    <exportedArtifact>org.apache.maven:maven-api-xml</exportedArtifact>
+
     <exportedArtifact>classworlds:classworlds</exportedArtifact>
     <exportedArtifact>org.codehaus.plexus:plexus-classworlds</exportedArtifact>
     <exportedArtifact>org.codehaus.plexus:plexus-component-api</exportedArtifact>

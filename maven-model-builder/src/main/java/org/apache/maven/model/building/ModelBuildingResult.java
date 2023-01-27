@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.util.List;
 
@@ -29,8 +28,7 @@ import org.apache.maven.model.Profile;
  *
  * @author Benjamin Bentmann
  */
-public interface ModelBuildingResult
-{
+public interface ModelBuildingResult {
 
     /**
      * Gets the sequence of model identifiers that denote the lineage of models from which the effective model was
@@ -73,7 +71,7 @@ public interface ModelBuildingResult
      * @param modelId The identifier of the desired raw model, must not be {@code null}.
      * @return The raw model or {@code null} if the specified model id does not refer to a known model.
      */
-    Model getRawModel( String modelId );
+    Model getRawModel(String modelId);
 
     /**
      * Gets the profiles from the specified model that were active during model building. The model identifier should be
@@ -84,7 +82,7 @@ public interface ModelBuildingResult
      * @return The active profiles of the model or an empty list if none or {@code null} if the specified model id does
      *         not refer to a known model.
      */
-    List<Profile> getActivePomProfiles( String modelId );
+    List<Profile> getActivePomProfiles(String modelId);
 
     /**
      * Gets the external profiles that were active during model building. External profiles are those that were
@@ -102,5 +100,4 @@ public interface ModelBuildingResult
      * @return The problems that were encountered during the model building, can be empty but never {@code null}.
      */
     List<ModelProblem> getProblems();
-
 }

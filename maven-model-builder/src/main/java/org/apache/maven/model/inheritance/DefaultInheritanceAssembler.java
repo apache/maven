@@ -1,5 +1,3 @@
-package org.apache.maven.model.inheritance;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,16 @@ package org.apache.maven.model.inheritance;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.inheritance;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.Model;
@@ -45,12 +44,10 @@ import org.codehaus.plexus.util.StringUtils;
  *
  * @author Benjamin Bentmann
  */
-@SuppressWarnings( { "checkstyle:methodname" } )
+@SuppressWarnings({"checkstyle:methodname"})
 @Named
 @Singleton
-public class DefaultInheritanceAssembler
-    implements InheritanceAssembler
-{
+public class DefaultInheritanceAssembler implements InheritanceAssembler {
 
     private InheritanceModelMerger merger = new InheritanceModelMerger();
 
@@ -59,14 +56,13 @@ public class DefaultInheritanceAssembler
     private static final String CHILD_DIRECTORY_PROPERTY = "project.directory";
 
     @Override
-    public Model assembleModelInheritance( Model child, Model parent, ModelBuildingRequest request,
-                                          ModelProblemCollector problems )
-    {
+    public Model assembleModelInheritance(
+            Model child, Model parent, ModelBuildingRequest request, ModelProblemCollector problems) {
         Map<Object, Object> hints = new HashMap<>();
-        String childPath = child.getProperties().getOrDefault( CHILD_DIRECTORY_PROPERTY, child.getArtifactId() );
-        hints.put( CHILD_DIRECTORY, childPath );
-        hints.put( MavenModelMerger.CHILD_PATH_ADJUSTMENT, getChildPathAdjustment( child, parent, childPath ) );
-        return merger.merge( child, parent, false, hints );
+        String childPath = child.getProperties().getOrDefault(CHILD_DIRECTORY_PROPERTY, child.getArtifactId());
+        hints.put(CHILD_DIRECTORY, childPath);
+        hints.put(MavenModelMerger.CHILD_PATH_ADJUSTMENT, getChildPathAdjustment(child, parent, childPath));
+        return merger.merge(child, parent, false, hints);
     }
 
     /**
@@ -88,12 +84,10 @@ public class DefaultInheritanceAssembler
      * @param childDirectory The directory defined in child model, may be <code>null</code>.
      * @return The path adjustment, can be empty but never <code>null</code>.
      */
-    private String getChildPathAdjustment( Model child, Model parent, String childDirectory )
-    {
+    private String getChildPathAdjustment(Model child, Model parent, String childDirectory) {
         String adjustment = "";
 
-        if ( parent != null )
-        {
+        if (parent != null) {
             String childName = child.getArtifactId();
 
             /*
@@ -103,33 +97,28 @@ public class DefaultInheritanceAssembler
              * repository. In other words, modules where artifactId != moduleDirName will see different effective URLs
              * depending on how the model was constructed (from filesystem or from repository).
              */
-            if ( child.getProjectDirectory() != null )
-            {
+            if (child.getProjectDirectory() != null) {
                 childName = child.getProjectDirectory().getFileName().toString();
             }
 
-            for ( String module : parent.getModules() )
-            {
-                module = module.replace( '\\', '/' );
+            for (String module : parent.getModules()) {
+                module = module.replace('\\', '/');
 
-                if ( module.regionMatches( true, module.length() - 4, ".xml", 0, 4 ) )
-                {
-                    module = module.substring( 0, module.lastIndexOf( '/' ) + 1 );
+                if (module.regionMatches(true, module.length() - 4, ".xml", 0, 4)) {
+                    module = module.substring(0, module.lastIndexOf('/') + 1);
                 }
 
                 String moduleName = module;
-                if ( moduleName.endsWith( "/" ) )
-                {
-                    moduleName = moduleName.substring( 0, moduleName.length() - 1 );
+                if (moduleName.endsWith("/")) {
+                    moduleName = moduleName.substring(0, moduleName.length() - 1);
                 }
 
-                int lastSlash = moduleName.lastIndexOf( '/' );
+                int lastSlash = moduleName.lastIndexOf('/');
 
-                moduleName = moduleName.substring( lastSlash + 1 );
+                moduleName = moduleName.substring(lastSlash + 1);
 
-                if ( ( moduleName.equals( childName ) || ( moduleName.equals( childDirectory ) ) ) && lastSlash >= 0 )
-                {
-                    adjustment = module.substring( 0, lastSlash );
+                if ((moduleName.equals(childName) || (moduleName.equals(childDirectory))) && lastSlash >= 0) {
+                    adjustment = module.substring(0, lastSlash);
                     break;
                 }
             }
@@ -141,223 +130,197 @@ public class DefaultInheritanceAssembler
     /**
      * InheritanceModelMerger
      */
-    protected static class InheritanceModelMerger
-        extends MavenModelMerger
-    {
+    protected static class InheritanceModelMerger extends MavenModelMerger {
 
         @Override
-        protected String extrapolateChildUrl( String parentUrl, boolean appendPath, Map<Object, Object> context )
-        {
-            Object childDirectory = context.get( CHILD_DIRECTORY );
-            Object childPathAdjustment = context.get( CHILD_PATH_ADJUSTMENT );
+        protected String extrapolateChildUrl(String parentUrl, boolean appendPath, Map<Object, Object> context) {
+            Object childDirectory = context.get(CHILD_DIRECTORY);
+            Object childPathAdjustment = context.get(CHILD_PATH_ADJUSTMENT);
 
-            if ( StringUtils.isBlank( parentUrl ) || childDirectory == null || childPathAdjustment == null
-                || !appendPath )
-            {
+            if (StringUtils.isBlank(parentUrl)
+                    || childDirectory == null
+                    || childPathAdjustment == null
+                    || !appendPath) {
                 return parentUrl;
             }
 
             // append childPathAdjustment and childDirectory to parent url
-            return appendPath( parentUrl, childDirectory.toString(), childPathAdjustment.toString() );
+            return appendPath(parentUrl, childDirectory.toString(), childPathAdjustment.toString());
         }
 
-        private String appendPath( String parentUrl, String childPath, String pathAdjustment )
-        {
-            StringBuilder url = new StringBuilder( parentUrl.length() + pathAdjustment.length() + childPath.length()
-                + ( ( pathAdjustment.length() == 0 ) ? 1 : 2 ) );
+        private String appendPath(String parentUrl, String childPath, String pathAdjustment) {
+            StringBuilder url = new StringBuilder(parentUrl.length()
+                    + pathAdjustment.length()
+                    + childPath.length()
+                    + ((pathAdjustment.length() == 0) ? 1 : 2));
 
-            url.append( parentUrl );
-            concatPath( url, pathAdjustment );
-            concatPath( url, childPath );
+            url.append(parentUrl);
+            concatPath(url, pathAdjustment);
+            concatPath(url, childPath);
 
             return url.toString();
         }
 
-        private void concatPath( StringBuilder url, String path )
-        {
-            if ( path.length() > 0 )
-            {
-                boolean initialUrlEndsWithSlash = url.charAt( url.length() - 1 ) == '/';
-                boolean pathStartsWithSlash = path.charAt( 0 ) ==  '/';
+        private void concatPath(StringBuilder url, String path) {
+            if (path.length() > 0) {
+                boolean initialUrlEndsWithSlash = url.charAt(url.length() - 1) == '/';
+                boolean pathStartsWithSlash = path.charAt(0) == '/';
 
-                if ( pathStartsWithSlash )
-                {
-                    if ( initialUrlEndsWithSlash )
-                    {
+                if (pathStartsWithSlash) {
+                    if (initialUrlEndsWithSlash) {
                         // 1 extra '/' to remove
-                        url.setLength( url.length() - 1 );
+                        url.setLength(url.length() - 1);
                     }
-                }
-                else if ( !initialUrlEndsWithSlash )
-                {
+                } else if (!initialUrlEndsWithSlash) {
                     // add missing '/' between url and path
-                    url.append( '/' );
+                    url.append('/');
                 }
 
-                url.append( path );
+                url.append(path);
 
                 // ensure resulting url ends with slash if initial url was
-                if ( initialUrlEndsWithSlash && !path.endsWith( "/" ) )
-                {
-                    url.append( '/' );
+                if (initialUrlEndsWithSlash && !path.endsWith("/")) {
+                    url.append('/');
                 }
             }
         }
 
         @Override
-        protected void mergeModelBase_Properties( ModelBase.Builder builder,
-                                                  ModelBase target, ModelBase source, boolean sourceDominant,
-                                                  Map<Object, Object> context )
-        {
+        protected void mergeModelBase_Properties(
+                ModelBase.Builder builder,
+                ModelBase target,
+                ModelBase source,
+                boolean sourceDominant,
+                Map<Object, Object> context) {
             Map<String, String> merged = new HashMap<>();
-            if ( sourceDominant )
-            {
-                merged.putAll( target.getProperties() );
-                putAll( merged, source.getProperties(), CHILD_DIRECTORY_PROPERTY );
+            if (sourceDominant) {
+                merged.putAll(target.getProperties());
+                putAll(merged, source.getProperties(), CHILD_DIRECTORY_PROPERTY);
+            } else {
+                putAll(merged, source.getProperties(), CHILD_DIRECTORY_PROPERTY);
+                merged.putAll(target.getProperties());
             }
-            else
-            {
-                putAll( merged, source.getProperties(), CHILD_DIRECTORY_PROPERTY );
-                merged.putAll( target.getProperties() );
-            }
-            builder.properties( merged );
-            builder.location( "properties",
-                                InputLocation.merge( target.getLocation( "properties" ),
-                                                     source.getLocation( "properties" ), sourceDominant ) );
+            builder.properties(merged);
+            builder.location(
+                    "properties",
+                    InputLocation.merge(
+                            target.getLocation("properties"), source.getLocation("properties"), sourceDominant));
         }
 
-        private void putAll( Map<String, String> s, Map<String, String> t, Object excludeKey )
-        {
-            for ( Map.Entry<String, String> e : t.entrySet() )
-            {
-                if ( !e.getKey().equals( excludeKey ) )
-                {
-                    s.put( e.getKey(), e.getValue() );
+        private void putAll(Map<String, String> s, Map<String, String> t, Object excludeKey) {
+            for (Map.Entry<String, String> e : t.entrySet()) {
+                if (!e.getKey().equals(excludeKey)) {
+                    s.put(e.getKey(), e.getValue());
                 }
             }
         }
 
         @Override
-        protected void mergePluginContainer_Plugins( PluginContainer.Builder builder,
-                                                     PluginContainer target, PluginContainer source,
-                                                     boolean sourceDominant, Map<Object, Object> context )
-        {
+        protected void mergePluginContainer_Plugins(
+                PluginContainer.Builder builder,
+                PluginContainer target,
+                PluginContainer source,
+                boolean sourceDominant,
+                Map<Object, Object> context) {
             List<Plugin> src = source.getPlugins();
-            if ( !src.isEmpty() )
-            {
+            if (!src.isEmpty()) {
                 List<Plugin> tgt = target.getPlugins();
-                Map<Object, Plugin> master = new LinkedHashMap<>( src.size() * 2 );
+                Map<Object, Plugin> master = new LinkedHashMap<>(src.size() * 2);
 
-                for ( Plugin element : src )
-                {
-                    if ( element.isInherited() || !element.getExecutions().isEmpty() )
-                    {
+                for (Plugin element : src) {
+                    if (element.isInherited() || !element.getExecutions().isEmpty()) {
                         // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions
-                        Plugin plugin = Plugin.newInstance( false );
-                        plugin = mergePlugin( plugin, element, sourceDominant, context );
+                        Plugin plugin = Plugin.newInstance(false);
+                        plugin = mergePlugin(plugin, element, sourceDominant, context);
 
-                        Object key = getPluginKey().apply( plugin );
+                        Object key = getPluginKey().apply(plugin);
 
-                        master.put( key, plugin );
+                        master.put(key, plugin);
                     }
                 }
 
                 Map<Object, List<Plugin>> predecessors = new LinkedHashMap<>();
                 List<Plugin> pending = new ArrayList<>();
-                for ( Plugin element : tgt )
-                {
-                    Object key = getPluginKey().apply( element );
-                    Plugin existing = master.get( key );
-                    if ( existing != null )
-                    {
-                        element = mergePlugin( element, existing, sourceDominant, context );
+                for (Plugin element : tgt) {
+                    Object key = getPluginKey().apply(element);
+                    Plugin existing = master.get(key);
+                    if (existing != null) {
+                        element = mergePlugin(element, existing, sourceDominant, context);
 
-                        master.put( key, element );
+                        master.put(key, element);
 
-                        if ( !pending.isEmpty() )
-                        {
-                            predecessors.put( key, pending );
+                        if (!pending.isEmpty()) {
+                            predecessors.put(key, pending);
                             pending = new ArrayList<>();
                         }
-                    }
-                    else
-                    {
-                        pending.add( element );
+                    } else {
+                        pending.add(element);
                     }
                 }
 
-                List<Plugin> result = new ArrayList<>( src.size() + tgt.size() );
-                for ( Map.Entry<Object, Plugin> entry : master.entrySet() )
-                {
-                    List<Plugin> pre = predecessors.get( entry.getKey() );
-                    if ( pre != null )
-                    {
-                        result.addAll( pre );
+                List<Plugin> result = new ArrayList<>(src.size() + tgt.size());
+                for (Map.Entry<Object, Plugin> entry : master.entrySet()) {
+                    List<Plugin> pre = predecessors.get(entry.getKey());
+                    if (pre != null) {
+                        result.addAll(pre);
                     }
-                    result.add( entry.getValue() );
+                    result.add(entry.getValue());
                 }
-                result.addAll( pending );
+                result.addAll(pending);
 
-                builder.plugins( result );
+                builder.plugins(result);
             }
         }
 
         @Override
-        protected Plugin mergePlugin( Plugin target, Plugin source,
-                                      boolean sourceDominant, Map<Object, Object> context )
-        {
-            Plugin.Builder builder = Plugin.newBuilder( target );
-            if ( source.isInherited() )
-            {
-                mergeConfigurationContainer( builder, target, source, sourceDominant, context );
+        protected Plugin mergePlugin(
+                Plugin target, Plugin source, boolean sourceDominant, Map<Object, Object> context) {
+            Plugin.Builder builder = Plugin.newBuilder(target);
+            if (source.isInherited()) {
+                mergeConfigurationContainer(builder, target, source, sourceDominant, context);
             }
-            mergePlugin_GroupId( builder, target, source, sourceDominant, context );
-            mergePlugin_ArtifactId( builder, target, source, sourceDominant, context );
-            mergePlugin_Version( builder, target, source, sourceDominant, context );
-            mergePlugin_Extensions( builder, target, source, sourceDominant, context );
-            mergePlugin_Executions( builder, target, source, sourceDominant, context );
-            mergePlugin_Dependencies( builder, target, source, sourceDominant, context );
+            mergePlugin_GroupId(builder, target, source, sourceDominant, context);
+            mergePlugin_ArtifactId(builder, target, source, sourceDominant, context);
+            mergePlugin_Version(builder, target, source, sourceDominant, context);
+            mergePlugin_Extensions(builder, target, source, sourceDominant, context);
+            mergePlugin_Executions(builder, target, source, sourceDominant, context);
+            mergePlugin_Dependencies(builder, target, source, sourceDominant, context);
             return builder.build();
         }
 
         @Override
-        protected void mergeReporting_Plugins( Reporting.Builder builder,
-                                               Reporting target, Reporting source, boolean sourceDominant,
-                                               Map<Object, Object> context )
-        {
+        protected void mergeReporting_Plugins(
+                Reporting.Builder builder,
+                Reporting target,
+                Reporting source,
+                boolean sourceDominant,
+                Map<Object, Object> context) {
             List<ReportPlugin> src = source.getPlugins();
-            if ( !src.isEmpty() )
-            {
+            if (!src.isEmpty()) {
                 List<ReportPlugin> tgt = target.getPlugins();
-                Map<Object, ReportPlugin> merged =
-                    new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
+                Map<Object, ReportPlugin> merged = new LinkedHashMap<>((src.size() + tgt.size()) * 2);
 
-                for ( ReportPlugin element :  src )
-                {
-                    if ( element.isInherited() )
-                    {
+                for (ReportPlugin element : src) {
+                    if (element.isInherited()) {
                         // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions as well
-                        ReportPlugin plugin = ReportPlugin.newInstance( false );
-                        plugin = mergeReportPlugin( plugin, element, sourceDominant, context );
+                        ReportPlugin plugin = ReportPlugin.newInstance(false);
+                        plugin = mergeReportPlugin(plugin, element, sourceDominant, context);
 
-                        merged.put( getReportPluginKey().apply( element ), plugin );
+                        merged.put(getReportPluginKey().apply(element), plugin);
                     }
                 }
 
-                for ( ReportPlugin element : tgt )
-                {
-                    Object key = getReportPluginKey().apply( element );
-                    ReportPlugin existing = merged.get( key );
-                    if ( existing != null )
-                    {
-                        element = mergeReportPlugin( element, existing, sourceDominant, context );
+                for (ReportPlugin element : tgt) {
+                    Object key = getReportPluginKey().apply(element);
+                    ReportPlugin existing = merged.get(key);
+                    if (existing != null) {
+                        element = mergeReportPlugin(element, existing, sourceDominant, context);
                     }
-                    merged.put( key, element );
+                    merged.put(key, element);
                 }
 
-                builder.plugins( merged.values() );
+                builder.plugins(merged.values());
             }
         }
     }
-
 }

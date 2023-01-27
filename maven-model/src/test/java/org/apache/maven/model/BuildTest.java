@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
@@ -30,34 +29,36 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
-public class BuildTest
-{
+public class BuildTest {
 
     @Test
-    public void testHashCodeNullSafe()
-    {
+    public void testHashCodeNullSafe() {
         new Build().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Build().equals( null ) );
+    public void testEqualsNullSafe() {
+        assertFalse(new Build().equals(null));
 
-        new Build().equals( new Build() );
+        new Build().equals(new Build());
     }
 
     @Test
-    public void testEqualsIdentity()
-    {
+    public void testEqualsIdentity() {
         Build thing = new Build();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Build().toString() );
+    public void testToStringNullSafe() {
+        assertNotNull(new Build().toString());
     }
 
+    public void testToStringNotNonsense() {
+        Build build = new Build();
+
+        String s = build.toString();
+
+        assert "Build {BuildBase {PluginConfiguration {PluginContainer {}}}}".equals(s) : s;
+    }
 }

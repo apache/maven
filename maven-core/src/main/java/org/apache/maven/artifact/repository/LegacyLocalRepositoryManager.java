@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.repository;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.repository;
 
 import java.io.File;
 import java.util.Collections;
@@ -51,9 +50,7 @@ import org.eclipse.aether.repository.RemoteRepository;
  *
  * @author Benjamin Bentmann
  */
-public class LegacyLocalRepositoryManager
-    implements LocalRepositoryManager
-{
+public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
 
     private final ArtifactRepository delegate;
 
@@ -61,40 +58,33 @@ public class LegacyLocalRepositoryManager
 
     private final boolean realLocalRepo;
 
-    public static RepositorySystemSession overlay( ArtifactRepository repository, RepositorySystemSession session,
-                                                   RepositorySystem system )
-    {
-        if ( repository == null || repository.getBasedir() == null )
-        {
+    public static RepositorySystemSession overlay(
+            ArtifactRepository repository, RepositorySystemSession session, RepositorySystem system) {
+        if (repository == null || repository.getBasedir() == null) {
             return session;
         }
 
-        if ( session != null )
-        {
+        if (session != null) {
             LocalRepositoryManager lrm = session.getLocalRepositoryManager();
-            if ( lrm != null && lrm.getRepository().getBasedir().equals( new File( repository.getBasedir() ) ) )
-            {
+            if (lrm != null && lrm.getRepository().getBasedir().equals(new File(repository.getBasedir()))) {
                 return session;
             }
-        }
-        else
-        {
+        } else {
             session = new DefaultRepositorySystemSession();
         }
 
-        final LocalRepositoryManager llrm = new LegacyLocalRepositoryManager( repository );
+        final LocalRepositoryManager llrm = new LegacyLocalRepositoryManager(repository);
 
-        return new DefaultRepositorySystemSession( session ).setLocalRepositoryManager( llrm );
+        return new DefaultRepositorySystemSession(session).setLocalRepositoryManager(llrm);
     }
 
-    private LegacyLocalRepositoryManager( ArtifactRepository delegate )
-    {
-        this.delegate = Objects.requireNonNull( delegate, "delegate cannot be null" );
+    private LegacyLocalRepositoryManager(ArtifactRepository delegate) {
+        this.delegate = Objects.requireNonNull(delegate, "delegate cannot be null");
 
         ArtifactRepositoryLayout layout = delegate.getLayout();
-        repo =
-            new LocalRepository( new File( delegate.getBasedir() ),
-                                 ( layout != null ) ? layout.getClass().getSimpleName() : "legacy" );
+        repo = new LocalRepository(
+                new File(delegate.getBasedir()),
+                (layout != null) ? layout.getClass().getSimpleName() : "legacy");
 
         /*
          * NOTE: "invoker:install" vs "appassembler:assemble": Both mojos use the artifact installer to put an artifact
@@ -108,334 +98,253 @@ public class LegacyLocalRepositoryManager
          * transformation however contradicts the other use case of precisely obeying the repository's layout. The below
          * flag tries to detect which use case applies to make both plugins happy.
          */
-        realLocalRepo = ( layout instanceof DefaultRepositoryLayout ) && "local".equals( delegate.getId() );
+        realLocalRepo = (layout instanceof DefaultRepositoryLayout) && "local".equals(delegate.getId());
     }
 
-    public LocalRepository getRepository()
-    {
+    public LocalRepository getRepository() {
         return repo;
     }
 
-    public String getPathForLocalArtifact( Artifact artifact )
-    {
-        if ( realLocalRepo )
-        {
-            return delegate.pathOf( RepositoryUtils.toArtifact( artifact.setVersion( artifact.getBaseVersion() ) ) );
+    public String getPathForLocalArtifact(Artifact artifact) {
+        if (realLocalRepo) {
+            return delegate.pathOf(RepositoryUtils.toArtifact(artifact.setVersion(artifact.getBaseVersion())));
         }
-        return delegate.pathOf( RepositoryUtils.toArtifact( artifact ) );
+        return delegate.pathOf(RepositoryUtils.toArtifact(artifact));
     }
 
-    public String getPathForRemoteArtifact( Artifact artifact, RemoteRepository repository, String context )
-    {
-        return delegate.pathOf( RepositoryUtils.toArtifact( artifact ) );
+    public String getPathForRemoteArtifact(Artifact artifact, RemoteRepository repository, String context) {
+        return delegate.pathOf(RepositoryUtils.toArtifact(artifact));
     }
 
-    public String getPathForLocalMetadata( Metadata metadata )
-    {
-        return delegate.pathOfLocalRepositoryMetadata( new ArtifactMetadataAdapter( metadata ), delegate );
+    public String getPathForLocalMetadata(Metadata metadata) {
+        return delegate.pathOfLocalRepositoryMetadata(new ArtifactMetadataAdapter(metadata), delegate);
     }
 
-    public String getPathForRemoteMetadata( Metadata metadata, RemoteRepository repository, String context )
-    {
-        return delegate.pathOfLocalRepositoryMetadata( new ArtifactMetadataAdapter( metadata ),
-                                                       new ArtifactRepositoryAdapter( repository ) );
+    public String getPathForRemoteMetadata(Metadata metadata, RemoteRepository repository, String context) {
+        return delegate.pathOfLocalRepositoryMetadata(
+                new ArtifactMetadataAdapter(metadata), new ArtifactRepositoryAdapter(repository));
     }
 
-    public LocalArtifactResult find( RepositorySystemSession session, LocalArtifactRequest request )
-    {
-        String path = getPathForLocalArtifact( request.getArtifact() );
-        File file = new File( getRepository().getBasedir(), path );
+    public LocalArtifactResult find(RepositorySystemSession session, LocalArtifactRequest request) {
+        String path = getPathForLocalArtifact(request.getArtifact());
+        File file = new File(getRepository().getBasedir(), path);
 
-        LocalArtifactResult result = new LocalArtifactResult( request );
-        if ( file.isFile() )
-        {
-            result.setFile( file );
-            result.setAvailable( true );
+        LocalArtifactResult result = new LocalArtifactResult(request);
+        if (file.isFile()) {
+            result.setFile(file);
+            result.setAvailable(true);
         }
 
         return result;
     }
 
-    public LocalMetadataResult find( RepositorySystemSession session, LocalMetadataRequest request )
-    {
+    public LocalMetadataResult find(RepositorySystemSession session, LocalMetadataRequest request) {
         Metadata metadata = request.getMetadata();
 
         String path;
-        if ( request.getRepository() == null )
-        {
-            path = getPathForLocalMetadata( metadata );
-        }
-        else
-        {
-            path = getPathForRemoteMetadata( metadata, request.getRepository(), request.getContext() );
+        if (request.getRepository() == null) {
+            path = getPathForLocalMetadata(metadata);
+        } else {
+            path = getPathForRemoteMetadata(metadata, request.getRepository(), request.getContext());
         }
 
-        File file = new File( getRepository().getBasedir(), path );
+        File file = new File(getRepository().getBasedir(), path);
 
-        LocalMetadataResult result = new LocalMetadataResult( request );
-        if ( file.isFile() )
-        {
-            result.setFile( file );
+        LocalMetadataResult result = new LocalMetadataResult(request);
+        if (file.isFile()) {
+            result.setFile(file);
         }
 
         return result;
     }
 
-    public void add( RepositorySystemSession session, LocalArtifactRegistration request )
-    {
+    public void add(RepositorySystemSession session, LocalArtifactRegistration request) {
         // noop
     }
 
-    public void add( RepositorySystemSession session, LocalMetadataRegistration request )
-    {
+    public void add(RepositorySystemSession session, LocalMetadataRegistration request) {
         // noop
     }
 
-    static class ArtifactMetadataAdapter
-        implements ArtifactMetadata
-    {
+    static class ArtifactMetadataAdapter implements ArtifactMetadata {
 
         private final Metadata metadata;
 
-        ArtifactMetadataAdapter( Metadata metadata )
-        {
+        ArtifactMetadataAdapter(Metadata metadata) {
             this.metadata = metadata;
         }
 
-        public boolean storedInArtifactVersionDirectory()
-        {
+        public boolean storedInArtifactVersionDirectory() {
             return metadata.getVersion().length() > 0;
         }
 
-        public boolean storedInGroupDirectory()
-        {
+        public boolean storedInGroupDirectory() {
             return metadata.getArtifactId().length() <= 0;
         }
 
-        public String getGroupId()
-        {
-            return nullify( metadata.getGroupId() );
+        public String getGroupId() {
+            return nullify(metadata.getGroupId());
         }
 
-        public String getArtifactId()
-        {
-            return nullify( metadata.getArtifactId() );
+        public String getArtifactId() {
+            return nullify(metadata.getArtifactId());
         }
 
-        public String getBaseVersion()
-        {
-            return nullify( metadata.getVersion() );
+        public String getBaseVersion() {
+            return nullify(metadata.getVersion());
         }
 
-        private String nullify( String str )
-        {
-            return ( str == null || str.length() <= 0 ) ? null : str;
+        private String nullify(String str) {
+            return (str == null || str.length() <= 0) ? null : str;
         }
 
-        public Object getKey()
-        {
+        public Object getKey() {
             return metadata.toString();
         }
 
-        public String getRemoteFilename()
-        {
+        public String getRemoteFilename() {
             return metadata.getType();
         }
 
-        public String getLocalFilename( ArtifactRepository repository )
-        {
-            return insertRepositoryKey( getRemoteFilename(), repository.getKey() );
+        public String getLocalFilename(ArtifactRepository repository) {
+            return insertRepositoryKey(getRemoteFilename(), repository.getKey());
         }
 
-        private String insertRepositoryKey( String filename, String repositoryKey )
-        {
+        private String insertRepositoryKey(String filename, String repositoryKey) {
             String result;
-            int idx = filename.indexOf( '.' );
-            if ( idx < 0 )
-            {
+            int idx = filename.indexOf('.');
+            if (idx < 0) {
                 result = filename + '-' + repositoryKey;
-            }
-            else
-            {
-                result = filename.substring( 0, idx ) + '-' + repositoryKey + filename.substring( idx );
+            } else {
+                result = filename.substring(0, idx) + '-' + repositoryKey + filename.substring(idx);
             }
             return result;
         }
 
-        public void merge( org.apache.maven.repository.legacy.metadata.ArtifactMetadata metadata )
-        {
+        public void merge(org.apache.maven.repository.legacy.metadata.ArtifactMetadata metadata) {
             // not used
         }
 
-        public void merge( ArtifactMetadata metadata )
-        {
+        public void merge(ArtifactMetadata metadata) {
             // not used
         }
 
-        public void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
-            throws RepositoryMetadataStoreException
-        {
+        public void storeInLocalRepository(ArtifactRepository localRepository, ArtifactRepository remoteRepository)
+                throws RepositoryMetadataStoreException {
             // not used
         }
 
-        public String extendedToString()
-        {
+        public String extendedToString() {
             return metadata.toString();
         }
-
     }
 
-    static class ArtifactRepositoryAdapter
-        implements ArtifactRepository
-    {
+    static class ArtifactRepositoryAdapter implements ArtifactRepository {
 
         private final RemoteRepository repository;
 
-        ArtifactRepositoryAdapter( RemoteRepository repository )
-        {
+        ArtifactRepositoryAdapter(RemoteRepository repository) {
             this.repository = repository;
         }
 
-        public String pathOf( org.apache.maven.artifact.Artifact artifact )
-        {
+        public String pathOf(org.apache.maven.artifact.Artifact artifact) {
             return null;
         }
 
-        public String pathOfRemoteRepositoryMetadata( ArtifactMetadata artifactMetadata )
-        {
+        public String pathOfRemoteRepositoryMetadata(ArtifactMetadata artifactMetadata) {
             return null;
         }
 
-        public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
-        {
+        public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
             return null;
         }
 
-        public String getUrl()
-        {
+        public String getUrl() {
             return repository.getUrl();
         }
 
-        public void setUrl( String url )
-        {
-        }
+        public void setUrl(String url) {}
 
-        public String getBasedir()
-        {
+        public String getBasedir() {
             return null;
         }
 
-        public String getProtocol()
-        {
+        public String getProtocol() {
             return repository.getProtocol();
         }
 
-        public String getId()
-        {
+        public String getId() {
             return repository.getId();
         }
 
-        public void setId( String id )
-        {
-        }
+        public void setId(String id) {}
 
-        public ArtifactRepositoryPolicy getSnapshots()
-        {
+        public ArtifactRepositoryPolicy getSnapshots() {
             return null;
         }
 
-        public void setSnapshotUpdatePolicy( ArtifactRepositoryPolicy policy )
-        {
-        }
+        public void setSnapshotUpdatePolicy(ArtifactRepositoryPolicy policy) {}
 
-        public ArtifactRepositoryPolicy getReleases()
-        {
+        public ArtifactRepositoryPolicy getReleases() {
             return null;
         }
 
-        public void setReleaseUpdatePolicy( ArtifactRepositoryPolicy policy )
-        {
-        }
+        public void setReleaseUpdatePolicy(ArtifactRepositoryPolicy policy) {}
 
-        public ArtifactRepositoryLayout getLayout()
-        {
+        public ArtifactRepositoryLayout getLayout() {
             return null;
         }
 
-        public void setLayout( ArtifactRepositoryLayout layout )
-        {
-        }
+        public void setLayout(ArtifactRepositoryLayout layout) {}
 
-        public String getKey()
-        {
+        public String getKey() {
             return getId();
         }
 
-        public boolean isUniqueVersion()
-        {
+        public boolean isUniqueVersion() {
             return true;
         }
 
-        public boolean isBlacklisted()
-        {
+        public boolean isBlacklisted() {
             return false;
         }
 
-        public void setBlacklisted( boolean blackListed )
-        {
-        }
+        public void setBlacklisted(boolean blackListed) {}
 
-        public org.apache.maven.artifact.Artifact find( org.apache.maven.artifact.Artifact artifact )
-        {
+        public org.apache.maven.artifact.Artifact find(org.apache.maven.artifact.Artifact artifact) {
             return null;
         }
 
-        public List<String> findVersions( org.apache.maven.artifact.Artifact artifact )
-        {
+        public List<String> findVersions(org.apache.maven.artifact.Artifact artifact) {
             return Collections.emptyList();
         }
 
-        public boolean isProjectAware()
-        {
+        public boolean isProjectAware() {
             return false;
         }
 
-        public void setAuthentication( Authentication authentication )
-        {
-        }
+        public void setAuthentication(Authentication authentication) {}
 
-        public Authentication getAuthentication()
-        {
+        public Authentication getAuthentication() {
             return null;
         }
 
-        public void setProxy( Proxy proxy )
-        {
-        }
+        public void setProxy(Proxy proxy) {}
 
-        public Proxy getProxy()
-        {
+        public Proxy getProxy() {
             return null;
         }
 
-        public List<ArtifactRepository> getMirroredRepositories()
-        {
+        public List<ArtifactRepository> getMirroredRepositories() {
             return Collections.emptyList();
         }
 
-        public void setMirroredRepositories( List<ArtifactRepository> mirroredRepositories )
-        {
-        }
+        public void setMirroredRepositories(List<ArtifactRepository> mirroredRepositories) {}
 
-        public boolean isBlocked()
-        {
+        public boolean isBlocked() {
             return false;
         }
 
-        public void setBlocked( boolean blocked )
-        {
-        }
-
+        public void setBlocked(boolean blocked) {}
     }
-
 }

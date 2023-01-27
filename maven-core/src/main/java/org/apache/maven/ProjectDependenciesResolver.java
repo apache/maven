@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
 
 import java.util.Collection;
 import java.util.Set;
@@ -35,8 +34,7 @@ import org.apache.maven.project.MavenProject;
  *
  */
 @Deprecated
-public interface ProjectDependenciesResolver
-{
+public interface ProjectDependenciesResolver {
 
     /**
      * Resolves the transitive dependencies of the specified project.
@@ -48,8 +46,8 @@ public interface ProjectDependenciesResolver
      * @throws ArtifactResolutionException in case of resolution issue
      * @throws ArtifactNotFoundException if an artifact is not found
      */
-    Set<Artifact> resolve( MavenProject project, Collection<String> scopesToResolve, MavenSession session )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
+    Set<Artifact> resolve(MavenProject project, Collection<String> scopesToResolve, MavenSession session)
+            throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
      * Resolves the transitive dependencies of the specified project.
@@ -62,9 +60,12 @@ public interface ProjectDependenciesResolver
      * @throws ArtifactResolutionException in case of resolution issue
      * @throws ArtifactNotFoundException if an artifact is not found
      */
-    Set<Artifact> resolve( MavenProject project, Collection<String> scopesToCollect,
-                           Collection<String> scopesToResolve, MavenSession session )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
+    Set<Artifact> resolve(
+            MavenProject project,
+            Collection<String> scopesToCollect,
+            Collection<String> scopesToResolve,
+            MavenSession session)
+            throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
      * Resolves the transitive dependencies of the specified project.
@@ -78,9 +79,13 @@ public interface ProjectDependenciesResolver
      * @throws ArtifactResolutionException in case of resolution issue
      * @throws ArtifactNotFoundException if an artifact is not found
      */
-    Set<Artifact> resolve( MavenProject project, Collection<String> scopesToCollect,
-                           Collection<String> scopesToResolve, MavenSession session, Set<Artifact> ignorableArtifacts )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
+    Set<Artifact> resolve(
+            MavenProject project,
+            Collection<String> scopesToCollect,
+            Collection<String> scopesToResolve,
+            MavenSession session,
+            Set<Artifact> ignorableArtifacts)
+            throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
      * Resolves the transitive dependencies of the specified projects. Note that dependencies which can't be resolved
@@ -96,8 +101,6 @@ public interface ProjectDependenciesResolver
      * @throws ArtifactResolutionException in case of resolution issue
      * @throws ArtifactNotFoundException if an artifact is not found
      */
-    Set<Artifact> resolve( Collection<? extends MavenProject> projects, Collection<String> scopes,
-                           MavenSession session )
-        throws ArtifactResolutionException, ArtifactNotFoundException;
-
+    Set<Artifact> resolve(Collection<? extends MavenProject> projects, Collection<String> scopes, MavenSession session)
+            throws ArtifactResolutionException, ArtifactNotFoundException;
 }

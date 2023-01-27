@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,15 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+package org.apache.maven;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import com.google.inject.ScopeAnnotation;
+
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Indicates that annotated component should be instantiated before session execution starts
@@ -34,9 +33,7 @@ import com.google.inject.ScopeAnnotation;
  * @author Jason van Zyl
  * @since 3.2.0
  */
-@Target( { TYPE } )
-@Retention( RUNTIME )
+@Target({TYPE})
+@Retention(RUNTIME)
 @ScopeAnnotation
-public @interface SessionScoped
-{
-}
+public @interface SessionScoped {}

@@ -1,5 +1,3 @@
-package org.apache.maven.configuration;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.configuration;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.configuration;
 
 /**
  * A request to configure a bean from some configuration in the POM or similar.
  *
  * @author Benjamin Bentmann
  */
-public interface BeanConfigurationRequest
-{
+public interface BeanConfigurationRequest {
 
     /**
      * Gets the bean to configure. Eventually, a valid request must have a bean set.
@@ -40,7 +38,7 @@ public interface BeanConfigurationRequest
      * @param bean The bean to configure, may be {@code null}.
      * @return This request for chaining, never {@code null}.
      */
-    BeanConfigurationRequest setBean( Object bean );
+    BeanConfigurationRequest setBean(Object bean);
 
     /**
      * Gets the configuration to unmarshal into the bean.
@@ -57,7 +55,7 @@ public interface BeanConfigurationRequest
      * @param configuration The configuration to unmarshal, may be {@code null}.
      * @return This request for chaining, never {@code null}.
      */
-    BeanConfigurationRequest setConfiguration( Object configuration );
+    BeanConfigurationRequest setConfiguration(Object configuration);
 
     /**
      * Sets the configuration to unmarshal into the bean. The configuration should be taken from
@@ -69,7 +67,7 @@ public interface BeanConfigurationRequest
      * @param element Configuration element name to unmarshal or {@code null} to unmarshal entire configuration.
      * @return This request for chaining, never {@code null}.
      */
-    BeanConfigurationRequest setConfiguration( Object configuration, String element );
+    BeanConfigurationRequest setConfiguration(Object configuration, String element);
 
     /**
      * Returns configuration element name or {@code null}.
@@ -95,7 +93,7 @@ public interface BeanConfigurationRequest
      * @param classLoader The class loader to load referenced types from, may be {@code null}.
      * @return This request for chaining, never {@code null}.
      */
-    BeanConfigurationRequest setClassLoader( ClassLoader classLoader );
+    BeanConfigurationRequest setClassLoader(ClassLoader classLoader);
 
     /**
      * Gets the optional preprocessor for configuration values.
@@ -110,7 +108,7 @@ public interface BeanConfigurationRequest
      * @param valuePreprocessor The preprocessor for configuration values, may be {@code null} if unneeded.
      * @return This request for chaining, never {@code null}.
      */
-    BeanConfigurationRequest setValuePreprocessor( BeanConfigurationValuePreprocessor valuePreprocessor );
+    BeanConfigurationRequest setValuePreprocessor(BeanConfigurationValuePreprocessor valuePreprocessor);
 
     /**
      * Gets the optional path translator for configuration values unmarshalled to files.
@@ -125,6 +123,5 @@ public interface BeanConfigurationRequest
      * @param pathTranslator The path translator for files, may be {@code null} if unneeded.
      * @return This request for chaining, never {@code null}.
      */
-    BeanConfigurationRequest setPathTranslator( BeanConfigurationPathTranslator pathTranslator );
-
+    BeanConfigurationRequest setPathTranslator(BeanConfigurationPathTranslator pathTranslator);
 }

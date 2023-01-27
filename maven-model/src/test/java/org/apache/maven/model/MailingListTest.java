@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,11 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,34 +30,37 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
-public class MailingListTest
-{
+public class MailingListTest {
 
     @Test
-    public void testHashCodeNullSafe()
-    {
+    public void testHashCodeNullSafe() {
         new MailingList().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new MailingList().equals( null ) );
+    public void testEqualsNullSafe() {
+        assertFalse(new MailingList().equals(null));
 
-        new MailingList().equals( new MailingList() );
+        new MailingList().equals(new MailingList());
     }
 
     @Test
-    public void testEqualsIdentity()
-    {
+    public void testEqualsIdentity() {
         MailingList thing = new MailingList();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new MailingList().toString() );
+    public void testToStringNullSafe() {
+        assertNotNull(new MailingList().toString());
     }
 
+    public void testToStringNotNonsense() {
+        MailingList list = new MailingList();
+        list.setName("modello-dev");
+
+        String s = list.toString();
+
+        assertEquals("MailingList {name=modello-dev, archive=null}", s);
+    }
 }

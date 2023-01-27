@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,12 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api;
+
+import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
-
-import java.util.Optional;
 
 /**
  * Event sent by maven during various phases of the build process.
@@ -32,13 +31,12 @@ import java.util.Optional;
  * @since 4.0
  */
 @Experimental
-public interface Event
-{
+public interface Event {
 
     /**
      * Gets the type of the event.
      *
-     * @return The type of the event, never {@code null}.
+     * @return the type of the event, never {@code null}
      */
     @Nonnull
     EventType getType();
@@ -46,7 +44,7 @@ public interface Event
     /**
      * Gets the session from which this event originates.
      *
-     * @return The current session, never {@code null}.
+     * @return the current session, never {@code null}
      */
     @Nonnull
     Session getSession();
@@ -54,7 +52,7 @@ public interface Event
     /**
      * Gets the current project (if any).
      *
-     * @return The current project or {@code empty()} if not applicable.
+     * @return the current project or {@code empty()} if not applicable
      */
     @Nonnull
     Optional<Project> getProject();
@@ -62,7 +60,7 @@ public interface Event
     /**
      * Gets the current mojo execution (if any).
      *
-     * @return The current mojo execution or {@code empty()} if not applicable.
+     * @return the current mojo execution or {@code empty()} if not applicable
      */
     @Nonnull
     Optional<MojoExecution> getMojoExecution();
@@ -70,8 +68,7 @@ public interface Event
     /**
      * Gets the exception that caused the event (if any).
      *
-     * @return The exception or {@code empty()} if none.
+     * @return the exception or {@code empty()} if none
      */
     Optional<Exception> getException();
-
 }

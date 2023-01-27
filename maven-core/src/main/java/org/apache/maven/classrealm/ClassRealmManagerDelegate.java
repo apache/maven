@@ -1,5 +1,3 @@
-package org.apache.maven.classrealm;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,7 +16,7 @@ package org.apache.maven.classrealm;
  * specific language governing permissions and limitations
  * under the License.
  */
-
+package org.apache.maven.classrealm;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
@@ -28,9 +26,7 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
  *
  * @author igor
  */
-public interface ClassRealmManagerDelegate
-{
+public interface ClassRealmManagerDelegate {
 
-    void setupRealm( ClassRealm classRealm, ClassRealmRequest request );
-
+    void setupRealm(ClassRealm classRealm, ClassRealmRequest request);
 }

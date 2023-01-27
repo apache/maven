@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,10 +16,7 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.api.Service;
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
+package org.apache.maven.api.services;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -33,7 +28,10 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.ResolutionScope;
+import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Interface to manage the project during its lifecycle.
@@ -41,8 +39,7 @@ import org.apache.maven.api.Session;
  * @since 4.0
  */
 @Experimental
-public interface ProjectManager extends Service
-{
+public interface ProjectManager extends Service {
     /**
      * Returns the path to the resolved file in the local repository
      * if the artifact has been resolved.
@@ -50,44 +47,41 @@ public interface ProjectManager extends Service
      * @return the path of the resolved artifact
      */
     @Nonnull
-    Optional<Path> getPath( Project project );
+    Optional<Path> getPath(Project project);
 
     @Nonnull
-    Collection<Artifact> getAttachedArtifacts( Project project );
+    Collection<Artifact> getAttachedArtifacts(Project project);
 
-    default void attachArtifact( Session session, Project project, Path path )
-    {
+    default void attachArtifact(Session session, Project project, Path path) {
         String name = path.getFileName().toString();
-        int dot = name.lastIndexOf( '.' );
-        String ext = dot >= 1 ? name.substring( dot + 1 ) : "";
-        Artifact artifact = session.createArtifact( project.getGroupId(), project.getArtifactId(),
-                project.getVersion(), ext );
-        attachArtifact( project, artifact, path );
+        int dot = name.lastIndexOf('.');
+        String ext = dot >= 1 ? name.substring(dot + 1) : "";
+        Artifact artifact =
+                session.createArtifact(project.getGroupId(), project.getArtifactId(), project.getVersion(), ext);
+        attachArtifact(project, artifact, path);
     }
 
-    default void attachArtifact( Session session, Project project, String type, Path path )
-    {
-        Artifact artifact = session.createArtifact( project.getGroupId(), project.getArtifactId(),
-                                                    project.getVersion(), null, null, type );
-        attachArtifact( project, artifact, path );
+    default void attachArtifact(Session session, Project project, String type, Path path) {
+        Artifact artifact = session.createArtifact(
+                project.getGroupId(), project.getArtifactId(), project.getVersion(), null, null, type);
+        attachArtifact(project, artifact, path);
     }
 
-    void attachArtifact( Project project, Artifact artifact, Path path );
+    void attachArtifact(Project project, Artifact artifact, Path path);
 
-    List<String> getCompileSourceRoots( Project project );
+    List<String> getCompileSourceRoots(Project project);
 
-    void addCompileSourceRoot( Project project, String sourceRoot );
+    void addCompileSourceRoot(Project project, String sourceRoot);
 
-    List<String> getTestCompileSourceRoots( Project project );
+    List<String> getTestCompileSourceRoots(Project project);
 
-    void addTestCompileSourceRoot( Project project, String sourceRoot );
+    void addTestCompileSourceRoot(Project project, String sourceRoot);
 
-    List<RemoteRepository> getRepositories( Project project );
+    List<RemoteRepository> getRepositories(Project project);
 
-    List<Artifact> getResolvedDependencies( Project project, ResolutionScope scope );
+    List<Artifact> getResolvedDependencies(Project project, ResolutionScope scope);
 
-    Node getCollectedDependencies( Project project, ResolutionScope scope );
+    Node getCollectedDependencies(Project project, ResolutionScope scope);
 
-    void setProperty( Project project, String key, String value );
-
+    void setProperty(Project project, String key, String value);
 }

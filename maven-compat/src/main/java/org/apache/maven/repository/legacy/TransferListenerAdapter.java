@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.legacy;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -33,9 +32,7 @@ import org.apache.maven.wagon.resource.Resource;
 /**
  * TransferListenerAdapter
  */
-public class TransferListenerAdapter
-    implements TransferListener
-{
+public class TransferListenerAdapter implements TransferListener {
 
     private final ArtifactTransferListener listener;
 
@@ -43,148 +40,113 @@ public class TransferListenerAdapter
 
     private final Map<Resource, Long> transfers;
 
-    public static TransferListener newAdapter( ArtifactTransferListener listener )
-    {
-        if ( listener == null )
-        {
+    public static TransferListener newAdapter(ArtifactTransferListener listener) {
+        if (listener == null) {
             return null;
-        }
-        else
-        {
-            return new TransferListenerAdapter( listener );
+        } else {
+            return new TransferListenerAdapter(listener);
         }
     }
 
-    private TransferListenerAdapter( ArtifactTransferListener listener )
-    {
+    private TransferListenerAdapter(ArtifactTransferListener listener) {
         this.listener = listener;
         this.artifacts = new IdentityHashMap<>();
         this.transfers = new IdentityHashMap<>();
     }
 
-    public void debug( String message )
-    {
-    }
+    public void debug(String message) {}
 
-    public void transferCompleted( TransferEvent transferEvent )
-    {
-        ArtifactTransferEvent event = wrap( transferEvent );
+    public void transferCompleted(TransferEvent transferEvent) {
+        ArtifactTransferEvent event = wrap(transferEvent);
 
         Long transferred;
-        synchronized ( transfers )
-        {
-            transferred = transfers.remove( transferEvent.getResource() );
+        synchronized (transfers) {
+            transferred = transfers.remove(transferEvent.getResource());
         }
-        if ( transferred != null )
-        {
-            event.setTransferredBytes( transferred );
+        if (transferred != null) {
+            event.setTransferredBytes(transferred);
         }
 
-        synchronized ( artifacts )
-        {
-            artifacts.remove( transferEvent.getResource() );
+        synchronized (artifacts) {
+            artifacts.remove(transferEvent.getResource());
         }
 
-        listener.transferCompleted( event );
+        listener.transferCompleted(event);
     }
 
-    public void transferError( TransferEvent transferEvent )
-    {
-        synchronized ( transfers )
-        {
-            transfers.remove( transferEvent.getResource() );
+    public void transferError(TransferEvent transferEvent) {
+        synchronized (transfers) {
+            transfers.remove(transferEvent.getResource());
         }
-        synchronized ( artifacts )
-        {
-            artifacts.remove( transferEvent.getResource() );
+        synchronized (artifacts) {
+            artifacts.remove(transferEvent.getResource());
         }
     }
 
-    public void transferInitiated( TransferEvent transferEvent )
-    {
-        listener.transferInitiated( wrap( transferEvent ) );
+    public void transferInitiated(TransferEvent transferEvent) {
+        listener.transferInitiated(wrap(transferEvent));
     }
 
-    public void transferProgress( TransferEvent transferEvent, byte[] buffer, int length )
-    {
+    public void transferProgress(TransferEvent transferEvent, byte[] buffer, int length) {
         Long transferred;
-        synchronized ( transfers )
-        {
-            transferred = transfers.get( transferEvent.getResource() );
-            if ( transferred == null )
-            {
+        synchronized (transfers) {
+            transferred = transfers.get(transferEvent.getResource());
+            if (transferred == null) {
                 transferred = (long) length;
-            }
-            else
-            {
+            } else {
                 transferred = transferred + length;
             }
-            transfers.put( transferEvent.getResource(), transferred );
+            transfers.put(transferEvent.getResource(), transferred);
         }
 
-        ArtifactTransferEvent event = wrap( transferEvent );
-        event.setDataBuffer( buffer );
-        event.setDataOffset( 0 );
-        event.setDataLength( length );
-        event.setTransferredBytes( transferred );
+        ArtifactTransferEvent event = wrap(transferEvent);
+        event.setDataBuffer(buffer);
+        event.setDataOffset(0);
+        event.setDataLength(length);
+        event.setTransferredBytes(transferred);
 
-        listener.transferProgress( event );
+        listener.transferProgress(event);
     }
 
-    public void transferStarted( TransferEvent transferEvent )
-    {
-        listener.transferStarted( wrap( transferEvent ) );
+    public void transferStarted(TransferEvent transferEvent) {
+        listener.transferStarted(wrap(transferEvent));
     }
 
-    private ArtifactTransferEvent wrap( TransferEvent event )
-    {
-        if ( event == null )
-        {
+    private ArtifactTransferEvent wrap(TransferEvent event) {
+        if (event == null) {
             return null;
-        }
-        else
-        {
+        } else {
             String wagon = event.getWagon().getClass().getName();
 
-            ArtifactTransferResource artifact = wrap( event.getWagon().getRepository(), event.getResource() );
+            ArtifactTransferResource artifact = wrap(event.getWagon().getRepository(), event.getResource());
 
             ArtifactTransferEvent evt;
-            if ( event.getException() != null )
-            {
-                evt = new ArtifactTransferEvent( wagon, event.getException(), event.getRequestType(), artifact );
-            }
-            else
-            {
-                evt = new ArtifactTransferEvent( wagon, event.getEventType(), event.getRequestType(), artifact );
+            if (event.getException() != null) {
+                evt = new ArtifactTransferEvent(wagon, event.getException(), event.getRequestType(), artifact);
+            } else {
+                evt = new ArtifactTransferEvent(wagon, event.getEventType(), event.getRequestType(), artifact);
             }
 
-            evt.setLocalFile( event.getLocalFile() );
+            evt.setLocalFile(event.getLocalFile());
 
             return evt;
         }
     }
 
-    private ArtifactTransferResource wrap( Repository repository, Resource resource )
-    {
-        if ( resource == null )
-        {
+    private ArtifactTransferResource wrap(Repository repository, Resource resource) {
+        if (resource == null) {
             return null;
-        }
-        else
-        {
-            synchronized ( artifacts )
-            {
-                ArtifactTransferResource artifact = artifacts.get( resource );
+        } else {
+            synchronized (artifacts) {
+                ArtifactTransferResource artifact = artifacts.get(resource);
 
-                if ( artifact == null )
-                {
-                    artifact = new MavenArtifact( repository.getUrl(), resource );
-                    artifacts.put( resource, artifact );
+                if (artifact == null) {
+                    artifact = new MavenArtifact(repository.getUrl(), resource);
+                    artifacts.put(resource, artifact);
                 }
 
                 return artifact;
             }
         }
     }
-
 }

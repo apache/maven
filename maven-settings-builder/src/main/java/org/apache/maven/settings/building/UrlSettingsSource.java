@@ -1,5 +1,3 @@
-package org.apache.maven.settings.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.settings.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.building;
 
 import java.net.URL;
 
@@ -31,18 +30,15 @@ import org.apache.maven.building.UrlSource;
  * @deprecated instead use {@link UrlSource}
  */
 @Deprecated
-public class UrlSettingsSource extends UrlSource
-    implements SettingsSource
-{
+public class UrlSettingsSource extends UrlSource implements SettingsSource {
 
     /**
      * Creates a new model source backed by the specified URL.
      *
      * @param settingsUrl The settings URL, must not be {@code null}.
      */
-    public UrlSettingsSource( URL settingsUrl )
-    {
-        super( settingsUrl );
+    public UrlSettingsSource(URL settingsUrl) {
+        super(settingsUrl);
     }
 
     /**
@@ -52,9 +48,7 @@ public class UrlSettingsSource extends UrlSource
      * @deprecated instead use {@link #getUrl()}
      */
     @Deprecated
-    public URL getSettingsUrl()
-    {
+    public URL getSettingsUrl() {
         return getUrl();
     }
-
 }

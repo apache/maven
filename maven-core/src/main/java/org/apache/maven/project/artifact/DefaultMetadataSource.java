@@ -1,5 +1,3 @@
-package org.apache.maven.project.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.artifact;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,14 +36,14 @@ import org.apache.maven.project.ProjectBuilder;
  */
 @Named
 @Singleton
-public class DefaultMetadataSource
-    extends MavenMetadataSource
-{
+public class DefaultMetadataSource extends MavenMetadataSource {
     @Inject
     public DefaultMetadataSource(
-            RepositoryMetadataManager repositoryMetadataManager, ArtifactFactory repositorySystem,
-            ProjectBuilder projectBuilder, MavenMetadataCache cache, LegacySupport legacySupport )
-    {
-        super( repositoryMetadataManager, repositorySystem, projectBuilder, cache, legacySupport );
+            RepositoryMetadataManager repositoryMetadataManager,
+            ArtifactFactory repositorySystem,
+            ProjectBuilder projectBuilder,
+            MavenMetadataCache cache,
+            LegacySupport legacySupport) {
+        super(repositoryMetadataManager, repositorySystem, projectBuilder, cache, legacySupport);
     }
 }

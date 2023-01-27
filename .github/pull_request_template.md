@@ -6,9 +6,10 @@ contribution quickly and easily:
        require a JIRA issue. Your pull request should address just this issue, without
        pulling in other changes.
  - [ ] Each commit in the pull request should have a meaningful subject line and body.
- - [ ] Format the pull request title like `[MNG-XXX] SUMMARY`, where you replace `MNG-XXX`
-       and `SUMMARY` with the appropriate JIRA issue. Best practice is to use the JIRA issue
-       title in the pull request title and in the first line of the commit message.
+ - [ ] Format the pull request title like `[MNG-XXX] SUMMARY`,
+       where you replace `MNG-XXX` and `SUMMARY` with the appropriate JIRA issue.
+ - [ ] Also format the first line of the commit message like `[MNG-XXX] SUMMARY`.
+       Best practice is to use the JIRA issue title in both the pull request title and in the first line of the commit message.
  - [ ] Write a pull request description that is detailed enough to understand what the pull request does, how, and why.
  - [ ] Run `mvn clean verify` to make sure basic checks pass. A more thorough check will
        be performed on your pull request automatically.

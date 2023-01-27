@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform;
 
 import java.util.List;
 
@@ -31,45 +30,33 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
  * @author Guillaume Nodet
  * @since 4.0.0
  */
-public class RelativePathXMLFilter extends NodeBufferingParser
-{
+public class RelativePathXMLFilter extends NodeBufferingParser {
 
-    public RelativePathXMLFilter( XmlPullParser xmlPullParser )
-    {
-        super( xmlPullParser, "parent" );
+    public RelativePathXMLFilter(XmlPullParser xmlPullParser) {
+        super(xmlPullParser, "parent");
     }
 
-    protected void process( List<Event> buffer )
-    {
+    protected void process(List<Event> buffer) {
         boolean skip = false;
         Event prev = null;
-        for ( Event event : buffer )
-        {
-            if ( event.event == START_TAG && "relativePath".equals( event.name ) )
-            {
+        for (Event event : buffer) {
+            if (event.event == START_TAG && "relativePath".equals(event.name)) {
                 skip = true;
-                if ( prev != null && prev.event == TEXT && prev.text.matches( "\\s+" ) )
-                {
+                if (prev != null && prev.event == TEXT && prev.text.matches("\\s+")) {
                     prev = null;
                 }
                 event = null;
-            }
-            else if ( event.event == END_TAG && "relativePath".equals( event.name ) )
-            {
+            } else if (event.event == END_TAG && "relativePath".equals(event.name)) {
                 skip = false;
                 event = null;
-            }
-            else if ( skip )
-            {
+            } else if (skip) {
                 event = null;
             }
-            if ( prev != null )
-            {
-                pushEvent( prev );
+            if (prev != null) {
+                pushEvent(prev);
             }
             prev = event;
         }
-        pushEvent( prev );
+        pushEvent(prev);
     }
-
 }

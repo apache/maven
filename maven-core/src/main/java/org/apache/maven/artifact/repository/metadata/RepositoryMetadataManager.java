@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.repository.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.repository.metadata;
 
 import java.util.List;
 
@@ -28,19 +27,20 @@ import org.apache.maven.artifact.repository.RepositoryRequest;
 /**
  * RepositoryMetadataManager
  */
-public interface RepositoryMetadataManager
-{
+public interface RepositoryMetadataManager {
 
-    void resolve( RepositoryMetadata repositoryMetadata, RepositoryRequest repositoryRequest )
-        throws RepositoryMetadataResolutionException;
+    void resolve(RepositoryMetadata repositoryMetadata, RepositoryRequest repositoryRequest)
+            throws RepositoryMetadataResolutionException;
 
-    void resolve( RepositoryMetadata repositoryMetadata, List<ArtifactRepository> repositories,
-                  ArtifactRepository localRepository )
-        throws RepositoryMetadataResolutionException;
+    void resolve(
+            RepositoryMetadata repositoryMetadata,
+            List<ArtifactRepository> repositories,
+            ArtifactRepository localRepository)
+            throws RepositoryMetadataResolutionException;
 
-    void resolveAlways( RepositoryMetadata metadata, ArtifactRepository localRepository,
-                        ArtifactRepository remoteRepository )
-        throws RepositoryMetadataResolutionException;
+    void resolveAlways(
+            RepositoryMetadata metadata, ArtifactRepository localRepository, ArtifactRepository remoteRepository)
+            throws RepositoryMetadataResolutionException;
 
     /**
      * Deploy metadata to the remote repository.
@@ -50,9 +50,8 @@ public interface RepositoryMetadataManager
      * @param deploymentRepository the remote repository to deploy to
      * @throws RepositoryMetadataDeploymentException in case of metadata deployment issue
      */
-    void deploy( ArtifactMetadata metadata, ArtifactRepository localRepository,
-                 ArtifactRepository deploymentRepository )
-        throws RepositoryMetadataDeploymentException;
+    void deploy(ArtifactMetadata metadata, ArtifactRepository localRepository, ArtifactRepository deploymentRepository)
+            throws RepositoryMetadataDeploymentException;
 
     /**
      * Install the metadata in the local repository.
@@ -61,6 +60,6 @@ public interface RepositoryMetadataManager
      * @param localRepository the local repository
      * @throws RepositoryMetadataInstallationException in case of metadata installation issue
      */
-    void install( ArtifactMetadata metadata, ArtifactRepository localRepository )
-        throws RepositoryMetadataInstallationException;
+    void install(ArtifactMetadata metadata, ArtifactRepository localRepository)
+            throws RepositoryMetadataInstallationException;
 }

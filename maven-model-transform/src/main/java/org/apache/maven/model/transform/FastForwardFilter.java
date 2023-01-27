@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -36,8 +35,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * @author Guillaume Nodet
  * @since 4.0.0
  */
-class FastForwardFilter extends BufferingParser
-{
+class FastForwardFilter extends BufferingParser {
     /**
      * DOM elements of pom
      *
@@ -54,50 +52,40 @@ class FastForwardFilter extends BufferingParser
 
     private int domDepth = 0;
 
-    FastForwardFilter( XmlPullParser xmlPullParser )
-    {
-        super( xmlPullParser );
+    FastForwardFilter(XmlPullParser xmlPullParser) {
+        super(xmlPullParser);
     }
 
     @Override
-    public int next() throws XmlPullParserException, IOException
-    {
+    public int next() throws XmlPullParserException, IOException {
         int event = super.next();
         filter();
         return event;
     }
 
     @Override
-    public int nextToken() throws XmlPullParserException, IOException
-    {
+    public int nextToken() throws XmlPullParserException, IOException {
         int event = super.nextToken();
         filter();
         return event;
     }
 
-    protected void filter() throws XmlPullParserException, IOException
-    {
-        if ( xmlPullParser.getEventType() == START_TAG )
-        {
+    protected void filter() throws XmlPullParserException, IOException {
+        if (xmlPullParser.getEventType() == START_TAG) {
             String localName = xmlPullParser.getName();
-            if ( domDepth > 0 )
-            {
+            if (domDepth > 0) {
                 domDepth++;
-            }
-            else
-            {
+            } else {
                 final String key = state.peekLast() + '/' + localName;
-                switch ( key )
-                {
+                switch (key) {
                     case "execution/configuration":
                     case "plugin/configuration":
                     case "plugin/goals":
                     case "profile/reports":
                     case "project/reports":
                     case "reportSet/configuration":
-                        if ( domDepth == 0 )
-                        {
-                            bypass( true );
+                        if (domDepth == 0) {
+                            bypass(true);
                         }
                         domDepth++;
                         break;
@@ -105,15 +93,11 @@ class FastForwardFilter extends BufferingParser
                         break;
                 }
             }
-            state.add( localName );
-        }
-        else if ( xmlPullParser.getEventType() == END_TAG )
-        {
-            if ( domDepth > 0 )
-            {
-                if ( --domDepth == 0 )
-                {
-                    bypass( false );
+            state.add(localName);
+        } else if (xmlPullParser.getEventType() == END_TAG) {
+            if (domDepth > 0) {
+                if (--domDepth == 0) {
+                    bypass(false);
                 }
             }
             state.removeLast();
@@ -121,8 +105,7 @@ class FastForwardFilter extends BufferingParser
     }
 
     @Override
-    public void bypass( boolean bypass )
-    {
+    public void bypass(boolean bypass) {
         this.bypass = bypass;
     }
 }

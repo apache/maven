@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,15 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.model.Build;
-import org.apache.maven.project.MavenProject;
-import org.junit.jupiter.api.Test;
+package org.apache.maven.execution;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import org.apache.maven.model.Build;
+import org.apache.maven.project.MavenProject;
+import org.junit.jupiter.api.Test;
 
 import static java.util.Collections.singleton;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -33,73 +32,71 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 
-public class DefaultBuildResumptionDataRepositoryTest
-{
+public class DefaultBuildResumptionDataRepositoryTest {
     private final DefaultBuildResumptionDataRepository repository = new DefaultBuildResumptionDataRepository();
 
     @Test
-    public void resumeFromPropertyGetsApplied()
-    {
+    public void resumeFromPropertyGetsApplied() {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         Properties properties = new Properties();
-        properties.setProperty( "remainingProjects", ":module-a" );
+        properties.setProperty("remainingProjects", ":module-a");
 
-        repository.applyResumptionProperties( request, properties );
+        repository.applyResumptionProperties(request, properties);
 
-        assertThat( request.getProjectActivation().getOptionalActiveProjectSelectors(), is( singleton( ":module-a" ) ) );
+        assertThat(request.getProjectActivation().getOptionalActiveProjectSelectors(), is(singleton(":module-a")));
     }
 
     @Test
-    public void resumeFromPropertyDoesNotOverrideExistingRequestParameters()
-    {
+    public void resumeFromPropertyDoesNotOverrideExistingRequestParameters() {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
-        request.setResumeFrom( ":module-b" );
+        request.setResumeFrom(":module-b");
         Properties properties = new Properties();
-        properties.setProperty( "remainingProjects", ":module-a" );
+        properties.setProperty("remainingProjects", ":module-a");
 
-        repository.applyResumptionProperties( request, properties );
+        repository.applyResumptionProperties(request, properties);
 
-        assertThat( request.getResumeFrom(), is( ":module-b" ) );
+        assertThat(request.getResumeFrom(), is(":module-b"));
     }
 
     @Test
-    public void projectsFromPropertyGetsAddedToExistingRequestParameters()
-    {
+    public void projectsFromPropertyGetsAddedToExistingRequestParameters() {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         List<String> selectedProjects = new ArrayList<>();
-        selectedProjects.add( ":module-a" );
-        request.setSelectedProjects( selectedProjects );
+        selectedProjects.add(":module-a");
+        request.setSelectedProjects(selectedProjects);
         Properties properties = new Properties();
-        properties.setProperty( "remainingProjects", ":module-b, :module-c" );
+        properties.setProperty("remainingProjects", ":module-b, :module-c");
 
-        repository.applyResumptionProperties( request, properties );
+        repository.applyResumptionProperties(request, properties);
 
-        assertThat( request.getProjectActivation().getOptionalActiveProjectSelectors(), containsInAnyOrder( ":module-a", ":module-b", ":module-c" ) );
+        assertThat(
+                request.getProjectActivation().getOptionalActiveProjectSelectors(),
+                containsInAnyOrder(":module-a", ":module-b", ":module-c"));
     }
 
     @Test
-    public void selectedProjectsAreNotAddedWhenPropertyValueIsEmpty()
-    {
+    public void selectedProjectsAreNotAddedWhenPropertyValueIsEmpty() {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         Properties properties = new Properties();
-        properties.setProperty( "remainingProjects", "" );
+        properties.setProperty("remainingProjects", "");
 
-        repository.applyResumptionProperties( request, properties );
+        repository.applyResumptionProperties(request, properties);
 
-        assertThat( request.getProjectActivation().getOptionalActiveProjectSelectors(), is( empty() ) );
+        assertThat(request.getProjectActivation().getOptionalActiveProjectSelectors(), is(empty()));
     }
 
     @Test
-    public void applyResumptionData_shouldLoadData()
-    {
+    public void applyResumptionData_shouldLoadData() {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         Build build = new Build();
-        build.setDirectory( "src/test/resources/org/apache/maven/execution/" );
+        build.setDirectory("src/test/resources/org/apache/maven/execution/");
         MavenProject rootProject = new MavenProject();
-        rootProject.setBuild( build );
+        rootProject.setBuild(build);
 
-        repository.applyResumptionData( request,  rootProject );
+        repository.applyResumptionData(request, rootProject);
 
-        assertThat( request.getProjectActivation().getOptionalActiveProjectSelectors(), containsInAnyOrder( "example:module-c" ) );
+        assertThat(
+                request.getProjectActivation().getOptionalActiveProjectSelectors(),
+                containsInAnyOrder("example:module-c"));
     }
 }

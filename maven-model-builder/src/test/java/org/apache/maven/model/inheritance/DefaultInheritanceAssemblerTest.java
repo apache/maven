@@ -1,5 +1,3 @@
-package org.apache.maven.model.inheritance;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.inheritance;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.inheritance;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,8 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Hervé Boutemy
  */
-public class DefaultInheritanceAssemblerTest
-{
+public class DefaultInheritanceAssemblerTest {
     private DefaultModelReader reader;
 
     private ModelWriter writer;
@@ -52,38 +50,29 @@ public class DefaultInheritanceAssemblerTest
     private InheritanceAssembler assembler;
 
     @BeforeEach
-    public void setUp()
-        throws Exception
-    {
-        reader = new DefaultModelReader( new AbstractModelSourceTransformer()
-        {
+    public void setUp() throws Exception {
+        reader = new DefaultModelReader(new AbstractModelSourceTransformer() {
             @Override
-            public XmlPullParser transform( XmlPullParser parser, Path pomFile, TransformerContext context )
-                    throws IOException, TransformerException
-            {
+            public XmlPullParser transform(XmlPullParser parser, Path pomFile, TransformerContext context)
+                    throws IOException, TransformerException {
                 return null;
             }
-        } );
+        });
         writer = new DefaultModelWriter();
         assembler = new DefaultInheritanceAssembler();
     }
 
-    private File getPom( String name )
-    {
-        return new File( "src/test/resources/poms/inheritance/" + name + ".xml" );
+    private File getPom(String name) {
+        return new File("src/test/resources/poms/inheritance/" + name + ".xml");
     }
 
-    private Model getModel( String name )
-        throws IOException
-    {
-        return reader.read( getPom( name ), null );
+    private Model getModel(String name) throws IOException {
+        return reader.read(getPom(name), null).getDelegate();
     }
 
     @Test
-    public void testPluginConfiguration()
-        throws Exception
-    {
-        testInheritance( "plugin-configuration" );
+    public void testPluginConfiguration() throws Exception {
+        testInheritance("plugin-configuration");
     }
 
     /**
@@ -92,10 +81,8 @@ public class DefaultInheritanceAssemblerTest
      * @throws IOException Model read problem
      */
     @Test
-    public void testUrls()
-        throws Exception
-    {
-        testInheritance( "urls" );
+    public void testUrls() throws Exception {
+        testInheritance("urls");
     }
 
     /**
@@ -103,10 +90,8 @@ public class DefaultInheritanceAssemblerTest
      * @throws IOException Model read problem
      */
     @Test
-    public void testFlatUrls()
-        throws IOException
-    {
-        testInheritance( "flat-urls" );
+    public void testFlatUrls() throws IOException {
+        testInheritance("flat-urls");
     }
 
     /**
@@ -114,10 +99,8 @@ public class DefaultInheritanceAssemblerTest
      * @throws Exception
      */
     @Test
-    public void testNoAppendUrls()
-        throws Exception
-    {
-        testInheritance( "no-append-urls" );
+    public void testNoAppendUrls() throws Exception {
+        testInheritance("no-append-urls");
     }
 
     /**
@@ -125,10 +108,8 @@ public class DefaultInheritanceAssemblerTest
      * @throws Exception
      */
     @Test
-    public void testNoAppendUrls2()
-        throws Exception
-    {
-        testInheritance( "no-append-urls2" );
+    public void testNoAppendUrls2() throws Exception {
+        testInheritance("no-append-urls2");
     }
 
     /**
@@ -136,10 +117,8 @@ public class DefaultInheritanceAssemblerTest
      * @throws Exception
      */
     @Test
-    public void testNoAppendUrls3()
-        throws Exception
-    {
-        testInheritance( "no-append-urls3" );
+    public void testNoAppendUrls3() throws Exception {
+        testInheritance("no-append-urls3");
     }
 
     /**
@@ -149,106 +128,98 @@ public class DefaultInheritanceAssemblerTest
      * @throws IOException Model read problem
      */
     @Test
-    public void testFlatTrickyUrls()
-        throws IOException
-    {
+    public void testFlatTrickyUrls() throws IOException {
         // parent references child with artifactId (which is not directory name)
         // then relative path calculation will fail during build from disk but success when calculated from repo
-        try
-        {
+        try {
             // build from disk expected to fail
-            testInheritance( "tricky-flat-artifactId-urls", false );
-            //fail( "should have failed since module reference == artifactId != directory name" );
-        }
-        catch ( AssertionError afe )
-        {
+            testInheritance("tricky-flat-artifactId-urls", false);
+            // fail( "should have failed since module reference == artifactId != directory name" );
+        } catch (AssertionError afe) {
             // expected failure: wrong relative path calculation
-            assertTrue( afe.getMessage().contains(
-                                "Expected text value 'http://www.apache.org/path/to/parent/child-artifact-id/' but was " +
-                                        "'http://www.apache.org/path/to/parent/../child-artifact-id/'" ),
-                        afe.getMessage() );
+            assertTrue(
+                    afe.getMessage()
+                            .contains(
+                                    "Expected text value 'http://www.apache.org/path/to/parent/child-artifact-id/' but was "
+                                            + "'http://www.apache.org/path/to/parent/../child-artifact-id/'"),
+                    afe.getMessage());
         }
         // but ok from repo: local disk is ignored
-        testInheritance( "tricky-flat-artifactId-urls", true );
+        testInheritance("tricky-flat-artifactId-urls", true);
 
         // parent references child with directory name (which is not artifact id)
         // then relative path calculation will success during build from disk but fail when calculated from repo
-        testInheritance( "tricky-flat-directory-urls", false );
+        testInheritance("tricky-flat-directory-urls", false);
 
         AssertionError afe = assertThrows(
                 AssertionError.class,
-                () -> testInheritance( "tricky-flat-directory-urls", true ),
-                "should have failed since module reference == directory name != artifactId" );
+                () -> testInheritance("tricky-flat-directory-urls", true),
+                "should have failed since module reference == directory name != artifactId");
         // expected failure
-        assertTrue( afe.getMessage().contains(
-                                "Expected text value 'http://www.apache.org/path/to/parent/../child-artifact-id/' but was " +
-                                        "'http://www.apache.org/path/to/parent/child-artifact-id/'" ),
-                    afe.getMessage() );
+        assertTrue(
+                afe.getMessage()
+                        .contains(
+                                "Expected text value 'http://www.apache.org/path/to/parent/../child-artifact-id/' but was "
+                                        + "'http://www.apache.org/path/to/parent/child-artifact-id/'"),
+                afe.getMessage());
     }
 
     @Test
-    public void testWithEmptyUrl()
-        throws IOException
-    {
-            testInheritance( "empty-urls", false );
+    public void testWithEmptyUrl() throws IOException {
+        testInheritance("empty-urls", false);
     }
 
-    public void testInheritance( String baseName )
-        throws IOException
-    {
-        testInheritance( baseName, false );
-        testInheritance( baseName, true );
+    public void testInheritance(String baseName) throws IOException {
+        testInheritance(baseName, false);
+        testInheritance(baseName, true);
     }
 
-    public void testInheritance( String baseName, boolean fromRepo )
-        throws IOException
-    {
-        Model parent = getModel( baseName + "-parent" );
+    public void testInheritance(String baseName, boolean fromRepo) throws IOException {
+        Model parent = getModel(baseName + "-parent");
 
-        Model child = getModel( baseName + "-child" );
+        Model child = getModel(baseName + "-child");
 
-        if ( fromRepo )
-        {
+        if (fromRepo) {
             // when model is read from repo, a stream is used, then pomFile == null
             // (has consequences in inheritance algorithm since getProjectDirectory() returns null)
-            parent = Model.newBuilder( parent, true ).pomFile( null ).build();
-            child = Model.newBuilder( child, true ).pomFile( null ).build();
+            parent = Model.newBuilder(parent, true).pomFile(null).build();
+            child = Model.newBuilder(child, true).pomFile(null).build();
         }
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
-        Model assembled = assembler.assembleModelInheritance( child, parent, null, problems );
+        Model assembled = assembler.assembleModelInheritance(child, parent, null, problems);
 
         // write baseName + "-actual"
-        File actual = new File( "target/test-classes/poms/inheritance/" + baseName
-            + ( fromRepo ? "-build" : "-repo" ) + "-actual.xml" );
-        writer.write( actual, null, assembled );
+        File actual = new File(
+                "target/test-classes/poms/inheritance/" + baseName + (fromRepo ? "-build" : "-repo") + "-actual.xml");
+        writer.write(actual, null, assembled);
 
         // check with getPom( baseName + "-expected" )
-        File expected = getPom( baseName + "-expected" );
+        File expected = getPom(baseName + "-expected");
 
-        assertThat( actual, CompareMatcher.isIdenticalTo( expected ).ignoreComments().ignoreWhitespace() );
+        assertThat(
+                actual, CompareMatcher.isIdenticalTo(expected).ignoreComments().ignoreWhitespace());
     }
 
     @Test
-    public void testModulePathNotArtifactId()
-        throws IOException
-    {
-        Model parent = getModel( "module-path-not-artifactId-parent" );
+    public void testModulePathNotArtifactId() throws IOException {
+        Model parent = getModel("module-path-not-artifactId-parent");
 
-        Model child = getModel( "module-path-not-artifactId-child" );
+        Model child = getModel("module-path-not-artifactId-child");
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
-        Model model = assembler.assembleModelInheritance( child, parent, null, problems );
+        Model model = assembler.assembleModelInheritance(child, parent, null, problems);
 
-        File actual = new File( "target/test-classes/poms/inheritance/module-path-not-artifactId-actual.xml" );
+        File actual = new File("target/test-classes/poms/inheritance/module-path-not-artifactId-actual.xml");
 
-        writer.write( actual, null, model );
+        writer.write(actual, null, model);
 
         // check with getPom( "module-path-not-artifactId-effective" )
-        File expected = getPom( "module-path-not-artifactId-expected" );
+        File expected = getPom("module-path-not-artifactId-expected");
 
-        assertThat( actual, CompareMatcher.isIdenticalTo(expected).ignoreComments().ignoreWhitespace() );
+        assertThat(
+                actual, CompareMatcher.isIdenticalTo(expected).ignoreComments().ignoreWhitespace());
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,14 @@ package org.apache.maven.lifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle;
 
 /**
  * Signals a failure to locate a lifecycle.
  *
  * @author Benjamin Bentmann
  */
-public class LifecycleNotFoundException
-    extends Exception
-{
+public class LifecycleNotFoundException extends Exception {
 
     private final String lifecycleId;
 
@@ -35,10 +32,9 @@ public class LifecycleNotFoundException
      *
      * @param lifecycleId The identifier of the lifecycle that could not be located, may be {@code null}.
      */
-    public LifecycleNotFoundException( String lifecycleId )
-    {
-        super( "Unknown lifecycle " + lifecycleId );
-        this.lifecycleId = ( lifecycleId != null ) ? lifecycleId : "";
+    public LifecycleNotFoundException(String lifecycleId) {
+        super("Unknown lifecycle " + lifecycleId);
+        this.lifecycleId = (lifecycleId != null) ? lifecycleId : "";
     }
 
     /**
@@ -46,9 +42,7 @@ public class LifecycleNotFoundException
      *
      * @return The identifier of the lifecycle that was not found, never {@code null}.
      */
-    public String getLifecycleId()
-    {
+    public String getLifecycleId() {
         return lifecycleId;
     }
-
 }

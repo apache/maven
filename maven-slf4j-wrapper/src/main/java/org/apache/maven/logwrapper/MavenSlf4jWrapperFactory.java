@@ -1,5 +1,3 @@
-package org.apache.maven.logwrapper;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,17 @@ package org.apache.maven.logwrapper;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.slf4j.ILoggerFactory;
+package org.apache.maven.logwrapper;
 
 import java.util.Optional;
+
+import org.slf4j.ILoggerFactory;
 
 /**
  * Wrapper for creating loggers which can have a log level threshold.
  */
-public interface MavenSlf4jWrapperFactory extends ILoggerFactory
-{
-    void setLogLevelRecorder( LogLevelRecorder logLevelRecorder );
+public interface MavenSlf4jWrapperFactory extends ILoggerFactory {
+    void setLogLevelRecorder(LogLevelRecorder logLevelRecorder);
+
     Optional<LogLevelRecorder> getLogLevelRecorder();
 }

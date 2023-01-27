@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,11 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,34 +30,56 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
-public class OrganizationTest
-{
+public class OrganizationTest {
 
     @Test
-    public void testHashCodeNullSafe()
-    {
+    public void testHashCodeNullSafe() {
         new Organization().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Organization().equals( null ) );
+    public void testEqualsNullSafe() {
+        assertFalse(new Organization().equals(null));
 
-        new Organization().equals( new Organization() );
+        new Organization().equals(new Organization());
     }
 
     @Test
-    public void testEqualsIdentity()
-    {
+    public void testEqualsIdentity() {
         Organization thing = new Organization();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Organization().toString() );
+    public void testToStringNullSafe() {
+        assertNotNull(new Organization().toString());
     }
 
+    public void testToStringNotNonsense11() {
+        Organization org = new Organization();
+        org.setName("Testing Maven Unit");
+        org.setUrl("https://maven.localdomain");
+
+        assertEquals("Organization {name=Testing Maven Unit, url=https://maven.localdomain}", org.toString());
+    }
+
+    public void testToStringNotNonsense10() {
+        Organization org = new Organization();
+        org.setName("Testing Maven Unit");
+
+        assertEquals("Organization {name=Testing Maven Unit, url=null}", org.toString());
+    }
+
+    public void testToStringNotNonsense01() {
+        Organization org = new Organization();
+        org.setUrl("https://maven.localdomain");
+
+        assertEquals("Organization {name=null, url=https://maven.localdomain}", org.toString());
+    }
+
+    public void testToStringNotNonsense00() {
+        Organization org = new Organization();
+
+        assertEquals("Organization {name=null, url=null}", org.toString());
+    }
 }

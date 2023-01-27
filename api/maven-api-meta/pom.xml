@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -23,10 +23,11 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-api</artifactId>
-    <version>4.0.0-alpha-3-SNAPSHOT</version>
+    <version>4.0.0-alpha-4-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-api-meta</artifactId>
-  <name>Maven API Meta annotations</name>
+  <name>Maven 4 API Meta annotations</name>
+  <description>Java annotations for Maven 4 Immutable API.</description>
 
 </project>

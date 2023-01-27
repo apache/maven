@@ -1,5 +1,3 @@
-package org.apache.maven.model.composition;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.composition;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.composition;
 
 import java.util.List;
 
@@ -31,8 +30,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
  *
  * @author Benjamin Bentmann
  */
-public interface DependencyManagementImporter
-{
+public interface DependencyManagementImporter {
 
     /**
      * Imports the specified dependency management sections into the given target model.
@@ -42,7 +40,9 @@ public interface DependencyManagementImporter
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    Model importManagement( Model target, List<? extends DependencyManagement> sources, ModelBuildingRequest request,
-                           ModelProblemCollector problems );
-
+    Model importManagement(
+            Model target,
+            List<? extends DependencyManagement> sources,
+            ModelBuildingRequest request,
+            ModelProblemCollector problems);
 }

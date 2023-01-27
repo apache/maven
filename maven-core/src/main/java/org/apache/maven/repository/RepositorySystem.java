@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 import java.io.File;
 import java.util.List;
@@ -40,51 +39,49 @@ import org.eclipse.aether.RepositorySystemSession;
  * @author Jason van Zyl
  * @since 3.0-alpha
  */
-public interface RepositorySystem
-{
+public interface RepositorySystem {
     String DEFAULT_LOCAL_REPO_ID = "local";
 
-    @SuppressWarnings( "checkstyle:constantname" )
-    String userHome = System.getProperty( "user.home" );
+    @SuppressWarnings("checkstyle:constantname")
+    String userHome = System.getProperty("user.home");
 
-    @SuppressWarnings( "checkstyle:constantname" )
-    File userMavenConfigurationHome = new File( userHome, ".m2" );
+    @SuppressWarnings("checkstyle:constantname")
+    File userMavenConfigurationHome = new File(userHome, ".m2");
 
-    @SuppressWarnings( "checkstyle:constantname" )
-    File defaultUserLocalRepository = new File( userMavenConfigurationHome, "repository" );
+    @SuppressWarnings("checkstyle:constantname")
+    File defaultUserLocalRepository = new File(userMavenConfigurationHome, "repository");
 
     String DEFAULT_REMOTE_REPO_ID = "central";
 
     String DEFAULT_REMOTE_REPO_URL = "https://repo.maven.apache.org/maven2";
 
-    Artifact createArtifact( String groupId, String artifactId, String version, String packaging );
+    Artifact createArtifact(String groupId, String artifactId, String version, String packaging);
 
-    Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type );
+    Artifact createArtifact(String groupId, String artifactId, String version, String scope, String type);
 
-    Artifact createProjectArtifact( String groupId, String artifactId, String version );
+    Artifact createProjectArtifact(String groupId, String artifactId, String version);
 
-    Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type,
-                                           String classifier );
+    Artifact createArtifactWithClassifier(
+            String groupId, String artifactId, String version, String type, String classifier);
 
-    Artifact createPluginArtifact( Plugin plugin );
+    Artifact createPluginArtifact(Plugin plugin);
 
-    Artifact createDependencyArtifact( Dependency dependency );
+    Artifact createDependencyArtifact(Dependency dependency);
 
-    ArtifactRepository buildArtifactRepository( Repository repository )
-        throws InvalidRepositoryException;
+    ArtifactRepository buildArtifactRepository(Repository repository) throws InvalidRepositoryException;
 
-    ArtifactRepository createDefaultRemoteRepository()
-        throws InvalidRepositoryException;
+    ArtifactRepository createDefaultRemoteRepository() throws InvalidRepositoryException;
 
-    ArtifactRepository createDefaultLocalRepository()
-        throws InvalidRepositoryException;
+    ArtifactRepository createDefaultLocalRepository() throws InvalidRepositoryException;
 
-    ArtifactRepository createLocalRepository( File localRepository )
-        throws InvalidRepositoryException;
+    ArtifactRepository createLocalRepository(File localRepository) throws InvalidRepositoryException;
 
-    ArtifactRepository createArtifactRepository( String id, String url, ArtifactRepositoryLayout repositoryLayout,
-                                                 ArtifactRepositoryPolicy snapshots,
-                                                 ArtifactRepositoryPolicy releases );
+    ArtifactRepository createArtifactRepository(
+            String id,
+            String url,
+            ArtifactRepositoryLayout repositoryLayout,
+            ArtifactRepositoryPolicy snapshots,
+            ArtifactRepositoryPolicy releases);
 
     /**
      * Calculates the effective repositories for the given input repositories which are assumed to be already mirrored
@@ -95,7 +92,7 @@ public interface RepositorySystem
      * @param repositories The original repositories, may be {@code null}.
      * @return The effective repositories or {@code null} if the input was {@code null}.
      */
-    List<ArtifactRepository> getEffectiveRepositories( List<ArtifactRepository> repositories );
+    List<ArtifactRepository> getEffectiveRepositories(List<ArtifactRepository> repositories);
 
     /**
      * Determines the mirror for the specified repository.
@@ -104,7 +101,7 @@ public interface RepositorySystem
      * @param mirrors The available mirrors, may be {@code null}.
      * @return The mirror specification for the repository or {@code null} if no mirror matched.
      */
-    Mirror getMirror( ArtifactRepository repository, List<Mirror> mirrors );
+    Mirror getMirror(ArtifactRepository repository, List<Mirror> mirrors);
 
     /**
      * Injects the mirroring information into the specified repositories. For each repository that is matched by a
@@ -115,7 +112,7 @@ public interface RepositorySystem
      * @param repositories The repositories into which to inject the mirror information, may be {@code null}.
      * @param mirrors The available mirrors, may be {@code null}.
      */
-    void injectMirror( List<ArtifactRepository> repositories, List<Mirror> mirrors );
+    void injectMirror(List<ArtifactRepository> repositories, List<Mirror> mirrors);
 
     /**
      * Injects the proxy information into the specified repositories. For each repository that is matched by a proxy,
@@ -126,7 +123,7 @@ public interface RepositorySystem
      * @param repositories The repositories into which to inject the proxy information, may be {@code null}.
      * @param proxies The available proxies, may be {@code null}.
      */
-    void injectProxy( List<ArtifactRepository> repositories, List<org.apache.maven.settings.Proxy> proxies );
+    void injectProxy(List<ArtifactRepository> repositories, List<org.apache.maven.settings.Proxy> proxies);
 
     /**
      * Injects the authentication information into the specified repositories. For each repository that is matched by a
@@ -137,15 +134,15 @@ public interface RepositorySystem
      * @param repositories The repositories into which to inject the authentication information, may be {@code null}.
      * @param servers The available servers, may be {@code null}.
      */
-    void injectAuthentication( List<ArtifactRepository> repositories, List<Server> servers );
+    void injectAuthentication(List<ArtifactRepository> repositories, List<Server> servers);
 
-    void injectMirror( RepositorySystemSession session, List<ArtifactRepository> repositories );
+    void injectMirror(RepositorySystemSession session, List<ArtifactRepository> repositories);
 
-    void injectProxy( RepositorySystemSession session, List<ArtifactRepository> repositories );
+    void injectProxy(RepositorySystemSession session, List<ArtifactRepository> repositories);
 
-    void injectAuthentication( RepositorySystemSession session, List<ArtifactRepository> repositories );
+    void injectAuthentication(RepositorySystemSession session, List<ArtifactRepository> repositories);
 
-    ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
+    ArtifactResolutionResult resolve(ArtifactResolutionRequest request);
 
     // Install
 
@@ -156,12 +153,14 @@ public interface RepositorySystem
     //
     // Raw file transfers
     //
-    void publish( ArtifactRepository repository, File source, String remotePath,
-                  ArtifactTransferListener transferListener )
-        throws ArtifactTransferFailedException;
+    void publish(
+            ArtifactRepository repository, File source, String remotePath, ArtifactTransferListener transferListener)
+            throws ArtifactTransferFailedException;
 
-    void retrieve( ArtifactRepository repository, File destination, String remotePath,
-                   ArtifactTransferListener transferListener )
-        throws ArtifactTransferFailedException, ArtifactDoesNotExistException;
-
+    void retrieve(
+            ArtifactRepository repository,
+            File destination,
+            String remotePath,
+            ArtifactTransferListener transferListener)
+            throws ArtifactTransferFailedException, ArtifactDoesNotExistException;
 }

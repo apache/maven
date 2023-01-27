@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,54 +27,46 @@ import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.annotations.Nonnull;
 import org.eclipse.aether.graph.DependencyNode;
 
-class WrapperNode extends AbstractNode
-{
+class WrapperNode extends AbstractNode {
     protected final Node delegate;
     protected final List<Node> children;
 
-    WrapperNode( Node delegate, List<Node> children )
-    {
+    WrapperNode(Node delegate, List<Node> children) {
         this.delegate = delegate;
         this.children = children;
     }
 
     @Override
-    DependencyNode getDependencyNode()
-    {
-        return Utils.cast( AbstractNode.class, delegate,
-                "delegate is not an instance of AbstractNode" ).getDependencyNode();
+    DependencyNode getDependencyNode() {
+        return Utils.cast(AbstractNode.class, delegate, "delegate is not an instance of AbstractNode")
+                .getDependencyNode();
     }
 
     @Override
-    public List<Node> getChildren()
-    {
+    public List<Node> getChildren() {
         return children;
     }
 
     @Override
-    public Dependency getDependency()
-    {
+    public Dependency getDependency() {
         return delegate.getDependency();
     }
 
     @Override
     @Nonnull
-    public List<RemoteRepository> getRemoteRepositories()
-    {
+    public List<RemoteRepository> getRemoteRepositories() {
         return delegate.getRemoteRepositories();
     }
 
     @Override
     @Nonnull
-    public Optional<RemoteRepository> getRepository()
-    {
+    public Optional<RemoteRepository> getRepository() {
         return delegate.getRepository();
     }
 
     @Override
     @Nonnull
-    public String asString()
-    {
+    public String asString() {
         return delegate.asString();
     }
 }

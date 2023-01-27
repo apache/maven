@@ -1,19 +1,24 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.maven.project;
 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
- * agreements. See the NOTICE file distributed with this work for additional information regarding
- * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance with the License. You may obtain a
- * copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
- */
+import javax.inject.Inject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,20 +32,17 @@ import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
-import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.jupiter.api.BeforeEach;
-
-import javax.inject.Inject;
 
 /**
  * @author Jason van Zyl
  */
 @PlexusTest
-public abstract class AbstractMavenProjectTestCase
-{
+public abstract class AbstractMavenProjectTestCase {
     protected ProjectBuilder projectBuilder;
 
     @Inject
@@ -54,22 +56,16 @@ public abstract class AbstractMavenProjectTestCase
     }
 
     @BeforeEach
-    public void setUp()
-        throws Exception
-    {
-        if ( getContainer().hasComponent( ProjectBuilder.class, "test" ) )
-        {
-            projectBuilder = getContainer().lookup( ProjectBuilder.class, "test" );
-        }
-        else
-        {
+    public void setUp() throws Exception {
+        if (getContainer().hasComponent(ProjectBuilder.class, "test")) {
+            projectBuilder = getContainer().lookup(ProjectBuilder.class, "test");
+        } else {
             // default over to the main project builder...
-            projectBuilder = getContainer().lookup( ProjectBuilder.class );
+            projectBuilder = getContainer().lookup(ProjectBuilder.class);
         }
     }
 
-    protected ProjectBuilder getProjectBuilder()
-    {
+    protected ProjectBuilder getProjectBuilder() {
         return projectBuilder;
     }
 
@@ -77,103 +73,81 @@ public abstract class AbstractMavenProjectTestCase
     // Local repository
     // ----------------------------------------------------------------------
 
-    protected File getLocalRepositoryPath()
-        throws FileNotFoundException, URISyntaxException
-    {
-        File markerFile = getFileForClasspathResource( "local-repo/marker.txt" );
+    protected File getLocalRepositoryPath() throws FileNotFoundException, URISyntaxException {
+        File markerFile = getFileForClasspathResource("local-repo/marker.txt");
 
         return markerFile.getAbsoluteFile().getParentFile();
     }
 
-    protected static File getFileForClasspathResource( String resource )
-        throws FileNotFoundException
-    {
+    protected static File getFileForClasspathResource(String resource) throws FileNotFoundException {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
 
-        URL resourceUrl = cloader.getResource( resource );
+        URL resourceUrl = cloader.getResource(resource);
 
-        if ( resourceUrl == null )
-        {
-            throw new FileNotFoundException( "Unable to find: " + resource );
+        if (resourceUrl == null) {
+            throw new FileNotFoundException("Unable to find: " + resource);
         }
 
-        return new File( URI.create( resourceUrl.toString().replaceAll( " ", "%20" ) ) );
+        return new File(URI.create(resourceUrl.toString().replaceAll(" ", "%20")));
     }
 
-    protected ArtifactRepository getLocalRepository()
-        throws Exception
-    {
-        return repositorySystem.createLocalRepository( getLocalRepositoryPath() );
+    protected ArtifactRepository getLocalRepository() throws Exception {
+        return repositorySystem.createLocalRepository(getLocalRepositoryPath());
     }
 
     // ----------------------------------------------------------------------
     // Project building
     // ----------------------------------------------------------------------
 
-    protected MavenProject getProjectWithDependencies( File pom )
-        throws Exception
-    {
+    protected MavenProject getProjectWithDependencies(File pom) throws Exception {
         ProjectBuildingRequest configuration = newBuildingRequest();
-        configuration.setRemoteRepositories( Arrays.asList( new ArtifactRepository[] {} ) );
-        configuration.setProcessPlugins( false );
-        configuration.setResolveDependencies( true );
+        configuration.setRemoteRepositories(Arrays.asList(new ArtifactRepository[] {}));
+        configuration.setProcessPlugins(false);
+        configuration.setResolveDependencies(true);
 
-        try
-        {
-            return projectBuilder.build( pom, configuration ).getProject();
-        }
-        catch ( Exception e )
-        {
+        try {
+            return projectBuilder.build(pom, configuration).getProject();
+        } catch (Exception e) {
             Throwable cause = e.getCause();
-            if ( cause instanceof ModelBuildingException )
-            {
+            if (cause instanceof ModelBuildingException) {
                 String message = "In: " + pom + "\n\n";
-                for ( ModelProblem problem : ( (ModelBuildingException) cause ).getProblems() )
-                {
+                for (ModelProblem problem : ((ModelBuildingException) cause).getProblems()) {
                     message += problem + "\n";
                 }
-                System.out.println( message );
+                System.out.println(message);
             }
 
             throw e;
         }
     }
 
-    protected MavenProject getProject( File pom )
-        throws Exception
-    {
+    protected MavenProject getProject(File pom) throws Exception {
         ProjectBuildingRequest configuration = newBuildingRequest();
 
-        return projectBuilder.build( pom, configuration ).getProject();
+        return projectBuilder.build(pom, configuration).getProject();
     }
 
-    protected MavenProject getProjectFromRemoteRepository( final File pom )
-        throws Exception
-    {
+    protected MavenProject getProjectFromRemoteRepository(final File pom) throws Exception {
         final ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
-        configuration.setLocalRepository( this.getLocalRepository() );
-        configuration.setRemoteRepositories( Arrays.asList( this.repositorySystem.createDefaultRemoteRepository() ) );
-        initRepoSession( configuration );
+        configuration.setLocalRepository(this.getLocalRepository());
+        configuration.setRemoteRepositories(Arrays.asList(this.repositorySystem.createDefaultRemoteRepository()));
+        initRepoSession(configuration);
 
-        return projectBuilder.build( pom, configuration ).getProject();
+        return projectBuilder.build(pom, configuration).getProject();
     }
 
-    protected ProjectBuildingRequest newBuildingRequest()
-        throws Exception
-    {
+    protected ProjectBuildingRequest newBuildingRequest() throws Exception {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
-        configuration.setLocalRepository( getLocalRepository() );
-        initRepoSession( configuration );
+        configuration.setLocalRepository(getLocalRepository());
+        initRepoSession(configuration);
         return configuration;
     }
 
-    protected void initRepoSession( ProjectBuildingRequest request )
-    {
-        File localRepo = new File( request.getLocalRepository().getBasedir() );
+    protected void initRepoSession(ProjectBuildingRequest request) {
+        File localRepo = new File(request.getLocalRepository().getBasedir());
         DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
-        repoSession.setCache( new DefaultRepositoryCache() );
-        repoSession.setLocalRepositoryManager( new LegacyLocalRepositoryManager( localRepo ) );
-        request.setRepositorySession( repoSession );
+        repoSession.setCache(new DefaultRepositoryCache());
+        repoSession.setLocalRepositoryManager(new LegacyLocalRepositoryManager(localRepo));
+        request.setRepositorySession(repoSession);
     }
-
 }

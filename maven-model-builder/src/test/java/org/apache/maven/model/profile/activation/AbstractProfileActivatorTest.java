@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile.activation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.profile.activation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile.activation;
 
 import java.util.Properties;
 
@@ -35,8 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Benjamin Bentmann
  */
-public abstract class AbstractProfileActivatorTest<T extends ProfileActivator>
-{
+public abstract class AbstractProfileActivatorTest<T extends ProfileActivator> {
 
     protected T activator;
 
@@ -44,25 +42,21 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator>
     abstract void setUp() throws Exception;
 
     @AfterEach
-    void tearDown() throws Exception
-    {
+    void tearDown() throws Exception {
         activator = null;
     }
 
-    protected ProfileActivationContext newContext( final Properties userProperties, final Properties systemProperties )
-    {
+    protected ProfileActivationContext newContext(final Properties userProperties, final Properties systemProperties) {
         DefaultProfileActivationContext context = new DefaultProfileActivationContext();
-        return context.setUserProperties( userProperties ).setSystemProperties( systemProperties );
+        return context.setUserProperties(userProperties).setSystemProperties(systemProperties);
     }
 
-    protected void assertActivation( boolean active, Profile profile, ProfileActivationContext context )
-    {
+    protected void assertActivation(boolean active, Profile profile, ProfileActivationContext context) {
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
-        assertEquals( active, activator.isActive( new org.apache.maven.model.Profile( profile ), context, problems ) );
+        assertEquals(active, activator.isActive(new org.apache.maven.model.Profile(profile), context, problems));
 
-        assertEquals( 0, problems.getErrors().size(), problems.getErrors().toString() );
-        assertEquals( 0, problems.getWarnings().size(), problems.getWarnings().toString() );
+        assertEquals(0, problems.getErrors().size(), problems.getErrors().toString());
+        assertEquals(0, problems.getWarnings().size(), problems.getWarnings().toString());
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,19 +16,21 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.util.HashSet;
-import java.util.List;
+package org.apache.maven.lifecycle.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.HashSet;
+import java.util.List;
 
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
+import org.apache.maven.internal.transformation.ConsumerPomArtifactTransformer;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
@@ -50,13 +50,13 @@ import org.apache.maven.session.scope.internal.SessionScope;
  */
 @Named
 @Singleton
-public class LifecycleModuleBuilder
-{
+public class LifecycleModuleBuilder {
 
     private final MojoExecutor mojoExecutor;
     private final BuilderCommon builderCommon;
     private final ExecutionEventCatapult eventCatapult;
     private final ProjectExecutionListener projectExecutionListener;
+    private final ConsumerPomArtifactTransformer consumerPomArtifactTransformer;
     private final SessionScope sessionScope;
 
     @Inject
@@ -65,84 +65,79 @@ public class LifecycleModuleBuilder
             BuilderCommon builderCommon,
             ExecutionEventCatapult eventCatapult,
             List<ProjectExecutionListener> listeners,
-            SessionScope sessionScope )
-    {
+            ConsumerPomArtifactTransformer consumerPomArtifactTransformer,
+            SessionScope sessionScope) {
         this.mojoExecutor = mojoExecutor;
         this.builderCommon = builderCommon;
         this.eventCatapult = eventCatapult;
-        this.projectExecutionListener = new CompoundProjectExecutionListener( listeners );
+        this.projectExecutionListener = new CompoundProjectExecutionListener(listeners);
+        this.consumerPomArtifactTransformer = consumerPomArtifactTransformer;
         this.sessionScope = sessionScope;
     }
 
-    public void buildProject( MavenSession session, ReactorContext reactorContext, MavenProject currentProject,
-                              TaskSegment taskSegment )
-    {
-        buildProject( session, session, reactorContext, currentProject, taskSegment );
+    public void buildProject(
+            MavenSession session, ReactorContext reactorContext, MavenProject currentProject, TaskSegment taskSegment) {
+        buildProject(session, session, reactorContext, currentProject, taskSegment);
     }
 
-    public void buildProject( MavenSession session, MavenSession rootSession, ReactorContext reactorContext,
-                              MavenProject currentProject, TaskSegment taskSegment )
-    {
-        session.setCurrentProject( currentProject );
+    public void buildProject(
+            MavenSession session,
+            MavenSession rootSession,
+            ReactorContext reactorContext,
+            MavenProject currentProject,
+            TaskSegment taskSegment) {
+        session.setCurrentProject(currentProject);
 
         long buildStartTime = System.currentTimeMillis();
 
-        try
-        {
+        try {
 
-            if ( reactorContext.getReactorBuildStatus().isHaltedOrBlacklisted( currentProject ) )
-            {
-                eventCatapult.fire( ExecutionEvent.Type.ProjectSkipped, session, null );
+            if (reactorContext.getReactorBuildStatus().isHaltedOrBlacklisted(currentProject)) {
+                eventCatapult.fire(ExecutionEvent.Type.ProjectSkipped, session, null);
                 return;
             }
 
-            BuilderCommon.attachToThread( currentProject );
+            consumerPomArtifactTransformer.injectTransformedArtifacts(currentProject, session.getRepositorySession());
 
-            projectExecutionListener.beforeProjectExecution( new ProjectExecutionEvent( session, currentProject ) );
+            BuilderCommon.attachToThread(currentProject);
 
-            eventCatapult.fire( ExecutionEvent.Type.ProjectStarted, session, null );
+            projectExecutionListener.beforeProjectExecution(new ProjectExecutionEvent(session, currentProject));
+
+            eventCatapult.fire(ExecutionEvent.Type.ProjectStarted, session, null);
 
             MavenExecutionPlan executionPlan =
-                builderCommon.resolveBuildPlan( session, currentProject, taskSegment, new HashSet<>() );
+                    builderCommon.resolveBuildPlan(session, currentProject, taskSegment, new HashSet<>());
             List<MojoExecution> mojoExecutions = executionPlan.getMojoExecutions();
 
-            projectExecutionListener.beforeProjectLifecycleExecution( new ProjectExecutionEvent( session,
-                                                                                                 currentProject,
-                                                                                                 mojoExecutions ) );
-            mojoExecutor.execute( session, mojoExecutions, reactorContext.getProjectIndex() );
+            projectExecutionListener.beforeProjectLifecycleExecution(
+                    new ProjectExecutionEvent(session, currentProject, mojoExecutions));
+            mojoExecutor.execute(session, mojoExecutions, reactorContext.getProjectIndex());
 
             long buildEndTime = System.currentTimeMillis();
 
-            projectExecutionListener.afterProjectExecutionSuccess( new ProjectExecutionEvent( session, currentProject,
-                                                                                              mojoExecutions ) );
+            projectExecutionListener.afterProjectExecutionSuccess(
+                    new ProjectExecutionEvent(session, currentProject, mojoExecutions));
 
-            reactorContext.getResult().addBuildSummary( new BuildSuccess( currentProject,
-                                                                          buildEndTime - buildStartTime ) );
+            reactorContext.getResult().addBuildSummary(new BuildSuccess(currentProject, buildEndTime - buildStartTime));
 
-            eventCatapult.fire( ExecutionEvent.Type.ProjectSucceeded, session, null );
-        }
-        catch ( Throwable t )
-        {
-            builderCommon.handleBuildError( reactorContext, rootSession, session, currentProject, t, buildStartTime );
+            eventCatapult.fire(ExecutionEvent.Type.ProjectSucceeded, session, null);
+        } catch (Throwable t) {
+            builderCommon.handleBuildError(reactorContext, rootSession, session, currentProject, t, buildStartTime);
 
-            projectExecutionListener.afterProjectExecutionFailure( new ProjectExecutionEvent( session, currentProject,
-                                                                                              t ) );
+            projectExecutionListener.afterProjectExecutionFailure(
+                    new ProjectExecutionEvent(session, currentProject, t));
 
             // rethrow original errors and runtime exceptions
-            if ( t instanceof RuntimeException )
-            {
+            if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             }
-            if ( t instanceof Error )
-            {
+            if (t instanceof Error) {
                 throw (Error) t;
             }
-        }
-        finally
-        {
-            session.setCurrentProject( null );
+        } finally {
+            session.setCurrentProject(null);
 
-            Thread.currentThread().setContextClassLoader( reactorContext.getOriginalContextClassLoader() );
+            Thread.currentThread().setContextClassLoader(reactorContext.getOriginalContextClassLoader());
         }
     }
 }
