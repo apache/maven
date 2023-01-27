@@ -49,6 +49,18 @@ public class DefaultModelNormalizer implements ModelNormalizer {
     private DuplicateMerger merger = new DuplicateMerger();
 
     @Override
+    public void mergeDuplicates(
+            org.apache.maven.model.Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
+        model.update(mergeDuplicates(model.getDelegate(), request, problems));
+    }
+
+    @Override
+    public void injectDefaultValues(
+            org.apache.maven.model.Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
+        model.update(injectDefaultValues(model.getDelegate(), request, problems));
+    }
+
+    @Override
     public Model mergeDuplicates(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
         Model.Builder builder = Model.newBuilder(model);
 
@@ -127,9 +139,7 @@ public class DefaultModelNormalizer implements ModelNormalizer {
 
     private Dependency injectDependency(Dependency d) {
         // we cannot set this directly in the MDO due to the interactions with dependency management
-        return StringUtils.isEmpty(d.getScope())
-                ? Dependency.newBuilder(d).scope("compile").build()
-                : d;
+        return StringUtils.isEmpty(d.getScope()) ? d.withScope("compile") : d;
     }
 
     /**

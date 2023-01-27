@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.maven.api.model.BuildBase;
@@ -65,6 +66,39 @@ public class MavenModelMerger extends MavenMerger {
      * The context key for the artifact id of the target model.
      */
     public static final String ARTIFACT_ID = "artifact-id";
+
+    public MavenModelMerger() {
+        super(false);
+    }
+
+    /**
+     * Merges the specified source object into the given target object.
+     *
+     * @param target The target object whose existing contents should be merged with the source, must not be
+     *            <code>null</code>.
+     * @param source The (read-only) source object that should be merged into the target object, may be
+     *            <code>null</code>.
+     * @param sourceDominant A flag indicating whether either the target object or the source object provides the
+     *            dominant data.
+     * @param hints A set of key-value pairs that customized merger implementations can use to carry domain-specific
+     *            information along, may be <code>null</code>.
+     */
+    public void merge(
+            org.apache.maven.model.Model target,
+            org.apache.maven.model.Model source,
+            boolean sourceDominant,
+            Map<?, ?> hints) {
+        Objects.requireNonNull(target, "target cannot be null");
+        if (source == null) {
+            return;
+        }
+        target.update(merge(target.getDelegate(), source.getDelegate(), sourceDominant, hints));
+    }
+
+    @Override
+    public Model merge(Model target, Model source, boolean sourceDominant, Map<?, ?> hints) {
+        return super.merge(target, source, sourceDominant, hints);
+    }
 
     @Override
     protected Model mergeModel(Model target, Model source, boolean sourceDominant, Map<Object, Object> context) {

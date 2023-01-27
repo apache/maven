@@ -104,6 +104,37 @@ under the License.
       <plugin>
         <groupId>com.github.siom79.japicmp</groupId>
         <artifactId>japicmp-maven-plugin</artifactId>
+        <configuration>
+          <parameter>
+            <excludes>
+              <exclude>org.apache.maven.monitor.logging.DefaultLog</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Execution#addGoal(java.lang.String):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Execution#getConfiguration():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Execution#removeGoal(java.lang.String):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Execution#setConfiguration(java.lang.Object):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Execution#setGoals(java.util.List):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Execution#Execution():CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.io.xpp3.LifecycleMappingsXpp3Reader#contentTransformer</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Lifecycle#addPhase(org.apache.maven.plugin.lifecycle.Phase):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Lifecycle#removePhase(org.apache.maven.plugin.lifecycle.Phase):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Lifecycle#setId(java.lang.String):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Lifecycle#setPhases(java.util.List):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Lifecycle#Lifecycle():CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.LifecycleConfiguration#addLifecycle(org.apache.maven.plugin.lifecycle.Lifecycle):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.LifecycleConfiguration#removeLifecycle(org.apache.maven.plugin.lifecycle.Lifecycle):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.LifecycleConfiguration#setLifecycles(java.util.List):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.LifecycleConfiguration#setModelEncoding(java.lang.String):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.LifecycleConfiguration#LifecycleConfiguration():CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Phase#addExecution(org.apache.maven.plugin.lifecycle.Execution):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Phase#getConfiguration():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Phase#removeExecution(org.apache.maven.plugin.lifecycle.Execution):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Phase#setConfiguration(java.lang.Object):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Phase#setExecutions(java.util.List):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Phase#setId(java.lang.String):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.lifecycle.Phase#Phase():CONSTRUCTOR_REMOVED</exclude>
+            </excludes>
+          </parameter>
+        </configuration>
       </plugin>
     </plugins>
   </build>

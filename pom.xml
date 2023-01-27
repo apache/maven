@@ -170,6 +170,7 @@ under the License.
     <slf4jVersion>1.7.36</slf4jVersion>
     <xmlunitVersion>2.6.4</xmlunitVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+    <maven.baseline>3.8.7</maven.baseline>
     <!-- Control the name of the distribution and information output by mvn -->
     <distributionId>apache-maven</distributionId>
     <distributionShortName>Maven</distributionShortName>
@@ -556,36 +557,11 @@ under the License.
               <configuration>
                 <parameter>
                   <!-- baseline is 3.8.6 for Maven 4 -->
-                  <oldVersionPattern>3.8.6</oldVersionPattern>
+                  <oldVersionPattern>${maven.baseline}</oldVersionPattern>
                   <breakBuildOnBinaryIncompatibleModifications>true</breakBuildOnBinaryIncompatibleModifications>
                   <onlyBinaryIncompatible>true</onlyBinaryIncompatible>
-                  <!-- only exported packages from maven-core/META-INF/maven/extension.xml matter  -->
-                  <includes>
-                    <include>org.apache.maven.artifact</include>
-                    <include>org.apache.maven.classrealm</include>
-                    <include>org.apache.maven.cli</include>
-                    <include>org.apache.maven.configuration</include>
-                    <include>org.apache.maven.exception</include>
-                    <include>org.apache.maven.execution</include>
-                    <include>org.apache.maven.execution.scope</include>
-                    <include>org.apache.maven.feature</include>
-                    <include>org.apache.maven.graph</include>
-                    <include>org.apache.maven.lifecycle</include>
-                    <include>org.apache.maven.model</include>
-                    <include>org.apache.maven.monitor</include>
-                    <include>org.apache.maven.plugin</include>
-                    <include>org.apache.maven.profiles</include>
-                    <include>org.apache.maven.project</include>
-                    <include>org.apache.maven.reporting</include>
-                    <include>org.apache.maven.repository</include>
-                    <include>org.apache.maven.rtinfo</include>
-                    <include>org.apache.maven.rtinfo.internal</include>
-                    <include>org.apache.maven.settings</include>
-                    <include>org.apache.maven.toolchain</include>
-                    <include>org.apache.maven.usability</include>
-                  </includes>
-                  <includeExclusively>true</includeExclusively>
                   <!-- don't include subpackages -->
+                  <includeExclusively>true</includeExclusively>
                 </parameter>
               </configuration>
             </execution>

@@ -26,7 +26,7 @@ import java.io.Writer;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.maven.api.toolchain.PersistedToolchains;
+import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Writer;
 
 /**
@@ -45,7 +45,7 @@ public class DefaultToolchainsWriter implements ToolchainsWriter {
         Objects.requireNonNull(toolchains, "toolchains cannot be null");
 
         try (Writer out = output) {
-            new MavenToolchainsXpp3Writer().write(out, toolchains);
+            new MavenToolchainsXpp3Writer().write(out, toolchains.getDelegate());
         }
     }
 }

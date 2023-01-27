@@ -28,7 +28,7 @@ import java.io.Reader;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.maven.api.toolchain.PersistedToolchains;
+import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Reader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -55,7 +55,7 @@ public class DefaultToolchainsReader implements ToolchainsReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (Reader in = input) {
-            return new MavenToolchainsXpp3Reader().read(in, isStrict(options));
+            return new PersistedToolchains(new MavenToolchainsXpp3Reader().read(in, isStrict(options)));
         } catch (XmlPullParserException e) {
             throw new ToolchainsParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
         }
@@ -66,7 +66,7 @@ public class DefaultToolchainsReader implements ToolchainsReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (InputStream in = input) {
-            return new MavenToolchainsXpp3Reader().read(in, isStrict(options));
+            return new PersistedToolchains(new MavenToolchainsXpp3Reader().read(in, isStrict(options)));
         } catch (XmlPullParserException e) {
             throw new ToolchainsParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
         }

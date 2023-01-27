@@ -19,16 +19,14 @@
 package org.apache.maven.settings.validation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.api.settings.Mirror;
-import org.apache.maven.api.settings.Profile;
-import org.apache.maven.api.settings.Proxy;
-import org.apache.maven.api.settings.Repository;
-import org.apache.maven.api.settings.Server;
-import org.apache.maven.api.settings.Settings;
+import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Profile;
+import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Repository;
+import org.apache.maven.settings.Server;
+import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
 import org.apache.maven.settings.building.SettingsProblemCollector;
 import org.junit.jupiter.api.AfterEach;
@@ -61,29 +59,26 @@ public class DefaultSettingsValidatorTest {
 
     @Test
     public void testValidate() {
-        Profile prof = Profile.newInstance().withId("xxx");
-        Settings model = Settings.newInstance().withProfiles(Collections.singletonList(prof));
+        Settings model = new Settings();
+        Profile prof = new Profile();
+        prof.setId("xxx");
+        model.addProfile(prof);
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(model, problems);
         assertEquals(0, problems.messages.size());
 
-        Repository repo = Repository.newInstance();
-        prof = prof.withRepositories(Collections.singletonList(repo));
-        model = model.withProfiles(Collections.singletonList(prof));
+        Repository repo = new Repository();
+        prof.addRepository(repo);
         problems = new SimpleProblemCollector();
         validator.validate(model, problems);
         assertEquals(2, problems.messages.size());
 
-        repo = repo.withUrl("http://xxx.xxx.com");
-        prof = prof.withRepositories(Collections.singletonList(repo));
-        model = model.withProfiles(Collections.singletonList(prof));
+        repo.setUrl("http://xxx.xxx.com");
         problems = new SimpleProblemCollector();
         validator.validate(model, problems);
         assertEquals(1, problems.messages.size());
 
-        repo = repo.withId("xxx");
-        prof = prof.withRepositories(Collections.singletonList(repo));
-        model = model.withProfiles(Collections.singletonList(prof));
+        repo.setId("xxx");
         problems = new SimpleProblemCollector();
         validator.validate(model, problems);
         assertEquals(0, problems.messages.size());
@@ -91,14 +86,15 @@ public class DefaultSettingsValidatorTest {
 
     @Test
     public void testValidateMirror() throws Exception {
-        Mirror mirror1 = Mirror.newBuilder().id("local").build();
-        Mirror mirror2 = Mirror.newBuilder()
-                .id("illegal\\:/chars")
-                .url("http://void")
-                .mirrorOf("void")
-                .build();
-        Settings settings =
-                Settings.newBuilder().mirrors(Arrays.asList(mirror1, mirror2)).build();
+        Settings settings = new Settings();
+        Mirror mirror = new Mirror();
+        mirror.setId("local");
+        settings.addMirror(mirror);
+        mirror = new Mirror();
+        mirror.setId("illegal\\:/chars");
+        mirror.setUrl("http://void");
+        mirror.setMirrorOf("void");
+        settings.addMirror(mirror);
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);
@@ -111,16 +107,16 @@ public class DefaultSettingsValidatorTest {
 
     @Test
     public void testValidateRepository() throws Exception {
-        Repository repo1 = Repository.newBuilder().id("local").build();
-        Repository repo2 = Repository.newBuilder()
-                .id("illegal\\:/chars")
-                .url("http://void")
-                .build();
-        Profile profile =
-                Profile.newBuilder().repositories(Arrays.asList(repo1, repo2)).build();
-        Settings settings = Settings.newBuilder()
-                .profiles(Collections.singletonList(profile))
-                .build();
+        Profile profile = new Profile();
+        Repository repo = new Repository();
+        repo.setId("local");
+        profile.addRepository(repo);
+        repo = new Repository();
+        repo.setId("illegal\\:/chars");
+        repo.setUrl("http://void");
+        profile.addRepository(repo);
+        Settings settings = new Settings();
+        settings.addProfile(profile);
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);
@@ -137,10 +133,13 @@ public class DefaultSettingsValidatorTest {
 
     @Test
     public void testValidateUniqueServerId() throws Exception {
-        Server server1 = Server.newBuilder().id("test").build();
-        Server server2 = Server.newBuilder().id("test").build();
-        Settings settings =
-                Settings.newBuilder().servers(Arrays.asList(server1, server2)).build();
+        Settings settings = new Settings();
+        Server server1 = new Server();
+        server1.setId("test");
+        settings.addServer(server1);
+        Server server2 = new Server();
+        server2.setId("test");
+        settings.addServer(server2);
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);
@@ -151,11 +150,13 @@ public class DefaultSettingsValidatorTest {
 
     @Test
     public void testValidateUniqueProfileId() throws Exception {
-        Profile profile1 = Profile.newBuilder().id("test").build();
-        Profile profile2 = Profile.newBuilder().id("test").build();
-        Settings settings = Settings.newBuilder()
-                .profiles(Arrays.asList(profile1, profile2))
-                .build();
+        Settings settings = new Settings();
+        Profile profile1 = new Profile();
+        profile1.setId("test");
+        settings.addProfile(profile1);
+        Profile profile2 = new Profile();
+        profile2.setId("test");
+        settings.addProfile(profile2);
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);
@@ -167,17 +168,18 @@ public class DefaultSettingsValidatorTest {
 
     @Test
     public void testValidateUniqueRepositoryId() throws Exception {
-        Repository repo1 =
-                Repository.newBuilder().id("test").url("http://apache.org/").build();
-        Repository repo2 =
-                Repository.newBuilder().id("test").url("http://apache.org/").build();
-        Profile profile = Profile.newBuilder()
-                .id("pro")
-                .repositories(Arrays.asList(repo1, repo2))
-                .build();
-        Settings settings = Settings.newBuilder()
-                .profiles(Collections.singletonList(profile))
-                .build();
+        Settings settings = new Settings();
+        Profile profile = new Profile();
+        profile.setId("pro");
+        settings.addProfile(profile);
+        Repository repo1 = new Repository();
+        repo1.setUrl("http://apache.org/");
+        repo1.setId("test");
+        profile.addRepository(repo1);
+        Repository repo2 = new Repository();
+        repo2.setUrl("http://apache.org/");
+        repo2.setId("test");
+        profile.addRepository(repo2);
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);
@@ -190,37 +192,27 @@ public class DefaultSettingsValidatorTest {
 
     @Test
     public void testValidateUniqueProxyId() throws Exception {
-        Proxy proxy = Proxy.newBuilder().id("foo").host("www.example.com").build();
-        Settings settings =
-                Settings.newBuilder().proxies(Arrays.asList(proxy, proxy)).build();
+        Settings settings = new Settings();
+        Proxy proxy = new Proxy();
+        String id = "foo";
+        proxy.setId(id);
+        proxy.setHost("www.example.com");
+        settings.addProxy(proxy);
+        settings.addProxy(proxy);
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);
         assertEquals(1, problems.messages.size());
         assertContains(
                 problems.messages.get(0),
-                "'proxies.proxy.id' must be unique" + " but found duplicate proxy with id foo");
-    }
-
-    @Test
-    public void testValidateUniqueProxyNullId() throws Exception {
-        Proxy proxy = Proxy.newBuilder(false).host("www.example.com").build();
-        Settings settings =
-                Settings.newBuilder().proxies(Arrays.asList(proxy, proxy)).build();
-
-        SimpleProblemCollector problems = new SimpleProblemCollector();
-        validator.validate(settings, problems);
-        assertEquals(1, problems.messages.size());
-        assertContains(
-                problems.messages.get(0),
-                "'proxies.proxy.id' must be unique" + " but found duplicate proxy with id null");
+                "'proxies.proxy.id' must be unique" + " but found duplicate proxy with id " + id);
     }
 
     @Test
     public void testValidateProxy() throws Exception {
-        Proxy proxy = Proxy.newBuilder().build();
-        Settings settings =
-                Settings.newBuilder().proxies(Collections.singletonList(proxy)).build();
+        Settings settings = new Settings();
+        Proxy proxy1 = new Proxy();
+        settings.addProxy(proxy1);
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate(settings, problems);

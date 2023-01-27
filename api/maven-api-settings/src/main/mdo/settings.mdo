@@ -825,6 +825,8 @@
         <field>
           <name>id</name>
           <version>1.0.0+</version>
+          <required>true</required>
+          <identifier>true</identifier>
           <description>
             <![CDATA[
             A unique identifier for a repository.
@@ -865,7 +867,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.1.0</version>
           <code>
             <![CDATA[
     /**
@@ -920,7 +922,7 @@
       <!-- prevent Modello generation of an incorrect equals method. Could be avoided by using <identity/> tags to mark ID as the only identity field -->
       <codeSegments>
         <codeSegment>
-          <version>1.0.0+</version>
+          <version>1.0.0/1.1.0</version>
           <code>
             <![CDATA[
     /**

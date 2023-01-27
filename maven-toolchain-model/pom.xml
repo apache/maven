@@ -83,6 +83,28 @@ under the License.
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>com.github.siom79.japicmp</groupId>
+        <artifactId>japicmp-maven-plugin</artifactId>
+        <configuration>
+          <parameter>
+            <includes>
+              <include>org.apache.maven.toolchain.model</include>
+            </includes>
+            <excludes>
+              <exclude>org.apache.maven.toolchain.model.PersistedToolchains#setModelEncoding(java.lang.String):METHOD_REMOVED</exclude>
+            </excludes>
+            <includeExclusively>true</includeExclusively>
+          </parameter>
+          <oldVersion>
+            <dependency>
+              <groupId>org.apache.maven</groupId>
+              <artifactId>maven-core</artifactId>
+              <version>${maven.baseline}</version>
+            </dependency>
+          </oldVersion>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 

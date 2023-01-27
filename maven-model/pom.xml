@@ -81,7 +81,7 @@ under the License.
             <configuration>
               <version>4.1.0</version>
               <templates>
-                <template>model-v3-modified.vm</template>
+                <template>model-v3.vm</template>
               </templates>
             </configuration>
           </execution>
@@ -112,6 +112,40 @@ under the License.
           <excludes>
             <exclude>**/package-info.java</exclude>
           </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.github.siom79.japicmp</groupId>
+        <artifactId>japicmp-maven-plugin</artifactId>
+        <configuration>
+          <parameter>
+            <excludes>
+              <exclude>org.apache.maven.model.*#setOtherLocation(java.lang.Object,org.apache.maven.model.InputLocation):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.ConfigurationContainer#isInheritanceApplied():METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.ConfigurationContainer#setInherited(boolean):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.ConfigurationContainer#unsetInheritanceApplied():METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Contributor#addProperty(java.lang.String,java.lang.String):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Dependency#clearManagementKey():METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.ModelBase#addProperty(java.lang.String,java.lang.String):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.ModelBase#getReports():METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.ModelBase#setReports(java.lang.Object):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Notifier#addConfiguration(java.lang.String,java.lang.String):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Plugin#getGoals():METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Plugin#setGoals(java.lang.Object):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Reporting#flushReportPluginMap():METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Reporting#getReportPluginsAsMap():METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Resource#initMergeId():METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Scm#setChildScmConnectionInheritAppendPath(boolean):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Scm#setChildScmDeveloperConnectionInheritAppendPath(boolean):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Scm#setChildScmUrlInheritAppendPath(boolean):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.Site#setChildSiteUrlInheritAppendPath(boolean):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.io.xpp3.MavenXpp3Reader#contentTransformer</exclude>
+              <exclude>org.apache.maven.model.io.xpp3.MavenXpp3ReaderEx#contentTransformer</exclude>
+              <exclude>org.apache.maven.model.io.xpp3.MavenXpp3WriterEx#toString(org.apache.maven.model.InputLocation):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.io.xpp3.MavenXpp3WriterEx#writeXpp3DomToSerializer(org.codehaus.plexus.util.xml.Xpp3Dom,org.codehaus.plexus.util.xml.pull.XmlSerializer):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.merge.ModelMerger</exclude>
+            </excludes>
+          </parameter>
         </configuration>
       </plugin>
     </plugins>

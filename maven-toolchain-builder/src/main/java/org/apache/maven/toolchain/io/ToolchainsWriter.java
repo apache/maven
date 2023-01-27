@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
-import org.apache.maven.api.toolchain.PersistedToolchains;
+import org.apache.maven.toolchain.model.PersistedToolchains;
 
 /**
  * Handles serialization of toolchains into some kind of textual format like XML.

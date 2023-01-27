@@ -84,6 +84,19 @@ under the License.
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>com.github.siom79.japicmp</groupId>
+        <artifactId>japicmp-maven-plugin</artifactId>
+        <configuration>
+          <parameter>
+            <excludes>
+              <exclude>org.apache.maven.settings.io.xpp3.SettingsXpp3Reader#contentTransformer</exclude>
+              <exclude>org.apache.maven.settings.RuntimeInfo</exclude>
+              <exclude>org.apache.maven.settings.Settings#setModelEncoding(java.lang.String):METHOD_REMOVED</exclude>
+            </excludes>
+          </parameter>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>
