@@ -66,6 +66,10 @@ public class MavenModelMerger extends MavenMerger {
      */
     public static final String ARTIFACT_ID = "artifact-id";
 
+    public MavenModelMerger() {
+        super(false);
+    }
+
     @Override
     protected Model mergeModel(Model target, Model source, boolean sourceDominant, Map<Object, Object> context) {
         context.put(ARTIFACT_ID, target.getArtifactId());

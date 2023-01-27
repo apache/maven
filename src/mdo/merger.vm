@@ -54,6 +54,16 @@ import ${packageModelV4}.${class.Name};
 public class ${className}
 {
 
+    private final boolean deepMerge;
+
+    public ${className}() {
+        this(true);
+    }
+
+    public ${className}(boolean deepMerge) {
+        this.deepMerge = deepMerge;
+    }
+
     /**
      * Merges the specified source object into the given target object.
      *
@@ -170,7 +180,12 @@ public class ${className}
             }
         }
       #elseif ( $field.to && $field.multiplicity == "*" )
-        builder.${field.name}( merge( target.get${capField}(), source.get${capField}(), sourceDominant, get${field.to}Key() ) );
+        if (deepMerge) {
+            builder.${field.name}( merge( target.get${capField}(), source.get${capField}(), get${field.to}Key(),
+                    ( t, s ) -> merge${field.to}( t, s, sourceDominant, context ) ) );
+        } else {
+            builder.${field.name}( merge( target.get${capField}(), source.get${capField}(), sourceDominant, get${field.to}Key() ) );
+        }
       #elseif ( $field.type == "DOM" )
         XmlNode src = source.getConfiguration();
         if ( src != null )
