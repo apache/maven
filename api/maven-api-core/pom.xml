@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-api</artifactId>
-    <version>4.0.0-alpha-4</version>
+    <version>4.0.0-alpha-5-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-api-core</artifactId>
@@ -34,22 +34,22 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-meta</artifactId>
-      <version>4.0.0-alpha-4</version>
+      <version>4.0.0-alpha-5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-model</artifactId>
-      <version>4.0.0-alpha-4</version>
+      <version>4.0.0-alpha-5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-settings</artifactId>
-      <version>4.0.0-alpha-4</version>
+      <version>4.0.0-alpha-5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-toolchain</artifactId>
-      <version>4.0.0-alpha-4</version>
+      <version>4.0.0-alpha-5-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
