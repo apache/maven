@@ -29,7 +29,7 @@ under the License.
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>4.0.0-alpha-4-SNAPSHOT</version>
+  <version>4.0.0-alpha-4</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -128,7 +128,7 @@ under the License.
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
-    <tag>maven-4.0.0-alpha-3</tag>
+    <tag>maven-4.0.0-alpha-4</tag>
     <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
   </scm>
   <issueManagement>
@@ -157,7 +157,7 @@ under the License.
     <mockitoVersion>3.2.0</mockitoVersion>
     <plexusVersion>2.1.0</plexusVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
-    <plexusUtilsVersion>4.0.0-alpha-4-SNAPSHOT</plexusUtilsVersion>
+    <plexusUtilsVersion>4.0.0-alpha-4</plexusUtilsVersion>
     <plexusUtilsVersionEmbedded>3.5.0</plexusUtilsVersionEmbedded>
     <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>30.1-jre</guavaVersion>
@@ -176,7 +176,7 @@ under the License.
     <distributionShortName>Maven</distributionShortName>
     <distributionName>Apache Maven</distributionName>
     <maven.site.path>ref/4-LATEST</maven.site.path>
-    <project.build.outputTimestamp>2022-12-12T10:37:34Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2023-01-27T15:32:50Z</project.build.outputTimestamp>
   </properties>
 
   <!--bootstrap-start-comment-->

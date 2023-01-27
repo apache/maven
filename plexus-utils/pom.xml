@@ -22,12 +22,12 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-4-SNAPSHOT</version>
+    <version>4.0.0-alpha-4</version>
   </parent>
 
   <groupId>org.apache.maven</groupId>
   <artifactId>plexus-utils</artifactId>
-  <version>4.0.0-alpha-4-SNAPSHOT</version>
+  <version>4.0.0-alpha-4</version>
   <name>Apache Maven Plexus-Utils</name>
   <description>Apache Maven repackaging of Plexus Utils with immutable Dom interface and its replacement implementation.</description>
 
