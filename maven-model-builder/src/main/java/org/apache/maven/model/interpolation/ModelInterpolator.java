@@ -20,7 +20,7 @@ package org.apache.maven.model.interpolation;
 
 import java.io.File;
 
-import org.apache.maven.api.model.Model;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 
@@ -46,8 +46,8 @@ public interface ModelInterpolator {
      */
     Model interpolateModel(Model model, File projectDir, ModelBuildingRequest request, ModelProblemCollector problems);
 
-    org.apache.maven.model.Model interpolateModel(
-            org.apache.maven.model.Model model,
+    org.apache.maven.api.model.Model interpolateModel(
+            org.apache.maven.api.model.Model model,
             File projectDir,
             ModelBuildingRequest request,
             ModelProblemCollector problems);

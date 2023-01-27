@@ -30,9 +30,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.api.settings.Settings;
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;
+import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.TrackableBase;
 import org.apache.maven.settings.io.SettingsParseException;
 import org.apache.maven.settings.io.SettingsReader;
@@ -95,7 +95,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         Source userSettingsSource = getSettingsSource(request.getUserSettingsFile(), request.getUserSettingsSource());
         Settings userSettings = readSettings(userSettingsSource, request, problems);
 
-        userSettings = settingsMerger.merge(userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL);
+        settingsMerger.merge(userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL);
 
         problems.setSource("");
 
@@ -106,7 +106,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         if (localRepository != null && localRepository.length() > 0) {
             File file = new File(localRepository);
             if (!file.isAbsolute() && file.getPath().startsWith(File.separator)) {
-                userSettings = userSettings.withLocalRepository(file.getAbsolutePath());
+                userSettings.setLocalRepository(file.getAbsolutePath());
             }
         }
 
@@ -114,8 +114,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             throw new SettingsBuildingException(problems.getProblems());
         }
 
-        return new DefaultSettingsBuildingResult(
-                new org.apache.maven.settings.Settings(userSettings), problems.getProblems());
+        return new DefaultSettingsBuildingResult(userSettings, problems.getProblems());
     }
 
     private boolean hasErrors(List<SettingsProblem> problems) {
@@ -142,7 +141,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     private Settings readSettings(
             Source settingsSource, SettingsBuildingRequest request, DefaultSettingsProblemCollector problems) {
         if (settingsSource == null) {
-            return Settings.newInstance();
+            return new Settings();
         }
 
         problems.setSource(settingsSource.getLocation());
@@ -169,7 +168,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     e.getLineNumber(),
                     e.getColumnNumber(),
                     e);
-            return Settings.newInstance();
+            return new Settings();
         } catch (IOException e) {
             problems.add(
                     SettingsProblem.Severity.FATAL,
@@ -177,7 +176,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     -1,
                     -1,
                     e);
-            return Settings.newInstance();
+            return new Settings();
         }
 
         settingsValidator.validate(settings, problems);

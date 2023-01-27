@@ -18,7 +18,7 @@
  */
 package org.apache.maven.settings.validation;
 
-import org.apache.maven.api.settings.Settings;
+import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblemCollector;
 
 /**

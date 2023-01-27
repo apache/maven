@@ -28,7 +28,7 @@ import java.io.Reader;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.maven.api.settings.Settings;
+import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.v4.SettingsXpp3Reader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -54,7 +54,7 @@ public class DefaultSettingsReader implements SettingsReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (Reader in = input) {
-            return new SettingsXpp3Reader().read(in, isStrict(options));
+            return new Settings(new SettingsXpp3Reader().read(in, isStrict(options)));
         } catch (XmlPullParserException e) {
             throw new SettingsParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
         }
@@ -65,7 +65,7 @@ public class DefaultSettingsReader implements SettingsReader {
         Objects.requireNonNull(input, "input cannot be null");
 
         try (InputStream in = input) {
-            return new SettingsXpp3Reader().read(in, isStrict(options));
+            return new Settings(new SettingsXpp3Reader().read(in, isStrict(options)));
         } catch (XmlPullParserException e) {
             throw new SettingsParseException(e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e);
         }

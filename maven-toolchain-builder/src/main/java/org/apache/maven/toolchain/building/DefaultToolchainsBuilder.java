@@ -29,8 +29,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.api.toolchain.PersistedToolchains;
-import org.apache.maven.api.toolchain.TrackableBase;
 import org.apache.maven.building.Problem;
 import org.apache.maven.building.ProblemCollector;
 import org.apache.maven.building.ProblemCollectorFactory;
@@ -39,6 +37,8 @@ import org.apache.maven.toolchain.io.ToolchainsParseException;
 import org.apache.maven.toolchain.io.ToolchainsReader;
 import org.apache.maven.toolchain.io.ToolchainsWriter;
 import org.apache.maven.toolchain.merge.MavenToolchainMerger;
+import org.apache.maven.toolchain.model.PersistedToolchains;
+import org.apache.maven.toolchain.model.TrackableBase;
 import org.codehaus.plexus.interpolation.EnvarBasedValueSource;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
@@ -69,19 +69,17 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
 
         PersistedToolchains userToolchains = readToolchains(request.getUserToolchainsSource(), request, problems);
 
-        PersistedToolchains merged =
-                toolchainsMerger.merge(userToolchains, globalToolchains, TrackableBase.GLOBAL_LEVEL);
+        toolchainsMerger.merge(userToolchains, globalToolchains, TrackableBase.GLOBAL_LEVEL);
 
         problems.setSource("");
 
-        merged = interpolate(merged, problems);
+        userToolchains = interpolate(userToolchains, problems);
 
         if (hasErrors(problems.getProblems())) {
             throw new ToolchainsBuildingException(problems.getProblems());
         }
 
-        return new DefaultToolchainsBuildingResult(
-                new org.apache.maven.toolchain.model.PersistedToolchains(merged), problems.getProblems());
+        return new DefaultToolchainsBuildingResult(userToolchains, problems.getProblems());
     }
 
     private PersistedToolchains interpolate(PersistedToolchains toolchains, ProblemCollector problems) {
@@ -143,7 +141,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
     private PersistedToolchains readToolchains(
             Source toolchainsSource, ToolchainsBuildingRequest request, ProblemCollector problems) {
         if (toolchainsSource == null) {
-            return PersistedToolchains.newInstance();
+            return new PersistedToolchains();
         }
 
         PersistedToolchains toolchains;
@@ -167,7 +165,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
                     e.getLineNumber(),
                     e.getColumnNumber(),
                     e);
-            return PersistedToolchains.newInstance();
+            return new PersistedToolchains();
         } catch (IOException e) {
             problems.add(
                     Problem.Severity.FATAL,
@@ -175,7 +173,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
                     -1,
                     -1,
                     e);
-            return PersistedToolchains.newInstance();
+            return new PersistedToolchains();
         }
 
         return toolchains;

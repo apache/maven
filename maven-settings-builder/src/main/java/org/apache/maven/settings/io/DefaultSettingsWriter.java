@@ -29,7 +29,7 @@ import java.io.Writer;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.maven.api.settings.Settings;
+import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.v4.SettingsXpp3Writer;
 import org.codehaus.plexus.util.WriterFactory;
 
@@ -58,7 +58,7 @@ public class DefaultSettingsWriter implements SettingsWriter {
         Objects.requireNonNull(settings, "settings cannot be null");
 
         try (Writer out = output) {
-            new SettingsXpp3Writer().write(out, settings);
+            new SettingsXpp3Writer().write(out, settings.getDelegate());
         }
     }
 

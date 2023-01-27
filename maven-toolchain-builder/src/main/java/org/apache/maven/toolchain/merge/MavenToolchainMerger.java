@@ -18,14 +18,7 @@
  */
 package org.apache.maven.toolchain.merge;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.maven.api.toolchain.PersistedToolchains;
-import org.apache.maven.api.toolchain.ToolchainModel;
-import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.toolchain.model.PersistedToolchains;
 
 /**
  *
@@ -34,51 +27,14 @@ import org.apache.maven.api.xml.XmlNode;
  */
 public class MavenToolchainMerger {
 
-    public PersistedToolchains merge(
-            PersistedToolchains dominant, PersistedToolchains recessive, String recessiveSourceLevel) {
+    public void merge(PersistedToolchains dominant, PersistedToolchains recessive, String recessiveSourceLevel) {
         if (dominant == null || recessive == null) {
-            return dominant;
+            return;
         }
 
         recessive.setSourceLevel(recessiveSourceLevel);
 
-        return shallowMerge(dominant.getToolchains(), recessive.getToolchains(), recessiveSourceLevel);
-    }
-
-    private PersistedToolchains shallowMerge(
-            List<ToolchainModel> dominant, List<ToolchainModel> recessive, String recessiveSourceLevel) {
-        Map<Object, ToolchainModel> merged = new LinkedHashMap<>();
-
-        for (ToolchainModel dominantModel : dominant) {
-            Object key = getToolchainModelKey(dominantModel);
-
-            merged.put(key, dominantModel);
-        }
-
-        for (ToolchainModel recessiveModel : recessive) {
-            Object key = getToolchainModelKey(recessiveModel);
-
-            ToolchainModel dominantModel = merged.get(key);
-            if (dominantModel == null) {
-                recessiveModel.setSourceLevel(recessiveSourceLevel);
-                merged.put(key, recessiveModel);
-            } else {
-                merged.put(key, mergeToolchainModelConfiguration(dominantModel, recessiveModel));
-            }
-        }
-        return PersistedToolchains.newBuilder()
-                .toolchains(new ArrayList<>(merged.values()))
-                .build();
-    }
-
-    protected ToolchainModel mergeToolchainModelConfiguration(ToolchainModel target, ToolchainModel source) {
-        XmlNode src = source.getConfiguration();
-        XmlNode tgt = target.getConfiguration();
-        XmlNode merged = XmlNode.merge(tgt, src);
-        return target.withConfiguration(merged);
-    }
-
-    protected Object getToolchainModelKey(ToolchainModel model) {
-        return model;
+        dominant.update(new org.apache.maven.toolchain.v4.MavenToolchainsMerger()
+                .merge(dominant.getDelegate(), recessive.getDelegate(), true, null));
     }
 }

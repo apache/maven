@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 
-import org.apache.maven.api.settings.Settings;
+import org.apache.maven.settings.Settings;
 
 /**
  * Handles deserialization of settings from some kind of textual format like XML.
