@@ -122,7 +122,6 @@ public class LifecycleDependencyResolver
                                             boolean aggregating, Set<Artifact> projectArtifacts )
         throws LifecycleExecutionException
     {
-
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         try
         {
