@@ -282,7 +282,7 @@ public final class SettingsUtilsV4 {
         RepositoryPolicy policy = RepositoryPolicy.newBuilder()
                 .enabled(modelPolicy.isEnabled())
                 .updatePolicy(modelPolicy.getUpdatePolicy())
-                .checksumPolicy(modelPolicy.getUpdatePolicy())
+                .checksumPolicy(modelPolicy.getChecksumPolicy())
                 .build();
         return policy;
     }
