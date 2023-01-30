@@ -27,6 +27,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.maven.RepositoryUtils;
@@ -86,10 +88,16 @@ public class LifecycleDependencyResolver {
 
     public static List<MavenProject> getProjects(MavenProject project, MavenSession session, boolean aggregator) {
         if (aggregator) {
-            return session.getProjects();
+            return getProjectAndSubModules(project).collect(Collectors.toList());
         } else {
             return Collections.singletonList(project);
         }
+    }
+
+    private static Stream<MavenProject> getProjectAndSubModules(MavenProject project) {
+        return Stream.concat(
+                Stream.of(project),
+                project.getCollectedProjects().stream().flatMap(LifecycleDependencyResolver::getProjectAndSubModules));
     }
 
     public void resolveProjectDependencies(
