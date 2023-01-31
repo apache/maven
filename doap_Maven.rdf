@@ -32,6 +32,17 @@ under the License.
     <category rdf:resource="http://projects.apache.org/category/build-management"/>
     <release>
       <Version>
+        <name>Apache Maven 4.0.0-alpha-4</name>
+        <created>2023-01-31</created>
+        <revision>4.0.0-alpha-4</revision>
+        <file-release>http://archive.apache.org/dist/maven/maven-4/4.0.0-alpha-4/binaries/apache-maven-4.0.0-alpha-4-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-4/4.0.0-alpha-4/binaries/apache-maven-4.0.0-alpha-4-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-4/4.0.0-alpha-4/source/apache-maven-4.0.0-alpha-4-src.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-4/4.0.0-alpha-4/source/apache-maven-4.0.0-alpha-4-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
         <name>Apache Maven 4.0.0-alpha-3</name>
         <created>2022-12-15</created>
         <revision>4.0.0-alpha-3</revision>
