@@ -282,7 +282,6 @@ under the License.
                 </goals>
                 <configuration>
                   <includeClassifiers>src</includeClassifiers>
-                  <attachChecksums>true</attachChecksums>
                 </configuration>
               </execution>
             </executions>
