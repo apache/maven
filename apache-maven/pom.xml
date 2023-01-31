@@ -290,24 +290,13 @@ under the License.
               <execution>
                 <id>source-release-checksum</id>
                 <goals>
-                  <goal>files</goal>
+                  <goal>artifacts</goal>
                 </goals>
+                <configuration>
+                  <includeClassifiers>src</includeClassifiers>
+                </configuration>
               </execution>
             </executions>
-            <configuration>
-              <fileSets>
-                <fileSet>
-                  <directory>${project.build.directory}</directory>
-                  <includes>
-                    <include>${project.artifactId}-${project.version}-src.zip</include>
-                    <include>${project.artifactId}-${project.version}-src.tar.gz</include>
-                    <include>${project.artifactId}-${project.version}-bin.zip</include>
-                    <include>${project.artifactId}-${project.version}-bin.tar.gz</include>
-                  </includes>
-                </fileSet>
-              </fileSets>
-              <failIfNoFiles>true</failIfNoFiles>
-            </configuration>
           </plugin>
         </plugins>
       </build>
