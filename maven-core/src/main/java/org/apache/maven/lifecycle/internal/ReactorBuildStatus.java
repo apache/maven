@@ -21,6 +21,7 @@ package org.apache.maven.lifecycle.internal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.project.MavenProject;

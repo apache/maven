@@ -18,14 +18,13 @@
  */
 package org.apache.maven.lifecycle.internal;
 
-import static java.util.Arrays.stream;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -41,6 +40,8 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.Arrays.stream;
 
 /**
  * @since 3.3.1, MNG-5753

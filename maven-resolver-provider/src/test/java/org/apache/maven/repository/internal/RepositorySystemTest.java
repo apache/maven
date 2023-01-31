@@ -20,6 +20,7 @@ package org.apache.maven.repository.internal;
 
 import java.util.Arrays;
 import java.util.List;
+
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;

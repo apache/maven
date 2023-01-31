@@ -18,18 +18,13 @@
  */
 package org.apache.maven.project;
 
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.lessThan;
-import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -43,6 +38,12 @@ import org.codehaus.plexus.PlexusTestCase;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
 
 public class PomConstructionTest extends PlexusTestCase {
     private static String BASE_DIR = "src/test";

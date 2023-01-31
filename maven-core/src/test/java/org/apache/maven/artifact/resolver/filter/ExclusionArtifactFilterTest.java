@@ -18,17 +18,18 @@
  */
 package org.apache.maven.artifact.resolver.filter;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
 import java.util.Collections;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Exclusion;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ExclusionArtifactFilterTest {
     private Artifact artifact;

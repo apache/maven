@@ -20,6 +20,7 @@ package org.apache.maven.project;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.maven.model.building.ModelCache;
 
 /**

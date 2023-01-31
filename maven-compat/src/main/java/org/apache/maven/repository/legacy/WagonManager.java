@@ -20,6 +20,7 @@ package org.apache.maven.repository.legacy;
 
 import java.io.File;
 import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;

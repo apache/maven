@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;

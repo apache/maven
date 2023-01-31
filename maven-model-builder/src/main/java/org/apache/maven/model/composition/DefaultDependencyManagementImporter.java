@@ -18,12 +18,14 @@
  */
 package org.apache.maven.model.composition;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;

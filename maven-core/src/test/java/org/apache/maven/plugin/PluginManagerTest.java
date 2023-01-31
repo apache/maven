@@ -19,6 +19,7 @@
 package org.apache.maven.plugin;
 
 import java.util.List;
+
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;

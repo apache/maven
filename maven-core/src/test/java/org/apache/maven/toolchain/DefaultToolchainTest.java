@@ -18,13 +18,9 @@
  */
 package org.apache.maven.toolchain;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.mockito.Mockito.verify;
-
 import java.io.InputStream;
 import java.util.Collections;
+
 import org.apache.maven.toolchain.java.DefaultJavaToolChain;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
@@ -34,6 +30,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Mockito.verify;
 
 public class DefaultToolchainTest {
     @Mock

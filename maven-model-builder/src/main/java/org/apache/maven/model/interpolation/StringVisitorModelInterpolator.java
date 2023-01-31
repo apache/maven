@@ -18,14 +18,16 @@
  */
 package org.apache.maven.model.interpolation;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.ActivationOS;

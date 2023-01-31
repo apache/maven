@@ -18,9 +18,10 @@
  */
 package org.apache.maven.execution.scope.internal;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.google.inject.Key;
 import com.google.inject.Provider;
-import java.util.concurrent.atomic.AtomicInteger;
 import junit.framework.TestCase;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.scope.WeakMojoExecutionListener;

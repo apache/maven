@@ -18,13 +18,14 @@
  */
 package org.apache.maven.project.artifact;
 
-import static org.junit.Assert.assertArrayEquals;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.codehaus.plexus.PlexusTestCase;
+
+import static org.junit.Assert.assertArrayEquals;
 
 public class DefaultProjectArtifactsCacheTest extends PlexusTestCase {
 

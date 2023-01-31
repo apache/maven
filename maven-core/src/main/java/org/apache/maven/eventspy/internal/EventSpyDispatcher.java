@@ -20,6 +20,7 @@ package org.apache.maven.eventspy.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.ExecutionListener;
 import org.codehaus.plexus.component.annotations.Component;

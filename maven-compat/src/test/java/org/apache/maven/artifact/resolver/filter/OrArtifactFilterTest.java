@@ -19,6 +19,7 @@
 package org.apache.maven.artifact.resolver.filter;
 
 import java.util.Arrays;
+
 import junit.framework.TestCase;
 import org.apache.maven.artifact.Artifact;
 

@@ -21,6 +21,7 @@ package org.apache.maven.project.artifact;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;

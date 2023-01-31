@@ -20,6 +20,7 @@ package org.apache.maven.lifecycle.internal.builder.multithreaded;
 
 import java.util.List;
 import java.util.Set;
+
 import junit.framework.TestCase;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.lifecycle.internal.ProjectBuildList;

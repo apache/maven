@@ -18,13 +18,13 @@
  */
 package org.apache.maven.lifecycle.mapping;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * DefaultLifecycleMapping

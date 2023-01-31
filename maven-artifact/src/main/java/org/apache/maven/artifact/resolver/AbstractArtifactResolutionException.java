@@ -20,6 +20,7 @@ package org.apache.maven.artifact.resolver;
 
 import java.util.Iterator;
 import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;

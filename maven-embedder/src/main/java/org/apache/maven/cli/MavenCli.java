@@ -18,11 +18,6 @@
  */
 package org.apache.maven.cli;
 
-import static org.apache.maven.cli.CLIManager.COLOR;
-import static org.apache.maven.cli.ResolveFile.resolveFile;
-import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
-
-import com.google.inject.AbstractModule;
 import java.io.BufferedInputStream;
 import java.io.Console;
 import java.io.File;
@@ -46,6 +41,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.google.inject.AbstractModule;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
@@ -116,6 +113,10 @@ import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecUtil;
 import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
+
+import static org.apache.maven.cli.CLIManager.COLOR;
+import static org.apache.maven.cli.ResolveFile.resolveFile;
+import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 // TODO push all common bits back to plexus cli and prepare for transition to Guice. We don't need 50 ways to make CLIs
 

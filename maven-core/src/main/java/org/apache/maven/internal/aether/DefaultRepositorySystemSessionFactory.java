@@ -18,7 +18,8 @@
  */
 package org.apache.maven.internal.aether;
 
-import static java.util.stream.Collectors.toList;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,8 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
-import javax.inject.Named;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
@@ -67,6 +67,8 @@ import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @since 3.3.0

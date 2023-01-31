@@ -20,6 +20,7 @@ package org.apache.maven.lifecycle;
 
 import java.io.IOException;
 import java.util.Iterator;
+
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathNotFoundException;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;

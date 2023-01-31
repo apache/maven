@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
+
 import org.apache.maven.repository.internal.PluginsMetadata.PluginInfo;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.Xpp3Dom;

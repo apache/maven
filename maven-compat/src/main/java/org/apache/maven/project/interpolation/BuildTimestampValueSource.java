@@ -20,6 +20,7 @@ package org.apache.maven.project.interpolation;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 
 /**

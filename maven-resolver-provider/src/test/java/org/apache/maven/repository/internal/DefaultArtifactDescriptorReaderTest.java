@@ -18,9 +18,6 @@
  */
 package org.apache.maven.repository.internal;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -28,6 +25,9 @@ import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.RepositoryEventDispatcher;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.mockito.ArgumentCaptor;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class DefaultArtifactDescriptorReaderTest extends AbstractRepositoryTestCase {
 

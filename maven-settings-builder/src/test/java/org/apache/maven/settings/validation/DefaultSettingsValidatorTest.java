@@ -20,6 +20,7 @@ package org.apache.maven.settings.validation;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import junit.framework.TestCase;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Profile;

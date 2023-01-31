@@ -20,6 +20,7 @@ package org.apache.maven.project.harness;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.jxpath.ri.Compiler;
 import org.apache.commons.jxpath.ri.compiler.NodeNameTest;
 import org.apache.commons.jxpath.ri.compiler.NodeTest;

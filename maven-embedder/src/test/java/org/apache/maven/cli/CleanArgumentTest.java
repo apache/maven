@@ -18,9 +18,9 @@
  */
 package org.apache.maven.cli;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Karl Heinz Marbaise

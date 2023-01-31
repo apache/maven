@@ -19,6 +19,7 @@
 package org.apache.maven.plugin;
 
 import java.lang.reflect.Array;
+
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.codehaus.plexus.logging.Logger;
 

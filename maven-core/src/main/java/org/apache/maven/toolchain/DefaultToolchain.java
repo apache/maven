@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.logging.Logger;
 

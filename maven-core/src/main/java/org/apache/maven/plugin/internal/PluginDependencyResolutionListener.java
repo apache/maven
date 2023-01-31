@@ -23,6 +23,7 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.ResolutionListener;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;

@@ -19,6 +19,7 @@
 package org.apache.maven.lifecycle.internal.builder;
 
 import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.ExecutionEvent;

@@ -18,14 +18,14 @@
  */
 package org.apache.maven.model.building;
 
-import static java.util.Collections.singleton;
-import static org.apache.maven.model.building.ModelProblem.Severity.ERROR;
-import static org.apache.maven.model.building.ModelProblem.Severity.FATAL;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import static java.util.Collections.singleton;
+import static org.apache.maven.model.building.ModelProblem.Severity.ERROR;
+import static org.apache.maven.model.building.ModelProblem.Severity.FATAL;
 
 /**
  * There are various forms of results that are represented by this class:

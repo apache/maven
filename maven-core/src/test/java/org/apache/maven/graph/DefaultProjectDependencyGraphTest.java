@@ -20,6 +20,7 @@ package org.apache.maven.graph;
 
 import java.util.Arrays;
 import java.util.List;
+
 import junit.framework.TestCase;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.model.Dependency;

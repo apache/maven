@@ -21,6 +21,7 @@ package org.apache.maven.model.building;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Paths;
+
 import junit.framework.TestCase;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;

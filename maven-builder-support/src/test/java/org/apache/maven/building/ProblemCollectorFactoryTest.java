@@ -18,11 +18,12 @@
  */
 package org.apache.maven.building;
 
+import java.util.Collections;
+
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
-
-import java.util.Collections;
-import org.junit.Test;
 
 public class ProblemCollectorFactoryTest {
 

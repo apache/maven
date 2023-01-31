@@ -20,6 +20,7 @@ package org.apache.maven.model.validation;
 
 import java.io.InputStream;
 import java.util.List;
+
 import junit.framework.TestCase;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;

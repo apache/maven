@@ -18,12 +18,11 @@
  */
 package org.apache.maven.lifecycle.internal;
 
-import static org.junit.Assert.assertNull;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import org.apache.maven.execution.AbstractExecutionListener;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -37,6 +36,8 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
+
+import static org.junit.Assert.assertNull;
 
 public class LifecycleModuleBuilderTest extends PlexusTestCase {
     @Override

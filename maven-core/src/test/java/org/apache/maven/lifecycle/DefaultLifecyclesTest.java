@@ -19,6 +19,7 @@
 package org.apache.maven.lifecycle;
 
 import java.util.List;
+
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.annotations.Requirement;
 

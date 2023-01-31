@@ -18,18 +18,19 @@
  */
 package org.apache.maven;
 
-import static org.hamcrest.Matchers.endsWith;
-import static org.junit.Assert.assertThat;
-
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Requirement;
+
+import static org.hamcrest.Matchers.endsWith;
+import static org.junit.Assert.assertThat;
 
 public class ProjectDependenciesResolverTest extends AbstractCoreMavenComponentTestCase {
     @Requirement

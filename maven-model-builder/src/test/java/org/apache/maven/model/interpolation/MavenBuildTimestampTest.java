@@ -20,6 +20,7 @@ package org.apache.maven.model.interpolation;
 
 import java.util.Date;
 import java.util.Properties;
+
 import junit.framework.TestCase;
 
 public class MavenBuildTimestampTest extends TestCase {

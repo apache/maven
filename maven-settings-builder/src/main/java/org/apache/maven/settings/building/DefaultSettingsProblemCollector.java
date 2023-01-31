@@ -20,6 +20,7 @@ package org.apache.maven.settings.building;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.maven.settings.io.SettingsParseException;
 
 /**

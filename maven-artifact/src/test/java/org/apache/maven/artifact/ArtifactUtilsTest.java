@@ -21,6 +21,7 @@ package org.apache.maven.artifact;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import junit.framework.TestCase;
 import org.apache.maven.artifact.versioning.VersionRange;
 

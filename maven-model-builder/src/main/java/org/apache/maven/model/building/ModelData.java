@@ -19,6 +19,7 @@
 package org.apache.maven.model.building;
 
 import java.util.List;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 

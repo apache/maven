@@ -20,6 +20,7 @@ package org.apache.maven.project.artifact;
 
 import java.util.Arrays;
 import java.util.Collections;
+
 import junit.framework.TestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;

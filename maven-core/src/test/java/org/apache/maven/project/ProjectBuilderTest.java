@@ -18,12 +18,6 @@
  */
 package org.apache.maven.project;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.InvalidArtifactRTException;
@@ -42,6 +37,12 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelSource;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     @Override

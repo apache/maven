@@ -19,6 +19,7 @@
 package org.apache.maven.artifact.repository;
 
 import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;

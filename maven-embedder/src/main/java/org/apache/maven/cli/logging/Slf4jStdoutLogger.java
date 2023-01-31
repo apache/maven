@@ -19,6 +19,7 @@
 package org.apache.maven.cli.logging;
 
 import java.io.PrintStream;
+
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 

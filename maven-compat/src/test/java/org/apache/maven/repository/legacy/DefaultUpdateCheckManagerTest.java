@@ -19,6 +19,7 @@
 package org.apache.maven.repository.legacy;
 
 import java.io.File;
+
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;

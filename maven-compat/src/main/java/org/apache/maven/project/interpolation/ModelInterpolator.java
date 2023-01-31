@@ -20,6 +20,7 @@ package org.apache.maven.project.interpolation;
 
 import java.io.File;
 import java.util.Map;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.project.ProjectBuilderConfiguration;
 

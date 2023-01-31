@@ -18,11 +18,13 @@
  */
 package org.apache.maven.settings.validation;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Proxy;

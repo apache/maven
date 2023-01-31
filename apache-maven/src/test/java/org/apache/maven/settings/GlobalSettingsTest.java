@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+
 import junit.framework.TestCase;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 

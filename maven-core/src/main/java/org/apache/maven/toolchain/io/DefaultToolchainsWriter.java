@@ -18,12 +18,14 @@
  */
 package org.apache.maven.toolchain.io;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 import java.util.Objects;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.io.xpp3.MavenToolchainsXpp3Writer;
 

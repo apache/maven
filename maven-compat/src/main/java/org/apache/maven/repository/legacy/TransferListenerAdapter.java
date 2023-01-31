@@ -20,6 +20,7 @@ package org.apache.maven.repository.legacy;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
+
 import org.apache.maven.repository.ArtifactTransferEvent;
 import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.repository.ArtifactTransferResource;

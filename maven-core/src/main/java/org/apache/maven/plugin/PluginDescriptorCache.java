@@ -19,6 +19,7 @@
 package org.apache.maven.plugin;
 
 import java.util.List;
+
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.eclipse.aether.RepositorySystemSession;

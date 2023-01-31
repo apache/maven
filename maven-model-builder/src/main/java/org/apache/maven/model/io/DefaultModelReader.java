@@ -18,6 +18,9 @@
  */
 package org.apache.maven.model.io;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -25,8 +28,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 import java.util.Objects;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;

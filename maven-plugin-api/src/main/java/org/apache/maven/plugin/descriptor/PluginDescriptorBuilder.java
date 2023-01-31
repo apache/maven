@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;

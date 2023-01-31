@@ -19,6 +19,7 @@
 package org.apache.maven.plugin.internal;
 
 import java.util.concurrent.CountDownLatch;
+
 import junit.framework.TestCase;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;

@@ -20,6 +20,7 @@ package org.apache.maven.project.inheritance.t10;
 
 import java.io.File;
 import java.util.Map;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;

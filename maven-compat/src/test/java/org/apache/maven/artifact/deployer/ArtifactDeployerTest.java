@@ -18,15 +18,16 @@
  */
 package org.apache.maven.artifact.deployer;
 
-import static org.mockito.Mockito.mock;
-
 import java.io.File;
+
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.util.FileUtils;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

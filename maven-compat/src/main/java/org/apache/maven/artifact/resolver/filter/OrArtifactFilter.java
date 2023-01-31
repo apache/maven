@@ -21,6 +21,7 @@ package org.apache.maven.artifact.resolver.filter;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 
 /**

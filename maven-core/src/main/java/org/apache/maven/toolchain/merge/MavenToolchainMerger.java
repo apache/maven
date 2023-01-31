@@ -21,6 +21,7 @@ package org.apache.maven.toolchain.merge;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.util.xml.Xpp3Dom;

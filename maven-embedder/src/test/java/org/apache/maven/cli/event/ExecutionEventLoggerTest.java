@@ -18,11 +18,8 @@
  */
 package org.apache.maven.cli.event;
 
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.io.File;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
@@ -33,6 +30,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.slf4j.Logger;
+
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ExecutionEventLoggerTest {
     private ExecutionEventLogger executionEventLogger;

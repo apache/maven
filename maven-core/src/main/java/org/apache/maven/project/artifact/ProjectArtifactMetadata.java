@@ -20,6 +20,7 @@ package org.apache.maven.project.artifact;
 
 import java.io.File;
 import java.io.IOException;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.AbstractArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;

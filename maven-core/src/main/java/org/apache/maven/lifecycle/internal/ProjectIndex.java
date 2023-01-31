@@ -21,6 +21,7 @@ package org.apache.maven.lifecycle.internal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.project.MavenProject;
 

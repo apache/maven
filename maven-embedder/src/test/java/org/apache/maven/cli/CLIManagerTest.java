@@ -18,13 +18,13 @@
  */
 package org.apache.maven.cli;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
 import org.apache.commons.cli.CommandLine;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class CLIManagerTest {
     private CLIManager cliManager;

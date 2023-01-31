@@ -20,6 +20,7 @@ package org.apache.maven.project.canonical;
 
 import java.io.File;
 import java.util.List;
+
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.AbstractMavenProjectTestCase;

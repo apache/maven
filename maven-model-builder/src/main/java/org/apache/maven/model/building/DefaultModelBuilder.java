@@ -18,8 +18,9 @@
  */
 package org.apache.maven.model.building;
 
-import static org.apache.maven.model.building.Result.error;
-import static org.apache.maven.model.building.Result.newResult;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,9 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -82,6 +81,9 @@ import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.sisu.Nullable;
+
+import static org.apache.maven.model.building.Result.error;
+import static org.apache.maven.model.building.Result.newResult;
 
 /**
  * @author Benjamin Bentmann

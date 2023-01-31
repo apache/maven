@@ -20,6 +20,7 @@ package org.apache.maven.repository.internal;
 
 import java.net.MalformedURLException;
 import java.util.Arrays;
+
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.resolution.ModelResolver;

@@ -20,6 +20,7 @@ package org.apache.maven.classrealm;
 
 import java.util.List;
 import java.util.Map;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;

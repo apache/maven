@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 

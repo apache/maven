@@ -19,6 +19,7 @@
 package org.apache.maven.project;
 
 import java.io.File;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.DefaultArtifactDescriptorReader;

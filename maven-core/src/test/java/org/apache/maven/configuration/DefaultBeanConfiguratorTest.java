@@ -21,6 +21,7 @@ package org.apache.maven.configuration;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;

@@ -20,6 +20,7 @@ package org.apache.maven.profiles;
 
 import java.io.File;
 import java.io.IOException;
+
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**

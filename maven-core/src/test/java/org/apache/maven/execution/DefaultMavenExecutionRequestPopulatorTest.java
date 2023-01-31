@@ -18,8 +18,10 @@
  */
 package org.apache.maven.execution;
 
-import java.util.List;
 import javax.inject.Inject;
+
+import java.util.List;
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;

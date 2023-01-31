@@ -20,6 +20,7 @@ package org.apache.maven.cli;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;

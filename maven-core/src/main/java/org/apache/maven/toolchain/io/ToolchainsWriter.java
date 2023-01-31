@@ -21,6 +21,7 @@ package org.apache.maven.toolchain.io;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
+
 import org.apache.maven.toolchain.model.PersistedToolchains;
 
 /**

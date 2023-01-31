@@ -20,6 +20,7 @@ package org.apache.maven.model.profile.activation;
 
 import java.util.Objects;
 import java.util.Properties;
+
 import junit.framework.TestCase;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.SimpleProblemCollector;

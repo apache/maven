@@ -19,6 +19,7 @@
 package org.apache.maven.plugin;
 
 import java.util.Map;
+
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 

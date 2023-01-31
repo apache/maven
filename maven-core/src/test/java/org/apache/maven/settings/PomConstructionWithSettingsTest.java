@@ -21,6 +21,7 @@ package org.apache.maven.settings;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuilder;

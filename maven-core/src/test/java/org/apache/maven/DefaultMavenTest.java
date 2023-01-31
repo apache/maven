@@ -18,11 +18,10 @@
  */
 package org.apache.maven;
 
-import static java.util.Arrays.asList;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -32,6 +31,8 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.codehaus.plexus.component.annotations.Component;
+
+import static java.util.Arrays.asList;
 
 public class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
     @Component(role = AbstractMavenLifecycleParticipant.class, hint = "WsrClassCatcher")

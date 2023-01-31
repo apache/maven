@@ -21,6 +21,7 @@ package org.apache.maven.model.building;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.ModelParseException;
 

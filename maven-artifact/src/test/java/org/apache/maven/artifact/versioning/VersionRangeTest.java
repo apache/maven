@@ -19,6 +19,7 @@
 package org.apache.maven.artifact.versioning;
 
 import java.util.List;
+
 import junit.framework.TestCase;
 import org.apache.maven.artifact.Artifact;
 

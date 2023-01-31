@@ -20,6 +20,7 @@ package org.apache.maven.plugin.version;
 
 import java.util.Collections;
 import java.util.List;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;

@@ -20,6 +20,7 @@ package org.apache.maven.artifact.repository.metadata;
 
 import java.util.Iterator;
 import java.util.List;
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**

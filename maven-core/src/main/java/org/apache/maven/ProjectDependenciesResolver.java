@@ -20,6 +20,7 @@ package org.apache.maven;
 
 import java.util.Collection;
 import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
