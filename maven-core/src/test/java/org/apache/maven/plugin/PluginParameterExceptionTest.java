@@ -19,6 +19,7 @@
 package org.apache.maven.plugin;
 
 import java.util.Collections;
+
 import junit.framework.TestCase;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;

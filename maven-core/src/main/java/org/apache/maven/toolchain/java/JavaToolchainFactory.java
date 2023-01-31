@@ -21,6 +21,7 @@ package org.apache.maven.toolchain.java;
 import java.io.File;
 import java.util.Map.Entry;
 import java.util.Properties;
+
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
 import org.apache.maven.toolchain.RequirementMatcher;
 import org.apache.maven.toolchain.RequirementMatcherFactory;

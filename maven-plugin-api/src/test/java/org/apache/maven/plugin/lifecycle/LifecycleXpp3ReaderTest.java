@@ -19,6 +19,7 @@
 package org.apache.maven.plugin.lifecycle;
 
 import java.io.IOException;
+
 import junit.framework.TestCase;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 

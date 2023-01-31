@@ -21,6 +21,7 @@ package org.apache.maven.lifecycle.internal.stub;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import org.apache.maven.execution.AbstractExecutionListener;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;

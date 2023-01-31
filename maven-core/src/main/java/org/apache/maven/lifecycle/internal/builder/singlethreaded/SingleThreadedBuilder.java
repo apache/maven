@@ -19,6 +19,7 @@
 package org.apache.maven.lifecycle.internal.builder.singlethreaded;
 
 import java.util.List;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
 import org.apache.maven.lifecycle.internal.ProjectBuildList;

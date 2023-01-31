@@ -20,6 +20,7 @@ package org.apache.maven.model.interpolation;
 
 import java.util.Date;
 import java.util.Properties;
+
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 
 class BuildTimestampValueSource extends AbstractValueSource {

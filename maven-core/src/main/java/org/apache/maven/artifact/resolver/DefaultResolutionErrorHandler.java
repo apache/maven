@@ -21,6 +21,7 @@ package org.apache.maven.artifact.resolver;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import org.codehaus.plexus.component.annotations.Component;
 
 /**

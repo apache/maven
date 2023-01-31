@@ -20,6 +20,7 @@ package org.apache.maven.configuration.internal;
 
 import java.io.File;
 import java.util.Objects;
+
 import org.apache.maven.configuration.BeanConfigurationException;
 import org.apache.maven.configuration.BeanConfigurationPathTranslator;
 import org.apache.maven.configuration.BeanConfigurationRequest;

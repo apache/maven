@@ -21,6 +21,7 @@ package org.apache.maven.project;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Collections;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.codehaus.plexus.component.annotations.Component;

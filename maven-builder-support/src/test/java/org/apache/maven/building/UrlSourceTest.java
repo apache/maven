@@ -18,14 +18,15 @@
  */
 package org.apache.maven.building;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Scanner;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class UrlSourceTest {
 

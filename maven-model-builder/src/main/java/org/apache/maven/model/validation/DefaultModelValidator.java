@@ -18,6 +18,10 @@
  */
 package org.apache.maven.model.validation;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,9 +32,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Build;

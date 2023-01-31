@@ -19,6 +19,7 @@
 package org.apache.maven.lifecycle.internal;
 
 import java.util.HashSet;
+
 import junit.framework.TestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;

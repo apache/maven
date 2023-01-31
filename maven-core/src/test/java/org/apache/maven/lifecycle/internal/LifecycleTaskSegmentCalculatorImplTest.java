@@ -19,6 +19,7 @@
 package org.apache.maven.lifecycle.internal;
 
 import java.util.List;
+
 import junit.framework.TestCase;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.stub.LifecycleTaskSegmentCalculatorStub;

@@ -19,6 +19,7 @@
 package org.apache.maven.settings;
 
 import java.util.List;
+
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.settings.merge.MavenSettingsMerger;
 

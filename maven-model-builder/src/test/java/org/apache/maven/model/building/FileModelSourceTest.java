@@ -18,14 +18,15 @@
  */
 package org.apache.maven.model.building;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.codehaus.plexus.util.Os;
+import org.junit.Test;
+
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assume.assumeTrue;
-
-import java.io.File;
-import java.io.IOException;
-import org.codehaus.plexus.util.Os;
-import org.junit.Test;
 
 /**
  * Test that validate the solution of MNG-6261 issue

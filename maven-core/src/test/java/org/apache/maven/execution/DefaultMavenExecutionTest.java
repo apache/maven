@@ -18,15 +18,16 @@
  */
 package org.apache.maven.execution;
 
+import java.util.List;
+
+import org.apache.maven.project.MavenProject;
+import org.junit.Test;
+
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertThat;
-
-import java.util.List;
-import org.apache.maven.project.MavenProject;
-import org.junit.Test;
 
 /**
  * @author Benjamin Bentmann

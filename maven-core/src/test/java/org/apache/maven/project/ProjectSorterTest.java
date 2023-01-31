@@ -18,13 +18,10 @@
  */
 package org.apache.maven.project;
 
-import static org.hamcrest.Matchers.hasItem;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Extension;
@@ -35,6 +32,10 @@ import org.apache.maven.model.PluginManagement;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import static org.hamcrest.Matchers.hasItem;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 /**
  * Test sorting projects by dependencies.

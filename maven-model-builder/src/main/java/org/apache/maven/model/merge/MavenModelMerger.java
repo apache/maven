@@ -24,6 +24,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Dependency;

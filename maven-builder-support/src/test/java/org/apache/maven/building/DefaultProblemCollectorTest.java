@@ -18,10 +18,10 @@
  */
 package org.apache.maven.building;
 
-import static org.junit.Assert.*;
-
 import org.apache.maven.building.Problem.Severity;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class DefaultProblemCollectorTest {
 

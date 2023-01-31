@@ -18,11 +18,12 @@
  */
 package org.apache.maven.building;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.InputStream;
 import java.util.Scanner;
+
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class StringSourceTest {
     @Test

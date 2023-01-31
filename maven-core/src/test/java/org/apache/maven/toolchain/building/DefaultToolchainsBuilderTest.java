@@ -18,16 +18,11 @@
  */
 package org.apache.maven.toolchain.building;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.maven.building.StringSource;
 import org.apache.maven.toolchain.io.DefaultToolchainsReader;
 import org.apache.maven.toolchain.io.DefaultToolchainsWriter;
@@ -42,6 +37,12 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 
 public class DefaultToolchainsBuilderTest {
     private static final String LS = System.lineSeparator();

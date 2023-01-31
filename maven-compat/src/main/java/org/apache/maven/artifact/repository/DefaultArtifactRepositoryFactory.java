@@ -20,6 +20,7 @@ package org.apache.maven.artifact.repository;
 
 import java.util.Arrays;
 import java.util.List;
+
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.plugin.LegacySupport;

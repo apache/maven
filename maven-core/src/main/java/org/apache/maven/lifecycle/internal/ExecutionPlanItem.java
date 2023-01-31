@@ -20,6 +20,7 @@ package org.apache.maven.lifecycle.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;

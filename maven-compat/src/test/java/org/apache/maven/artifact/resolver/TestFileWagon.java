@@ -20,6 +20,7 @@ package org.apache.maven.artifact.resolver;
 
 import java.io.File;
 import java.io.InputStream;
+
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authorization.AuthorizationException;

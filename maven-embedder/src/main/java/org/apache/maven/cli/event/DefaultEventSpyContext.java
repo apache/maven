@@ -20,6 +20,7 @@ package org.apache.maven.cli.event;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.maven.eventspy.EventSpy;
 
 /**

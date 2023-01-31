@@ -19,6 +19,7 @@
 package org.apache.maven;
 
 import java.util.Set;
+
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
 /**

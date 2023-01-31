@@ -18,13 +18,14 @@
  */
 package org.apache.maven.toolchain.building;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Collections;
+
 import org.apache.maven.building.Problem;
 import org.apache.maven.building.ProblemCollector;
 import org.apache.maven.building.ProblemCollectorFactory;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class ToolchainsBuildingExceptionTest {
     private static final String LS = System.lineSeparator();

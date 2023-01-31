@@ -20,6 +20,7 @@ package org.apache.maven.artifact.resolver;
 
 import java.util.Arrays;
 import java.util.List;
+
 import junit.framework.TestCase;
 
 /**

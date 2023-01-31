@@ -18,8 +18,6 @@
  */
 package org.apache.maven.model.building;
 
-import static org.junit.Assert.assertNotNull;
-
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
@@ -27,6 +25,8 @@ import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Guillaume Nodet

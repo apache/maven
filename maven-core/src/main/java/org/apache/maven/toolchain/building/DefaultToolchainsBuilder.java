@@ -18,15 +18,17 @@
  */
 package org.apache.maven.toolchain.building;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+
 import org.apache.maven.building.Problem;
 import org.apache.maven.building.ProblemCollector;
 import org.apache.maven.building.ProblemCollectorFactory;

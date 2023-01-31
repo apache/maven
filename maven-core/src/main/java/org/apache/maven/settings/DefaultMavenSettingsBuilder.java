@@ -20,6 +20,7 @@ package org.apache.maven.settings;
 
 import java.io.File;
 import java.io.IOException;
+
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.properties.internal.SystemProperties;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;

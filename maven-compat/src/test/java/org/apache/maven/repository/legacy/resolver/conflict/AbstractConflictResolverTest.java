@@ -19,6 +19,7 @@
 package org.apache.maven.repository.legacy.resolver.conflict;
 
 import java.util.Collections;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;

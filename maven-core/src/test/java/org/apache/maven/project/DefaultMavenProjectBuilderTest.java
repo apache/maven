@@ -18,16 +18,17 @@
  */
 package org.apache.maven.project;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.util.FileUtils;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
 
 public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
 

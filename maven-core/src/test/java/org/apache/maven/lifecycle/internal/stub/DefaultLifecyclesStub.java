@@ -18,15 +18,16 @@
  */
 package org.apache.maven.lifecycle.internal.stub;
 
-import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.*;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
+
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.*;
 
 /**
  * @author Kristian Rosenvold

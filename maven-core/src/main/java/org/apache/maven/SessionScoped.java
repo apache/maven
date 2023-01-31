@@ -18,12 +18,13 @@
  */
 package org.apache.maven;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-import com.google.inject.ScopeAnnotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
+import com.google.inject.ScopeAnnotation;
+
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Indicates that annotated component should be instantiated before session execution starts

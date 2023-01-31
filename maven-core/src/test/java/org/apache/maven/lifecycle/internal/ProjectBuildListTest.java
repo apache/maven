@@ -18,14 +18,14 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
+import org.junit.Test;
+
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
-import org.junit.Test;
 
 /**
  * @author Kristian Rosenvold

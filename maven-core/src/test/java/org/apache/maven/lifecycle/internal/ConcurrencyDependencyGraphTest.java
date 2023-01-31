@@ -18,9 +18,8 @@
  */
 package org.apache.maven.lifecycle.internal;
 
-import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.*;
-
 import java.util.List;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
@@ -35,6 +34,8 @@ import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
+
+import static org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub.*;
 
 /**
  * @author Kristian Rosenvold

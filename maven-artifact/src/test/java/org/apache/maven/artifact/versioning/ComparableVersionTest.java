@@ -19,6 +19,7 @@
 package org.apache.maven.artifact.versioning;
 
 import java.util.Locale;
+
 import junit.framework.TestCase;
 
 /**

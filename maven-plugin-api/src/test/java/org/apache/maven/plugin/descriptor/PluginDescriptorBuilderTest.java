@@ -20,6 +20,7 @@ package org.apache.maven.plugin.descriptor;
 
 import java.io.IOException;
 import java.io.Reader;
+
 import junit.framework.TestCase;
 import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.component.repository.ComponentRequirement;

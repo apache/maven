@@ -19,6 +19,7 @@
 package org.apache.maven.project.inheritance;
 
 import java.io.File;
+
 import org.apache.maven.project.AbstractMavenProjectTestCase;
 
 /**

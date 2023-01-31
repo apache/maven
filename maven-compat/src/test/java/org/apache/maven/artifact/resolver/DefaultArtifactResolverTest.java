@@ -19,6 +19,7 @@
 package org.apache.maven.artifact.resolver;
 
 import java.util.Collections;
+
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.DefaultArtifactResolver.DaemonThreadCreator;

@@ -21,6 +21,7 @@ package org.apache.maven.model.merge;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+
 import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
 import org.junit.Test;

@@ -20,6 +20,7 @@ package org.apache.maven.artifact.resolver.filter;
 
 import java.util.List;
 import java.util.function.Predicate;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Exclusion;
 

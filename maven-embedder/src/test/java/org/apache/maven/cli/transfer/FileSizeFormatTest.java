@@ -18,12 +18,13 @@
  */
 package org.apache.maven.cli.transfer;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Locale;
+
 import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat;
 import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat.ScaleUnit;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class FileSizeFormatTest {
 

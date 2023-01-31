@@ -19,6 +19,7 @@
 package org.apache.maven.model.interpolation;
 
 import java.util.List;
+
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;

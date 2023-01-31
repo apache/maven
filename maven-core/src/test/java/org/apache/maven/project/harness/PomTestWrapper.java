@@ -21,6 +21,7 @@ package org.apache.maven.project.harness;
 import java.io.File;
 import java.util.Iterator;
 import java.util.Objects;
+
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathNotFoundException;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;

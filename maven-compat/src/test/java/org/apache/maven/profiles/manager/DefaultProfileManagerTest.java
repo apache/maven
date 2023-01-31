@@ -20,6 +20,7 @@ package org.apache.maven.profiles.manager;
 
 import java.util.List;
 import java.util.Properties;
+
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;

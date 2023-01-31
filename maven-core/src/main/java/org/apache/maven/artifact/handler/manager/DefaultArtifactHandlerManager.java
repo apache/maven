@@ -21,6 +21,7 @@ package org.apache.maven.artifact.handler.manager;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.codehaus.plexus.component.annotations.Component;

@@ -21,6 +21,7 @@ package org.apache.maven.artifact.versioning;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
 import org.apache.maven.artifact.Artifact;
 
 /**

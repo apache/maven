@@ -18,10 +18,9 @@
  */
 package org.apache.maven.model.inheritance;
 
-import static org.junit.Assert.assertThat;
-
 import java.io.File;
 import java.io.IOException;
+
 import junit.framework.TestCase;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.SimpleProblemCollector;
@@ -30,6 +29,8 @@ import org.apache.maven.model.io.DefaultModelWriter;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
 import org.xmlunit.matchers.CompareMatcher;
+
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Hervé Boutemy

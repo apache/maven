@@ -20,6 +20,7 @@ package org.apache.maven.artifact.deployer;
 
 import java.util.Collections;
 import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;

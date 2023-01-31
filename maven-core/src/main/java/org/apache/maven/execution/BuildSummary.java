@@ -19,6 +19,7 @@
 package org.apache.maven.execution;
 
 import java.util.Objects;
+
 import org.apache.maven.project.MavenProject;
 
 /**

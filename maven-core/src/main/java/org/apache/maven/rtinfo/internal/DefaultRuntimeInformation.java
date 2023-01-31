@@ -21,6 +21,7 @@ package org.apache.maven.rtinfo.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.rtinfo.RuntimeInformation;

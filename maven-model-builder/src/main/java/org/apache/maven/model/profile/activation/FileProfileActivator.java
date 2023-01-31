@@ -18,10 +18,12 @@
  */
 package org.apache.maven.model.profile.activation;
 
-import java.io.File;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.io.File;
+
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Profile;

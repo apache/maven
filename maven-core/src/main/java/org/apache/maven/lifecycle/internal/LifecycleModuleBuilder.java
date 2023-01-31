@@ -20,6 +20,7 @@ package org.apache.maven.lifecycle.internal;
 
 import java.util.HashSet;
 import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.ExecutionEvent;

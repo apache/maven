@@ -18,11 +18,11 @@
  */
 package org.apache.maven.lifecycle;
 
-import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
-
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.logging.MessageBuilder;
+
+import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

@@ -19,6 +19,7 @@
 package org.apache.maven.artifact.handler.manager;
 
 import java.util.Map;
+
 import org.apache.maven.artifact.handler.ArtifactHandler;
 
 /**

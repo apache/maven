@@ -18,12 +18,10 @@
  */
 package org.apache.maven.project;
 
-import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertThat;
-
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
@@ -34,6 +32,9 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.repository.RemoteRepository;
+
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertThat;
 
 /**
  * Test cases for the project {@code ModelResolver} implementation.

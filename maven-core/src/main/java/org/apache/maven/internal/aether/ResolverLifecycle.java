@@ -18,14 +18,15 @@
  */
 package org.apache.maven.internal.aether;
 
-import static java.util.Objects.requireNonNull;
-
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.sisu.EagerSingleton;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Maven internal component that bridges container "shut down" to {@link RepositorySystem#shutdown()}.
