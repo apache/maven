@@ -108,7 +108,7 @@ under the License.
     <module>maven-model-transform</module>
     <module>api</module>
     <module>maven-xml-impl</module>
-    <module>plexus-utils</module>
+    <module>maven-plexus-utils</module>
     <module>maven-core</module>
     <module>maven-settings</module>
     <module>maven-settings-builder</module>
@@ -206,7 +206,7 @@ under the License.
       <!--  Plexus -->
       <dependency>
         <groupId>org.apache.maven</groupId>
-        <artifactId>plexus-utils</artifactId>
+        <artifactId>maven-plexus-utils</artifactId>
         <version>${plexusUtilsVersion}</version>
       </dependency>
       <dependency>
