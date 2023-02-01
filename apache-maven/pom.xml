@@ -290,7 +290,7 @@ under the License.
                   <goal>artifacts</goal>
                 </goals>
                 <configuration>
-                  <includeClassifiers>src</includeClassifiers>
+                  <includeClassifiers>bin,src</includeClassifiers>
                 </configuration>
               </execution>
             </executions>
