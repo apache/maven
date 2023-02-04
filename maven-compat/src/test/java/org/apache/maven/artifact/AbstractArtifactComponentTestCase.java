@@ -39,6 +39,7 @@ import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
@@ -47,6 +48,7 @@ import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.collection.DependencyTraverser;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
@@ -313,6 +315,11 @@ public abstract class AbstractArtifactComponentTestCase extends PlexusTestCase {
 
         LocalRepository localRepo = new LocalRepository(localRepository().getBasedir());
         session.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory().newInstance(session, localRepo));
+        try {
+            session.setWorkspaceReader(lookup(WorkspaceReader.class, "test"));
+        } catch (ComponentLookupException e) {
+            // no reader, nothing to do...
+        }
 
         return session;
     }

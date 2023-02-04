@@ -34,6 +34,7 @@ import java.util.Set;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -53,12 +54,14 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Relocation;
+import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblem;
@@ -93,7 +96,10 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
     private RepositoryMetadataManager repositoryMetadataManager;
 
     @Requirement
-    private ArtifactFactory repositorySystem;
+    private ArtifactFactory artifactFactory;
+
+    @Requirement
+    private MavenRepositorySystem repositorySystem;
 
     // TODO This prevents a cycle in the composition which shows us another problem we need to deal with.
     // @Requirement
@@ -120,6 +126,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
         }
     }
 
+    @Override
     public ResolutionGroup retrieve(
             Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
             throws ArtifactMetadataRetrievalException {
@@ -141,6 +148,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
         return retrieve(request);
     }
 
+    @Override
     public ResolutionGroup retrieve(MetadataResolutionRequest request) throws ArtifactMetadataRetrievalException {
         Artifact artifact = request.getArtifact();
 
@@ -175,7 +183,8 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
         Artifact relocatedArtifact = null;
 
         // TODO hack: don't rebuild model if it was already loaded during reactor resolution
-        final WorkspaceReader workspace = legacySupport.getRepositorySession().getWorkspaceReader();
+        RepositorySystemSession repositorySession = legacySupport.getRepositorySession();
+        final WorkspaceReader workspace = repositorySession.getWorkspaceReader();
         Model model = null;
         if (workspace instanceof MavenWorkspaceReader) {
             model = ((MavenWorkspaceReader) workspace).findModel(RepositoryUtils.toArtifact(artifact));
@@ -188,9 +197,17 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
             managedDependencies = dependencyManagement == null ? null : dependencyManagement.getDependencies();
             MavenSession session = legacySupport.getSession();
             if (session != null) {
-                MavenProject project = session.getProjectMap()
-                        .get(ArtifactUtils.key(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()));
-                pomRepositories = project.getRemoteArtifactRepositories();
+                Map<String, MavenProject> projectMap = session.getProjectMap();
+                MavenProject project = projectMap == null
+                        ? null
+                        : projectMap.get(ArtifactUtils.key(
+                                artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion()));
+                if (project == null) {
+                    // if the project is not on the project map, read the repositories from the model itself!
+                    pomRepositories = getRepositoriesFromModel(repositorySession, model);
+                } else {
+                    pomRepositories = project.getRemoteArtifactRepositories();
+                }
             } else {
                 pomRepositories = new ArrayList<>();
             }
@@ -267,6 +284,21 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
         return result;
     }
 
+    private List<ArtifactRepository> getRepositoriesFromModel(RepositorySystemSession repositorySession, Model model) {
+        List<ArtifactRepository> pomRepositories = new ArrayList<>();
+        for (Repository modelRepository : model.getRepositories()) {
+            try {
+                pomRepositories.add(MavenRepositorySystem.buildArtifactRepository(modelRepository));
+            } catch (InvalidRepositoryException e) {
+                // can not use this then
+            }
+        }
+        repositorySystem.injectMirror(repositorySession, pomRepositories);
+        repositorySystem.injectProxy(repositorySession, pomRepositories);
+        repositorySystem.injectAuthentication(repositorySession, pomRepositories);
+        return pomRepositories;
+    }
+
     private boolean hasFile(Artifact artifact) {
         return artifact != null
                 && artifact.getFile() != null
@@ -305,7 +337,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
 
             ArtifactFilter inheritedFilter = (owner != null) ? owner.getDependencyFilter() : null;
 
-            return createDependencyArtifact(repositorySystem, dependency, inheritedScope, inheritedFilter);
+            return createDependencyArtifact(artifactFactory, dependency, inheritedScope, inheritedFilter);
         } catch (InvalidVersionSpecificationException e) {
             throw new ArtifactMetadataRetrievalException(
                     "Invalid version for dependency " + dependency.getManagementKey() + ": " + e.getMessage(), e, pom);
@@ -389,6 +421,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
         return effectiveFilter;
     }
 
+    @Override
     public List<ArtifactVersion> retrieveAvailableVersions(
             Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
             throws ArtifactMetadataRetrievalException {
@@ -400,6 +433,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
         return retrieveAvailableVersions(request);
     }
 
+    @Override
     public List<ArtifactVersion> retrieveAvailableVersions(MetadataResolutionRequest request)
             throws ArtifactMetadataRetrievalException {
         RepositoryMetadata metadata = new ArtifactRepositoryMetadata(request.getArtifact());
@@ -415,6 +449,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
         return retrieveAvailableVersionsFromMetadata(metadata.getMetadata(), availableVersions);
     }
 
+    @Override
     public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
             Artifact artifact, ArtifactRepository localRepository, ArtifactRepository deploymentRepository)
             throws ArtifactMetadataRetrievalException {
@@ -502,7 +537,7 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
         do {
             project = null;
 
-            pomArtifact = repositorySystem.createProjectArtifact(
+            pomArtifact = artifactFactory.createProjectArtifact(
                     artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getScope());
 
             if ("pom".equals(artifact.getType())) {

@@ -34,6 +34,7 @@ import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
+import org.eclipse.aether.repository.WorkspaceReader;
 
 // It would be cool if there was a hook that i could use to setup a test environment.
 // I want to setup a local/remote repositories for testing but i don't want to have
@@ -45,12 +46,17 @@ import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
  * @author Jason van Zyl
  */
 public class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
+
     private DefaultArtifactResolver artifactResolver;
 
     private Artifact projectArtifact;
 
+    private TestMavenWorkspaceReader workspaceReader;
+
     @Override
     protected void setUp() throws Exception {
+        workspaceReader = new TestMavenWorkspaceReader();
+        getContainer().addComponent(workspaceReader, WorkspaceReader.class, "test");
         super.setUp();
 
         artifactResolver = (DefaultArtifactResolver) lookup(ArtifactResolver.class);
@@ -163,12 +169,24 @@ public class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
         assertLocalArtifactPresent(l);
     }
 
+    public void testReadRepoFromModel() throws Exception {
+        Artifact m = createArtifact(TestMavenWorkspaceReader.ARTIFACT_ID, TestMavenWorkspaceReader.VERSION);
+        ArtifactMetadataSource source = lookup(ArtifactMetadataSource.class, "maven");
+        ResolutionGroup group = source.retrieve(m, localRepository(), new ArrayList<ArtifactRepository>());
+        List<ArtifactRepository> repositories = group.getResolutionRepositories();
+        assertEquals("There should be one repository!", 1, repositories.size());
+        ArtifactRepository repository = repositories.get(0);
+        assertEquals(TestMavenWorkspaceReader.REPO_ID, repository.getId());
+        assertEquals(TestMavenWorkspaceReader.REPO_URL, repository.getUrl());
+    }
+
     public void testTransitiveResolutionOrder() throws Exception {
         Artifact m = createLocalArtifact("m", "1.0");
 
         Artifact n = createLocalArtifact("n", "1.0");
 
         ArtifactMetadataSource mds = new ArtifactMetadataSource() {
+            @Override
             public ResolutionGroup retrieve(
                     Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
                     throws ArtifactMetadataRetrievalException {
@@ -177,23 +195,27 @@ public class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
                 return new ResolutionGroup(artifact, dependencies, remoteRepositories);
             }
 
+            @Override
             public List<ArtifactVersion> retrieveAvailableVersions(
                     Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
                     throws ArtifactMetadataRetrievalException {
                 throw new UnsupportedOperationException("Cannot get available versions in this test case");
             }
 
+            @Override
             public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
                     Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository)
                     throws ArtifactMetadataRetrievalException {
                 throw new UnsupportedOperationException("Cannot get available versions in this test case");
             }
 
+            @Override
             public ResolutionGroup retrieve(MetadataResolutionRequest request)
                     throws ArtifactMetadataRetrievalException {
                 return retrieve(request.getArtifact(), request.getLocalRepository(), request.getRemoteRepositories());
             }
 
+            @Override
             public List<ArtifactVersion> retrieveAvailableVersions(MetadataResolutionRequest request)
                     throws ArtifactMetadataRetrievalException {
                 return retrieveAvailableVersions(
