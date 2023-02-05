@@ -35,6 +35,7 @@ import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -63,6 +64,13 @@ public class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
         super.setUp();
 
         projectArtifact = createLocalArtifact("project", "3.0");
+    }
+
+    @Override
+    protected DefaultRepositorySystemSession initRepoSession() throws Exception {
+        DefaultRepositorySystemSession session = super.initRepoSession();
+        session.setWorkspaceReader(new TestMavenWorkspaceReader());
+        return session;
     }
 
     @Override
@@ -167,6 +175,17 @@ public class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
         assertLocalArtifactPresent(l);
     }
 
+    public void testReadRepoFromModel() throws Exception {
+        Artifact m = createArtifact(TestMavenWorkspaceReader.ARTIFACT_ID, TestMavenWorkspaceReader.VERSION);
+        ArtifactMetadataSource source = getContainer().lookup(ArtifactMetadataSource.class, "maven");
+        ResolutionGroup group = source.retrieve(m, localRepository(), new ArrayList<ArtifactRepository>());
+        List<ArtifactRepository> repositories = group.getResolutionRepositories();
+        assertEquals(1, repositories.size(), "There should be one repository!");
+        ArtifactRepository repository = repositories.get(0);
+        assertEquals(TestMavenWorkspaceReader.REPO_ID, repository.getId());
+        assertEquals(TestMavenWorkspaceReader.REPO_URL, repository.getUrl());
+    }
+
     @Test
     public void testTransitiveResolutionOrder() throws Exception {
         Artifact m = createLocalArtifact("m", "1.0");
@@ -174,6 +193,7 @@ public class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
         Artifact n = createLocalArtifact("n", "1.0");
 
         ArtifactMetadataSource mds = new ArtifactMetadataSource() {
+            @Override
             public ResolutionGroup retrieve(
                     Artifact artifact,
                     ArtifactRepository localRepository,
@@ -183,6 +203,7 @@ public class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
                 return new ResolutionGroup(artifact, dependencies, remoteRepositories);
             }
 
+            @Override
             public List<ArtifactVersion> retrieveAvailableVersions(
                     Artifact artifact,
                     ArtifactRepository localRepository,
@@ -190,15 +211,18 @@ public class ArtifactResolverTest extends AbstractArtifactComponentTestCase {
                 throw new UnsupportedOperationException("Cannot get available versions in this test case");
             }
 
+            @Override
             public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
                     Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository) {
                 throw new UnsupportedOperationException("Cannot get available versions in this test case");
             }
 
+            @Override
             public ResolutionGroup retrieve(MetadataResolutionRequest request) {
                 return retrieve(request.getArtifact(), request.getLocalRepository(), request.getRemoteRepositories());
             }
 
+            @Override
             public List<ArtifactVersion> retrieveAvailableVersions(MetadataResolutionRequest request) {
                 return retrieveAvailableVersions(
                         request.getArtifact(), request.getLocalRepository(), request.getRemoteRepositories());

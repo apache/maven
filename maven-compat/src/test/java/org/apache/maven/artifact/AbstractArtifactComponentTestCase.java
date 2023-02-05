@@ -288,7 +288,7 @@ public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCas
         }
     }
 
-    protected RepositorySystemSession initRepoSession() throws Exception {
+    protected DefaultRepositorySystemSession initRepoSession() throws Exception {
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
         session.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(true, true));
         DependencyTraverser depTraverser = new FatArtifactTraverser();
@@ -311,7 +311,6 @@ public abstract class AbstractArtifactComponentTestCase // extends PlexusTestCas
 
         LocalRepository localRepo = new LocalRepository(localRepository().getBasedir());
         session.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory().newInstance(session, localRepo));
-
         return session;
     }
 
