@@ -29,6 +29,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.artifact.MavenMetadataCache;
 import org.apache.maven.project.artifact.MavenMetadataSource;
@@ -43,8 +44,9 @@ public class TestMetadataSource extends MavenMetadataSource {
             ArtifactFactory repositorySystem,
             ProjectBuilder projectBuilder,
             MavenMetadataCache cache,
-            LegacySupport legacySupport) {
-        super(repositoryMetadataManager, repositorySystem, projectBuilder, cache, legacySupport);
+            LegacySupport legacySupport,
+            MavenRepositorySystem mavenRepositorySystem) {
+        super(repositoryMetadataManager, repositorySystem, projectBuilder, cache, legacySupport, mavenRepositorySystem);
     }
 
     @Override

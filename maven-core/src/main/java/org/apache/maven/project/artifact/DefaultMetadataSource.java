@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.ProjectBuilder;
 
@@ -40,10 +41,11 @@ public class DefaultMetadataSource extends MavenMetadataSource {
     @Inject
     public DefaultMetadataSource(
             RepositoryMetadataManager repositoryMetadataManager,
-            ArtifactFactory repositorySystem,
+            ArtifactFactory artifactFactory,
             ProjectBuilder projectBuilder,
             MavenMetadataCache cache,
-            LegacySupport legacySupport) {
-        super(repositoryMetadataManager, repositorySystem, projectBuilder, cache, legacySupport);
+            LegacySupport legacySupport,
+            MavenRepositorySystem mavenRepositorySystem) {
+        super(repositoryMetadataManager, artifactFactory, projectBuilder, cache, legacySupport, mavenRepositorySystem);
     }
 }
