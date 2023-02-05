@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,34 +16,29 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
 
 import java.io.File;
 
 /**
  * MissingModuleException
  */
-public class MissingModuleException
-    extends MavenExecutionException
-{
+public class MissingModuleException extends MavenExecutionException {
 
     private File moduleFile;
     private final String moduleName;
 
-    public MissingModuleException( String moduleName, File moduleFile, File pomFile )
-    {
-        super( "The module: " + moduleName + " cannot be found in file: " + moduleFile, pomFile );
+    public MissingModuleException(String moduleName, File moduleFile, File pomFile) {
+        super("The module: " + moduleName + " cannot be found in file: " + moduleFile, pomFile);
         this.moduleName = moduleName;
         this.moduleFile = moduleFile;
     }
 
-    public File getModuleFile()
-    {
+    public File getModuleFile() {
         return moduleFile;
     }
 
-    public String getModuleName()
-    {
+    public String getModuleName() {
         return moduleName;
     }
-
 }

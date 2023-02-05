@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model.building;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -32,42 +31,30 @@ import org.apache.maven.model.Model;
  * @author Robert Scholte
  * @since 4.0.0
  */
-class DefaultTransformerContext implements TransformerContext
-{
+class DefaultTransformerContext implements TransformerContext {
     final Map<String, String> userProperties = new ConcurrentHashMap<>();
 
     final Map<Path, Holder> modelByPath = new ConcurrentHashMap<>();
 
     final Map<GAKey, Holder> modelByGA = new ConcurrentHashMap<>();
 
-    public static class Holder
-    {
+    public static class Holder {
         private volatile boolean set;
         private volatile Model model;
 
-        Holder()
-        {
-        }
+        Holder() {}
 
-        public static Model deref( Holder holder )
-        {
+        public static Model deref(Holder holder) {
             return holder != null ? holder.get() : null;
         }
 
-        public Model get()
-        {
-            if ( !set )
-            {
-                synchronized ( this )
-                {
-                    if ( !set )
-                    {
-                        try
-                        {
+        public Model get() {
+            if (!set) {
+                synchronized (this) {
+                    if (!set) {
+                        try {
                             this.wait();
-                        }
-                        catch ( InterruptedException e )
-                        {
+                        } catch (InterruptedException e) {
                             // Ignore
                         }
                     }
@@ -76,14 +63,10 @@ class DefaultTransformerContext implements TransformerContext
             return model;
         }
 
-        public Model computeIfAbsent( Supplier<Model> supplier )
-        {
-            if ( !set )
-            {
-                synchronized ( this )
-                {
-                    if ( !set )
-                    {
+        public Model computeIfAbsent(Supplier<Model> supplier) {
+            if (!set) {
+                synchronized (this) {
+                    if (!set) {
                         this.set = true;
                         this.model = supplier.get();
                         this.notifyAll();
@@ -92,60 +75,50 @@ class DefaultTransformerContext implements TransformerContext
             }
             return model;
         }
-
     }
 
     @Override
-    public String getUserProperty( String key )
-    {
-        return userProperties.get( key );
+    public String getUserProperty(String key) {
+        return userProperties.get(key);
     }
 
     @Override
-    public Model getRawModel( Path p )
-    {
-        return Holder.deref( modelByPath.get( p ) );
+    public Model getRawModel(Path p) {
+        return Holder.deref(modelByPath.get(p));
     }
 
     @Override
-    public Model getRawModel( String groupId, String artifactId )
-    {
-        return Holder.deref( modelByGA.get( new GAKey( groupId, artifactId ) ) );
+    public Model getRawModel(String groupId, String artifactId) {
+        return Holder.deref(modelByGA.get(new GAKey(groupId, artifactId)));
     }
 
-    static class GAKey
-    {
+    static class GAKey {
         private final String groupId;
         private final String artifactId;
         private final int hashCode;
 
-        GAKey( String groupId, String artifactId )
-        {
+        GAKey(String groupId, String artifactId) {
             this.groupId = groupId;
             this.artifactId = artifactId;
-            this.hashCode = Objects.hash( groupId, artifactId );
+            this.hashCode = Objects.hash(groupId, artifactId);
         }
 
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return hashCode;
         }
 
         @Override
-        public boolean equals( Object obj )
-        {
-            if ( this == obj )
-            {
+        public boolean equals(Object obj) {
+            if (this == obj) {
                 return true;
             }
-            if ( !( obj instanceof GAKey ) )
-            {
+            if (!(obj instanceof GAKey)) {
                 return false;
             }
 
             GAKey other = (GAKey) obj;
-            return Objects.equals( artifactId, other.artifactId ) && Objects.equals( groupId, other.groupId );
+            return Objects.equals(artifactId, other.artifactId) && Objects.equals(groupId, other.groupId);
         }
     }
 }

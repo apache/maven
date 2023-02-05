@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.deployer;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.deployer;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,10 @@ package org.apache.maven.artifact.deployer;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.deployer;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,37 +32,26 @@ import org.apache.maven.repository.legacy.metadata.ArtifactMetadataSource;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 import org.apache.maven.repository.legacy.metadata.ResolutionGroup;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 /** @author Jason van Zyl */
-@Named( "classpath" )
+@Named("classpath")
 @Singleton
-public class SimpleArtifactMetadataSource
-    implements ArtifactMetadataSource
-{
-    public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
-                                     List<ArtifactRepository> remoteRepositories )
-    {
-        throw new UnsupportedOperationException( "Cannot retrieve metadata in this test case" );
+public class SimpleArtifactMetadataSource implements ArtifactMetadataSource {
+    public ResolutionGroup retrieve(
+            Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories) {
+        throw new UnsupportedOperationException("Cannot retrieve metadata in this test case");
     }
 
-    public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
-                                                            List<ArtifactRepository> remoteRepositories )
-    {
-        return Collections.singletonList( new DefaultArtifactVersion( "10.1.3" ) );
+    public List<ArtifactVersion> retrieveAvailableVersions(
+            Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories) {
+        return Collections.singletonList(new DefaultArtifactVersion("10.1.3"));
     }
 
-    public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact,
-                                                                                    ArtifactRepository localRepository,
-                                                                                    ArtifactRepository remoteRepository )
-    {
-        return Collections.singletonList( new DefaultArtifactVersion( "10.1.3" ) );
+    public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
+            Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository) {
+        return Collections.singletonList(new DefaultArtifactVersion("10.1.3"));
     }
 
-    public ResolutionGroup retrieve( MetadataResolutionRequest request )
-    {
-        return retrieve( request.getArtifact(), request.getLocalRepository(), request.getRemoteRepositories() );
+    public ResolutionGroup retrieve(MetadataResolutionRequest request) {
+        return retrieve(request.getArtifact(), request.getLocalRepository(), request.getRemoteRepositories());
     }
-
 }

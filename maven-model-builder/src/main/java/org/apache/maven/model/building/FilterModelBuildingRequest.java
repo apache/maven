@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.io.File;
 import java.util.Date;
@@ -35,276 +34,235 @@ import org.apache.maven.model.resolution.WorkspaceModelResolver;
  *
  * @author Benjamin Bentmann
  */
-class FilterModelBuildingRequest
-    implements ModelBuildingRequest
-{
+class FilterModelBuildingRequest implements ModelBuildingRequest {
 
     protected ModelBuildingRequest request;
 
-    FilterModelBuildingRequest( ModelBuildingRequest request )
-    {
+    FilterModelBuildingRequest(ModelBuildingRequest request) {
         this.request = request;
     }
 
     @Override
-    public File getPomFile()
-    {
+    public File getPomFile() {
         return request.getPomFile();
     }
 
     @Override
-    public FilterModelBuildingRequest setPomFile( File pomFile )
-    {
-        request.setPomFile( pomFile );
+    public FilterModelBuildingRequest setPomFile(File pomFile) {
+        request.setPomFile(pomFile);
 
         return this;
     }
 
     @Override
-    public ModelSource getModelSource()
-    {
+    public ModelSource getModelSource() {
         return request.getModelSource();
     }
 
     @Override
-    public FilterModelBuildingRequest setModelSource( ModelSource modelSource )
-    {
-        request.setModelSource( modelSource );
+    public FilterModelBuildingRequest setModelSource(ModelSource modelSource) {
+        request.setModelSource(modelSource);
 
         return this;
     }
 
     @Override
-    public int getValidationLevel()
-    {
+    public int getValidationLevel() {
         return request.getValidationLevel();
     }
 
     @Override
-    public FilterModelBuildingRequest setValidationLevel( int validationLevel )
-    {
-        request.setValidationLevel( validationLevel );
+    public FilterModelBuildingRequest setValidationLevel(int validationLevel) {
+        request.setValidationLevel(validationLevel);
 
         return this;
     }
 
     @Override
-    public boolean isProcessPlugins()
-    {
+    public boolean isProcessPlugins() {
         return request.isProcessPlugins();
     }
 
     @Override
-    public FilterModelBuildingRequest setProcessPlugins( boolean processPlugins )
-    {
-        request.setProcessPlugins( processPlugins );
+    public FilterModelBuildingRequest setProcessPlugins(boolean processPlugins) {
+        request.setProcessPlugins(processPlugins);
 
         return this;
     }
 
     @Override
-    public boolean isTwoPhaseBuilding()
-    {
+    public boolean isTwoPhaseBuilding() {
         return request.isTwoPhaseBuilding();
     }
 
     @Override
-    public FilterModelBuildingRequest setTwoPhaseBuilding( boolean twoPhaseBuilding )
-    {
-        request.setTwoPhaseBuilding( twoPhaseBuilding );
+    public FilterModelBuildingRequest setTwoPhaseBuilding(boolean twoPhaseBuilding) {
+        request.setTwoPhaseBuilding(twoPhaseBuilding);
 
         return this;
     }
 
     @Override
-    public boolean isLocationTracking()
-    {
+    public boolean isLocationTracking() {
         return request.isLocationTracking();
     }
 
     @Override
-    public FilterModelBuildingRequest setLocationTracking( boolean locationTracking )
-    {
-        request.setLocationTracking( locationTracking );
+    public FilterModelBuildingRequest setLocationTracking(boolean locationTracking) {
+        request.setLocationTracking(locationTracking);
 
         return this;
     }
 
     @Override
-    public List<Profile> getProfiles()
-    {
+    public List<Profile> getProfiles() {
         return request.getProfiles();
     }
 
     @Override
-    public FilterModelBuildingRequest setProfiles( List<Profile> profiles )
-    {
-        request.setProfiles( profiles );
+    public FilterModelBuildingRequest setProfiles(List<Profile> profiles) {
+        request.setProfiles(profiles);
 
         return this;
     }
 
     @Override
-    public List<String> getActiveProfileIds()
-    {
+    public List<String> getActiveProfileIds() {
         return request.getActiveProfileIds();
     }
 
     @Override
-    public FilterModelBuildingRequest setActiveProfileIds( List<String> activeProfileIds )
-    {
-        request.setActiveProfileIds( activeProfileIds );
+    public FilterModelBuildingRequest setActiveProfileIds(List<String> activeProfileIds) {
+        request.setActiveProfileIds(activeProfileIds);
 
         return this;
     }
 
     @Override
-    public List<String> getInactiveProfileIds()
-    {
+    public List<String> getInactiveProfileIds() {
         return request.getInactiveProfileIds();
     }
 
     @Override
-    public FilterModelBuildingRequest setInactiveProfileIds( List<String> inactiveProfileIds )
-    {
-        request.setInactiveProfileIds( inactiveProfileIds );
+    public FilterModelBuildingRequest setInactiveProfileIds(List<String> inactiveProfileIds) {
+        request.setInactiveProfileIds(inactiveProfileIds);
 
         return this;
     }
 
     @Override
-    public Properties getSystemProperties()
-    {
+    public Properties getSystemProperties() {
         return request.getSystemProperties();
     }
 
     @Override
-    public FilterModelBuildingRequest setSystemProperties( Properties systemProperties )
-    {
-        request.setSystemProperties( systemProperties );
+    public FilterModelBuildingRequest setSystemProperties(Properties systemProperties) {
+        request.setSystemProperties(systemProperties);
 
         return this;
     }
 
     @Override
-    public Properties getUserProperties()
-    {
+    public Properties getUserProperties() {
         return request.getUserProperties();
     }
 
     @Override
-    public FilterModelBuildingRequest setUserProperties( Properties userProperties )
-    {
-        request.setUserProperties( userProperties );
+    public FilterModelBuildingRequest setUserProperties(Properties userProperties) {
+        request.setUserProperties(userProperties);
 
         return this;
     }
 
     @Override
-    public Date getBuildStartTime()
-    {
+    public Date getBuildStartTime() {
         return request.getBuildStartTime();
     }
 
     @Override
-    public ModelBuildingRequest setBuildStartTime( Date buildStartTime )
-    {
-        request.setBuildStartTime( buildStartTime );
+    public ModelBuildingRequest setBuildStartTime(Date buildStartTime) {
+        request.setBuildStartTime(buildStartTime);
 
         return this;
     }
 
     @Override
-    public ModelResolver getModelResolver()
-    {
+    public ModelResolver getModelResolver() {
         return request.getModelResolver();
     }
 
     @Override
-    public FilterModelBuildingRequest setModelResolver( ModelResolver modelResolver )
-    {
-        request.setModelResolver( modelResolver );
+    public FilterModelBuildingRequest setModelResolver(ModelResolver modelResolver) {
+        request.setModelResolver(modelResolver);
 
         return this;
     }
 
     @Override
-    public ModelBuildingListener getModelBuildingListener()
-    {
+    public ModelBuildingListener getModelBuildingListener() {
         return request.getModelBuildingListener();
     }
 
     @Override
-    public ModelBuildingRequest setModelBuildingListener( ModelBuildingListener modelBuildingListener )
-    {
-        request.setModelBuildingListener( modelBuildingListener );
+    public ModelBuildingRequest setModelBuildingListener(ModelBuildingListener modelBuildingListener) {
+        request.setModelBuildingListener(modelBuildingListener);
 
         return this;
     }
 
     @Override
-    public ModelCache getModelCache()
-    {
+    public ModelCache getModelCache() {
         return request.getModelCache();
     }
 
     @Override
-    public FilterModelBuildingRequest setModelCache( ModelCache modelCache )
-    {
-        request.setModelCache( modelCache );
+    public FilterModelBuildingRequest setModelCache(ModelCache modelCache) {
+        request.setModelCache(modelCache);
 
         return this;
     }
 
     @Override
-    public Model getFileModel()
-    {
+    public Model getFileModel() {
         return request.getFileModel();
     }
 
     @Override
-    public ModelBuildingRequest setFileModel( Model fileModel )
-    {
-        request.setFileModel( fileModel );
+    public ModelBuildingRequest setFileModel(Model fileModel) {
+        request.setFileModel(fileModel);
         return this;
     }
 
     @Override
-    public Model getRawModel()
-    {
+    public Model getRawModel() {
         return request.getRawModel();
     }
 
     @Override
-    public ModelBuildingRequest setRawModel( Model rawModel )
-    {
-        request.setRawModel( rawModel );
+    public ModelBuildingRequest setRawModel(Model rawModel) {
+        request.setRawModel(rawModel);
         return this;
     }
 
     @Override
-    public WorkspaceModelResolver getWorkspaceModelResolver()
-    {
+    public WorkspaceModelResolver getWorkspaceModelResolver() {
         return request.getWorkspaceModelResolver();
     }
 
     @Override
-    public ModelBuildingRequest setWorkspaceModelResolver( WorkspaceModelResolver workspaceResolver )
-    {
-        request.setWorkspaceModelResolver( workspaceResolver );
+    public ModelBuildingRequest setWorkspaceModelResolver(WorkspaceModelResolver workspaceResolver) {
+        request.setWorkspaceModelResolver(workspaceResolver);
         return this;
     }
 
     @Override
-    public TransformerContextBuilder getTransformerContextBuilder()
-    {
+    public TransformerContextBuilder getTransformerContextBuilder() {
         return request.getTransformerContextBuilder();
     }
 
     @Override
-    public ModelBuildingRequest setTransformerContextBuilder( TransformerContextBuilder contextBuilder )
-    {
-        request.setTransformerContextBuilder( contextBuilder );
+    public ModelBuildingRequest setTransformerContextBuilder(TransformerContextBuilder contextBuilder) {
+        request.setTransformerContextBuilder(contextBuilder);
         return this;
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.cli.logging.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.cli.logging.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli.logging.impl;
 
 import java.net.URL;
 import java.util.Map;
@@ -33,40 +32,34 @@ import org.slf4j.LoggerFactory;
  * @author Hervé Boutemy
  * @since 3.2.4
  */
-public class UnsupportedSlf4jBindingConfiguration
-    extends BaseSlf4jConfiguration
-{
-    private static final Logger LOGGER = LoggerFactory.getLogger( UnsupportedSlf4jBindingConfiguration.class );
+public class UnsupportedSlf4jBindingConfiguration extends BaseSlf4jConfiguration {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnsupportedSlf4jBindingConfiguration.class);
 
     private String slf4jBinding;
 
     private Map<URL, Set<Object>> supported;
 
-    public UnsupportedSlf4jBindingConfiguration( String slf4jBinding, Map<URL, Set<Object>> supported )
-    {
+    public UnsupportedSlf4jBindingConfiguration(String slf4jBinding, Map<URL, Set<Object>> supported) {
         this.slf4jBinding = slf4jBinding;
         this.supported = supported;
     }
 
     @Override
-    public void activate()
-    {
-        LOGGER.warn( "The SLF4J binding actually used is not supported by Maven: {}", slf4jBinding );
-        LOGGER.warn( "Maven supported bindings are:" );
+    public void activate() {
+        LOGGER.warn("The SLF4J binding actually used is not supported by Maven: {}", slf4jBinding);
+        LOGGER.warn("Maven supported bindings are:");
 
         String ls = System.lineSeparator();
 
-        for ( Map.Entry<URL, Set<Object>> entry : supported.entrySet() )
-        {
+        for (Map.Entry<URL, Set<Object>> entry : supported.entrySet()) {
             StringBuilder sb = new StringBuilder();
-            sb.append( "(from " ).append( entry.getKey().toExternalForm() ).append( ')' );
+            sb.append("(from ").append(entry.getKey().toExternalForm()).append(')');
 
-            for ( Object binding : entry.getValue() )
-            {
-                sb.append( ls ).append( "- " ).append( binding );
+            for (Object binding : entry.getValue()) {
+                sb.append(ls).append("- ").append(binding);
             }
 
-            LOGGER.warn( sb.toString() );
+            LOGGER.warn(sb.toString());
         }
     }
 }

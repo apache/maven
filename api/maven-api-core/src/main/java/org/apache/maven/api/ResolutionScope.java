@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,65 +39,59 @@ import org.apache.maven.api.annotations.Experimental;
  * @since 4.0
  */
 @Experimental
-public enum ResolutionScope
-{
+public enum ResolutionScope {
     /**
      * empty resolution scope
      */
-    NONE( null ),
+    NONE(null),
     /**
      * <code>compile</code> resolution scope
      * = <code>compile</code> + <code>system</code> + <code>provided</code> dependencies
      */
-    COMPILE( "compile", Scope.COMPILE, Scope.SYSTEM, Scope.PROVIDED ),
+    COMPILE("compile", Scope.COMPILE, Scope.SYSTEM, Scope.PROVIDED),
     /**
      * <code>compile+runtime</code> resolution scope (Maven 3 only)
      * = <code>compile</code> + <code>system</code> + <code>provided</code> + <code>runtime</code> dependencies
      */
-    COMPILE_PLUS_RUNTIME( "compile+runtime", Scope.COMPILE, Scope.SYSTEM, Scope.PROVIDED, Scope.RUNTIME ),
+    COMPILE_PLUS_RUNTIME("compile+runtime", Scope.COMPILE, Scope.SYSTEM, Scope.PROVIDED, Scope.RUNTIME),
     /**
      * <code>runtime</code> resolution scope
      * = <code>compile</code> + <code>runtime</code> dependencies
      */
-    RUNTIME( "runtime", Scope.COMPILE, Scope.RUNTIME ),
+    RUNTIME("runtime", Scope.COMPILE, Scope.RUNTIME),
     /**
      * <code>runtime+system</code> resolution scope (Maven 3 only)
      * = <code>compile</code> + <code>system</code> + <code>runtime</code> dependencies
      */
-    RUNTIME_PLUS_SYSTEM( "runtime+system", Scope.COMPILE, Scope.SYSTEM, Scope.RUNTIME ),
+    RUNTIME_PLUS_SYSTEM("runtime+system", Scope.COMPILE, Scope.SYSTEM, Scope.RUNTIME),
     /**
      * <code>test</code> resolution scope
      * = <code>compile</code> + <code>system</code> + <code>provided</code> + <code>runtime</code> + <code>test</code>
      * dependencies
      */
-    TEST( "test", Scope.COMPILE, Scope.SYSTEM, Scope.PROVIDED, Scope.RUNTIME, Scope.TEST );
+    TEST("test", Scope.COMPILE, Scope.SYSTEM, Scope.PROVIDED, Scope.RUNTIME, Scope.TEST);
 
-    private static final Map<String, ResolutionScope> VALUES
-            = Stream.of( ResolutionScope.values() ).collect( Collectors.toMap( ResolutionScope::id, s -> s ) );
+    private static final Map<String, ResolutionScope> VALUES =
+            Stream.of(ResolutionScope.values()).collect(Collectors.toMap(ResolutionScope::id, s -> s));
 
-    public static ResolutionScope fromString( String id )
-    {
-        return Optional.ofNullable( VALUES.get( id ) )
-                .orElseThrow( () -> new IllegalArgumentException( "Unknown resolution scope " + id ) );
+    public static ResolutionScope fromString(String id) {
+        return Optional.ofNullable(VALUES.get(id))
+                .orElseThrow(() -> new IllegalArgumentException("Unknown resolution scope " + id));
     }
 
     private final String id;
     private final Set<Scope> scopes;
 
-    ResolutionScope( String id, Scope... scopes )
-    {
+    ResolutionScope(String id, Scope... scopes) {
         this.id = id;
-        this.scopes = Collections.unmodifiableSet( new HashSet<>( Arrays.asList( scopes ) ) );
+        this.scopes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(scopes)));
     }
 
-    public String id()
-    {
+    public String id() {
         return this.id;
     }
 
-    public Set<Scope> scopes()
-    {
+    public Set<Scope> scopes() {
         return scopes;
     }
-
 }

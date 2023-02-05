@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import java.util.List;
 import java.util.Map;
@@ -35,8 +34,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * @since 4.0
  */
 @Experimental
-public interface ToolchainManager extends Service
-{
+public interface ToolchainManager extends Service {
 
     /**
      *
@@ -47,7 +45,7 @@ public interface ToolchainManager extends Service
      * @throws ToolchainManagerException if an exception occurs
      */
     @Nonnull
-    List<Toolchain> getToolchains( @Nonnull Session session, String type, Map<String, String> requirements );
+    List<Toolchain> getToolchains(@Nonnull Session session, String type, Map<String, String> requirements);
 
     /**
      *
@@ -57,7 +55,7 @@ public interface ToolchainManager extends Service
      * @throws ToolchainManagerException if an exception occurs
      */
     @Nonnull
-    Optional<Toolchain> getToolchainFromBuildContext( @Nonnull Session session, String type )
+    Optional<Toolchain> getToolchainFromBuildContext(@Nonnull Session session, String type)
             throws ToolchainManagerException;
 
     /**
@@ -68,8 +66,7 @@ public interface ToolchainManager extends Service
      * @throws ToolchainManagerException if an exception occurs
      */
     @Nonnull
-    List<Toolchain> getToolchainsForType( @Nonnull Session session, String type )
-            throws ToolchainManagerException;
+    List<Toolchain> getToolchainsForType(@Nonnull Session session, String type) throws ToolchainManagerException;
 
     /**
      *
@@ -77,6 +74,5 @@ public interface ToolchainManager extends Service
      * @param toolchain
      * @throws ToolchainManagerException if an exception occurs
      */
-    void storeToolchainToBuildContext( @Nonnull Session session, Toolchain toolchain )
-            throws ToolchainManagerException;
+    void storeToolchainToBuildContext(@Nonnull Session session, Toolchain toolchain) throws ToolchainManagerException;
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.model.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.transform;
 
 import java.nio.file.Path;
 
@@ -28,27 +27,23 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
  * @author Robert Scholte
  * @since 4.0.0
  */
-public class RawToConsumerPomXMLFilterFactory
-{
+public class RawToConsumerPomXMLFilterFactory {
     private BuildToRawPomXMLFilterFactory buildPomXMLFilterFactory;
 
-    public RawToConsumerPomXMLFilterFactory( BuildToRawPomXMLFilterFactory buildPomXMLFilterFactory )
-    {
+    public RawToConsumerPomXMLFilterFactory(BuildToRawPomXMLFilterFactory buildPomXMLFilterFactory) {
         this.buildPomXMLFilterFactory = buildPomXMLFilterFactory;
     }
 
-    public final XmlPullParser get( XmlPullParser orgParser, Path projectPath )
-    {
+    public final XmlPullParser get(XmlPullParser orgParser, Path projectPath) {
         // Ensure that xs:any elements aren't touched by next filters
-        XmlPullParser parser = orgParser instanceof FastForwardFilter
-                ? orgParser : new FastForwardFilter( orgParser );
+        XmlPullParser parser = orgParser instanceof FastForwardFilter ? orgParser : new FastForwardFilter(orgParser);
 
-        parser = buildPomXMLFilterFactory.get( parser, projectPath );
+        parser = buildPomXMLFilterFactory.get(parser, projectPath);
 
         // Strip modules
-        parser = new ModulesXMLFilter( parser );
+        parser = new ModulesXMLFilter(parser);
         // Adjust relativePath
-        parser = new RelativePathXMLFilter( parser );
+        parser = new RelativePathXMLFilter(parser);
 
         return parser;
     }

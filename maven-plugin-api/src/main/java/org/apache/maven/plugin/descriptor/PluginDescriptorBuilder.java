@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.descriptor;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.descriptor;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.descriptor;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.descriptor;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -25,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.maven.internal.xml.XmlNodeBuilder;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
-import org.apache.maven.internal.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
@@ -36,357 +35,310 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 /**
  * @author Jason van Zyl
  */
-public class PluginDescriptorBuilder
-{
-    public PluginDescriptor build( Reader reader )
-        throws PlexusConfigurationException
-    {
-        return build( reader, null );
+public class PluginDescriptorBuilder {
+    public PluginDescriptor build(Reader reader) throws PlexusConfigurationException {
+        return build(reader, null);
     }
 
-    public PluginDescriptor build( Reader reader, String source )
-        throws PlexusConfigurationException
-    {
-        return build( source, buildConfiguration( reader ) );
+    public PluginDescriptor build(Reader reader, String source) throws PlexusConfigurationException {
+        return build(source, buildConfiguration(reader));
     }
 
-    private PluginDescriptor build( String source, PlexusConfiguration c )
-        throws PlexusConfigurationException
-    {
+    private PluginDescriptor build(String source, PlexusConfiguration c) throws PlexusConfigurationException {
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
 
-        pluginDescriptor.setSource( source );
-        pluginDescriptor.setGroupId( extractGroupId( c ) );
-        pluginDescriptor.setArtifactId( extractArtifactId( c ) );
-        pluginDescriptor.setVersion( extractVersion( c ) );
-        pluginDescriptor.setGoalPrefix( extractGoalPrefix( c ) );
+        pluginDescriptor.setSource(source);
+        pluginDescriptor.setGroupId(extractGroupId(c));
+        pluginDescriptor.setArtifactId(extractArtifactId(c));
+        pluginDescriptor.setVersion(extractVersion(c));
+        pluginDescriptor.setGoalPrefix(extractGoalPrefix(c));
 
-        pluginDescriptor.setName( extractName( c ) );
-        pluginDescriptor.setDescription( extractDescription( c ) );
+        pluginDescriptor.setName(extractName(c));
+        pluginDescriptor.setDescription(extractDescription(c));
 
-        pluginDescriptor.setIsolatedRealm( extractIsolatedRealm( c ) );
-        pluginDescriptor.setInheritedByDefault( extractInheritedByDefault( c ) );
-        pluginDescriptor.setRequiredJavaVersion( extractRequiredJavaVersion( c ).orElse( null ) );
-        pluginDescriptor.setRequiredMavenVersion( extractRequiredMavenVersion( c ).orElse( null ) );
+        pluginDescriptor.setIsolatedRealm(extractIsolatedRealm(c));
+        pluginDescriptor.setInheritedByDefault(extractInheritedByDefault(c));
+        pluginDescriptor.setRequiredJavaVersion(extractRequiredJavaVersion(c).orElse(null));
+        pluginDescriptor.setRequiredMavenVersion(extractRequiredMavenVersion(c).orElse(null));
 
-        pluginDescriptor.addMojos( extractMojos( c, pluginDescriptor ) );
+        pluginDescriptor.addMojos(extractMojos(c, pluginDescriptor));
 
-        pluginDescriptor.setDependencies( extractComponentDependencies( c ) );
+        pluginDescriptor.setDependencies(extractComponentDependencies(c));
 
         return pluginDescriptor;
     }
 
-    private String extractGroupId( PlexusConfiguration c )
-    {
-        return c.getChild( "groupId" ).getValue();
+    private String extractGroupId(PlexusConfiguration c) {
+        return c.getChild("groupId").getValue();
     }
 
-    private String extractArtifactId( PlexusConfiguration c )
-    {
-        return c.getChild( "artifactId" ).getValue();
+    private String extractArtifactId(PlexusConfiguration c) {
+        return c.getChild("artifactId").getValue();
     }
 
-    private String extractVersion( PlexusConfiguration c )
-    {
-        return c.getChild( "version" ).getValue();
+    private String extractVersion(PlexusConfiguration c) {
+        return c.getChild("version").getValue();
     }
 
-    private String extractGoalPrefix( PlexusConfiguration c )
-    {
-        return c.getChild( "goalPrefix" ).getValue();
+    private String extractGoalPrefix(PlexusConfiguration c) {
+        return c.getChild("goalPrefix").getValue();
     }
 
-    private String extractName( PlexusConfiguration c )
-    {
-        return c.getChild( "name" ).getValue();
+    private String extractName(PlexusConfiguration c) {
+        return c.getChild("name").getValue();
     }
 
-    private String extractDescription( PlexusConfiguration c )
-    {
-        return c.getChild( "description" ).getValue();
+    private String extractDescription(PlexusConfiguration c) {
+        return c.getChild("description").getValue();
     }
 
-    private List<MojoDescriptor> extractMojos( PlexusConfiguration c, PluginDescriptor pluginDescriptor )
-        throws PlexusConfigurationException
-    {
+    private List<MojoDescriptor> extractMojos(PlexusConfiguration c, PluginDescriptor pluginDescriptor)
+            throws PlexusConfigurationException {
         List<MojoDescriptor> mojos = new ArrayList<>();
 
-        PlexusConfiguration[] mojoConfigurations = c.getChild( "mojos" ).getChildren( "mojo" );
+        PlexusConfiguration[] mojoConfigurations = c.getChild("mojos").getChildren("mojo");
 
-        for ( PlexusConfiguration component : mojoConfigurations )
-        {
-            mojos.add( buildComponentDescriptor( component, pluginDescriptor ) );
-
+        for (PlexusConfiguration component : mojoConfigurations) {
+            mojos.add(buildComponentDescriptor(component, pluginDescriptor));
         }
         return mojos;
     }
 
-    private boolean extractInheritedByDefault( PlexusConfiguration c )
-    {
-        String inheritedByDefault = c.getChild( "inheritedByDefault" ).getValue();
+    private boolean extractInheritedByDefault(PlexusConfiguration c) {
+        String inheritedByDefault = c.getChild("inheritedByDefault").getValue();
 
-        if ( inheritedByDefault != null )
-        {
-            return Boolean.parseBoolean( inheritedByDefault );
+        if (inheritedByDefault != null) {
+            return Boolean.parseBoolean(inheritedByDefault);
         }
         return false;
     }
 
-    private boolean extractIsolatedRealm( PlexusConfiguration c )
-    {
-        String isolatedRealm = c.getChild( "isolatedRealm" ).getValue();
+    private boolean extractIsolatedRealm(PlexusConfiguration c) {
+        String isolatedRealm = c.getChild("isolatedRealm").getValue();
 
-        if ( isolatedRealm != null )
-        {
-            return Boolean.parseBoolean( isolatedRealm );
+        if (isolatedRealm != null) {
+            return Boolean.parseBoolean(isolatedRealm);
         }
         return false;
     }
 
-    private Optional<String> extractRequiredJavaVersion( PlexusConfiguration c )
-    {
-        return Optional.ofNullable( c.getChild( "requiredJavaVersion" ) ).map( PlexusConfiguration::getValue );
+    private Optional<String> extractRequiredJavaVersion(PlexusConfiguration c) {
+        return Optional.ofNullable(c.getChild("requiredJavaVersion")).map(PlexusConfiguration::getValue);
     }
 
-    private Optional<String> extractRequiredMavenVersion( PlexusConfiguration c )
-    {
-        return Optional.ofNullable( c.getChild( "requiredMavenVersion" ) ).map( PlexusConfiguration::getValue );
+    private Optional<String> extractRequiredMavenVersion(PlexusConfiguration c) {
+        return Optional.ofNullable(c.getChild("requiredMavenVersion")).map(PlexusConfiguration::getValue);
     }
 
-    private List<ComponentDependency> extractComponentDependencies( PlexusConfiguration c )
-    {
+    private List<ComponentDependency> extractComponentDependencies(PlexusConfiguration c) {
 
-        PlexusConfiguration[] dependencyConfigurations = c.getChild( "dependencies" ).getChildren( "dependency" );
+        PlexusConfiguration[] dependencyConfigurations =
+                c.getChild("dependencies").getChildren("dependency");
 
         List<ComponentDependency> dependencies = new ArrayList<>();
 
-        for ( PlexusConfiguration d : dependencyConfigurations )
-        {
-            dependencies.add( extractComponentDependency( d ) );
+        for (PlexusConfiguration d : dependencyConfigurations) {
+            dependencies.add(extractComponentDependency(d));
         }
         return dependencies;
     }
 
-    private ComponentDependency extractComponentDependency( PlexusConfiguration d )
-    {
+    private ComponentDependency extractComponentDependency(PlexusConfiguration d) {
         ComponentDependency cd = new ComponentDependency();
 
-        cd.setArtifactId( extractArtifactId( d ) );
+        cd.setArtifactId(extractArtifactId(d));
 
-        cd.setGroupId( extractGroupId( d ) );
+        cd.setGroupId(extractGroupId(d));
 
-        cd.setType( d.getChild( "type" ).getValue() );
+        cd.setType(d.getChild("type").getValue());
 
-        cd.setVersion( extractVersion( d ) );
+        cd.setVersion(extractVersion(d));
         return cd;
     }
 
-    @SuppressWarnings( "checkstyle:methodlength" )
-    public MojoDescriptor buildComponentDescriptor( PlexusConfiguration c, PluginDescriptor pluginDescriptor )
-        throws PlexusConfigurationException
-    {
+    @SuppressWarnings("checkstyle:methodlength")
+    public MojoDescriptor buildComponentDescriptor(PlexusConfiguration c, PluginDescriptor pluginDescriptor)
+            throws PlexusConfigurationException {
         MojoDescriptor mojo = new MojoDescriptor();
-        mojo.setPluginDescriptor( pluginDescriptor );
+        mojo.setPluginDescriptor(pluginDescriptor);
 
-        mojo.setGoal( c.getChild( "goal" ).getValue() );
+        mojo.setGoal(c.getChild("goal").getValue());
 
-        mojo.setImplementation( c.getChild( "implementation" ).getValue() );
+        mojo.setImplementation(c.getChild("implementation").getValue());
 
-        PlexusConfiguration langConfig = c.getChild( "language" );
+        PlexusConfiguration langConfig = c.getChild("language");
 
-        if ( langConfig != null )
-        {
-            mojo.setLanguage( langConfig.getValue() );
+        if (langConfig != null) {
+            mojo.setLanguage(langConfig.getValue());
         }
 
-        PlexusConfiguration configuratorConfig = c.getChild( "configurator" );
+        PlexusConfiguration configuratorConfig = c.getChild("configurator");
 
-        if ( configuratorConfig != null )
-        {
-            mojo.setComponentConfigurator( configuratorConfig.getValue() );
+        if (configuratorConfig != null) {
+            mojo.setComponentConfigurator(configuratorConfig.getValue());
         }
 
-        PlexusConfiguration composerConfig = c.getChild( "composer" );
+        PlexusConfiguration composerConfig = c.getChild("composer");
 
-        if ( composerConfig != null )
-        {
-            mojo.setComponentComposer( composerConfig.getValue() );
+        if (composerConfig != null) {
+            mojo.setComponentComposer(composerConfig.getValue());
         }
 
-        String since = c.getChild( "since" ).getValue();
+        String since = c.getChild("since").getValue();
 
-        if ( since != null )
-        {
-            mojo.setSince( since );
+        if (since != null) {
+            mojo.setSince(since);
         }
 
-        PlexusConfiguration deprecated = c.getChild( "deprecated", false );
+        PlexusConfiguration deprecated = c.getChild("deprecated", false);
 
-        if ( deprecated != null )
-        {
-            mojo.setDeprecated( deprecated.getValue() );
+        if (deprecated != null) {
+            mojo.setDeprecated(deprecated.getValue());
         }
 
-        String phase = c.getChild( "phase" ).getValue();
+        String phase = c.getChild("phase").getValue();
 
-        if ( phase != null )
-        {
-            mojo.setPhase( phase );
+        if (phase != null) {
+            mojo.setPhase(phase);
         }
 
-        String executePhase = c.getChild( "executePhase" ).getValue();
+        String executePhase = c.getChild("executePhase").getValue();
 
-        if ( executePhase != null )
-        {
-            mojo.setExecutePhase( executePhase );
+        if (executePhase != null) {
+            mojo.setExecutePhase(executePhase);
         }
 
-        String executeMojo = c.getChild( "executeGoal" ).getValue();
+        String executeMojo = c.getChild("executeGoal").getValue();
 
-        if ( executeMojo != null )
-        {
-            mojo.setExecuteGoal( executeMojo );
+        if (executeMojo != null) {
+            mojo.setExecuteGoal(executeMojo);
         }
 
-        String executeLifecycle = c.getChild( "executeLifecycle" ).getValue();
+        String executeLifecycle = c.getChild("executeLifecycle").getValue();
 
-        if ( executeLifecycle != null )
-        {
-            mojo.setExecuteLifecycle( executeLifecycle );
+        if (executeLifecycle != null) {
+            mojo.setExecuteLifecycle(executeLifecycle);
         }
 
-        mojo.setInstantiationStrategy( c.getChild( "instantiationStrategy" ).getValue() );
+        mojo.setInstantiationStrategy(c.getChild("instantiationStrategy").getValue());
 
-        mojo.setDescription( extractDescription( c ) );
+        mojo.setDescription(extractDescription(c));
 
-        PlexusConfiguration dependencyResolution = c.getChild( "requiresDependencyResolution", false );
+        PlexusConfiguration dependencyResolution = c.getChild("requiresDependencyResolution", false);
 
-        if ( dependencyResolution != null )
-        {
-            mojo.setDependencyResolutionRequired( dependencyResolution.getValue() );
+        if (dependencyResolution != null) {
+            mojo.setDependencyResolutionRequired(dependencyResolution.getValue());
         }
 
-        PlexusConfiguration dependencyCollection = c.getChild( "requiresDependencyCollection", false );
+        PlexusConfiguration dependencyCollection = c.getChild("requiresDependencyCollection", false);
 
-        if ( dependencyCollection != null )
-        {
-            mojo.setDependencyCollectionRequired( dependencyCollection.getValue() );
+        if (dependencyCollection != null) {
+            mojo.setDependencyCollectionRequired(dependencyCollection.getValue());
         }
 
-        String directInvocationOnly = c.getChild( "requiresDirectInvocation" ).getValue();
+        String directInvocationOnly = c.getChild("requiresDirectInvocation").getValue();
 
-        if ( directInvocationOnly != null )
-        {
-            mojo.setDirectInvocationOnly( Boolean.parseBoolean( directInvocationOnly ) );
+        if (directInvocationOnly != null) {
+            mojo.setDirectInvocationOnly(Boolean.parseBoolean(directInvocationOnly));
         }
 
-        String requiresProject = c.getChild( "requiresProject" ).getValue();
+        String requiresProject = c.getChild("requiresProject").getValue();
 
-        if ( requiresProject != null )
-        {
-            mojo.setProjectRequired( Boolean.parseBoolean( requiresProject ) );
+        if (requiresProject != null) {
+            mojo.setProjectRequired(Boolean.parseBoolean(requiresProject));
         }
 
-        String requiresReports = c.getChild( "requiresReports" ).getValue();
+        String requiresReports = c.getChild("requiresReports").getValue();
 
-        if ( requiresReports != null )
-        {
-            mojo.setRequiresReports( Boolean.parseBoolean( requiresReports ) );
+        if (requiresReports != null) {
+            mojo.setRequiresReports(Boolean.parseBoolean(requiresReports));
         }
 
-        String aggregator = c.getChild( "aggregator" ).getValue();
+        String aggregator = c.getChild("aggregator").getValue();
 
-        if ( aggregator != null )
-        {
-            mojo.setAggregator( Boolean.parseBoolean( aggregator ) );
+        if (aggregator != null) {
+            mojo.setAggregator(Boolean.parseBoolean(aggregator));
         }
 
-        String requiresOnline = c.getChild( "requiresOnline" ).getValue();
+        String requiresOnline = c.getChild("requiresOnline").getValue();
 
-        if ( requiresOnline != null )
-        {
-            mojo.setOnlineRequired( Boolean.parseBoolean( requiresOnline ) );
+        if (requiresOnline != null) {
+            mojo.setOnlineRequired(Boolean.parseBoolean(requiresOnline));
         }
 
-        String inheritedByDefault = c.getChild( "inheritedByDefault" ).getValue();
+        String inheritedByDefault = c.getChild("inheritedByDefault").getValue();
 
-        if ( inheritedByDefault != null )
-        {
-            mojo.setInheritedByDefault( Boolean.parseBoolean( inheritedByDefault ) );
+        if (inheritedByDefault != null) {
+            mojo.setInheritedByDefault(Boolean.parseBoolean(inheritedByDefault));
         }
 
-        String threadSafe = c.getChild( "threadSafe" ).getValue();
+        String threadSafe = c.getChild("threadSafe").getValue();
 
-        if ( threadSafe != null )
-        {
-            mojo.setThreadSafe( Boolean.parseBoolean( threadSafe ) );
+        if (threadSafe != null) {
+            mojo.setThreadSafe(Boolean.parseBoolean(threadSafe));
         }
 
-        String v4Api = c.getChild( "v4Api" ).getValue();
+        String v4Api = c.getChild("v4Api").getValue();
 
-        if ( v4Api != null )
-        {
-            mojo.setV4Api( Boolean.parseBoolean( v4Api ) );
+        if (v4Api != null) {
+            mojo.setV4Api(Boolean.parseBoolean(v4Api));
         }
 
         // ----------------------------------------------------------------------
         // Configuration
         // ----------------------------------------------------------------------
 
-        PlexusConfiguration mojoConfig = c.getChild( "configuration" );
-        mojo.setMojoConfiguration( mojoConfig );
+        PlexusConfiguration mojoConfig = c.getChild("configuration");
+        mojo.setMojoConfiguration(mojoConfig);
 
         // ----------------------------------------------------------------------
         // Parameters
         // ----------------------------------------------------------------------
 
-        PlexusConfiguration[] parameterConfigurations = c.getChild( "parameters" ).getChildren( "parameter" );
+        PlexusConfiguration[] parameterConfigurations = c.getChild("parameters").getChildren("parameter");
 
         List<Parameter> parameters = new ArrayList<>();
 
-        for ( PlexusConfiguration d : parameterConfigurations )
-        {
+        for (PlexusConfiguration d : parameterConfigurations) {
             Parameter parameter = new Parameter();
 
-            parameter.setName( extractName( d ) );
+            parameter.setName(extractName(d));
 
-            parameter.setAlias( d.getChild( "alias" ).getValue() );
+            parameter.setAlias(d.getChild("alias").getValue());
 
-            parameter.setType( d.getChild( "type" ).getValue() );
+            parameter.setType(d.getChild("type").getValue());
 
-            String required = d.getChild( "required" ).getValue();
+            String required = d.getChild("required").getValue();
 
-            parameter.setRequired( Boolean.parseBoolean( required ) );
+            parameter.setRequired(Boolean.parseBoolean(required));
 
-            PlexusConfiguration editableConfig = d.getChild( "editable" );
+            PlexusConfiguration editableConfig = d.getChild("editable");
 
             // we need the null check for pre-build legacy plugins...
-            if ( editableConfig != null )
-            {
-                String editable = d.getChild( "editable" ).getValue();
+            if (editableConfig != null) {
+                String editable = d.getChild("editable").getValue();
 
-                parameter.setEditable( editable == null || Boolean.parseBoolean( editable ) );
+                parameter.setEditable(editable == null || Boolean.parseBoolean(editable));
             }
 
-            parameter.setDescription( extractDescription( d ) );
+            parameter.setDescription(extractDescription(d));
 
-            parameter.setDeprecated( d.getChild( "deprecated" ).getValue() );
+            parameter.setDeprecated(d.getChild("deprecated").getValue());
 
-            parameter.setImplementation( d.getChild( "implementation" ).getValue() );
+            parameter.setImplementation(d.getChild("implementation").getValue());
 
-            parameter.setSince( d.getChild( "since" ).getValue() );
+            parameter.setSince(d.getChild("since").getValue());
 
-            PlexusConfiguration paramConfig = mojoConfig.getChild( parameter.getName(), false );
-            if ( paramConfig != null )
-            {
-                parameter.setExpression( paramConfig.getValue( null ) );
-                parameter.setDefaultValue( paramConfig.getAttribute( "default-value" ) );
+            PlexusConfiguration paramConfig = mojoConfig.getChild(parameter.getName(), false);
+            if (paramConfig != null) {
+                parameter.setExpression(paramConfig.getValue(null));
+                parameter.setDefaultValue(paramConfig.getAttribute("default-value"));
             }
 
-            parameters.add( parameter );
+            parameters.add(parameter);
         }
 
-        mojo.setParameters( parameters );
+        mojo.setParameters(parameters);
 
         // TODO this should not need to be handed off...
 
@@ -394,19 +346,18 @@ public class PluginDescriptorBuilder
         // Requirements
         // ----------------------------------------------------------------------
 
-        PlexusConfiguration[] requirements = c.getChild( "requirements" ).getChildren( "requirement" );
+        PlexusConfiguration[] requirements = c.getChild("requirements").getChildren("requirement");
 
-        for ( PlexusConfiguration requirement : requirements )
-        {
+        for (PlexusConfiguration requirement : requirements) {
             ComponentRequirement cr = new ComponentRequirement();
 
-            cr.setRole( requirement.getChild( "role" ).getValue() );
+            cr.setRole(requirement.getChild("role").getValue());
 
-            cr.setRoleHint( requirement.getChild( "role-hint" ).getValue() );
+            cr.setRoleHint(requirement.getChild("role-hint").getValue());
 
-            cr.setFieldName( requirement.getChild( "field-name" ).getValue() );
+            cr.setFieldName(requirement.getChild("field-name").getValue());
 
-            mojo.addRequirement( cr );
+            mojo.addRequirement(cr);
         }
 
         return mojo;
@@ -416,16 +367,11 @@ public class PluginDescriptorBuilder
     //
     // ----------------------------------------------------------------------
 
-    public PlexusConfiguration buildConfiguration( Reader configuration )
-        throws PlexusConfigurationException
-    {
-        try
-        {
-            return XmlPlexusConfiguration.toPlexusConfiguration( Xpp3DomBuilder.build( configuration ) );
-        }
-        catch ( IOException | XmlPullParserException e )
-        {
-            throw new PlexusConfigurationException( e.getMessage(), e );
+    public PlexusConfiguration buildConfiguration(Reader configuration) throws PlexusConfigurationException {
+        try {
+            return XmlPlexusConfiguration.toPlexusConfiguration(XmlNodeBuilder.build(configuration));
+        } catch (IOException | XmlPullParserException e) {
+            throw new PlexusConfigurationException(e.getMessage(), e);
         }
     }
 }

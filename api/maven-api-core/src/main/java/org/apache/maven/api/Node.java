@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,15 +16,16 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Immutable;
-import org.apache.maven.api.annotations.Nonnull;
+package org.apache.maven.api;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Represents a dependency node within a Maven project's dependency collector.
@@ -36,8 +35,7 @@ import java.util.stream.Stream;
  */
 @Experimental
 @Immutable
-public interface Node
-{
+public interface Node {
 
     /**
      * @return dependency for this node
@@ -70,7 +68,7 @@ public interface Node
      * @param visitor the visitor to call back, must not be {@code null}
      * @return {@code true} to visit siblings nodes of this node as well, {@code false} to skip siblings
      */
-    boolean accept( @Nonnull NodeVisitor visitor );
+    boolean accept(@Nonnull NodeVisitor visitor);
 
     /**
      * Returns a new tree starting at this node, filtering the children.
@@ -80,7 +78,7 @@ public interface Node
      * @param filter the filter to apply
      * @return a new filtered graph
      */
-    Node filter( Predicate<Node> filter );
+    Node filter(Predicate<Node> filter);
 
     /**
      * Returns a string representation of this dependency node.
@@ -95,9 +93,7 @@ public interface Node
      * @return a stream containing this node and its descendant
      */
     @Nonnull
-    default Stream<Node> stream()
-    {
-        return Stream.concat( Stream.of( this ), getChildren().stream().flatMap( Node::stream ) );
+    default Stream<Node> stream() {
+        return Stream.concat(Stream.of(this), getChildren().stream().flatMap(Node::stream));
     }
-
 }

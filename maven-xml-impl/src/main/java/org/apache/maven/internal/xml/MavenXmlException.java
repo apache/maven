@@ -1,5 +1,3 @@
-package org.apache.maven.internal.xml;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,30 +16,24 @@ package org.apache.maven.internal.xml;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.xml;
 
-public class MavenXmlException extends RuntimeException
-{
-    public MavenXmlException()
-    {
+public class MavenXmlException extends RuntimeException {
+    public MavenXmlException() {}
+
+    public MavenXmlException(String message) {
+        super(message);
     }
 
-    public MavenXmlException( String message )
-    {
-        super( message );
+    public MavenXmlException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public MavenXmlException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public MavenXmlException(Throwable cause) {
+        super(cause);
     }
 
-    public MavenXmlException( Throwable cause )
-    {
-        super( cause );
-    }
-
-    public MavenXmlException( String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace )
-    {
-        super( message, cause, enableSuppression, writableStackTrace );
+    public MavenXmlException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

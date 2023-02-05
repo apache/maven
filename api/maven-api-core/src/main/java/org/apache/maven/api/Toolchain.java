@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api;
 
 import java.util.Map;
 
@@ -29,8 +28,7 @@ import org.apache.maven.api.annotations.Experimental;
  * @since 4.0
  */
 @Experimental
-public interface Toolchain
-{
+public interface Toolchain {
     /**
      * get the type of toolchain.
      *
@@ -44,7 +42,7 @@ public interface Toolchain
      * @param toolName the tool platform independent tool name
      * @return file representing the tool executable, or null if the tool cannot be found
      */
-    String findTool( String toolName );
+    String findTool(String toolName);
 
     /**
      * Let the toolchain decide if it matches requirements defined
@@ -52,5 +50,5 @@ public interface Toolchain
      * @param requirements Map&lt;String, String&gt; key value pair, may not be {@code null}
      * @return {@code true} if the requirements match, otherwise {@code false}
      */
-    boolean matchesRequirements( Map<String, String> requirements );
+    boolean matchesRequirements(Map<String, String> requirements);
 }

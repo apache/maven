@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,14 +17,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-3-SNAPSHOT</version>
+    <version>4.0.0-alpha-5-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-model-builder</artifactId>
@@ -37,7 +35,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-xml-impl</artifactId>
-      <version>4.0.0-alpha-3-SNAPSHOT</version>
+      <version>4.0.0-alpha-5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -109,6 +107,68 @@ under the License.
       <plugin>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>sisu-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>com.github.siom79.japicmp</groupId>
+        <artifactId>japicmp-maven-plugin</artifactId>
+        <configuration>
+          <oldVersion>
+            <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>${project.artifactId}</artifactId>
+              <version>${maven.baseline}</version>
+            </dependency>
+          </oldVersion>
+          <parameter>
+            <excludes>
+              <exclude>org.apache.maven.model.building.DefaultModelBuilder#DefaultModelBuilder():CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.model.building.DefaultModelProcessor#setModelLocator(org.apache.maven.model.locator.ModelLocator):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.building.DefaultModelProcessor#setModelReader(org.apache.maven.model.io.ModelReader):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.building.DefaultModelProcessor#DefaultModelProcessor():CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.model.building.ModelCache#get(org.apache.maven.building.Source,java.lang.String):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.building.ModelCache#get(org.apache.maven.building.Source,org.apache.maven.model.building.ModelCacheTag):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.building.ModelCache#get(java.lang.String,java.lang.String,java.lang.String,org.apache.maven.model.building.ModelCacheTag):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.building.ModelCache#put(org.apache.maven.building.Source,java.lang.String,java.lang.Object):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.building.ModelCache#put(org.apache.maven.building.Source,org.apache.maven.model.building.ModelCacheTag,java.lang.Object):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.building.ModelCache#put(java.lang.String,java.lang.String,java.lang.String,org.apache.maven.model.building.ModelCacheTag,java.lang.Object):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.composition.DependencyManagementImporter#importManagement(org.apache.maven.model.Model,java.util.List,org.apache.maven.model.building.ModelBuildingRequest,org.apache.maven.model.building.ModelProblemCollector):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.composition.DefaultDependencyManagementImporter#importManagement(org.apache.maven.model.Model,java.util.List,org.apache.maven.model.building.ModelBuildingRequest,org.apache.maven.model.building.ModelProblemCollector):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.inheritance.DefaultInheritanceAssembler</exclude>
+              <exclude>org.apache.maven.model.inheritance.InheritanceAssembler#assembleModelInheritance(org.apache.maven.model.Model,org.apache.maven.model.Model,org.apache.maven.model.building.ModelBuildingRequest,org.apache.maven.model.building.ModelProblemCollector):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.interpolation.AbstractStringBasedModelInterpolator</exclude>
+              <exclude>org.apache.maven.model.interpolation.StringSearchModelInterpolator</exclude>
+              <exclude>org.apache.maven.model.interpolation.StringVisitorModelInterpolator</exclude>
+              <exclude>org.apache.maven.model.io.DefaultModelReader#DefaultModelReader():CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.model.management.DefaultDependencyManagementInjector$ManagementModelMerger</exclude>
+              <exclude>org.apache.maven.model.management.DefaultPluginManagementInjector$ManagementModelMerger</exclude>
+              <exclude>org.apache.maven.model.merge.MavenModelMerger</exclude>
+              <exclude>org.apache.maven.model.normalization.DefaultModelNormalizer$DuplicateMerger#mergePlugin(org.apache.maven.model.Plugin,org.apache.maven.model.Plugin):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.normalization.DefaultModelNormalizer$DuplicateMerger:METHOD_REMOVED_IN_SUPERCLASS</exclude>
+              <exclude>org.apache.maven.model.path.DefaultModelPathTranslator#setPathTranslator(org.apache.maven.model.path.PathTranslator):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.path.DefaultModelPathTranslator#DefaultModelPathTranslator():CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.model.path.DefaultModelUrlNormalizer#setUrlNormalizer(org.apache.maven.model.path.UrlNormalizer):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.path.DefaultModelUrlNormalizer#DefaultModelUrlNormalizer():CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.model.path.ProfileActivationFilePathInterpolator#setPathTranslator(org.apache.maven.model.path.PathTranslator):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.path.ProfileActivationFilePathInterpolator#ProfileActivationFilePathInterpolator():CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.model.profile.activation.FileProfileActivator#setProfileActivationFilePathInterpolator(org.apache.maven.model.path.ProfileActivationFilePathInterpolator):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.profile.activation.FileProfileActivator#FileProfileActivator():CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.model.profile.DefaultProfileInjector</exclude>
+              <exclude>org.apache.maven.model.resolution.InvalidRepositoryException#getRepository():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.model.resolution.InvalidRepositoryException#InvalidRepositoryException(java.lang.String,org.apache.maven.model.Repository,java.lang.Throwable):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.model.resolution.InvalidRepositoryException#InvalidRepositoryException(java.lang.String,org.apache.maven.model.Repository):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.model.resolution.ModelResolver#addRepository(org.apache.maven.api.model.Repository):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.resolution.ModelResolver#addRepository(org.apache.maven.api.model.Repository,boolean):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.resolution.ModelResolver#resolveModel(org.apache.maven.api.model.Parent,java.util.concurrent.atomic.AtomicReference):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.resolution.ModelResolver#resolveModel(org.apache.maven.api.model.Dependency,java.util.concurrent.atomic.AtomicReference):METHOD_NEW_DEFAULT</exclude>
+              <exclude>org.apache.maven.model.superpom.DefaultSuperPomProvider#getSuperModel(java.lang.String):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.model.superpom.DefaultSuperPomProvider#setModelProcessor(org.apache.maven.model.building.ModelProcessor):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.superpom.DefaultSuperPomProvider#DefaultSuperPomProvider():CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.model.superpom.SuperPomProvider#getSuperModel(java.lang.String):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.model.validation.DefaultModelValidator#validateDependencyVersion(org.apache.maven.model.building.ModelProblemCollector,org.apache.maven.model.Dependency,java.lang.String):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.model.validation.ModelValidator#validateFileModel(org.apache.maven.model.Model,org.apache.maven.model.building.ModelBuildingRequest,org.apache.maven.model.building.ModelProblemCollector):METHOD_NEW_DEFAULT</exclude>
+            </excludes>
+          </parameter>
+        </configuration>
       </plugin>
     </plugins>
   </build>

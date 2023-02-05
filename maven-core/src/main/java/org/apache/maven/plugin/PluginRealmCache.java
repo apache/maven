@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import java.util.List;
 import java.util.Map;
@@ -38,20 +37,16 @@ import org.eclipse.aether.repository.RemoteRepository;
  * @author Igor Fedorenko
  * @author Benjamin Bentmann
  */
-public interface PluginRealmCache
-{
+public interface PluginRealmCache {
     /**
      * CacheRecord
      */
-    class CacheRecord
-    {
-        public ClassRealm getRealm()
-        {
+    class CacheRecord {
+        public ClassRealm getRealm() {
             return realm;
         }
 
-        public List<Artifact> getArtifacts()
-        {
+        public List<Artifact> getArtifacts() {
             return artifacts;
         }
 
@@ -59,8 +54,7 @@ public interface PluginRealmCache
 
         private final List<Artifact> artifacts;
 
-        public CacheRecord( ClassRealm realm, List<Artifact> artifacts )
-        {
+        public CacheRecord(ClassRealm realm, List<Artifact> artifacts) {
             this.realm = realm;
             this.artifacts = artifacts;
         }
@@ -69,27 +63,28 @@ public interface PluginRealmCache
     /**
      * A cache key.
      */
-    interface Key
-    {
+    interface Key {
         // marker interface for cache keys
     }
 
     @FunctionalInterface
-    interface PluginRealmSupplier
-    {
+    interface PluginRealmSupplier {
         CacheRecord load() throws PluginResolutionException, PluginContainerException;
     }
 
-    Key createKey( Plugin plugin, ClassLoader parentRealm, Map<String, ClassLoader> foreignImports,
-                   DependencyFilter dependencyFilter, List<RemoteRepository> repositories,
-                   RepositorySystemSession session );
+    Key createKey(
+            Plugin plugin,
+            ClassLoader parentRealm,
+            Map<String, ClassLoader> foreignImports,
+            DependencyFilter dependencyFilter,
+            List<RemoteRepository> repositories,
+            RepositorySystemSession session);
 
-    CacheRecord get( Key key );
+    CacheRecord get(Key key);
 
-    CacheRecord get( Key key, PluginRealmSupplier supplier )
-            throws PluginResolutionException, PluginContainerException;
+    CacheRecord get(Key key, PluginRealmSupplier supplier) throws PluginResolutionException, PluginContainerException;
 
-    CacheRecord put( Key key, ClassRealm pluginRealm, List<Artifact> pluginArtifacts );
+    CacheRecord put(Key key, ClassRealm pluginRealm, List<Artifact> pluginArtifacts);
 
     void flush();
 
@@ -101,6 +96,5 @@ public interface PluginRealmCache
      * @param project The project that employs the plugin realm, must not be {@code null}.
      * @param record The cache record being used for the project, must not be {@code null}.
      */
-    void register( MavenProject project, Key key, CacheRecord record );
-
+    void register(MavenProject project, Key key, CacheRecord record);
 }

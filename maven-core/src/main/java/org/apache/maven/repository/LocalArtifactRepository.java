@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
@@ -25,12 +24,10 @@ import org.apache.maven.artifact.repository.MavenArtifactRepository;
 /**
  * LocalArtifactRepository
  */
-public abstract class LocalArtifactRepository
-    extends MavenArtifactRepository
-{
+public abstract class LocalArtifactRepository extends MavenArtifactRepository {
     public static final String IDE_WORKSPACE = "ide-workspace";
 
-    public abstract Artifact find( Artifact artifact );
+    public abstract Artifact find(Artifact artifact);
 
     public abstract boolean hasLocalMetadata();
 }

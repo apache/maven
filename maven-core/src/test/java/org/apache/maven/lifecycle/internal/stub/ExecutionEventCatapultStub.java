@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal.stub;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,25 +16,19 @@ package org.apache.maven.lifecycle.internal.stub;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal.stub;
 
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ExecutionEvent.Type;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.plugin.MojoExecution;
 
 /**
  * @author Benjamin Bentmann
  */
-public class ExecutionEventCatapultStub
-    implements ExecutionEventCatapult
-{
+public class ExecutionEventCatapultStub implements ExecutionEventCatapult {
 
-    public void fire( Type eventType, MavenSession session, MojoExecution mojoExecution )
-    {
-    }
+    public void fire(Type eventType, MavenSession session, MojoExecution mojoExecution) {}
 
-    public void fire( Type eventType, MavenSession session, MojoExecution mojoExecution, Exception exception )
-    {
-    }
-
+    public void fire(Type eventType, MavenSession session, MojoExecution mojoExecution, Exception exception) {}
 }

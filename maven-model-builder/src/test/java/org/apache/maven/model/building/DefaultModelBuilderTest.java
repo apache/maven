@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,10 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
+
+import java.io.File;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Parent;
@@ -27,8 +29,6 @@ import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.junit.jupiter.api.Test;
-import java.io.File;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -36,151 +36,132 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * @author Guillaume Nodet
  */
-public class DefaultModelBuilderTest
-{
+public class DefaultModelBuilderTest {
 
     private static final String BASE1_ID = "thegroup:base1:pom";
 
-    private static final String BASE1 = "<project>\n" +
-            "  <modelVersion>4.0.0</modelVersion>\n" +
-            "  <groupId>thegroup</groupId>\n" +
-            "  <artifactId>base1</artifactId>\n" +
-            "  <version>1</version>\n" +
-            "  <packaging>pom</packaging>\n" +
-            "  <dependencyManagement>\n" +
-            "    <dependencies>\n" +
-            "      <dependency>\n" +
-            "        <groupId>thegroup</groupId>\n" +
-            "        <artifactId>base2</artifactId>\n" +
-            "        <version>1</version>\n" +
-            "        <type>pom</type>\n" +
-            "        <scope>import</scope>\n" +
-            "      </dependency>\n" +
-            "    </dependencies>\n" +
-            "  </dependencyManagement>\n" +
-            "</project>\n";
+    private static final String BASE1 = "<project>\n" + "  <modelVersion>4.0.0</modelVersion>\n"
+            + "  <groupId>thegroup</groupId>\n"
+            + "  <artifactId>base1</artifactId>\n"
+            + "  <version>1</version>\n"
+            + "  <packaging>pom</packaging>\n"
+            + "  <dependencyManagement>\n"
+            + "    <dependencies>\n"
+            + "      <dependency>\n"
+            + "        <groupId>thegroup</groupId>\n"
+            + "        <artifactId>base2</artifactId>\n"
+            + "        <version>1</version>\n"
+            + "        <type>pom</type>\n"
+            + "        <scope>import</scope>\n"
+            + "      </dependency>\n"
+            + "    </dependencies>\n"
+            + "  </dependencyManagement>\n"
+            + "</project>\n";
 
     private static final String BASE2_ID = "thegroup:base2:pom";
 
-    private static final String BASE2 = "<project>\n" +
-            "  <modelVersion>4.0.0</modelVersion>\n" +
-            "  <groupId>thegroup</groupId>\n" +
-            "  <artifactId>base2</artifactId>\n" +
-            "  <version>1</version>\n" +
-            "  <packaging>pom</packaging>\n" +
-            "  <dependencyManagement>\n" +
-            "    <dependencies>\n" +
-            "      <dependency>\n" +
-            "        <groupId>thegroup</groupId>\n" +
-            "        <artifactId>base1</artifactId>\n" +
-            "        <version>1</version>\n" +
-            "        <type>pom</type>\n" +
-            "        <scope>import</scope>\n" +
-            "      </dependency>\n" +
-            "    </dependencies>\n" +
-            "  </dependencyManagement>\n" +
-            "</project>\n";
+    private static final String BASE2 = "<project>\n" + "  <modelVersion>4.0.0</modelVersion>\n"
+            + "  <groupId>thegroup</groupId>\n"
+            + "  <artifactId>base2</artifactId>\n"
+            + "  <version>1</version>\n"
+            + "  <packaging>pom</packaging>\n"
+            + "  <dependencyManagement>\n"
+            + "    <dependencies>\n"
+            + "      <dependency>\n"
+            + "        <groupId>thegroup</groupId>\n"
+            + "        <artifactId>base1</artifactId>\n"
+            + "        <version>1</version>\n"
+            + "        <type>pom</type>\n"
+            + "        <scope>import</scope>\n"
+            + "      </dependency>\n"
+            + "    </dependencies>\n"
+            + "  </dependencyManagement>\n"
+            + "</project>\n";
 
     @Test
-    public void testCycleInImports()
-            throws Exception
-    {
+    public void testCycleInImports() throws Exception {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
-        assertNotNull( builder );
+        assertNotNull(builder);
 
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
-        request.setModelSource( new StringModelSource( BASE1 ) );
-        request.setModelResolver( new CycleInImportsResolver() );
+        request.setModelSource(new StringModelSource(BASE1));
+        request.setModelResolver(new CycleInImportsResolver());
 
-        assertThrows( ModelBuildingException.class, () -> builder.build( request ) );
+        assertThrows(ModelBuildingException.class, () -> builder.build(request));
     }
 
-    static class CycleInImportsResolver extends BaseModelResolver
-    {
+    static class CycleInImportsResolver extends BaseModelResolver {
         @Override
-        public ModelSource resolveModel( org.apache.maven.model.Dependency dependency ) throws UnresolvableModelException
-        {
-            switch ( dependency.getManagementKey() )
-            {
-                case BASE1_ID: return new StringModelSource( BASE1 );
-                case BASE2_ID: return new StringModelSource( BASE2 );
+        public ModelSource resolveModel(org.apache.maven.model.Dependency dependency)
+                throws UnresolvableModelException {
+            switch (dependency.getManagementKey()) {
+                case BASE1_ID:
+                    return new StringModelSource(BASE1);
+                case BASE2_ID:
+                    return new StringModelSource(BASE2);
             }
             return null;
         }
     }
 
-    static class BaseModelResolver implements ModelResolver
-    {
+    static class BaseModelResolver implements ModelResolver {
         @Override
-        public ModelSource resolveModel( String groupId, String artifactId, String version )
-                throws UnresolvableModelException
-        {
+        public ModelSource resolveModel(String groupId, String artifactId, String version)
+                throws UnresolvableModelException {
             return null;
         }
 
         @Override
-        public ModelSource resolveModel( Parent parent, AtomicReference<Parent> modified ) throws UnresolvableModelException
-        {
+        public ModelSource resolveModel(Parent parent, AtomicReference<Parent> modified)
+                throws UnresolvableModelException {
             return null;
         }
 
         @Override
-        public ModelSource resolveModel( Dependency dependency, AtomicReference<Dependency> modified ) throws UnresolvableModelException
-        {
+        public ModelSource resolveModel(Dependency dependency, AtomicReference<Dependency> modified)
+                throws UnresolvableModelException {
             return null;
         }
 
         @Override
-        public void addRepository( Repository repository ) throws InvalidRepositoryException
-        {
-        }
+        public void addRepository(Repository repository) throws InvalidRepositoryException {}
 
         @Override
-        public void addRepository(Repository repository, boolean replace) throws InvalidRepositoryException
-        {
-        }
+        public void addRepository(Repository repository, boolean replace) throws InvalidRepositoryException {}
 
         @Override
-        public ModelResolver newCopy()
-        {
+        public ModelResolver newCopy() {
             return this;
         }
 
         @Override
-        public ModelSource resolveModel( org.apache.maven.model.Parent parent ) throws UnresolvableModelException
-        {
+        public ModelSource resolveModel(org.apache.maven.model.Parent parent) throws UnresolvableModelException {
             return null;
         }
 
         @Override
-        public ModelSource resolveModel( org.apache.maven.model.Dependency dependency )
-                throws UnresolvableModelException
-        {
+        public ModelSource resolveModel(org.apache.maven.model.Dependency dependency)
+                throws UnresolvableModelException {
             return null;
         }
 
         @Override
-        public void addRepository( org.apache.maven.model.Repository repository ) throws InvalidRepositoryException
-        {
-
-        }
+        public void addRepository(org.apache.maven.model.Repository repository) throws InvalidRepositoryException {}
 
         @Override
-        public void addRepository( org.apache.maven.model.Repository repository, boolean replace )
-                throws InvalidRepositoryException
-        {
-
-        }
+        public void addRepository(org.apache.maven.model.Repository repository, boolean replace)
+                throws InvalidRepositoryException {}
     }
 
     @Test
-    public void testBuildRawModel()
-            throws Exception
-    {
+    public void testBuildRawModel() throws Exception {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
-        assertNotNull( builder );
+        assertNotNull(builder);
 
-        Result<? extends Model> res = builder.buildRawModel( new File( getClass().getResource("/poms/factory/simple.xml" ).getFile() ), ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, false);
-        assertNotNull( res.get() );
+        Result<? extends Model> res = builder.buildRawModel(
+                new File(getClass().getResource("/poms/factory/simple.xml").getFile()),
+                ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL,
+                false);
+        assertNotNull(res.get());
     }
 }

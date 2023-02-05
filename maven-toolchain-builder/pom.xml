@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,14 +17,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <parent>
-    <artifactId>maven</artifactId>
-    <groupId>org.apache.maven</groupId>
-    <version>4.0.0-alpha-3-SNAPSHOT</version>
-  </parent>
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven</groupId>
+    <artifactId>maven</artifactId>
+    <version>4.0.0-alpha-5-SNAPSHOT</version>
+  </parent>
 
   <artifactId>maven-toolchain-builder</artifactId>
 
@@ -65,6 +63,32 @@ under the License.
       <plugin>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>sisu-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>com.github.siom79.japicmp</groupId>
+        <artifactId>japicmp-maven-plugin</artifactId>
+        <configuration>
+          <parameter>
+            <includes>
+              <include>org.apache.maven.toolchain.building</include>
+              <include>org.apache.maven.toolchain.io</include>
+              <include>org.apache.maven.toolchain.io.xpp3</include>
+              <include>org.apache.maven.toolchain.merge</include>
+            </includes>
+            <excludes>
+              <exclude>org.apache.maven.toolchain.building.DefaultToolchainsBuilder#DefaultToolchainsBuilder():CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.toolchain.merge.MavenToolchainMerger#getToolchainModelKey(org.apache.maven.toolchain.model.ToolchainModel):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.toolchain.merge.MavenToolchainMerger#mergeToolchainModelConfiguration(org.apache.maven.toolchain.model.ToolchainModel,org.apache.maven.toolchain.model.ToolchainModel):METHOD_REMOVED</exclude>
+            </excludes>
+          </parameter>
+          <oldVersion>
+            <dependency>
+              <groupId>org.apache.maven</groupId>
+              <artifactId>maven-core</artifactId>
+              <version>${maven.baseline}</version>
+            </dependency>
+          </oldVersion>
+        </configuration>
       </plugin>
     </plugins>
   </build>

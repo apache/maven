@@ -7,7 +7,7 @@
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,13 +18,13 @@
  */
 package org.apache.maven;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.util.concurrent.atomic.AtomicReference;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -41,19 +41,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DefaultMavenTest
-        extends AbstractCoreMavenComponentTestCase
-{
+public class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
     @Singleton
-    @Named( "WsrClassCatcher" )
-    private static final class WsrClassCatcher extends AbstractMavenLifecycleParticipant
-    {
-        private final AtomicReference<Class<?>> wsrClassRef = new AtomicReference<>( null );
+    @Named("WsrClassCatcher")
+    private static final class WsrClassCatcher extends AbstractMavenLifecycleParticipant {
+        private final AtomicReference<Class<?>> wsrClassRef = new AtomicReference<>(null);
 
         @Override
-        public void afterProjectsRead( MavenSession session ) throws MavenExecutionException
-        {
-            wsrClassRef.set( session.getRepositorySession().getWorkspaceReader().getClass() );
+        public void afterProjectsRead(MavenSession session) throws MavenExecutionException {
+            wsrClassRef.set(session.getRepositorySession().getWorkspaceReader().getClass());
         }
     }
 
@@ -61,56 +57,48 @@ public class DefaultMavenTest
     private Maven maven;
 
     @Override
-    protected String getProjectsDirectory()
-    {
+    protected String getProjectsDirectory() {
         return "src/test/projects/default-maven";
     }
 
     @Test
-    public void testEnsureResolverSessionHasMavenWorkspaceReader()
-            throws Exception
-    {
-        WsrClassCatcher wsrClassCatcher = ( WsrClassCatcher ) getContainer()
-                .lookup( AbstractMavenLifecycleParticipant.class, "WsrClassCatcher" );
-        Maven maven = getContainer().lookup( Maven.class );
-        MavenExecutionRequest request = createMavenExecutionRequest( getProject( "simple" ) ).setGoals( asList("validate") );
+    public void testEnsureResolverSessionHasMavenWorkspaceReader() throws Exception {
+        WsrClassCatcher wsrClassCatcher =
+                (WsrClassCatcher) getContainer().lookup(AbstractMavenLifecycleParticipant.class, "WsrClassCatcher");
+        Maven maven = getContainer().lookup(Maven.class);
+        MavenExecutionRequest request =
+                createMavenExecutionRequest(getProject("simple")).setGoals(asList("validate"));
 
-        MavenExecutionResult result = maven.execute( request );
+        MavenExecutionResult result = maven.execute(request);
 
         Class<?> wsrClass = wsrClassCatcher.wsrClassRef.get();
-        assertNotNull( wsrClass, "wsr cannot be null" );
-        assertTrue( MavenWorkspaceReader.class.isAssignableFrom( wsrClass ), String.valueOf( wsrClass ) );
+        assertNotNull(wsrClass, "wsr cannot be null");
+        assertTrue(MavenWorkspaceReader.class.isAssignableFrom(wsrClass), String.valueOf(wsrClass));
     }
 
     @Test
-    public void testThatErrorDuringProjectDependencyGraphCreationAreStored()
-            throws Exception
-    {
-        MavenExecutionRequest request = createMavenExecutionRequest( getProject( "cyclic-reference" ) ).setGoals( asList("validate") );
+    public void testThatErrorDuringProjectDependencyGraphCreationAreStored() throws Exception {
+        MavenExecutionRequest request =
+                createMavenExecutionRequest(getProject("cyclic-reference")).setGoals(asList("validate"));
 
-        MavenExecutionResult result = maven.execute( request );
+        MavenExecutionResult result = maven.execute(request);
 
-        assertEquals( ProjectCycleException.class, result.getExceptions().get( 0 ).getClass() );
+        assertEquals(ProjectCycleException.class, result.getExceptions().get(0).getClass());
     }
 
     @Test
-    public void testMavenProjectNoDuplicateArtifacts()
-        throws Exception
-    {
-        MavenProjectHelper mavenProjectHelper = getContainer().lookup( MavenProjectHelper.class );
+    public void testMavenProjectNoDuplicateArtifacts() throws Exception {
+        MavenProjectHelper mavenProjectHelper = getContainer().lookup(MavenProjectHelper.class);
         MavenProject mavenProject = new MavenProject();
-        mavenProject.setArtifact( new DefaultArtifact( "g", "a", "1.0", Artifact.SCOPE_TEST, "jar", "", null ) );
-        File artifactFile = Files.createTempFile( "foo", "tmp").toFile();
-        try
-        {
-            mavenProjectHelper.attachArtifact( mavenProject, "sources", artifactFile );
-            assertEquals( 1, mavenProject.getAttachedArtifacts().size() );
-            mavenProjectHelper.attachArtifact( mavenProject, "sources", artifactFile );
-            assertEquals( 1, mavenProject.getAttachedArtifacts().size() );
-        } finally
-        {
-            Files.deleteIfExists( artifactFile.toPath() );
+        mavenProject.setArtifact(new DefaultArtifact("g", "a", "1.0", Artifact.SCOPE_TEST, "jar", "", null));
+        File artifactFile = Files.createTempFile("foo", "tmp").toFile();
+        try {
+            mavenProjectHelper.attachArtifact(mavenProject, "sources", artifactFile);
+            assertEquals(1, mavenProject.getAttachedArtifacts().size());
+            mavenProjectHelper.attachArtifact(mavenProject, "sources", artifactFile);
+            assertEquals(1, mavenProject.getAttachedArtifacts().size());
+        } finally {
+            Files.deleteIfExists(artifactFile.toPath());
         }
     }
-
 }

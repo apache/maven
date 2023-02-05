@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
@@ -27,14 +26,12 @@ import org.apache.maven.project.MavenProject;
  *
  * @author Benjamin Bentmann
  */
-public interface ExecutionEvent
-{
+public interface ExecutionEvent {
 
     /**
      * The possible types of execution events.
      */
-    enum Type
-    {
+    enum Type {
         ProjectDiscoveryStarted,
         SessionStarted,
         SessionEnded,
@@ -88,5 +85,4 @@ public interface ExecutionEvent
      * @return The exception or {@code null} if none.
      */
     Exception getException();
-
 }

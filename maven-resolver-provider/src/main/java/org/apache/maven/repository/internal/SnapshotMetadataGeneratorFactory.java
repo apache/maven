@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -31,27 +30,22 @@ import org.eclipse.aether.installation.InstallRequest;
 /**
  * Maven GAV level metadata generator factory.
  */
-@Named( "snapshot" )
+@Named("snapshot")
 @Singleton
-public class SnapshotMetadataGeneratorFactory
-    implements MetadataGeneratorFactory
-{
+public class SnapshotMetadataGeneratorFactory implements MetadataGeneratorFactory {
     @Override
-    public MetadataGenerator newInstance( RepositorySystemSession session, InstallRequest request )
-    {
-        return new LocalSnapshotMetadataGenerator( session, request );
+    public MetadataGenerator newInstance(RepositorySystemSession session, InstallRequest request) {
+        return new LocalSnapshotMetadataGenerator(session, request);
     }
 
     @Override
-    public MetadataGenerator newInstance( RepositorySystemSession session, DeployRequest request )
-    {
-        return new RemoteSnapshotMetadataGenerator( session, request );
+    public MetadataGenerator newInstance(RepositorySystemSession session, DeployRequest request) {
+        return new RemoteSnapshotMetadataGenerator(session, request);
     }
 
-    @SuppressWarnings( "checkstyle:magicnumber" )
+    @SuppressWarnings("checkstyle:magicnumber")
     @Override
-    public float getPriority()
-    {
+    public float getPriority() {
         return 30; // GAV level metadata should be deployed 1st MD
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import javax.inject.Inject;
 
@@ -29,58 +28,50 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DefaultVersionResolverTest
-    extends AbstractRepositoryTestCase
-{
+public class DefaultVersionResolverTest extends AbstractRepositoryTestCase {
     @Inject
     private DefaultVersionResolver versionResolver;
 
     @Test
-    public void testResolveSeparateInstalledClassifiedNonUniqueVersionedArtifacts()
-        throws Exception
-    {
+    public void testResolveSeparateInstalledClassifiedNonUniqueVersionedArtifacts() throws Exception {
         VersionRequest requestB = new VersionRequest();
-        requestB.addRepository( newTestRepository() );
+        requestB.addRepository(newTestRepository());
         Artifact artifactB =
-            new DefaultArtifact( "org.apache.maven.its", "dep-mng5324", "classifierB", "jar", "07.20.3-SNAPSHOT" );
-        requestB.setArtifact( artifactB );
+                new DefaultArtifact("org.apache.maven.its", "dep-mng5324", "classifierB", "jar", "07.20.3-SNAPSHOT");
+        requestB.setArtifact(artifactB);
 
-        VersionResult resultB = versionResolver.resolveVersion( session, requestB );
-        assertEquals( "07.20.3-20120809.112920-97", resultB.getVersion() );
+        VersionResult resultB = versionResolver.resolveVersion(session, requestB);
+        assertEquals("07.20.3-20120809.112920-97", resultB.getVersion());
 
         VersionRequest requestA = new VersionRequest();
-        requestA.addRepository( newTestRepository() );
+        requestA.addRepository(newTestRepository());
 
         Artifact artifactA =
-            new DefaultArtifact( "org.apache.maven.its", "dep-mng5324", "classifierA", "jar", "07.20.3-SNAPSHOT" );
-        requestA.setArtifact( artifactA );
+                new DefaultArtifact("org.apache.maven.its", "dep-mng5324", "classifierA", "jar", "07.20.3-SNAPSHOT");
+        requestA.setArtifact(artifactA);
 
-        VersionResult resultA = versionResolver.resolveVersion( session, requestA );
-        assertEquals( "07.20.3-20120809.112124-88", resultA.getVersion() );
+        VersionResult resultA = versionResolver.resolveVersion(session, requestA);
+        assertEquals("07.20.3-20120809.112124-88", resultA.getVersion());
     }
 
     @Test
-    public void testResolveSeparateInstalledClassifiedNonVersionedArtifacts()
-        throws Exception
-    {
+    public void testResolveSeparateInstalledClassifiedNonVersionedArtifacts() throws Exception {
         VersionRequest requestA = new VersionRequest();
-        requestA.addRepository( newTestRepository() );
+        requestA.addRepository(newTestRepository());
         String versionA = "07.20.3-20120809.112124-88";
-        Artifact artifactA =
-            new DefaultArtifact( "org.apache.maven.its", "dep-mng5324", "classifierA", "jar", versionA );
-        requestA.setArtifact( artifactA );
+        Artifact artifactA = new DefaultArtifact("org.apache.maven.its", "dep-mng5324", "classifierA", "jar", versionA);
+        requestA.setArtifact(artifactA);
 
-        VersionResult resultA = versionResolver.resolveVersion( session, requestA );
-        assertEquals( versionA, resultA.getVersion() );
+        VersionResult resultA = versionResolver.resolveVersion(session, requestA);
+        assertEquals(versionA, resultA.getVersion());
 
         VersionRequest requestB = new VersionRequest();
-        requestB.addRepository( newTestRepository() );
+        requestB.addRepository(newTestRepository());
         String versionB = "07.20.3-20120809.112920-97";
-        Artifact artifactB =
-            new DefaultArtifact( "org.apache.maven.its", "dep-mng5324", "classifierB", "jar", versionB );
-        requestB.setArtifact( artifactB );
+        Artifact artifactB = new DefaultArtifact("org.apache.maven.its", "dep-mng5324", "classifierB", "jar", versionB);
+        requestB.setArtifact(artifactB);
 
-        VersionResult resultB = versionResolver.resolveVersion( session, requestB );
-        assertEquals( versionB, resultB.getVersion() );
+        VersionResult resultB = versionResolver.resolveVersion(session, requestB);
+        assertEquals(versionB, resultB.getVersion());
     }
 }

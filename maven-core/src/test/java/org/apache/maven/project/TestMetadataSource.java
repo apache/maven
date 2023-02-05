@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,12 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.util.List;
+package org.apache.maven.project;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -30,31 +29,34 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.artifact.MavenMetadataCache;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 
-@SuppressWarnings( "deprecation" )
-@Named( "classpath" )
+@SuppressWarnings("deprecation")
+@Named("classpath")
 @Singleton
-public class TestMetadataSource
-    extends MavenMetadataSource
-{
+public class TestMetadataSource extends MavenMetadataSource {
 
-    public TestMetadataSource( RepositoryMetadataManager repositoryMetadataManager, ArtifactFactory repositorySystem, ProjectBuilder projectBuilder, MavenMetadataCache cache, LegacySupport legacySupport) {
-        super( repositoryMetadataManager, repositorySystem, projectBuilder, cache, legacySupport );
+    public TestMetadataSource(
+            RepositoryMetadataManager repositoryMetadataManager,
+            ArtifactFactory repositorySystem,
+            ProjectBuilder projectBuilder,
+            MavenMetadataCache cache,
+            LegacySupport legacySupport,
+            MavenRepositorySystem mavenRepositorySystem) {
+        super(repositoryMetadataManager, repositorySystem, projectBuilder, cache, legacySupport, mavenRepositorySystem);
     }
 
     @Override
-    public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
-                                     List<ArtifactRepository> remoteRepositories )
-        throws ArtifactMetadataRetrievalException
-    {
-        ResolutionGroup rg = super.retrieve( artifact, localRepository, remoteRepositories );
+    public ResolutionGroup retrieve(
+            Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
+            throws ArtifactMetadataRetrievalException {
+        ResolutionGroup rg = super.retrieve(artifact, localRepository, remoteRepositories);
 
-        for ( Artifact a : rg.getArtifacts() )
-        {
-            a.setResolved( true );
+        for (Artifact a : rg.getArtifacts()) {
+            a.setResolved(true);
         }
 
         return rg;

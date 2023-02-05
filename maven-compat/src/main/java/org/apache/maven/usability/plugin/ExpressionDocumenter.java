@@ -1,5 +1,3 @@
-package org.apache.maven.usability.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.usability.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,10 +16,7 @@ package org.apache.maven.usability.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.usability.plugin.io.xpp3.ParamdocXpp3Reader;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+package org.apache.maven.usability.plugin;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,53 +30,42 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.usability.plugin.io.xpp3.ParamdocXpp3Reader;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
 /**
  * ExpressionDocumenter
  */
-public class ExpressionDocumenter
-{
+public class ExpressionDocumenter {
 
-    private static final String[] EXPRESSION_ROOTS =
-    {
-        "project", "settings", "session", "plugin", "rootless"
-    };
+    private static final String[] EXPRESSION_ROOTS = {"project", "settings", "session", "plugin", "rootless"};
 
     private static final String EXPRESSION_DOCO_ROOTPATH = "META-INF/maven/plugin-expressions/";
 
     private static Map<String, Expression> expressionDocumentation;
 
-    public static Map<String, Expression> load()
-        throws ExpressionDocumentationException
-    {
-        if ( expressionDocumentation == null )
-        {
+    public static Map<String, Expression> load() throws ExpressionDocumentationException {
+        if (expressionDocumentation == null) {
             expressionDocumentation = new HashMap<>();
 
             ClassLoader docLoader = initializeDocLoader();
 
-            for ( String root : EXPRESSION_ROOTS )
-            {
-                try ( InputStream docStream = docLoader.getResourceAsStream(
-                    EXPRESSION_DOCO_ROOTPATH + root + ".paramdoc.xml" ) )
-                {
-                    if ( docStream != null )
-                    {
-                        Map<String, Expression> doco = parseExpressionDocumentation( docStream );
+            for (String root : EXPRESSION_ROOTS) {
+                try (InputStream docStream =
+                        docLoader.getResourceAsStream(EXPRESSION_DOCO_ROOTPATH + root + ".paramdoc.xml")) {
+                    if (docStream != null) {
+                        Map<String, Expression> doco = parseExpressionDocumentation(docStream);
 
-                        expressionDocumentation.putAll( doco );
+                        expressionDocumentation.putAll(doco);
                     }
-                }
-                catch ( IOException e )
-                {
+                } catch (IOException e) {
                     throw new ExpressionDocumentationException(
-                        "Failed to read documentation for expression root: " + root, e );
-                }
-                catch ( XmlPullParserException e )
-                {
+                            "Failed to read documentation for expression root: " + root, e);
+                } catch (XmlPullParserException e) {
                     throw new ExpressionDocumentationException(
-                        "Failed to parse documentation for expression root: " + root, e );
+                            "Failed to parse documentation for expression root: " + root, e);
                 }
-
             }
         }
 
@@ -114,63 +98,50 @@ public class ExpressionDocumenter
      * @throws IOException
      * @throws XmlPullParserException
      */
-    private static Map<String, Expression> parseExpressionDocumentation( InputStream docStream )
-        throws IOException, XmlPullParserException
-    {
-        Reader reader = new BufferedReader( ReaderFactory.newXmlReader( docStream ) );
+    private static Map<String, Expression> parseExpressionDocumentation(InputStream docStream)
+            throws IOException, XmlPullParserException {
+        Reader reader = new BufferedReader(ReaderFactory.newXmlReader(docStream));
 
         ParamdocXpp3Reader paramdocReader = new ParamdocXpp3Reader();
 
-        ExpressionDocumentation documentation = paramdocReader.read( reader, true );
+        ExpressionDocumentation documentation = paramdocReader.read(reader, true);
 
         List<Expression> expressions = documentation.getExpressions();
 
         Map<String, Expression> bySyntax = new HashMap<>();
 
-        if ( expressions != null && !expressions.isEmpty() )
-        {
-            for ( Expression expression : expressions )
-            {
-                bySyntax.put( expression.getSyntax(), expression );
+        if (expressions != null && !expressions.isEmpty()) {
+            for (Expression expression : expressions) {
+                bySyntax.put(expression.getSyntax(), expression);
             }
         }
 
         return bySyntax;
     }
 
-    private static ClassLoader initializeDocLoader()
-        throws ExpressionDocumentationException
-    {
-        String myResourcePath = ExpressionDocumenter.class.getName().replace( '.', '/' ) + ".class";
+    private static ClassLoader initializeDocLoader() throws ExpressionDocumentationException {
+        String myResourcePath = ExpressionDocumenter.class.getName().replace('.', '/') + ".class";
 
-        URL myResource = ExpressionDocumenter.class.getClassLoader().getResource( myResourcePath );
+        URL myResource = ExpressionDocumenter.class.getClassLoader().getResource(myResourcePath);
 
         assert myResource != null : "The resource is this class itself loaded by its own classloader and must exist";
 
         String myClasspathEntry = myResource.getPath();
 
-        myClasspathEntry = myClasspathEntry.substring( 0, myClasspathEntry.length() - ( myResourcePath.length() + 2 ) );
+        myClasspathEntry = myClasspathEntry.substring(0, myClasspathEntry.length() - (myResourcePath.length() + 2));
 
-        if ( myClasspathEntry.startsWith( "file:" ) )
-        {
-            myClasspathEntry = myClasspathEntry.substring( "file:".length() );
+        if (myClasspathEntry.startsWith("file:")) {
+            myClasspathEntry = myClasspathEntry.substring("file:".length());
         }
 
         URL docResource;
-        try
-        {
-            docResource = new File( myClasspathEntry ).toURL();
-        }
-        catch ( MalformedURLException e )
-        {
+        try {
+            docResource = new File(myClasspathEntry).toURL();
+        } catch (MalformedURLException e) {
             throw new ExpressionDocumentationException(
-                "Cannot construct expression documentation classpath" + " resource base.", e );
+                    "Cannot construct expression documentation classpath" + " resource base.", e);
         }
 
-        return new URLClassLoader( new URL[]
-        {
-            docResource
-        } );
+        return new URLClassLoader(new URL[] {docResource});
     }
-
 }

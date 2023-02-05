@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,21 +16,20 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import java.util.List;
 
 /**
  * This class holds the information required to enable resuming a Maven build with {@code --resume}.
  */
-public class BuildResumptionData
-{
+public class BuildResumptionData {
     /**
      * The list of projects that remain to be built.
      */
     private final List<String> remainingProjects;
 
-    public BuildResumptionData ( final List<String> remainingProjects )
-    {
+    public BuildResumptionData(final List<String> remainingProjects) {
         this.remainingProjects = remainingProjects;
     }
 
@@ -40,9 +37,7 @@ public class BuildResumptionData
      * Returns the projects that still need to be built when resuming.
      * @return A list containing the group and artifact id of the projects.
      */
-    public List<String> getRemainingProjects()
-    {
+    public List<String> getRemainingProjects() {
         return this.remainingProjects;
     }
-
 }

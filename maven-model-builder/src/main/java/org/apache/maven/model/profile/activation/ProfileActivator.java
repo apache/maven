@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile.activation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.profile.activation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile.activation;
 
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProblemCollector;
@@ -28,8 +27,7 @@ import org.apache.maven.model.profile.ProfileActivationContext;
  *
  * @author Benjamin Bentmann
  */
-public interface ProfileActivator
-{
+public interface ProfileActivator {
 
     /**
      * Determines whether the specified profile is active in the given activator context.
@@ -41,7 +39,7 @@ public interface ProfileActivator
      *            {@code null}.
      * @return {@code true} if the profile is active, {@code false} otherwise.
      */
-    boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems );
+    boolean isActive(Profile profile, ProfileActivationContext context, ModelProblemCollector problems);
 
     /**
      * Determines whether specified activation method is present in configuration or not. It should help to have AND
@@ -54,6 +52,5 @@ public interface ProfileActivator
      *            {@code null}.
      * @return {@code true} if the profile is active, {@code false} otherwise.
      */
-    boolean presentInConfig( Profile profile, ProfileActivationContext context, ModelProblemCollector problems );
-
+    boolean presentInConfig(Profile profile, ProfileActivationContext context, ModelProblemCollector problems);
 }

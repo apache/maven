@@ -1,5 +1,3 @@
-package org.apache.maven.api;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,11 +16,12 @@ package org.apache.maven.api;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api;
+
+import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
-
-import java.util.Optional;
 
 /**
  * Event sent by maven during various phases of the build process.
@@ -32,8 +31,7 @@ import java.util.Optional;
  * @since 4.0
  */
 @Experimental
-public interface Event
-{
+public interface Event {
 
     /**
      * Gets the type of the event.
@@ -73,5 +71,4 @@ public interface Event
      * @return the exception or {@code empty()} if none
      */
     Optional<Exception> getException();
-
 }

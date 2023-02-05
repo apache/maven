@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.legacy;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy;
 
 import java.io.File;
 import java.util.List;
@@ -35,50 +34,53 @@ import org.apache.maven.wagon.repository.Repository;
 /**
  * WagonManager
  */
-public interface WagonManager
-{
+public interface WagonManager {
     @Deprecated
-    Wagon getWagon( String protocol )
-        throws UnsupportedProtocolException;
+    Wagon getWagon(String protocol) throws UnsupportedProtocolException;
 
     @Deprecated
-    Wagon getWagon( Repository repository )
-        throws UnsupportedProtocolException, WagonConfigurationException;
+    Wagon getWagon(Repository repository) throws UnsupportedProtocolException, WagonConfigurationException;
 
     //
     // Retriever
     //
-    void getArtifact( Artifact artifact, ArtifactRepository repository, TransferListener transferListener,
-                      boolean force )
-        throws TransferFailedException, ResourceDoesNotExistException;
+    void getArtifact(Artifact artifact, ArtifactRepository repository, TransferListener transferListener, boolean force)
+            throws TransferFailedException, ResourceDoesNotExistException;
 
-    void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories,
-                      TransferListener transferListener, boolean force )
-        throws TransferFailedException, ResourceDoesNotExistException;
+    void getArtifact(
+            Artifact artifact,
+            List<ArtifactRepository> remoteRepositories,
+            TransferListener transferListener,
+            boolean force)
+            throws TransferFailedException, ResourceDoesNotExistException;
 
-    void getRemoteFile( ArtifactRepository repository, File destination, String remotePath,
-                        TransferListener downloadMonitor, String checksumPolicy, boolean force )
-        throws TransferFailedException, ResourceDoesNotExistException;
+    void getRemoteFile(
+            ArtifactRepository repository,
+            File destination,
+            String remotePath,
+            TransferListener downloadMonitor,
+            String checksumPolicy,
+            boolean force)
+            throws TransferFailedException, ResourceDoesNotExistException;
 
-    void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File destination,
-                              String checksumPolicy )
-        throws TransferFailedException, ResourceDoesNotExistException;
+    void getArtifactMetadata(
+            ArtifactMetadata metadata, ArtifactRepository remoteRepository, File destination, String checksumPolicy)
+            throws TransferFailedException, ResourceDoesNotExistException;
 
-    void getArtifactMetadataFromDeploymentRepository( ArtifactMetadata metadata, ArtifactRepository remoteRepository,
-                                                      File file, String checksumPolicyWarn )
-        throws TransferFailedException, ResourceDoesNotExistException;
+    void getArtifactMetadataFromDeploymentRepository(
+            ArtifactMetadata metadata, ArtifactRepository remoteRepository, File file, String checksumPolicyWarn)
+            throws TransferFailedException, ResourceDoesNotExistException;
 
     //
     // Deployer
     //
-    void putArtifact( File source, Artifact artifact, ArtifactRepository deploymentRepository,
-                      TransferListener downloadMonitor )
-        throws TransferFailedException;
+    void putArtifact(
+            File source, Artifact artifact, ArtifactRepository deploymentRepository, TransferListener downloadMonitor)
+            throws TransferFailedException;
 
-    void putRemoteFile( ArtifactRepository repository, File source, String remotePath,
-                        TransferListener downloadMonitor )
-        throws TransferFailedException;
+    void putRemoteFile(ArtifactRepository repository, File source, String remotePath, TransferListener downloadMonitor)
+            throws TransferFailedException;
 
-    void putArtifactMetadata( File source, ArtifactMetadata artifactMetadata, ArtifactRepository repository )
-        throws TransferFailedException;
+    void putArtifactMetadata(File source, ArtifactMetadata artifactMetadata, ArtifactRepository repository)
+            throws TransferFailedException;
 }

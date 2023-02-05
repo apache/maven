@@ -1,5 +1,3 @@
-package org.apache.maven.project.path;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.path;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,44 +16,41 @@ package org.apache.maven.project.path;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.path;
 
 import java.io.File;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-@SuppressWarnings( "deprecation" )
-public class DefaultPathTranslatorTest
-{
+
+@SuppressWarnings("deprecation")
+public class DefaultPathTranslatorTest {
 
     @Test
-    public void testAlignToBasedirWhereBasedirExpressionIsTheCompleteValue()
-    {
-        File basedir = new File( System.getProperty( "java.io.tmpdir" ), "test" ).getAbsoluteFile();
+    public void testAlignToBasedirWhereBasedirExpressionIsTheCompleteValue() {
+        File basedir = new File(System.getProperty("java.io.tmpdir"), "test").getAbsoluteFile();
 
-        String aligned = new DefaultPathTranslator().alignToBaseDirectory( "${basedir}", basedir );
+        String aligned = new DefaultPathTranslator().alignToBaseDirectory("${basedir}", basedir);
 
-        assertEquals( basedir.getAbsolutePath(), aligned );
+        assertEquals(basedir.getAbsolutePath(), aligned);
     }
 
     @Test
-    public void testAlignToBasedirWhereBasedirExpressionIsTheValuePrefix()
-    {
-        File basedir = new File( System.getProperty( "java.io.tmpdir" ), "test" ).getAbsoluteFile();
+    public void testAlignToBasedirWhereBasedirExpressionIsTheValuePrefix() {
+        File basedir = new File(System.getProperty("java.io.tmpdir"), "test").getAbsoluteFile();
 
-        String aligned = new DefaultPathTranslator().alignToBaseDirectory( "${basedir}/dir", basedir );
+        String aligned = new DefaultPathTranslator().alignToBaseDirectory("${basedir}/dir", basedir);
 
-        assertEquals( new File( basedir, "dir" ).getAbsolutePath(), aligned );
+        assertEquals(new File(basedir, "dir").getAbsolutePath(), aligned);
     }
 
     @Test
-    public void testUnalignToBasedirWherePathEqualsBasedir()
-    {
-        File basedir = new File( System.getProperty( "java.io.tmpdir" ), "test" ).getAbsoluteFile();
+    public void testUnalignToBasedirWherePathEqualsBasedir() {
+        File basedir = new File(System.getProperty("java.io.tmpdir"), "test").getAbsoluteFile();
 
-        String unaligned = new DefaultPathTranslator().unalignFromBaseDirectory( basedir.getAbsolutePath(), basedir );
+        String unaligned = new DefaultPathTranslator().unalignFromBaseDirectory(basedir.getAbsolutePath(), basedir);
 
-        assertEquals( ".", unaligned );
+        assertEquals(".", unaligned);
     }
-
 }

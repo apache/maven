@@ -1,5 +1,3 @@
-package org.apache.maven.feature;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,8 +16,12 @@ package org.apache.maven.feature;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.feature;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
  * Centralized class for feature information
@@ -27,15 +29,24 @@ import java.util.Properties;
  * @author Robert Scholte
  * @since 4.0.0
  */
-public final class Features
-{
-    private Features()
-    {
+public final class Features {
+    private Features() {}
+
+    public static Feature buildConsumer(Properties userProperties) {
+        return buildConsumer(toMap(userProperties));
     }
 
-    public static Feature buildConsumer( Properties userProperties )
-    {
-        return new Feature( userProperties, "maven.experimental.buildconsumer", "true" );
+    public static Feature buildConsumer(Map<String, String> userProperties) {
+        return new Feature(userProperties, "maven.experimental.buildconsumer", "true");
+    }
+
+    private static Map<String, String> toMap(Properties properties) {
+        return properties.entrySet().stream()
+                .collect(Collectors.toMap(
+                        e -> String.valueOf(e.getKey()),
+                        e -> String.valueOf(e.getValue()),
+                        (prev, next) -> next,
+                        HashMap::new));
     }
 
     /**
@@ -44,28 +55,22 @@ public final class Features
      * @author Robert Scholte
      * @since 4.0.0
      */
-    public static class Feature
-    {
+    public static class Feature {
         private final boolean active;
 
         private final String name;
 
-        Feature( Properties userProperties, String name, String defaultValue )
-        {
+        Feature(Map<String, String> userProperties, String name, String defaultValue) {
             this.name = name;
-            this.active = "true".equals( userProperties.getProperty( name, defaultValue ) );
+            this.active = "true".equals(userProperties.getOrDefault(name, defaultValue));
         }
 
-        public boolean isActive()
-        {
-           return active;
+        public boolean isActive() {
+            return active;
         }
 
-        public String propertyName()
-        {
+        public String propertyName() {
             return name;
         }
-
     }
-
 }

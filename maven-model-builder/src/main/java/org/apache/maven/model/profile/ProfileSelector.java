@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.profile;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile;
 
 import java.util.Collection;
 import java.util.List;
@@ -30,8 +29,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
  *
  * @author Benjamin Bentmann
  */
-public interface ProfileSelector
-{
+public interface ProfileSelector {
 
     /**
      * Determines the profiles which are active in the specified activation context. Active profiles will eventually be
@@ -43,7 +41,6 @@ public interface ProfileSelector
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      * @return The profiles that have been activated, never {@code null}.
      */
-    List<Profile> getActiveProfiles( Collection<Profile> profiles, ProfileActivationContext context,
-                                     ModelProblemCollector problems );
-
+    List<Profile> getActiveProfiles(
+            Collection<Profile> profiles, ProfileActivationContext context, ModelProblemCollector problems);
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import org.apache.maven.model.Plugin;
 
@@ -26,22 +25,18 @@ import org.apache.maven.model.Plugin;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-public class PluginResolutionException
-    extends Exception
-{
+public class PluginResolutionException extends Exception {
 
     private final Plugin plugin;
 
-    public PluginResolutionException( Plugin plugin, Throwable cause )
-    {
-        super( "Plugin " + plugin.getId() + " or one of its dependencies could not be resolved: " + cause.getMessage(),
-               cause );
+    public PluginResolutionException(Plugin plugin, Throwable cause) {
+        super(
+                "Plugin " + plugin.getId() + " or one of its dependencies could not be resolved: " + cause.getMessage(),
+                cause);
         this.plugin = plugin;
     }
 
-    public Plugin getPlugin()
-    {
+    public Plugin getPlugin() {
         return plugin;
     }
-
 }

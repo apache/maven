@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,33 +17,28 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>35</version>
+    <version>39</version>
     <relativePath />
   </parent>
 
   <artifactId>maven-bom</artifactId>
-  <version>4.0.0-alpha-3-SNAPSHOT</version>
+  <version>4.0.0-alpha-5-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Maven Dependencies BOM</name>
   <description>Bill Of Materials for Apache Maven dependencies</description>
   <url>https://maven.apache.org/ref/${project.version}/${project.artifactId}</url>
 
-  <properties>
-    <maven.site.path>ref/4-LATEST/${project.artifactId}</maven.site.path>
-  </properties>
-
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
+    <tag>maven-4.0.0-alpha-3</tag>
     <url>https://github.com/apache/maven/tree/${project.scm.tag}/${project.artifactId}</url>
-    <tag>maven-4.0.0-alpha-1</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
@@ -55,12 +49,16 @@ under the License.
     <url>https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/</url>
   </ciManagement>
   <distributionManagement>
-    <downloadUrl>https://maven.apache.org/download.html</downloadUrl>
     <site>
       <id>apache.website</id>
       <url>scm:svn:https://svn.apache.org/repos/asf/maven/website/components/${maven.site.path}</url>
     </site>
+    <downloadUrl>https://maven.apache.org/download.html</downloadUrl>
   </distributionManagement>
+
+  <properties>
+    <maven.site.path>ref/4-LATEST/${project.artifactId}</maven.site.path>
+  </properties>
 
   <dependencyManagement>
     <!-- Not included:

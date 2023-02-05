@@ -1,5 +1,3 @@
-package org.apache.maven.internal.impl;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.internal.impl;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.internal.impl;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.impl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -39,91 +38,74 @@ import org.apache.maven.toolchain.ToolchainPrivate;
 
 @Named
 @Singleton
-public class DefaultToolchainManager implements ToolchainManager
-{
+public class DefaultToolchainManager implements ToolchainManager {
     private final DefaultToolchainManagerPrivate toolchainManagerPrivate;
 
     @Inject
-    public DefaultToolchainManager( DefaultToolchainManagerPrivate toolchainManagerPrivate )
-    {
+    public DefaultToolchainManager(DefaultToolchainManagerPrivate toolchainManagerPrivate) {
         this.toolchainManagerPrivate = toolchainManagerPrivate;
     }
 
     @Override
-    public List<Toolchain> getToolchains( Session session, String type, Map<String, String> requirements )
-            throws ToolchainManagerException
-    {
-        MavenSession s = ( ( DefaultSession ) session ).getMavenSession();
+    public List<Toolchain> getToolchains(Session session, String type, Map<String, String> requirements)
+            throws ToolchainManagerException {
+        MavenSession s = ((DefaultSession) session).getMavenSession();
         List<org.apache.maven.toolchain.Toolchain> toolchains =
-                toolchainManagerPrivate.getToolchains( s, type, requirements );
-        return new MappedList<>( toolchains, this::toToolchain );
+                toolchainManagerPrivate.getToolchains(s, type, requirements);
+        return new MappedList<>(toolchains, this::toToolchain);
     }
 
     @Override
-    public Optional<Toolchain> getToolchainFromBuildContext( Session session, String type )
-            throws ToolchainManagerException
-    {
-        MavenSession s = ( ( DefaultSession ) session ).getMavenSession();
-        return Optional.ofNullable( toolchainManagerPrivate.getToolchainFromBuildContext( type, s ) )
-                .map( this::toToolchain );
+    public Optional<Toolchain> getToolchainFromBuildContext(Session session, String type)
+            throws ToolchainManagerException {
+        MavenSession s = ((DefaultSession) session).getMavenSession();
+        return Optional.ofNullable(toolchainManagerPrivate.getToolchainFromBuildContext(type, s))
+                .map(this::toToolchain);
     }
 
     @Override
-    public List<Toolchain> getToolchainsForType( Session session, String type )
-            throws ToolchainManagerException
-    {
-        try
-        {
-            MavenSession s = ( (DefaultSession) session ).getMavenSession();
-            ToolchainPrivate[] toolchains = toolchainManagerPrivate.getToolchainsForType( type, s );
-            return new MappedList<>( Arrays.asList( toolchains ), this::toToolchain );
-        }
-        catch ( MisconfiguredToolchainException e )
-        {
-            throw new ToolchainManagerException( "Unable to get toochains for type " + type, e );
+    public List<Toolchain> getToolchainsForType(Session session, String type) throws ToolchainManagerException {
+        try {
+            MavenSession s = ((DefaultSession) session).getMavenSession();
+            ToolchainPrivate[] toolchains = toolchainManagerPrivate.getToolchainsForType(type, s);
+            return new MappedList<>(Arrays.asList(toolchains), this::toToolchain);
+        } catch (MisconfiguredToolchainException e) {
+            throw new ToolchainManagerException("Unable to get toochains for type " + type, e);
         }
     }
 
     @Override
-    public void storeToolchainToBuildContext( Session session, Toolchain toolchain )
-            throws ToolchainManagerException
-    {
-        MavenSession s = ( ( DefaultSession ) session ).getMavenSession();
+    public void storeToolchainToBuildContext(Session session, Toolchain toolchain) throws ToolchainManagerException {
+        MavenSession s = ((DefaultSession) session).getMavenSession();
         org.apache.maven.toolchain.ToolchainPrivate tc =
-                (org.apache.maven.toolchain.ToolchainPrivate) ( (ToolchainWrapper) toolchain ).toolchain;
-        toolchainManagerPrivate.storeToolchainToBuildContext( tc, s );
+                (org.apache.maven.toolchain.ToolchainPrivate) ((ToolchainWrapper) toolchain).toolchain;
+        toolchainManagerPrivate.storeToolchainToBuildContext(tc, s);
     }
 
-    private Toolchain toToolchain( org.apache.maven.toolchain.Toolchain toolchain )
-    {
-        return new ToolchainWrapper( toolchain );
+    private Toolchain toToolchain(org.apache.maven.toolchain.Toolchain toolchain) {
+        return new ToolchainWrapper(toolchain);
     }
 
-    private static class ToolchainWrapper implements Toolchain
-    {
+    private static class ToolchainWrapper implements Toolchain {
         private final org.apache.maven.toolchain.Toolchain toolchain;
 
-        ToolchainWrapper( org.apache.maven.toolchain.Toolchain toolchain )
-        {
+        ToolchainWrapper(org.apache.maven.toolchain.Toolchain toolchain) {
             this.toolchain = toolchain;
         }
 
         @Override
-        public String getType()
-        {
+        public String getType() {
             return toolchain.getType();
         }
 
         @Override
-        public String findTool( String toolName )
-        {
-            return toolchain.findTool( toolName );
+        public String findTool(String toolName) {
+            return toolchain.findTool(toolName);
         }
 
         @Override
-        public boolean matchesRequirements( Map<String, String> requirements )
-        {
-            return ( (ToolchainPrivate) toolchain ).matchesRequirements( requirements );
+        public boolean matchesRequirements(Map<String, String> requirements) {
+            return ((ToolchainPrivate) toolchain).matchesRequirements(requirements);
         }
     }
 }

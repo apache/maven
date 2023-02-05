@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,130 +34,108 @@ import org.eclipse.aether.artifact.Artifact;
 /**
  * Maven local GAV level metadata.
  */
-final class LocalSnapshotMetadata
-    extends MavenMetadata
-{
+final class LocalSnapshotMetadata extends MavenMetadata {
 
     private final Collection<Artifact> artifacts = new ArrayList<>();
 
     private final boolean legacyFormat;
 
-    LocalSnapshotMetadata( Artifact artifact, boolean legacyFormat, Date timestamp )
-    {
-        super( createMetadata( artifact, legacyFormat ), null, timestamp );
+    LocalSnapshotMetadata(Artifact artifact, boolean legacyFormat, Date timestamp) {
+        super(createMetadata(artifact, legacyFormat), null, timestamp);
         this.legacyFormat = legacyFormat;
     }
 
-    LocalSnapshotMetadata( Metadata metadata, File file, boolean legacyFormat, Date timestamp )
-    {
-        super( metadata, file, timestamp );
+    LocalSnapshotMetadata(Metadata metadata, File file, boolean legacyFormat, Date timestamp) {
+        super(metadata, file, timestamp);
         this.legacyFormat = legacyFormat;
     }
 
-    private static Metadata createMetadata( Artifact artifact, boolean legacyFormat )
-    {
+    private static Metadata createMetadata(Artifact artifact, boolean legacyFormat) {
         Snapshot snapshot = new Snapshot();
-        snapshot.setLocalCopy( true );
+        snapshot.setLocalCopy(true);
         Versioning versioning = new Versioning();
-        versioning.setSnapshot( snapshot );
+        versioning.setSnapshot(snapshot);
 
         Metadata metadata = new Metadata();
-        metadata.setVersioning( versioning );
-        metadata.setGroupId( artifact.getGroupId() );
-        metadata.setArtifactId( artifact.getArtifactId() );
-        metadata.setVersion( artifact.getBaseVersion() );
+        metadata.setVersioning(versioning);
+        metadata.setGroupId(artifact.getGroupId());
+        metadata.setArtifactId(artifact.getArtifactId());
+        metadata.setVersion(artifact.getBaseVersion());
 
-        if ( !legacyFormat )
-        {
-            metadata.setModelVersion( "1.1.0" );
+        if (!legacyFormat) {
+            metadata.setModelVersion("1.1.0");
         }
 
         return metadata;
     }
 
-    public void bind( Artifact artifact )
-    {
-        artifacts.add( artifact );
+    public void bind(Artifact artifact) {
+        artifacts.add(artifact);
     }
 
-    public MavenMetadata setFile( File file )
-    {
-        return new LocalSnapshotMetadata( metadata, file, legacyFormat, timestamp );
+    public MavenMetadata setFile(File file) {
+        return new LocalSnapshotMetadata(metadata, file, legacyFormat, timestamp);
     }
 
-    public Object getKey()
-    {
+    public Object getKey() {
         return getGroupId() + ':' + getArtifactId() + ':' + getVersion();
     }
 
-    public static Object getKey( Artifact artifact )
-    {
+    public static Object getKey(Artifact artifact) {
         return artifact.getGroupId() + ':' + artifact.getArtifactId() + ':' + artifact.getBaseVersion();
     }
 
     @Override
-    protected void merge( Metadata recessive )
-    {
-        metadata.getVersioning().setLastUpdatedTimestamp( timestamp );
+    protected void merge(Metadata recessive) {
+        metadata.getVersioning().setLastUpdatedTimestamp(timestamp);
 
-        if ( !legacyFormat )
-        {
+        if (!legacyFormat) {
             String lastUpdated = metadata.getVersioning().getLastUpdated();
 
             Map<String, SnapshotVersion> versions = new LinkedHashMap<>();
 
-            for ( Artifact artifact : artifacts )
-            {
+            for (Artifact artifact : artifacts) {
                 SnapshotVersion sv = new SnapshotVersion();
-                sv.setClassifier( artifact.getClassifier() );
-                sv.setExtension( artifact.getExtension() );
-                sv.setVersion( getVersion() );
-                sv.setUpdated( lastUpdated );
-                versions.put( getKey( sv.getClassifier(), sv.getExtension() ), sv );
+                sv.setClassifier(artifact.getClassifier());
+                sv.setExtension(artifact.getExtension());
+                sv.setVersion(getVersion());
+                sv.setUpdated(lastUpdated);
+                versions.put(getKey(sv.getClassifier(), sv.getExtension()), sv);
             }
 
             Versioning versioning = recessive.getVersioning();
-            if ( versioning != null )
-            {
-                for ( SnapshotVersion sv : versioning.getSnapshotVersions() )
-                {
-                    String key = getKey( sv.getClassifier(), sv.getExtension() );
-                    if ( !versions.containsKey( key ) )
-                    {
-                        versions.put( key, sv );
+            if (versioning != null) {
+                for (SnapshotVersion sv : versioning.getSnapshotVersions()) {
+                    String key = getKey(sv.getClassifier(), sv.getExtension());
+                    if (!versions.containsKey(key)) {
+                        versions.put(key, sv);
                     }
                 }
             }
 
-            metadata.getVersioning().setSnapshotVersions( new ArrayList<>( versions.values() ) );
+            metadata.getVersioning().setSnapshotVersions(new ArrayList<>(versions.values()));
         }
 
         artifacts.clear();
     }
 
-    private String getKey( String classifier, String extension )
-    {
+    private String getKey(String classifier, String extension) {
         return classifier + ':' + extension;
     }
 
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return metadata.getGroupId();
     }
 
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return metadata.getArtifactId();
     }
 
-    public String getVersion()
-    {
+    public String getVersion() {
         return metadata.getVersion();
     }
 
-    public Nature getNature()
-    {
+    public Nature getNature() {
         return Nature.SNAPSHOT;
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.prefix;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.prefix;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.prefix;
 
 import java.util.List;
 
@@ -31,8 +30,7 @@ import org.eclipse.aether.repository.RemoteRepository;
  * @since 3.0
  * @author Benjamin Bentmann
  */
-public interface PluginPrefixRequest
-{
+public interface PluginPrefixRequest {
 
     /**
      * Gets the prefix of the plugin.
@@ -47,7 +45,7 @@ public interface PluginPrefixRequest
      * @param prefix The prefix of the plugin.
      * @return This request, never {@code null}.
      */
-    PluginPrefixRequest setPrefix( String prefix );
+    PluginPrefixRequest setPrefix(String prefix);
 
     /**
      * Gets the list of group ids to scan for the plugin prefix.
@@ -62,7 +60,7 @@ public interface PluginPrefixRequest
      * @param pluginGroups The list of group ids to scan for the plugin prefix, may be {@code null}.
      * @return This request, never {@code null}.
      */
-    PluginPrefixRequest setPluginGroups( List<String> pluginGroups );
+    PluginPrefixRequest setPluginGroups(List<String> pluginGroups);
 
     /**
      * Gets the POM whose build plugins are to be scanned for the prefix.
@@ -79,7 +77,7 @@ public interface PluginPrefixRequest
      *            plugin repositories.
      * @return This request, never {@code null}.
      */
-    PluginPrefixRequest setPom( Model pom );
+    PluginPrefixRequest setPom(Model pom);
 
     /**
      * Gets the remote repositories to use.
@@ -95,7 +93,7 @@ public interface PluginPrefixRequest
      * @param repositories The remote repositories to use.
      * @return This request, never {@code null}.
      */
-    PluginPrefixRequest setRepositories( List<RemoteRepository> repositories );
+    PluginPrefixRequest setRepositories(List<RemoteRepository> repositories);
 
     /**
      * Gets the session to use for repository access.
@@ -110,6 +108,5 @@ public interface PluginPrefixRequest
      * @param repositorySession The repository session to use.
      * @return This request, never {@code null}.
      */
-    PluginPrefixRequest setRepositorySession( RepositorySystemSession repositorySession );
-
+    PluginPrefixRequest setRepositorySession(RepositorySystemSession repositorySession);
 }

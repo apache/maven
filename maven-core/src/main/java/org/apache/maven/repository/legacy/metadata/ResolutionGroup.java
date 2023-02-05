@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.legacy.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.repository.legacy.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy.metadata;
 
 import java.util.List;
 import java.util.Map;
@@ -29,8 +28,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 /**
  * ResolutionGroup
  */
-public class ResolutionGroup
-{
+public class ResolutionGroup {
 
     private final Set<Artifact> artifacts;
 
@@ -42,15 +40,17 @@ public class ResolutionGroup
 
     private final Map<String, Artifact> managedVersions;
 
-    public ResolutionGroup( Artifact pomArtifact, Set<Artifact> artifacts,
-                            List<ArtifactRepository> resolutionRepositories )
-    {
-        this( pomArtifact, null, artifacts, null, resolutionRepositories );
+    public ResolutionGroup(
+            Artifact pomArtifact, Set<Artifact> artifacts, List<ArtifactRepository> resolutionRepositories) {
+        this(pomArtifact, null, artifacts, null, resolutionRepositories);
     }
 
-    public ResolutionGroup( Artifact pomArtifact, Artifact relocatedArtifact, Set<Artifact> artifacts,
-                            Map<String, Artifact> managedVersions, List<ArtifactRepository> resolutionRepositories )
-    {
+    public ResolutionGroup(
+            Artifact pomArtifact,
+            Artifact relocatedArtifact,
+            Set<Artifact> artifacts,
+            Map<String, Artifact> managedVersions,
+            List<ArtifactRepository> resolutionRepositories) {
         this.pomArtifact = pomArtifact;
         this.relocatedArtifact = relocatedArtifact;
         this.artifacts = artifacts;
@@ -58,29 +58,23 @@ public class ResolutionGroup
         this.resolutionRepositories = resolutionRepositories;
     }
 
-    public Artifact getPomArtifact()
-    {
+    public Artifact getPomArtifact() {
         return pomArtifact;
     }
 
-    public Artifact getRelocatedArtifact()
-    {
+    public Artifact getRelocatedArtifact() {
         return relocatedArtifact;
     }
 
-    public Set<Artifact> getArtifacts()
-    {
+    public Set<Artifact> getArtifacts() {
         return artifacts;
     }
 
-    public List<ArtifactRepository> getResolutionRepositories()
-    {
+    public List<ArtifactRepository> getResolutionRepositories() {
         return resolutionRepositories;
     }
 
-    public Map<String, Artifact> getManagedVersions()
-    {
+    public Map<String, Artifact> getManagedVersions() {
         return managedVersions;
     }
-
 }

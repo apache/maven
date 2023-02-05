@@ -1,5 +1,3 @@
-package org.apache.maven.api.services;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.services;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api.services;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.services;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,8 +48,7 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
  */
 @Experimental
 @Immutable
-public interface DependencyCollectorRequest
-{
+public interface DependencyCollectorRequest {
 
     @Nonnull
     Session getSession();
@@ -70,43 +68,38 @@ public interface DependencyCollectorRequest
     boolean getVerbose();
 
     @Nonnull
-    static DependencyCollectorRequest build( @Nonnull Session session, Artifact root )
-    {
+    static DependencyCollectorRequest build(@Nonnull Session session, Artifact root) {
         return builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .rootArtifact( nonNull( root, "root cannot be null" ) )
+                .session(nonNull(session, "session cannot be null"))
+                .rootArtifact(nonNull(root, "root cannot be null"))
                 .build();
     }
 
     @Nonnull
-    static DependencyCollectorRequest build( @Nonnull Session session, @Nonnull DependencyCoordinate root )
-    {
+    static DependencyCollectorRequest build(@Nonnull Session session, @Nonnull DependencyCoordinate root) {
         return builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .root( nonNull( root, "root cannot be null" ) )
+                .session(nonNull(session, "session cannot be null"))
+                .root(nonNull(root, "root cannot be null"))
                 .build();
     }
 
     @Nonnull
-    static DependencyCollectorRequest build( @Nonnull Session session, @Nonnull Project project )
-    {
+    static DependencyCollectorRequest build(@Nonnull Session session, @Nonnull Project project) {
         return builder()
-                .session( nonNull( session, "session cannot be null" ) )
-                .rootArtifact( nonNull( project, "project cannot be null" ).getArtifact() )
-                .dependencies( project.getDependencies() )
-                .managedDependencies( project.getManagedDependencies() )
+                .session(nonNull(session, "session cannot be null"))
+                .rootArtifact(nonNull(project, "project cannot be null").getArtifact())
+                .dependencies(project.getDependencies())
+                .managedDependencies(project.getManagedDependencies())
                 .build();
     }
 
     @Nonnull
-    static DependencyCollectorRequestBuilder builder()
-    {
+    static DependencyCollectorRequestBuilder builder() {
         return new DependencyCollectorRequestBuilder();
     }
 
     @NotThreadSafe
-    class DependencyCollectorRequestBuilder
-    {
+    class DependencyCollectorRequestBuilder {
 
         Session session;
         Artifact rootArtifact;
@@ -115,13 +108,10 @@ public interface DependencyCollectorRequest
         List<DependencyCoordinate> managedDependencies = Collections.emptyList();
         boolean verbose;
 
-        DependencyCollectorRequestBuilder()
-        {
-        }
+        DependencyCollectorRequestBuilder() {}
 
         @Nonnull
-        public DependencyCollectorRequestBuilder session( @Nonnull Session session )
-        {
+        public DependencyCollectorRequestBuilder session(@Nonnull Session session) {
             this.session = session;
             return this;
         }
@@ -138,8 +128,7 @@ public interface DependencyCollectorRequest
          * @return this request for chaining, never {@code null}
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder rootArtifact( @Nullable Artifact rootArtifact )
-        {
+        public DependencyCollectorRequestBuilder rootArtifact(@Nullable Artifact rootArtifact) {
             this.rootArtifact = rootArtifact;
             return this;
         }
@@ -149,8 +138,7 @@ public interface DependencyCollectorRequest
          * @return this request for chaining, never {@code null}
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder root( @Nonnull DependencyCoordinate root )
-        {
+        public DependencyCollectorRequestBuilder root(@Nonnull DependencyCoordinate root) {
             this.root = root;
             return this;
         }
@@ -164,9 +152,8 @@ public interface DependencyCollectorRequest
          * @return this request for chaining, never {@code null}
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder dependencies( @Nullable List<DependencyCoordinate> dependencies )
-        {
-            this.dependencies = ( dependencies != null ) ? dependencies : Collections.emptyList();
+        public DependencyCollectorRequestBuilder dependencies(@Nullable List<DependencyCoordinate> dependencies) {
+            this.dependencies = (dependencies != null) ? dependencies : Collections.emptyList();
             return this;
         }
 
@@ -177,19 +164,15 @@ public interface DependencyCollectorRequest
          * @return this request for chaining, never {@code null}
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder dependency( @Nullable DependencyCoordinate dependency )
-        {
-            if ( dependency != null )
-            {
-                if ( this.dependencies.isEmpty() )
-                {
+        public DependencyCollectorRequestBuilder dependency(@Nullable DependencyCoordinate dependency) {
+            if (dependency != null) {
+                if (this.dependencies.isEmpty()) {
                     this.dependencies = new ArrayList<>();
                 }
-                this.dependencies.add( dependency );
+                this.dependencies.add(dependency);
             }
             return this;
         }
-
 
         /**
          * Sets the dependency management to apply to transitive dependencies. To clarify, this management does not
@@ -201,9 +184,8 @@ public interface DependencyCollectorRequest
          */
         @Nonnull
         public DependencyCollectorRequestBuilder managedDependencies(
-                        @Nullable List<DependencyCoordinate> managedDependencies )
-        {
-            this.managedDependencies = ( managedDependencies != null ) ? managedDependencies : Collections.emptyList();
+                @Nullable List<DependencyCoordinate> managedDependencies) {
+            this.managedDependencies = (managedDependencies != null) ? managedDependencies : Collections.emptyList();
             return this;
         }
 
@@ -215,15 +197,12 @@ public interface DependencyCollectorRequest
          * @return this request for chaining, never {@code null}
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder managedDependency( @Nullable DependencyCoordinate managedDependency )
-        {
-            if ( managedDependency != null )
-            {
-                if ( this.managedDependencies.isEmpty() )
-                {
+        public DependencyCollectorRequestBuilder managedDependency(@Nullable DependencyCoordinate managedDependency) {
+            if (managedDependency != null) {
+                if (this.managedDependencies.isEmpty()) {
                     this.managedDependencies = new ArrayList<>();
                 }
-                this.managedDependencies.add( managedDependency );
+                this.managedDependencies.add(managedDependency);
             }
             return this;
         }
@@ -235,33 +214,23 @@ public interface DependencyCollectorRequest
          * @return this request for chaining, never {@code null}
          */
         @Nonnull
-        public DependencyCollectorRequestBuilder verbose( boolean verbose )
-        {
+        public DependencyCollectorRequestBuilder verbose(boolean verbose) {
             this.verbose = verbose;
             return this;
         }
 
         @Nonnull
-        public DependencyCollectorRequest build()
-        {
+        public DependencyCollectorRequest build() {
             return new DefaultDependencyCollectorRequest(
-                    session,
-                    rootArtifact,
-                    root,
-                    dependencies,
-                    managedDependencies,
-                    verbose );
+                    session, rootArtifact, root, dependencies, managedDependencies, verbose);
         }
 
-        static class DefaultDependencyCollectorRequest extends BaseRequest
-                implements DependencyCollectorRequest
-        {
+        static class DefaultDependencyCollectorRequest extends BaseRequest implements DependencyCollectorRequest {
             private final Artifact rootArtifact;
             private final DependencyCoordinate root;
             private final Collection<DependencyCoordinate> dependencies;
             private final Collection<DependencyCoordinate> managedDependencies;
             private final boolean verbose;
-
 
             /**
              * Creates a request with the specified properties.
@@ -276,59 +245,50 @@ public interface DependencyCollectorRequest
                     @Nullable DependencyCoordinate root,
                     @Nonnull Collection<DependencyCoordinate> dependencies,
                     @Nonnull Collection<DependencyCoordinate> managedDependencies,
-                    boolean verbose )
-            {
-                super( session );
+                    boolean verbose) {
+                super(session);
                 this.rootArtifact = rootArtifact;
                 this.root = root;
-                this.dependencies = unmodifiable( nonNull( dependencies, "dependencies cannot be null" ) );
-                this.managedDependencies = unmodifiable( nonNull( managedDependencies,
-                                                         "managedDependencies cannot be null" ) );
+                this.dependencies = unmodifiable(nonNull(dependencies, "dependencies cannot be null"));
+                this.managedDependencies =
+                        unmodifiable(nonNull(managedDependencies, "managedDependencies cannot be null"));
                 this.verbose = verbose;
             }
 
             @Nonnull
             @Override
-            public Optional<Artifact> getRootArtifact()
-            {
-                return Optional.ofNullable( rootArtifact );
+            public Optional<Artifact> getRootArtifact() {
+                return Optional.ofNullable(rootArtifact);
             }
 
             @Nonnull
             @Override
-            public Optional<DependencyCoordinate> getRoot()
-            {
-                return Optional.ofNullable( root );
+            public Optional<DependencyCoordinate> getRoot() {
+                return Optional.ofNullable(root);
             }
 
             @Nonnull
             @Override
-            public Collection<DependencyCoordinate> getDependencies()
-            {
+            public Collection<DependencyCoordinate> getDependencies() {
                 return dependencies;
             }
 
             @Nonnull
             @Override
-            public Collection<DependencyCoordinate> getManagedDependencies()
-            {
+            public Collection<DependencyCoordinate> getManagedDependencies() {
                 return managedDependencies;
             }
 
             @Override
-            public boolean getVerbose()
-            {
+            public boolean getVerbose() {
                 return verbose;
             }
 
             @Nonnull
             @Override
-            public String toString()
-            {
+            public String toString() {
                 return getRoot() + " -> " + getDependencies();
             }
-
         }
     }
-
 }

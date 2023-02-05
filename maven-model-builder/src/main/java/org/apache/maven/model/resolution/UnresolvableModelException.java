@@ -1,5 +1,3 @@
-package org.apache.maven.model.resolution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,14 @@ package org.apache.maven.model.resolution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.resolution;
 
 /**
  * Signals an error when resolving the path to an external model.
  *
  * @author Benjamin Bentmann
  */
-public class UnresolvableModelException
-    extends Exception
-{
+public class UnresolvableModelException extends Exception {
 
     /**
      * The group id of the unresolvable model.
@@ -52,13 +49,12 @@ public class UnresolvableModelException
      * @param version The version of the unresolvable model, may be {@code null}.
      * @param cause The cause, may be {@code null}.
      */
-    public UnresolvableModelException( String message, String groupId, String artifactId, String version,
-                                       Throwable cause )
-    {
-        super( message, cause );
-        this.groupId = ( groupId != null ) ? groupId : "";
-        this.artifactId = ( artifactId != null ) ? artifactId : "";
-        this.version = ( version != null ) ? version : "";
+    public UnresolvableModelException(
+            String message, String groupId, String artifactId, String version, Throwable cause) {
+        super(message, cause);
+        this.groupId = (groupId != null) ? groupId : "";
+        this.artifactId = (artifactId != null) ? artifactId : "";
+        this.version = (version != null) ? version : "";
     }
 
     /**
@@ -69,12 +65,11 @@ public class UnresolvableModelException
      * @param artifactId The artifact id of the unresolvable model, may be {@code null}.
      * @param version The version of the unresolvable model, may be {@code null}.
      */
-    public UnresolvableModelException( String message, String groupId, String artifactId, String version )
-    {
-        super( message );
-        this.groupId = ( groupId != null ) ? groupId : "";
-        this.artifactId = ( artifactId != null ) ? artifactId : "";
-        this.version = ( version != null ) ? version : "";
+    public UnresolvableModelException(String message, String groupId, String artifactId, String version) {
+        super(message);
+        this.groupId = (groupId != null) ? groupId : "";
+        this.artifactId = (artifactId != null) ? artifactId : "";
+        this.version = (version != null) ? version : "";
     }
 
     /**
@@ -85,9 +80,8 @@ public class UnresolvableModelException
      * @param artifactId
      * @param version
      */
-    public UnresolvableModelException( Throwable cause, String groupId, String artifactId, String version )
-    {
-        super( cause );
+    public UnresolvableModelException(Throwable cause, String groupId, String artifactId, String version) {
+        super(cause);
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
@@ -98,8 +92,7 @@ public class UnresolvableModelException
      *
      * @return The group id of the unresolvable model, can be empty but never {@code null}.
      */
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return groupId;
     }
 
@@ -108,8 +101,7 @@ public class UnresolvableModelException
      *
      * @return The artifact id of the unresolvable model, can be empty but never {@code null}.
      */
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return artifactId;
     }
 
@@ -118,9 +110,7 @@ public class UnresolvableModelException
      *
      * @return The version of the unresolvable model, can be empty but never {@code null}.
      */
-    public String getVersion()
-    {
+    public String getVersion() {
         return version;
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.legacy;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,10 +16,11 @@ package org.apache.maven.repository.legacy;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.io.File;
+package org.apache.maven.repository.legacy;
 
 import javax.inject.Inject;
+
+import java.io.File;
 
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
@@ -40,9 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DefaultUpdateCheckManagerTest
-    extends AbstractArtifactComponentTestCase
-{
+public class DefaultUpdateCheckManagerTest extends AbstractArtifactComponentTestCase {
 
     @Inject
     private ArtifactFactory artifactFactory;
@@ -50,209 +47,196 @@ public class DefaultUpdateCheckManagerTest
     DefaultUpdateCheckManager updateCheckManager;
 
     @Override
-    protected String component()
-    {
+    protected String component() {
         return "updateCheckManager";
     }
 
     @BeforeEach
     @Override
-    public void setUp()
-        throws Exception
-    {
+    public void setUp() throws Exception {
         super.setUp();
 
-        updateCheckManager = new DefaultUpdateCheckManager( new ConsoleLogger( Logger.LEVEL_DEBUG, "test" ) );
+        updateCheckManager = new DefaultUpdateCheckManager(new ConsoleLogger(Logger.LEVEL_DEBUG, "test"));
     }
 
     @Test
-    public void testArtifact() throws Exception
-    {
+    public void testArtifact() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
 
-        Artifact a = createArtifact( "a", "0.0.1-SNAPSHOT" );
-        File file = new File( localRepository.getBasedir(),
-                              localRepository.pathOf( a ) );
+        Artifact a = createArtifact("a", "0.0.1-SNAPSHOT");
+        File file = new File(localRepository.getBasedir(), localRepository.pathOf(a));
         file.delete();
-        a.setFile( file );
+        a.setFile(file);
 
-        File touchFile = updateCheckManager.getTouchfile( a );
+        File touchFile = updateCheckManager.getTouchfile(a);
         touchFile.delete();
 
-        assertTrue( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
+        assertTrue(updateCheckManager.isUpdateRequired(a, remoteRepository));
 
         file.getParentFile().mkdirs();
         file.createNewFile();
-        updateCheckManager.touch( a, remoteRepository, null );
+        updateCheckManager.touch(a, remoteRepository, null);
 
-        assertFalse( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
+        assertFalse(updateCheckManager.isUpdateRequired(a, remoteRepository));
 
-        assertNull( updateCheckManager.readLastUpdated( touchFile,
-                                                        updateCheckManager.getRepositoryKey( remoteRepository ) ) );
+        assertNull(
+                updateCheckManager.readLastUpdated(touchFile, updateCheckManager.getRepositoryKey(remoteRepository)));
 
-        assertFalse( updateCheckManager.getTouchfile( a ).exists() );
+        assertFalse(updateCheckManager.getTouchfile(a).exists());
     }
 
     @Test
-    public void testMissingArtifact()
-        throws Exception
-    {
+    public void testMissingArtifact() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
 
-        Artifact a = createArtifact( "a", "0.0.1-SNAPSHOT" );
-        File file = new File( localRepository.getBasedir(),
-                              localRepository.pathOf( a ) );
+        Artifact a = createArtifact("a", "0.0.1-SNAPSHOT");
+        File file = new File(localRepository.getBasedir(), localRepository.pathOf(a));
         file.delete();
-        a.setFile( file );
+        a.setFile(file);
 
-        File touchFile = updateCheckManager.getTouchfile( a );
+        File touchFile = updateCheckManager.getTouchfile(a);
         touchFile.delete();
 
-        assertTrue( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
+        assertTrue(updateCheckManager.isUpdateRequired(a, remoteRepository));
 
-        updateCheckManager.touch( a, remoteRepository, null );
+        updateCheckManager.touch(a, remoteRepository, null);
 
-        assertFalse( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
+        assertFalse(updateCheckManager.isUpdateRequired(a, remoteRepository));
 
-        assertFalse( file.exists() );
-        assertNotNull( updateCheckManager.readLastUpdated( touchFile,
-                                                           updateCheckManager.getRepositoryKey( remoteRepository ) ) );
+        assertFalse(file.exists());
+        assertNotNull(
+                updateCheckManager.readLastUpdated(touchFile, updateCheckManager.getRepositoryKey(remoteRepository)));
     }
 
     @Test
-    public void testPom() throws Exception
-    {
+    public void testPom() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
 
-        Artifact a = createArtifact( "a", "0.0.1", "pom" );
-        File file = new File( localRepository.getBasedir(),
-                              localRepository.pathOf( a ) );
+        Artifact a = createArtifact("a", "0.0.1", "pom");
+        File file = new File(localRepository.getBasedir(), localRepository.pathOf(a));
         file.delete();
-        a.setFile( file );
+        a.setFile(file);
 
-        File touchFile = updateCheckManager.getTouchfile( a );
+        File touchFile = updateCheckManager.getTouchfile(a);
         touchFile.delete();
 
-        assertTrue( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
+        assertTrue(updateCheckManager.isUpdateRequired(a, remoteRepository));
 
         file.getParentFile().mkdirs();
         file.createNewFile();
-        updateCheckManager.touch( a, remoteRepository, null );
+        updateCheckManager.touch(a, remoteRepository, null);
 
-        assertFalse( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
+        assertFalse(updateCheckManager.isUpdateRequired(a, remoteRepository));
 
-        assertNull( updateCheckManager.readLastUpdated( touchFile,
-                                                        updateCheckManager.getRepositoryKey( remoteRepository ) ) );
+        assertNull(
+                updateCheckManager.readLastUpdated(touchFile, updateCheckManager.getRepositoryKey(remoteRepository)));
 
-        assertFalse( updateCheckManager.getTouchfile( a ).exists() );
+        assertFalse(updateCheckManager.getTouchfile(a).exists());
     }
 
     @Test
-    public void testMissingPom()
-        throws Exception
-    {
+    public void testMissingPom() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
 
-        Artifact a = createArtifact( "a", "0.0.1", "pom" );
-        File file = new File( localRepository.getBasedir(),
-                              localRepository.pathOf( a ) );
+        Artifact a = createArtifact("a", "0.0.1", "pom");
+        File file = new File(localRepository.getBasedir(), localRepository.pathOf(a));
         file.delete();
-        a.setFile( file );
+        a.setFile(file);
 
-        File touchFile = updateCheckManager.getTouchfile( a );
+        File touchFile = updateCheckManager.getTouchfile(a);
         touchFile.delete();
 
-        assertTrue( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
+        assertTrue(updateCheckManager.isUpdateRequired(a, remoteRepository));
 
-        updateCheckManager.touch( a, remoteRepository, null );
+        updateCheckManager.touch(a, remoteRepository, null);
 
-        assertFalse( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
+        assertFalse(updateCheckManager.isUpdateRequired(a, remoteRepository));
 
-        assertFalse( file.exists() );
-        assertNotNull( updateCheckManager.readLastUpdated( touchFile,
-                                                           updateCheckManager.getRepositoryKey( remoteRepository ) ) );
+        assertFalse(file.exists());
+        assertNotNull(
+                updateCheckManager.readLastUpdated(touchFile, updateCheckManager.getRepositoryKey(remoteRepository)));
     }
 
     @Test
-    public void testMetadata() throws Exception
-    {
+    public void testMetadata() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
 
-        Artifact a = createRemoteArtifact( "a", "0.0.1-SNAPSHOT" );
-        RepositoryMetadata metadata = new ArtifactRepositoryMetadata( a );
+        Artifact a = createRemoteArtifact("a", "0.0.1-SNAPSHOT");
+        RepositoryMetadata metadata = new ArtifactRepositoryMetadata(a);
 
-        File file = new File( localRepository.getBasedir(),
-                              localRepository.pathOfLocalRepositoryMetadata( metadata, localRepository ) );
+        File file = new File(
+                localRepository.getBasedir(), localRepository.pathOfLocalRepositoryMetadata(metadata, localRepository));
         file.delete();
 
-        File touchFile = updateCheckManager.getTouchfile( metadata, file );
+        File touchFile = updateCheckManager.getTouchfile(metadata, file);
         touchFile.delete();
 
-        assertTrue( updateCheckManager.isUpdateRequired( metadata, remoteRepository, file ) );
+        assertTrue(updateCheckManager.isUpdateRequired(metadata, remoteRepository, file));
 
         file.getParentFile().mkdirs();
         file.createNewFile();
-        updateCheckManager.touch( metadata, remoteRepository, file );
+        updateCheckManager.touch(metadata, remoteRepository, file);
 
-        assertFalse( updateCheckManager.isUpdateRequired( metadata, remoteRepository, file ) );
+        assertFalse(updateCheckManager.isUpdateRequired(metadata, remoteRepository, file));
 
-        assertNotNull( updateCheckManager.readLastUpdated( touchFile, updateCheckManager.getMetadataKey( remoteRepository, file ) ) );
+        assertNotNull(updateCheckManager.readLastUpdated(
+                touchFile, updateCheckManager.getMetadataKey(remoteRepository, file)));
     }
 
     @Test
-    public void testMissingMetadata() throws Exception
-    {
+    public void testMissingMetadata() throws Exception {
         ArtifactRepository remoteRepository = remoteRepository();
 
         ArtifactRepository localRepository = localRepository();
 
-        Artifact a = createRemoteArtifact( "a", "0.0.1-SNAPSHOT" );
-        RepositoryMetadata metadata = new ArtifactRepositoryMetadata( a );
+        Artifact a = createRemoteArtifact("a", "0.0.1-SNAPSHOT");
+        RepositoryMetadata metadata = new ArtifactRepositoryMetadata(a);
 
-        File file = new File( localRepository.getBasedir(),
-                              localRepository.pathOfLocalRepositoryMetadata( metadata, localRepository ) );
+        File file = new File(
+                localRepository.getBasedir(), localRepository.pathOfLocalRepositoryMetadata(metadata, localRepository));
         file.delete();
 
-        File touchFile = updateCheckManager.getTouchfile( metadata, file );
+        File touchFile = updateCheckManager.getTouchfile(metadata, file);
         touchFile.delete();
 
-        assertTrue( updateCheckManager.isUpdateRequired( metadata, remoteRepository, file ) );
+        assertTrue(updateCheckManager.isUpdateRequired(metadata, remoteRepository, file));
 
-        updateCheckManager.touch( metadata, remoteRepository, file );
+        updateCheckManager.touch(metadata, remoteRepository, file);
 
-        assertFalse( updateCheckManager.isUpdateRequired( metadata, remoteRepository, file ) );
+        assertFalse(updateCheckManager.isUpdateRequired(metadata, remoteRepository, file));
 
-        assertNotNull( updateCheckManager.readLastUpdated( touchFile, updateCheckManager.getMetadataKey( remoteRepository, file ) ) );
+        assertNotNull(updateCheckManager.readLastUpdated(
+                touchFile, updateCheckManager.getMetadataKey(remoteRepository, file)));
     }
 
     @Test
-    public void testArtifactTouchFileName() throws Exception
-    {
+    public void testArtifactTouchFileName() throws Exception {
         ArtifactRepository localRepository = localRepository();
 
-        Artifact a = artifactFactory.createArtifactWithClassifier( "groupId", "a", "0.0.1-SNAPSHOT", "jar", null );
-        File file = new File( localRepository.getBasedir(),
-                              localRepository.pathOf( a ) );
-        a.setFile( file );
+        Artifact a = artifactFactory.createArtifactWithClassifier("groupId", "a", "0.0.1-SNAPSHOT", "jar", null);
+        File file = new File(localRepository.getBasedir(), localRepository.pathOf(a));
+        a.setFile(file);
 
-        assertEquals( "a-0.0.1-SNAPSHOT.jar.lastUpdated", updateCheckManager.getTouchfile( a ).getName() );
+        assertEquals(
+                "a-0.0.1-SNAPSHOT.jar.lastUpdated",
+                updateCheckManager.getTouchfile(a).getName());
 
-        a = artifactFactory.createArtifactWithClassifier( "groupId", "a", "0.0.1-SNAPSHOT", "jar", "classifier" );
-        file = new File( localRepository.getBasedir(),
-                              localRepository.pathOf( a ) );
-        a.setFile( file );
+        a = artifactFactory.createArtifactWithClassifier("groupId", "a", "0.0.1-SNAPSHOT", "jar", "classifier");
+        file = new File(localRepository.getBasedir(), localRepository.pathOf(a));
+        a.setFile(file);
 
-        assertEquals( "a-0.0.1-SNAPSHOT-classifier.jar.lastUpdated", updateCheckManager.getTouchfile( a ).getName() );
+        assertEquals(
+                "a-0.0.1-SNAPSHOT-classifier.jar.lastUpdated",
+                updateCheckManager.getTouchfile(a).getName());
     }
-
 }

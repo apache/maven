@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.execution;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -33,32 +32,25 @@ import org.codehaus.plexus.util.StringUtils;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 @Deprecated
-@Component( role = RuntimeInformation.class )
-public class DefaultRuntimeInformation
-    implements RuntimeInformation, Initializable
-{
+@Component(role = RuntimeInformation.class)
+public class DefaultRuntimeInformation implements RuntimeInformation, Initializable {
 
     @Requirement
     private org.apache.maven.rtinfo.RuntimeInformation rtInfo;
 
     private ArtifactVersion applicationVersion;
 
-    public ArtifactVersion getApplicationVersion()
-    {
+    public ArtifactVersion getApplicationVersion() {
         return applicationVersion;
     }
 
-    public void initialize()
-        throws InitializationException
-    {
+    public void initialize() throws InitializationException {
         String mavenVersion = rtInfo.getMavenVersion();
 
-        if ( StringUtils.isEmpty( mavenVersion ) )
-        {
-            throw new InitializationException( "Unable to read Maven version from maven-core" );
+        if (StringUtils.isEmpty(mavenVersion)) {
+            throw new InitializationException("Unable to read Maven version from maven-core");
         }
 
-        applicationVersion = new DefaultArtifactVersion( mavenVersion );
+        applicationVersion = new DefaultArtifactVersion(mavenVersion);
     }
-
 }

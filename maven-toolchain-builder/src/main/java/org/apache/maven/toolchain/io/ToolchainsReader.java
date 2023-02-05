@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.toolchain.io;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain.io;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +24,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 
-import org.apache.maven.api.toolchain.PersistedToolchains;
+import org.apache.maven.toolchain.model.PersistedToolchains;
 
 /**
  * Handles deserialization of toolchains from some kind of textual format like XML.
@@ -33,8 +32,7 @@ import org.apache.maven.api.toolchain.PersistedToolchains;
  * @author Robert Scholte
  * @since 3.3.0
  */
-public interface ToolchainsReader
-{
+public interface ToolchainsReader {
 
     /**
      * The key for the option to enable strict parsing. This option is of type {@link Boolean} and defaults to {@code
@@ -51,8 +49,7 @@ public interface ToolchainsReader
      * @throws IOException If the toolchains could not be deserialized.
      * @throws ToolchainsParseException If the input format could not be parsed.
      */
-    PersistedToolchains read( File input, Map<String, ?> options )
-        throws IOException, ToolchainsParseException;
+    PersistedToolchains read(File input, Map<String, ?> options) throws IOException, ToolchainsParseException;
 
     /**
      * Reads the toolchains from the specified character reader. The reader will be automatically closed before the
@@ -64,8 +61,7 @@ public interface ToolchainsReader
      * @throws IOException If the toolchains could not be deserialized.
      * @throws ToolchainsParseException If the input format could not be parsed.
      */
-    PersistedToolchains read( Reader input, Map<String, ?> options )
-        throws IOException, ToolchainsParseException;
+    PersistedToolchains read(Reader input, Map<String, ?> options) throws IOException, ToolchainsParseException;
 
     /**
      * Reads the toolchains from the specified byte stream. The stream will be automatically closed before the method
@@ -77,7 +73,5 @@ public interface ToolchainsReader
      * @throws IOException If the toolchains could not be deserialized.
      * @throws ToolchainsParseException If the input format could not be parsed.
      */
-    PersistedToolchains read( InputStream input, Map<String, ?> options )
-        throws IOException, ToolchainsParseException;
-
+    PersistedToolchains read(InputStream input, Map<String, ?> options) throws IOException, ToolchainsParseException;
 }

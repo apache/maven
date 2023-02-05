@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -30,12 +29,9 @@ import org.eclipse.aether.RepositorySystemSession;
  */
 @Singleton
 @Named
-public class DefaultModelCacheFactory implements ModelCacheFactory
-{
+public class DefaultModelCacheFactory implements ModelCacheFactory {
     @Override
-    public ModelCache createCache( RepositorySystemSession session )
-    {
-        return DefaultModelCache.newInstance( session );
+    public ModelCache createCache(RepositorySystemSession session) {
+        return DefaultModelCache.newInstance(session);
     }
-
 }

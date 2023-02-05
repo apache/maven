@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -44,171 +43,175 @@ import org.apache.maven.model.v4.MavenMerger;
  * @author Robert Scholte
  * @since 4.0.0
  */
-class FileToRawModelMerger extends MavenMerger
-{
+class FileToRawModelMerger extends MavenMerger {
 
     @Override
-    protected void mergeBuild_Extensions( Build.Builder builder,
-                                          Build target, Build source, boolean sourceDominant,
-                                          Map<Object, Object> context )
-    {
-        // don't merge
-    }
-
-
-    @Override
-    protected void mergeBuildBase_Resources( BuildBase.Builder builder,
-                                             BuildBase target, BuildBase source, boolean sourceDominant,
-                                             Map<Object, Object> context )
-    {
+    protected void mergeBuild_Extensions(
+            Build.Builder builder, Build target, Build source, boolean sourceDominant, Map<Object, Object> context) {
         // don't merge
     }
 
     @Override
-    protected void mergeBuildBase_TestResources( BuildBase.Builder builder,
-                                                 BuildBase target, BuildBase source, boolean sourceDominant,
-                                                 Map<Object, Object> context )
-    {
+    protected void mergeBuildBase_Resources(
+            BuildBase.Builder builder,
+            BuildBase target,
+            BuildBase source,
+            boolean sourceDominant,
+            Map<Object, Object> context) {
         // don't merge
     }
 
     @Override
-    protected void mergeCiManagement_Notifiers( CiManagement.Builder builder,
-                                                CiManagement target, CiManagement source, boolean sourceDominant,
-                                                Map<Object, Object> context )
-    {
+    protected void mergeBuildBase_TestResources(
+            BuildBase.Builder builder,
+            BuildBase target,
+            BuildBase source,
+            boolean sourceDominant,
+            Map<Object, Object> context) {
         // don't merge
     }
 
     @Override
-    protected void mergeDependencyManagement_Dependencies( DependencyManagement.Builder builder,
-                                                           DependencyManagement target, DependencyManagement source,
-                                                           boolean sourceDominant, Map<Object, Object> context )
-    {
+    protected void mergeCiManagement_Notifiers(
+            CiManagement.Builder builder,
+            CiManagement target,
+            CiManagement source,
+            boolean sourceDominant,
+            Map<Object, Object> context) {
+        // don't merge
+    }
+
+    @Override
+    protected void mergeDependencyManagement_Dependencies(
+            DependencyManagement.Builder builder,
+            DependencyManagement target,
+            DependencyManagement source,
+            boolean sourceDominant,
+            Map<Object, Object> context) {
         Iterator<Dependency> sourceIterator = source.getDependencies().iterator();
-        builder.dependencies( target.getDependencies().stream()
-                .map( d -> mergeDependency( d, sourceIterator.next(), sourceDominant, context ) )
-                .collect( Collectors.toList() ) );
+        builder.dependencies(target.getDependencies().stream()
+                .map(d -> mergeDependency(d, sourceIterator.next(), sourceDominant, context))
+                .collect(Collectors.toList()));
     }
 
     @Override
-    protected void mergeDependency_Exclusions( Dependency.Builder builder,
-                                               Dependency target, Dependency source, boolean sourceDominant,
-                                               Map<Object, Object> context )
-    {
+    protected void mergeDependency_Exclusions(
+            Dependency.Builder builder,
+            Dependency target,
+            Dependency source,
+            boolean sourceDominant,
+            Map<Object, Object> context) {
         // don't merge
     }
 
     @Override
-    protected void mergeModel_Contributors( Model.Builder builder,
-                                            Model target, Model source, boolean sourceDominant,
-                                            Map<Object, Object> context )
-    {
+    protected void mergeModel_Contributors(
+            Model.Builder builder, Model target, Model source, boolean sourceDominant, Map<Object, Object> context) {
         // don't merge
     }
 
     @Override
-    protected void mergeModel_Developers( Model.Builder builder,
-                                          Model target, Model source, boolean sourceDominant,
-                                          Map<Object, Object> context )
-    {
+    protected void mergeModel_Developers(
+            Model.Builder builder, Model target, Model source, boolean sourceDominant, Map<Object, Object> context) {
         // don't merge
     }
 
     @Override
-    protected void mergeModel_Licenses( Model.Builder builder,
-                                        Model target, Model source, boolean sourceDominant,
-                                        Map<Object, Object> context )
-    {
+    protected void mergeModel_Licenses(
+            Model.Builder builder, Model target, Model source, boolean sourceDominant, Map<Object, Object> context) {
         // don't merge
     }
 
     @Override
-    protected void mergeModel_MailingLists( Model.Builder builder,
-                                            Model target, Model source, boolean sourceDominant,
-                                            Map<Object, Object> context )
-    {
+    protected void mergeModel_MailingLists(
+            Model.Builder builder, Model target, Model source, boolean sourceDominant, Map<Object, Object> context) {
         // don't merge
     }
 
     @Override
-    protected void mergeModel_Profiles( Model.Builder builder,
-                                        Model target, Model source, boolean sourceDominant,
-                                        Map<Object, Object> context )
-    {
+    protected void mergeModel_Profiles(
+            Model.Builder builder, Model target, Model source, boolean sourceDominant, Map<Object, Object> context) {
         Iterator<Profile> sourceIterator = source.getProfiles().iterator();
-        builder.profiles( target.getProfiles().stream()
-                .map( d -> mergeProfile( d, sourceIterator.next(), sourceDominant, context ) )
-                .collect( Collectors.toList() ) );
+        builder.profiles(target.getProfiles().stream()
+                .map(d -> mergeProfile(d, sourceIterator.next(), sourceDominant, context))
+                .collect(Collectors.toList()));
     }
 
     @Override
-    protected void mergeModelBase_Dependencies( ModelBase.Builder builder,
-                                                ModelBase target, ModelBase source, boolean sourceDominant,
-                                                Map<Object, Object> context )
-    {
+    protected void mergeModelBase_Dependencies(
+            ModelBase.Builder builder,
+            ModelBase target,
+            ModelBase source,
+            boolean sourceDominant,
+            Map<Object, Object> context) {
         Iterator<Dependency> sourceIterator = source.getDependencies().iterator();
-        builder.dependencies( target.getDependencies().stream()
-                .map( d -> mergeDependency( d, sourceIterator.next(), sourceDominant, context ) )
-                .collect( Collectors.toList() ) );
+        builder.dependencies(target.getDependencies().stream()
+                .map(d -> mergeDependency(d, sourceIterator.next(), sourceDominant, context))
+                .collect(Collectors.toList()));
     }
 
     @Override
-    protected void mergeModelBase_PluginRepositories( ModelBase.Builder builder,
-                                                      ModelBase target, ModelBase source, boolean sourceDominant,
-                                                      Map<Object, Object> context )
-    {
-        builder.pluginRepositories( source.getPluginRepositories() );
+    protected void mergeModelBase_PluginRepositories(
+            ModelBase.Builder builder,
+            ModelBase target,
+            ModelBase source,
+            boolean sourceDominant,
+            Map<Object, Object> context) {
+        builder.pluginRepositories(source.getPluginRepositories());
     }
 
     @Override
-    protected void mergeModelBase_Repositories( ModelBase.Builder builder,
-                                                ModelBase target, ModelBase source, boolean sourceDominant,
-                                                Map<Object, Object> context )
-    {
+    protected void mergeModelBase_Repositories(
+            ModelBase.Builder builder,
+            ModelBase target,
+            ModelBase source,
+            boolean sourceDominant,
+            Map<Object, Object> context) {
         // don't merge
     }
 
     @Override
-    protected void mergePlugin_Dependencies( Plugin.Builder builder,
-                                             Plugin target, Plugin source, boolean sourceDominant,
-                                             Map<Object, Object> context )
-    {
+    protected void mergePlugin_Dependencies(
+            Plugin.Builder builder, Plugin target, Plugin source, boolean sourceDominant, Map<Object, Object> context) {
         Iterator<Dependency> sourceIterator = source.getDependencies().iterator();
-        builder.dependencies( target.getDependencies().stream()
-                .map( d -> mergeDependency( d, sourceIterator.next(), sourceDominant, context ) )
-                .collect( Collectors.toList() ) );
+        builder.dependencies(target.getDependencies().stream()
+                .map(d -> mergeDependency(d, sourceIterator.next(), sourceDominant, context))
+                .collect(Collectors.toList()));
     }
 
     @Override
-    protected void mergePlugin_Executions( Plugin.Builder builder,
-                                           Plugin target, Plugin source, boolean sourceDominant,
-                                           Map<Object, Object> context )
-    {
+    protected void mergePlugin_Executions(
+            Plugin.Builder builder, Plugin target, Plugin source, boolean sourceDominant, Map<Object, Object> context) {
         // don't merge
     }
 
     @Override
-    protected void mergeReporting_Plugins( Reporting.Builder builder,
-                                           Reporting target, Reporting source, boolean sourceDominant,
-                                           Map<Object, Object> context )
-    {
+    protected void mergeReporting_Plugins(
+            Reporting.Builder builder,
+            Reporting target,
+            Reporting source,
+            boolean sourceDominant,
+            Map<Object, Object> context) {
         // don't merge
     }
 
     @Override
-    protected void mergeReportPlugin_ReportSets( ReportPlugin.Builder builder,
-                                                 ReportPlugin target, ReportPlugin source, boolean sourceDominant,
-                                                 Map<Object, Object> context )
-    {
+    protected void mergeReportPlugin_ReportSets(
+            ReportPlugin.Builder builder,
+            ReportPlugin target,
+            ReportPlugin source,
+            boolean sourceDominant,
+            Map<Object, Object> context) {
         // don't merge
     }
 
     @Override
-    protected void mergePluginContainer_Plugins( PluginContainer.Builder builder,
-                                                 PluginContainer target, PluginContainer source,
-                                                 boolean sourceDominant, Map<Object, Object> context )
-    {
+    protected void mergePluginContainer_Plugins(
+            PluginContainer.Builder builder,
+            PluginContainer target,
+            PluginContainer source,
+            boolean sourceDominant,
+            Map<Object, Object> context) {
         // don't merge
     }
 }

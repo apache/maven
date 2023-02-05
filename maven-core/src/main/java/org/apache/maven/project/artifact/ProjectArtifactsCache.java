@@ -1,5 +1,3 @@
-package org.apache.maven.project.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.artifact;
 
 import java.util.Collection;
 import java.util.Set;
@@ -26,6 +25,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
+
 /**
  * Caches project artifacts. <strong>Warning:</strong> This is an internal utility interface that is only public for
  * technical reasons, it is not part of the public API. In particular, this interface can be changed or deleted without
@@ -35,58 +35,55 @@ import org.eclipse.aether.RepositorySystemSession;
  * @author Benjamin Bentmann
  * @author Anton Tanasenko
  */
-public interface ProjectArtifactsCache
-{
+public interface ProjectArtifactsCache {
 
     /**
      * A cache key.
      */
-    interface Key
-    {
+    interface Key {
         // marker interface for cache keys
     }
 
     /**
      * CacheRecord
      */
-    class CacheRecord
-    {
+    class CacheRecord {
 
-        public Set<Artifact> getArtifacts()
-        {
+        public Set<Artifact> getArtifacts() {
             return artifacts;
         }
 
         private final Set<Artifact> artifacts;
 
-        public LifecycleExecutionException getException()
-        {
+        public LifecycleExecutionException getException() {
             return exception;
         }
 
         private final LifecycleExecutionException exception;
 
-        CacheRecord( Set<Artifact> artifacts )
-        {
+        CacheRecord(Set<Artifact> artifacts) {
             this.artifacts = artifacts;
             this.exception = null;
         }
 
-        CacheRecord( LifecycleExecutionException exception )
-        {
+        CacheRecord(LifecycleExecutionException exception) {
             this.artifacts = null;
             this.exception = exception;
         }
     }
 
-    Key createKey( MavenProject project, Collection<String> scopesToCollect, Collection<String> scopesToResolve,
-        boolean aggregating, RepositorySystemSession session );
+    Key createKey(
+            MavenProject project,
+            Collection<String> scopesToCollect,
+            Collection<String> scopesToResolve,
+            boolean aggregating,
+            RepositorySystemSession session);
 
-    CacheRecord get( Key key ) throws LifecycleExecutionException;
+    CacheRecord get(Key key) throws LifecycleExecutionException;
 
-    CacheRecord put( Key key, Set<Artifact> pluginArtifacts );
+    CacheRecord put(Key key, Set<Artifact> pluginArtifacts);
 
-    CacheRecord put( Key key, LifecycleExecutionException e );
+    CacheRecord put(Key key, LifecycleExecutionException e);
 
     void flush();
 
@@ -98,6 +95,5 @@ public interface ProjectArtifactsCache
      * @param project The project that employs the plugin realm, must not be {@code null}.
      * @param record The cache record being used for the project, must not be {@code null}.
      */
-    void register( MavenProject project, Key cacheKey, CacheRecord record );
-
+    void register(MavenProject project, Key cacheKey, CacheRecord record);
 }

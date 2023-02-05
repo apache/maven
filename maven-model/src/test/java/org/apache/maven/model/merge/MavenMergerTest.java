@@ -1,5 +1,3 @@
-package org.apache.maven.model.merge;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.merge;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.merge;
 
 import java.util.Arrays;
 
@@ -37,50 +36,55 @@ import static org.hamcrest.Matchers.is;
  * @author Robert Scholte
  *
  */
-public class MavenMergerTest
-{
+public class MavenMergerTest {
     private MavenMerger mavenMerger = new MavenMerger();
 
     @Test
-    public void mergeArtifactId()
-    {
-        Model target = Model.newBuilder().artifactId( "TARGET" ).build();
+    public void mergeArtifactId() {
+        Model target = Model.newBuilder().artifactId("TARGET").build();
 
-        Model source = Model.newBuilder().artifactId( "SOURCE" ).build();
+        Model source = Model.newBuilder().artifactId("SOURCE").build();
 
-        Model merged = mavenMerger.merge( target, source, true, null );
-        assertThat( merged.getArtifactId(), is( "SOURCE" ) );
+        Model merged = mavenMerger.merge(target, source, true, null);
+        assertThat(merged.getArtifactId(), is("SOURCE"));
 
-        merged = mavenMerger.merge( target, source, false, null );
-        assertThat( merged.getArtifactId(), is( "TARGET" ) );
+        merged = mavenMerger.merge(target, source, false, null);
+        assertThat(merged.getArtifactId(), is("TARGET"));
     }
 
     @Test
-    public void mergeSameContributors()
-    {
-        Contributor contributor = Contributor.newBuilder().email( "contributor@maven.apache.org" ).build();
+    public void mergeSameContributors() {
+        Contributor contributor =
+                Contributor.newBuilder().email("contributor@maven.apache.org").build();
 
-        Model target = Model.newBuilder().contributors( Arrays.asList( contributor ) ).build();
+        Model target =
+                Model.newBuilder().contributors(Arrays.asList(contributor)).build();
 
-        Model source = Model.newBuilder().contributors( Arrays.asList( contributor ) ).build();
+        Model source =
+                Model.newBuilder().contributors(Arrays.asList(contributor)).build();
 
-        Model merged = mavenMerger.merge( target, source, true, null );
+        Model merged = mavenMerger.merge(target, source, true, null);
 
-        assertThat( merged.getContributors(), contains( contributor ) );
+        assertThat(merged.getContributors(), contains(contributor));
     }
 
     @Test
-    public void mergeSameDependencies()
-    {
-        Dependency dependency = Dependency.newBuilder().groupId( "groupId" ).artifactId( "artifactId" ).type( "type" ).build();
+    public void mergeSameDependencies() {
+        Dependency dependency = Dependency.newBuilder()
+                .groupId("groupId")
+                .artifactId("artifactId")
+                .type("type")
+                .build();
 
-        Model target = Model.newBuilder().dependencies( Arrays.asList( dependency ) ).build();
+        Model target =
+                Model.newBuilder().dependencies(Arrays.asList(dependency)).build();
 
-        Model source = Model.newBuilder().dependencies( Arrays.asList( dependency ) ).build();
+        Model source =
+                Model.newBuilder().dependencies(Arrays.asList(dependency)).build();
 
-        Model merged = mavenMerger.merge( target, source, true, null );
+        Model merged = mavenMerger.merge(target, source, true, null);
 
-        assertThat( merged.getDependencies(), contains( dependency ) );
+        assertThat(merged.getDependencies(), contains(dependency));
     }
 
     /*

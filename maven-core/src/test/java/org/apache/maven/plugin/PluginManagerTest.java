@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,9 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
+
+import javax.inject.Inject;
 
 import java.util.List;
 
@@ -38,65 +39,57 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import javax.inject.Inject;
-
-public class PluginManagerTest
-    extends AbstractCoreMavenComponentTestCase
-{
+public class PluginManagerTest extends AbstractCoreMavenComponentTestCase {
     @Inject
     private DefaultBuildPluginManager pluginManager;
 
-    protected String getProjectsDirectory()
-    {
+    protected String getProjectsDirectory() {
         return "src/test/projects/plugin-manager";
     }
 
     @Test
-    public void testPluginLoading()
-        throws Exception
-    {
-        MavenSession session = createMavenSession( null );
+    public void testPluginLoading() throws Exception {
+        MavenSession session = createMavenSession(null);
         Plugin plugin = new Plugin();
-        plugin.setGroupId( "org.apache.maven.its.plugins" );
-        plugin.setArtifactId( "maven-it-plugin" );
-        plugin.setVersion( "0.1" );
-        PluginDescriptor pluginDescriptor =
-            pluginManager.loadPlugin( plugin, session.getCurrentProject().getRemotePluginRepositories(),
-                                      session.getRepositorySession() );
-        assertNotNull( pluginDescriptor );
+        plugin.setGroupId("org.apache.maven.its.plugins");
+        plugin.setArtifactId("maven-it-plugin");
+        plugin.setVersion("0.1");
+        PluginDescriptor pluginDescriptor = pluginManager.loadPlugin(
+                plugin, session.getCurrentProject().getRemotePluginRepositories(), session.getRepositorySession());
+        assertNotNull(pluginDescriptor);
     }
 
     @Test
-    public void testMojoDescriptorRetrieval()
-        throws Exception
-    {
-        MavenSession session = createMavenSession( null );
+    public void testMojoDescriptorRetrieval() throws Exception {
+        MavenSession session = createMavenSession(null);
         String goal = "it";
         Plugin plugin = new Plugin();
-        plugin.setGroupId( "org.apache.maven.its.plugins" );
-        plugin.setArtifactId( "maven-it-plugin" );
-        plugin.setVersion( "0.1" );
+        plugin.setGroupId("org.apache.maven.its.plugins");
+        plugin.setArtifactId("maven-it-plugin");
+        plugin.setVersion("0.1");
 
-        MojoDescriptor mojoDescriptor =
-            pluginManager.getMojoDescriptor( plugin, goal, session.getCurrentProject().getRemotePluginRepositories(),
-                                             session.getRepositorySession() );
-        assertNotNull( mojoDescriptor );
-        assertEquals( goal, mojoDescriptor.getGoal() );
+        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor(
+                plugin,
+                goal,
+                session.getCurrentProject().getRemotePluginRepositories(),
+                session.getRepositorySession());
+        assertNotNull(mojoDescriptor);
+        assertEquals(goal, mojoDescriptor.getGoal());
         // igorf: plugin realm comes later
         // assertNotNull( mojoDescriptor.getRealm() );
 
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-        assertNotNull( pluginDescriptor );
-        assertEquals( "org.apache.maven.its.plugins", pluginDescriptor.getGroupId() );
-        assertEquals( "maven-it-plugin", pluginDescriptor.getArtifactId() );
-        assertEquals( "0.1", pluginDescriptor.getVersion() );
+        assertNotNull(pluginDescriptor);
+        assertEquals("org.apache.maven.its.plugins", pluginDescriptor.getGroupId());
+        assertEquals("maven-it-plugin", pluginDescriptor.getArtifactId());
+        assertEquals("0.1", pluginDescriptor.getVersion());
     }
 
     // -----------------------------------------------------------------------------------------------
     // Tests which exercise the lifecycle executor when it is dealing with individual goals.
     // -----------------------------------------------------------------------------------------------
 
-    //TODO These two tests display a lack of symmetry with respect to the input which is a free form string and the
+    // TODO These two tests display a lack of symmetry with respect to the input which is a free form string and the
     //      mojo descriptor which comes back. All the free form parsing needs to be done somewhere else, this is
     //      really the function of the CLI, and then the pre-processing of that output still needs to be fed into
     //      a hinting process which helps flesh out the full specification of the plugin. The plugin manager should
@@ -104,10 +97,8 @@ public class PluginManagerTest
     //      the plugin manager provides.
 
     @Test
-    public void testRemoteResourcesPlugin()
-        throws Exception
-    {
-        //TODO turn an equivalent back on when the RR plugin is released.
+    public void testRemoteResourcesPlugin() throws Exception {
+        // TODO turn an equivalent back on when the RR plugin is released.
 
         /*
 
@@ -132,10 +123,8 @@ public class PluginManagerTest
         */
     }
 
-    //TODO this will be the basis of the customizable lifecycle execution so need to figure this out quickly.
-    public void testSurefirePlugin()
-        throws Exception
-    {
+    // TODO this will be the basis of the customizable lifecycle execution so need to figure this out quickly.
+    public void testSurefirePlugin() throws Exception {
         /*
         MavenSession session = createMavenSession( getProject( "project-with-inheritance" ) );
         String goal = "test";
@@ -158,10 +147,7 @@ public class PluginManagerTest
     }
 
     @Test
-    public void testMojoConfigurationIsMergedCorrectly()
-        throws Exception
-    {
-    }
+    public void testMojoConfigurationIsMergedCorrectly() throws Exception {}
 
     /**
      * The case where the user wants to specify an alternate version of the underlying tool. Common case
@@ -169,40 +155,28 @@ public class PluginManagerTest
      * to use a specific version. We need to make sure the version that they specify takes precedence.
      */
     @Test
-    public void testMojoWhereInternallyStatedDependencyIsOverriddenByProject()
-        throws Exception
-    {
-    }
+    public void testMojoWhereInternallyStatedDependencyIsOverriddenByProject() throws Exception {}
 
     /**
      * The case where you have a plugin in the current build that you want to be used on projects in
      * the current build.
      */
     @Test
-    public void testMojoThatIsPresentInTheCurrentBuild()
-        throws Exception
-    {
-    }
+    public void testMojoThatIsPresentInTheCurrentBuild() throws Exception {}
 
     /**
      * This is the case where the Mojo wants to execute on every project and then do something at the end
      * with the results of each project.
      */
     @Test
-    public void testAggregatorMojo()
-        throws Exception
-    {
-    }
+    public void testAggregatorMojo() throws Exception {}
 
     /**
      * This is the case where a Mojo needs the lifecycle run to a certain phase before it can do
      * anything useful.
      */
     @Test
-    public void testMojoThatRequiresExecutionToAGivenPhaseBeforeExecutingItself()
-        throws Exception
-    {
-    }
+    public void testMojoThatRequiresExecutionToAGivenPhaseBeforeExecutingItself() throws Exception {}
 
     // test that mojo which does not require dependency resolution trigger no downloading of dependencies
 
@@ -211,111 +185,98 @@ public class PluginManagerTest
     // test a build where projects use different versions of the same plugin
 
     @Test
-    public void testThatPluginDependencyThatHasSystemScopeIsResolved()
-        throws Exception
-    {
-        MavenSession session = createMavenSession( getProject( "project-contributing-system-scope-plugin-dep" ) );
+    public void testThatPluginDependencyThatHasSystemScopeIsResolved() throws Exception {
+        MavenSession session = createMavenSession(getProject("project-contributing-system-scope-plugin-dep"));
         MavenProject project = session.getCurrentProject();
-        Plugin plugin = project.getPlugin( "org.apache.maven.its.plugins:maven-it-plugin" );
+        Plugin plugin = project.getPlugin("org.apache.maven.its.plugins:maven-it-plugin");
 
         RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
-        repositoryRequest.setLocalRepository( getLocalRepository() );
-        repositoryRequest.setRemoteRepositories( getPluginArtifactRepositories() );
+        repositoryRequest.setLocalRepository(getLocalRepository());
+        repositoryRequest.setRemoteRepositories(getPluginArtifactRepositories());
 
-        PluginDescriptor pluginDescriptor =
-            pluginManager.loadPlugin( plugin, session.getCurrentProject().getRemotePluginRepositories(),
-                                      session.getRepositorySession() );
-        pluginManager.getPluginRealm( session, pluginDescriptor );
+        PluginDescriptor pluginDescriptor = pluginManager.loadPlugin(
+                plugin, session.getCurrentProject().getRemotePluginRepositories(), session.getRepositorySession());
+        pluginManager.getPluginRealm(session, pluginDescriptor);
         List<Artifact> artifacts = pluginDescriptor.getArtifacts();
 
-        for ( Artifact a : artifacts )
-        {
-            if ( a.getGroupId().equals( "org.apache.maven.its.mng3586" ) && a.getArtifactId().equals( "tools" ) )
-            {
+        for (Artifact a : artifacts) {
+            if (a.getGroupId().equals("org.apache.maven.its.mng3586")
+                    && a.getArtifactId().equals("tools")) {
                 // The system scoped dependencies will be present in the classloader for the plugin
                 return;
             }
         }
 
-        fail( "Can't find the system scoped dependency in the plugin artifacts." );
+        fail("Can't find the system scoped dependency in the plugin artifacts.");
     }
 
     // -----------------------------------------------------------------------------------------------
     // Testing help
     // -----------------------------------------------------------------------------------------------
 
-    protected void assertPluginDescriptor( MojoDescriptor mojoDescriptor, String groupId, String artifactId, String version )
-    {
-        assertNotNull( mojoDescriptor );
+    protected void assertPluginDescriptor(
+            MojoDescriptor mojoDescriptor, String groupId, String artifactId, String version) {
+        assertNotNull(mojoDescriptor);
         PluginDescriptor pd = mojoDescriptor.getPluginDescriptor();
-        assertNotNull( pd );
-        assertEquals( groupId, pd.getGroupId() );
-        assertEquals( artifactId, pd.getArtifactId() );
-        assertEquals( version, pd.getVersion() );
+        assertNotNull(pd);
+        assertEquals(groupId, pd.getGroupId());
+        assertEquals(artifactId, pd.getArtifactId());
+        assertEquals(version, pd.getVersion());
     }
 
     @Test
-    public void testPluginRealmCache()
-        throws Exception
-    {
+    public void testPluginRealmCache() throws Exception {
         RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
-        repositoryRequest.setLocalRepository( getLocalRepository() );
-        repositoryRequest.setRemoteRepositories( getPluginArtifactRepositories() );
+        repositoryRequest.setLocalRepository(getLocalRepository());
+        repositoryRequest.setRemoteRepositories(getPluginArtifactRepositories());
 
         // prime realm cache
-        MavenSession session = createMavenSession( getProject( "project-contributing-system-scope-plugin-dep" ) );
+        MavenSession session = createMavenSession(getProject("project-contributing-system-scope-plugin-dep"));
         MavenProject project = session.getCurrentProject();
-        Plugin plugin = project.getPlugin( "org.apache.maven.its.plugins:maven-it-plugin" );
+        Plugin plugin = project.getPlugin("org.apache.maven.its.plugins:maven-it-plugin");
 
-        PluginDescriptor pluginDescriptor =
-            pluginManager.loadPlugin( plugin, session.getCurrentProject().getRemotePluginRepositories(),
-                                      session.getRepositorySession() );
-        pluginManager.getPluginRealm( session, pluginDescriptor );
+        PluginDescriptor pluginDescriptor = pluginManager.loadPlugin(
+                plugin, session.getCurrentProject().getRemotePluginRepositories(), session.getRepositorySession());
+        pluginManager.getPluginRealm(session, pluginDescriptor);
 
-        assertEquals( 1, pluginDescriptor.getDependencies().size() );
+        assertEquals(1, pluginDescriptor.getDependencies().size());
 
-        for ( ComponentDescriptor<?> descriptor : pluginDescriptor.getComponents() )
-        {
-            assertNotNull( descriptor.getRealm() );
-            assertNotNull( descriptor.getImplementationClass() );
+        for (ComponentDescriptor<?> descriptor : pluginDescriptor.getComponents()) {
+            assertNotNull(descriptor.getRealm());
+            assertNotNull(descriptor.getImplementationClass());
         }
 
         // reload plugin realm from cache
-        session = createMavenSession( getProject( "project-contributing-system-scope-plugin-dep" ) );
+        session = createMavenSession(getProject("project-contributing-system-scope-plugin-dep"));
         project = session.getCurrentProject();
-        plugin = project.getPlugin( "org.apache.maven.its.plugins:maven-it-plugin" );
+        plugin = project.getPlugin("org.apache.maven.its.plugins:maven-it-plugin");
 
-        pluginDescriptor =
-            pluginManager.loadPlugin( plugin, session.getCurrentProject().getRemotePluginRepositories(),
-                                      session.getRepositorySession() );
-        pluginManager.getPluginRealm( session, pluginDescriptor );
+        pluginDescriptor = pluginManager.loadPlugin(
+                plugin, session.getCurrentProject().getRemotePluginRepositories(), session.getRepositorySession());
+        pluginManager.getPluginRealm(session, pluginDescriptor);
 
-        assertEquals( 1, pluginDescriptor.getDependencies().size() );
+        assertEquals(1, pluginDescriptor.getDependencies().size());
 
-        for ( ComponentDescriptor<?> descriptor : pluginDescriptor.getComponents() )
-        {
-            assertNotNull( descriptor.getRealm() );
-            assertNotNull( descriptor.getImplementationClass() );
+        for (ComponentDescriptor<?> descriptor : pluginDescriptor.getComponents()) {
+            assertNotNull(descriptor.getRealm());
+            assertNotNull(descriptor.getImplementationClass());
         }
     }
 
     @Test
-    public void testBuildExtensionsPluginLoading()
-        throws Exception
-    {
+    public void testBuildExtensionsPluginLoading() throws Exception {
         RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
-        repositoryRequest.setLocalRepository( getLocalRepository() );
-        repositoryRequest.setRemoteRepositories( getPluginArtifactRepositories() );
+        repositoryRequest.setLocalRepository(getLocalRepository());
+        repositoryRequest.setRemoteRepositories(getPluginArtifactRepositories());
 
         // prime realm cache
-        MavenSession session = createMavenSession( getProject( "project-with-build-extensions-plugin" ) );
+        MavenSession session = createMavenSession(getProject("project-with-build-extensions-plugin"));
         MavenProject project = session.getCurrentProject();
-        Plugin plugin = project.getPlugin( "org.apache.maven.its.plugins:maven-it-plugin" );
+        Plugin plugin = project.getPlugin("org.apache.maven.its.plugins:maven-it-plugin");
 
-        PluginDescriptor pluginDescriptor =
-            pluginManager.loadPlugin( plugin, session.getCurrentProject().getRemotePluginRepositories(),
-                                      session.getRepositorySession() );
-        ClassRealm pluginRealm = pluginManager.getPluginRealm( session, pluginDescriptor );
+        PluginDescriptor pluginDescriptor = pluginManager.loadPlugin(
+                plugin, session.getCurrentProject().getRemotePluginRepositories(), session.getRepositorySession());
+        ClassRealm pluginRealm = pluginManager.getPluginRealm(session, pluginDescriptor);
 
         assertEquals(pluginRealm, pluginDescriptor.getComponents().get(0).getRealm());
     }

@@ -1,5 +1,3 @@
-package org.apache.maven.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.metadata;
 
 import java.util.Collection;
 
@@ -29,12 +28,12 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  *
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  */
-public class ArtifactMetadata
-{
+public class ArtifactMetadata {
     /**
      * standard glorified artifact coordinates
      */
     protected String groupId;
+
     protected String artifactId;
     protected String version;
     protected String type;
@@ -64,67 +63,75 @@ public class ArtifactMetadata
     /** error message  */
     private String error;
 
-    //------------------------------------------------------------------
+    // ------------------------------------------------------------------
     /**
      *
      */
-    public ArtifactMetadata( String name )
-    {
-        if ( name == null )
-        {
+    public ArtifactMetadata(String name) {
+        if (name == null) {
             return;
         }
-        int ind1 = name.indexOf( ':' );
-        int ind2 = name.lastIndexOf( ':' );
+        int ind1 = name.indexOf(':');
+        int ind2 = name.lastIndexOf(':');
 
-        if ( ind1 == -1 || ind2 == -1 )
-        {
+        if (ind1 == -1 || ind2 == -1) {
             return;
         }
 
-        this.groupId = name.substring( 0, ind1 );
-        if ( ind1 == ind2 )
-        {
-            this.artifactId = name.substring( ind1 + 1 );
-        }
-        else
-        {
-            this.artifactId = name.substring( ind1 + 1, ind2 );
-            this.version = name.substring( ind2 + 1 );
+        this.groupId = name.substring(0, ind1);
+        if (ind1 == ind2) {
+            this.artifactId = name.substring(ind1 + 1);
+        } else {
+            this.artifactId = name.substring(ind1 + 1, ind2);
+            this.version = name.substring(ind2 + 1);
         }
     }
 
-    public ArtifactMetadata( String groupId, String name, String version )
-    {
-        this( groupId, name, version, null );
+    public ArtifactMetadata(String groupId, String name, String version) {
+        this(groupId, name, version, null);
     }
 
-    public ArtifactMetadata( String groupId, String name, String version, String type )
-    {
-        this( groupId, name, version, type, null );
+    public ArtifactMetadata(String groupId, String name, String version, String type) {
+        this(groupId, name, version, type, null);
     }
 
-    public ArtifactMetadata( String groupId, String name, String version, String type, ArtifactScopeEnum artifactScope )
-    {
-        this( groupId, name, version, type, artifactScope, null );
+    public ArtifactMetadata(String groupId, String name, String version, String type, ArtifactScopeEnum artifactScope) {
+        this(groupId, name, version, type, artifactScope, null);
     }
 
-    public ArtifactMetadata( String groupId, String name, String version, String type, ArtifactScopeEnum artifactScope,
-                             String classifier )
-    {
-        this( groupId, name, version, type, artifactScope, classifier, null );
+    public ArtifactMetadata(
+            String groupId,
+            String name,
+            String version,
+            String type,
+            ArtifactScopeEnum artifactScope,
+            String classifier) {
+        this(groupId, name, version, type, artifactScope, classifier, null);
     }
 
-    public ArtifactMetadata( String groupId, String name, String version, String type, ArtifactScopeEnum artifactScope,
-                             String classifier, String artifactUri )
-    {
-        this( groupId, name, version, type, artifactScope, classifier, artifactUri, null, true, null );
+    public ArtifactMetadata(
+            String groupId,
+            String name,
+            String version,
+            String type,
+            ArtifactScopeEnum artifactScope,
+            String classifier,
+            String artifactUri) {
+        this(groupId, name, version, type, artifactScope, classifier, artifactUri, null, true, null);
     }
 
-    @SuppressWarnings( "checkstyle:parameternumber" )
-    public ArtifactMetadata( String groupId, String name, String version, String type, ArtifactScopeEnum artifactScope,
-                             String classifier, String artifactUri, String why, boolean resolved, String error )
-    {
+    @SuppressWarnings("checkstyle:parameternumber")
+    public ArtifactMetadata(
+            String groupId,
+            String name,
+            String version,
+            String type,
+            ArtifactScopeEnum artifactScope,
+            String classifier,
+            String artifactUri,
+            String why,
+            boolean resolved,
+            String error) {
         this.groupId = groupId;
         this.artifactId = name;
         this.version = version;
@@ -137,17 +144,32 @@ public class ArtifactMetadata
         this.error = error;
     }
 
-    @SuppressWarnings( "checkstyle:parameternumber" )
-    public ArtifactMetadata( String groupId, String name, String version, String type, String scopeString,
-                             String classifier, String artifactUri, String why, boolean resolved, String error )
-    {
-        this( groupId, name, version, type,
-              scopeString == null ? ArtifactScopeEnum.DEFAULT_SCOPE : ArtifactScopeEnum.valueOf( scopeString ),
-              classifier, artifactUri, why, resolved, error );
+    @SuppressWarnings("checkstyle:parameternumber")
+    public ArtifactMetadata(
+            String groupId,
+            String name,
+            String version,
+            String type,
+            String scopeString,
+            String classifier,
+            String artifactUri,
+            String why,
+            boolean resolved,
+            String error) {
+        this(
+                groupId,
+                name,
+                version,
+                type,
+                scopeString == null ? ArtifactScopeEnum.DEFAULT_SCOPE : ArtifactScopeEnum.valueOf(scopeString),
+                classifier,
+                artifactUri,
+                why,
+                resolved,
+                error);
     }
 
-    public ArtifactMetadata( Artifact af )
-    {
+    public ArtifactMetadata(Artifact af) {
         /*
         if ( af != null )
         {
@@ -155,190 +177,154 @@ public class ArtifactMetadata
         }
         */
     }
-    //------------------------------------------------------------------
-//    public void init( ArtifactMetadata af )
-//    {
-//        setGroupId( af.getGroupId() );
-//        setArtifactId( af.getArtifactId() );
-//        setVersion( af.getVersion() );
-//        setType( af.getType() );
-//        setScope( af.getScope() );
-//        setClassifier( af.getClassifier() );
-//        //setUri( af.getDownloadUrl() );
-//
-//        this.resolved = af.isResolved();
-//    }
+    // ------------------------------------------------------------------
+    //    public void init( ArtifactMetadata af )
+    //    {
+    //        setGroupId( af.getGroupId() );
+    //        setArtifactId( af.getArtifactId() );
+    //        setVersion( af.getVersion() );
+    //        setType( af.getType() );
+    //        setScope( af.getScope() );
+    //        setClassifier( af.getClassifier() );
+    //        //setUri( af.getDownloadUrl() );
+    //
+    //        this.resolved = af.isResolved();
+    //    }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return groupId + ":" + artifactId + ":" + version;
     }
 
-    public String toDomainString()
-    {
+    public String toDomainString() {
         return groupId + ":" + artifactId;
     }
 
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return groupId;
     }
 
-    public void setGroupId( String groupId )
-    {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return artifactId;
     }
 
-    public void setArtifactId( String name )
-    {
+    public void setArtifactId(String name) {
         this.artifactId = name;
     }
 
-    public String getVersion()
-    {
+    public String getVersion() {
         return version;
     }
 
-    public void setVersion( String version )
-    {
+    public void setVersion(String version) {
         this.version = version;
     }
 
-    public String getType()
-    {
+    public String getType() {
         return type;
     }
 
-    public String getCheckedType()
-    {
+    public String getCheckedType() {
         return type == null ? "jar" : type;
     }
 
-    public void setType( String type )
-    {
+    public void setType(String type) {
         this.type = type;
     }
 
-    public ArtifactScopeEnum getArtifactScope()
-    {
+    public ArtifactScopeEnum getArtifactScope() {
         return artifactScope == null ? ArtifactScopeEnum.DEFAULT_SCOPE : artifactScope;
     }
 
-    public void setArtifactScope( ArtifactScopeEnum artifactScope )
-    {
+    public void setArtifactScope(ArtifactScopeEnum artifactScope) {
         this.artifactScope = artifactScope;
     }
 
-    public void setScope( String scope )
-    {
-        this.artifactScope = scope == null ? ArtifactScopeEnum.DEFAULT_SCOPE : ArtifactScopeEnum.valueOf( scope );
+    public void setScope(String scope) {
+        this.artifactScope = scope == null ? ArtifactScopeEnum.DEFAULT_SCOPE : ArtifactScopeEnum.valueOf(scope);
     }
 
-    public String getClassifier()
-    {
+    public String getClassifier() {
         return classifier;
     }
 
-    public void setClassifier( String classifier )
-    {
+    public void setClassifier(String classifier) {
         this.classifier = classifier;
     }
 
-    public boolean isResolved()
-    {
+    public boolean isResolved() {
         return resolved;
     }
 
-    public void setResolved( boolean resolved )
-    {
+    public void setResolved(boolean resolved) {
         this.resolved = resolved;
     }
 
-    public String getUri()
-    {
+    public String getUri() {
         return uri;
     }
 
-    public void setUri( String uri )
-    {
+    public void setUri(String uri) {
         this.uri = uri;
     }
 
-    public String getScope()
-    {
+    public String getScope() {
         return getArtifactScope().getScope();
     }
 
-    public ArtifactScopeEnum getScopeAsEnum()
-    {
+    public ArtifactScopeEnum getScopeAsEnum() {
         return artifactScope == null ? ArtifactScopeEnum.DEFAULT_SCOPE : artifactScope;
     }
 
-    public boolean isArtifactExists()
-    {
+    public boolean isArtifactExists() {
         return artifactExists;
     }
 
-    public void setArtifactExists( boolean artifactExists )
-    {
+    public void setArtifactExists(boolean artifactExists) {
         this.artifactExists = artifactExists;
     }
 
-
-    public Collection<ArtifactMetadata> getDependencies()
-    {
+    public Collection<ArtifactMetadata> getDependencies() {
         return dependencies;
     }
 
-    public void setDependencies( Collection<ArtifactMetadata> dependencies )
-    {
+    public void setDependencies(Collection<ArtifactMetadata> dependencies) {
         this.dependencies = dependencies;
     }
 
-    public String getArtifactUri()
-    {
+    public String getArtifactUri() {
         return artifactUri;
     }
 
-    public void setArtifactUri( String artifactUri )
-    {
+    public void setArtifactUri(String artifactUri) {
         this.artifactUri = artifactUri;
     }
 
-
-    public String getWhy()
-    {
+    public String getWhy() {
         return why;
     }
 
-    public void setWhy( String why )
-    {
+    public void setWhy(String why) {
         this.why = why;
     }
 
-    public String getError()
-    {
+    public String getError() {
         return error;
     }
 
-    public void setError( String error )
-    {
+    public void setError(String error) {
         this.error = error;
     }
 
-    public boolean isError()
-    {
+    public boolean isError() {
         return error == null;
     }
 
-    public String getDependencyConflictId()
-    {
+    public String getDependencyConflictId() {
         return groupId + ":" + artifactId;
     }
 }

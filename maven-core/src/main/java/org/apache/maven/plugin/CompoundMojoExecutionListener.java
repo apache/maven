@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,47 +16,36 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import java.util.Collection;
 
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
 
-class CompoundMojoExecutionListener
-    implements MojoExecutionListener
-{
+class CompoundMojoExecutionListener implements MojoExecutionListener {
 
     private final Collection<MojoExecutionListener> listeners;
 
-    CompoundMojoExecutionListener( Collection<MojoExecutionListener> listeners )
-    {
+    CompoundMojoExecutionListener(Collection<MojoExecutionListener> listeners) {
         this.listeners = listeners; // NB this is live injected collection
     }
 
-    public void beforeMojoExecution( MojoExecutionEvent event )
-        throws MojoExecutionException
-    {
-        for ( MojoExecutionListener listener : listeners )
-        {
-            listener.beforeMojoExecution( event );
+    public void beforeMojoExecution(MojoExecutionEvent event) throws MojoExecutionException {
+        for (MojoExecutionListener listener : listeners) {
+            listener.beforeMojoExecution(event);
         }
     }
 
-    public void afterMojoExecutionSuccess( MojoExecutionEvent event )
-        throws MojoExecutionException
-    {
-        for ( MojoExecutionListener listener : listeners )
-        {
-            listener.afterMojoExecutionSuccess( event );
+    public void afterMojoExecutionSuccess(MojoExecutionEvent event) throws MojoExecutionException {
+        for (MojoExecutionListener listener : listeners) {
+            listener.afterMojoExecutionSuccess(event);
         }
     }
 
-    public void afterExecutionFailure( MojoExecutionEvent event )
-    {
-        for ( MojoExecutionListener listener : listeners )
-        {
-            listener.afterExecutionFailure( event );
+    public void afterExecutionFailure(MojoExecutionEvent event) {
+        for (MojoExecutionListener listener : listeners) {
+            listener.afterExecutionFailure(event);
         }
     }
-
 }

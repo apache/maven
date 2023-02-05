@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import org.apache.maven.model.Model;
 
@@ -28,9 +27,7 @@ import org.apache.maven.model.Model;
  *
  * @author Benjamin Bentmann
  */
-public class DefaultModelProblem
-    implements ModelProblem
-{
+public class DefaultModelProblem implements ModelProblem {
 
     private final String source;
 
@@ -48,7 +45,6 @@ public class DefaultModelProblem
 
     private final Version version;
 
-
     /**
      * Creates a new problem with the specified message and exception.
      *
@@ -60,12 +56,24 @@ public class DefaultModelProblem
      * @param columnNumber The one-based index of the column containing the error or {@code -1} if unknown.
      * @param exception The exception that caused this problem, may be {@code null}.
      */
-    //mkleint: does this need to be public?
-    public DefaultModelProblem( String message, Severity severity, Version version, Model source, int lineNumber,
-                                int columnNumber, Exception exception )
-    {
-        this( message, severity, version, ModelProblemUtils.toPath( source ), lineNumber, columnNumber,
-              ModelProblemUtils.toId( source ), exception );
+    // mkleint: does this need to be public?
+    public DefaultModelProblem(
+            String message,
+            Severity severity,
+            Version version,
+            Model source,
+            int lineNumber,
+            int columnNumber,
+            Exception exception) {
+        this(
+                message,
+                severity,
+                version,
+                ModelProblemUtils.toPath(source),
+                lineNumber,
+                columnNumber,
+                ModelProblemUtils.toId(source),
+                exception);
     }
 
     /**
@@ -81,66 +89,62 @@ public class DefaultModelProblem
      * @param modelId The identifier of the model that exhibits the problem, may be {@code null}.
      * @param exception The exception that caused this problem, may be {@code null}.
      */
-    //mkleint: does this need to be public?
-    @SuppressWarnings( "checkstyle:parameternumber" )
-    public DefaultModelProblem( String message, Severity severity, Version version, String source, int lineNumber,
-                                int columnNumber, String modelId, Exception exception )
-    {
+    // mkleint: does this need to be public?
+    @SuppressWarnings("checkstyle:parameternumber")
+    public DefaultModelProblem(
+            String message,
+            Severity severity,
+            Version version,
+            String source,
+            int lineNumber,
+            int columnNumber,
+            String modelId,
+            Exception exception) {
         this.message = message;
-        this.severity = ( severity != null ) ? severity : Severity.ERROR;
-        this.source = ( source != null ) ? source : "";
+        this.severity = (severity != null) ? severity : Severity.ERROR;
+        this.source = (source != null) ? source : "";
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
-        this.modelId = ( modelId != null ) ? modelId : "";
+        this.modelId = (modelId != null) ? modelId : "";
         this.exception = exception;
         this.version = version;
     }
 
     @Override
-    public String getSource()
-    {
+    public String getSource() {
         return source;
     }
 
     @Override
-    public int getLineNumber()
-    {
+    public int getLineNumber() {
         return lineNumber;
     }
 
     @Override
-    public int getColumnNumber()
-    {
+    public int getColumnNumber() {
         return columnNumber;
     }
 
     @Override
-    public String getModelId()
-    {
+    public String getModelId() {
         return modelId;
     }
 
     @Override
-    public Exception getException()
-    {
+    public Exception getException() {
         return exception;
     }
 
     @Override
-    public String getMessage()
-    {
+    public String getMessage() {
         String msg;
 
-        if ( message != null && message.length() > 0 )
-        {
+        if (message != null && message.length() > 0) {
             msg = message;
-        }
-        else
-        {
+        } else {
             msg = exception.getMessage();
 
-            if ( msg == null )
-            {
+            if (msg == null) {
                 msg = "";
             }
         }
@@ -149,33 +153,27 @@ public class DefaultModelProblem
     }
 
     @Override
-    public Severity getSeverity()
-    {
+    public Severity getSeverity() {
         return severity;
     }
 
     @Override
-    public Version getVersion()
-    {
+    public Version getVersion() {
         return version;
     }
 
-
     @Override
-    public String toString()
-    {
-        StringBuilder buffer = new StringBuilder( 128 );
+    public String toString() {
+        StringBuilder buffer = new StringBuilder(128);
 
-        buffer.append( '[' ).append( getSeverity() ).append( "] " );
-        buffer.append( getMessage() );
-        String location = ModelProblemUtils.formatLocation( this, null );
-        if ( !location.isEmpty() )
-        {
-            buffer.append( " @ " );
-            buffer.append( location );
+        buffer.append('[').append(getSeverity()).append("] ");
+        buffer.append(getMessage());
+        String location = ModelProblemUtils.formatLocation(this, null);
+        if (!location.isEmpty()) {
+            buffer.append(" @ ");
+            buffer.append(location);
         }
 
         return buffer.toString();
     }
-
 }

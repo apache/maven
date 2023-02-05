@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,13 @@ package org.apache.maven.artifact.resolver;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver;
 
 /**
  * @author Benjamin Bentmann
  */
-public interface ResolutionErrorHandler
-{
+public interface ResolutionErrorHandler {
 
-    void throwErrors( ArtifactResolutionRequest request, ArtifactResolutionResult result )
-        throws ArtifactResolutionException;
-
+    void throwErrors(ArtifactResolutionRequest request, ArtifactResolutionResult result)
+            throws ArtifactResolutionException;
 }

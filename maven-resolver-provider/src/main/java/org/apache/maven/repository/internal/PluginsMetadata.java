@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,11 +30,8 @@ import org.apache.maven.artifact.repository.metadata.Plugin;
 /**
  * Maven G level metadata.
  */
-final class PluginsMetadata
-    extends MavenMetadata
-{
-    static final class PluginInfo
-    {
+final class PluginsMetadata extends MavenMetadata {
+    static final class PluginInfo {
         final String groupId;
 
         private final String artifactId;
@@ -44,8 +40,7 @@ final class PluginsMetadata
 
         private final String name;
 
-        PluginInfo( String groupId, String artifactId, String goalPrefix, String name )
-        {
+        PluginInfo(String groupId, String artifactId, String goalPrefix, String name) {
             this.groupId = groupId;
             this.artifactId = artifactId;
             this.goalPrefix = goalPrefix;
@@ -55,70 +50,60 @@ final class PluginsMetadata
 
     private final PluginInfo pluginInfo;
 
-    PluginsMetadata( PluginInfo pluginInfo, Date timestamp )
-    {
-        super( createRepositoryMetadata( pluginInfo ), null, timestamp );
+    PluginsMetadata(PluginInfo pluginInfo, Date timestamp) {
+        super(createRepositoryMetadata(pluginInfo), null, timestamp);
         this.pluginInfo = pluginInfo;
     }
 
-    PluginsMetadata( PluginInfo pluginInfo, File file, Date timestamp )
-    {
-        super( createRepositoryMetadata( pluginInfo ), file, timestamp );
+    PluginsMetadata(PluginInfo pluginInfo, File file, Date timestamp) {
+        super(createRepositoryMetadata(pluginInfo), file, timestamp);
         this.pluginInfo = pluginInfo;
     }
 
-    private static Metadata createRepositoryMetadata( PluginInfo pluginInfo )
-    {
+    private static Metadata createRepositoryMetadata(PluginInfo pluginInfo) {
         Metadata result = new Metadata();
         Plugin plugin = new Plugin();
-        plugin.setPrefix( pluginInfo.goalPrefix );
-        plugin.setArtifactId( pluginInfo.artifactId );
-        plugin.setName( pluginInfo.name );
-        result.getPlugins().add( plugin );
+        plugin.setPrefix(pluginInfo.goalPrefix);
+        plugin.setArtifactId(pluginInfo.artifactId);
+        plugin.setName(pluginInfo.name);
+        result.getPlugins().add(plugin);
         return result;
     }
 
     @Override
-    protected void merge( Metadata recessive )
-    {
+    protected void merge(Metadata recessive) {
         List<Plugin> recessivePlugins = recessive.getPlugins();
         List<Plugin> plugins = metadata.getPlugins();
-        if ( !plugins.isEmpty() )
-        {
+        if (!plugins.isEmpty()) {
             LinkedHashMap<String, Plugin> mergedPlugins = new LinkedHashMap<>();
-            recessivePlugins.forEach( p -> mergedPlugins.put( p.getPrefix(), p ) );
-            plugins.forEach( p -> mergedPlugins.put( p.getPrefix(), p ) );
-            metadata.setPlugins( new ArrayList<>( mergedPlugins.values() ) );
+            recessivePlugins.forEach(p -> mergedPlugins.put(p.getPrefix(), p));
+            plugins.forEach(p -> mergedPlugins.put(p.getPrefix(), p));
+            metadata.setPlugins(new ArrayList<>(mergedPlugins.values()));
         }
     }
 
     @Override
-    public MavenMetadata setFile( File file )
-    {
-        return new PluginsMetadata( pluginInfo, file, timestamp );
+    public MavenMetadata setFile(File file) {
+        return new PluginsMetadata(pluginInfo, file, timestamp);
     }
 
     @Override
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return pluginInfo.groupId;
     }
 
     @Override
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return "";
     }
 
     @Override
-    public String getVersion()
-    {
+    public String getVersion() {
         return "";
     }
 
     @Override
-    public Nature getNature()
-    {
+    public Nature getNature() {
         return Nature.RELEASE_OR_SNAPSHOT;
     }
 }

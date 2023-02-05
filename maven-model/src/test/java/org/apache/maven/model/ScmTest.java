@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,11 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,34 +30,37 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
-public class ScmTest
-{
+public class ScmTest {
 
     @Test
-    public void testHashCodeNullSafe()
-    {
+    public void testHashCodeNullSafe() {
         new Scm().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Scm().equals( null ) );
+    public void testEqualsNullSafe() {
+        assertFalse(new Scm().equals(null));
 
-        new Scm().equals( new Scm() );
+        new Scm().equals(new Scm());
     }
 
     @Test
-    public void testEqualsIdentity()
-    {
+    public void testEqualsIdentity() {
         Scm thing = new Scm();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Scm().toString() );
+    public void testToStringNullSafe() {
+        assertNotNull(new Scm().toString());
     }
 
+    public void testToStringNotNonsense() {
+        Scm scm = new Scm();
+        scm.setConnection("scm:git:git://git.localdomain/model");
+
+        String s = scm.toString();
+
+        assertEquals("Scm {connection=scm:git:git://git.localdomain/model}", s);
+    }
 }
