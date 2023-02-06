@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import java.util.List;
 
@@ -29,8 +28,7 @@ import org.apache.maven.project.MavenProject;
  * @author Benjamin Bentmann
  * @since 3.0-alpha
  */
-public interface ProjectDependencyGraph
-{
+public interface ProjectDependencyGraph {
 
     /**
      * Gets all collected projects.
@@ -58,7 +56,7 @@ public interface ProjectDependencyGraph
      *            downstream projects.
      * @return The downstream projects in the build order, never {@code null}.
      */
-    List<MavenProject> getDownstreamProjects( MavenProject project, boolean transitive );
+    List<MavenProject> getDownstreamProjects(MavenProject project, boolean transitive);
 
     /**
      * Gets the upstream projects of the specified project. An upstream project is a project that directly or indirectly
@@ -69,6 +67,5 @@ public interface ProjectDependencyGraph
      *            upstream projects.
      * @return The upstream projects in the build order, never {@code null}.
      */
-    List<MavenProject> getUpstreamProjects( MavenProject project, boolean transitive );
-
+    List<MavenProject> getUpstreamProjects(MavenProject project, boolean transitive);
 }

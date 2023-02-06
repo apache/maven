@@ -1,6 +1,4 @@
-package org.apache.maven.model.building;
-
-  /*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -18,43 +16,38 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import junit.framework.TestCase;
+package org.apache.maven.model.building;
 
 import java.io.File;
 import java.util.Properties;
 
+import junit.framework.TestCase;
+
 /**
  * @author Konstantin Perikov
  */
-public class ComplexActivationTest
-        extends TestCase
-{
+public class ComplexActivationTest extends TestCase {
 
-    private File getPom( String name )
-    {
-        return new File( "src/test/resources/poms/factory/" + name + ".xml" ).getAbsoluteFile();
+    private File getPom(String name) {
+        return new File("src/test/resources/poms/factory/" + name + ".xml").getAbsoluteFile();
     }
 
-    public void testAndConditionInActivation()
-            throws Exception
-    {
+    public void testAndConditionInActivation() throws Exception {
         Properties sysProperties = new Properties();
-        sysProperties.setProperty( "myproperty", "test" );
+        sysProperties.setProperty("myproperty", "test");
 
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
-        assertNotNull( builder );
+        assertNotNull(builder);
 
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
-        request.setProcessPlugins( true );
-        request.setPomFile( getPom( "complex" ) );
-        request.setSystemProperties( sysProperties );
+        request.setProcessPlugins(true);
+        request.setPomFile(getPom("complex"));
+        request.setSystemProperties(sysProperties);
 
-        ModelBuildingResult result = builder.build( request );
-        assertNotNull( result );
-        assertNotNull( result.getEffectiveModel() );
-        assertEquals( "activated-1", result.getEffectiveModel().getProperties().get( "profile.file" ) );
-        assertNull( result.getEffectiveModel().getProperties().get( "profile.miss" ) );
+        ModelBuildingResult result = builder.build(request);
+        assertNotNull(result);
+        assertNotNull(result.getEffectiveModel());
+        assertEquals("activated-1", result.getEffectiveModel().getProperties().get("profile.file"));
+        assertNull(result.getEffectiveModel().getProperties().get("profile.miss"));
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import junit.framework.TestCase;
 
@@ -26,31 +25,24 @@ import junit.framework.TestCase;
  *
  * @author Benjamin Bentmann
  */
-public class PluginExecutionTest
-    extends TestCase
-{
+public class PluginExecutionTest extends TestCase {
 
-    public void testHashCodeNullSafe()
-    {
+    public void testHashCodeNullSafe() {
         new PluginExecution().hashCode();
     }
 
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new PluginExecution().equals( null ) );
+    public void testEqualsNullSafe() {
+        assertFalse(new PluginExecution().equals(null));
 
-        new PluginExecution().equals( new PluginExecution() );
+        new PluginExecution().equals(new PluginExecution());
     }
 
-    public void testEqualsIdentity()
-    {
+    public void testEqualsIdentity() {
         PluginExecution thing = new PluginExecution();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new PluginExecution().toString() );
+    public void testToStringNullSafe() {
+        assertNotNull(new PluginExecution().toString());
     }
-
 }

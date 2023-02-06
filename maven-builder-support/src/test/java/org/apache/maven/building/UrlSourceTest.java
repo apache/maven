@@ -1,5 +1,3 @@
-package org.apache.maven.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,54 +16,44 @@ package org.apache.maven.building;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.junit.Test;
+package org.apache.maven.building;
 
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Scanner;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class UrlSourceTest
-{
+public class UrlSourceTest {
 
     @Test
-    public void testUrlSource()
-    {
-        try
-        {
-            new UrlSource( null );
-            fail( "Should fail, since you must specify a url" );
-        }
-        catch ( NullPointerException e )
-        {
-            assertEquals( "url cannot be null", e.getMessage() );
+    public void testUrlSource() {
+        try {
+            new UrlSource(null);
+            fail("Should fail, since you must specify a url");
+        } catch (NullPointerException e) {
+            assertEquals("url cannot be null", e.getMessage());
         }
     }
 
     @Test
-    public void testGetInputStream()
-        throws Exception
-    {
-        URL txtFile = new File( "target/test-classes/source.txt" ).toURI().toURL();
-        UrlSource source = new UrlSource( txtFile );
-        try ( InputStream is = source.getInputStream();
-              Scanner scanner = new Scanner( is ) )
-        {
-            assertEquals( "Hello World!", scanner.nextLine() );
+    public void testGetInputStream() throws Exception {
+        URL txtFile = new File("target/test-classes/source.txt").toURI().toURL();
+        UrlSource source = new UrlSource(txtFile);
+        try (InputStream is = source.getInputStream();
+                Scanner scanner = new Scanner(is)) {
+            assertEquals("Hello World!", scanner.nextLine());
         }
     }
 
     @Test
-    public void testGetLocation()
-        throws Exception
-    {
-        URL txtFile = new File( "target/test-classes/source.txt" ).toURI().toURL();
-        UrlSource source = new UrlSource( txtFile );
-        assertEquals( txtFile.toExternalForm(), source.getLocation() );
+    public void testGetLocation() throws Exception {
+        URL txtFile = new File("target/test-classes/source.txt").toURI().toURL();
+        UrlSource source = new UrlSource(txtFile);
+        assertEquals(txtFile.toExternalForm(), source.getLocation());
     }
-
 }

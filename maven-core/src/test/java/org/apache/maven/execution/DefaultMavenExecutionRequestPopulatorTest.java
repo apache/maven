@@ -1,15 +1,3 @@
-package org.apache.maven.execution;
-
-import java.util.List;
-
-import javax.inject.Inject;
-
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.settings.Profile;
-import org.apache.maven.settings.Repository;
-import org.apache.maven.settings.Settings;
-import org.eclipse.sisu.launch.InjectedTestCase;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,7 +7,7 @@ import org.eclipse.sisu.launch.InjectedTestCase;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -28,35 +16,42 @@ import org.eclipse.sisu.launch.InjectedTestCase;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
-public class DefaultMavenExecutionRequestPopulatorTest
-    extends InjectedTestCase
-{
+import javax.inject.Inject;
+
+import java.util.List;
+
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.settings.Profile;
+import org.apache.maven.settings.Repository;
+import org.apache.maven.settings.Settings;
+import org.eclipse.sisu.launch.InjectedTestCase;
+
+public class DefaultMavenExecutionRequestPopulatorTest extends InjectedTestCase {
     @Inject
     MavenExecutionRequestPopulator testee;
-        
-    public void testPluginRepositoryInjection()
-        throws Exception
-    {
+
+    public void testPluginRepositoryInjection() throws Exception {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
 
         Repository r = new Repository();
-        r.setId( "test" );
-        r.setUrl( "file:///test" );
+        r.setId("test");
+        r.setUrl("file:///test");
 
         Profile p = new Profile();
-        p.setId( "test" );
-        p.addPluginRepository( r );
+        p.setId("test");
+        p.addPluginRepository(r);
 
         Settings settings = new Settings();
-        settings.addProfile( p );
-        settings.addActiveProfile( p.getId() );
+        settings.addProfile(p);
+        settings.addActiveProfile(p.getId());
 
-        testee.populateFromSettings( request, settings );
+        testee.populateFromSettings(request, settings);
 
         List<ArtifactRepository> repositories = request.getPluginArtifactRepositories();
-        assertEquals( 1, repositories.size() );
-        assertEquals( r.getId(), repositories.get( 0 ).getId() );
-        assertEquals( r.getUrl(), repositories.get( 0 ).getUrl() );
+        assertEquals(1, repositories.size());
+        assertEquals(r.getId(), repositories.get(0).getId());
+        assertEquals(r.getUrl(), repositories.get(0).getUrl());
     }
 }

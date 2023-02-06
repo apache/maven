@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.toolchain.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain.building;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,40 +26,34 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
 
 /**
  * Holds the result of the merged toolchains and holds the problems during this build, if any.
- * 
+ *
  * @author Robert Scholte
  * @since 3.3.0
  */
-public class DefaultToolchainsBuildingResult
-    implements ToolchainsBuildingResult
-{
+public class DefaultToolchainsBuildingResult implements ToolchainsBuildingResult {
 
     private PersistedToolchains effectiveToolchains;
-    
+
     private List<Problem> problems;
-    
+
     /**
      * Default constructor
-     * 
+     *
      * @param effectiveToolchains the merged toolchains, may not be {@code null}
      * @param problems the problems while building the effectiveToolchains, if any.
      */
-    public DefaultToolchainsBuildingResult( PersistedToolchains effectiveToolchains, List<Problem> problems )
-    {
+    public DefaultToolchainsBuildingResult(PersistedToolchains effectiveToolchains, List<Problem> problems) {
         this.effectiveToolchains = effectiveToolchains;
-        this.problems = ( problems != null ) ? problems : new ArrayList<Problem>();
+        this.problems = (problems != null) ? problems : new ArrayList<Problem>();
     }
 
     @Override
-    public PersistedToolchains getEffectiveToolchains()
-    {
+    public PersistedToolchains getEffectiveToolchains() {
         return effectiveToolchains;
     }
-    
+
     @Override
-    public List<Problem> getProblems()
-    {
+    public List<Problem> getProblems() {
         return problems;
     }
-
 }

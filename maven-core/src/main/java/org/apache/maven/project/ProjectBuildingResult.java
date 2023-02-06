@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.io.File;
 import java.util.List;
@@ -29,8 +28,7 @@ import org.apache.maven.model.building.ModelProblem;
  *
  * @author Benjamin Bentmann
  */
-public interface ProjectBuildingResult
-{
+public interface ProjectBuildingResult {
 
     /**
      * Gets the identifier of the project that could not be built. The general format of the identifier is {@code
@@ -70,5 +68,4 @@ public interface ProjectBuildingResult
      *         not requested.
      */
     DependencyResolutionResult getDependencyResolutionResult();
-
 }

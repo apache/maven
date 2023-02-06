@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.io.File;
 
@@ -27,122 +26,110 @@ import org.apache.maven.repository.internal.DefaultArtifactDescriptorReader;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.ArtifactResolver;
 
-public class ProjectClasspathTest
-    extends AbstractMavenProjectTestCase
-{
+public class ProjectClasspathTest extends AbstractMavenProjectTestCase {
     static final String dir = "projects/scope/";
 
-    public void setUp()
-        throws Exception
-    {
-        ArtifactResolver resolver = lookup( ArtifactResolver.class, "classpath" );
-        DefaultArtifactDescriptorReader pomReader = (DefaultArtifactDescriptorReader)lookup(ArtifactDescriptorReader.class);
-        pomReader.setArtifactResolver( resolver );
+    public void setUp() throws Exception {
+        ArtifactResolver resolver = lookup(ArtifactResolver.class, "classpath");
+        DefaultArtifactDescriptorReader pomReader =
+                (DefaultArtifactDescriptorReader) lookup(ArtifactDescriptorReader.class);
+        pomReader.setArtifactResolver(resolver);
 
-        projectBuilder = lookup( ProjectBuilder.class, "classpath" );
+        projectBuilder = lookup(ProjectBuilder.class, "classpath");
 
         // the metadata source looks up the default impl, so we have to trick it
-        getContainer().addComponent( projectBuilder, ProjectBuilder.class, "default" );
+        getContainer().addComponent(projectBuilder, ProjectBuilder.class, "default");
 
-        repositorySystem = lookup( RepositorySystem.class );
+        repositorySystem = lookup(RepositorySystem.class);
     }
 
     @Override
-    protected String getCustomConfigurationName()
-    {
+    protected String getCustomConfigurationName() {
         return null;
     }
 
-    public void testProjectClasspath()
-        throws Exception
-    {
-        File f = getFileForClasspathResource( dir + "project-with-scoped-dependencies.xml" );
+    public void testProjectClasspath() throws Exception {
+        File f = getFileForClasspathResource(dir + "project-with-scoped-dependencies.xml");
 
-        MavenProject project = getProjectWithDependencies( f );
+        MavenProject project = getProjectWithDependencies(f);
 
         Artifact artifact;
 
-        assertNotNull( "Test project can't be null!", project );
+        assertNotNull("Test project can't be null!", project);
 
-        checkArtifactIdScope( project, "provided", "provided" );
-        checkArtifactIdScope( project, "test", "test" );
-        checkArtifactIdScope( project, "compile", "compile" );
-        checkArtifactIdScope( project, "runtime", "runtime" );
-        checkArtifactIdScope( project, "default", "compile" );
+        checkArtifactIdScope(project, "provided", "provided");
+        checkArtifactIdScope(project, "test", "test");
+        checkArtifactIdScope(project, "compile", "compile");
+        checkArtifactIdScope(project, "runtime", "runtime");
+        checkArtifactIdScope(project, "default", "compile");
 
         // check all transitive deps of a test dependency are test, except test and provided which is skipped
-        artifact = getArtifact( project, "maven-test-test", "scope-provided" );
-        assertNull( "Check no provided dependencies are transitive", artifact );
-        artifact = getArtifact( project, "maven-test-test", "scope-test" );
-        assertNull( "Check no test dependencies are transitive", artifact );
+        artifact = getArtifact(project, "maven-test-test", "scope-provided");
+        assertNull("Check no provided dependencies are transitive", artifact);
+        artifact = getArtifact(project, "maven-test-test", "scope-test");
+        assertNull("Check no test dependencies are transitive", artifact);
 
-        artifact = getArtifact( project, "maven-test-test", "scope-compile" );
-        assertNotNull( artifact );
+        artifact = getArtifact(project, "maven-test-test", "scope-compile");
+        assertNotNull(artifact);
 
-        System.out.println( "a = " + artifact );
-        System.out.println( "b = " + artifact.getScope() );
-        assertEquals( "Check scope", "test", artifact.getScope() );
-        artifact = getArtifact( project, "maven-test-test", "scope-default" );
-        assertEquals( "Check scope", "test", artifact.getScope() );
-        artifact = getArtifact( project, "maven-test-test", "scope-runtime" );
-        assertEquals( "Check scope", "test", artifact.getScope() );
+        System.out.println("a = " + artifact);
+        System.out.println("b = " + artifact.getScope());
+        assertEquals("Check scope", "test", artifact.getScope());
+        artifact = getArtifact(project, "maven-test-test", "scope-default");
+        assertEquals("Check scope", "test", artifact.getScope());
+        artifact = getArtifact(project, "maven-test-test", "scope-runtime");
+        assertEquals("Check scope", "test", artifact.getScope());
 
         // check all transitive deps of a provided dependency are provided scope, except for test
-        checkGroupIdScope( project, "provided", "maven-test-provided" );
-        artifact = getArtifact( project, "maven-test-provided", "scope-runtime" );
-        assertEquals( "Check scope", "provided", artifact.getScope() );
+        checkGroupIdScope(project, "provided", "maven-test-provided");
+        artifact = getArtifact(project, "maven-test-provided", "scope-runtime");
+        assertEquals("Check scope", "provided", artifact.getScope());
 
         // check all transitive deps of a runtime dependency are runtime scope, except for test
-        checkGroupIdScope( project, "runtime", "maven-test-runtime" );
-        artifact = getArtifact( project, "maven-test-runtime", "scope-runtime" );
-        assertEquals( "Check scope", "runtime", artifact.getScope() );
+        checkGroupIdScope(project, "runtime", "maven-test-runtime");
+        artifact = getArtifact(project, "maven-test-runtime", "scope-runtime");
+        assertEquals("Check scope", "runtime", artifact.getScope());
 
         // check all transitive deps of a compile dependency are compile scope, except for runtime and test
-        checkGroupIdScope( project, "compile", "maven-test-compile" );
-        artifact = getArtifact( project, "maven-test-compile", "scope-runtime" );
-        assertEquals( "Check scope", "runtime", artifact.getScope() );
+        checkGroupIdScope(project, "compile", "maven-test-compile");
+        artifact = getArtifact(project, "maven-test-compile", "scope-runtime");
+        assertEquals("Check scope", "runtime", artifact.getScope());
 
         // check all transitive deps of a default dependency are compile scope, except for runtime and test
-        checkGroupIdScope( project, "compile", "maven-test-default" );
-        artifact = getArtifact( project, "maven-test-default", "scope-runtime" );
-        assertEquals( "Check scope", "runtime", artifact.getScope() );
+        checkGroupIdScope(project, "compile", "maven-test-default");
+        artifact = getArtifact(project, "maven-test-default", "scope-runtime");
+        assertEquals("Check scope", "runtime", artifact.getScope());
     }
 
-    private void checkGroupIdScope( MavenProject project, String scopeValue, String groupId )
-    {
+    private void checkGroupIdScope(MavenProject project, String scopeValue, String groupId) {
         Artifact artifact;
-        artifact = getArtifact( project, groupId, "scope-compile" );
-        assertEquals( "Check scope", scopeValue, artifact.getScope() );
-        artifact = getArtifact( project, groupId, "scope-test" );
-        assertNull( "Check test dependency is not transitive", artifact );
-        artifact = getArtifact( project, groupId, "scope-provided" );
-        assertNull( "Check provided dependency is not transitive", artifact );
-        artifact = getArtifact( project, groupId, "scope-default" );
-        assertEquals( "Check scope", scopeValue, artifact.getScope() );
+        artifact = getArtifact(project, groupId, "scope-compile");
+        assertEquals("Check scope", scopeValue, artifact.getScope());
+        artifact = getArtifact(project, groupId, "scope-test");
+        assertNull("Check test dependency is not transitive", artifact);
+        artifact = getArtifact(project, groupId, "scope-provided");
+        assertNull("Check provided dependency is not transitive", artifact);
+        artifact = getArtifact(project, groupId, "scope-default");
+        assertEquals("Check scope", scopeValue, artifact.getScope());
     }
 
-    private void checkArtifactIdScope( MavenProject project, String scope, String scopeValue )
-    {
+    private void checkArtifactIdScope(MavenProject project, String scope, String scopeValue) {
         String artifactId = "scope-" + scope;
-        Artifact artifact = getArtifact( project, "maven-test", artifactId );
-        assertNotNull( artifact );
-        assertEquals( "Check scope", scopeValue, artifact.getScope() );
+        Artifact artifact = getArtifact(project, "maven-test", artifactId);
+        assertNotNull(artifact);
+        assertEquals("Check scope", scopeValue, artifact.getScope());
     }
 
-    private Artifact getArtifact( MavenProject project, String groupId, String artifactId )
-    {
-        System.out.println( "[ Looking for " + groupId + ":" + artifactId + " ]" );
-        for ( Artifact a : project.getArtifacts() )
-        {
-            System.out.println( a.toString() );
-            if ( artifactId.equals( a.getArtifactId() ) && a.getGroupId().equals( groupId ) )
-            {
-                System.out.println( "RETURN" );
+    private Artifact getArtifact(MavenProject project, String groupId, String artifactId) {
+        System.out.println("[ Looking for " + groupId + ":" + artifactId + " ]");
+        for (Artifact a : project.getArtifacts()) {
+            System.out.println(a.toString());
+            if (artifactId.equals(a.getArtifactId()) && a.getGroupId().equals(groupId)) {
+                System.out.println("RETURN");
                 return a;
             }
         }
-        System.out.println( "Return null" );
+        System.out.println("Return null");
         return null;
     }
-
 }

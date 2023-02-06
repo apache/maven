@@ -1,5 +1,3 @@
-package org.apache.maven.settings.merge;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.settings.merge;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.settings.merge;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.merge;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,39 +31,32 @@ import org.codehaus.plexus.util.StringUtils;
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
  * @author Benjamin Bentmann
  */
-public class MavenSettingsMerger
-{
+public class MavenSettingsMerger {
 
     /**
      * @param dominant
      * @param recessive
      * @param recessiveSourceLevel
      */
-    public void merge( Settings dominant, Settings recessive, String recessiveSourceLevel )
-    {
-        if ( dominant == null || recessive == null )
-        {
+    public void merge(Settings dominant, Settings recessive, String recessiveSourceLevel) {
+        if (dominant == null || recessive == null) {
             return;
         }
 
-        recessive.setSourceLevel( recessiveSourceLevel );
+        recessive.setSourceLevel(recessiveSourceLevel);
 
         List<String> dominantActiveProfiles = dominant.getActiveProfiles();
         List<String> recessiveActiveProfiles = recessive.getActiveProfiles();
 
-        if ( recessiveActiveProfiles != null )
-        {
-            if ( dominantActiveProfiles == null )
-            {
+        if (recessiveActiveProfiles != null) {
+            if (dominantActiveProfiles == null) {
                 dominantActiveProfiles = new ArrayList<>();
-                dominant.setActiveProfiles( dominantActiveProfiles );
+                dominant.setActiveProfiles(dominantActiveProfiles);
             }
 
-            for ( String profileId : recessiveActiveProfiles )
-            {
-                if ( !dominantActiveProfiles.contains( profileId ) )
-                {
-                    dominantActiveProfiles.add( profileId );
+            for (String profileId : recessiveActiveProfiles) {
+                if (!dominantActiveProfiles.contains(profileId)) {
+                    dominantActiveProfiles.add(profileId);
                 }
             }
         }
@@ -73,33 +65,27 @@ public class MavenSettingsMerger
 
         List<String> recessivePluginGroupIds = recessive.getPluginGroups();
 
-        if ( recessivePluginGroupIds != null )
-        {
-            if ( dominantPluginGroupIds == null )
-            {
+        if (recessivePluginGroupIds != null) {
+            if (dominantPluginGroupIds == null) {
                 dominantPluginGroupIds = new ArrayList<>();
-                dominant.setPluginGroups( dominantPluginGroupIds );
+                dominant.setPluginGroups(dominantPluginGroupIds);
             }
 
-            for ( String pluginGroupId : recessivePluginGroupIds )
-            {
-                if ( !dominantPluginGroupIds.contains( pluginGroupId ) )
-                {
-                    dominantPluginGroupIds.add( pluginGroupId );
+            for (String pluginGroupId : recessivePluginGroupIds) {
+                if (!dominantPluginGroupIds.contains(pluginGroupId)) {
+                    dominantPluginGroupIds.add(pluginGroupId);
                 }
             }
         }
 
-        if ( StringUtils.isEmpty( dominant.getLocalRepository() ) )
-        {
-            dominant.setLocalRepository( recessive.getLocalRepository() );
+        if (StringUtils.isEmpty(dominant.getLocalRepository())) {
+            dominant.setLocalRepository(recessive.getLocalRepository());
         }
 
-        shallowMergeById( dominant.getMirrors(), recessive.getMirrors(), recessiveSourceLevel );
-        shallowMergeById( dominant.getServers(), recessive.getServers(), recessiveSourceLevel );
-        shallowMergeById( dominant.getProxies(), recessive.getProxies(), recessiveSourceLevel );
-        shallowMergeById( dominant.getProfiles(), recessive.getProfiles(), recessiveSourceLevel );
-
+        shallowMergeById(dominant.getMirrors(), recessive.getMirrors(), recessiveSourceLevel);
+        shallowMergeById(dominant.getServers(), recessive.getServers(), recessiveSourceLevel);
+        shallowMergeById(dominant.getProxies(), recessive.getProxies(), recessiveSourceLevel);
+        shallowMergeById(dominant.getProfiles(), recessive.getProfiles(), recessiveSourceLevel);
     }
 
     /**
@@ -107,18 +93,15 @@ public class MavenSettingsMerger
      * @param recessive
      * @param recessiveSourceLevel
      */
-    private static <T extends IdentifiableBase> void shallowMergeById( List<T> dominant, List<T> recessive,
-                                                                       String recessiveSourceLevel )
-    {
-        Map<String, T> dominantById = mapById( dominant );
+    private static <T extends IdentifiableBase> void shallowMergeById(
+            List<T> dominant, List<T> recessive, String recessiveSourceLevel) {
+        Map<String, T> dominantById = mapById(dominant);
 
-        for ( T identifiable : recessive )
-        {
-            if ( !dominantById.containsKey( identifiable.getId() ) )
-            {
-                identifiable.setSourceLevel( recessiveSourceLevel );
+        for (T identifiable : recessive) {
+            if (!dominantById.containsKey(identifiable.getId())) {
+                identifiable.setSourceLevel(recessiveSourceLevel);
 
-                dominant.add( identifiable );
+                dominant.add(identifiable);
             }
         }
     }
@@ -127,16 +110,13 @@ public class MavenSettingsMerger
      * @param identifiables
      * @return a map
      */
-    private static <T extends IdentifiableBase> Map<String, T> mapById( List<T> identifiables )
-    {
+    private static <T extends IdentifiableBase> Map<String, T> mapById(List<T> identifiables) {
         Map<String, T> byId = new HashMap<>();
 
-        for ( T identifiable : identifiables )
-        {
-            byId.put( identifiable.getId(), identifiable );
+        for (T identifiable : identifiables) {
+            byId.put(identifiable.getId(), identifiable);
         }
 
         return byId;
     }
-
 }

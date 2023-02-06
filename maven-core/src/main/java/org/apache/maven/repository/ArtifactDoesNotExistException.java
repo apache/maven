@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,20 +16,17 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 /**
  * ArtifactDoesNotExistException
  */
-public class ArtifactDoesNotExistException
-    extends Exception
-{
-    public ArtifactDoesNotExistException( final String message )
-    {
-        super( message );
+public class ArtifactDoesNotExistException extends Exception {
+    public ArtifactDoesNotExistException(final String message) {
+        super(message);
     }
 
-    public ArtifactDoesNotExistException( final String message, final Throwable cause )
-    {
-        super( message, cause );
+    public ArtifactDoesNotExistException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 }

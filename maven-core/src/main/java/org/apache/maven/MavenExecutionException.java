@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
 
 import java.io.File;
 
@@ -26,30 +25,24 @@ import org.apache.maven.project.ProjectBuildingException;
 /**
  * @author Jason van Zyl
  */
-public class MavenExecutionException
-    extends Exception
-{
+public class MavenExecutionException extends Exception {
     private File pomFile;
 
-    public MavenExecutionException( String message, File pomFile )
-    {
-        super( message );
+    public MavenExecutionException(String message, File pomFile) {
+        super(message);
         this.pomFile = pomFile;
     }
 
-    public MavenExecutionException( String message, File pomFile, ProjectBuildingException cause )
-    {
-        super( message, cause );
+    public MavenExecutionException(String message, File pomFile, ProjectBuildingException cause) {
+        super(message, cause);
         this.pomFile = pomFile;
     }
 
-    public MavenExecutionException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public MavenExecutionException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public File getPomFile()
-    {
+    public File getPomFile() {
         return pomFile;
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.internal;
 
 import java.util.List;
 
@@ -37,8 +36,7 @@ import org.eclipse.aether.repository.RemoteRepository;
  * @since 3.0
  * @author Benjamin Bentmann
  */
-public interface PluginDependenciesResolver
-{
+public interface PluginDependenciesResolver {
 
     /**
      * Resolves the main artifact of the specified plugin.
@@ -50,8 +48,8 @@ public interface PluginDependenciesResolver
      * @return The resolved plugin artifact, never {@code null}.
      * @throws PluginResolutionException If the plugin artifact could not be resolved.
      */
-    Artifact resolve( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
-        throws PluginResolutionException;
+    Artifact resolve(Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session)
+            throws PluginResolutionException;
 
     /**
      * Resolves the runtime dependencies of the specified plugin.
@@ -64,8 +62,11 @@ public interface PluginDependenciesResolver
      * @return The dependency tree denoting the resolved plugin class path, never {@code null}.
      * @throws PluginResolutionException If any dependency could not be resolved.
      */
-    DependencyNode resolve( Plugin plugin, Artifact pluginArtifact, DependencyFilter dependencyFilter,
-                            List<RemoteRepository> repositories, RepositorySystemSession session )
-        throws PluginResolutionException;
-
+    DependencyNode resolve(
+            Plugin plugin,
+            Artifact pluginArtifact,
+            DependencyFilter dependencyFilter,
+            List<RemoteRepository> repositories,
+            RepositorySystemSession session)
+            throws PluginResolutionException;
 }

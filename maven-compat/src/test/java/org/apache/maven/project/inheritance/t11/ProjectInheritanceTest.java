@@ -1,5 +1,3 @@
-package org.apache.maven.project.inheritance.t11;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.inheritance.t11;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.inheritance.t11;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.inheritance.t11;
 
 import java.io.File;
 
@@ -30,9 +29,7 @@ import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
  * @author <a href="mailto:pschneider@gmail.com">Patrick Schneider</a>
  * @see <a href="https://issues.apache.org/jira/browse/MNG-2919">MNG-2919</a>
  */
-public class ProjectInheritanceTest
-    extends AbstractProjectInheritanceTestCase
-{
+public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
     // p1 inherits from p0
@@ -44,21 +41,20 @@ public class ProjectInheritanceTest
     //
     // ----------------------------------------------------------------------
 
-    public void testDependencyManagementDoesNotOverrideScopeOfCurrentArtifact()
-        throws Exception
-    {
+    public void testDependencyManagementDoesNotOverrideScopeOfCurrentArtifact() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
-        File pom0 = new File( localRepo, "p0/pom.xml" );
+        File pom0 = new File(localRepo, "p0/pom.xml");
         File pom0Basedir = pom0.getParentFile();
-        File pom1 = new File( pom0Basedir, "p1/pom.xml" );
+        File pom1 = new File(pom0Basedir, "p1/pom.xml");
 
         // load the child project, which inherits from p0...
-        MavenProject project0 = getProjectWithDependencies( pom0 );
-        MavenProject project1 = getProjectWithDependencies( pom1 );
+        MavenProject project0 = getProjectWithDependencies(pom0);
+        MavenProject project1 = getProjectWithDependencies(pom1);
 
-        assertEquals( pom0Basedir, project1.getParent().getBasedir() );
-        assertNull( "dependencyManagement has overwritten the scope of the currently building child project",
-                    project1.getArtifact().getScope() );
+        assertEquals(pom0Basedir, project1.getParent().getBasedir());
+        assertNull(
+                "dependencyManagement has overwritten the scope of the currently building child project",
+                project1.getArtifact().getScope());
     }
 }

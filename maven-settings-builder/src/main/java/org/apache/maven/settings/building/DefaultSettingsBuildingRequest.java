@@ -1,5 +1,3 @@
-package org.apache.maven.settings.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.settings.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.building;
 
 import java.io.File;
 import java.util.Properties;
@@ -27,9 +26,7 @@ import java.util.Properties;
  *
  * @author Benjamin Bentmann
  */
-public class DefaultSettingsBuildingRequest
-    implements SettingsBuildingRequest
-{
+public class DefaultSettingsBuildingRequest implements SettingsBuildingRequest {
 
     private File globalSettingsFile;
 
@@ -44,66 +41,56 @@ public class DefaultSettingsBuildingRequest
     private Properties userProperties;
 
     @Override
-    public File getGlobalSettingsFile()
-    {
+    public File getGlobalSettingsFile() {
         return globalSettingsFile;
     }
 
     @Override
-    public DefaultSettingsBuildingRequest setGlobalSettingsFile( File globalSettingsFile )
-    {
+    public DefaultSettingsBuildingRequest setGlobalSettingsFile(File globalSettingsFile) {
         this.globalSettingsFile = globalSettingsFile;
 
         return this;
     }
 
     @Override
-    public SettingsSource getGlobalSettingsSource()
-    {
+    public SettingsSource getGlobalSettingsSource() {
         return globalSettingsSource;
     }
 
     @Override
-    public DefaultSettingsBuildingRequest setGlobalSettingsSource( SettingsSource globalSettingsSource )
-    {
+    public DefaultSettingsBuildingRequest setGlobalSettingsSource(SettingsSource globalSettingsSource) {
         this.globalSettingsSource = globalSettingsSource;
 
         return this;
     }
 
     @Override
-    public File getUserSettingsFile()
-    {
+    public File getUserSettingsFile() {
         return userSettingsFile;
     }
 
     @Override
-    public DefaultSettingsBuildingRequest setUserSettingsFile( File userSettingsFile )
-    {
+    public DefaultSettingsBuildingRequest setUserSettingsFile(File userSettingsFile) {
         this.userSettingsFile = userSettingsFile;
 
         return this;
     }
 
     @Override
-    public SettingsSource getUserSettingsSource()
-    {
+    public SettingsSource getUserSettingsSource() {
         return userSettingsSource;
     }
 
     @Override
-    public DefaultSettingsBuildingRequest setUserSettingsSource( SettingsSource userSettingsSource )
-    {
+    public DefaultSettingsBuildingRequest setUserSettingsSource(SettingsSource userSettingsSource) {
         this.userSettingsSource = userSettingsSource;
 
         return this;
     }
 
     @Override
-    public Properties getSystemProperties()
-    {
-        if ( systemProperties == null )
-        {
+    public Properties getSystemProperties() {
+        if (systemProperties == null) {
             systemProperties = new Properties();
         }
 
@@ -111,18 +98,15 @@ public class DefaultSettingsBuildingRequest
     }
 
     @Override
-    public DefaultSettingsBuildingRequest setSystemProperties( Properties systemProperties )
-    {
-        if ( systemProperties != null )
-        {
+    public DefaultSettingsBuildingRequest setSystemProperties(Properties systemProperties) {
+        if (systemProperties != null) {
             this.systemProperties = new Properties();
-            synchronized ( systemProperties )
-            { // avoid concurrentmodification if someone else sets/removes an unrelated system property
-                this.systemProperties.putAll( systemProperties );
+            synchronized (
+                    systemProperties) { // avoid concurrentmodification if someone else sets/removes an unrelated system
+                // property
+                this.systemProperties.putAll(systemProperties);
             }
-        }
-        else
-        {
+        } else {
             this.systemProperties = null;
         }
 
@@ -130,10 +114,8 @@ public class DefaultSettingsBuildingRequest
     }
 
     @Override
-    public Properties getUserProperties()
-    {
-        if ( userProperties == null )
-        {
+    public Properties getUserProperties() {
+        if (userProperties == null) {
             userProperties = new Properties();
         }
 
@@ -141,19 +123,14 @@ public class DefaultSettingsBuildingRequest
     }
 
     @Override
-    public DefaultSettingsBuildingRequest setUserProperties( Properties userProperties )
-    {
-        if ( userProperties != null )
-        {
+    public DefaultSettingsBuildingRequest setUserProperties(Properties userProperties) {
+        if (userProperties != null) {
             this.userProperties = new Properties();
-            this.userProperties.putAll( userProperties );
-        }
-        else
-        {
+            this.userProperties.putAll(userProperties);
+        } else {
             this.userProperties = null;
         }
 
         return this;
     }
-
 }

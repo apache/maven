@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.lifecycle;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -28,45 +27,35 @@ import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.harness.Xpp3DomPointerFactory;
 
-public class MojoExecutionXPathContainer
-{
+public class MojoExecutionXPathContainer {
     private JXPathContext context;
 
-    static
-    {
-        JXPathContextReferenceImpl.addNodePointerFactory( new Xpp3DomPointerFactory() );
+    static {
+        JXPathContextReferenceImpl.addNodePointerFactory(new Xpp3DomPointerFactory());
     }
 
-    public MojoExecutionXPathContainer( MojoExecution mojoExecution )
-        throws IOException
-    {
-        context = JXPathContext.newContext( mojoExecution );
+    public MojoExecutionXPathContainer(MojoExecution mojoExecution) throws IOException {
+        context = JXPathContext.newContext(mojoExecution);
     }
 
-	public Iterator<?> getIteratorForXPathExpression( String expression )
-    {
-        return context.iterate( expression );
+    public Iterator<?> getIteratorForXPathExpression(String expression) {
+        return context.iterate(expression);
     }
 
-    public boolean containsXPathExpression( String expression )
-    {
-        return context.getValue( expression ) != null;
+    public boolean containsXPathExpression(String expression) {
+        return context.getValue(expression) != null;
     }
 
-    public Object getValue( String expression )
-    {
-        try
-        {
-            return context.getValue( expression );
-        }
-        catch ( JXPathNotFoundException e )
-        {
+    public Object getValue(String expression) {
+        try {
+            return context.getValue(expression);
+        } catch (JXPathNotFoundException e) {
             return null;
         }
     }
 
-    public boolean xPathExpressionEqualsValue( String expression, String value )
-    {
-        return context.getValue( expression ) != null && context.getValue( expression ).equals( value );
+    public boolean xPathExpressionEqualsValue(String expression, String value) {
+        return context.getValue(expression) != null
+                && context.getValue(expression).equals(value);
     }
 }

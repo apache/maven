@@ -1,5 +1,3 @@
-package org.apache.maven.cli;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.cli;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,33 +16,29 @@ package org.apache.maven.cli;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+package org.apache.maven.cli;
 
 import org.apache.commons.cli.CommandLine;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CLIManagerTest
-{
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
+public class CLIManagerTest {
     private CLIManager cliManager;
 
     @Before
-    public void setup()
-    {
+    public void setup() {
         cliManager = new CLIManager();
     }
 
     @Test
-    public void spacedOptions()
-        throws Exception
-    {
-        CommandLine cmdLine = cliManager.parse( "-X -Dx=1 -D y=2 test".split( " " ) );
-        assertTrue( cmdLine.hasOption( CLIManager.DEBUG ) );
-        assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[0], is( "x=1" ) );
-        assertThat( cmdLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY )[1], is( "y=2" ) );
+    public void spacedOptions() throws Exception {
+        CommandLine cmdLine = cliManager.parse("-X -Dx=1 -D y=2 test".split(" "));
+        assertTrue(cmdLine.hasOption(CLIManager.DEBUG));
+        assertThat(cmdLine.getOptionValues(CLIManager.SET_SYSTEM_PROPERTY)[0], is("x=1"));
+        assertThat(cmdLine.getOptionValues(CLIManager.SET_SYSTEM_PROPERTY)[1], is("y=2"));
     }
-
 }

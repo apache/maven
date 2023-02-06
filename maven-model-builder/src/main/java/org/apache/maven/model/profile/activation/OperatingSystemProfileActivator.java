@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile.activation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.profile.activation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile.activation;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -35,137 +34,115 @@ import org.codehaus.plexus.util.Os;
  * @author Benjamin Bentmann
  * @see ActivationOS
  */
-@Named( "os" )
+@Named("os")
 @Singleton
-public class OperatingSystemProfileActivator
-    implements ProfileActivator
-{
+public class OperatingSystemProfileActivator implements ProfileActivator {
 
     @Override
-    public boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
-    {
+    public boolean isActive(Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
         Activation activation = profile.getActivation();
 
-        if ( activation == null )
-        {
+        if (activation == null) {
             return false;
         }
 
         ActivationOS os = activation.getOs();
 
-        if ( os == null )
-        {
+        if (os == null) {
             return false;
         }
 
-        boolean active = ensureAtLeastOneNonNull( os );
+        boolean active = ensureAtLeastOneNonNull(os);
 
-        if ( active && os.getFamily() != null )
-        {
-            active = determineFamilyMatch( os.getFamily() );
+        if (active && os.getFamily() != null) {
+            active = determineFamilyMatch(os.getFamily());
         }
-        if ( active && os.getName() != null )
-        {
-            active = determineNameMatch( os.getName() );
+        if (active && os.getName() != null) {
+            active = determineNameMatch(os.getName());
         }
-        if ( active && os.getArch() != null )
-        {
-            active = determineArchMatch( os.getArch() );
+        if (active && os.getArch() != null) {
+            active = determineArchMatch(os.getArch());
         }
-        if ( active && os.getVersion() != null )
-        {
-            active = determineVersionMatch( os.getVersion() );
+        if (active && os.getVersion() != null) {
+            active = determineVersionMatch(os.getVersion());
         }
 
         return active;
     }
 
     @Override
-    public boolean presentInConfig( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
-    {
+    public boolean presentInConfig(Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
         Activation activation = profile.getActivation();
 
-        if ( activation == null )
-        {
+        if (activation == null) {
             return false;
         }
 
         ActivationOS os = activation.getOs();
 
-        if ( os == null )
-        {
+        if (os == null) {
             return false;
         }
         return true;
     }
 
-    private boolean ensureAtLeastOneNonNull( ActivationOS os )
-    {
+    private boolean ensureAtLeastOneNonNull(ActivationOS os) {
         return os.getArch() != null || os.getFamily() != null || os.getName() != null || os.getVersion() != null;
     }
 
-    private boolean determineVersionMatch( String version )
-    {
+    private boolean determineVersionMatch(String version) {
         String test = version;
         boolean reverse = false;
 
-        if ( test.startsWith( "!" ) )
-        {
+        if (test.startsWith("!")) {
             reverse = true;
-            test = test.substring( 1 );
+            test = test.substring(1);
         }
 
-        boolean result = Os.isVersion( test );
+        boolean result = Os.isVersion(test);
 
         return reverse ? !result : result;
     }
 
-    private boolean determineArchMatch( String arch )
-    {
+    private boolean determineArchMatch(String arch) {
         String test = arch;
         boolean reverse = false;
 
-        if ( test.startsWith( "!" ) )
-        {
+        if (test.startsWith("!")) {
             reverse = true;
-            test = test.substring( 1 );
+            test = test.substring(1);
         }
 
-        boolean result = Os.isArch( test );
+        boolean result = Os.isArch(test);
 
         return reverse ? !result : result;
     }
 
-    private boolean determineNameMatch( String name )
-    {
+    private boolean determineNameMatch(String name) {
         String test = name;
         boolean reverse = false;
 
-        if ( test.startsWith( "!" ) )
-        {
+        if (test.startsWith("!")) {
             reverse = true;
-            test = test.substring( 1 );
+            test = test.substring(1);
         }
 
-        boolean result = Os.isName( test );
+        boolean result = Os.isName(test);
 
         return reverse ? !result : result;
     }
 
-    private boolean determineFamilyMatch( String family )
-    {
+    private boolean determineFamilyMatch(String family) {
         String test = family;
         boolean reverse = false;
 
-        if ( test.startsWith( "!" ) )
-        {
+        if (test.startsWith("!")) {
             reverse = true;
-            test = test.substring( 1 );
+            test = test.substring(1);
         }
 
-        boolean result = Os.isFamily( test );
+        boolean result = Os.isFamily(test);
 
         return reverse ? !result : result;
     }
-
 }

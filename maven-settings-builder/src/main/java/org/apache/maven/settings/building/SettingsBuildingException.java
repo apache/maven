@@ -1,5 +1,3 @@
-package org.apache.maven.settings.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.settings.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.building;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -31,9 +30,7 @@ import java.util.List;
  *
  * @author Benjamin Bentmann
  */
-public class SettingsBuildingException
-    extends Exception
-{
+public class SettingsBuildingException extends Exception {
 
     private final List<SettingsProblem> problems;
 
@@ -42,14 +39,12 @@ public class SettingsBuildingException
      *
      * @param problems The problems that causes this exception, may be {@code null}.
      */
-    public SettingsBuildingException( List<SettingsProblem> problems )
-    {
-        super( toMessage( problems ) );
+    public SettingsBuildingException(List<SettingsProblem> problems) {
+        super(toMessage(problems));
 
         this.problems = new ArrayList<>();
-        if ( problems != null )
-        {
-            this.problems.addAll( problems );
+        if (problems != null) {
+            this.problems.addAll(problems);
         }
     }
 
@@ -58,33 +53,29 @@ public class SettingsBuildingException
      *
      * @return The problems that caused this exception, never {@code null}.
      */
-    public List<SettingsProblem> getProblems()
-    {
+    public List<SettingsProblem> getProblems() {
         return problems;
     }
 
-    private static String toMessage( List<SettingsProblem> problems )
-    {
-        StringWriter buffer = new StringWriter( 1024 );
+    private static String toMessage(List<SettingsProblem> problems) {
+        StringWriter buffer = new StringWriter(1024);
 
-        PrintWriter writer = new PrintWriter( buffer );
+        PrintWriter writer = new PrintWriter(buffer);
 
-        writer.print( problems.size() );
-        writer.print( ( problems.size() == 1 ) ? " problem was " : " problems were " );
-        writer.print( "encountered while building the effective settings" );
+        writer.print(problems.size());
+        writer.print((problems.size() == 1) ? " problem was " : " problems were ");
+        writer.print("encountered while building the effective settings");
         writer.println();
 
-        for ( SettingsProblem problem : problems )
-        {
-            writer.print( "[" );
-            writer.print( problem.getSeverity() );
-            writer.print( "] " );
-            writer.print( problem.getMessage() );
-            writer.print( " @ " );
-            writer.println( problem.getLocation() );
+        for (SettingsProblem problem : problems) {
+            writer.print("[");
+            writer.print(problem.getSeverity());
+            writer.print("] ");
+            writer.print(problem.getMessage());
+            writer.print(" @ ");
+            writer.println(problem.getLocation());
         }
 
         return buffer.toString();
     }
-
 }

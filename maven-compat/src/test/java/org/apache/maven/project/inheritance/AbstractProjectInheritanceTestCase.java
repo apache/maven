@@ -1,5 +1,3 @@
-package org.apache.maven.project.inheritance;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.inheritance;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.inheritance;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.inheritance;
 
 import java.io.File;
 
@@ -26,32 +25,26 @@ import org.apache.maven.project.AbstractMavenProjectTestCase;
 /**
  * @author Jason van Zyl
  */
-public abstract class AbstractProjectInheritanceTestCase
-    extends AbstractMavenProjectTestCase
-{
-    protected String getTestSeries()
-    {
+public abstract class AbstractProjectInheritanceTestCase extends AbstractMavenProjectTestCase {
+    protected String getTestSeries() {
         String className = getClass().getPackage().getName();
 
-        return className.substring( className.lastIndexOf( '.' ) + 1 );
+        return className.substring(className.lastIndexOf('.') + 1);
     }
 
-    protected File projectFile( String name )
-    {
-        return projectFile( "maven", name );
+    protected File projectFile(String name) {
+        return projectFile("maven", name);
     }
 
-    protected File projectFile( String groupId, String artifactId )
-    {
-        return new File( getLocalRepositoryPath(), "/" + groupId + "/poms/" + artifactId + "-1.0.pom" );
+    protected File projectFile(String groupId, String artifactId) {
+        return new File(getLocalRepositoryPath(), "/" + groupId + "/poms/" + artifactId + "-1.0.pom");
     }
 
     // ----------------------------------------------------------------------
     // The local repository for this category of tests
     // ----------------------------------------------------------------------
 
-    protected File getLocalRepositoryPath()
-    {
-        return getTestFile("src/test/resources/inheritance-repo/" + getTestSeries() );
+    protected File getLocalRepositoryPath() {
+        return getTestFile("src/test/resources/inheritance-repo/" + getTestSeries());
     }
 }

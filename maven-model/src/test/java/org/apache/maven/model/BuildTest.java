@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import junit.framework.TestCase;
 
@@ -26,31 +25,32 @@ import junit.framework.TestCase;
  *
  * @author Benjamin Bentmann
  */
-public class BuildTest
-    extends TestCase
-{
+public class BuildTest extends TestCase {
 
-    public void testHashCodeNullSafe()
-    {
+    public void testHashCodeNullSafe() {
         new Build().hashCode();
     }
 
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new Build().equals( null ) );
+    public void testEqualsNullSafe() {
+        assertFalse(new Build().equals(null));
 
-        new Build().equals( new Build() );
+        new Build().equals(new Build());
     }
 
-    public void testEqualsIdentity()
-    {
+    public void testEqualsIdentity() {
         Build thing = new Build();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new Build().toString() );
+    public void testToStringNullSafe() {
+        assertNotNull(new Build().toString());
     }
 
+    public void testToStringNotNonsense() {
+        Build build = new Build();
+
+        String s = build.toString();
+
+        assert "Build {BuildBase {PluginConfiguration {PluginContainer {}}}}".equals(s) : s;
+    }
 }

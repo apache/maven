@@ -1,5 +1,3 @@
-package org.apache.maven.settings;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.settings;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.settings;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,79 +36,59 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 /**
  * @author jdcasey
  */
-@Component( role = MavenSettingsBuilder.class )
-public class DefaultMavenSettingsBuilder
-    extends AbstractLogEnabled
-    implements MavenSettingsBuilder
-{
+@Component(role = MavenSettingsBuilder.class)
+public class DefaultMavenSettingsBuilder extends AbstractLogEnabled implements MavenSettingsBuilder {
 
     @Requirement
     private SettingsBuilder settingsBuilder;
 
-    public Settings buildSettings()
-        throws IOException, XmlPullParserException
-    {
-        File userSettingsFile =
-            getFile( "${user.home}/.m2/settings.xml", "user.home",
-                     MavenSettingsBuilder.ALT_USER_SETTINGS_XML_LOCATION );
+    public Settings buildSettings() throws IOException, XmlPullParserException {
+        File userSettingsFile = getFile(
+                "${user.home}/.m2/settings.xml", "user.home", MavenSettingsBuilder.ALT_USER_SETTINGS_XML_LOCATION);
 
-        return buildSettings( userSettingsFile );
+        return buildSettings(userSettingsFile);
     }
 
-    public Settings buildSettings( boolean useCachedSettings )
-        throws IOException, XmlPullParserException
-    {
+    public Settings buildSettings(boolean useCachedSettings) throws IOException, XmlPullParserException {
         return buildSettings();
     }
 
-    public Settings buildSettings( File userSettingsFile )
-        throws IOException, XmlPullParserException
-    {
-        File globalSettingsFile =
-            getFile( "${maven.conf}/settings.xml", "maven.conf",
-                     MavenSettingsBuilder.ALT_GLOBAL_SETTINGS_XML_LOCATION );
+    public Settings buildSettings(File userSettingsFile) throws IOException, XmlPullParserException {
+        File globalSettingsFile = getFile(
+                "${maven.conf}/settings.xml", "maven.conf", MavenSettingsBuilder.ALT_GLOBAL_SETTINGS_XML_LOCATION);
 
         SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
-        request.setUserSettingsFile( userSettingsFile );
-        request.setGlobalSettingsFile( globalSettingsFile );
-        request.setSystemProperties( SystemProperties.getSystemProperties() );
-        return build( request );
+        request.setUserSettingsFile(userSettingsFile);
+        request.setGlobalSettingsFile(globalSettingsFile);
+        request.setSystemProperties(SystemProperties.getSystemProperties());
+        return build(request);
     }
 
-    public Settings buildSettings( File userSettingsFile, boolean useCachedSettings )
-        throws IOException, XmlPullParserException
-    {
-        return buildSettings( userSettingsFile );
+    public Settings buildSettings(File userSettingsFile, boolean useCachedSettings)
+            throws IOException, XmlPullParserException {
+        return buildSettings(userSettingsFile);
     }
 
-    private Settings build( SettingsBuildingRequest request )
-        throws IOException, XmlPullParserException
-    {
-        try
-        {
-            return settingsBuilder.build( request ).getEffectiveSettings();
-        }
-        catch ( SettingsBuildingException e )
-        {
-            throw (IOException) new IOException( e.getMessage() ).initCause( e );
+    private Settings build(SettingsBuildingRequest request) throws IOException, XmlPullParserException {
+        try {
+            return settingsBuilder.build(request).getEffectiveSettings();
+        } catch (SettingsBuildingException e) {
+            throw (IOException) new IOException(e.getMessage()).initCause(e);
         }
     }
 
     /** @since 2.1 */
-    public Settings buildSettings( MavenExecutionRequest request )
-        throws IOException, XmlPullParserException
-    {
+    public Settings buildSettings(MavenExecutionRequest request) throws IOException, XmlPullParserException {
         SettingsBuildingRequest settingsRequest = new DefaultSettingsBuildingRequest();
-        settingsRequest.setUserSettingsFile( request.getUserSettingsFile() );
-        settingsRequest.setGlobalSettingsFile( request.getGlobalSettingsFile() );
-        settingsRequest.setUserProperties( request.getUserProperties() );
-        settingsRequest.setSystemProperties( request.getSystemProperties() );
+        settingsRequest.setUserSettingsFile(request.getUserSettingsFile());
+        settingsRequest.setGlobalSettingsFile(request.getGlobalSettingsFile());
+        settingsRequest.setUserProperties(request.getUserProperties());
+        settingsRequest.setSystemProperties(request.getSystemProperties());
 
-        return build( settingsRequest );
+        return build(settingsRequest);
     }
 
-    private File getFile( String pathPattern, String basedirSysProp, String altLocationSysProp )
-    {
+    private File getFile(String pathPattern, String basedirSysProp, String altLocationSysProp) {
         // -------------------------------------------------------------------------------------
         // Alright, here's the justification for all the regexp wizardry below...
         //
@@ -123,23 +102,21 @@ public class DefaultMavenSettingsBuilder
         // in order to avoid surprises with the File construction...
         // -------------------------------------------------------------------------------------
 
-        String path = System.getProperty( altLocationSysProp );
+        String path = System.getProperty(altLocationSysProp);
 
-        if ( StringUtils.isEmpty( path ) )
-        {
+        if (StringUtils.isEmpty(path)) {
             // TODO This replacing shouldn't be necessary as user.home should be in the
             // context of the container and thus the value would be interpolated by Plexus
-            String basedir = System.getProperty( basedirSysProp );
-            if ( basedir == null )
-            {
-                basedir = System.getProperty( "user.dir" );
+            String basedir = System.getProperty(basedirSysProp);
+            if (basedir == null) {
+                basedir = System.getProperty("user.dir");
             }
 
-            basedir = basedir.replaceAll( "\\\\", "/" );
-            basedir = basedir.replaceAll( "\\$", "\\\\\\$" );
+            basedir = basedir.replaceAll("\\\\", "/");
+            basedir = basedir.replaceAll("\\$", "\\\\\\$");
 
-            path = pathPattern.replaceAll( "\\$\\{" + basedirSysProp + "\\}", basedir );
-            path = path.replaceAll( "\\\\", "/" );
+            path = pathPattern.replaceAll("\\$\\{" + basedirSysProp + "\\}", basedir);
+            path = path.replaceAll("\\\\", "/");
             // ---------------------------------------------------------------------------------
             // I'm not sure if this last regexp was really intended to disallow the usage of
             // network paths as user.home directory. Unfortunately it did. I removed it and
@@ -148,7 +125,6 @@ public class DefaultMavenSettingsBuilder
             // path = path.replaceAll( "//", "/" );
 
         }
-        return new File( path ).getAbsoluteFile();
+        return new File(path).getAbsoluteFile();
     }
-
 }

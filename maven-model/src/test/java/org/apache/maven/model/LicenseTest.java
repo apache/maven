@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import junit.framework.TestCase;
 
@@ -26,31 +25,34 @@ import junit.framework.TestCase;
  *
  * @author Benjamin Bentmann
  */
-public class LicenseTest
-    extends TestCase
-{
+public class LicenseTest extends TestCase {
 
-    public void testHashCodeNullSafe()
-    {
+    public void testHashCodeNullSafe() {
         new License().hashCode();
     }
 
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new License().equals( null ) );
+    public void testEqualsNullSafe() {
+        assertFalse(new License().equals(null));
 
-        new License().equals( new License() );
+        new License().equals(new License());
     }
 
-    public void testEqualsIdentity()
-    {
+    public void testEqualsIdentity() {
         License thing = new License();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new License().toString() );
+    public void testToStringNullSafe() {
+        assertNotNull(new License().toString());
     }
 
+    public void testToStringNotNonsense() {
+        License license = new License();
+        license.setName("Unlicense");
+        license.setUrl("http://lic.localdomain");
+
+        String s = license.toString();
+
+        assert "License {name=Unlicense, url=http://lic.localdomain}".equals(s) : s;
+    }
 }

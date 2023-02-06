@@ -1,5 +1,3 @@
-package org.apache.maven.session.scope.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.session.scope.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,49 +16,44 @@ package org.apache.maven.session.scope.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.session.scope.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.google.inject.AbstractModule;
 import org.apache.maven.SessionScoped;
 import org.apache.maven.execution.MavenSession;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
-import com.google.inject.AbstractModule;
-
 /**
  * SessionScopeModule
  */
 @Named
-public class SessionScopeModule
-    extends AbstractModule
-{
+public class SessionScopeModule extends AbstractModule {
     private final SessionScope scope;
 
     @Inject
-    public SessionScopeModule()
-    {
-        this( new SessionScope() );
+    public SessionScopeModule() {
+        this(new SessionScope());
     }
 
-    public SessionScopeModule( PlexusContainer container )
-        throws ComponentLookupException
-    {
-        this( container.lookup( SessionScope.class ) );
+    public SessionScopeModule(PlexusContainer container) throws ComponentLookupException {
+        this(container.lookup(SessionScope.class));
     }
 
-    private SessionScopeModule( SessionScope scope )
-    {
+    private SessionScopeModule(SessionScope scope) {
         this.scope = scope;
     }
 
     @Override
-    protected void configure()
-    {
-        bindScope( SessionScoped.class, scope );
-        bind( SessionScope.class ).toInstance( scope );
+    protected void configure() {
+        bindScope(SessionScoped.class, scope);
+        bind(SessionScope.class).toInstance(scope);
 
-        bind( MavenSession.class ).toProvider( SessionScope.<MavenSession>seededKeyProvider() ).in( scope );
+        bind(MavenSession.class)
+                .toProvider(SessionScope.<MavenSession>seededKeyProvider())
+                .in(scope);
     }
 }

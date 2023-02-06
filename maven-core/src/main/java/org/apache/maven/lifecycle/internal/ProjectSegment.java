@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,12 +16,13 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal;
+
+import java.util.List;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.project.MavenProject;
-
-import java.util.List;
 
 /**
  * A build context that matches a mavenproject to a given tasksegment, and the session to be used.
@@ -55,8 +54,7 @@ import java.util.List;
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold
  */
-public final class ProjectSegment
-{
+public final class ProjectSegment {
     private final MavenProject project;
 
     private final TaskSegment taskSegment;
@@ -67,44 +65,37 @@ public final class ProjectSegment
 
     private final List<MavenProject> transitiveUpstreamProjects;
 
-    public ProjectSegment( MavenProject project, TaskSegment taskSegment, MavenSession copiedSession )
-    {
+    public ProjectSegment(MavenProject project, TaskSegment taskSegment, MavenSession copiedSession) {
         this.project = project;
         this.taskSegment = taskSegment;
         this.session = copiedSession;
         final ProjectDependencyGraph dependencyGraph = getSession().getProjectDependencyGraph();
-        nonTransitiveUpstreamProjects = dependencyGraph.getUpstreamProjects( getProject(), false );
-        transitiveUpstreamProjects = dependencyGraph.getUpstreamProjects( getProject(), true );
+        nonTransitiveUpstreamProjects = dependencyGraph.getUpstreamProjects(getProject(), false);
+        transitiveUpstreamProjects = dependencyGraph.getUpstreamProjects(getProject(), true);
     }
 
-    public MavenSession getSession()
-    {
+    public MavenSession getSession() {
         return session;
     }
 
-    public MavenProject getProject()
-    {
+    public MavenProject getProject() {
         return project;
     }
 
-    public TaskSegment getTaskSegment()
-    {
+    public TaskSegment getTaskSegment() {
         return taskSegment;
     }
 
-    public List<MavenProject> getImmediateUpstreamProjects()
-    {
+    public List<MavenProject> getImmediateUpstreamProjects() {
         return nonTransitiveUpstreamProjects;
     }
 
-    public List<MavenProject> getTransitiveUpstreamProjects()
-    {
+    public List<MavenProject> getTransitiveUpstreamProjects() {
         return transitiveUpstreamProjects;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getProject().getId() + " -> " + getTaskSegment();
     }
 }

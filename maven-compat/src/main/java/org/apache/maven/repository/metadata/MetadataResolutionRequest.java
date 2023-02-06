@@ -1,5 +1,3 @@
-package org.apache.maven.repository.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,62 +16,53 @@ package org.apache.maven.repository.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.metadata;
 
 import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /** @author Oleg Gusakov */
-public class MetadataResolutionRequest
-{
+public class MetadataResolutionRequest {
     protected ArtifactMetadata query;
     protected ArtifactRepository localRepository;
     protected List<ArtifactRepository> remoteRepositories;
 
-    //--------------------------------------------------------------------
-    public MetadataResolutionRequest()
-    {
-    }
+    // --------------------------------------------------------------------
+    public MetadataResolutionRequest() {}
 
-    //--------------------------------------------------------------------
-    public MetadataResolutionRequest( ArtifactMetadata query, ArtifactRepository localRepository,
-                                      List<ArtifactRepository> remoteRepositories )
-    {
+    // --------------------------------------------------------------------
+    public MetadataResolutionRequest(
+            ArtifactMetadata query, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories) {
         this.query = query;
         this.localRepository = localRepository;
         this.remoteRepositories = remoteRepositories;
     }
 
-    //--------------------------------------------------------------------
-    public ArtifactMetadata getQuery()
-    {
+    // --------------------------------------------------------------------
+    public ArtifactMetadata getQuery() {
         return query;
     }
 
-    public void setQuery( ArtifactMetadata query )
-    {
+    public void setQuery(ArtifactMetadata query) {
         this.query = query;
     }
 
-    public ArtifactRepository getLocalRepository()
-    {
+    public ArtifactRepository getLocalRepository() {
         return localRepository;
     }
 
-    public void setLocalRepository( ArtifactRepository localRepository )
-    {
+    public void setLocalRepository(ArtifactRepository localRepository) {
         this.localRepository = localRepository;
     }
 
-    public List<ArtifactRepository> getRemoteRepositories()
-    {
+    public List<ArtifactRepository> getRemoteRepositories() {
         return remoteRepositories;
     }
 
-    public void setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
-    {
+    public void setRemoteRepositories(List<ArtifactRepository> remoteRepositories) {
         this.remoteRepositories = remoteRepositories;
     }
-    //--------------------------------------------------------------------
-    //--------------------------------------------------------------------
+    // --------------------------------------------------------------------
+    // --------------------------------------------------------------------
 }

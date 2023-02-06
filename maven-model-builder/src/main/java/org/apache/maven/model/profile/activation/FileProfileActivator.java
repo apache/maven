@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile.activation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +16,13 @@ package org.apache.maven.model.profile.activation;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import java.io.File;
+package org.apache.maven.model.profile.activation;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import java.io.File;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
@@ -49,80 +48,64 @@ import org.codehaus.plexus.util.StringUtils;
  * @see ActivationFile
  * @see org.apache.maven.model.validation.DefaultModelValidator#validateRawModel
  */
-@Named( "file" )
+@Named("file")
 @Singleton
-public class FileProfileActivator
-    implements ProfileActivator
-{
+public class FileProfileActivator implements ProfileActivator {
 
     @Inject
     private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
 
     public FileProfileActivator setProfileActivationFilePathInterpolator(
-            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator )
-    {
+            ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator) {
         this.profileActivationFilePathInterpolator = profileActivationFilePathInterpolator;
         return this;
     }
 
     @Override
-    public boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
-    {
+    public boolean isActive(Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
         Activation activation = profile.getActivation();
 
-        if ( activation == null )
-        {
+        if (activation == null) {
             return false;
         }
 
         ActivationFile file = activation.getFile();
 
-        if ( file == null )
-        {
+        if (file == null) {
             return false;
         }
 
         String path;
         boolean missing;
 
-        if ( StringUtils.isNotEmpty( file.getExists() ) )
-        {
+        if (StringUtils.isNotEmpty(file.getExists())) {
             path = file.getExists();
             missing = false;
-        }
-        else if ( StringUtils.isNotEmpty( file.getMissing() ) )
-        {
+        } else if (StringUtils.isNotEmpty(file.getMissing())) {
             path = file.getMissing();
             missing = true;
-        }
-        else
-        {
+        } else {
             return false;
         }
 
-        try
-        {
-            path = profileActivationFilePathInterpolator.interpolate( path, context );
-        }
-        catch ( InterpolationException e )
-        {
-            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Failed to interpolate file location " + path + " for profile " + profile.getId()
-                            + ": " + e.getMessage() )
-                    .setLocation( file.getLocation( missing ? "missing" : "exists" ) )
-                    .setException( e ) );
+        try {
+            path = profileActivationFilePathInterpolator.interpolate(path, context);
+        } catch (InterpolationException e) {
+            problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                    .setMessage("Failed to interpolate file location " + path + " for profile " + profile.getId() + ": "
+                            + e.getMessage())
+                    .setLocation(file.getLocation(missing ? "missing" : "exists"))
+                    .setException(e));
             return false;
         }
 
-        if ( path == null )
-        {
+        if (path == null) {
             return false;
         }
 
-        File f = new File( path );
+        File f = new File(path);
 
-        if ( !f.isAbsolute() )
-        {
+        if (!f.isAbsolute()) {
             return false;
         }
 
@@ -132,22 +115,18 @@ public class FileProfileActivator
     }
 
     @Override
-    public boolean presentInConfig( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
-    {
+    public boolean presentInConfig(Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
         Activation activation = profile.getActivation();
 
-        if ( activation == null )
-        {
+        if (activation == null) {
             return false;
         }
 
         ActivationFile file = activation.getFile();
 
-        if ( file == null )
-        {
+        if (file == null) {
             return false;
         }
         return true;
     }
-
 }

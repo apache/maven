@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,9 +16,7 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+package org.apache.maven.repository.internal;
 
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
@@ -30,48 +26,49 @@ import org.eclipse.aether.impl.RepositoryEventDispatcher;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.mockito.ArgumentCaptor;
 
-public class DefaultArtifactDescriptorReaderTest
-    extends AbstractRepositoryTestCase
-{
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
-    public void testMng5459()
-        throws Exception
-    {
+public class DefaultArtifactDescriptorReaderTest extends AbstractRepositoryTestCase {
+
+    public void testMng5459() throws Exception {
         // prepare
-        DefaultArtifactDescriptorReader reader = (DefaultArtifactDescriptorReader) lookup( ArtifactDescriptorReader.class );
+        DefaultArtifactDescriptorReader reader =
+                (DefaultArtifactDescriptorReader) lookup(ArtifactDescriptorReader.class);
 
-        RepositoryEventDispatcher eventDispatcher = mock( RepositoryEventDispatcher.class );
+        RepositoryEventDispatcher eventDispatcher = mock(RepositoryEventDispatcher.class);
 
-        ArgumentCaptor<RepositoryEvent> event = ArgumentCaptor.forClass( RepositoryEvent.class );
+        ArgumentCaptor<RepositoryEvent> event = ArgumentCaptor.forClass(RepositoryEvent.class);
 
-        reader.setRepositoryEventDispatcher( eventDispatcher );
+        reader.setRepositoryEventDispatcher(eventDispatcher);
 
         ArtifactDescriptorRequest request = new ArtifactDescriptorRequest();
 
-        request.addRepository( newTestRepository() );
+        request.addRepository(newTestRepository());
 
-        request.setArtifact( new DefaultArtifact( "org.apache.maven.its", "dep-mng5459", "jar", "0.4.0-SNAPSHOT" ) );
+        request.setArtifact(new DefaultArtifact("org.apache.maven.its", "dep-mng5459", "jar", "0.4.0-SNAPSHOT"));
 
         // execute
-        reader.readArtifactDescriptor( session, request );
+        reader.readArtifactDescriptor(session, request);
 
         // verify
-        verify( eventDispatcher ).dispatch( event.capture() );
+        verify(eventDispatcher).dispatch(event.capture());
 
         boolean missingArtifactDescriptor = false;
 
-        for( RepositoryEvent evt : event.getAllValues() )
-        {
-            if ( EventType.ARTIFACT_DESCRIPTOR_MISSING.equals( evt.getType() ) )
-            {
-                assertEquals( "Could not find artifact org.apache.maven.its:dep-mng5459:pom:0.4.0-20130404.090532-2 in repo (" + newTestRepository().getUrl() + ")", evt.getException().getMessage() );
+        for (RepositoryEvent evt : event.getAllValues()) {
+            if (EventType.ARTIFACT_DESCRIPTOR_MISSING.equals(evt.getType())) {
+                assertEquals(
+                        "Could not find artifact org.apache.maven.its:dep-mng5459:pom:0.4.0-20130404.090532-2 in repo ("
+                                + newTestRepository().getUrl() + ")",
+                        evt.getException().getMessage());
                 missingArtifactDescriptor = true;
             }
         }
 
-        if( !missingArtifactDescriptor )
-        {
-            fail( "Expected missing artifact descriptor for org.apache.maven.its:dep-mng5459:pom:0.4.0-20130404.090532-2" );
+        if (!missingArtifactDescriptor) {
+            fail(
+                    "Expected missing artifact descriptor for org.apache.maven.its:dep-mng5459:pom:0.4.0-20130404.090532-2");
         }
     }
 }

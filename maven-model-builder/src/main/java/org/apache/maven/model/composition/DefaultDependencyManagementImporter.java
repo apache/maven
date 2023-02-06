@@ -1,5 +1,3 @@
-package org.apache.maven.model.composition;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,15 @@ package org.apache.maven.model.composition;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.composition;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -40,47 +39,38 @@ import org.apache.maven.model.building.ModelProblemCollector;
  */
 @Named
 @Singleton
-public class DefaultDependencyManagementImporter
-    implements DependencyManagementImporter
-{
+public class DefaultDependencyManagementImporter implements DependencyManagementImporter {
 
     @Override
-    public void importManagement( Model target, List<? extends DependencyManagement> sources,
-                                  ModelBuildingRequest request, ModelProblemCollector problems )
-    {
-        if ( sources != null && !sources.isEmpty() )
-        {
+    public void importManagement(
+            Model target,
+            List<? extends DependencyManagement> sources,
+            ModelBuildingRequest request,
+            ModelProblemCollector problems) {
+        if (sources != null && !sources.isEmpty()) {
             Map<String, Dependency> dependencies = new LinkedHashMap<>();
 
             DependencyManagement depMgmt = target.getDependencyManagement();
 
-            if ( depMgmt != null )
-            {
-                for ( Dependency dependency : depMgmt.getDependencies() )
-                {
-                    dependencies.put( dependency.getManagementKey(), dependency );
+            if (depMgmt != null) {
+                for (Dependency dependency : depMgmt.getDependencies()) {
+                    dependencies.put(dependency.getManagementKey(), dependency);
                 }
-            }
-            else
-            {
+            } else {
                 depMgmt = new DependencyManagement();
-                target.setDependencyManagement( depMgmt );
+                target.setDependencyManagement(depMgmt);
             }
 
-            for ( DependencyManagement source : sources )
-            {
-                for ( Dependency dependency : source.getDependencies() )
-                {
+            for (DependencyManagement source : sources) {
+                for (Dependency dependency : source.getDependencies()) {
                     String key = dependency.getManagementKey();
-                    if ( !dependencies.containsKey( key ) )
-                    {
-                        dependencies.put( key, dependency );
+                    if (!dependencies.containsKey(key)) {
+                        dependencies.put(key, dependency);
                     }
                 }
             }
 
-            depMgmt.setDependencies( new ArrayList<>( dependencies.values() ) );
+            depMgmt.setDependencies(new ArrayList<>(dependencies.values()));
         }
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.project.inheritance.t12;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.inheritance.t12;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.inheritance.t12;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.inheritance.t12;
 
 import java.io.File;
 import java.util.Map;
@@ -30,8 +29,7 @@ import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
  * Verifies that plugin execution sections in the parent POM that have
  * inherit == false are not inherited to the child POM.
  */
-public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase
-{
+public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
     // p1 inherits from p0
@@ -43,23 +41,24 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase
     //
     // ----------------------------------------------------------------------
 
-    public void testFalsePluginExecutionInheritValue() throws Exception
-    {
+    public void testFalsePluginExecutionInheritValue() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
-        File pom0 = new File( localRepo, "p0/pom.xml" );
+        File pom0 = new File(localRepo, "p0/pom.xml");
         File pom0Basedir = pom0.getParentFile();
-        File pom1 = new File( pom0Basedir, "p1/pom.xml" );
+        File pom1 = new File(pom0Basedir, "p1/pom.xml");
 
-        getProjectWithDependencies( pom0 );
-        MavenProject project1 = getProjectWithDependencies( pom1 );
+        getProjectWithDependencies(pom0);
+        MavenProject project1 = getProjectWithDependencies(pom1);
 
         Map pluginMap = project1.getBuild().getPluginsAsMap();
-        Plugin compilerPlugin = (Plugin) pluginMap.get( "org.apache.maven.plugins:maven-compiler-plugin" );
+        Plugin compilerPlugin = (Plugin) pluginMap.get("org.apache.maven.plugins:maven-compiler-plugin");
 
-        assertNotNull( compilerPlugin );
+        assertNotNull(compilerPlugin);
 
         Map executionMap = compilerPlugin.getExecutionsAsMap();
-        assertNull( "Plugin execution: \'test\' should NOT exist in the compiler plugin specification for the child project!", executionMap.get( "test" ) );
+        assertNull(
+                "Plugin execution: \'test\' should NOT exist in the compiler plugin specification for the child project!",
+                executionMap.get("test"));
     }
 }

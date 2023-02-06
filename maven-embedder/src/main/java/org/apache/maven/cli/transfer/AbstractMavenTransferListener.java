@@ -1,5 +1,3 @@
-package org.apache.maven.cli.transfer;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.cli.transfer;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.cli.transfer;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cli.transfer;
 
 import java.io.PrintStream;
 import java.text.DecimalFormat;
@@ -33,9 +32,7 @@ import org.eclipse.aether.transfer.TransferResource;
 /**
  * AbstractMavenTransferListener
  */
-public abstract class AbstractMavenTransferListener
-    extends AbstractTransferListener
-{
+public abstract class AbstractMavenTransferListener extends AbstractTransferListener {
 
     // CHECKSTYLE_OFF: LineLength
     /**
@@ -50,88 +47,68 @@ public abstract class AbstractMavenTransferListener
      */
     // CHECKSTYLE_ON: LineLength
     // TODO Move me to Maven Shared Utils
-    static class FileSizeFormat
-    {
-        enum ScaleUnit
-        {
-            BYTE
-            {
+    static class FileSizeFormat {
+        enum ScaleUnit {
+            BYTE {
                 @Override
-                public long bytes()
-                {
+                public long bytes() {
                     return 1L;
                 }
 
                 @Override
-                public String symbol()
-                {
+                public String symbol() {
                     return "B";
                 }
             },
-            KILOBYTE
-            {
+            KILOBYTE {
                 @Override
-                public long bytes()
-                {
+                public long bytes() {
                     return 1000L;
                 }
 
                 @Override
-                public String symbol()
-                {
+                public String symbol() {
                     return "kB";
                 }
             },
-            MEGABYTE
-            {
+            MEGABYTE {
                 @Override
-                public long bytes()
-                {
+                public long bytes() {
                     return KILOBYTE.bytes() * KILOBYTE.bytes();
                 }
 
                 @Override
-                public String symbol()
-                {
+                public String symbol() {
                     return "MB";
                 }
             },
-            GIGABYTE
-            {
+            GIGABYTE {
                 @Override
-                public long bytes()
-                {
+                public long bytes() {
                     return MEGABYTE.bytes() * KILOBYTE.bytes();
-                };
+                }
+                ;
 
                 @Override
-                public String symbol()
-                {
+                public String symbol() {
                     return "GB";
                 }
             };
 
             public abstract long bytes();
+
             public abstract String symbol();
 
-            public static ScaleUnit getScaleUnit( long size )
-            {
-                Validate.isTrue( size >= 0L, "file size cannot be negative: %s", size );
+            public static ScaleUnit getScaleUnit(long size) {
+                Validate.isTrue(size >= 0L, "file size cannot be negative: %s", size);
 
-                if ( size >= GIGABYTE.bytes() )
-                {
+                if (size >= GIGABYTE.bytes()) {
                     return GIGABYTE;
-                }
-                else if ( size >= MEGABYTE.bytes() )
-                {
+                } else if (size >= MEGABYTE.bytes()) {
                     return MEGABYTE;
-                }
-                else if ( size >= KILOBYTE.bytes() )
-                {
+                } else if (size >= KILOBYTE.bytes()) {
                     return KILOBYTE;
-                }
-                else
-                {
+                } else {
                     return BYTE;
                 }
             }
@@ -140,133 +117,115 @@ public abstract class AbstractMavenTransferListener
         private DecimalFormat smallFormat;
         private DecimalFormat largeFormat;
 
-        FileSizeFormat( Locale locale )
-        {
-            smallFormat = new DecimalFormat( "#0.0", new DecimalFormatSymbols( locale ) );
-            largeFormat = new DecimalFormat( "###0", new DecimalFormatSymbols( locale ) );
+        FileSizeFormat(Locale locale) {
+            smallFormat = new DecimalFormat("#0.0", new DecimalFormatSymbols(locale));
+            largeFormat = new DecimalFormat("###0", new DecimalFormatSymbols(locale));
         }
 
-        public String format( long size )
-        {
-            return format( size, null );
+        public String format(long size) {
+            return format(size, null);
         }
 
-        public String format( long size, ScaleUnit unit )
-        {
-            return format( size, unit, false );
+        public String format(long size, ScaleUnit unit) {
+            return format(size, unit, false);
         }
 
-        @SuppressWarnings( "checkstyle:magicnumber" )
-        public String format( long size, ScaleUnit unit, boolean omitSymbol )
-        {
-            Validate.isTrue( size >= 0L, "file size cannot be negative: %s", size );
+        @SuppressWarnings("checkstyle:magicnumber")
+        public String format(long size, ScaleUnit unit, boolean omitSymbol) {
+            Validate.isTrue(size >= 0L, "file size cannot be negative: %s", size);
 
-            if ( unit == null )
-            {
-                unit = ScaleUnit.getScaleUnit( size );
+            if (unit == null) {
+                unit = ScaleUnit.getScaleUnit(size);
             }
 
             double scaledSize = (double) size / unit.bytes();
             String scaledSymbol = " " + unit.symbol();
 
-            if ( omitSymbol )
-            {
+            if (omitSymbol) {
                 scaledSymbol = "";
             }
 
-            if ( unit == ScaleUnit.BYTE )
-            {
-                return largeFormat.format( size ) + scaledSymbol;
+            if (unit == ScaleUnit.BYTE) {
+                return largeFormat.format(size) + scaledSymbol;
             }
 
-            if ( scaledSize < 0.05 || scaledSize >= 10.0 )
-            {
-                return largeFormat.format( scaledSize ) + scaledSymbol;
-            }
-            else
-            {
-                return smallFormat.format( scaledSize ) + scaledSymbol;
+            if (scaledSize < 0.05 || scaledSize >= 10.0) {
+                return largeFormat.format(scaledSize) + scaledSymbol;
+            } else {
+                return smallFormat.format(scaledSize) + scaledSymbol;
             }
         }
 
-        public String formatProgress( long progressedSize, long size )
-        {
-            Validate.isTrue( progressedSize >= 0L, "progressed file size cannot be negative: %s", progressedSize );
-            Validate.isTrue( size >= 0L && progressedSize <= size || size < 0L,
-                "progressed file size cannot be greater than size: %s > %s", progressedSize, size );
+        public String formatProgress(long progressedSize, long size) {
+            Validate.isTrue(progressedSize >= 0L, "progressed file size cannot be negative: %s", progressedSize);
+            Validate.isTrue(
+                    size >= 0L && progressedSize <= size || size < 0L,
+                    "progressed file size cannot be greater than size: %s > %s",
+                    progressedSize,
+                    size);
 
-            if ( size >= 0L && progressedSize != size )
-            {
-                ScaleUnit unit = ScaleUnit.getScaleUnit( size );
-                String formattedProgressedSize = format( progressedSize, unit, true );
-                String formattedSize = format( size, unit );
+            if (size >= 0L && progressedSize != size) {
+                ScaleUnit unit = ScaleUnit.getScaleUnit(size);
+                String formattedProgressedSize = format(progressedSize, unit, true);
+                String formattedSize = format(size, unit);
 
                 return formattedProgressedSize + "/" + formattedSize;
-            }
-            else
-            {
-                return format( progressedSize );
+            } else {
+                return format(progressedSize);
             }
         }
     }
 
     protected PrintStream out;
 
-    protected AbstractMavenTransferListener( PrintStream out )
-    {
+    protected AbstractMavenTransferListener(PrintStream out) {
         this.out = out;
     }
 
     @Override
-    public void transferInitiated( TransferEvent event )
-    {
+    public void transferInitiated(TransferEvent event) {
         String action = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
         TransferResource resource = event.getResource();
         StringBuilder message = new StringBuilder();
-        message.append( action ).append( ' ' ).append( direction ).append( ' ' ).append( resource.getRepositoryId() );
-        message.append( ": " );
-        message.append( resource.getRepositoryUrl() ).append( resource.getResourceName() );
+        message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());
+        message.append(": ");
+        message.append(resource.getRepositoryUrl()).append(resource.getResourceName());
 
-        out.println( message.toString() );
+        out.println(message.toString());
     }
 
     @Override
-    public void transferCorrupted( TransferEvent event )
-        throws TransferCancelledException
-    {
+    public void transferCorrupted(TransferEvent event) throws TransferCancelledException {
         TransferResource resource = event.getResource();
         // TODO This needs to be colorized
-        out.println( "[WARNING] " + event.getException().getMessage() + " from " + resource.getRepositoryId() + " for "
-            + resource.getRepositoryUrl() + resource.getResourceName() );
+        out.println("[WARNING] " + event.getException().getMessage() + " from " + resource.getRepositoryId() + " for "
+                + resource.getRepositoryUrl() + resource.getResourceName());
     }
 
     @Override
-    public void transferSucceeded( TransferEvent event )
-    {
-        String action = ( event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded" );
+    public void transferSucceeded(TransferEvent event) {
+        String action = (event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded");
         String direction = event.getRequestType() == TransferEvent.RequestType.PUT ? "to" : "from";
 
         TransferResource resource = event.getResource();
         long contentLength = event.getTransferredBytes();
-        FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
+        FileSizeFormat format = new FileSizeFormat(Locale.ENGLISH);
 
         StringBuilder message = new StringBuilder();
-        message.append( action ).append( ' ' ).append( direction ).append( ' ' ).append( resource.getRepositoryId() );
-        message.append( ": " );
-        message.append( resource.getRepositoryUrl() ).append( resource.getResourceName() );
-        message.append( " (" ).append( format.format( contentLength ) );
+        message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());
+        message.append(": ");
+        message.append(resource.getRepositoryUrl()).append(resource.getResourceName());
+        message.append(" (").append(format.format(contentLength));
 
         long duration = System.currentTimeMillis() - resource.getTransferStartTime();
-        if ( duration > 0L )
-        {
-            double bytesPerSecond = contentLength / ( duration / 1000.0 );
-            message.append( " at " ).append( format.format( (long) bytesPerSecond ) ).append( "/s" );
+        if (duration > 0L) {
+            double bytesPerSecond = contentLength / (duration / 1000.0);
+            message.append(" at ").append(format.format((long) bytesPerSecond)).append("/s");
         }
 
-        message.append( ')' );
-        out.println( message.toString() );
+        message.append(')');
+        out.println(message.toString());
     }
-
 }

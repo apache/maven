@@ -1,5 +1,3 @@
-package org.apache.maven.model.path;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.model.path;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.model.path;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.path;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,51 +36,41 @@ import org.apache.maven.model.building.ModelBuildingRequest;
  */
 @Named
 @Singleton
-public class DefaultModelUrlNormalizer
-    implements ModelUrlNormalizer
-{
+public class DefaultModelUrlNormalizer implements ModelUrlNormalizer {
 
     @Inject
     private UrlNormalizer urlNormalizer;
 
-    public DefaultModelUrlNormalizer setUrlNormalizer( UrlNormalizer urlNormalizer )
-    {
+    public DefaultModelUrlNormalizer setUrlNormalizer(UrlNormalizer urlNormalizer) {
         this.urlNormalizer = urlNormalizer;
         return this;
     }
 
     @Override
-    public void normalize( Model model, ModelBuildingRequest request )
-    {
-        if ( model == null )
-        {
+    public void normalize(Model model, ModelBuildingRequest request) {
+        if (model == null) {
             return;
         }
 
-        model.setUrl( normalize( model.getUrl() ) );
+        model.setUrl(normalize(model.getUrl()));
 
         Scm scm = model.getScm();
-        if ( scm != null )
-        {
-            scm.setUrl( normalize( scm.getUrl() ) );
-            scm.setConnection( normalize( scm.getConnection() ) );
-            scm.setDeveloperConnection( normalize( scm.getDeveloperConnection() ) );
+        if (scm != null) {
+            scm.setUrl(normalize(scm.getUrl()));
+            scm.setConnection(normalize(scm.getConnection()));
+            scm.setDeveloperConnection(normalize(scm.getDeveloperConnection()));
         }
 
         DistributionManagement dist = model.getDistributionManagement();
-        if ( dist != null )
-        {
+        if (dist != null) {
             Site site = dist.getSite();
-            if ( site != null )
-            {
-                site.setUrl( normalize( site.getUrl() ) );
+            if (site != null) {
+                site.setUrl(normalize(site.getUrl()));
             }
         }
     }
 
-    private String normalize( String url )
-    {
-        return urlNormalizer.normalize( url );
+    private String normalize(String url) {
+        return urlNormalizer.normalize(url);
     }
-
 }

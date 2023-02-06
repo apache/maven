@@ -1,5 +1,3 @@
-package org.apache.maven.project.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.artifact;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,75 +30,64 @@ import org.apache.maven.project.MavenProject;
 /**
  * ProjectArtifact
  */
-public class ProjectArtifact
-    extends DefaultArtifact
-    implements ArtifactWithDependencies
-{
+public class ProjectArtifact extends DefaultArtifact implements ArtifactWithDependencies {
     private MavenProject project;
 
-    public ProjectArtifact( MavenProject project )
-    {
-        super( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, "pom", null,
-               new PomArtifactHandler() );
+    public ProjectArtifact(MavenProject project) {
+        super(
+                project.getGroupId(),
+                project.getArtifactId(),
+                project.getVersion(),
+                null,
+                "pom",
+                null,
+                new PomArtifactHandler());
         this.project = project;
-        setFile( project.getFile() );
-        setResolved( true );
+        setFile(project.getFile());
+        setResolved(true);
     }
 
-    public MavenProject getProject()
-    {
+    public MavenProject getProject() {
         return project;
     }
 
-    public List<Dependency> getDependencies()
-    {
+    public List<Dependency> getDependencies() {
         return project.getDependencies();
     }
 
-    public List<Dependency> getManagedDependencies()
-    {
+    public List<Dependency> getManagedDependencies() {
         DependencyManagement depMngt = project.getDependencyManagement();
-        return ( depMngt != null )
-                   ? Collections.unmodifiableList( depMngt.getDependencies() )
-                   : Collections.<Dependency>emptyList();
-
+        return (depMngt != null)
+                ? Collections.unmodifiableList(depMngt.getDependencies())
+                : Collections.<Dependency>emptyList();
     }
 
-    static class PomArtifactHandler
-        implements ArtifactHandler
-    {
-        public String getClassifier()
-        {
+    static class PomArtifactHandler implements ArtifactHandler {
+        public String getClassifier() {
             return null;
         }
 
-        public String getDirectory()
-        {
+        public String getDirectory() {
             return null;
         }
 
-        public String getExtension()
-        {
+        public String getExtension() {
             return "pom";
         }
 
-        public String getLanguage()
-        {
+        public String getLanguage() {
             return "none";
         }
 
-        public String getPackaging()
-        {
+        public String getPackaging() {
             return "pom";
         }
 
-        public boolean isAddedToClasspath()
-        {
+        public boolean isAddedToClasspath() {
             return false;
         }
 
-        public boolean isIncludesDependencies()
-        {
+        public boolean isIncludesDependencies() {
             return false;
         }
     }

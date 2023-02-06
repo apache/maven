@@ -1,5 +1,3 @@
-package org.apache.maven.project.harness;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.harness;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.harness;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.harness;
 
 import java.util.Locale;
 
@@ -31,31 +30,23 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  *
  * @author Benjamin Bentmann
  */
-public class Xpp3DomPointerFactory
-    implements NodePointerFactory
-{
+public class Xpp3DomPointerFactory implements NodePointerFactory {
 
-    public int getOrder()
-    {
+    public int getOrder() {
         return 200;
     }
 
-    public NodePointer createNodePointer( QName name, Object object, Locale locale )
-    {
-        if ( object instanceof Xpp3Dom )
-        {
-            return new Xpp3DomNodePointer( (Xpp3Dom) object );
+    public NodePointer createNodePointer(QName name, Object object, Locale locale) {
+        if (object instanceof Xpp3Dom) {
+            return new Xpp3DomNodePointer((Xpp3Dom) object);
         }
         return null;
     }
 
-    public NodePointer createNodePointer( NodePointer parent, QName name, Object object )
-    {
-        if ( object instanceof Xpp3Dom )
-        {
-            return new Xpp3DomNodePointer( parent, (Xpp3Dom) object );
+    public NodePointer createNodePointer(NodePointer parent, QName name, Object object) {
+        if (object instanceof Xpp3Dom) {
+            return new Xpp3DomNodePointer(parent, (Xpp3Dom) object);
         }
         return null;
     }
-
 }

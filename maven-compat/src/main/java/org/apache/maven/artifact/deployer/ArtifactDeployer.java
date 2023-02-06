@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.deployer;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.deployer;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.deployer;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.deployer;
 
 import java.io.File;
 
@@ -27,8 +26,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 /**
  * ArtifactDeployer
  */
-public interface ArtifactDeployer
-{
+public interface ArtifactDeployer {
     String ROLE = ArtifactDeployer.class.getName();
 
     /**
@@ -45,9 +43,13 @@ public interface ArtifactDeployer
      *             method
      */
     @Deprecated
-    void deploy( String basedir, String finalName, Artifact artifact, ArtifactRepository deploymentRepository,
-                 ArtifactRepository localRepository )
-        throws ArtifactDeploymentException;
+    void deploy(
+            String basedir,
+            String finalName,
+            Artifact artifact,
+            ArtifactRepository deploymentRepository,
+            ArtifactRepository localRepository)
+            throws ArtifactDeploymentException;
 
     /**
      * Deploy an artifact from a particular file.
@@ -58,7 +60,7 @@ public interface ArtifactDeployer
      * @param localRepository the local repository to install into
      * @throws ArtifactDeploymentException if an error occurred deploying the artifact
      */
-    void deploy( File source, Artifact artifact, ArtifactRepository deploymentRepository,
-                 ArtifactRepository localRepository )
-        throws ArtifactDeploymentException;
+    void deploy(
+            File source, Artifact artifact, ArtifactRepository deploymentRepository, ArtifactRepository localRepository)
+            throws ArtifactDeploymentException;
 }

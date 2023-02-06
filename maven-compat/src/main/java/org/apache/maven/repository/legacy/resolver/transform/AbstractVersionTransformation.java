@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy.resolver.transform;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.legacy.resolver.transform;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.repository.legacy.resolver.transform;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy.resolver.transform;
 
 import java.util.List;
 
@@ -44,92 +43,74 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * TODO try and refactor to remove abstract methods - not particular happy about current design
  */
-public abstract class AbstractVersionTransformation
-    extends AbstractLogEnabled
-    implements ArtifactTransformation
-{
+public abstract class AbstractVersionTransformation extends AbstractLogEnabled implements ArtifactTransformation {
     @Requirement
     protected RepositoryMetadataManager repositoryMetadataManager;
 
     @Requirement
     protected WagonManager wagonManager;
 
-    public void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories,
-                                     ArtifactRepository localRepository )
-        throws ArtifactResolutionException, ArtifactNotFoundException
-    {
+    public void transformForResolve(
+            Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository)
+            throws ArtifactResolutionException, ArtifactNotFoundException {
         RepositoryRequest request = new DefaultRepositoryRequest();
-        request.setLocalRepository( localRepository );
-        request.setRemoteRepositories( remoteRepositories );
-        transformForResolve( artifact, request );
+        request.setLocalRepository(localRepository);
+        request.setRemoteRepositories(remoteRepositories);
+        transformForResolve(artifact, request);
     }
 
-    protected String resolveVersion( Artifact artifact, ArtifactRepository localRepository,
-                                     List<ArtifactRepository> remoteRepositories )
-        throws RepositoryMetadataResolutionException
-    {
+    protected String resolveVersion(
+            Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories)
+            throws RepositoryMetadataResolutionException {
         RepositoryRequest request = new DefaultRepositoryRequest();
-        request.setLocalRepository( localRepository );
-        request.setRemoteRepositories( remoteRepositories );
-        return resolveVersion( artifact, request );
+        request.setLocalRepository(localRepository);
+        request.setRemoteRepositories(remoteRepositories);
+        return resolveVersion(artifact, request);
     }
 
-    protected String resolveVersion( Artifact artifact, RepositoryRequest request )
-        throws RepositoryMetadataResolutionException
-    {
+    protected String resolveVersion(Artifact artifact, RepositoryRequest request)
+            throws RepositoryMetadataResolutionException {
         RepositoryMetadata metadata;
         // Don't use snapshot metadata for LATEST (which isSnapshot returns true for)
-        if ( !artifact.isSnapshot() || Artifact.LATEST_VERSION.equals( artifact.getBaseVersion() ) )
-        {
-            metadata = new ArtifactRepositoryMetadata( artifact );
-        }
-        else
-        {
-            metadata = new SnapshotArtifactRepositoryMetadata( artifact );
+        if (!artifact.isSnapshot() || Artifact.LATEST_VERSION.equals(artifact.getBaseVersion())) {
+            metadata = new ArtifactRepositoryMetadata(artifact);
+        } else {
+            metadata = new SnapshotArtifactRepositoryMetadata(artifact);
         }
 
-        repositoryMetadataManager.resolve( metadata, request );
+        repositoryMetadataManager.resolve(metadata, request);
 
-        artifact.addMetadata( metadata );
+        artifact.addMetadata(metadata);
 
         Metadata repoMetadata = metadata.getMetadata();
         String version = null;
-        if ( repoMetadata != null && repoMetadata.getVersioning() != null )
-        {
-            version = constructVersion( repoMetadata.getVersioning(), artifact.getBaseVersion() );
+        if (repoMetadata != null && repoMetadata.getVersioning() != null) {
+            version = constructVersion(repoMetadata.getVersioning(), artifact.getBaseVersion());
         }
 
-        if ( version == null )
-        {
+        if (version == null) {
             // use the local copy, or if it doesn't exist - go to the remote repo for it
             version = artifact.getBaseVersion();
         }
 
         // TODO also do this logging for other metadata?
         // TODO figure out way to avoid duplicated message
-        if ( getLogger().isDebugEnabled() )
-        {
-            if ( !version.equals( artifact.getBaseVersion() ) )
-            {
+        if (getLogger().isDebugEnabled()) {
+            if (!version.equals(artifact.getBaseVersion())) {
                 String message = artifact.getArtifactId() + ": resolved to version " + version;
-                if ( artifact.getRepository() != null )
-                {
+                if (artifact.getRepository() != null) {
                     message += " from repository " + artifact.getRepository().getId();
-                }
-                else
-                {
+                } else {
                     message += " from local repository";
                 }
-                getLogger().debug( message );
-            }
-            else
-            {
+                getLogger().debug(message);
+            } else {
                 // Locally installed file is newer, don't use the resolved version
-                getLogger().debug( artifact.getArtifactId() + ": using locally installed snapshot" );
+                getLogger().debug(artifact.getArtifactId() + ": using locally installed snapshot");
             }
         }
         return version;
     }
 
-    protected abstract String constructVersion( Versioning versioning, String baseVersion );
+    protected abstract String constructVersion(Versioning versioning, String baseVersion);
 }

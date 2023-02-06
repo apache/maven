@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.resolver;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver;
 
 import java.util.List;
 import java.util.Set;
@@ -32,15 +31,16 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
  * along with their metadata. No artifacts are downloaded.
  */
 @Deprecated
-public interface ArtifactCollector
-    extends org.apache.maven.repository.legacy.resolver.LegacyArtifactCollector
-{
+public interface ArtifactCollector extends org.apache.maven.repository.legacy.resolver.LegacyArtifactCollector {
 
     @Deprecated
-    ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                      ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
-                                      ArtifactMetadataSource source, ArtifactFilter filter,
-                                      List<ResolutionListener> listeners )
-        throws ArtifactResolutionException;
-
+    ArtifactResolutionResult collect(
+            Set<Artifact> artifacts,
+            Artifact originatingArtifact,
+            ArtifactRepository localRepository,
+            List<ArtifactRepository> remoteRepositories,
+            ArtifactMetadataSource source,
+            ArtifactFilter filter,
+            List<ResolutionListener> listeners)
+            throws ArtifactResolutionException;
 }

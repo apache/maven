@@ -1,5 +1,3 @@
-package org.apache.maven.model.resolution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.resolution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.resolution;
 
 import org.apache.maven.model.Repository;
 
@@ -26,9 +25,7 @@ import org.apache.maven.model.Repository;
  *
  * @author Benjamin Bentmann
  */
-public class InvalidRepositoryException
-    extends Exception
-{
+public class InvalidRepositoryException extends Exception {
 
     /**
      * The repository that raised this error, can be {@code null}.
@@ -42,9 +39,8 @@ public class InvalidRepositoryException
      * @param repository The repository that caused the error, may be {@code null}.
      * @param cause The cause, may be {@code null}.
      */
-    public InvalidRepositoryException( String message, Repository repository, Throwable cause )
-    {
-        super( message, cause );
+    public InvalidRepositoryException(String message, Repository repository, Throwable cause) {
+        super(message, cause);
         this.repository = repository;
     }
 
@@ -54,9 +50,8 @@ public class InvalidRepositoryException
      * @param message The detail message, may be {@code null}.
      * @param repository The repository that caused the error, may be {@code null}.
      */
-    public InvalidRepositoryException( String message, Repository repository )
-    {
-        super( message );
+    public InvalidRepositoryException(String message, Repository repository) {
+        super(message);
         this.repository = repository;
     }
 
@@ -65,9 +60,7 @@ public class InvalidRepositoryException
      *
      * @return The repository that causes this error or {@code null} if not known.
      */
-    public Repository getRepository()
-    {
+    public Repository getRepository() {
         return repository;
     }
-
 }

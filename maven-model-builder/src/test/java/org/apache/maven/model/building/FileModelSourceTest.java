@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,58 +16,55 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
+
 import java.io.File;
 import java.io.IOException;
+
+import org.codehaus.plexus.util.Os;
+import org.junit.Test;
+
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
-import org.codehaus.plexus.util.Os;;
 import static org.junit.Assume.assumeTrue;
-import org.junit.Test;
 
 /**
  * Test that validate the solution of MNG-6261 issue
  *
  */
-public class FileModelSourceTest
-{
+public class FileModelSourceTest {
 
     /**
      * Test of equals method, of class FileModelSource.
      */
     @Test
-    public void testEquals()
-            throws Exception 
-    {
-        File tempFile = createTempFile( "pomTest" );
-        FileModelSource instance = new FileModelSource( tempFile );
+    public void testEquals() throws Exception {
+        File tempFile = createTempFile("pomTest");
+        FileModelSource instance = new FileModelSource(tempFile);
 
-        assertFalse( instance.equals( null ) );
-        assertFalse( instance.equals( new Object() ) );
-        assertTrue( instance.equals( instance ) );
-        assertTrue( instance.equals( new FileModelSource( tempFile ) ) );
+        assertFalse(instance.equals(null));
+        assertFalse(instance.equals(new Object()));
+        assertTrue(instance.equals(instance));
+        assertTrue(instance.equals(new FileModelSource(tempFile)));
     }
 
     @Test
-    public void testWindowsPaths() 
-            throws Exception 
-    {
-        assumeTrue( Os.isFamily( "Windows" ) );
+    public void testWindowsPaths() throws Exception {
+        assumeTrue(Os.isFamily("Windows"));
 
-        File upperCaseFile = createTempFile( "TESTE" );
+        File upperCaseFile = createTempFile("TESTE");
         String absolutePath = upperCaseFile.getAbsolutePath();
-        File lowerCaseFile = new File( absolutePath.toLowerCase() );
-        
-        FileModelSource upperCaseFileSouce = new FileModelSource( upperCaseFile );
-        FileModelSource lowerCaseFileSouce = new FileModelSource( lowerCaseFile );
+        File lowerCaseFile = new File(absolutePath.toLowerCase());
 
-        assertTrue( upperCaseFileSouce.equals( lowerCaseFileSouce ) );        
+        FileModelSource upperCaseFileSouce = new FileModelSource(upperCaseFile);
+        FileModelSource lowerCaseFileSouce = new FileModelSource(lowerCaseFile);
+
+        assertTrue(upperCaseFileSouce.equals(lowerCaseFileSouce));
     }
 
-    private File createTempFile( String name ) throws IOException
-    {
-        File tempFile = File.createTempFile( name, ".xml" );
+    private File createTempFile(String name) throws IOException {
+        File tempFile = File.createTempFile(name, ".xml");
         tempFile.deleteOnExit();
         return tempFile;
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,30 +16,25 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import java.util.List;
 
 /**
  * InvalidPluginDescriptorException
  */
-public class InvalidPluginDescriptorException
-    extends Exception
-{
+public class InvalidPluginDescriptorException extends Exception {
 
-    public InvalidPluginDescriptorException( String message, List<String> errors )
-    {
-        super( toMessage( message, errors ) );
+    public InvalidPluginDescriptorException(String message, List<String> errors) {
+        super(toMessage(message, errors));
     }
 
-    private static String toMessage( String message, List<String> errors )
-    {
-        StringBuilder buffer = new StringBuilder( 256 );
-        buffer.append( message );
-        for ( String error : errors )
-        {
-            buffer.append( ", " ).append( error );
+    private static String toMessage(String message, List<String> errors) {
+        StringBuilder buffer = new StringBuilder(256);
+        buffer.append(message);
+        for (String error : errors) {
+            buffer.append(", ").append(error);
         }
         return buffer.toString();
     }
-
 }

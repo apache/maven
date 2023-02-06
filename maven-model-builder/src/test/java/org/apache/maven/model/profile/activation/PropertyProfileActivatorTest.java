@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile.activation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.profile.activation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile.activation;
 
 import java.util.Properties;
 
@@ -30,156 +29,130 @@ import org.apache.maven.model.Profile;
  *
  * @author Benjamin Bentmann
  */
-public class PropertyProfileActivatorTest
-    extends AbstractProfileActivatorTest<PropertyProfileActivator>
-{
+public class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<PropertyProfileActivator> {
 
-    public PropertyProfileActivatorTest()
-    {
-        super( PropertyProfileActivator.class );
+    public PropertyProfileActivatorTest() {
+        super(PropertyProfileActivator.class);
     }
 
-    private Profile newProfile( String key, String value )
-    {
+    private Profile newProfile(String key, String value) {
         ActivationProperty ap = new ActivationProperty();
-        ap.setName( key );
-        ap.setValue( value );
+        ap.setName(key);
+        ap.setValue(value);
 
         Activation a = new Activation();
-        a.setProperty( ap );
+        a.setProperty(ap);
 
         Profile p = new Profile();
-        p.setActivation( a );
+        p.setActivation(a);
 
         return p;
     }
 
-    private Properties newProperties( String key, String value )
-    {
+    private Properties newProperties(String key, String value) {
         Properties props = new Properties();
-        props.setProperty( key, value );
+        props.setProperty(key, value);
         return props;
     }
 
-    public void testNullSafe()
-        throws Exception
-    {
+    public void testNullSafe() throws Exception {
         Profile p = new Profile();
 
-        assertActivation( false, p, newContext( null, null ) );
+        assertActivation(false, p, newContext(null, null));
 
-        p.setActivation( new Activation() );
+        p.setActivation(new Activation());
 
-        assertActivation( false, p, newContext( null, null ) );
+        assertActivation(false, p, newContext(null, null));
     }
 
-    public void testWithNameOnly_UserProperty()
-        throws Exception
-    {
-        Profile profile = newProfile( "prop", null );
+    public void testWithNameOnly_UserProperty() throws Exception {
+        Profile profile = newProfile("prop", null);
 
-        assertActivation( true, profile, newContext( newProperties( "prop", "value" ), null ) );
+        assertActivation(true, profile, newContext(newProperties("prop", "value"), null));
 
-        assertActivation( false, profile, newContext( newProperties( "prop", "" ), null ) );
+        assertActivation(false, profile, newContext(newProperties("prop", ""), null));
 
-        assertActivation( false, profile, newContext( newProperties( "other", "value" ), null ) );
+        assertActivation(false, profile, newContext(newProperties("other", "value"), null));
     }
 
-    public void testWithNameOnly_SystemProperty()
-        throws Exception
-    {
-        Profile profile = newProfile( "prop", null );
+    public void testWithNameOnly_SystemProperty() throws Exception {
+        Profile profile = newProfile("prop", null);
 
-        assertActivation( true, profile, newContext( null, newProperties( "prop", "value" ) ) );
+        assertActivation(true, profile, newContext(null, newProperties("prop", "value")));
 
-        assertActivation( false, profile, newContext( null, newProperties( "prop", "" ) ) );
+        assertActivation(false, profile, newContext(null, newProperties("prop", "")));
 
-        assertActivation( false, profile, newContext( null, newProperties( "other", "value" ) ) );
+        assertActivation(false, profile, newContext(null, newProperties("other", "value")));
     }
 
-    public void testWithNegatedNameOnly_UserProperty()
-        throws Exception
-    {
-        Profile profile = newProfile( "!prop", null );
+    public void testWithNegatedNameOnly_UserProperty() throws Exception {
+        Profile profile = newProfile("!prop", null);
 
-        assertActivation( false, profile, newContext( newProperties( "prop", "value" ), null ) );
+        assertActivation(false, profile, newContext(newProperties("prop", "value"), null));
 
-        assertActivation( true, profile, newContext( newProperties( "prop", "" ), null ) );
+        assertActivation(true, profile, newContext(newProperties("prop", ""), null));
 
-        assertActivation( true, profile, newContext( newProperties( "other", "value" ), null ) );
+        assertActivation(true, profile, newContext(newProperties("other", "value"), null));
     }
 
-    public void testWithNegatedNameOnly_SystemProperty()
-        throws Exception
-    {
-        Profile profile = newProfile( "!prop", null );
+    public void testWithNegatedNameOnly_SystemProperty() throws Exception {
+        Profile profile = newProfile("!prop", null);
 
-        assertActivation( false, profile, newContext( null, newProperties( "prop", "value" ) ) );
+        assertActivation(false, profile, newContext(null, newProperties("prop", "value")));
 
-        assertActivation( true, profile, newContext( null, newProperties( "prop", "" ) ) );
+        assertActivation(true, profile, newContext(null, newProperties("prop", "")));
 
-        assertActivation( true, profile, newContext( null, newProperties( "other", "value" ) ) );
+        assertActivation(true, profile, newContext(null, newProperties("other", "value")));
     }
 
-    public void testWithValue_UserProperty()
-        throws Exception
-    {
-        Profile profile = newProfile( "prop", "value" );
+    public void testWithValue_UserProperty() throws Exception {
+        Profile profile = newProfile("prop", "value");
 
-        assertActivation( true, profile, newContext( newProperties( "prop", "value" ), null ) );
+        assertActivation(true, profile, newContext(newProperties("prop", "value"), null));
 
-        assertActivation( false, profile, newContext( newProperties( "prop", "other" ), null ) );
+        assertActivation(false, profile, newContext(newProperties("prop", "other"), null));
 
-        assertActivation( false, profile, newContext( newProperties( "prop", "" ), null ) );
+        assertActivation(false, profile, newContext(newProperties("prop", ""), null));
     }
 
-    public void testWithValue_SystemProperty()
-        throws Exception
-    {
-        Profile profile = newProfile( "prop", "value" );
+    public void testWithValue_SystemProperty() throws Exception {
+        Profile profile = newProfile("prop", "value");
 
-        assertActivation( true, profile, newContext( null, newProperties( "prop", "value" ) ) );
+        assertActivation(true, profile, newContext(null, newProperties("prop", "value")));
 
-        assertActivation( false, profile, newContext( null, newProperties( "prop", "other" ) ) );
+        assertActivation(false, profile, newContext(null, newProperties("prop", "other")));
 
-        assertActivation( false, profile, newContext( null, newProperties( "other", "" ) ) );
+        assertActivation(false, profile, newContext(null, newProperties("other", "")));
     }
 
-    public void testWithNegatedValue_UserProperty()
-        throws Exception
-    {
-        Profile profile = newProfile( "prop", "!value" );
+    public void testWithNegatedValue_UserProperty() throws Exception {
+        Profile profile = newProfile("prop", "!value");
 
-        assertActivation( false, profile, newContext( newProperties( "prop", "value" ), null ) );
+        assertActivation(false, profile, newContext(newProperties("prop", "value"), null));
 
-        assertActivation( true, profile, newContext( newProperties( "prop", "other" ), null ) );
+        assertActivation(true, profile, newContext(newProperties("prop", "other"), null));
 
-        assertActivation( true, profile, newContext( newProperties( "prop", "" ), null ) );
+        assertActivation(true, profile, newContext(newProperties("prop", ""), null));
     }
 
-    public void testWithNegatedValue_SystemProperty()
-        throws Exception
-    {
-        Profile profile = newProfile( "prop", "!value" );
+    public void testWithNegatedValue_SystemProperty() throws Exception {
+        Profile profile = newProfile("prop", "!value");
 
-        assertActivation( false, profile, newContext( null, newProperties( "prop", "value" ) ) );
+        assertActivation(false, profile, newContext(null, newProperties("prop", "value")));
 
-        assertActivation( true, profile, newContext( null, newProperties( "prop", "other" ) ) );
+        assertActivation(true, profile, newContext(null, newProperties("prop", "other")));
 
-        assertActivation( true, profile, newContext( null, newProperties( "other", "" ) ) );
+        assertActivation(true, profile, newContext(null, newProperties("other", "")));
     }
 
-    public void testWithValue_UserPropertyDominantOverSystemProperty()
-        throws Exception
-    {
-        Profile profile = newProfile( "prop", "value" );
+    public void testWithValue_UserPropertyDominantOverSystemProperty() throws Exception {
+        Profile profile = newProfile("prop", "value");
 
-        Properties props1 = newProperties( "prop", "value" );
-        Properties props2 = newProperties( "prop", "other" );
+        Properties props1 = newProperties("prop", "value");
+        Properties props2 = newProperties("prop", "other");
 
-        assertActivation( true, profile, newContext( props1, props2 ) );
+        assertActivation(true, profile, newContext(props1, props2));
 
-        assertActivation( false, profile, newContext( props2, props1 ) );
+        assertActivation(false, profile, newContext(props2, props1));
     }
-
 }

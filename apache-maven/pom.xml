@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,14 +17,13 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>3.9.0-SNAPSHOT</version>
+    <version>3.9.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>apache-maven</artifactId>
@@ -100,6 +98,19 @@ under the License.
     </dependency>
   </dependencies>
 
+  <pluginRepositories>
+    <pluginRepository>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>apache.snapshots</id>
+      <url>http://repository.apache.org/snapshots/</url>
+    </pluginRepository>
+  </pluginRepositories>
+
   <build>
     <finalName>${distributionFileName}</finalName>
     <pluginManagement>
@@ -148,12 +159,9 @@ under the License.
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <systemProperties>
-            <property>
-              <name>basedir</name>
-              <value>${basedir}</value>
-            </property>
-          </systemProperties>
+          <systemPropertyVariables>
+            <basedir>${basedir}</basedir>
+          </systemPropertyVariables>
         </configuration>
         <executions>
           <execution>
@@ -170,10 +178,10 @@ under the License.
         <executions>
           <execution>
             <id>create-distro-packages</id>
-            <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
+            <phase>package</phase>
             <configuration>
               <descriptors>
                 <descriptor>src/main/assembly/bin.xml</descriptor>
@@ -184,19 +192,6 @@ under the License.
       </plugin>
     </plugins>
   </build>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>apache.snapshots</id>
-      <url>http://repository.apache.org/snapshots/</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </pluginRepository>
-  </pluginRepositories>
 
   <profiles>
     <profile>
@@ -213,10 +208,10 @@ under the License.
             <artifactId>maven-clean-plugin</artifactId>
             <executions>
               <execution>
+                <id>clean-target-dir</id>
                 <goals>
                   <goal>clean</goal>
                 </goals>
-                <id>clean-target-dir</id>
                 <phase>prepare-package</phase>
                 <configuration>
                   <excludeDefaultDirectories>true</excludeDefaultDirectories>
@@ -234,10 +229,10 @@ under the License.
             <executions>
               <execution>
                 <id>create-distribution-dir</id>
-                <phase>package</phase>
                 <goals>
                   <goal>single</goal>
                 </goals>
+                <phase>package</phase>
                 <configuration>
                   <finalName>./</finalName>
                   <appendAssemblyId>false</appendAssemblyId>
@@ -262,10 +257,10 @@ under the License.
             <executions>
               <execution>
                 <id>make-src-assembly</id>
-                <phase>package</phase>
                 <goals>
                   <goal>single</goal>
                 </goals>
+                <phase>package</phase>
                 <configuration>
                   <descriptors>
                     <descriptor>src/main/assembly/src.xml</descriptor>
@@ -283,30 +278,19 @@ under the License.
               <execution>
                 <id>source-release-checksum</id>
                 <goals>
-                  <goal>files</goal>
+                  <goal>artifacts</goal>
                 </goals>
+                <configuration>
+                  <includeClassifiers>bin,src</includeClassifiers>
+                </configuration>
               </execution>
             </executions>
-            <configuration>
-              <fileSets>
-                <fileSet>
-                  <directory>${project.build.directory}</directory>
-                  <includes>
-                    <include>${project.artifactId}-${project.version}-src.zip</include>
-                    <include>${project.artifactId}-${project.version}-src.tar.gz</include>
-                    <include>${project.artifactId}-${project.version}-bin.zip</include>
-                    <include>${project.artifactId}-${project.version}-bin.tar.gz</include>
-                  </includes>
-                </fileSet>
-              </fileSets>
-              <failIfNoFiles>true</failIfNoFiles>
-            </configuration>
           </plugin>
         </plugins>
       </build>
-  </profile>
-  <profile>
-    <id>versionlessMavenDist</id>
+    </profile>
+    <profile>
+      <id>versionlessMavenDist</id>
       <build>
         <finalName>${project.artifactId}</finalName>
       </build>

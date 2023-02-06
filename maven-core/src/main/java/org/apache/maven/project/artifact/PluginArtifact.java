@@ -1,5 +1,3 @@
-package org.apache.maven.project.artifact;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.artifact;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.artifact;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.artifact;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,66 +30,57 @@ import org.apache.maven.model.Plugin;
 /**
  * PluginArtifact
  */
-public class PluginArtifact
-    extends DefaultArtifact
-    implements ArtifactWithDependencies
-{
+public class PluginArtifact extends DefaultArtifact implements ArtifactWithDependencies {
     private Plugin plugin;
 
-    public PluginArtifact( Plugin plugin, Artifact pluginArtifact )
-    {
-        super( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), null, "maven-plugin", null,
-               new PluginArtifactHandler() );
+    public PluginArtifact(Plugin plugin, Artifact pluginArtifact) {
+        super(
+                plugin.getGroupId(),
+                plugin.getArtifactId(),
+                plugin.getVersion(),
+                null,
+                "maven-plugin",
+                null,
+                new PluginArtifactHandler());
         this.plugin = plugin;
-        setFile( pluginArtifact.getFile() );
-        setResolved( true );
+        setFile(pluginArtifact.getFile());
+        setResolved(true);
     }
 
-    public List<Dependency> getDependencies()
-    {
+    public List<Dependency> getDependencies() {
         return plugin.getDependencies();
     }
 
-    public List<Dependency> getManagedDependencies()
-    {
+    public List<Dependency> getManagedDependencies() {
         return Collections.emptyList();
     }
 
-    static class PluginArtifactHandler
-        implements ArtifactHandler
-    {
-        public String getClassifier()
-        {
+    static class PluginArtifactHandler implements ArtifactHandler {
+        public String getClassifier() {
             return null;
         }
 
-        public String getDirectory()
-        {
+        public String getDirectory() {
             return null;
         }
 
-        public String getExtension()
-        {
+        public String getExtension() {
             return "jar";
         }
 
-        public String getLanguage()
-        {
+        public String getLanguage() {
             return "none";
         }
 
-        public String getPackaging()
-        {
+        public String getPackaging() {
             return "maven-plugin";
         }
 
-        public boolean isAddedToClasspath()
-        {
+        public boolean isAddedToClasspath() {
             return true;
         }
 
-        public boolean isIncludesDependencies()
-        {
+        public boolean isIncludesDependencies() {
             return false;
         }
     }

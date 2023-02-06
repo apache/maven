@@ -1,5 +1,3 @@
-package org.apache.maven.model.io;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.io;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.io;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,8 +31,7 @@ import org.apache.maven.model.Model;
  *
  * @author Benjamin Bentmann
  */
-public interface ModelReader
-{
+public interface ModelReader {
 
     /**
      * The key for the option to enable strict parsing. This option is of type {@link Boolean} and defaults to {@code
@@ -57,8 +55,7 @@ public interface ModelReader
      * @throws IOException If the model could not be deserialized.
      * @throws ModelParseException If the input format could not be parsed.
      */
-    Model read( File input, Map<String, ?> options )
-        throws IOException, ModelParseException;
+    Model read(File input, Map<String, ?> options) throws IOException, ModelParseException;
 
     /**
      * Reads the model from the specified character reader. The reader will be automatically closed before the method
@@ -70,8 +67,7 @@ public interface ModelReader
      * @throws IOException If the model could not be deserialized.
      * @throws ModelParseException If the input format could not be parsed.
      */
-    Model read( Reader input, Map<String, ?> options )
-        throws IOException, ModelParseException;
+    Model read(Reader input, Map<String, ?> options) throws IOException, ModelParseException;
 
     /**
      * Reads the model from the specified byte stream. The stream will be automatically closed before the method
@@ -83,7 +79,5 @@ public interface ModelReader
      * @throws IOException If the model could not be deserialized.
      * @throws ModelParseException If the input format could not be parsed.
      */
-    Model read( InputStream input, Map<String, ?> options )
-        throws IOException, ModelParseException;
-
+    Model read(InputStream input, Map<String, ?> options) throws IOException, ModelParseException;
 }

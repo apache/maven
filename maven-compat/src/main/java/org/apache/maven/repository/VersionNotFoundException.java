@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 import java.io.File;
 
@@ -30,20 +29,19 @@ import org.apache.maven.model.Dependency;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-public class VersionNotFoundException
-    extends Exception
-{
+public class VersionNotFoundException extends Exception {
     private Dependency dependency;
 
     private String projectId;
     private File pomFile;
     private InvalidVersionSpecificationException cause;
 
-    public VersionNotFoundException( String projectId, Dependency dependency, File pomFile,
-                                     InvalidVersionSpecificationException cause )
-    {
-        super( projectId + ", " + formatLocationInPom( dependency ) + " " + dependency.getVersion() + ", pom file "
-            + pomFile, cause );
+    public VersionNotFoundException(
+            String projectId, Dependency dependency, File pomFile, InvalidVersionSpecificationException cause) {
+        super(
+                projectId + ", " + formatLocationInPom(dependency) + " " + dependency.getVersion() + ", pom file "
+                        + pomFile,
+                cause);
 
         this.projectId = projectId;
 
@@ -54,30 +52,23 @@ public class VersionNotFoundException
         this.dependency = dependency;
     }
 
-    private static String formatLocationInPom( Dependency dependency )
-    {
-        return "Dependency: " + ArtifactUtils.versionlessKey( dependency.getGroupId(), dependency.getArtifactId() );
+    private static String formatLocationInPom(Dependency dependency) {
+        return "Dependency: " + ArtifactUtils.versionlessKey(dependency.getGroupId(), dependency.getArtifactId());
     }
 
-    public Dependency getDependency()
-    {
+    public Dependency getDependency() {
         return dependency;
     }
 
-    public String getProjectId()
-    {
+    public String getProjectId() {
         return projectId;
     }
 
-    public File getPomFile()
-    {
+    public File getPomFile() {
         return pomFile;
     }
 
-    public InvalidVersionSpecificationException getCauseException()
-    {
+    public InvalidVersionSpecificationException getCauseException() {
         return cause;
     }
-
-
 }

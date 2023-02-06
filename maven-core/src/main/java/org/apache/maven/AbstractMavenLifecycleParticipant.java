@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
 
 import org.apache.maven.execution.MavenSession;
 
@@ -31,8 +30,7 @@ import org.apache.maven.execution.MavenSession;
  * @see <a href="https://issues.apache.org/jira/browse/MNG-4224">MNG-4224</a>
  * @since 3.0-alpha-3
  */
-public abstract class AbstractMavenLifecycleParticipant
-{
+public abstract class AbstractMavenLifecycleParticipant {
 
     /**
      * Invoked after all MavenProject instances have been created.
@@ -40,9 +38,7 @@ public abstract class AbstractMavenLifecycleParticipant
      * This callback is intended to allow extensions to manipulate MavenProjects
      * before they are sorted and actual build execution starts.
      */
-    public void afterProjectsRead( MavenSession session )
-        throws MavenExecutionException
-    {
+    public void afterProjectsRead(MavenSession session) throws MavenExecutionException {
         // do nothing
     }
 
@@ -54,9 +50,7 @@ public abstract class AbstractMavenLifecycleParticipant
      * instance construction.
      */
     // TODO This is too early for build extensions, so maybe just remove it?
-    public void afterSessionStart( MavenSession session )
-        throws MavenExecutionException
-    {
+    public void afterSessionStart(MavenSession session) throws MavenExecutionException {
         // do nothing
     }
 
@@ -69,9 +63,7 @@ public abstract class AbstractMavenLifecycleParticipant
      * code.
      * @since 3.2.1, MNG-5389
      */
-    public void afterSessionEnd( MavenSession session )
-        throws MavenExecutionException
-    {
+    public void afterSessionEnd(MavenSession session) throws MavenExecutionException {
         // do nothing
     }
 }

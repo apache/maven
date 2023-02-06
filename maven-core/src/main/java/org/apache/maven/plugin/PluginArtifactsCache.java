@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import java.util.List;
 
@@ -36,58 +35,54 @@ import org.eclipse.aether.repository.RemoteRepository;
  * @author Igor Fedorenko
  * @author Benjamin Bentmann
  */
-public interface PluginArtifactsCache
-{
+public interface PluginArtifactsCache {
 
     /**
      * A cache key.
      */
-    interface Key
-    {
+    interface Key {
         // marker interface for cache keys
     }
 
     /**
      * CacheRecord
      */
-    class CacheRecord
-    {
+    class CacheRecord {
 
         private final List<Artifact> artifacts;
 
-        public List<Artifact> getArtifacts()
-        {
+        public List<Artifact> getArtifacts() {
             return artifacts;
         }
 
-        public PluginResolutionException getException()
-        {
+        public PluginResolutionException getException() {
             return exception;
         }
 
         private final PluginResolutionException exception;
 
-        public CacheRecord( List<Artifact> artifacts )
-        {
+        public CacheRecord(List<Artifact> artifacts) {
             this.artifacts = artifacts;
             this.exception = null;
         }
 
-        public CacheRecord( PluginResolutionException exception )
-        {
+        public CacheRecord(PluginResolutionException exception) {
             this.artifacts = null;
             this.exception = exception;
         }
     }
 
-    Key createKey( Plugin plugin, DependencyFilter extensionFilter, List<RemoteRepository> repositories,
-                   RepositorySystemSession session );
+    Key createKey(
+            Plugin plugin,
+            DependencyFilter extensionFilter,
+            List<RemoteRepository> repositories,
+            RepositorySystemSession session);
 
-    CacheRecord get( Key key ) throws PluginResolutionException;
+    CacheRecord get(Key key) throws PluginResolutionException;
 
-    CacheRecord put( Key key, List<Artifact> pluginArtifacts );
+    CacheRecord put(Key key, List<Artifact> pluginArtifacts);
 
-    CacheRecord put( Key key, PluginResolutionException e );
+    CacheRecord put(Key key, PluginResolutionException e);
 
     void flush();
 
@@ -99,6 +94,5 @@ public interface PluginArtifactsCache
      * @param project The project that employs the plugin realm, must not be {@code null}.
      * @param record The cache record being used for the project, must not be {@code null}.
      */
-    void register( MavenProject project, Key cacheKey, CacheRecord record );
-
+    void register(MavenProject project, Key cacheKey, CacheRecord record);
 }

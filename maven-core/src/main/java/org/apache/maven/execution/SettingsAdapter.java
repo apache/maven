@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.execution;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -39,16 +38,13 @@ import org.apache.maven.settings.SettingsUtils;
  *
  * @author Jason van Zyl
  */
-class SettingsAdapter
-    extends Settings
-{
+class SettingsAdapter extends Settings {
 
     private MavenExecutionRequest request;
 
     private RuntimeInfo runtimeInfo;
 
-    SettingsAdapter( MavenExecutionRequest request )
-    {
+    SettingsAdapter(MavenExecutionRequest request) {
         this.request = request;
 
         /*
@@ -57,14 +53,12 @@ class SettingsAdapter
          * a null file should be harmless as this case matches general Maven 2.x behavior...
          */
         File userSettings = request.getUserSettingsFile();
-        this.runtimeInfo = new RuntimeInfo( ( userSettings != null && userSettings.isFile() ) ? userSettings : null );
+        this.runtimeInfo = new RuntimeInfo((userSettings != null && userSettings.isFile()) ? userSettings : null);
     }
 
     @Override
-    public String getLocalRepository()
-    {
-        if ( request.getLocalRepositoryPath() != null )
-        {
+    public String getLocalRepository() {
+        if (request.getLocalRepositoryPath() != null) {
             return request.getLocalRepositoryPath().getAbsolutePath();
         }
 
@@ -72,55 +66,46 @@ class SettingsAdapter
     }
 
     @Override
-    public boolean isInteractiveMode()
-    {
+    public boolean isInteractiveMode() {
         return request.isInteractiveMode();
     }
 
     @Override
-    public boolean isOffline()
-    {
+    public boolean isOffline() {
         return request.isOffline();
     }
 
     @Override
-    public List<Proxy> getProxies()
-    {
+    public List<Proxy> getProxies() {
         return request.getProxies();
     }
 
     @Override
-    public List<Server> getServers()
-    {
+    public List<Server> getServers() {
         return request.getServers();
     }
 
     @Override
-    public List<Mirror> getMirrors()
-    {
+    public List<Mirror> getMirrors() {
         return request.getMirrors();
     }
 
     @Override
-    public List<Profile> getProfiles()
-    {
+    public List<Profile> getProfiles() {
         List<Profile> result = new ArrayList<>();
-        for ( org.apache.maven.model.Profile profile : request.getProfiles() )
-        {
-            result.add( SettingsUtils.convertToSettingsProfile( profile ) );
+        for (org.apache.maven.model.Profile profile : request.getProfiles()) {
+            result.add(SettingsUtils.convertToSettingsProfile(profile));
         }
         return result;
     }
 
     @Override
-    public List<String> getActiveProfiles()
-    {
+    public List<String> getActiveProfiles() {
         return request.getActiveProfiles();
     }
 
     @Override
-    public List<String> getPluginGroups()
-    {
+    public List<String> getPluginGroups() {
         return request.getPluginGroups();
     }
 }

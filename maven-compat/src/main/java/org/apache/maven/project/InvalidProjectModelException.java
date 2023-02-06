@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.io.File;
 
@@ -27,14 +26,11 @@ import org.apache.maven.project.validation.ModelValidationResult;
  * InvalidProjectModelException
  */
 @Deprecated
-public class InvalidProjectModelException
-    extends ProjectBuildingException
-{
+public class InvalidProjectModelException extends ProjectBuildingException {
     private ModelValidationResult validationResult;
 
-    public InvalidProjectModelException( String projectId, String message, File pomLocation )
-    {
-        super( projectId, message, pomLocation );
+    public InvalidProjectModelException(String projectId, String message, File pomLocation) {
+        super(projectId, message, pomLocation);
     }
 
     /**
@@ -44,16 +40,14 @@ public class InvalidProjectModelException
      * @param validationResult
      * @deprecated use {@link File} constructor for pomLocation
      */
-    public InvalidProjectModelException( String projectId, String pomLocation, String message,
-                                         ModelValidationResult validationResult )
-    {
-        this( projectId, message, new File( pomLocation ), validationResult );
+    public InvalidProjectModelException(
+            String projectId, String pomLocation, String message, ModelValidationResult validationResult) {
+        this(projectId, message, new File(pomLocation), validationResult);
     }
 
-    public InvalidProjectModelException( String projectId, String message, File pomFile,
-                                         ModelValidationResult validationResult )
-    {
-        super( projectId, message, pomFile );
+    public InvalidProjectModelException(
+            String projectId, String message, File pomFile, ModelValidationResult validationResult) {
+        super(projectId, message, pomFile);
 
         this.validationResult = validationResult;
     }
@@ -64,14 +58,11 @@ public class InvalidProjectModelException
      * @param message
      * @deprecated use {@link File} constructor for pomLocation
      */
-    public InvalidProjectModelException( String projectId, String pomLocation, String message )
-    {
-        this( projectId, message, new File( pomLocation ) );
+    public InvalidProjectModelException(String projectId, String pomLocation, String message) {
+        this(projectId, message, new File(pomLocation));
     }
 
-    public final ModelValidationResult getValidationResult()
-    {
+    public final ModelValidationResult getValidationResult() {
         return validationResult;
     }
-
 }

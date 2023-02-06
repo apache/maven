@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile.activation;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,12 @@ package org.apache.maven.model.profile.activation;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile.activation;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
@@ -25,106 +29,90 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.path.DefaultPathTranslator;
 import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
-
 import org.junit.Before;
 import org.junit.Test;
-
-import java.nio.file.Files;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
 
 /**
  * Tests {@link FileProfileActivator}.
  *
  * @author Ravil Galeyev
  */
-public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileActivator>
-{
+public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileActivator> {
     Path tempDir;
 
     private final DefaultProfileActivationContext context = new DefaultProfileActivationContext();
 
-    public FileProfileActivatorTest()
-    {
-        super( FileProfileActivator.class );
+    public FileProfileActivatorTest() {
+        super(FileProfileActivator.class);
     }
 
     @Before
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         super.setUp();
 
-        tempDir = Files.createTempDirectory( null );
+        tempDir = Files.createTempDirectory(null);
 
         activator.setProfileActivationFilePathInterpolator(
-                new ProfileActivationFilePathInterpolator().setPathTranslator( new DefaultPathTranslator() ) );
+                new ProfileActivationFilePathInterpolator().setPathTranslator(new DefaultPathTranslator()));
 
-        context.setProjectDirectory( new File( tempDir.toString() ) );
+        context.setProjectDirectory(new File(tempDir.toString()));
 
-        File file = new File( tempDir.resolve( "file.txt" ).toString() );
-        if ( !file.createNewFile() )
-        {
-            throw new IOException( "Can't create " + file );
+        File file = new File(tempDir.resolve("file.txt").toString());
+        if (!file.createNewFile()) {
+            throw new IOException("Can't create " + file);
         }
     }
 
     @Test
-    public void testIsActiveNoFile()
-    {
-        assertActivation( false, newExistsProfile( null ), context );
-        assertActivation( false, newExistsProfile( "someFile.txt" ), context );
-        assertActivation( false, newExistsProfile( "${basedir}/someFile.txt" ), context );
+    public void testIsActiveNoFile() {
+        assertActivation(false, newExistsProfile(null), context);
+        assertActivation(false, newExistsProfile("someFile.txt"), context);
+        assertActivation(false, newExistsProfile("${basedir}/someFile.txt"), context);
 
-        assertActivation( false, newMissingProfile( null ), context );
-        assertActivation( true, newMissingProfile( "someFile.txt" ), context );
-        assertActivation( true, newMissingProfile( "${basedir}/someFile.txt" ), context );
+        assertActivation(false, newMissingProfile(null), context);
+        assertActivation(true, newMissingProfile("someFile.txt"), context);
+        assertActivation(true, newMissingProfile("${basedir}/someFile.txt"), context);
     }
 
     @Test
-    public void testIsActiveExistsFileExists()
-    {
-        assertActivation( true, newExistsProfile( "file.txt" ), context );
-        assertActivation( true, newExistsProfile( "${basedir}" ), context );
-        assertActivation( true, newExistsProfile( "${basedir}/" + "file.txt" ), context );
+    public void testIsActiveExistsFileExists() {
+        assertActivation(true, newExistsProfile("file.txt"), context);
+        assertActivation(true, newExistsProfile("${basedir}"), context);
+        assertActivation(true, newExistsProfile("${basedir}/" + "file.txt"), context);
 
-        assertActivation( false, newMissingProfile( "file.txt" ), context );
-        assertActivation( false, newMissingProfile( "${basedir}" ), context );
-        assertActivation( false, newMissingProfile( "${basedir}/" + "file.txt" ), context );
+        assertActivation(false, newMissingProfile("file.txt"), context);
+        assertActivation(false, newMissingProfile("${basedir}"), context);
+        assertActivation(false, newMissingProfile("${basedir}/" + "file.txt"), context);
     }
 
     @Test
-    public void testIsActiveExistsLeavesFileUnchanged()
-    {
-        Profile profile = newExistsProfile( "file.txt" );
-        assertEquals( "file.txt", profile.getActivation().getFile().getExists() );
+    public void testIsActiveExistsLeavesFileUnchanged() {
+        Profile profile = newExistsProfile("file.txt");
+        assertEquals("file.txt", profile.getActivation().getFile().getExists());
 
-        assertActivation( true, profile, context );
+        assertActivation(true, profile, context);
 
-        assertEquals( "file.txt", profile.getActivation().getFile().getExists() );
+        assertEquals("file.txt", profile.getActivation().getFile().getExists());
     }
 
-    private Profile newExistsProfile( String filePath )
-    {
+    private Profile newExistsProfile(String filePath) {
         ActivationFile activationFile = new ActivationFile();
-        activationFile.setExists( filePath );
-        return newProfile( activationFile );
+        activationFile.setExists(filePath);
+        return newProfile(activationFile);
     }
 
-    private Profile newMissingProfile( String filePath )
-    {
+    private Profile newMissingProfile(String filePath) {
         ActivationFile activationFile = new ActivationFile();
-        activationFile.setMissing( filePath );
-        return newProfile( activationFile );
+        activationFile.setMissing(filePath);
+        return newProfile(activationFile);
     }
 
-    private Profile newProfile( ActivationFile activationFile )
-    {
+    private Profile newProfile(ActivationFile activationFile) {
         Activation activation = new Activation();
-        activation.setFile( activationFile );
+        activation.setFile(activationFile);
 
         Profile profile = new Profile();
-        profile.setActivation( activation );
+        profile.setActivation(activation);
 
         return profile;
     }

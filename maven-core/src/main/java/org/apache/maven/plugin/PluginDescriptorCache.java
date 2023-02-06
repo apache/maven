@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import java.util.List;
 
@@ -36,23 +35,20 @@ import org.eclipse.aether.repository.RemoteRepository;
  * @since 3.0
  * @author Benjamin Bentmann
  */
-public interface PluginDescriptorCache
-{
+public interface PluginDescriptorCache {
 
     /**
      * A cache key.
      */
-    interface Key
-    {
+    interface Key {
         // marker interface for cache keys
     }
 
-    Key createKey( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session );
+    Key createKey(Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session);
 
-    void put( Key key, PluginDescriptor pluginDescriptor );
+    void put(Key key, PluginDescriptor pluginDescriptor);
 
-    PluginDescriptor get( Key key );
+    PluginDescriptor get(Key key);
 
     void flush();
-
 }

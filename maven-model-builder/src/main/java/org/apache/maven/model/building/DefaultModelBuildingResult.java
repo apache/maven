@@ -1,5 +1,3 @@
-package org.apache.maven.model.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.building;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,9 +32,7 @@ import org.apache.maven.model.Profile;
  *
  * @author Benjamin Bentmann
  */
-class DefaultModelBuildingResult
-    implements ModelBuildingResult
-{
+class DefaultModelBuildingResult implements ModelBuildingResult {
 
     private Model effectiveModel;
 
@@ -49,8 +46,7 @@ class DefaultModelBuildingResult
 
     private List<ModelProblem> problems;
 
-    DefaultModelBuildingResult()
-    {
+    DefaultModelBuildingResult() {
         modelIds = new ArrayList<>();
         rawModels = new HashMap<>();
         activePomProfiles = new HashMap<>();
@@ -59,93 +55,76 @@ class DefaultModelBuildingResult
     }
 
     @Override
-    public Model getEffectiveModel()
-    {
+    public Model getEffectiveModel() {
         return effectiveModel;
     }
 
-    public DefaultModelBuildingResult setEffectiveModel( Model model )
-    {
+    public DefaultModelBuildingResult setEffectiveModel(Model model) {
         this.effectiveModel = model;
 
         return this;
     }
 
     @Override
-    public List<String> getModelIds()
-    {
+    public List<String> getModelIds() {
         return modelIds;
     }
 
-    public DefaultModelBuildingResult addModelId( String modelId )
-    {
+    public DefaultModelBuildingResult addModelId(String modelId) {
         // Intentionally notNull because Super POM may not contain a modelId
-        Objects.requireNonNull( modelId, "modelId cannot null" );
+        Objects.requireNonNull(modelId, "modelId cannot null");
 
-        modelIds.add( modelId );
+        modelIds.add(modelId);
 
         return this;
     }
 
     @Override
-    public Model getRawModel()
-    {
-        return rawModels.get( modelIds.get( 0 ) );
+    public Model getRawModel() {
+        return rawModels.get(modelIds.get(0));
     }
 
     @Override
-    public Model getRawModel( String modelId )
-    {
-        return rawModels.get( modelId );
+    public Model getRawModel(String modelId) {
+        return rawModels.get(modelId);
     }
 
-    public DefaultModelBuildingResult setRawModel( String modelId, Model rawModel )
-    {
+    public DefaultModelBuildingResult setRawModel(String modelId, Model rawModel) {
         // Intentionally notNull because Super POM may not contain a modelId
-        Objects.requireNonNull( modelId, "modelId cannot null" );
+        Objects.requireNonNull(modelId, "modelId cannot null");
 
-        rawModels.put( modelId, rawModel );
+        rawModels.put(modelId, rawModel);
 
         return this;
     }
 
     @Override
-    public List<Profile> getActivePomProfiles( String modelId )
-    {
-        return activePomProfiles.get( modelId );
+    public List<Profile> getActivePomProfiles(String modelId) {
+        return activePomProfiles.get(modelId);
     }
 
-    public DefaultModelBuildingResult setActivePomProfiles( String modelId, List<Profile> activeProfiles )
-    {
+    public DefaultModelBuildingResult setActivePomProfiles(String modelId, List<Profile> activeProfiles) {
         // Intentionally notNull because Super POM may not contain a modelId
-        Objects.requireNonNull( modelId, "modelId cannot null" );
+        Objects.requireNonNull(modelId, "modelId cannot null");
 
-        if ( activeProfiles != null )
-        {
-            this.activePomProfiles.put( modelId, new ArrayList<>( activeProfiles ) );
-        }
-        else
-        {
-            this.activePomProfiles.remove( modelId );
+        if (activeProfiles != null) {
+            this.activePomProfiles.put(modelId, new ArrayList<>(activeProfiles));
+        } else {
+            this.activePomProfiles.remove(modelId);
         }
 
         return this;
     }
 
     @Override
-    public List<Profile> getActiveExternalProfiles()
-    {
+    public List<Profile> getActiveExternalProfiles() {
         return activeExternalProfiles;
     }
 
-    public DefaultModelBuildingResult setActiveExternalProfiles( List<Profile> activeProfiles )
-    {
-        if ( activeProfiles != null )
-        {
-            this.activeExternalProfiles = new ArrayList<>( activeProfiles );
-        }
-        else
-        {
+    public DefaultModelBuildingResult setActiveExternalProfiles(List<Profile> activeProfiles) {
+        if (activeProfiles != null) {
+            this.activeExternalProfiles = new ArrayList<>(activeProfiles);
+        } else {
             this.activeExternalProfiles.clear();
         }
 
@@ -153,23 +132,17 @@ class DefaultModelBuildingResult
     }
 
     @Override
-    public List<ModelProblem> getProblems()
-    {
+    public List<ModelProblem> getProblems() {
         return problems;
     }
 
-    public DefaultModelBuildingResult setProblems( List<ModelProblem> problems )
-    {
-        if ( problems != null )
-        {
-            this.problems = new ArrayList<>( problems );
-        }
-        else
-        {
+    public DefaultModelBuildingResult setProblems(List<ModelProblem> problems) {
+        if (problems != null) {
+            this.problems = new ArrayList<>(problems);
+        } else {
             this.problems.clear();
         }
 
         return this;
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin;
 
 import java.util.List;
 
@@ -38,8 +37,7 @@ import org.eclipse.aether.repository.RemoteRepository;
  * @since 3.0
  * @author Benjamin Bentmann
  */
-public interface MavenPluginManager
-{
+public interface MavenPluginManager {
 
     /**
      * Retrieves the descriptor for the specified plugin from its main artifact.
@@ -50,9 +48,9 @@ public interface MavenPluginManager
      * @param session The repository session to use for resolving the plugin's main artifact, must not be {@code null}.
      * @return The plugin descriptor, never {@code null}.
      */
-    PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories,
-                                          RepositorySystemSession session )
-        throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException;
+    PluginDescriptor getPluginDescriptor(
+            Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session)
+            throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException;
 
     /**
      * Retrieves the descriptor for the specified plugin goal from the plugin's main artifact.
@@ -64,18 +62,17 @@ public interface MavenPluginManager
      * @param session The repository session to use for resolving the plugin's main artifact, must not be {@code null}.
      * @return The mojo descriptor, never {@code null}.
      */
-    MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, List<RemoteRepository> repositories,
-                                      RepositorySystemSession session )
-        throws MojoNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-        InvalidPluginDescriptorException;
+    MojoDescriptor getMojoDescriptor(
+            Plugin plugin, String goal, List<RemoteRepository> repositories, RepositorySystemSession session)
+            throws MojoNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+                    InvalidPluginDescriptorException;
 
     /**
      * Verifies the specified plugin is compatible with the current Maven runtime.
      *
      * @param pluginDescriptor The descriptor of the plugin to check, must not be {@code null}.
      */
-    void checkRequiredMavenVersion( PluginDescriptor pluginDescriptor )
-        throws PluginIncompatibleException;
+    void checkRequiredMavenVersion(PluginDescriptor pluginDescriptor) throws PluginIncompatibleException;
 
     /**
      * Sets up the class realm for the specified plugin. Both the class realm and the plugin artifacts that constitute
@@ -89,18 +86,21 @@ public interface MavenPluginManager
      * @param imports The packages/types to import from the parent realm, may be {@code null}.
      * @param filter The filter used to exclude certain plugin dependencies, may be {@code null}.
      */
-    void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,
-                           List<String> imports, DependencyFilter filter )
-        throws PluginResolutionException, PluginContainerException;
+    void setupPluginRealm(
+            PluginDescriptor pluginDescriptor,
+            MavenSession session,
+            ClassLoader parent,
+            List<String> imports,
+            DependencyFilter filter)
+            throws PluginResolutionException, PluginContainerException;
 
     /**
      * Sets up class realm for the specified build extensions plugin.
-     * 
+     *
      * @since 3.3.0
      */
-    ExtensionRealmCache.CacheRecord setupExtensionsRealm( MavenProject project, Plugin plugin,
-                                                          RepositorySystemSession session )
-        throws PluginManagerException;
+    ExtensionRealmCache.CacheRecord setupExtensionsRealm(
+            MavenProject project, Plugin plugin, RepositorySystemSession session) throws PluginManagerException;
 
     /**
      * Looks up the mojo for the specified mojo execution and populates its parameters from the configuration given by
@@ -114,8 +114,8 @@ public interface MavenPluginManager
      * @param mojoExecution The mojo execution to retrieve the mojo for, must not be {@code null}.
      * @return The ready-to-execute mojo, never {@code null}.
      */
-    <T> T getConfiguredMojo( Class<T> mojoInterface, MavenSession session, MojoExecution mojoExecution )
-        throws PluginConfigurationException, PluginContainerException;
+    <T> T getConfiguredMojo(Class<T> mojoInterface, MavenSession session, MojoExecution mojoExecution)
+            throws PluginConfigurationException, PluginContainerException;
 
     /**
      * Releases the specified mojo back to the container.
@@ -123,6 +123,5 @@ public interface MavenPluginManager
      * @param mojo The mojo to release, may be {@code null}.
      * @param mojoExecution The mojo execution the mojo was originally retrieved for, must not be {@code null}.
      */
-    void releaseMojo( Object mojo, MojoExecution mojoExecution );
-
+    void releaseMojo(Object mojo, MojoExecution mojoExecution);
 }

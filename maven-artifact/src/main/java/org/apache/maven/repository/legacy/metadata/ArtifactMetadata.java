@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy.metadata;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.repository.legacy.metadata;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.repository.legacy.metadata;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy.metadata;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreException;
@@ -29,8 +28,7 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreExce
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-public interface ArtifactMetadata
-{
+public interface ArtifactMetadata {
     /** Whether this metadata should be stored alongside the artifact. */
     boolean storedInArtifactVersionDirectory();
 
@@ -51,7 +49,7 @@ public interface ArtifactMetadata
      * @param repository the remote repository it came from
      * @return the filename
      */
-    String getLocalFilename( ArtifactRepository repository );
+    String getLocalFilename(ArtifactRepository repository);
 
     /**
      * Get the filename of this metadata on the remote repository.
@@ -66,7 +64,7 @@ public interface ArtifactMetadata
      *
      * @param metadata the new metadata
      */
-    void merge( ArtifactMetadata metadata );
+    void merge(ArtifactMetadata metadata);
 
     /**
      * Store the metadata in the local repository.
@@ -76,9 +74,8 @@ public interface ArtifactMetadata
      * @param remoteRepository the remote repository it came from
      * @throws RepositoryMetadataStoreException in case of issue
      */
-    void storeInLocalRepository( ArtifactRepository localRepository,
-                                 ArtifactRepository remoteRepository )
-        throws RepositoryMetadataStoreException;
+    void storeInLocalRepository(ArtifactRepository localRepository, ArtifactRepository remoteRepository)
+            throws RepositoryMetadataStoreException;
 
     String extendedToString();
 }

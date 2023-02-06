@@ -1,5 +1,3 @@
-package org.apache.maven;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,10 @@ package org.apache.maven;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import java.io.File;
 import java.util.Arrays;
@@ -41,9 +43,6 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
@@ -54,15 +53,13 @@ import static java.util.stream.Collectors.toMap;
  *
  * @author Jason van Zyl
  */
-@Named( ReactorReader.HINT )
+@Named(ReactorReader.HINT)
 @SessionScoped
-class ReactorReader
-    implements MavenWorkspaceReader
-{
+class ReactorReader implements MavenWorkspaceReader {
     public static final String HINT = "reactor";
 
     private static final Collection<String> COMPILE_PHASE_TYPES =
-        Arrays.asList( "jar", "ejb-client", "war", "rar", "ejb3", "par", "sar", "wsr", "har", "app-client" );
+            Arrays.asList("jar", "ejb-client", "war", "rar", "ejb3", "par", "sar", "wsr", "har", "app-client");
 
     private final MavenSession session;
     private final Map<String, MavenProject> projectsByGAV;
@@ -70,46 +67,38 @@ class ReactorReader
     private final WorkspaceRepository repository;
 
     private Function<MavenProject, String> projectIntoKey =
-            s -> ArtifactUtils.key( s.getGroupId(), s.getArtifactId(), s.getVersion() );
+            s -> ArtifactUtils.key(s.getGroupId(), s.getArtifactId(), s.getVersion());
 
     private Function<MavenProject, String> projectIntoVersionlessKey =
-            s -> ArtifactUtils.versionlessKey( s.getGroupId(), s.getArtifactId() );
+            s -> ArtifactUtils.versionlessKey(s.getGroupId(), s.getArtifactId());
 
     @Inject
-    ReactorReader( MavenSession session )
-    {
+    ReactorReader(MavenSession session) {
         this.session = session;
-        this.projectsByGAV =
-                session.getProjects().stream()
-                        .collect( toMap( projectIntoKey, identity() ) );
+        this.projectsByGAV = session.getProjects().stream().collect(toMap(projectIntoKey, identity()));
 
-        this.projectsByGA = projectsByGAV.values().stream()
-                .collect( groupingBy( projectIntoVersionlessKey ) );
+        this.projectsByGA = projectsByGAV.values().stream().collect(groupingBy(projectIntoVersionlessKey));
 
-        repository = new WorkspaceRepository( "reactor", new HashSet<>( projectsByGAV.keySet() ) );
+        repository = new WorkspaceRepository("reactor", new HashSet<>(projectsByGAV.keySet()));
     }
 
     //
     // Public API
     //
 
-    public WorkspaceRepository getRepository()
-    {
+    public WorkspaceRepository getRepository() {
         return repository;
     }
 
-    public File findArtifact( Artifact artifact )
-    {
-        String projectKey = ArtifactUtils.key( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
+    public File findArtifact(Artifact artifact) {
+        String projectKey = ArtifactUtils.key(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
 
-        MavenProject project = projectsByGAV.get( projectKey );
+        MavenProject project = projectsByGAV.get(projectKey);
 
-        if ( project != null )
-        {
-            File file = find( project, artifact );
-            if ( file == null && project != project.getExecutionProject() )
-            {
-                file = find( project.getExecutionProject(), artifact );
+        if (project != null) {
+            File file = find(project, artifact);
+            if (file == null && project != project.getExecutionProject()) {
+                file = find(project.getExecutionProject(), artifact);
             }
             return file;
         }
@@ -117,22 +106,19 @@ class ReactorReader
         return null;
     }
 
-    public List<String> findVersions( Artifact artifact )
-    {
-        String key = ArtifactUtils.versionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
+    public List<String> findVersions(Artifact artifact) {
+        String key = ArtifactUtils.versionlessKey(artifact.getGroupId(), artifact.getArtifactId());
 
-        return Optional.ofNullable( projectsByGA.get( key ) )
-                .orElse( Collections.emptyList() ).stream()
-                .filter( s -> Objects.nonNull( find( s, artifact ) ) )
-                .map( MavenProject::getVersion )
-                .collect( Collectors.collectingAndThen( Collectors.toList(), Collections::unmodifiableList ) );
+        return Optional.ofNullable(projectsByGA.get(key)).orElse(Collections.emptyList()).stream()
+                .filter(s -> Objects.nonNull(find(s, artifact)))
+                .map(MavenProject::getVersion)
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 
     @Override
-    public Model findModel( Artifact artifact )
-    {
-        String projectKey = ArtifactUtils.key( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
-        MavenProject project = projectsByGAV.get( projectKey );
+    public Model findModel(Artifact artifact) {
+        String projectKey = ArtifactUtils.key(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
+        MavenProject project = projectsByGAV.get(projectKey);
         return project == null ? null : project.getModel();
     }
 
@@ -140,37 +126,27 @@ class ReactorReader
     // Implementation
     //
 
-    private File find( MavenProject project, Artifact artifact )
-    {
-        if ( "pom".equals( artifact.getExtension() ) )
-        {
+    private File find(MavenProject project, Artifact artifact) {
+        if ("pom".equals(artifact.getExtension())) {
             return project.getFile();
         }
 
-        Artifact projectArtifact = findMatchingArtifact( project, artifact );
+        Artifact projectArtifact = findMatchingArtifact(project, artifact);
 
-        if ( hasArtifactFileFromPackagePhase( projectArtifact ) )
-        {
+        if (hasArtifactFileFromPackagePhase(projectArtifact)) {
             return projectArtifact.getFile();
-        }
-        else if ( !hasBeenPackaged( project ) )
-        {
+        } else if (!hasBeenPackaged(project)) {
             // fallback to loose class files only if artifacts haven't been packaged yet
             // and only for plain old jars. Not war files, not ear files, not anything else.
 
-            if ( isTestArtifact( artifact ) )
-            {
-                if ( project.hasLifecyclePhase( "test-compile" ) )
-                {
-                    return new File( project.getBuild().getTestOutputDirectory() );
+            if (isTestArtifact(artifact)) {
+                if (project.hasLifecyclePhase("test-compile")) {
+                    return new File(project.getBuild().getTestOutputDirectory());
                 }
-            }
-            else
-            {
-                String type = artifact.getProperty( "type", "" );
-                if ( project.hasLifecyclePhase( "compile" ) && COMPILE_PHASE_TYPES.contains( type ) )
-                {
-                    return new File( project.getBuild().getOutputDirectory() );
+            } else {
+                String type = artifact.getProperty("type", "");
+                if (project.hasLifecyclePhase("compile") && COMPILE_PHASE_TYPES.contains(type)) {
+                    return new File(project.getBuild().getOutputDirectory());
                 }
             }
         }
@@ -180,26 +156,25 @@ class ReactorReader
         return null;
     }
 
-    private File determinePreviouslyPackagedArtifactFile( MavenProject project, Artifact artifact )
-    {
-        if ( artifact == null )
-        {
+    private File determinePreviouslyPackagedArtifactFile(MavenProject project, Artifact artifact) {
+        if (artifact == null) {
             return null;
         }
 
-        String fileName = String.format( "%s.%s", project.getBuild().getFinalName(), artifact.getExtension() );
-        return new File( project.getBuild().getDirectory(), fileName );
+        String fileName = String.format("%s.%s", project.getBuild().getFinalName(), artifact.getExtension());
+        return new File(project.getBuild().getDirectory(), fileName);
     }
 
-    private boolean hasArtifactFileFromPackagePhase( Artifact projectArtifact )
-    {
-        return projectArtifact != null && projectArtifact.getFile() != null && projectArtifact.getFile().exists();
+    private boolean hasArtifactFileFromPackagePhase(Artifact projectArtifact) {
+        return projectArtifact != null
+                && projectArtifact.getFile() != null
+                && projectArtifact.getFile().exists();
     }
 
-    private boolean hasBeenPackaged( MavenProject project )
-    {
-        return project.hasLifecyclePhase( "package" ) || project.hasLifecyclePhase( "install" )
-            || project.hasLifecyclePhase( "deploy" );
+    private boolean hasBeenPackaged(MavenProject project) {
+        return project.hasLifecyclePhase("package")
+                || project.hasLifecyclePhase("install")
+                || project.hasLifecyclePhase("deploy");
     }
 
     /**
@@ -209,20 +184,18 @@ class ReactorReader
      * @param requestedArtifact The artifact to resolve, must not be <code>null</code>.
      * @return The matching artifact from the project or <code>null</code> if not found. Note that this
      */
-    private Artifact findMatchingArtifact( MavenProject project, Artifact requestedArtifact )
-    {
-        String requestedRepositoryConflictId = ArtifactIdUtils.toVersionlessId( requestedArtifact );
+    private Artifact findMatchingArtifact(MavenProject project, Artifact requestedArtifact) {
+        String requestedRepositoryConflictId = ArtifactIdUtils.toVersionlessId(requestedArtifact);
 
-        Artifact mainArtifact = RepositoryUtils.toArtifact( project.getArtifact() );
-        if ( requestedRepositoryConflictId.equals( ArtifactIdUtils.toVersionlessId( mainArtifact ) ) )
-        {
+        Artifact mainArtifact = RepositoryUtils.toArtifact(project.getArtifact());
+        if (requestedRepositoryConflictId.equals(ArtifactIdUtils.toVersionlessId(mainArtifact))) {
             return mainArtifact;
         }
 
-        return RepositoryUtils.toArtifacts( project.getAttachedArtifacts() ).stream()
-                .filter( isRequestedArtifact( requestedArtifact ) )
+        return RepositoryUtils.toArtifacts(project.getAttachedArtifacts()).stream()
+                .filter(isRequestedArtifact(requestedArtifact))
                 .findFirst()
-                .orElse( null );
+                .orElse(null);
     }
 
     /**
@@ -232,14 +205,12 @@ class ReactorReader
      * @param requestArtifact checked against the given artifact.
      * @return true if equals, false otherwise.
      */
-    private Predicate<Artifact> isRequestedArtifact( Artifact requestArtifact )
-    {
-        return s -> s.getArtifactId().equals( requestArtifact.getArtifactId() )
-                && s.getGroupId().equals( requestArtifact.getGroupId() )
-                && s.getVersion().equals( requestArtifact.getVersion() )
-                && s.getExtension().equals( requestArtifact.getExtension() )
-                && s.getClassifier().equals( requestArtifact.getClassifier() );
-
+    private Predicate<Artifact> isRequestedArtifact(Artifact requestArtifact) {
+        return s -> s.getArtifactId().equals(requestArtifact.getArtifactId())
+                && s.getGroupId().equals(requestArtifact.getGroupId())
+                && s.getVersion().equals(requestArtifact.getVersion())
+                && s.getExtension().equals(requestArtifact.getExtension())
+                && s.getClassifier().equals(requestArtifact.getClassifier());
     }
 
     /**
@@ -248,9 +219,8 @@ class ReactorReader
      * @param artifact The artifact to check, must not be {@code null}.
      * @return {@code true} if the artifact refers to test classes, {@code false} otherwise.
      */
-    private static boolean isTestArtifact( Artifact artifact )
-    {
-        return ( "test-jar".equals( artifact.getProperty( "type", "" ) ) )
-            || ( "jar".equals( artifact.getExtension() ) && "tests".equals( artifact.getClassifier() ) );
+    private static boolean isTestArtifact(Artifact artifact) {
+        return ("test-jar".equals(artifact.getProperty("type", "")))
+                || ("jar".equals(artifact.getExtension()) && "tests".equals(artifact.getClassifier()));
     }
 }

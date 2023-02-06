@@ -1,5 +1,3 @@
-package org.apache.maven.repository.legacy;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,13 +16,12 @@ package org.apache.maven.repository.legacy;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.legacy;
 
 import org.apache.maven.repository.ArtifactTransferResource;
 import org.apache.maven.wagon.resource.Resource;
 
-class MavenArtifact
-    implements ArtifactTransferResource
-{
+class MavenArtifact implements ArtifactTransferResource {
 
     private String repositoryUrl;
 
@@ -32,18 +29,12 @@ class MavenArtifact
 
     private long transferStartTime;
 
-    MavenArtifact( String repositoryUrl, Resource resource )
-    {
-        if ( repositoryUrl == null )
-        {
+    MavenArtifact(String repositoryUrl, Resource resource) {
+        if (repositoryUrl == null) {
             this.repositoryUrl = "";
-        }
-        else if ( !repositoryUrl.endsWith( "/" ) && repositoryUrl.length() > 0 )
-        {
+        } else if (!repositoryUrl.endsWith("/") && repositoryUrl.length() > 0) {
             this.repositoryUrl = repositoryUrl + '/';
-        }
-        else
-        {
+        } else {
             this.repositoryUrl = repositoryUrl;
         }
         this.resource = resource;
@@ -51,46 +42,36 @@ class MavenArtifact
         this.transferStartTime = System.currentTimeMillis();
     }
 
-    public String getRepositoryUrl()
-    {
+    public String getRepositoryUrl() {
         return repositoryUrl;
     }
 
-    public String getName()
-    {
+    public String getName() {
         String name = resource.getName();
 
-        if ( name == null )
-        {
+        if (name == null) {
             name = "";
-        }
-        else if ( name.startsWith( "/" ) )
-        {
-            name = name.substring( 1 );
+        } else if (name.startsWith("/")) {
+            name = name.substring(1);
         }
 
         return name;
     }
 
-    public String getUrl()
-    {
+    public String getUrl() {
         return getRepositoryUrl() + getName();
     }
 
-    public long getContentLength()
-    {
+    public long getContentLength() {
         return resource.getContentLength();
     }
 
-    public long getTransferStartTime()
-    {
+    public long getTransferStartTime() {
         return transferStartTime;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getUrl();
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.model.profile;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model.profile;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.profile;
 
 import java.io.File;
 import java.util.Collections;
@@ -33,9 +32,7 @@ import static java.util.stream.Collectors.toMap;
  *
  * @author Benjamin Bentmann
  */
-public class DefaultProfileActivationContext
-    implements ProfileActivationContext
-{
+public class DefaultProfileActivationContext implements ProfileActivationContext {
 
     private List<String> activeProfileIds = Collections.emptyList();
 
@@ -50,8 +47,7 @@ public class DefaultProfileActivationContext
     private File projectDirectory;
 
     @Override
-    public List<String> getActiveProfileIds()
-    {
+    public List<String> getActiveProfileIds() {
         return activeProfileIds;
     }
 
@@ -61,14 +57,10 @@ public class DefaultProfileActivationContext
      * @param activeProfileIds The identifiers of those profiles to activate, may be {@code null}.
      * @return This context, never {@code null}.
      */
-    public DefaultProfileActivationContext setActiveProfileIds( List<String> activeProfileIds )
-    {
-        if ( activeProfileIds != null )
-        {
-            this.activeProfileIds = Collections.unmodifiableList( activeProfileIds );
-        }
-        else
-        {
+    public DefaultProfileActivationContext setActiveProfileIds(List<String> activeProfileIds) {
+        if (activeProfileIds != null) {
+            this.activeProfileIds = Collections.unmodifiableList(activeProfileIds);
+        } else {
             this.activeProfileIds = Collections.emptyList();
         }
 
@@ -76,8 +68,7 @@ public class DefaultProfileActivationContext
     }
 
     @Override
-    public List<String> getInactiveProfileIds()
-    {
+    public List<String> getInactiveProfileIds() {
         return inactiveProfileIds;
     }
 
@@ -87,14 +78,10 @@ public class DefaultProfileActivationContext
      * @param inactiveProfileIds The identifiers of those profiles to deactivate, may be {@code null}.
      * @return This context, never {@code null}.
      */
-    public DefaultProfileActivationContext setInactiveProfileIds( List<String> inactiveProfileIds )
-    {
-        if ( inactiveProfileIds != null )
-        {
-            this.inactiveProfileIds = Collections.unmodifiableList( inactiveProfileIds );
-        }
-        else
-        {
+    public DefaultProfileActivationContext setInactiveProfileIds(List<String> inactiveProfileIds) {
+        if (inactiveProfileIds != null) {
+            this.inactiveProfileIds = Collections.unmodifiableList(inactiveProfileIds);
+        } else {
             this.inactiveProfileIds = Collections.emptyList();
         }
 
@@ -102,8 +89,7 @@ public class DefaultProfileActivationContext
     }
 
     @Override
-    public Map<String, String> getSystemProperties()
-    {
+    public Map<String, String> getSystemProperties() {
         return systemProperties;
     }
 
@@ -114,15 +100,11 @@ public class DefaultProfileActivationContext
      * @param systemProperties The system properties, may be {@code null}.
      * @return This context, never {@code null}.
      */
-    @SuppressWarnings( "unchecked" )
-    public DefaultProfileActivationContext setSystemProperties( Properties systemProperties )
-    {
-        if ( systemProperties != null )
-        {
-            this.systemProperties = Collections.unmodifiableMap( (Map) systemProperties );
-        }
-        else
-        {
+    @SuppressWarnings("unchecked")
+    public DefaultProfileActivationContext setSystemProperties(Properties systemProperties) {
+        if (systemProperties != null) {
+            this.systemProperties = Collections.unmodifiableMap((Map) systemProperties);
+        } else {
             this.systemProperties = Collections.emptyMap();
         }
 
@@ -136,14 +118,10 @@ public class DefaultProfileActivationContext
      * @param systemProperties The system properties, may be {@code null}.
      * @return This context, never {@code null}.
      */
-    public DefaultProfileActivationContext setSystemProperties( Map<String, String> systemProperties )
-    {
-        if ( systemProperties != null )
-        {
-            this.systemProperties = Collections.unmodifiableMap( systemProperties );
-        }
-        else
-        {
+    public DefaultProfileActivationContext setSystemProperties(Map<String, String> systemProperties) {
+        if (systemProperties != null) {
+            this.systemProperties = Collections.unmodifiableMap(systemProperties);
+        } else {
             this.systemProperties = Collections.emptyMap();
         }
 
@@ -151,8 +129,7 @@ public class DefaultProfileActivationContext
     }
 
     @Override
-    public Map<String, String> getUserProperties()
-    {
+    public Map<String, String> getUserProperties() {
         return userProperties;
     }
 
@@ -164,15 +141,11 @@ public class DefaultProfileActivationContext
      * @param userProperties The user properties, may be {@code null}.
      * @return This context, never {@code null}.
      */
-    @SuppressWarnings( "unchecked" )
-    public DefaultProfileActivationContext setUserProperties( Properties userProperties )
-    {
-        if ( userProperties != null )
-        {
-            this.userProperties = Collections.unmodifiableMap( (Map) userProperties );
-        }
-        else
-        {
+    @SuppressWarnings("unchecked")
+    public DefaultProfileActivationContext setUserProperties(Properties userProperties) {
+        if (userProperties != null) {
+            this.userProperties = Collections.unmodifiableMap((Map) userProperties);
+        } else {
             this.userProperties = Collections.emptyMap();
         }
 
@@ -187,14 +160,10 @@ public class DefaultProfileActivationContext
      * @param userProperties The user properties, may be {@code null}.
      * @return This context, never {@code null}.
      */
-    public DefaultProfileActivationContext setUserProperties( Map<String, String> userProperties )
-    {
-        if ( userProperties != null )
-        {
-            this.userProperties = Collections.unmodifiableMap( userProperties );
-        }
-        else
-        {
+    public DefaultProfileActivationContext setUserProperties(Map<String, String> userProperties) {
+        if (userProperties != null) {
+            this.userProperties = Collections.unmodifiableMap(userProperties);
+        } else {
             this.userProperties = Collections.emptyMap();
         }
 
@@ -202,8 +171,7 @@ public class DefaultProfileActivationContext
     }
 
     @Override
-    public File getProjectDirectory()
-    {
+    public File getProjectDirectory() {
         return projectDirectory;
     }
 
@@ -214,35 +182,27 @@ public class DefaultProfileActivationContext
      *                         happens in the context of metadata retrieval rather than project building.
      * @return This context, never {@code null}.
      */
-    public DefaultProfileActivationContext setProjectDirectory( File projectDirectory )
-    {
+    public DefaultProfileActivationContext setProjectDirectory(File projectDirectory) {
         this.projectDirectory = projectDirectory;
 
         return this;
     }
 
     @Override
-    public Map<String, String> getProjectProperties()
-    {
+    public Map<String, String> getProjectProperties() {
         return projectProperties;
     }
 
-    public DefaultProfileActivationContext setProjectProperties( Properties projectProperties )
-    {
-        if ( projectProperties != null )
-        {
+    public DefaultProfileActivationContext setProjectProperties(Properties projectProperties) {
+        if (projectProperties != null) {
             this.projectProperties = projectProperties.entrySet().stream()
-                    .collect(
-                            collectingAndThen(
-                                    toMap( k -> String.valueOf( k.getKey() ), v -> String.valueOf( v ) ),
-                                    Collections::unmodifiableMap ) );
-        }
-        else
-        {
+                    .collect(collectingAndThen(
+                            toMap(k -> String.valueOf(k.getKey()), v -> String.valueOf(v)),
+                            Collections::unmodifiableMap));
+        } else {
             this.projectProperties = Collections.emptyMap();
         }
 
         return this;
     }
-
 }

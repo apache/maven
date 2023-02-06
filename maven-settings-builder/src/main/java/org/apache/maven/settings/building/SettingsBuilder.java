@@ -1,5 +1,3 @@
-package org.apache.maven.settings.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.settings.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.building;
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
  *
  * @author Benjamin Bentmann
  */
-public interface SettingsBuilder
-{
+public interface SettingsBuilder {
 
     /**
      * Builds the effective settings of the specified settings files.
@@ -34,7 +32,5 @@ public interface SettingsBuilder
      * @return The result of the settings building, never {@code null}.
      * @throws SettingsBuildingException If the effective settings could not be built.
      */
-    SettingsBuildingResult build( SettingsBuildingRequest request )
-        throws SettingsBuildingException;
-
+    SettingsBuildingResult build(SettingsBuildingRequest request) throws SettingsBuildingException;
 }

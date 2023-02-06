@@ -1,5 +1,3 @@
-package org.apache.maven.properties.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.properties.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.properties.internal;
 
 import java.util.Locale;
 import java.util.Map;
@@ -33,8 +32,7 @@ import org.codehaus.plexus.util.Os;
  * @since 3.0
  * @author Benjamin Bentmann
  */
-public class EnvironmentUtils
-{
+public class EnvironmentUtils {
 
     private static Properties envVars;
 
@@ -46,25 +44,20 @@ public class EnvironmentUtils
      *
      * @param props The properties to add the environment variables to, may be {@code null}.
      */
-    public static void addEnvVars( Properties props )
-    {
-        if ( props != null )
-        {
-            if ( envVars == null )
-            {
+    public static void addEnvVars(Properties props) {
+        if (props != null) {
+            if (envVars == null) {
                 Properties tmp = new Properties();
-                boolean caseSensitive = !Os.isFamily( Os.FAMILY_WINDOWS );
-                for ( Map.Entry<String, String> entry : System.getenv().entrySet() )
-                {
-                    String key =
-                        "env." + ( caseSensitive ? entry.getKey() : entry.getKey().toUpperCase( Locale.ENGLISH ) );
-                    tmp.setProperty( key, entry.getValue() );
+                boolean caseSensitive = !Os.isFamily(Os.FAMILY_WINDOWS);
+                for (Map.Entry<String, String> entry : System.getenv().entrySet()) {
+                    String key = "env."
+                            + (caseSensitive ? entry.getKey() : entry.getKey().toUpperCase(Locale.ENGLISH));
+                    tmp.setProperty(key, entry.getValue());
                 }
                 envVars = tmp;
             }
 
-            props.putAll( envVars );
+            props.putAll(envVars);
         }
     }
-
 }

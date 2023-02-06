@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,16 +16,17 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
@@ -74,9 +73,7 @@ import org.eclipse.aether.transfer.ArtifactNotFoundException;
  */
 @Named
 @Singleton
-public class DefaultArtifactDescriptorReader
-    implements ArtifactDescriptorReader, Service
-{
+public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader, Service {
     private RemoteRepositoryManager remoteRepositoryManager;
 
     private VersionResolver versionResolver;
@@ -91,303 +88,271 @@ public class DefaultArtifactDescriptorReader
 
     private ModelCacheFactory modelCacheFactory;
 
-    public DefaultArtifactDescriptorReader()
-    {
+    public DefaultArtifactDescriptorReader() {
         // enable no-arg constructor
     }
 
     @Inject
-    DefaultArtifactDescriptorReader( RemoteRepositoryManager remoteRepositoryManager, VersionResolver versionResolver,
-                                     VersionRangeResolver versionRangeResolver, ArtifactResolver artifactResolver,
-                                     ModelBuilder modelBuilder, RepositoryEventDispatcher repositoryEventDispatcher,
-                                     ModelCacheFactory modelCacheFactory )
-    {
-        setRemoteRepositoryManager( remoteRepositoryManager );
-        setVersionResolver( versionResolver );
-        setVersionRangeResolver( versionRangeResolver );
-        setArtifactResolver( artifactResolver );
-        setModelBuilder( modelBuilder );
-        setRepositoryEventDispatcher( repositoryEventDispatcher );
-        setModelCacheFactory( modelCacheFactory );
+    DefaultArtifactDescriptorReader(
+            RemoteRepositoryManager remoteRepositoryManager,
+            VersionResolver versionResolver,
+            VersionRangeResolver versionRangeResolver,
+            ArtifactResolver artifactResolver,
+            ModelBuilder modelBuilder,
+            RepositoryEventDispatcher repositoryEventDispatcher,
+            ModelCacheFactory modelCacheFactory) {
+        setRemoteRepositoryManager(remoteRepositoryManager);
+        setVersionResolver(versionResolver);
+        setVersionRangeResolver(versionRangeResolver);
+        setArtifactResolver(artifactResolver);
+        setModelBuilder(modelBuilder);
+        setRepositoryEventDispatcher(repositoryEventDispatcher);
+        setModelCacheFactory(modelCacheFactory);
     }
 
-    public void initService( ServiceLocator locator )
-    {
-        setRemoteRepositoryManager( locator.getService( RemoteRepositoryManager.class ) );
-        setVersionResolver( locator.getService( VersionResolver.class ) );
-        setVersionRangeResolver( locator.getService( VersionRangeResolver.class ) );
-        setArtifactResolver( locator.getService( ArtifactResolver.class ) );
-        modelBuilder = locator.getService( ModelBuilder.class );
-        if ( modelBuilder == null )
-        {
-            setModelBuilder( new DefaultModelBuilderFactory().newInstance() );
+    public void initService(ServiceLocator locator) {
+        setRemoteRepositoryManager(locator.getService(RemoteRepositoryManager.class));
+        setVersionResolver(locator.getService(VersionResolver.class));
+        setVersionRangeResolver(locator.getService(VersionRangeResolver.class));
+        setArtifactResolver(locator.getService(ArtifactResolver.class));
+        modelBuilder = locator.getService(ModelBuilder.class);
+        if (modelBuilder == null) {
+            setModelBuilder(new DefaultModelBuilderFactory().newInstance());
         }
-        setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
-        setModelCacheFactory( locator.getService( ModelCacheFactory.class ) );
+        setRepositoryEventDispatcher(locator.getService(RepositoryEventDispatcher.class));
+        setModelCacheFactory(locator.getService(ModelCacheFactory.class));
     }
 
-    public DefaultArtifactDescriptorReader setRemoteRepositoryManager( RemoteRepositoryManager remoteRepositoryManager )
-    {
-        this.remoteRepositoryManager = Objects.requireNonNull( remoteRepositoryManager,
-            "remoteRepositoryManager cannot be null" );
+    public DefaultArtifactDescriptorReader setRemoteRepositoryManager(RemoteRepositoryManager remoteRepositoryManager) {
+        this.remoteRepositoryManager =
+                Objects.requireNonNull(remoteRepositoryManager, "remoteRepositoryManager cannot be null");
         return this;
     }
 
-    public DefaultArtifactDescriptorReader setVersionResolver( VersionResolver versionResolver )
-    {
-        this.versionResolver = Objects.requireNonNull( versionResolver, "versionResolver cannot be null" );
+    public DefaultArtifactDescriptorReader setVersionResolver(VersionResolver versionResolver) {
+        this.versionResolver = Objects.requireNonNull(versionResolver, "versionResolver cannot be null");
         return this;
     }
 
     /** @since 3.2.2 */
-    public DefaultArtifactDescriptorReader setVersionRangeResolver( VersionRangeResolver versionRangeResolver )
-    {
-        this.versionRangeResolver =
-            Objects.requireNonNull( versionRangeResolver, "versionRangeResolver cannot be null" );
+    public DefaultArtifactDescriptorReader setVersionRangeResolver(VersionRangeResolver versionRangeResolver) {
+        this.versionRangeResolver = Objects.requireNonNull(versionRangeResolver, "versionRangeResolver cannot be null");
         return this;
     }
 
-    public DefaultArtifactDescriptorReader setArtifactResolver( ArtifactResolver artifactResolver )
-    {
-        this.artifactResolver = Objects.requireNonNull( artifactResolver, "artifactResolver cannot be null" );
+    public DefaultArtifactDescriptorReader setArtifactResolver(ArtifactResolver artifactResolver) {
+        this.artifactResolver = Objects.requireNonNull(artifactResolver, "artifactResolver cannot be null");
         return this;
     }
 
     public DefaultArtifactDescriptorReader setRepositoryEventDispatcher(
-        RepositoryEventDispatcher repositoryEventDispatcher )
-    {
-        this.repositoryEventDispatcher = Objects.requireNonNull( repositoryEventDispatcher,
-            "repositoryEventDispatcher cannot be null" );
+            RepositoryEventDispatcher repositoryEventDispatcher) {
+        this.repositoryEventDispatcher =
+                Objects.requireNonNull(repositoryEventDispatcher, "repositoryEventDispatcher cannot be null");
         return this;
     }
 
-    public DefaultArtifactDescriptorReader setModelBuilder( ModelBuilder modelBuilder )
-    {
-        this.modelBuilder = Objects.requireNonNull( modelBuilder, "modelBuilder cannot be null" );
+    public DefaultArtifactDescriptorReader setModelBuilder(ModelBuilder modelBuilder) {
+        this.modelBuilder = Objects.requireNonNull(modelBuilder, "modelBuilder cannot be null");
         return this;
     }
 
-    public DefaultArtifactDescriptorReader setModelCacheFactory( ModelCacheFactory modelCacheFactory )
-    {
-        this.modelCacheFactory = Objects.requireNonNull( modelCacheFactory,
-                "modelCacheFactory cannot be null" );
+    public DefaultArtifactDescriptorReader setModelCacheFactory(ModelCacheFactory modelCacheFactory) {
+        this.modelCacheFactory = Objects.requireNonNull(modelCacheFactory, "modelCacheFactory cannot be null");
         return this;
     }
 
-    public ArtifactDescriptorResult readArtifactDescriptor( RepositorySystemSession session,
-                                                            ArtifactDescriptorRequest request )
-        throws ArtifactDescriptorException
-    {
-        ArtifactDescriptorResult result = new ArtifactDescriptorResult( request );
+    public ArtifactDescriptorResult readArtifactDescriptor(
+            RepositorySystemSession session, ArtifactDescriptorRequest request) throws ArtifactDescriptorException {
+        ArtifactDescriptorResult result = new ArtifactDescriptorResult(request);
 
-        Model model = loadPom( session, request, result );
-        if ( model != null )
-        {
+        Model model = loadPom(session, request, result);
+        if (model != null) {
             Map<String, Object> config = session.getConfigProperties();
             ArtifactDescriptorReaderDelegate delegate =
-                (ArtifactDescriptorReaderDelegate) config.get( ArtifactDescriptorReaderDelegate.class.getName() );
+                    (ArtifactDescriptorReaderDelegate) config.get(ArtifactDescriptorReaderDelegate.class.getName());
 
-            if ( delegate == null )
-            {
+            if (delegate == null) {
                 delegate = new ArtifactDescriptorReaderDelegate();
             }
 
-            delegate.populateResult( session, result, model );
+            delegate.populateResult(session, result, model);
         }
 
         return result;
     }
 
-    private Model loadPom( RepositorySystemSession session, ArtifactDescriptorRequest request,
-                           ArtifactDescriptorResult result )
-        throws ArtifactDescriptorException
-    {
-        RequestTrace trace = RequestTrace.newChild( request.getTrace(), request );
+    private Model loadPom(
+            RepositorySystemSession session, ArtifactDescriptorRequest request, ArtifactDescriptorResult result)
+            throws ArtifactDescriptorException {
+        RequestTrace trace = RequestTrace.newChild(request.getTrace(), request);
 
         Set<String> visited = new LinkedHashSet<>();
-        for ( Artifact a = request.getArtifact();; )
-        {
-            Artifact pomArtifact = ArtifactDescriptorUtils.toPomArtifact( a );
-            try
-            {
+        for (Artifact a = request.getArtifact(); ; ) {
+            Artifact pomArtifact = ArtifactDescriptorUtils.toPomArtifact(a);
+            try {
                 VersionRequest versionRequest =
-                    new VersionRequest( a, request.getRepositories(), request.getRequestContext() );
-                versionRequest.setTrace( trace );
-                VersionResult versionResult = versionResolver.resolveVersion( session, versionRequest );
+                        new VersionRequest(a, request.getRepositories(), request.getRequestContext());
+                versionRequest.setTrace(trace);
+                VersionResult versionResult = versionResolver.resolveVersion(session, versionRequest);
 
-                a = a.setVersion( versionResult.getVersion() );
+                a = a.setVersion(versionResult.getVersion());
 
                 versionRequest =
-                    new VersionRequest( pomArtifact, request.getRepositories(), request.getRequestContext() );
-                versionRequest.setTrace( trace );
-                versionResult = versionResolver.resolveVersion( session, versionRequest );
+                        new VersionRequest(pomArtifact, request.getRepositories(), request.getRequestContext());
+                versionRequest.setTrace(trace);
+                versionResult = versionResolver.resolveVersion(session, versionRequest);
 
-                pomArtifact = pomArtifact.setVersion( versionResult.getVersion() );
-            }
-            catch ( VersionResolutionException e )
-            {
-                result.addException( e );
-                throw new ArtifactDescriptorException( result );
+                pomArtifact = pomArtifact.setVersion(versionResult.getVersion());
+            } catch (VersionResolutionException e) {
+                result.addException(e);
+                throw new ArtifactDescriptorException(result);
             }
 
-            if ( !visited.add( a.getGroupId() + ':' + a.getArtifactId() + ':' + a.getBaseVersion() ) )
-            {
+            if (!visited.add(a.getGroupId() + ':' + a.getArtifactId() + ':' + a.getBaseVersion())) {
                 RepositoryException exception =
-                    new RepositoryException( "Artifact relocations form a cycle: " + visited );
-                invalidDescriptor( session, trace, a, exception );
-                if ( ( getPolicy( session, a, request ) & ArtifactDescriptorPolicy.IGNORE_INVALID ) != 0 )
-                {
+                        new RepositoryException("Artifact relocations form a cycle: " + visited);
+                invalidDescriptor(session, trace, a, exception);
+                if ((getPolicy(session, a, request) & ArtifactDescriptorPolicy.IGNORE_INVALID) != 0) {
                     return null;
                 }
-                result.addException( exception );
-                throw new ArtifactDescriptorException( result );
+                result.addException(exception);
+                throw new ArtifactDescriptorException(result);
             }
 
             ArtifactResult resolveResult;
-            try
-            {
+            try {
                 ArtifactRequest resolveRequest =
-                    new ArtifactRequest( pomArtifact, request.getRepositories(), request.getRequestContext() );
-                resolveRequest.setTrace( trace );
-                resolveResult = artifactResolver.resolveArtifact( session, resolveRequest );
+                        new ArtifactRequest(pomArtifact, request.getRepositories(), request.getRequestContext());
+                resolveRequest.setTrace(trace);
+                resolveResult = artifactResolver.resolveArtifact(session, resolveRequest);
                 pomArtifact = resolveResult.getArtifact();
-                result.setRepository( resolveResult.getRepository() );
-            }
-            catch ( ArtifactResolutionException e )
-            {
-                if ( e.getCause() instanceof ArtifactNotFoundException )
-                {
-                    missingDescriptor( session, trace, a, (Exception) e.getCause() );
-                    if ( ( getPolicy( session, a, request ) & ArtifactDescriptorPolicy.IGNORE_MISSING ) != 0 )
-                    {
+                result.setRepository(resolveResult.getRepository());
+            } catch (ArtifactResolutionException e) {
+                if (e.getCause() instanceof ArtifactNotFoundException) {
+                    missingDescriptor(session, trace, a, (Exception) e.getCause());
+                    if ((getPolicy(session, a, request) & ArtifactDescriptorPolicy.IGNORE_MISSING) != 0) {
                         return null;
                     }
                 }
-                result.addException( e );
-                throw new ArtifactDescriptorException( result );
+                result.addException(e);
+                throw new ArtifactDescriptorException(result);
             }
 
             Model model;
 
             // TODO hack: don't rebuild model if it was already loaded during reactor resolution
             final WorkspaceReader workspace = session.getWorkspaceReader();
-            if ( workspace instanceof MavenWorkspaceReader )
-            {
-                model = ( (MavenWorkspaceReader) workspace ).findModel( pomArtifact );
-                if ( model != null )
-                {
+            if (workspace instanceof MavenWorkspaceReader) {
+                model = ((MavenWorkspaceReader) workspace).findModel(pomArtifact);
+                if (model != null) {
                     return model;
                 }
             }
 
-            try
-            {
+            try {
                 ModelBuildingRequest modelRequest = new DefaultModelBuildingRequest();
-                modelRequest.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
-                modelRequest.setProcessPlugins( false );
-                modelRequest.setTwoPhaseBuilding( false );
-                modelRequest.setSystemProperties( toProperties( session.getSystemProperties() ) );
-                modelRequest.setUserProperties( toProperties( session.getUserProperties() ) );
-                modelRequest.setModelCache( modelCacheFactory.createCache( session ) );
-                modelRequest.setModelResolver( new DefaultModelResolver( session, trace.newChild( modelRequest ),
-                                                                         request.getRequestContext(), artifactResolver,
-                                                                         versionRangeResolver, remoteRepositoryManager,
-                                                                         request.getRepositories() ) );
-                if ( resolveResult.getRepository() instanceof WorkspaceRepository )
-                {
-                    modelRequest.setPomFile( pomArtifact.getFile() );
-                }
-                else
-                {
-                    modelRequest.setModelSource( new FileModelSource( pomArtifact.getFile() ) );
+                modelRequest.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+                modelRequest.setProcessPlugins(false);
+                modelRequest.setTwoPhaseBuilding(false);
+                // This merge is on purpose because otherwise user properties would override model
+                // properties in dependencies the user does not know. See MNG-7563 for details.
+                modelRequest.setSystemProperties(
+                        toProperties(session.getUserProperties(), session.getSystemProperties()));
+                modelRequest.setUserProperties(new Properties());
+                modelRequest.setModelCache(modelCacheFactory.createCache(session));
+                modelRequest.setModelResolver(new DefaultModelResolver(
+                        session,
+                        trace.newChild(modelRequest),
+                        request.getRequestContext(),
+                        artifactResolver,
+                        versionRangeResolver,
+                        remoteRepositoryManager,
+                        request.getRepositories()));
+                if (resolveResult.getRepository() instanceof WorkspaceRepository) {
+                    modelRequest.setPomFile(pomArtifact.getFile());
+                } else {
+                    modelRequest.setModelSource(new FileModelSource(pomArtifact.getFile()));
                 }
 
-                model = modelBuilder.build( modelRequest ).getEffectiveModel();
-            }
-            catch ( ModelBuildingException e )
-            {
-                for ( ModelProblem problem : e.getProblems() )
-                {
-                    if ( problem.getException() instanceof UnresolvableModelException )
-                    {
-                        result.addException( problem.getException() );
-                        throw new ArtifactDescriptorException( result );
+                model = modelBuilder.build(modelRequest).getEffectiveModel();
+            } catch (ModelBuildingException e) {
+                for (ModelProblem problem : e.getProblems()) {
+                    if (problem.getException() instanceof UnresolvableModelException) {
+                        result.addException(problem.getException());
+                        throw new ArtifactDescriptorException(result);
                     }
                 }
-                invalidDescriptor( session, trace, a, e );
-                if ( ( getPolicy( session, a, request ) & ArtifactDescriptorPolicy.IGNORE_INVALID ) != 0 )
-                {
+                invalidDescriptor(session, trace, a, e);
+                if ((getPolicy(session, a, request) & ArtifactDescriptorPolicy.IGNORE_INVALID) != 0) {
                     return null;
                 }
-                result.addException( e );
-                throw new ArtifactDescriptorException( result );
+                result.addException(e);
+                throw new ArtifactDescriptorException(result);
             }
 
-            Relocation relocation = getRelocation( model );
+            Relocation relocation = getRelocation(model);
 
-            if ( relocation != null )
-            {
-                result.addRelocation( a );
-                a =
-                    new RelocatedArtifact( a, relocation.getGroupId(), relocation.getArtifactId(),
-                                           relocation.getVersion(), relocation.getMessage() );
-                result.setArtifact( a );
-            }
-            else
-            {
+            if (relocation != null) {
+                result.addRelocation(a);
+                a = new RelocatedArtifact(
+                        a,
+                        relocation.getGroupId(),
+                        relocation.getArtifactId(),
+                        relocation.getVersion(),
+                        relocation.getMessage());
+                result.setArtifact(a);
+            } else {
                 return model;
             }
         }
     }
 
-    private Properties toProperties( Map<String, String> map )
-    {
+    private Properties toProperties(Map<String, String> dominant, Map<String, String> recessive) {
         Properties props = new Properties();
-        props.putAll( map );
+        if (recessive != null) {
+            props.putAll(recessive);
+        }
+        if (dominant != null) {
+            props.putAll(dominant);
+        }
         return props;
     }
 
-    private Relocation getRelocation( Model model )
-    {
+    private Relocation getRelocation(Model model) {
         Relocation relocation = null;
         DistributionManagement distMgmt = model.getDistributionManagement();
-        if ( distMgmt != null )
-        {
+        if (distMgmt != null) {
             relocation = distMgmt.getRelocation();
         }
         return relocation;
     }
 
-    private void missingDescriptor( RepositorySystemSession session, RequestTrace trace, Artifact artifact,
-                                    Exception exception )
-    {
-        RepositoryEvent.Builder event = new RepositoryEvent.Builder( session, EventType.ARTIFACT_DESCRIPTOR_MISSING );
-        event.setTrace( trace );
-        event.setArtifact( artifact );
-        event.setException( exception );
+    private void missingDescriptor(
+            RepositorySystemSession session, RequestTrace trace, Artifact artifact, Exception exception) {
+        RepositoryEvent.Builder event = new RepositoryEvent.Builder(session, EventType.ARTIFACT_DESCRIPTOR_MISSING);
+        event.setTrace(trace);
+        event.setArtifact(artifact);
+        event.setException(exception);
 
-        repositoryEventDispatcher.dispatch( event.build() );
+        repositoryEventDispatcher.dispatch(event.build());
     }
 
-    private void invalidDescriptor( RepositorySystemSession session, RequestTrace trace, Artifact artifact,
-                                    Exception exception )
-    {
-        RepositoryEvent.Builder event = new RepositoryEvent.Builder( session, EventType.ARTIFACT_DESCRIPTOR_INVALID );
-        event.setTrace( trace );
-        event.setArtifact( artifact );
-        event.setException( exception );
+    private void invalidDescriptor(
+            RepositorySystemSession session, RequestTrace trace, Artifact artifact, Exception exception) {
+        RepositoryEvent.Builder event = new RepositoryEvent.Builder(session, EventType.ARTIFACT_DESCRIPTOR_INVALID);
+        event.setTrace(trace);
+        event.setArtifact(artifact);
+        event.setException(exception);
 
-        repositoryEventDispatcher.dispatch( event.build() );
+        repositoryEventDispatcher.dispatch(event.build());
     }
 
-    private int getPolicy( RepositorySystemSession session, Artifact a, ArtifactDescriptorRequest request )
-    {
+    private int getPolicy(RepositorySystemSession session, Artifact a, ArtifactDescriptorRequest request) {
         ArtifactDescriptorPolicy policy = session.getArtifactDescriptorPolicy();
-        if ( policy == null )
-        {
+        if (policy == null) {
             return ArtifactDescriptorPolicy.STRICT;
         }
-        return policy.getPolicy( session, new ArtifactDescriptorPolicyRequest( a, request.getRequestContext() ) );
+        return policy.getPolicy(session, new ArtifactDescriptorPolicyRequest(a, request.getRequestContext()));
     }
-
 }

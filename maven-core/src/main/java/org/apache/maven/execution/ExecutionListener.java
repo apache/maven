@@ -1,5 +1,3 @@
-package org.apache.maven.execution;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.execution;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.execution;
 
 /**
  * Defines events that Maven fires during a build. <strong>Warning:</strong> This interface might be extended in future
@@ -26,41 +25,39 @@ package org.apache.maven.execution;
  *
  * @author Benjamin Bentmann
  */
-public interface ExecutionListener
-{
+public interface ExecutionListener {
 
-    void projectDiscoveryStarted( ExecutionEvent event );
+    void projectDiscoveryStarted(ExecutionEvent event);
 
-    void sessionStarted( ExecutionEvent event );
+    void sessionStarted(ExecutionEvent event);
 
-    void sessionEnded( ExecutionEvent event );
+    void sessionEnded(ExecutionEvent event);
 
-    void projectSkipped( ExecutionEvent event );
+    void projectSkipped(ExecutionEvent event);
 
-    void projectStarted( ExecutionEvent event );
+    void projectStarted(ExecutionEvent event);
 
-    void projectSucceeded( ExecutionEvent event );
+    void projectSucceeded(ExecutionEvent event);
 
-    void projectFailed( ExecutionEvent event );
+    void projectFailed(ExecutionEvent event);
 
-    void mojoSkipped( ExecutionEvent event );
+    void mojoSkipped(ExecutionEvent event);
 
-    void mojoStarted( ExecutionEvent event );
+    void mojoStarted(ExecutionEvent event);
 
-    void mojoSucceeded( ExecutionEvent event );
+    void mojoSucceeded(ExecutionEvent event);
 
-    void mojoFailed( ExecutionEvent event );
+    void mojoFailed(ExecutionEvent event);
 
-    void forkStarted( ExecutionEvent event );
+    void forkStarted(ExecutionEvent event);
 
-    void forkSucceeded( ExecutionEvent event );
+    void forkSucceeded(ExecutionEvent event);
 
-    void forkFailed( ExecutionEvent event );
+    void forkFailed(ExecutionEvent event);
 
-    void forkedProjectStarted( ExecutionEvent event );
+    void forkedProjectStarted(ExecutionEvent event);
 
-    void forkedProjectSucceeded( ExecutionEvent event );
+    void forkedProjectSucceeded(ExecutionEvent event);
 
-    void forkedProjectFailed( ExecutionEvent event );
-
+    void forkedProjectFailed(ExecutionEvent event);
 }

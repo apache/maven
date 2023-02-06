@@ -1,5 +1,3 @@
-package org.apache.maven.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,62 +16,52 @@ package org.apache.maven.building;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.junit.Test;
+package org.apache.maven.building;
 
 import java.io.File;
 import java.io.InputStream;
 import java.util.Scanner;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class FileSourceTest
-{
+public class FileSourceTest {
 
     @Test
-    public void testFileSource()
-    {
-        try
-        {
-            new FileSource( null );
-            fail( "Should fail, since you must specify a file" );
-        }
-        catch ( NullPointerException e )
-        {
-            assertEquals( "file cannot be null", e.getMessage() );
+    public void testFileSource() {
+        try {
+            new FileSource(null);
+            fail("Should fail, since you must specify a file");
+        } catch (NullPointerException e) {
+            assertEquals("file cannot be null", e.getMessage());
         }
     }
 
     @Test
-    public void testGetInputStream()
-        throws Exception
-    {
-        File txtFile = new File( "target/test-classes/source.txt" );
-        FileSource source = new FileSource( txtFile );
+    public void testGetInputStream() throws Exception {
+        File txtFile = new File("target/test-classes/source.txt");
+        FileSource source = new FileSource(txtFile);
 
-        try ( InputStream is = source.getInputStream();
-              Scanner scanner = new Scanner( is ) )
-        {
+        try (InputStream is = source.getInputStream();
+                Scanner scanner = new Scanner(is)) {
 
-            assertEquals( "Hello World!", scanner.nextLine() );
+            assertEquals("Hello World!", scanner.nextLine());
         }
     }
 
     @Test
-    public void testGetLocation()
-    {
-        File txtFile = new File( "target/test-classes/source.txt" );
-        FileSource source = new FileSource( txtFile );
-        assertEquals( txtFile.getAbsolutePath(), source.getLocation() );
+    public void testGetLocation() {
+        File txtFile = new File("target/test-classes/source.txt");
+        FileSource source = new FileSource(txtFile);
+        assertEquals(txtFile.getAbsolutePath(), source.getLocation());
     }
 
     @Test
-    public void testGetFile()
-    {
-        File txtFile = new File( "target/test-classes/source.txt" );
-        FileSource source = new FileSource( txtFile );
-        assertEquals( txtFile.getAbsoluteFile(), source.getFile() );
+    public void testGetFile() {
+        File txtFile = new File("target/test-classes/source.txt");
+        FileSource source = new FileSource(txtFile);
+        assertEquals(txtFile.getAbsoluteFile(), source.getFile());
     }
-
 }

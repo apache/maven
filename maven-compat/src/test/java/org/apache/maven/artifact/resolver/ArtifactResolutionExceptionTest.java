@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.resolver;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.artifact.resolver;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.resolver;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.resolver;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,13 +28,10 @@ import junit.framework.TestCase;
  *
  * @author Mauro Talevi
  */
-public class ArtifactResolutionExceptionTest
-    extends TestCase
-{
+public class ArtifactResolutionExceptionTest extends TestCase {
     private static final String LS = System.lineSeparator();
 
-    public void testMissingArtifactMessageFormat()
-    {
+    public void testMissingArtifactMessageFormat() {
         String message = "Missing artifact";
         String indentation = "  ";
         String groupId = "aGroupId";
@@ -44,9 +40,8 @@ public class ArtifactResolutionExceptionTest
         String type = "jar";
         String classifier = "aClassifier";
         String downloadUrl = "http://somewhere.com/download";
-        List<String> path = Arrays.asList( "dependency1", "dependency2" );
-        String expected =
-            "Missing artifact" + LS + LS + "  Try downloading the file manually from: " + LS
+        List<String> path = Arrays.asList("dependency1", "dependency2");
+        String expected = "Missing artifact" + LS + LS + "  Try downloading the file manually from: " + LS
                 + "      http://somewhere.com/download" + LS + LS + "  Then, install it using the command: " + LS
                 + "      mvn install:install-file -DgroupId=aGroupId -DartifactId=anArtifactId -Dversion=aVersion "
                 + "-Dclassifier=aClassifier -Dpackaging=jar -Dfile=/path/to/file" + LS + LS
@@ -55,10 +50,8 @@ public class ArtifactResolutionExceptionTest
                 + " -Dversion=aVersion -Dclassifier=aClassifier -Dpackaging=jar -Dfile=/path/to/file"
                 + " -Durl=[url] -DrepositoryId=[id]" + LS + LS + "  Path to dependency: " + LS + "  \t1) dependency1"
                 + LS + "  \t2) dependency2" + LS + LS;
-        String actual =
-            AbstractArtifactResolutionException.constructMissingArtifactMessage( message, indentation, groupId,
-                                                                                 artifactId, version, type, classifier,
-                                                                                 downloadUrl, path );
-        assertEquals( expected, actual );
+        String actual = AbstractArtifactResolutionException.constructMissingArtifactMessage(
+                message, indentation, groupId, artifactId, version, type, classifier, downloadUrl, path);
+        assertEquals(expected, actual);
     }
 }

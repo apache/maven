@@ -1,5 +1,3 @@
-package org.apache.maven.toolchain.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.toolchain.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.toolchain.building;
 
 import java.util.List;
 
@@ -30,8 +29,7 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
  * @author Robert Scholte
  * @since 3.3.0
  */
-public interface ToolchainsBuildingResult
-{
+public interface ToolchainsBuildingResult {
 
     /**
      * Gets the assembled toolchains.
@@ -42,9 +40,8 @@ public interface ToolchainsBuildingResult
 
     /**
      * Return a list of problems, if any.
-     * 
+     *
      * @return a list of problems, never {@code null}.
      */
     List<Problem> getProblems();
-
 }

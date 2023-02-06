@@ -1,5 +1,3 @@
-package org.apache.maven.settings.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.settings.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.settings.building;
 
 import java.io.File;
 
@@ -27,22 +26,19 @@ import org.apache.maven.building.FileSource;
  * Wraps an ordinary {@link File} as a settings source.
  *
  * @author Benjamin Bentmann
- * 
+ *
  * @deprecated instead use {@link FileSource}
  */
 @Deprecated
-public class FileSettingsSource extends FileSource
-    implements SettingsSource
-{
+public class FileSettingsSource extends FileSource implements SettingsSource {
 
     /**
      * Creates a new settings source backed by the specified file.
      *
      * @param settingsFile The settings file, must not be {@code null}.
      */
-    public FileSettingsSource( File settingsFile )
-    {
-        super( settingsFile );
+    public FileSettingsSource(File settingsFile) {
+        super(settingsFile);
     }
 
     /**
@@ -52,8 +48,7 @@ public class FileSettingsSource extends FileSource
      * @deprecated instead use {@link #getFile()}
      */
     @Deprecated
-    public File getSettingsFile()
-    {
+    public File getSettingsFile() {
         return getFile();
     }
 }

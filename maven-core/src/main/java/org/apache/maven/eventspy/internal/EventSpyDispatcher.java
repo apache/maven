@@ -1,5 +1,3 @@
-package org.apache.maven.eventspy.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.eventspy.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.eventspy.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,114 +32,84 @@ import org.eclipse.aether.RepositoryListener;
  * Dispatches callbacks to all registered eventspies.
  * @since 3.0.2
  */
-@Component( role = EventSpyDispatcher.class )
-public class EventSpyDispatcher
-{
+@Component(role = EventSpyDispatcher.class)
+public class EventSpyDispatcher {
 
     @Requirement
     private Logger logger;
 
-    @Requirement( role = EventSpy.class )
+    @Requirement(role = EventSpy.class)
     private List<EventSpy> eventSpies;
 
-    public void setEventSpies( List<EventSpy> eventSpies )
-    {
+    public void setEventSpies(List<EventSpy> eventSpies) {
         // make copy to get rid of needless overhead for dynamic lookups
-        this.eventSpies = new ArrayList<>( eventSpies );
+        this.eventSpies = new ArrayList<>(eventSpies);
     }
 
-    public List<EventSpy> getEventSpies()
-    {
+    public List<EventSpy> getEventSpies() {
         return eventSpies;
     }
 
-    public ExecutionListener chainListener( ExecutionListener listener )
-    {
-        if ( eventSpies.isEmpty() )
-        {
+    public ExecutionListener chainListener(ExecutionListener listener) {
+        if (eventSpies.isEmpty()) {
             return listener;
         }
-        return new EventSpyExecutionListener( this, listener );
+        return new EventSpyExecutionListener(this, listener);
     }
 
-    public RepositoryListener chainListener( RepositoryListener listener )
-    {
-        if ( eventSpies.isEmpty() )
-        {
+    public RepositoryListener chainListener(RepositoryListener listener) {
+        if (eventSpies.isEmpty()) {
             return listener;
         }
-        return new EventSpyRepositoryListener( this, listener );
+        return new EventSpyRepositoryListener(this, listener);
     }
 
-    public void init( EventSpy.Context context )
-    {
-        if ( eventSpies.isEmpty() )
-        {
+    public void init(EventSpy.Context context) {
+        if (eventSpies.isEmpty()) {
             return;
         }
-        for ( EventSpy eventSpy : eventSpies )
-        {
-            try
-            {
-                eventSpy.init( context );
-            }
-            catch ( Exception | LinkageError e )
-            {
-                logError( "initialize", e, eventSpy );
+        for (EventSpy eventSpy : eventSpies) {
+            try {
+                eventSpy.init(context);
+            } catch (Exception | LinkageError e) {
+                logError("initialize", e, eventSpy);
             }
         }
     }
 
-    public void onEvent( Object event )
-    {
-        if ( eventSpies.isEmpty() )
-        {
+    public void onEvent(Object event) {
+        if (eventSpies.isEmpty()) {
             return;
         }
-        for ( EventSpy eventSpy : eventSpies )
-        {
-            try
-            {
-                eventSpy.onEvent( event );
-            }
-            catch ( Exception | LinkageError e )
-            {
-                logError( "notify", e, eventSpy );
+        for (EventSpy eventSpy : eventSpies) {
+            try {
+                eventSpy.onEvent(event);
+            } catch (Exception | LinkageError e) {
+                logError("notify", e, eventSpy);
             }
         }
     }
 
-    public void close()
-    {
-        if ( eventSpies.isEmpty() )
-        {
+    public void close() {
+        if (eventSpies.isEmpty()) {
             return;
         }
-        for ( EventSpy eventSpy : eventSpies )
-        {
-            try
-            {
+        for (EventSpy eventSpy : eventSpies) {
+            try {
                 eventSpy.close();
-            }
-            catch ( Exception | LinkageError e )
-            {
-                logError( "close", e, eventSpy );
+            } catch (Exception | LinkageError e) {
+                logError("close", e, eventSpy);
             }
         }
     }
 
-    private void logError( String action, Throwable e, EventSpy spy )
-    {
+    private void logError(String action, Throwable e, EventSpy spy) {
         String msg = "Failed to " + action + " spy " + spy.getClass().getName() + ": " + e.getMessage();
 
-        if ( logger.isDebugEnabled() )
-        {
-            logger.warn( msg, e );
-        }
-        else
-        {
-            logger.warn( msg );
+        if (logger.isDebugEnabled()) {
+            logger.warn(msg, e);
+        } else {
+            logger.warn(msg);
         }
     }
-
 }

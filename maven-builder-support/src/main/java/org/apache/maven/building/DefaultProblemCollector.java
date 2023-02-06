@@ -1,5 +1,3 @@
-package org.apache.maven.building;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.building;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.building;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,37 +27,30 @@ import java.util.List;
  * @author Benjamin Bentmann
  * @author Robert Scholte
  */
-class DefaultProblemCollector
-    implements ProblemCollector
-{
+class DefaultProblemCollector implements ProblemCollector {
 
     private List<Problem> problems;
 
     private String source;
 
-    DefaultProblemCollector( List<Problem> problems )
-    {
-        this.problems = ( problems != null ) ? problems : new ArrayList<Problem>();
+    DefaultProblemCollector(List<Problem> problems) {
+        this.problems = (problems != null) ? problems : new ArrayList<Problem>();
     }
 
     @Override
-    public List<Problem> getProblems()
-    {
+    public List<Problem> getProblems() {
         return problems;
     }
 
     @Override
-    public void setSource( String source )
-    {
+    public void setSource(String source) {
         this.source = source;
     }
 
     @Override
-    public void add( Problem.Severity severity, String message, int line, int column, Exception cause )
-    {
-        Problem problem = new DefaultProblem( message, severity, source, line, column, cause );
+    public void add(Problem.Severity severity, String message, int line, int column, Exception cause) {
+        Problem problem = new DefaultProblem(message, severity, source, line, column, cause);
 
-        problems.add( problem );
+        problems.add(problem);
     }
-
 }

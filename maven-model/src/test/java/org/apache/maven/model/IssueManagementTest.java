@@ -1,5 +1,3 @@
-package org.apache.maven.model;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.model;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model;
 
 import junit.framework.TestCase;
 
@@ -26,31 +25,34 @@ import junit.framework.TestCase;
  *
  * @author Benjamin Bentmann
  */
-public class IssueManagementTest
-    extends TestCase
-{
+public class IssueManagementTest extends TestCase {
 
-    public void testHashCodeNullSafe()
-    {
+    public void testHashCodeNullSafe() {
         new IssueManagement().hashCode();
     }
 
-    public void testEqualsNullSafe()
-    {
-        assertFalse( new IssueManagement().equals( null ) );
+    public void testEqualsNullSafe() {
+        assertFalse(new IssueManagement().equals(null));
 
-        new IssueManagement().equals( new IssueManagement() );
+        new IssueManagement().equals(new IssueManagement());
     }
 
-    public void testEqualsIdentity()
-    {
+    public void testEqualsIdentity() {
         IssueManagement thing = new IssueManagement();
-        assertTrue( thing.equals( thing ) );
+        assertTrue(thing.equals(thing));
     }
 
-    public void testToStringNullSafe()
-    {
-        assertNotNull( new IssueManagement().toString() );
+    public void testToStringNullSafe() {
+        assertNotNull(new IssueManagement().toString());
     }
 
+    public void testToStringNotNonsense() {
+        IssueManagement im = new IssueManagement();
+        im.setSystem("Velociraptor");
+        im.setUrl("https://velo.localdomain");
+
+        String s = im.toString();
+
+        assert "IssueManagement {system=Velociraptor, url=https://velo.localdomain}".equals(s) : s;
+    }
 }

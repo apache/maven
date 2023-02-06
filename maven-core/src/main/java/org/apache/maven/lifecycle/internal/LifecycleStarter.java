@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal;
 
 import java.util.List;
 import java.util.Map;
@@ -42,9 +41,8 @@ import org.codehaus.plexus.logging.Logger;
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold
  */
-@Component( role = LifecycleStarter.class )
-public class LifecycleStarter
-{
+@Component(role = LifecycleStarter.class)
+public class LifecycleStarter {
     @Requirement
     private ExecutionEventCatapult eventCatapult;
 
@@ -65,84 +63,72 @@ public class LifecycleStarter
 
     @Requirement
     private Map<String, Builder> builders;
-    
+
     @Requirement
     private SessionScope sessionScope;
 
-    public void execute( MavenSession session )
-    {
-        eventCatapult.fire( ExecutionEvent.Type.SessionStarted, session, null );
+    public void execute(MavenSession session) {
+        eventCatapult.fire(ExecutionEvent.Type.SessionStarted, session, null);
 
         ReactorContext reactorContext = null;
         ProjectBuildList projectBuilds = null;
         MavenExecutionResult result = session.getResult();
 
-        try
-        {
-            if ( buildExecutionRequiresProject( session ) && projectIsNotPresent( session ) )
-            {
-                throw new MissingProjectException( "The goal you specified requires a project to execute"
-                    + " but there is no POM in this directory (" + session.getExecutionRootDirectory() + ")."
-                    + " Please verify you invoked Maven from the correct directory." );
+        try {
+            if (buildExecutionRequiresProject(session) && projectIsNotPresent(session)) {
+                throw new MissingProjectException("The goal you specified requires a project to execute"
+                        + " but there is no POM in this directory (" + session.getExecutionRootDirectory() + ")."
+                        + " Please verify you invoked Maven from the correct directory.");
             }
 
-            List<TaskSegment> taskSegments = lifecycleTaskSegmentCalculator.calculateTaskSegments( session );
-            projectBuilds = buildListCalculator.calculateProjectBuilds( session, taskSegments );
+            List<TaskSegment> taskSegments = lifecycleTaskSegmentCalculator.calculateTaskSegments(session);
+            projectBuilds = buildListCalculator.calculateProjectBuilds(session, taskSegments);
 
-            if ( projectBuilds.isEmpty() )
-            {
-                throw new NoGoalSpecifiedException( "No goals have been specified for this build."
-                    + " You must specify a valid lifecycle phase or a goal in the format <plugin-prefix>:<goal> or"
-                    + " <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>."
-                    + " Available lifecycle phases are: " + defaultLifeCycles.getLifecyclePhaseList() + "." );
+            if (projectBuilds.isEmpty()) {
+                throw new NoGoalSpecifiedException("No goals have been specified for this build."
+                        + " You must specify a valid lifecycle phase or a goal in the format <plugin-prefix>:<goal> or"
+                        + " <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>."
+                        + " Available lifecycle phases are: " + defaultLifeCycles.getLifecyclePhaseList() + ".");
             }
 
-            ProjectIndex projectIndex = new ProjectIndex( session.getProjects() );
+            ProjectIndex projectIndex = new ProjectIndex(session.getProjects());
 
-            if ( logger.isDebugEnabled() )
-            {
-                lifecycleDebugLogger.debugReactorPlan( projectBuilds );
+            if (logger.isDebugEnabled()) {
+                lifecycleDebugLogger.debugReactorPlan(projectBuilds);
             }
 
             ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
-            ReactorBuildStatus reactorBuildStatus = new ReactorBuildStatus( session.getProjectDependencyGraph() );
-            reactorContext = new ReactorContext( result, projectIndex, oldContextClassLoader, reactorBuildStatus );
+            ReactorBuildStatus reactorBuildStatus = new ReactorBuildStatus(session.getProjectDependencyGraph());
+            reactorContext = new ReactorContext(result, projectIndex, oldContextClassLoader, reactorBuildStatus);
 
             String builderId = session.getRequest().getBuilderId();
-            Builder builder = builders.get( builderId );
-            if ( builder == null )
-            {
-                throw new BuilderNotFoundException( String.format( "The builder requested using id = %s cannot be"
-                    + " found", builderId ) );
+            Builder builder = builders.get(builderId);
+            if (builder == null) {
+                throw new BuilderNotFoundException(
+                        String.format("The builder requested using id = %s cannot be" + " found", builderId));
             }
 
             int degreeOfConcurrency = session.getRequest().getDegreeOfConcurrency();
-            if ( degreeOfConcurrency > 1 )
-            {
-                logger.info( "" );
-                logger.info( String.format( "Using the %s implementation with a thread count of %d",
-                                            builder.getClass().getSimpleName(), degreeOfConcurrency ) );
+            if (degreeOfConcurrency > 1) {
+                logger.info("");
+                logger.info(String.format(
+                        "Using the %s implementation with a thread count of %d",
+                        builder.getClass().getSimpleName(), degreeOfConcurrency));
             }
-            builder.build( session, reactorContext, projectBuilds, taskSegments, reactorBuildStatus );
+            builder.build(session, reactorContext, projectBuilds, taskSegments, reactorBuildStatus);
 
-        }
-        catch ( Exception e )
-        {
-            result.addException( e );
-        }
-        finally
-        {
-            eventCatapult.fire( ExecutionEvent.Type.SessionEnded, session, null );
+        } catch (Exception e) {
+            result.addException(e);
+        } finally {
+            eventCatapult.fire(ExecutionEvent.Type.SessionEnded, session, null);
         }
     }
 
-    private boolean buildExecutionRequiresProject( MavenSession session )
-    {
-        return lifecycleTaskSegmentCalculator.requiresProject( session );
+    private boolean buildExecutionRequiresProject(MavenSession session) {
+        return lifecycleTaskSegmentCalculator.requiresProject(session);
     }
 
-    private boolean projectIsNotPresent( MavenSession session )
-    {
+    private boolean projectIsNotPresent(MavenSession session) {
         return !session.getRequest().isProjectPresent();
     }
 }

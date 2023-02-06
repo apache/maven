@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,25 +16,21 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 /**
  * @author Benjamin Bentmann
  */
-public class DependencyResolutionException
-    extends Exception
-{
+public class DependencyResolutionException extends Exception {
 
     private final transient DependencyResolutionResult result;
 
-    public DependencyResolutionException( DependencyResolutionResult result, String message, Throwable cause )
-    {
-        super( message, cause );
+    public DependencyResolutionException(DependencyResolutionResult result, String message, Throwable cause) {
+        super(message, cause);
         this.result = result;
     }
 
-    public DependencyResolutionResult getResult()
-    {
+    public DependencyResolutionResult getResult() {
         return result;
     }
-
 }

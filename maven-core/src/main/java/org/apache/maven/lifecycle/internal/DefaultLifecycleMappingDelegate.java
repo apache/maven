@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -47,36 +46,30 @@ import org.codehaus.plexus.component.annotations.Requirement;
  * lifecycle phase. Standard lifecycles use plugin execution {@code <phase>} or mojo default lifecycle phase to
  * calculate the execution plan, but custom lifecycles can use alternative mapping strategies.
  */
-@Component( role = LifecycleMappingDelegate.class, hint = DefaultLifecycleMappingDelegate.HINT )
-public class DefaultLifecycleMappingDelegate
-    implements LifecycleMappingDelegate
-{
+@Component(role = LifecycleMappingDelegate.class, hint = DefaultLifecycleMappingDelegate.HINT)
+public class DefaultLifecycleMappingDelegate implements LifecycleMappingDelegate {
     public static final String HINT = "default";
 
     @Requirement
     private BuildPluginManager pluginManager;
 
-    public Map<String, List<MojoExecution>> calculateLifecycleMappings( MavenSession session, MavenProject project,
-                                                                        Lifecycle lifecycle, String lifecyclePhase )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-        MojoNotFoundException, InvalidPluginDescriptorException
-    {
+    public Map<String, List<MojoExecution>> calculateLifecycleMappings(
+            MavenSession session, MavenProject project, Lifecycle lifecycle, String lifecyclePhase)
+            throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+                    MojoNotFoundException, InvalidPluginDescriptorException {
         /*
          * Initialize mapping from lifecycle phase to bound mojos. The key set of this map denotes the phases the caller
          * is interested in, i.e. all phases up to and including the specified phase.
          */
 
-        Map<String, Map<Integer, List<MojoExecution>>> mappings =
-            new LinkedHashMap<>();
+        Map<String, Map<Integer, List<MojoExecution>>> mappings = new LinkedHashMap<>();
 
-        for ( String phase : lifecycle.getPhases() )
-        {
+        for (String phase : lifecycle.getPhases()) {
             Map<Integer, List<MojoExecution>> phaseBindings = new TreeMap<>();
 
-            mappings.put( phase, phaseBindings );
+            mappings.put(phase, phaseBindings);
 
-            if ( phase.equals( lifecyclePhase ) )
-            {
+            if (phase.equals(lifecyclePhase)) {
                 break;
             }
         }
@@ -88,40 +81,31 @@ public class DefaultLifecycleMappingDelegate
          * not interested in any of the executions bound to it.
          */
 
-        for ( Plugin plugin : project.getBuild().getPlugins() )
-        {
-            for ( PluginExecution execution : plugin.getExecutions() )
-            {
+        for (Plugin plugin : project.getBuild().getPlugins()) {
+            for (PluginExecution execution : plugin.getExecutions()) {
                 // if the phase is specified then I don't have to go fetch the plugin yet and pull it down
                 // to examine the phase it is associated to.
-                if ( execution.getPhase() != null )
-                {
-                    Map<Integer, List<MojoExecution>> phaseBindings = mappings.get( execution.getPhase() );
-                    if ( phaseBindings != null )
-                    {
-                        for ( String goal : execution.getGoals() )
-                        {
-                            MojoExecution mojoExecution = new MojoExecution( plugin, goal, execution.getId() );
-                            mojoExecution.setLifecyclePhase( execution.getPhase() );
-                            addMojoExecution( phaseBindings, mojoExecution, execution.getPriority() );
+                if (execution.getPhase() != null) {
+                    Map<Integer, List<MojoExecution>> phaseBindings = mappings.get(execution.getPhase());
+                    if (phaseBindings != null) {
+                        for (String goal : execution.getGoals()) {
+                            MojoExecution mojoExecution = new MojoExecution(plugin, goal, execution.getId());
+                            mojoExecution.setLifecyclePhase(execution.getPhase());
+                            addMojoExecution(phaseBindings, mojoExecution, execution.getPriority());
                         }
                     }
                 }
                 // if not then i need to grab the mojo descriptor and look at the phase that is specified
-                else
-                {
-                    for ( String goal : execution.getGoals() )
-                    {
-                        MojoDescriptor mojoDescriptor =
-                            pluginManager.getMojoDescriptor( plugin, goal, project.getRemotePluginRepositories(),
-                                                             session.getRepositorySession() );
+                else {
+                    for (String goal : execution.getGoals()) {
+                        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor(
+                                plugin, goal, project.getRemotePluginRepositories(), session.getRepositorySession());
 
-                        Map<Integer, List<MojoExecution>> phaseBindings = mappings.get( mojoDescriptor.getPhase() );
-                        if ( phaseBindings != null )
-                        {
-                            MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, execution.getId() );
-                            mojoExecution.setLifecyclePhase( mojoDescriptor.getPhase() );
-                            addMojoExecution( phaseBindings, mojoExecution, execution.getPriority() );
+                        Map<Integer, List<MojoExecution>> phaseBindings = mappings.get(mojoDescriptor.getPhase());
+                        if (phaseBindings != null) {
+                            MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, execution.getId());
+                            mojoExecution.setLifecyclePhase(mojoDescriptor.getPhase());
+                            addMojoExecution(phaseBindings, mojoExecution, execution.getPriority());
                         }
                     }
                 }
@@ -130,34 +114,28 @@ public class DefaultLifecycleMappingDelegate
 
         Map<String, List<MojoExecution>> lifecycleMappings = new LinkedHashMap<>();
 
-        for ( Map.Entry<String, Map<Integer, List<MojoExecution>>> entry : mappings.entrySet() )
-        {
+        for (Map.Entry<String, Map<Integer, List<MojoExecution>>> entry : mappings.entrySet()) {
             List<MojoExecution> mojoExecutions = new ArrayList<>();
 
-            for ( List<MojoExecution> executions : entry.getValue().values() )
-            {
-                mojoExecutions.addAll( executions );
+            for (List<MojoExecution> executions : entry.getValue().values()) {
+                mojoExecutions.addAll(executions);
             }
 
-            lifecycleMappings.put( entry.getKey(), mojoExecutions );
+            lifecycleMappings.put(entry.getKey(), mojoExecutions);
         }
 
         return lifecycleMappings;
-
     }
 
-    private void addMojoExecution( Map<Integer, List<MojoExecution>> phaseBindings, MojoExecution mojoExecution,
-                                   int priority )
-    {
-        List<MojoExecution> mojoExecutions = phaseBindings.get( priority );
+    private void addMojoExecution(
+            Map<Integer, List<MojoExecution>> phaseBindings, MojoExecution mojoExecution, int priority) {
+        List<MojoExecution> mojoExecutions = phaseBindings.get(priority);
 
-        if ( mojoExecutions == null )
-        {
+        if (mojoExecutions == null) {
             mojoExecutions = new ArrayList<>();
-            phaseBindings.put( priority, mojoExecutions );
+            phaseBindings.put(priority, mojoExecutions);
         }
 
-        mojoExecutions.add( mojoExecution );
+        mojoExecutions.add(mojoExecution);
     }
-
 }

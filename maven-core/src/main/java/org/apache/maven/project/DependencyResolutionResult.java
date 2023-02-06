@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import java.util.List;
 
@@ -29,8 +28,7 @@ import org.eclipse.aether.graph.DependencyNode;
  *
  * @author Benjamin Bentmann
  */
-public interface DependencyResolutionResult
-{
+public interface DependencyResolutionResult {
 
     /**
      * Gets the dependency graph of the project.
@@ -75,6 +73,5 @@ public interface DependencyResolutionResult
      * @param dependency The dependency for which to retrieve the errors, must not be {@code null}.
      * @return The resolution errors for the specified dependency, never {@code null}.
      */
-    List<Exception> getResolutionErrors( Dependency dependency );
-
+    List<Exception> getResolutionErrors(Dependency dependency);
 }

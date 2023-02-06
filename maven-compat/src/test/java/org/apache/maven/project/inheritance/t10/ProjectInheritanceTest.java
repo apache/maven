@@ -1,5 +1,3 @@
-package org.apache.maven.project.inheritance.t10;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project.inheritance.t10;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project.inheritance.t10;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project.inheritance.t10;
 
 import java.io.File;
 import java.util.Map;
@@ -38,9 +37,7 @@ import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
  *
  * @author <a href="mailto:pschneider@gmail.com">Patrick Schneider</a>
  */
-public class ProjectInheritanceTest
-    extends AbstractProjectInheritanceTestCase
-{
+public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
     // p1 inherits from p0
@@ -49,23 +46,21 @@ public class ProjectInheritanceTest
     // or we can show it graphically as:
     //
     // p1 ---> p0 --> super model
-	//
+    //
     // ----------------------------------------------------------------------
 
-    public void testDependencyManagementOverridesTransitiveDependencyVersion()
-        throws Exception
-    {
+    public void testDependencyManagementOverridesTransitiveDependencyVersion() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
-        File pom0 = new File( localRepo, "p0/pom.xml" );
+        File pom0 = new File(localRepo, "p0/pom.xml");
         File pom0Basedir = pom0.getParentFile();
-        File pom1 = new File( pom0Basedir, "p1/pom.xml" );
+        File pom1 = new File(pom0Basedir, "p1/pom.xml");
 
         // load the child project, which inherits from p0...
-        MavenProject project0 = getProjectWithDependencies( pom0 );
-        MavenProject project1 = getProjectWithDependencies( pom1 );
+        MavenProject project0 = getProjectWithDependencies(pom0);
+        MavenProject project1 = getProjectWithDependencies(pom1);
 
-        assertEquals( pom0Basedir, project1.getParent().getBasedir() );
+        assertEquals(pom0Basedir, project1.getParent().getBasedir());
         System.out.println("Project " + project1.getId() + " " + project1);
         Map map = project1.getArtifactMap();
         assertNotNull("No artifacts", map);
@@ -76,19 +71,24 @@ public class ProjectInheritanceTest
         Artifact b = (Artifact) map.get("maven-test:t10-b");
         Artifact c = (Artifact) map.get("maven-test:t10-c");
 
-        assertNotNull( a );
-        assertNotNull( b );
-        assertNotNull( c );
+        assertNotNull(a);
+        assertNotNull(b);
+        assertNotNull(c);
 
         // inherited from depMgmt
         System.out.println(a.getScope());
-        assertTrue("Incorrect scope for " + a.getDependencyConflictId(), a.getScope().equals("test"));
+        assertTrue(
+                "Incorrect scope for " + a.getDependencyConflictId(),
+                a.getScope().equals("test"));
 
         // transitive dep, overridden b depMgmt
-        assertTrue("Incorrect scope for " + b.getDependencyConflictId(), b.getScope().equals("runtime"));
+        assertTrue(
+                "Incorrect scope for " + b.getDependencyConflictId(),
+                b.getScope().equals("runtime"));
 
         // direct dep, overrides depMgmt
-        assertTrue("Incorrect scope for " + c.getDependencyConflictId(), c.getScope().equals("runtime"));
-
+        assertTrue(
+                "Incorrect scope for " + c.getDependencyConflictId(),
+                c.getScope().equals("runtime"));
     }
 }

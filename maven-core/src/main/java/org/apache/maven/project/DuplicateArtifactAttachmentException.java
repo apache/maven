@@ -1,5 +1,3 @@
-package org.apache.maven.project;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.project;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.project;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.project;
 
 import org.apache.maven.artifact.Artifact;
 
@@ -30,9 +29,7 @@ import org.apache.maven.artifact.Artifact;
  * TODO Make this a checked exception, and modify the API of MavenProjectHelper.
  * Currently, this modification would create compatibility problems for existing plugins.
  */
-public class DuplicateArtifactAttachmentException
-    extends RuntimeException
-{
+public class DuplicateArtifactAttachmentException extends RuntimeException {
 
     private static final String DEFAULT_MESSAGE = "Duplicate artifact attachment detected.";
 
@@ -40,25 +37,21 @@ public class DuplicateArtifactAttachmentException
 
     private final MavenProject project;
 
-    public DuplicateArtifactAttachmentException( MavenProject project, Artifact artifact )
-    {
-        super( constructMessage( project, artifact ) );
+    public DuplicateArtifactAttachmentException(MavenProject project, Artifact artifact) {
+        super(constructMessage(project, artifact));
         this.project = project;
         this.artifact = artifact;
     }
 
-    private static String constructMessage( MavenProject project, Artifact artifact )
-    {
+    private static String constructMessage(MavenProject project, Artifact artifact) {
         return DEFAULT_MESSAGE + " (project: " + project.getId() + "; illegal attachment: " + artifact.getId() + ")";
     }
 
-    public MavenProject getProject()
-    {
+    public MavenProject getProject() {
         return project;
     }
 
-    public Artifact getArtifact()
-    {
+    public Artifact getArtifact() {
         return artifact;
     }
 }

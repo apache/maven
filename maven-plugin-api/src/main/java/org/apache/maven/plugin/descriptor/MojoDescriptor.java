@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.descriptor;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.descriptor;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.descriptor;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.descriptor;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -38,10 +37,7 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
  * TODO is there a need for the delegation of MavenMojoDescriptor to this?
  * Why not just extend ComponentDescriptor here?
  */
-public class MojoDescriptor
-    extends ComponentDescriptor<Mojo>
-    implements Cloneable
-{
+public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneable {
     /** The Plexus component type */
     public static final String MAVEN_PLUGIN = "maven-plugin";
 
@@ -143,10 +139,9 @@ public class MojoDescriptor
     /**
      * Default constructor.
      */
-    public MojoDescriptor()
-    {
-        setInstantiationStrategy( DEFAULT_INSTANTIATION_STRATEGY );
-        setComponentFactory( DEFAULT_LANGUAGE );
+    public MojoDescriptor() {
+        setInstantiationStrategy(DEFAULT_INSTANTIATION_STRATEGY);
+        setComponentFactory(DEFAULT_LANGUAGE);
     }
 
     // ----------------------------------------------------------------------
@@ -156,40 +151,35 @@ public class MojoDescriptor
     /**
      * @return the language of this Mojo, i.e. <code>java</code>
      */
-    public String getLanguage()
-    {
+    public String getLanguage() {
         return getComponentFactory();
     }
 
     /**
      * @param language the new language
      */
-    public void setLanguage( String language )
-    {
-        setComponentFactory( language );
+    public void setLanguage(String language) {
+        setComponentFactory(language);
     }
 
     /**
      * @return Description with reason of a Mojo deprecation.
      */
-    public String getDeprecated()
-    {
+    public String getDeprecated() {
         return deprecated;
     }
 
     /**
      * @param deprecated Description with reason of a Mojo deprecation.
      */
-    public void setDeprecated( String deprecated )
-    {
+    public void setDeprecated(String deprecated) {
         this.deprecated = deprecated;
     }
 
     /**
      * @return the list of parameters
      */
-    public List<Parameter> getParameters()
-    {
+    public List<Parameter> getParameters() {
         return parameters;
     }
 
@@ -197,12 +187,9 @@ public class MojoDescriptor
      * @param parameters the new list of parameters
      * @throws DuplicateParameterException if any
      */
-    public void setParameters( List<Parameter> parameters )
-        throws DuplicateParameterException
-    {
-        for ( Parameter parameter : parameters )
-        {
-            addParameter( parameter );
+    public void setParameters(List<Parameter> parameters) throws DuplicateParameterException {
+        for (Parameter parameter : parameters) {
+            addParameter(parameter);
         }
     }
 
@@ -210,38 +197,30 @@ public class MojoDescriptor
      * @param parameter add a new parameter
      * @throws DuplicateParameterException if any
      */
-    public void addParameter( Parameter parameter )
-        throws DuplicateParameterException
-    {
-        if ( parameters != null && parameters.contains( parameter ) )
-        {
-            throw new DuplicateParameterException( parameter.getName()
-                + " has been declared multiple times in mojo with goal: " + getGoal() + " (implementation: "
-                + getImplementation() + ")" );
+    public void addParameter(Parameter parameter) throws DuplicateParameterException {
+        if (parameters != null && parameters.contains(parameter)) {
+            throw new DuplicateParameterException(parameter.getName()
+                    + " has been declared multiple times in mojo with goal: " + getGoal() + " (implementation: "
+                    + getImplementation() + ")");
         }
 
-        if ( parameters == null )
-        {
+        if (parameters == null) {
             parameters = new LinkedList<>();
         }
 
-        parameters.add( parameter );
+        parameters.add(parameter);
     }
 
     /**
      * @return the list parameters as a Map
      */
-    public Map<String, Parameter> getParameterMap()
-    {
-        if ( parameterMap == null )
-        {
+    public Map<String, Parameter> getParameterMap() {
+        if (parameterMap == null) {
             parameterMap = new HashMap<>();
 
-            if ( parameters != null )
-            {
-                for ( Parameter pd : parameters )
-                {
-                    parameterMap.put( pd.getName(), pd );
+            if (parameters != null) {
+                for (Parameter pd : parameters) {
+                    parameterMap.put(pd.getName(), pd);
                 }
             }
         }
@@ -256,13 +235,11 @@ public class MojoDescriptor
     /**
      * @param requiresDependencyResolution the new required dependencies in a specified scope
      */
-    public void setDependencyResolutionRequired( String requiresDependencyResolution )
-    {
+    public void setDependencyResolutionRequired(String requiresDependencyResolution) {
         this.dependencyResolutionRequired = requiresDependencyResolution;
     }
 
-    public String getDependencyResolutionRequired()
-    {
+    public String getDependencyResolutionRequired() {
         return dependencyResolutionRequired;
     }
 
@@ -271,16 +248,14 @@ public class MojoDescriptor
      * TODO the name is not intelligible
      */
     @Deprecated
-    public String isDependencyResolutionRequired()
-    {
+    public String isDependencyResolutionRequired() {
         return dependencyResolutionRequired;
     }
 
     /**
      * @since 3.0-alpha-3
      */
-    public void setDependencyCollectionRequired( String requiresDependencyCollection )
-    {
+    public void setDependencyCollectionRequired(String requiresDependencyCollection) {
         this.dependencyCollectionRequired = requiresDependencyCollection;
     }
 
@@ -294,8 +269,7 @@ public class MojoDescriptor
      * @return The scope of (transitive) dependencies that should be collected or {@code null} if none.
      * @since 3.0-alpha-3
      */
-    public String getDependencyCollectionRequired()
-    {
+    public String getDependencyCollectionRequired() {
         return dependencyCollectionRequired;
     }
 
@@ -307,16 +281,14 @@ public class MojoDescriptor
      * @param requiresProject <code>true</code> if the Mojo needs a Maven project to be executed, <code>false</code>
      * otherwise.
      */
-    public void setProjectRequired( boolean requiresProject )
-    {
+    public void setProjectRequired(boolean requiresProject) {
         this.projectRequired = requiresProject;
     }
 
     /**
      * @return <code>true</code> if the Mojo needs a Maven project to be executed, <code>false</code> otherwise.
      */
-    public boolean isProjectRequired()
-    {
+    public boolean isProjectRequired() {
         return projectRequired;
     }
 
@@ -327,8 +299,7 @@ public class MojoDescriptor
     /**
      * @param requiresOnline <code>true</code> if the Mojo is online, <code>false</code> otherwise.
      */
-    public void setOnlineRequired( boolean requiresOnline )
-    {
+    public void setOnlineRequired(boolean requiresOnline) {
         this.onlineRequired = requiresOnline;
     }
 
@@ -337,8 +308,7 @@ public class MojoDescriptor
      */
     // blech! this isn't even intelligible as a method name. provided for
     // consistency...
-    public boolean isOnlineRequired()
-    {
+    public boolean isOnlineRequired() {
         return onlineRequired;
     }
 
@@ -346,107 +316,93 @@ public class MojoDescriptor
      * @return <code>true</code> if the Mojo is online, <code>false</code> otherwise.
      */
     // more english-friendly method...keep the code clean! :)
-    public boolean requiresOnline()
-    {
+    public boolean requiresOnline() {
         return onlineRequired;
     }
 
     /**
      * @return the binded phase name of the Mojo
      */
-    public String getPhase()
-    {
+    public String getPhase() {
         return phase;
     }
 
     /**
      * @param phase the new binded phase name of the Mojo
      */
-    public void setPhase( String phase )
-    {
+    public void setPhase(String phase) {
         this.phase = phase;
     }
 
     /**
      * @return the version when the Mojo was added to the API
      */
-    public String getSince()
-    {
+    public String getSince() {
         return since;
     }
 
     /**
      * @param since the new version when the Mojo was added to the API
      */
-    public void setSince( String since )
-    {
+    public void setSince(String since) {
         this.since = since;
     }
 
     /**
      * @return The goal name of the Mojo
      */
-    public String getGoal()
-    {
+    public String getGoal() {
         return goal;
     }
 
     /**
      * @param goal The new goal name of the Mojo
      */
-    public void setGoal( String goal )
-    {
+    public void setGoal(String goal) {
         this.goal = goal;
     }
 
     /**
      * @return the invocation phase of the Mojo
      */
-    public String getExecutePhase()
-    {
+    public String getExecutePhase() {
         return executePhase;
     }
 
     /**
      * @param executePhase the new invocation phase of the Mojo
      */
-    public void setExecutePhase( String executePhase )
-    {
+    public void setExecutePhase(String executePhase) {
         this.executePhase = executePhase;
     }
 
     /**
      * @return <code>true</code> if the Mojo uses <code>always</code> for the <code>executionStrategy</code>
      */
-    public boolean alwaysExecute()
-    {
-        return MULTI_PASS_EXEC_STRATEGY.equals( executionStrategy );
+    public boolean alwaysExecute() {
+        return MULTI_PASS_EXEC_STRATEGY.equals(executionStrategy);
     }
 
     /**
      * @return the execution strategy
      */
-    public String getExecutionStrategy()
-    {
+    public String getExecutionStrategy() {
         return executionStrategy;
     }
 
     /**
      * @param executionStrategy the new execution strategy
      */
-    public void setExecutionStrategy( String executionStrategy )
-    {
+    public void setExecutionStrategy(String executionStrategy) {
         this.executionStrategy = executionStrategy;
     }
 
     /**
      * @return the mojo configuration
      */
-    public PlexusConfiguration getMojoConfiguration()
-    {
-        if ( mojoConfiguration == null )
-        {
-            mojoConfiguration = new XmlPlexusConfiguration( "configuration" );
+    public PlexusConfiguration getMojoConfiguration() {
+        if (mojoConfiguration == null) {
+            mojoConfiguration = new XmlPlexusConfiguration("configuration");
         }
         return mojoConfiguration;
     }
@@ -454,28 +410,24 @@ public class MojoDescriptor
     /**
      * @param mojoConfiguration a new mojo configuration
      */
-    public void setMojoConfiguration( PlexusConfiguration mojoConfiguration )
-    {
+    public void setMojoConfiguration(PlexusConfiguration mojoConfiguration) {
         this.mojoConfiguration = mojoConfiguration;
     }
 
     /** {@inheritDoc} */
-    public String getRole()
-    {
+    public String getRole() {
         return Mojo.ROLE;
     }
 
     /** {@inheritDoc} */
-    public String getRoleHint()
-    {
+    public String getRoleHint() {
         return getId();
     }
 
     /**
      * @return the id of the mojo, based on the goal name
      */
-    public String getId()
-    {
+    public String getId() {
         return getPluginDescriptor().getId() + ":" + getGoal();
     }
 
@@ -484,104 +436,87 @@ public class MojoDescriptor
      * @see PluginDescriptor#getGoalPrefix()
      * @see #getGoal()
      */
-    public String getFullGoalName()
-    {
+    public String getFullGoalName() {
         return getPluginDescriptor().getGoalPrefix() + ":" + getGoal();
     }
 
     /** {@inheritDoc} */
-    public String getComponentType()
-    {
+    public String getComponentType() {
         return MAVEN_PLUGIN;
     }
 
     /**
      * @return the plugin descriptor
      */
-    public PluginDescriptor getPluginDescriptor()
-    {
+    public PluginDescriptor getPluginDescriptor() {
         return pluginDescriptor;
     }
 
     /**
      * @param pluginDescriptor the new plugin descriptor
      */
-    public void setPluginDescriptor( PluginDescriptor pluginDescriptor )
-    {
+    public void setPluginDescriptor(PluginDescriptor pluginDescriptor) {
         this.pluginDescriptor = pluginDescriptor;
     }
 
     /**
      * @return <code>true</code> if the Mojo is inherited, <code>false</code> otherwise.
      */
-    public boolean isInheritedByDefault()
-    {
+    public boolean isInheritedByDefault() {
         return inheritedByDefault;
     }
 
     /**
      * @param inheritedByDefault <code>true</code> if the Mojo is inherited, <code>false</code> otherwise.
      */
-    public void setInheritedByDefault( boolean inheritedByDefault )
-    {
+    public void setInheritedByDefault(boolean inheritedByDefault) {
         this.inheritedByDefault = inheritedByDefault;
     }
 
     /** {@inheritDoc} */
-    public boolean equals( Object object )
-    {
-        if ( this == object )
-        {
+    public boolean equals(Object object) {
+        if (this == object) {
             return true;
         }
 
-        if ( object instanceof MojoDescriptor )
-        {
+        if (object instanceof MojoDescriptor) {
             MojoDescriptor other = (MojoDescriptor) object;
 
-            if ( !compareObjects( getPluginDescriptor(), other.getPluginDescriptor() ) )
-            {
+            if (!compareObjects(getPluginDescriptor(), other.getPluginDescriptor())) {
                 return false;
             }
 
-            return compareObjects( getGoal(), other.getGoal() );
-
+            return compareObjects(getGoal(), other.getGoal());
         }
 
         return false;
     }
 
-    private boolean compareObjects( Object first, Object second )
-    {
-        if ( first == second )
-        {
+    private boolean compareObjects(Object first, Object second) {
+        if (first == second) {
             return true;
         }
 
-        if ( first == null || second == null )
-        {
+        if (first == null || second == null) {
             return false;
         }
 
-        return first.equals( second );
+        return first.equals(second);
     }
 
     /** {@inheritDoc} */
-    public int hashCode()
-    {
+    public int hashCode() {
         int result = 1;
 
         String goal = getGoal();
 
-        if ( goal != null )
-        {
+        if (goal != null) {
             result += goal.hashCode();
         }
 
         PluginDescriptor pd = getPluginDescriptor();
 
-        if ( pd != null )
-        {
+        if (pd != null) {
             result -= pd.hashCode();
         }
 
@@ -591,16 +526,14 @@ public class MojoDescriptor
     /**
      * @return the invocation lifecycle of the Mojo
      */
-    public String getExecuteLifecycle()
-    {
+    public String getExecuteLifecycle() {
         return executeLifecycle;
     }
 
     /**
      * @param executeLifecycle the new invocation lifecycle of the Mojo
      */
-    public void setExecuteLifecycle( String executeLifecycle )
-    {
+    public void setExecuteLifecycle(String executeLifecycle) {
         this.executeLifecycle = executeLifecycle;
     }
 
@@ -608,8 +541,7 @@ public class MojoDescriptor
      * @param aggregator <code>true</code> if the Mojo uses the Maven project and its child modules,
      * <code>false</code> otherwise.
      */
-    public void setAggregator( boolean aggregator )
-    {
+    public void setAggregator(boolean aggregator) {
         this.aggregator = aggregator;
     }
 
@@ -617,16 +549,14 @@ public class MojoDescriptor
      * @return <code>true</code> if the Mojo uses the Maven project and its child modules,
      * <code>false</code> otherwise.
      */
-    public boolean isAggregator()
-    {
+    public boolean isAggregator() {
         return aggregator;
     }
 
     /**
      * @return <code>true</code> if the Mojo cannot be invoked directly, <code>false</code> otherwise.
      */
-    public boolean isDirectInvocationOnly()
-    {
+    public boolean isDirectInvocationOnly() {
         return directInvocationOnly;
     }
 
@@ -634,50 +564,43 @@ public class MojoDescriptor
      * @param directInvocationOnly <code>true</code> if the Mojo cannot be invoked directly,
      * <code>false</code> otherwise.
      */
-    public void setDirectInvocationOnly( boolean directInvocationOnly )
-    {
+    public void setDirectInvocationOnly(boolean directInvocationOnly) {
         this.directInvocationOnly = directInvocationOnly;
     }
 
     /**
      * @return <code>true</code> if the Mojo needs reports to run, <code>false</code> otherwise.
      */
-    public boolean isRequiresReports()
-    {
+    public boolean isRequiresReports() {
         return requiresReports;
     }
 
     /**
      * @param requiresReports <code>true</code> if the Mojo needs reports to run, <code>false</code> otherwise.
      */
-    public void setRequiresReports( boolean requiresReports )
-    {
+    public void setRequiresReports(boolean requiresReports) {
         this.requiresReports = requiresReports;
     }
 
     /**
      * @param executeGoal the new invocation goal of the Mojo
      */
-    public void setExecuteGoal( String executeGoal )
-    {
+    public void setExecuteGoal(String executeGoal) {
         this.executeGoal = executeGoal;
     }
 
     /**
      * @return the invocation goal of the Mojo
      */
-    public String getExecuteGoal()
-    {
+    public String getExecuteGoal() {
         return executeGoal;
     }
-
 
     /**
      * @return True if the <code>Mojo</code> is thread-safe and can be run safely in parallel
      * @since 3.0-beta-2
      */
-    public boolean isThreadSafe()
-    {
+    public boolean isThreadSafe() {
         return threadSafe;
     }
 
@@ -685,34 +608,27 @@ public class MojoDescriptor
      * @param threadSafe indicates that the mojo is thread-safe and can be run safely in parallel
      * @since 3.0-beta-2
      */
-    public void setThreadSafe( boolean threadSafe )
-    {
+    public void setThreadSafe(boolean threadSafe) {
         this.threadSafe = threadSafe;
     }
 
     /**
      * @return {@code true} if this mojo forks either a goal or the lifecycle, {@code false} otherwise.
      */
-    public boolean isForking()
-    {
-        return ( getExecuteGoal() != null && getExecuteGoal().length() > 0 )
-            || ( getExecutePhase() != null && getExecutePhase().length() > 0 );
+    public boolean isForking() {
+        return (getExecuteGoal() != null && getExecuteGoal().length() > 0)
+                || (getExecutePhase() != null && getExecutePhase().length() > 0);
     }
 
     /**
      * Creates a shallow copy of this mojo descriptor.
      */
     @Override
-    public MojoDescriptor clone()
-    {
-        try
-        {
+    public MojoDescriptor clone() {
+        try {
             return (MojoDescriptor) super.clone();
-        }
-        catch ( CloneNotSupportedException e )
-        {
-            throw new UnsupportedOperationException( e );
+        } catch (CloneNotSupportedException e) {
+            throw new UnsupportedOperationException(e);
         }
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository;
 
 import java.util.List;
 import java.util.Map;
@@ -32,8 +31,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  * @author Oleg Gusakov
  *
  */
-public class MetadataResolutionRequest
-{
+public class MetadataResolutionRequest {
     private MavenArtifactMetadata mad;
 
     private String scope;
@@ -60,49 +58,40 @@ public class MetadataResolutionRequest
     /** result type - graph */
     private boolean asGraph = false;
 
-    public MetadataResolutionRequest()
-    {
-    }
+    public MetadataResolutionRequest() {}
 
-    public MetadataResolutionRequest( MavenArtifactMetadata md, ArtifactRepository localRepository,
-                                      List<ArtifactRepository> remoteRepositories )
-    {
+    public MetadataResolutionRequest(
+            MavenArtifactMetadata md, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories) {
         this.mad = md;
         this.localRepository = localRepository;
         this.remoteRepositories = remoteRepositories;
     }
 
-    public MavenArtifactMetadata getArtifactMetadata()
-    {
+    public MavenArtifactMetadata getArtifactMetadata() {
         return mad;
     }
 
-    public MetadataResolutionRequest setArtifactMetadata( MavenArtifactMetadata md )
-    {
+    public MetadataResolutionRequest setArtifactMetadata(MavenArtifactMetadata md) {
         this.mad = md;
 
         return this;
     }
 
-    public MetadataResolutionRequest setArtifactDependencies( Set<Artifact> artifactDependencies )
-    {
+    public MetadataResolutionRequest setArtifactDependencies(Set<Artifact> artifactDependencies) {
         this.artifactDependencies = artifactDependencies;
 
         return this;
     }
 
-    public Set<Artifact> getArtifactDependencies()
-    {
+    public Set<Artifact> getArtifactDependencies() {
         return artifactDependencies;
     }
 
-    public ArtifactRepository getLocalRepository()
-    {
+    public ArtifactRepository getLocalRepository() {
         return localRepository;
     }
 
-    public MetadataResolutionRequest setLocalRepository( ArtifactRepository localRepository )
-    {
+    public MetadataResolutionRequest setLocalRepository(ArtifactRepository localRepository) {
         this.localRepository = localRepository;
 
         return this;
@@ -112,13 +101,11 @@ public class MetadataResolutionRequest
      * @deprecated instead use {@link #getRemoteRepositories()}
      */
     @Deprecated
-    public List<ArtifactRepository> getRemoteRepostories()
-    {
+    public List<ArtifactRepository> getRemoteRepostories() {
         return remoteRepositories;
     }
 
-    public List<ArtifactRepository> getRemoteRepositories()
-    {
+    public List<ArtifactRepository> getRemoteRepositories() {
         return getRemoteRepostories();
     }
 
@@ -126,95 +113,87 @@ public class MetadataResolutionRequest
      * @deprecated instead use {@link #setRemoteRepositories(List)}
      */
     @Deprecated
-    public MetadataResolutionRequest setRemoteRepostories( List<ArtifactRepository> remoteRepostories )
-    {
+    public MetadataResolutionRequest setRemoteRepostories(List<ArtifactRepository> remoteRepostories) {
         this.remoteRepositories = remoteRepostories;
 
         return this;
     }
 
-    public MetadataResolutionRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
-    {
-        return setRemoteRepostories( remoteRepositories );
+    public MetadataResolutionRequest setRemoteRepositories(List<ArtifactRepository> remoteRepositories) {
+        return setRemoteRepostories(remoteRepositories);
     }
 
-    public Map getManagedVersionMap()
-    {
+    public Map getManagedVersionMap() {
         return managedVersionMap;
     }
 
-    public MetadataResolutionRequest setManagedVersionMap( Map managedVersionMap )
-    {
+    public MetadataResolutionRequest setManagedVersionMap(Map managedVersionMap) {
         this.managedVersionMap = managedVersionMap;
 
         return this;
     }
 
-    public String toString()
-    {
+    public String toString() {
         StringBuilder sb = new StringBuilder()
-                .append( "REQUEST: " ).append(  "\n" )
-                .append( "artifact: " ).append( mad ).append(  "\n" )
-                .append( artifactDependencies ).append(  "\n" )
-                .append( "localRepository: " ).append(  localRepository ).append(  "\n" )
-                .append( "remoteRepositories: " ).append(  remoteRepositories ).append(  "\n" )
-                ;
+                .append("REQUEST: ")
+                .append("\n")
+                .append("artifact: ")
+                .append(mad)
+                .append("\n")
+                .append(artifactDependencies)
+                .append("\n")
+                .append("localRepository: ")
+                .append(localRepository)
+                .append("\n")
+                .append("remoteRepositories: ")
+                .append(remoteRepositories)
+                .append("\n");
 
         return sb.toString();
     }
 
-    public boolean isAsList()
-    {
+    public boolean isAsList() {
         return asList;
     }
 
-    public MetadataResolutionRequest setAsList( boolean asList )
-    {
+    public MetadataResolutionRequest setAsList(boolean asList) {
         this.asList = asList;
         return this;
     }
 
-    public boolean isAsDirtyTree()
-    {
+    public boolean isAsDirtyTree() {
         return asDirtyTree;
     }
 
-    public MetadataResolutionRequest setAsDirtyTree( boolean asDirtyTree )
-    {
+    public MetadataResolutionRequest setAsDirtyTree(boolean asDirtyTree) {
         this.asDirtyTree = asDirtyTree;
         return this;
     }
 
-    public boolean isAsResolvedTree()
-    {
+    public boolean isAsResolvedTree() {
         return asResolvedTree;
     }
 
-    public MetadataResolutionRequest setAsResolvedTree( boolean asResolvedTree )
-    {
+    public MetadataResolutionRequest setAsResolvedTree(boolean asResolvedTree) {
         this.asResolvedTree = asResolvedTree;
         return this;
     }
 
-    public boolean isAsGraph()
-    {
+    public boolean isAsGraph() {
         return asGraph;
     }
 
-    public MetadataResolutionRequest setAsGraph( boolean asGraph )
-    {
+    public MetadataResolutionRequest setAsGraph(boolean asGraph) {
         this.asGraph = asGraph;
         return this;
     }
 
-    public MetadataResolutionRequest setScope( String scope )
-    {
+    public MetadataResolutionRequest setScope(String scope) {
         this.scope = scope;
         return this;
     }
 
-    public String getScope()
-    {
+    public String getScope() {
         return scope;
     }
 }

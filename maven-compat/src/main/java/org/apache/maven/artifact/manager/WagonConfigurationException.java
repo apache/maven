@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.manager;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,21 +16,18 @@ package org.apache.maven.artifact.manager;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.manager;
 
 /**
  * @author Olivier Lamy
  */
 @Deprecated
-public class WagonConfigurationException
-    extends org.apache.maven.repository.legacy.WagonConfigurationException
-{
-    public WagonConfigurationException( String repositoryId, String message, Throwable cause )
-    {
-        super( repositoryId, message, cause );
+public class WagonConfigurationException extends org.apache.maven.repository.legacy.WagonConfigurationException {
+    public WagonConfigurationException(String repositoryId, String message, Throwable cause) {
+        super(repositoryId, message, cause);
     }
 
-    public WagonConfigurationException( String repositoryId, String message )
-    {
-        super( repositoryId, message );
+    public WagonConfigurationException(String repositoryId, String message) {
+        super(repositoryId, message);
     }
 }

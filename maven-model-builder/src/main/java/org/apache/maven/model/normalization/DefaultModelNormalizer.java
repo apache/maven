@@ -1,5 +1,3 @@
-package org.apache.maven.model.normalization;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,15 +16,16 @@ package org.apache.maven.model.normalization;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.model.normalization;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -44,35 +43,28 @@ import org.codehaus.plexus.util.StringUtils;
  */
 @Named
 @Singleton
-public class DefaultModelNormalizer
-    implements ModelNormalizer
-{
+public class DefaultModelNormalizer implements ModelNormalizer {
 
     private DuplicateMerger merger = new DuplicateMerger();
 
     @Override
-    public void mergeDuplicates( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
-    {
+    public void mergeDuplicates(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
         Build build = model.getBuild();
-        if ( build != null )
-        {
+        if (build != null) {
             List<Plugin> plugins = build.getPlugins();
-            Map<Object, Plugin> normalized = new LinkedHashMap<>( plugins.size() * 2 );
+            Map<Object, Plugin> normalized = new LinkedHashMap<>(plugins.size() * 2);
 
-            for ( Plugin plugin : plugins )
-            {
+            for (Plugin plugin : plugins) {
                 Object key = plugin.getKey();
-                Plugin first = normalized.get( key );
-                if ( first != null )
-                {
-                    merger.mergePlugin( plugin, first );
+                Plugin first = normalized.get(key);
+                if (first != null) {
+                    merger.mergePlugin(plugin, first);
                 }
-                normalized.put( key, plugin );
+                normalized.put(key, plugin);
             }
 
-            if ( plugins.size() != normalized.size() )
-            {
-                build.setPlugins( new ArrayList<>( normalized.values() ) );
+            if (plugins.size() != normalized.size()) {
+                build.setPlugins(new ArrayList<>(normalized.values()));
             }
         }
 
@@ -84,58 +76,45 @@ public class DefaultModelNormalizer
          * aftereffects and bogus error messages.
          */
         List<Dependency> dependencies = model.getDependencies();
-        Map<String, Dependency> normalized = new LinkedHashMap<>( dependencies.size() * 2 );
+        Map<String, Dependency> normalized = new LinkedHashMap<>(dependencies.size() * 2);
 
-        for ( Dependency dependency : dependencies )
-        {
-            normalized.put( dependency.getManagementKey(), dependency );
+        for (Dependency dependency : dependencies) {
+            normalized.put(dependency.getManagementKey(), dependency);
         }
 
-        if ( dependencies.size() != normalized.size() )
-        {
-            model.setDependencies( new ArrayList<>( normalized.values() ) );
+        if (dependencies.size() != normalized.size()) {
+            model.setDependencies(new ArrayList<>(normalized.values()));
         }
     }
 
     /**
      * DuplicateMerger
      */
-    protected static class DuplicateMerger
-        extends MavenModelMerger
-    {
+    protected static class DuplicateMerger extends MavenModelMerger {
 
-        public void mergePlugin( Plugin target, Plugin source )
-        {
-            super.mergePlugin( target, source, false, Collections.emptyMap() );
+        public void mergePlugin(Plugin target, Plugin source) {
+            super.mergePlugin(target, source, false, Collections.emptyMap());
         }
-
     }
 
     @Override
-    public void injectDefaultValues( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
-    {
-        injectDependencyDefaults( model.getDependencies() );
+    public void injectDefaultValues(Model model, ModelBuildingRequest request, ModelProblemCollector problems) {
+        injectDependencyDefaults(model.getDependencies());
 
         Build build = model.getBuild();
-        if ( build != null )
-        {
-            for ( Plugin plugin : build.getPlugins() )
-            {
-                injectDependencyDefaults( plugin.getDependencies() );
+        if (build != null) {
+            for (Plugin plugin : build.getPlugins()) {
+                injectDependencyDefaults(plugin.getDependencies());
             }
         }
     }
 
-    private void injectDependencyDefaults( List<Dependency> dependencies )
-    {
-        for ( Dependency dependency : dependencies )
-        {
-            if ( StringUtils.isEmpty( dependency.getScope() ) )
-            {
+    private void injectDependencyDefaults(List<Dependency> dependencies) {
+        for (Dependency dependency : dependencies) {
+            if (StringUtils.isEmpty(dependency.getScope())) {
                 // we cannot set this directly in the MDO due to the interactions with dependency management
-                dependency.setScope( "compile" );
+                dependency.setScope("compile");
             }
         }
     }
-
 }

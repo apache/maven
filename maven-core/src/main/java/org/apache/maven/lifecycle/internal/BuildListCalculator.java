@@ -1,5 +1,3 @@
-package org.apache.maven.lifecycle.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.lifecycle.internal;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,60 +16,51 @@ package org.apache.maven.lifecycle.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.lifecycle.internal;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
- * 
+ *
  * @since 3.0
  * @author Kristian Rosenvold
  */
-@Component( role = BuildListCalculator.class )
-public class BuildListCalculator
-{
-    public ProjectBuildList calculateProjectBuilds( MavenSession session, List<TaskSegment> taskSegments )
-    {
+@Component(role = BuildListCalculator.class)
+public class BuildListCalculator {
+    public ProjectBuildList calculateProjectBuilds(MavenSession session, List<TaskSegment> taskSegments) {
         List<ProjectSegment> projectBuilds = new ArrayList<>();
 
         MavenProject rootProject = session.getTopLevelProject();
 
-        for ( TaskSegment taskSegment : taskSegments )
-        {
+        for (TaskSegment taskSegment : taskSegments) {
             List<MavenProject> projects;
 
-            if ( taskSegment.isAggregating() )
-            {
-                projects = Collections.singletonList( rootProject );
-            }
-            else
-            {
+            if (taskSegment.isAggregating()) {
+                projects = Collections.singletonList(rootProject);
+            } else {
                 projects = session.getProjects();
             }
-            for ( MavenProject project : projects )
-            {
+            for (MavenProject project : projects) {
                 ClassLoader tccl = Thread.currentThread().getContextClassLoader();
                 MavenProject currentProject = session.getCurrentProject();
-                try
-                {
-                    BuilderCommon.attachToThread( project ); // Not totally sure if this is needed for anything
-                    session.setCurrentProject( project );
-                    projectBuilds.add( new ProjectSegment( project, taskSegment, session ) );
-                }
-                finally
-                {
-                    session.setCurrentProject( currentProject );
-                    Thread.currentThread().setContextClassLoader( tccl );
+                try {
+                    BuilderCommon.attachToThread(project); // Not totally sure if this is needed for anything
+                    session.setCurrentProject(project);
+                    projectBuilds.add(new ProjectSegment(project, taskSegment, session));
+                } finally {
+                    session.setCurrentProject(currentProject);
+                    Thread.currentThread().setContextClassLoader(tccl);
                 }
             }
         }
-        return new ProjectBuildList( projectBuilds );
+        return new ProjectBuildList(projectBuilds);
     }
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.rtinfo;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,14 @@ package org.apache.maven.rtinfo;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.rtinfo;
 
 /**
  * Provides information about the current Maven runtime.
  *
  * @since 3.0.2
  */
-public interface RuntimeInformation
-{
+public interface RuntimeInformation {
 
     /**
      * Retrieves the current Maven version, for example "3.0.2".
@@ -44,6 +42,5 @@ public interface RuntimeInformation
      * @throws IllegalArgumentException If the specified version range is {@code null}, empty or otherwise not a valid
      *             version specification.
      */
-    boolean isMavenVersion( String versionRange );
-
+    boolean isMavenVersion(String versionRange);
 }

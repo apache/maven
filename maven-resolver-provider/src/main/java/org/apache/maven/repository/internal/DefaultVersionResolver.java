@@ -1,5 +1,3 @@
-package org.apache.maven.repository.internal;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,22 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.repository.internal;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
@@ -51,29 +65,12 @@ import org.eclipse.aether.spi.locator.ServiceLocator;
 import org.eclipse.aether.spi.synccontext.SyncContextFactory;
 import org.eclipse.aether.util.ConfigUtils;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
 /**
  * @author Benjamin Bentmann
  */
 @Named
 @Singleton
-public class DefaultVersionResolver
-    implements VersionResolver, Service
-{
+public class DefaultVersionResolver implements VersionResolver, Service {
 
     private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
 
@@ -89,365 +86,314 @@ public class DefaultVersionResolver
 
     private RepositoryEventDispatcher repositoryEventDispatcher;
 
-    public DefaultVersionResolver()
-    {
+    public DefaultVersionResolver() {
         // enable no-arg constructor
     }
 
     @Inject
-    DefaultVersionResolver( MetadataResolver metadataResolver, SyncContextFactory syncContextFactory,
-                            RepositoryEventDispatcher repositoryEventDispatcher )
-    {
-        setMetadataResolver( metadataResolver );
-        setSyncContextFactory( syncContextFactory );
-        setRepositoryEventDispatcher( repositoryEventDispatcher );
+    DefaultVersionResolver(
+            MetadataResolver metadataResolver,
+            SyncContextFactory syncContextFactory,
+            RepositoryEventDispatcher repositoryEventDispatcher) {
+        setMetadataResolver(metadataResolver);
+        setSyncContextFactory(syncContextFactory);
+        setRepositoryEventDispatcher(repositoryEventDispatcher);
     }
 
-    public void initService( ServiceLocator locator )
-    {
-        setMetadataResolver( locator.getService( MetadataResolver.class ) );
-        setSyncContextFactory( locator.getService( SyncContextFactory.class ) );
-        setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
+    public void initService(ServiceLocator locator) {
+        setMetadataResolver(locator.getService(MetadataResolver.class));
+        setSyncContextFactory(locator.getService(SyncContextFactory.class));
+        setRepositoryEventDispatcher(locator.getService(RepositoryEventDispatcher.class));
     }
 
-    public DefaultVersionResolver setMetadataResolver( MetadataResolver metadataResolver )
-    {
-        this.metadataResolver = Objects.requireNonNull( metadataResolver, "metadataResolver cannot be null" );
+    public DefaultVersionResolver setMetadataResolver(MetadataResolver metadataResolver) {
+        this.metadataResolver = Objects.requireNonNull(metadataResolver, "metadataResolver cannot be null");
         return this;
     }
 
-    public DefaultVersionResolver setSyncContextFactory( SyncContextFactory syncContextFactory )
-    {
-        this.syncContextFactory = Objects.requireNonNull( syncContextFactory, "syncContextFactory cannot be null" );
+    public DefaultVersionResolver setSyncContextFactory(SyncContextFactory syncContextFactory) {
+        this.syncContextFactory = Objects.requireNonNull(syncContextFactory, "syncContextFactory cannot be null");
         return this;
     }
 
-    public DefaultVersionResolver setRepositoryEventDispatcher( RepositoryEventDispatcher repositoryEventDispatcher )
-    {
-        this.repositoryEventDispatcher = Objects.requireNonNull( repositoryEventDispatcher,
-            "repositoryEventDispatcher cannot be null" );
+    public DefaultVersionResolver setRepositoryEventDispatcher(RepositoryEventDispatcher repositoryEventDispatcher) {
+        this.repositoryEventDispatcher =
+                Objects.requireNonNull(repositoryEventDispatcher, "repositoryEventDispatcher cannot be null");
         return this;
     }
 
-    @SuppressWarnings( "checkstyle:methodlength" )
-    public VersionResult resolveVersion( RepositorySystemSession session, VersionRequest request )
-        throws VersionResolutionException
-    {
-        RequestTrace trace = RequestTrace.newChild( request.getTrace(), request );
+    @SuppressWarnings("checkstyle:methodlength")
+    public VersionResult resolveVersion(RepositorySystemSession session, VersionRequest request)
+            throws VersionResolutionException {
+        RequestTrace trace = RequestTrace.newChild(request.getTrace(), request);
 
         Artifact artifact = request.getArtifact();
 
         String version = artifact.getVersion();
 
-        VersionResult result = new VersionResult( request );
+        VersionResult result = new VersionResult(request);
 
         Key cacheKey = null;
         RepositoryCache cache = session.getCache();
-        if ( cache != null && !ConfigUtils.getBoolean( session, false, "aether.versionResolver.noCache" ) )
-        {
-            cacheKey = new Key( session, request );
+        if (cache != null && !ConfigUtils.getBoolean(session, false, "aether.versionResolver.noCache")) {
+            cacheKey = new Key(session, request);
 
-            Object obj = cache.get( session, cacheKey );
-            if ( obj instanceof Record )
-            {
+            Object obj = cache.get(session, cacheKey);
+            if (obj instanceof Record) {
                 Record record = (Record) obj;
-                result.setVersion( record.version );
+                result.setVersion(record.version);
                 result.setRepository(
-                    getRepository( session, request.getRepositories(), record.repoClass, record.repoId ) );
+                        getRepository(session, request.getRepositories(), record.repoClass, record.repoId));
                 return result;
             }
         }
 
         Metadata metadata;
 
-        if ( RELEASE.equals( version ) )
-        {
-            metadata = new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), MAVEN_METADATA_XML,
-                                            Metadata.Nature.RELEASE );
-        }
-        else if ( LATEST.equals( version ) )
-        {
-            metadata = new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), MAVEN_METADATA_XML,
-                                            Metadata.Nature.RELEASE_OR_SNAPSHOT );
-        }
-        else if ( version.endsWith( SNAPSHOT ) )
-        {
+        if (RELEASE.equals(version)) {
+            metadata = new DefaultMetadata(
+                    artifact.getGroupId(), artifact.getArtifactId(), MAVEN_METADATA_XML, Metadata.Nature.RELEASE);
+        } else if (LATEST.equals(version)) {
+            metadata = new DefaultMetadata(
+                    artifact.getGroupId(),
+                    artifact.getArtifactId(),
+                    MAVEN_METADATA_XML,
+                    Metadata.Nature.RELEASE_OR_SNAPSHOT);
+        } else if (version.endsWith(SNAPSHOT)) {
             WorkspaceReader workspace = session.getWorkspaceReader();
-            if ( workspace != null && workspace.findVersions( artifact ).contains( version ) )
-            {
+            if (workspace != null && workspace.findVersions(artifact).contains(version)) {
                 metadata = null;
-                result.setRepository( workspace.getRepository() );
+                result.setRepository(workspace.getRepository());
+            } else {
+                metadata = new DefaultMetadata(
+                        artifact.getGroupId(),
+                        artifact.getArtifactId(),
+                        version,
+                        MAVEN_METADATA_XML,
+                        Metadata.Nature.SNAPSHOT);
             }
-            else
-            {
-                metadata =
-                    new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), version, MAVEN_METADATA_XML,
-                                         Metadata.Nature.SNAPSHOT );
-            }
-        }
-        else
-        {
+        } else {
             metadata = null;
         }
 
-        if ( metadata == null )
-        {
-            result.setVersion( version );
-        }
-        else
-        {
-            List<MetadataRequest> metadataReqs = new ArrayList<>( request.getRepositories().size() );
+        if (metadata == null) {
+            result.setVersion(version);
+        } else {
+            List<MetadataRequest> metadataReqs =
+                    new ArrayList<>(request.getRepositories().size());
 
-            metadataReqs.add( new MetadataRequest( metadata, null, request.getRequestContext() ) );
+            metadataReqs.add(new MetadataRequest(metadata, null, request.getRequestContext()));
 
-            for ( RemoteRepository repository : request.getRepositories() )
-            {
+            for (RemoteRepository repository : request.getRepositories()) {
                 MetadataRequest metadataRequest =
-                    new MetadataRequest( metadata, repository, request.getRequestContext() );
-                metadataRequest.setDeleteLocalCopyIfMissing( true );
-                metadataRequest.setFavorLocalRepository( true );
-                metadataRequest.setTrace( trace );
-                metadataReqs.add( metadataRequest );
+                        new MetadataRequest(metadata, repository, request.getRequestContext());
+                metadataRequest.setDeleteLocalCopyIfMissing(true);
+                metadataRequest.setFavorLocalRepository(true);
+                metadataRequest.setTrace(trace);
+                metadataReqs.add(metadataRequest);
             }
 
-            List<MetadataResult> metadataResults = metadataResolver.resolveMetadata( session, metadataReqs );
+            List<MetadataResult> metadataResults = metadataResolver.resolveMetadata(session, metadataReqs);
 
             Map<String, VersionInfo> infos = new HashMap<>();
 
-            for ( MetadataResult metadataResult : metadataResults )
-            {
-                result.addException( metadataResult.getException() );
+            for (MetadataResult metadataResult : metadataResults) {
+                result.addException(metadataResult.getException());
 
                 ArtifactRepository repository = metadataResult.getRequest().getRepository();
-                if ( repository == null )
-                {
+                if (repository == null) {
                     repository = session.getLocalRepository();
                 }
 
-                Versioning v = readVersions( session, trace, metadataResult.getMetadata(), repository, result );
-                merge( artifact, infos, v, repository );
+                Versioning v = readVersions(session, trace, metadataResult.getMetadata(), repository, result);
+                merge(artifact, infos, v, repository);
             }
 
-            if ( RELEASE.equals( version ) )
-            {
-                resolve( result, infos, RELEASE );
-            }
-            else if ( LATEST.equals( version ) )
-            {
-                if ( !resolve( result, infos, LATEST ) )
-                {
-                    resolve( result, infos, RELEASE );
+            if (RELEASE.equals(version)) {
+                resolve(result, infos, RELEASE);
+            } else if (LATEST.equals(version)) {
+                if (!resolve(result, infos, LATEST)) {
+                    resolve(result, infos, RELEASE);
                 }
 
-                if ( result.getVersion() != null && result.getVersion().endsWith( SNAPSHOT ) )
-                {
+                if (result.getVersion() != null && result.getVersion().endsWith(SNAPSHOT)) {
                     VersionRequest subRequest = new VersionRequest();
-                    subRequest.setArtifact( artifact.setVersion( result.getVersion() ) );
-                    if ( result.getRepository() instanceof RemoteRepository )
-                    {
+                    subRequest.setArtifact(artifact.setVersion(result.getVersion()));
+                    if (result.getRepository() instanceof RemoteRepository) {
                         RemoteRepository r = (RemoteRepository) result.getRepository();
-                        subRequest.setRepositories( Collections.singletonList( r ) );
+                        subRequest.setRepositories(Collections.singletonList(r));
+                    } else {
+                        subRequest.setRepositories(request.getRepositories());
                     }
-                    else
-                    {
-                        subRequest.setRepositories( request.getRepositories() );
-                    }
-                    VersionResult subResult = resolveVersion( session, subRequest );
-                    result.setVersion( subResult.getVersion() );
-                    result.setRepository( subResult.getRepository() );
-                    for ( Exception exception : subResult.getExceptions() )
-                    {
-                        result.addException( exception );
+                    VersionResult subResult = resolveVersion(session, subRequest);
+                    result.setVersion(subResult.getVersion());
+                    result.setRepository(subResult.getRepository());
+                    for (Exception exception : subResult.getExceptions()) {
+                        result.addException(exception);
                     }
                 }
-            }
-            else
-            {
-                String key = SNAPSHOT + getKey( artifact.getClassifier(), artifact.getExtension() );
-                merge( infos, SNAPSHOT, key );
-                if ( !resolve( result, infos, key ) )
-                {
-                    result.setVersion( version );
+            } else {
+                String key = SNAPSHOT + getKey(artifact.getClassifier(), artifact.getExtension());
+                merge(infos, SNAPSHOT, key);
+                if (!resolve(result, infos, key)) {
+                    result.setVersion(version);
                 }
             }
 
-            if ( StringUtils.isEmpty( result.getVersion() ) )
-            {
-                throw new VersionResolutionException( result );
+            if (StringUtils.isEmpty(result.getVersion())) {
+                throw new VersionResolutionException(result);
             }
         }
 
-        if ( cacheKey != null && metadata != null && isSafelyCacheable( session, artifact ) )
-        {
-            cache.put( session, cacheKey, new Record( result.getVersion(), result.getRepository() ) );
+        if (cacheKey != null && metadata != null && isSafelyCacheable(session, artifact)) {
+            cache.put(session, cacheKey, new Record(result.getVersion(), result.getRepository()));
         }
 
         return result;
     }
 
-    private boolean resolve( VersionResult result, Map<String, VersionInfo> infos, String key )
-    {
-        VersionInfo info = infos.get( key );
-        if ( info != null )
-        {
-            result.setVersion( info.version );
-            result.setRepository( info.repository );
+    private boolean resolve(VersionResult result, Map<String, VersionInfo> infos, String key) {
+        VersionInfo info = infos.get(key);
+        if (info != null) {
+            result.setVersion(info.version);
+            result.setRepository(info.repository);
         }
         return info != null;
     }
 
-    private Versioning readVersions( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
-                                     ArtifactRepository repository, VersionResult result )
-    {
+    private Versioning readVersions(
+            RepositorySystemSession session,
+            RequestTrace trace,
+            Metadata metadata,
+            ArtifactRepository repository,
+            VersionResult result) {
         Versioning versioning = null;
-        try
-        {
-            if ( metadata != null )
-            {
-                try ( SyncContext syncContext = syncContextFactory.newInstance( session, true ) )
-                {
-                    syncContext.acquire( null, Collections.singleton( metadata ) );
+        try {
+            if (metadata != null) {
+                try (SyncContext syncContext = syncContextFactory.newInstance(session, true)) {
+                    syncContext.acquire(null, Collections.singleton(metadata));
 
-                    if ( metadata.getFile() != null && metadata.getFile().exists() )
-                    {
-                        try ( final InputStream in = new FileInputStream( metadata.getFile() ) )
-                        {
-                            versioning = new MetadataXpp3Reader().read( in, false ).getVersioning();
+                    if (metadata.getFile() != null && metadata.getFile().exists()) {
+                        try (InputStream in = new FileInputStream(metadata.getFile())) {
+                            versioning =
+                                    new MetadataXpp3Reader().read(in, false).getVersioning();
 
                             /*
                             NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata
                             of the local repository. This is especially troublesome during snapshot resolution so we try
                             to handle that gracefully.
                              */
-                            if ( versioning != null && repository instanceof LocalRepository
-                                     && versioning.getSnapshot() != null
-                                     && versioning.getSnapshot().getBuildNumber() > 0 )
-                            {
+                            if (versioning != null
+                                    && repository instanceof LocalRepository
+                                    && versioning.getSnapshot() != null
+                                    && versioning.getSnapshot().getBuildNumber() > 0) {
                                 final Versioning repaired = new Versioning();
-                                repaired.setLastUpdated( versioning.getLastUpdated() );
-                                repaired.setSnapshot( new Snapshot() );
-                                repaired.getSnapshot().setLocalCopy( true );
+                                repaired.setLastUpdated(versioning.getLastUpdated());
+                                repaired.setSnapshot(new Snapshot());
+                                repaired.getSnapshot().setLocalCopy(true);
                                 versioning = repaired;
-                                throw new IOException( "Snapshot information corrupted with remote repository data"
-                                                           + ", please verify that no remote repository uses the id '"
-                                                           + repository.getId() + "'" );
-
+                                throw new IOException("Snapshot information corrupted with remote repository data"
+                                        + ", please verify that no remote repository uses the id '"
+                                        + repository.getId() + "'");
                             }
                         }
                     }
                 }
             }
-        }
-        catch ( Exception e )
-        {
-            invalidMetadata( session, trace, metadata, repository, e );
-            result.addException( e );
+        } catch (Exception e) {
+            invalidMetadata(session, trace, metadata, repository, e);
+            result.addException(e);
         }
 
-        return ( versioning != null ) ? versioning : new Versioning();
+        return (versioning != null) ? versioning : new Versioning();
     }
 
-    private void invalidMetadata( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
-                                  ArtifactRepository repository, Exception exception )
-    {
-        RepositoryEvent.Builder event = new RepositoryEvent.Builder( session, EventType.METADATA_INVALID );
-        event.setTrace( trace );
-        event.setMetadata( metadata );
-        event.setException( exception );
-        event.setRepository( repository );
+    private void invalidMetadata(
+            RepositorySystemSession session,
+            RequestTrace trace,
+            Metadata metadata,
+            ArtifactRepository repository,
+            Exception exception) {
+        RepositoryEvent.Builder event = new RepositoryEvent.Builder(session, EventType.METADATA_INVALID);
+        event.setTrace(trace);
+        event.setMetadata(metadata);
+        event.setException(exception);
+        event.setRepository(repository);
 
-        repositoryEventDispatcher.dispatch( event.build() );
+        repositoryEventDispatcher.dispatch(event.build());
     }
 
-    private void merge( Artifact artifact, Map<String, VersionInfo> infos, Versioning versioning,
-                        ArtifactRepository repository )
-    {
-        if ( StringUtils.isNotEmpty( versioning.getRelease() ) )
-        {
-            merge( RELEASE, infos, versioning.getLastUpdated(), versioning.getRelease(), repository );
+    private void merge(
+            Artifact artifact, Map<String, VersionInfo> infos, Versioning versioning, ArtifactRepository repository) {
+        if (StringUtils.isNotEmpty(versioning.getRelease())) {
+            merge(RELEASE, infos, versioning.getLastUpdated(), versioning.getRelease(), repository);
         }
 
-        if ( StringUtils.isNotEmpty( versioning.getLatest() ) )
-        {
-            merge( LATEST, infos, versioning.getLastUpdated(), versioning.getLatest(), repository );
+        if (StringUtils.isNotEmpty(versioning.getLatest())) {
+            merge(LATEST, infos, versioning.getLastUpdated(), versioning.getLatest(), repository);
         }
 
-        for ( SnapshotVersion sv : versioning.getSnapshotVersions() )
-        {
-            if ( StringUtils.isNotEmpty( sv.getVersion() ) )
-            {
-                String key = getKey( sv.getClassifier(), sv.getExtension() );
-                merge( SNAPSHOT + key, infos, sv.getUpdated(), sv.getVersion(), repository );
+        for (SnapshotVersion sv : versioning.getSnapshotVersions()) {
+            if (StringUtils.isNotEmpty(sv.getVersion())) {
+                String key = getKey(sv.getClassifier(), sv.getExtension());
+                merge(SNAPSHOT + key, infos, sv.getUpdated(), sv.getVersion(), repository);
             }
         }
 
         Snapshot snapshot = versioning.getSnapshot();
-        if ( snapshot != null && versioning.getSnapshotVersions().isEmpty() )
-        {
+        if (snapshot != null && versioning.getSnapshotVersions().isEmpty()) {
             String version = artifact.getVersion();
-            if ( snapshot.getTimestamp() != null && snapshot.getBuildNumber() > 0 )
-            {
+            if (snapshot.getTimestamp() != null && snapshot.getBuildNumber() > 0) {
                 String qualifier = snapshot.getTimestamp() + '-' + snapshot.getBuildNumber();
-                version = version.substring( 0, version.length() - SNAPSHOT.length() ) + qualifier;
+                version = version.substring(0, version.length() - SNAPSHOT.length()) + qualifier;
             }
-            merge( SNAPSHOT, infos, versioning.getLastUpdated(), version, repository );
+            merge(SNAPSHOT, infos, versioning.getLastUpdated(), version, repository);
         }
     }
 
-    private void merge( String key, Map<String, VersionInfo> infos, String timestamp, String version,
-                        ArtifactRepository repository )
-    {
-        VersionInfo info = infos.get( key );
-        if ( info == null )
-        {
-            info = new VersionInfo( timestamp, version, repository );
-            infos.put( key, info );
-        }
-        else if ( info.isOutdated( timestamp ) )
-        {
+    private void merge(
+            String key,
+            Map<String, VersionInfo> infos,
+            String timestamp,
+            String version,
+            ArtifactRepository repository) {
+        VersionInfo info = infos.get(key);
+        if (info == null) {
+            info = new VersionInfo(timestamp, version, repository);
+            infos.put(key, info);
+        } else if (info.isOutdated(timestamp)) {
             info.version = version;
             info.repository = repository;
             info.timestamp = timestamp;
         }
     }
 
-    private void merge( Map<String, VersionInfo> infos, String srcKey, String dstKey )
-    {
-        VersionInfo srcInfo = infos.get( srcKey );
-        VersionInfo dstInfo = infos.get( dstKey );
+    private void merge(Map<String, VersionInfo> infos, String srcKey, String dstKey) {
+        VersionInfo srcInfo = infos.get(srcKey);
+        VersionInfo dstInfo = infos.get(dstKey);
 
-        if ( dstInfo == null || ( srcInfo != null && dstInfo.isOutdated( srcInfo.timestamp )
-            && srcInfo.repository != dstInfo.repository ) )
-        {
-            infos.put( dstKey, srcInfo );
+        if (dstInfo == null
+                || (srcInfo != null
+                        && dstInfo.isOutdated(srcInfo.timestamp)
+                        && srcInfo.repository != dstInfo.repository)) {
+            infos.put(dstKey, srcInfo);
         }
     }
 
-    private String getKey( String classifier, String extension )
-    {
-        return StringUtils.clean( classifier ) + ':' + StringUtils.clean( extension );
+    private String getKey(String classifier, String extension) {
+        return StringUtils.clean(classifier) + ':' + StringUtils.clean(extension);
     }
 
-    private ArtifactRepository getRepository( RepositorySystemSession session,
-                                              List<RemoteRepository> repositories, Class<?> repoClass,
-                                              String repoId )
-    {
-        if ( repoClass != null )
-        {
-            if ( WorkspaceRepository.class.isAssignableFrom( repoClass ) )
-            {
+    private ArtifactRepository getRepository(
+            RepositorySystemSession session, List<RemoteRepository> repositories, Class<?> repoClass, String repoId) {
+        if (repoClass != null) {
+            if (WorkspaceRepository.class.isAssignableFrom(repoClass)) {
                 return session.getWorkspaceReader().getRepository();
-            }
-            else if ( LocalRepository.class.isAssignableFrom( repoClass ) )
-            {
+            } else if (LocalRepository.class.isAssignableFrom(repoClass)) {
                 return session.getLocalRepository();
-            }
-            else
-            {
-                for ( RemoteRepository repository : repositories )
-                {
-                    if ( repoId.equals( repository.getId() ) )
-                    {
+            } else {
+                for (RemoteRepository repository : repositories) {
+                    if (repoId.equals(repository.getId())) {
                         return repository;
                     }
                 }
@@ -456,26 +402,23 @@ public class DefaultVersionResolver
         return null;
     }
 
-    private boolean isSafelyCacheable( RepositorySystemSession session, Artifact artifact )
-    {
+    private boolean isSafelyCacheable(RepositorySystemSession session, Artifact artifact) {
         /*
          * The workspace/reactor is in flux so we better not assume definitive information for any of its
          * artifacts/projects.
          */
 
         WorkspaceReader workspace = session.getWorkspaceReader();
-        if ( workspace == null )
-        {
+        if (workspace == null) {
             return true;
         }
 
-        Artifact pomArtifact = ArtifactDescriptorUtils.toPomArtifact( artifact );
+        Artifact pomArtifact = ArtifactDescriptorUtils.toPomArtifact(artifact);
 
-        return workspace.findArtifact( pomArtifact ) == null;
+        return workspace.findArtifact(pomArtifact) == null;
     }
 
-    private static class VersionInfo
-    {
+    private static class VersionInfo {
 
         String timestamp;
 
@@ -483,22 +426,18 @@ public class DefaultVersionResolver
 
         ArtifactRepository repository;
 
-        VersionInfo( String timestamp, String version, ArtifactRepository repository )
-        {
-            this.timestamp = ( timestamp != null ) ? timestamp : "";
+        VersionInfo(String timestamp, String version, ArtifactRepository repository) {
+            this.timestamp = (timestamp != null) ? timestamp : "";
             this.version = version;
             this.repository = repository;
         }
 
-        boolean isOutdated( String timestamp )
-        {
-            return timestamp != null && timestamp.compareTo( this.timestamp ) > 0;
+        boolean isOutdated(String timestamp) {
+            return timestamp != null && timestamp.compareTo(this.timestamp) > 0;
         }
-
     }
 
-    private static class Key
-    {
+    private static class Key {
 
         private final String groupId;
 
@@ -520,8 +459,7 @@ public class DefaultVersionResolver
 
         private final int hashCode;
 
-        Key( RepositorySystemSession session, VersionRequest request )
-        {
+        Key(RepositorySystemSession session, VersionRequest request) {
             Artifact artifact = request.getArtifact();
             groupId = artifact.getGroupId();
             artifactId = artifact.getArtifactId();
@@ -530,19 +468,15 @@ public class DefaultVersionResolver
             version = artifact.getVersion();
             localRepo = session.getLocalRepository().getBasedir();
             WorkspaceReader reader = session.getWorkspaceReader();
-            workspace = ( reader != null ) ? reader.getRepository() : null;
-            repositories = new ArrayList<>( request.getRepositories().size() );
+            workspace = (reader != null) ? reader.getRepository() : null;
+            repositories = new ArrayList<>(request.getRepositories().size());
             boolean repoMan = false;
-            for ( RemoteRepository repository : request.getRepositories() )
-            {
-                if ( repository.isRepositoryManager() )
-                {
+            for (RemoteRepository repository : request.getRepositories()) {
+                if (repository.isRepositoryManager()) {
                     repoMan = true;
-                    repositories.addAll( repository.getMirroredRepositories() );
-                }
-                else
-                {
-                    repositories.add( repository );
+                    repositories.addAll(repository.getMirroredRepositories());
+                } else {
+                    repositories.add(repository);
                 }
             }
             context = repoMan ? request.getRequestContext() : "";
@@ -559,54 +493,47 @@ public class DefaultVersionResolver
         }
 
         @Override
-        public boolean equals( Object obj )
-        {
-            if ( obj == this )
-            {
+        public boolean equals(Object obj) {
+            if (obj == this) {
                 return true;
-            }
-            else if ( obj == null || !getClass().equals( obj.getClass() ) )
-            {
+            } else if (obj == null || !getClass().equals(obj.getClass())) {
                 return false;
             }
 
             Key that = (Key) obj;
-            return artifactId.equals( that.artifactId ) && groupId.equals( that.groupId ) && classifier.equals(
-                that.classifier ) && extension.equals( that.extension ) && version.equals( that.version )
-                && context.equals( that.context ) && localRepo.equals( that.localRepo )
-                && Objects.equals( workspace, that.workspace ) && repositories.equals( that.repositories );
+            return artifactId.equals(that.artifactId)
+                    && groupId.equals(that.groupId)
+                    && classifier.equals(that.classifier)
+                    && extension.equals(that.extension)
+                    && version.equals(that.version)
+                    && context.equals(that.context)
+                    && localRepo.equals(that.localRepo)
+                    && Objects.equals(workspace, that.workspace)
+                    && repositories.equals(that.repositories);
         }
 
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             return hashCode;
         }
-
     }
 
-    private static class Record
-    {
+    private static class Record {
         final String version;
 
         final String repoId;
 
         final Class<?> repoClass;
 
-        Record( String version, ArtifactRepository repository )
-        {
+        Record(String version, ArtifactRepository repository) {
             this.version = version;
-            if ( repository != null )
-            {
+            if (repository != null) {
                 repoId = repository.getId();
                 repoClass = repository.getClass();
-            }
-            else
-            {
+            } else {
                 repoId = null;
                 repoClass = null;
             }
         }
     }
-
 }

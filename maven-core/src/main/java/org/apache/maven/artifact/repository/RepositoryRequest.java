@@ -1,5 +1,3 @@
-package org.apache.maven.artifact.repository;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.artifact.repository;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.artifact.repository;
 
 import java.util.List;
 
@@ -26,8 +25,7 @@ import java.util.List;
  *
  * @author Benjamin Bentmann
  */
-public interface RepositoryRequest
-{
+public interface RepositoryRequest {
 
     /**
      * Indicates whether network access to remote repositories has been disabled.
@@ -42,7 +40,7 @@ public interface RepositoryRequest
      * @param offline {@code true} to disable remote access, {@code false} to allow network access.
      * @return This request, never {@code null}.
      */
-    RepositoryRequest setOffline( boolean offline );
+    RepositoryRequest setOffline(boolean offline);
 
     /**
      * Indicates whether remote repositories should be re-checked for updated artifacts/metadata regardless of their
@@ -60,7 +58,7 @@ public interface RepositoryRequest
      *            false} to use the update policy configured on each repository.
      * @return This request, never {@code null}.
      */
-    RepositoryRequest setForceUpdate( boolean forceUpdate );
+    RepositoryRequest setForceUpdate(boolean forceUpdate);
 
     /**
      * Gets the local repository to use.
@@ -75,7 +73,7 @@ public interface RepositoryRequest
      * @param localRepository The local repository to use.
      * @return This request, never {@code null}.
      */
-    RepositoryRequest setLocalRepository( ArtifactRepository localRepository );
+    RepositoryRequest setLocalRepository(ArtifactRepository localRepository);
 
     /**
      * Gets the remote repositories to use.
@@ -90,6 +88,5 @@ public interface RepositoryRequest
      * @param remoteRepositories The remote repositories to use.
      * @return This request, never {@code null}.
      */
-    RepositoryRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories );
-
+    RepositoryRequest setRemoteRepositories(List<ArtifactRepository> remoteRepositories);
 }
