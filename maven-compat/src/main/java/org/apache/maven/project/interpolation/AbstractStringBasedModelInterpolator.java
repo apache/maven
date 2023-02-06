@@ -126,6 +126,7 @@ public abstract class AbstractStringBasedModelInterpolator
      *
      * @deprecated Use {@link ModelInterpolator#interpolate(Model, File, ProjectBuilderConfiguration, boolean)} instead.
      */
+    @Deprecated
     public Model interpolate( Model model, Map<String, ?> context, boolean strict )
         throws ModelInterpolationException
     {

@@ -40,12 +40,14 @@ public interface ModelInterpolator
     /**
      * @deprecated Use {@link ModelInterpolator#interpolate(Model, File, ProjectBuilderConfiguration, boolean)} instead.
      */
+    @Deprecated
     Model interpolate( Model project, Map<String, ?> context )
         throws ModelInterpolationException;
 
     /**
      * @deprecated Use {@link ModelInterpolator#interpolate(Model, File, ProjectBuilderConfiguration, boolean)} instead.
      */
+    @Deprecated
     Model interpolate( Model model, Map<String, ?> context, boolean strict )
         throws ModelInterpolationException;
 

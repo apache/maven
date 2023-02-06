@@ -85,6 +85,7 @@ public class ProjectBuildingException
     /**
      * @deprecated use {@link #getPomFile()}
      */
+    @Deprecated
     public String getPomLocation()
     {
         if ( getPomFile() != null )
