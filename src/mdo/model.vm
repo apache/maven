@@ -125,15 +125,7 @@ public class ${class.name}
     #end
     #if ( $locationTracking )
       #if ( ! $class.superClass )
-    /** Location of the xml element for this object. */
-    final InputLocation location;
-      #end
-      #foreach ( $field in $class.getFields($version) )
-    /** Location of the xml element for the field ${field.name}. */
-    final InputLocation ${field.name}Location;
-      #end
-      #if ( ! $class.superClass )
-    /** Other locations */
+    /** Locations */
     final Map<Object, InputLocation> locations;
       #end
     #end
@@ -155,13 +147,7 @@ public class ${class.name}
         $type $field.name${sep}
     #end
     #if ( $locationTracking )
-        Map<Object, InputLocation> locations,
-      #set ( $sep = "#if(${allFields.size()}>0),#end" )
-        InputLocation location${sep}
-      #foreach ( $field in $allFields )
-        #set ( $sep = "#if(${locationTracking}&&$field!=${allFields[${allFields.size()} - 1]}),#end" )
-        InputLocation ${field.name}Location${sep}
-      #end
+        Map<Object, InputLocation> locations
     #end
     )
     {
@@ -172,13 +158,7 @@ public class ${class.name}
             ${field.name}${sep}
       #end
       #if ( $locationTracking )
-            locations,
-        #set ( $sep = "#if(${inheritedFields.size()}>0),#end" )
-            location${sep}
-        #foreach ( $field in $inheritedFields )
-          #set ( $sep = "#if(${locationTracking}&&$field!=${inheritedFields[${inheritedFields.size()} - 1]}),#end" )
-            ${field.name}Location${sep}
-        #end
+            locations
       #end
         );
     #end
@@ -195,10 +175,6 @@ public class ${class.name}
     #if ( $locationTracking )
       #if ( ! $class.superClass )
         this.locations = ImmutableCollections.copy( locations );
-        this.location = location;
-      #end
-      #foreach ( $field in $class.getFields($version) )
-        this.${field.name}Location = ${field.name}Location;
       #end
     #end
     }
@@ -258,31 +234,13 @@ public class ${class.name}
     }
 
     #end
-    #if ( $locationTracking )
+    #if ( $locationTracking && !$class.superClass )
     /**
      * Gets the location of the specified field in the input source.
      */
     public InputLocation getLocation( Object key )
     {
-        if ( key instanceof String )
-        {
-            switch ( ( String ) key )
-            {
-      #if ( ! $class.superClass )
-                case "":
-                    return location;
-      #end
-      #foreach ( $field in $class.getFields($version) )
-                case "${field.name}":
-                    return ${field.name}Location;
-      #end
-            }
-        }
-      #if ( $class.superClass )
-        return super.getLocation( key );
-      #else
         return locations != null ? locations.get( key ) : null;
-      #end
     }
 
     #end
@@ -311,7 +269,7 @@ public class ${class.name}
     @Nonnull
     public ${class.name} with${cap}( $type $field.name )
     {
-        return with().${field.name}( $field.name ).build();
+        return newBuilder(this, true).${field.name}( $field.name ).build();
     }
     #end
 
@@ -454,6 +412,9 @@ public class ${class.name}
     #foreach ( $field in $class.getFields($version) )
                 this.${field.name} = base.${field.name};
     #end
+    #if ( $locationTracking )
+                this.locations = base.locations;
+    #end
             }
             else
             {
@@ -490,9 +451,9 @@ public class ${class.name}
         {
             if ( location != null )
             {
-                if ( this.locations == null )
+                if ( !(this.locations instanceof HashMap) )
                 {
-                    this.locations = new HashMap<>();
+                    this.locations = this.locations != null ? new HashMap<>( this.locations ) : new HashMap<>();
                 }
                 this.locations.put( key, location );
             }
@@ -520,10 +481,6 @@ public class ${class.name}
             if ( this.locations != null )
             {
                 locations = this.locations;
-                location = locations.remove( "" );
-      #foreach ( $field in $allFields )
-                ${field.name}Location = locations.remove( "${field.name}" );
-      #end
             }
     #end
             return new ${class.name}(
@@ -539,13 +496,7 @@ public class ${class.name}
       #end
     #end
     #if ( $locationTracking )
-                locations != null ? locations : ( base != null ? base.locations : null ),
-      #set ( $sep = "#if(${allFields.size()}>0),#end" )
-                location != null ? location : ( base != null ? base.location : null )${sep}
-      #foreach ( $field in $allFields )
-        #set ( $sep = "#if(${locationTracking}&&$field!=${allFields[${allFields.size()} - 1]}),#end" )
-                ${field.name}Location != null ? ${field.name}Location : ( base != null ? base.${field.name}Location : null )${sep}
-      #end
+                locations != null ? locations : ( base != null ? base.locations : null )
     #end
             );
         }
