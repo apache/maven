@@ -29,8 +29,108 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class XmlNodeImplTest {
+
+    @Test
+    public void testCombineChildrenAppend() throws Exception {
+        String lhs = "<configuration>\n"
+                + "    <gradleEnterprise>\n"
+                + "        <plugins>\n"
+                + "            <plugin>\n"
+                + "                <groupId>org.apache.maven.plugins</groupId>\n"
+                + "                <artifactId>maven-compiler-plugin</artifactId>\n"
+                + "            </plugin>\n"
+                + "            <plugin>\n"
+                + "                <groupId>org.apache.maven.plugins</groupId>\n"
+                + "                <artifactId>maven-surefire-plugin</artifactId>\n"
+                + "                <inputs>\n"
+                + "                    <properties combine.children=\"append\">\n"
+                + "                        <property>\n"
+                + "                            <name>childAdditionalProperty</name>\n"
+                + "                            <value>child-additionalProperty</value>\n"
+                + "                        </property>\n"
+                + "                    </properties>\n"
+                + "                </inputs>\n"
+                + "            </plugin>\n"
+                + "        </plugins>\n"
+                + "    </gradleEnterprise>\n"
+                + "</configuration>";
+
+        String rhs = "<configuration>\n"
+                + "    <gradleEnterprise>\n"
+                + "        <plugins>\n"
+                + "            <plugin>\n"
+                + "                <groupId>org.apache.maven.plugins</groupId>\n"
+                + "                <artifactId>maven-compiler-plugin</artifactId>\n"
+                + "                <executions>\n"
+                + "                    <execution>\n"
+                + "                        <id>default-compile</id>\n"
+                + "                        <outputs>\n"
+                + "                            <notCacheableBecause>something</notCacheableBecause>\n"
+                + "                        </outputs>\n"
+                + "                    </execution>\n"
+                + "                </executions>\n"
+                + "            </plugin>\n"
+                + "            <plugin>\n"
+                + "                <groupId>org.apache.maven.plugins</groupId>\n"
+                + "                <artifactId>maven-surefire-plugin</artifactId>\n"
+                + "                <inputs>\n"
+                + "                    <properties>\n"
+                + "                        <property>\n"
+                + "                            <name>additionalProperty</name>\n"
+                + "                            <value>parent-additionalProperty</value>\n"
+                + "                        </property>\n"
+                + "                    </properties>\n"
+                + "                </inputs>\n"
+                + "            </plugin>\n"
+                + "        </plugins>\n"
+                + "    </gradleEnterprise>\n"
+                + "</configuration>\n";
+
+        String result = "<configuration>\n"
+                + "  <gradleEnterprise>\n"
+                + "    <plugins>\n"
+                + "      <plugin>\n"
+                + "        <groupId>org.apache.maven.plugins</groupId>\n"
+                + "        <artifactId>maven-compiler-plugin</artifactId>\n"
+                + "        <executions>\n"
+                + "          <execution>\n"
+                + "            <id>default-compile</id>\n"
+                + "            <outputs>\n"
+                + "              <notCacheableBecause>something</notCacheableBecause>\n"
+                + "            </outputs>\n"
+                + "          </execution>\n"
+                + "        </executions>\n"
+                + "      </plugin>\n"
+                + "      <plugin>\n"
+                + "        <groupId>org.apache.maven.plugins</groupId>\n"
+                + "        <artifactId>maven-surefire-plugin</artifactId>\n"
+                + "        <inputs>\n"
+                + "          <properties combine.children=\"append\">\n"
+                + "            <property>\n"
+                + "              <name>additionalProperty</name>\n"
+                + "              <value>parent-additionalProperty</value>\n"
+                + "            </property>\n"
+                + "            <property>\n"
+                + "              <name>childAdditionalProperty</name>\n"
+                + "              <value>child-additionalProperty</value>\n"
+                + "            </property>\n"
+                + "          </properties>\n"
+                + "        </inputs>\n"
+                + "      </plugin>\n"
+                + "    </plugins>\n"
+                + "  </gradleEnterprise>\n"
+                + "</configuration>";
+
+        XmlNode leftDom = toXmlNode(lhs);
+        XmlNode rightDom = toXmlNode(rhs);
+
+        XmlNode mergeResult = leftDom.merge(rightDom);
+
+        assertEquals(toXmlNode(result), mergeResult);
+    }
 
     /**
      * <p>testCombineId.</p>
@@ -160,7 +260,7 @@ public class XmlNodeImplTest {
         XmlNodeImpl rightDom = XmlNodeBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
         XmlNode mergeResult = XmlNodeImpl.merge(leftDom, rightDom, true);
-        assertEquals(null, mergeResult.getValue());
+        assertNull(mergeResult.getValue());
     }
 
     private static List<XmlNode> getChildren(XmlNode node, String name) {
@@ -173,6 +273,15 @@ public class XmlNodeImplTest {
                 .skip(nth)
                 .findFirst()
                 .orElse(null);
+    }
+
+    private static XmlNode toXmlNode(String xml) throws XmlPullParserException, IOException {
+        return toXmlNode(xml, null);
+    }
+
+    private static XmlNode toXmlNode(String xml, XmlNodeBuilder.InputLocationBuilder locationBuilder)
+            throws XmlPullParserException, IOException {
+        return XmlNodeBuilder.build(new StringReader(xml), locationBuilder);
     }
 
     private static class FixedInputLocationBuilder implements XmlNodeBuilder.InputLocationBuilder {
