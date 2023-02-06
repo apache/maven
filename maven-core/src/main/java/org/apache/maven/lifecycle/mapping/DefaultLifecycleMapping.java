@@ -36,6 +36,7 @@ public class DefaultLifecycleMapping implements LifecycleMapping {
     private Map<String, Lifecycle> lifecycleMap;
 
     /** @deprecated use lifecycles instead */
+    @Deprecated
     private Map<String, LifecyclePhase> phases;
 
     /**

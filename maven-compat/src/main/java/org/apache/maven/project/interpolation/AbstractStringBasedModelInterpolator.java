@@ -117,6 +117,7 @@ public abstract class AbstractStringBasedModelInterpolator extends AbstractLogEn
      *
      * @deprecated Use {@link ModelInterpolator#interpolate(Model, File, ProjectBuilderConfiguration, boolean)} instead.
      */
+    @Deprecated
     public Model interpolate(Model model, Map<String, ?> context, boolean strict) throws ModelInterpolationException {
         Properties props = new Properties();
         props.putAll(context);

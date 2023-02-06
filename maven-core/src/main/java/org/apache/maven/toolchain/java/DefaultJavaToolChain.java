@@ -29,6 +29,7 @@ import org.codehaus.plexus.logging.Logger;
  * @deprecated clients that do not require compatibility with Maven 3.2.3 and earlier should link to
  *             {@link JavaToolchainImpl} instead.
  */
+@Deprecated
 public class DefaultJavaToolChain extends JavaToolchainImpl {
     public static final String KEY_JAVAHOME = JavaToolchainImpl.KEY_JAVAHOME;
 

@@ -77,6 +77,7 @@ public class ProjectBuildingException extends Exception {
     /**
      * @deprecated use {@link #getPomFile()}
      */
+    @Deprecated
     public String getPomLocation() {
         if (getPomFile() != null) {
             return getPomFile().getAbsolutePath();
