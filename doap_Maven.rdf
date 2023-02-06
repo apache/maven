@@ -66,6 +66,17 @@ under the License.
     <release>
       <Version>
         <name>Latest stable release</name>
+        <created>2023-01-31</created>
+        <revision>3.9.0</revision>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.9.0/source/apache-maven-3.9.0-src.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.9.0/source/apache-maven-3.9.0-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 3.8.7</name>
         <created>2022-12-24</created>
         <revision>3.8.7</revision>
         <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.7/binaries/apache-maven-3.8.7-bin.zip</file-release>
