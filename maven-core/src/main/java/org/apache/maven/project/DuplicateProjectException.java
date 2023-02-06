@@ -35,6 +35,7 @@ public class DuplicateProjectException extends Exception {
     /**
      * @deprecated use {@link #DuplicateProjectException(String, File, File, String)}
      */
+    @Deprecated
     public DuplicateProjectException(String message) {
         this(null, null, null, message);
     }
@@ -42,6 +43,7 @@ public class DuplicateProjectException extends Exception {
     /**
      * @deprecated use {@link #DuplicateProjectException(String, File, File, String)}
      */
+    @Deprecated
     public DuplicateProjectException(String message, Exception e) {
         super(message, e);
         this.projectId = null;
