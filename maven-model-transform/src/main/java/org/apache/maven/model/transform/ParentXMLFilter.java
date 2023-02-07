@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 
 import org.apache.maven.model.transform.pull.NodeBufferingParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
@@ -46,6 +47,8 @@ class ParentXMLFilter extends NodeBufferingParser {
     private final Function<Path, Optional<RelativeProject>> relativePathMapper;
 
     private final Path projectPath;
+
+    private static final Pattern S_FILTER = Pattern.compile("\\s+");
 
     /**
      * @param relativePathMapper
@@ -73,7 +76,7 @@ class ParentXMLFilter extends NodeBufferingParser {
                 hasVersion |= "version".equals(tagName);
                 hasRelativePath |= "relativePath".equals(tagName);
             } else if (event.event == TEXT) {
-                if (event.text.matches("\\s+")) {
+                if (S_FILTER.matcher(event.text).matches()) {
                     if (whitespaceAfterParentStart.isEmpty()) {
                         whitespaceAfterParentStart = event.text;
                     }

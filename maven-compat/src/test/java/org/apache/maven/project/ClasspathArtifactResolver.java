@@ -22,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -59,8 +60,8 @@ public class ClasspathArtifactResolver implements ArtifactResolver {
                     artifact = artifact.setFile(ProjectClasspathTest.getFileForClasspathResource(
                             ProjectClasspathTest.dir + "transitive-" + scope + "-dep.xml"));
                     result.setArtifact(artifact);
-                } catch (FileNotFoundException e) {
-                    throw new IllegalStateException("Missing test POM for " + artifact);
+                } catch (FileNotFoundException | URISyntaxException e) {
+                    throw new IllegalStateException("Missing test POM for " + artifact, e);
                 }
             } else {
                 result.addException(new ArtifactNotFoundException(artifact, null));

@@ -163,11 +163,7 @@ public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpression
             }
 
             // Was not an expression
-            if (expression.contains("$$")) {
-                return expression.replaceAll("\\$\\$", "\\$");
-            } else {
-                return expression;
-            }
+            return expression.replace("$$", "$");
         }
 
         if ("localRepository".equals(expression)) {

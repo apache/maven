@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -48,6 +49,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 public class PluginDescriptor extends ComponentSetDescriptor implements Cloneable {
 
     private static final String LIFECYCLE_DESCRIPTOR = "META-INF/maven/lifecycle.xml";
+
+    private static final Pattern PATTERN_FILTER_1 = Pattern.compile("-?(maven|plugin)-?");
 
     private String groupId;
 
@@ -166,7 +169,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
         if ("maven-plugin-plugin".equals(artifactId)) {
             return "plugin";
         } else {
-            return artifactId.replaceAll("-?maven-?", "").replaceAll("-?plugin-?", "");
+            return PATTERN_FILTER_1.matcher(artifactId).replaceAll("");
         }
     }
 

@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Profile;
@@ -42,11 +43,10 @@ import org.codehaus.plexus.util.StringUtils;
 @Singleton
 public class DefaultSettingsValidator implements SettingsValidator {
 
-    private static final String ID_REGEX = "[A-Za-z0-9_\\-.]+";
+    private static final String ID = "[\\w.-]+";
+    private static final Pattern ID_REGEX = Pattern.compile(ID);
 
-    private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
-
-    private static final String ILLEGAL_REPO_ID_CHARS = ILLEGAL_FS_CHARS;
+    private static final String ILLEGAL_REPO_ID_CHARS = "\\/:\"<>|?*"; // ILLEGAL_FS_CHARS
 
     @Override
     public void validate(Settings settings, SettingsProblemCollector problems) {
@@ -63,13 +63,13 @@ public class DefaultSettingsValidator implements SettingsValidator {
                 if (StringUtils.isBlank(pluginGroup)) {
                     addViolation(
                             problems, Severity.ERROR, "pluginGroups.pluginGroup[" + i + "]", null, "must not be empty");
-                } else if (!pluginGroup.matches(ID_REGEX)) {
+                } else if (!ID_REGEX.matcher(pluginGroup).matches()) {
                     addViolation(
                             problems,
                             Severity.ERROR,
                             "pluginGroups.pluginGroup[" + i + "]",
                             null,
-                            "must denote a valid group id and match the pattern " + ID_REGEX);
+                            "must denote a valid group id and match the pattern " + ID);
                 }
             }
         }

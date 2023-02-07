@@ -160,11 +160,7 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
             }
 
             // Was not an expression
-            if (expression.contains("$$")) {
-                return expression.replaceAll("\\$\\$", "\\$");
-            } else {
-                return expression;
-            }
+            return expression.replace("$$", "$");
         }
 
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
