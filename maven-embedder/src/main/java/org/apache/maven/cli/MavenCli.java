@@ -169,6 +169,8 @@ public class MavenCli {
 
     private CLIManager cliManager;
 
+    private static final Pattern NEXT_LINE = Pattern.compile("\r?\n");
+
     public MavenCli() {
         this(null);
     }
@@ -932,7 +934,7 @@ public class MavenCli {
             }
         }
 
-        String[] lines = msg.split("(\r\n)|(\r)|(\n)");
+        String[] lines = NEXT_LINE.split(msg);
         String currentColor = "";
 
         for (int i = 0; i < lines.length; i++) {
