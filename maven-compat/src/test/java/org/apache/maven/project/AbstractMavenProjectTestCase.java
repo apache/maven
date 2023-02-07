@@ -90,7 +90,7 @@ public abstract class AbstractMavenProjectTestCase {
             throw new FileNotFoundException("Unable to find: " + resource);
         }
 
-        return new File(URI.create(resourceUrl.toString().replaceAll(" ", "%20")));
+        return new File(URI.create(resourceUrl.toString().replace(" ", "%20")));
     }
 
     protected ArtifactRepository getLocalRepository() throws Exception {

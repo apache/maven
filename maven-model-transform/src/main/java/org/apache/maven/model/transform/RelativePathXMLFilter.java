@@ -19,6 +19,7 @@
 package org.apache.maven.model.transform;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.maven.model.transform.pull.NodeBufferingParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
@@ -32,6 +33,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
  */
 public class RelativePathXMLFilter extends NodeBufferingParser {
 
+    private static final Pattern S_FILTER = Pattern.compile("\\s+");
+
     public RelativePathXMLFilter(XmlPullParser xmlPullParser) {
         super(xmlPullParser, "parent");
     }
@@ -42,7 +45,9 @@ public class RelativePathXMLFilter extends NodeBufferingParser {
         for (Event event : buffer) {
             if (event.event == START_TAG && "relativePath".equals(event.name)) {
                 skip = true;
-                if (prev != null && prev.event == TEXT && prev.text.matches("\\s+")) {
+                if (prev != null
+                        && prev.event == TEXT
+                        && S_FILTER.matcher(prev.text).matches()) {
                     prev = null;
                 }
                 event = null;

@@ -20,6 +20,7 @@ package org.apache.maven.model.transform;
 
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
 
 import org.apache.maven.model.transform.pull.NodeBufferingParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
@@ -33,6 +34,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
  */
 public class ReactorDependencyXMLFilter extends NodeBufferingParser {
     private final BiFunction<String, String, String> reactorVersionMapper;
+
+    private static final Pattern S_FILTER = Pattern.compile("\\s+");
 
     public ReactorDependencyXMLFilter(
             XmlPullParser xmlPullParser, BiFunction<String, String, String> reactorVersionMapper) {
@@ -53,7 +56,7 @@ public class ReactorDependencyXMLFilter extends NodeBufferingParser {
                 tagName = event.name;
                 hasVersion |= "version".equals(tagName);
             } else if (event.event == TEXT) {
-                if (event.text.matches("\\s+")) {
+                if (S_FILTER.matcher(event.text).matches()) {
                     if (dependencyWhitespace.isEmpty()) {
                         dependencyWhitespace = event.text;
                     }
