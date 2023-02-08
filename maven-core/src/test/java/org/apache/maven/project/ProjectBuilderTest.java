@@ -174,7 +174,7 @@ public class ProjectBuilderTest
             // modify parent
             File parent = new File( tempDir.toFile(), "pom.xml" );
             String parentContent = FileUtils.fileRead( parent );
-            parentContent = parentContent.replaceAll( "<packaging>pom</packaging>",
+            parentContent = parentContent.replace( "<packaging>pom</packaging>",
                     "<packaging>pom</packaging><properties><addedProperty>addedValue</addedProperty></properties>" );
             FileUtils.fileWrite( parent, "UTF-8", parentContent );
             // re-build pom with modified parent

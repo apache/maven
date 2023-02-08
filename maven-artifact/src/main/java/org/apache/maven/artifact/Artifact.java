@@ -46,7 +46,7 @@ public interface Artifact
 
     String SNAPSHOT_VERSION = "SNAPSHOT";
 
-    Pattern VERSION_FILE_PATTERN = Pattern.compile( "^(.*)-([0-9]{8}\\.[0-9]{6})-([0-9]+)$" );
+    Pattern VERSION_FILE_PATTERN = Pattern.compile( "^(.*)-(\\d{8}\\.\\d{6})-(\\d+)$" );
 
     // TODO into artifactScope handler
 
