@@ -68,7 +68,7 @@ import org.codehaus.plexus.util.StringUtils;
 @Singleton
 public class DefaultModelValidator implements ModelValidator {
 
-    private static final Pattern EXPRESSION_NAME_PATTERN = Pattern.compile("\\$\\{(.+?)\\}");
+    private static final Pattern EXPRESSION_NAME_PATTERN = Pattern.compile("\\$\\{(.+?)}");
 
     private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
 
@@ -1244,7 +1244,7 @@ public class DefaultModelValidator implements ModelValidator {
             return true;
         }
 
-        Matcher m = EXPRESSION_NAME_PATTERN.matcher(string.trim());
+        Matcher m = CI_FRIENDLY_EXPRESSION.matcher(string.trim());
         while (m.find()) {
             String property = m.group(1);
             if (!versionProcessor.isValidProperty(property)) {
