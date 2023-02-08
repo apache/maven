@@ -88,6 +88,9 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 
     private ModelCacheFactory modelCacheFactory;
 
+    private final ArtifactDescriptorReaderDelegate artifactDescriptorReaderDelegate =
+            new ArtifactDescriptorReaderDelegate();
+
     public DefaultArtifactDescriptorReader() {
         // enable no-arg constructor
     }
@@ -173,7 +176,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                     (ArtifactDescriptorReaderDelegate) config.get(ArtifactDescriptorReaderDelegate.class.getName());
 
             if (delegate == null) {
-                delegate = new ArtifactDescriptorReaderDelegate();
+                delegate = artifactDescriptorReaderDelegate;
             }
 
             delegate.populateResult(session, result, model);
