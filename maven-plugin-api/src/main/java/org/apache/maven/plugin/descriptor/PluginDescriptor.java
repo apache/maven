@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * @author Jason van Zyl
@@ -52,6 +53,8 @@ public class PluginDescriptor
 {
 
     private static final String LIFECYCLE_DESCRIPTOR = "META-INF/maven/lifecycle.xml";
+
+    private static final Pattern PATTERN_FILTER_1 = Pattern.compile("-?(maven|plugin)-?");
 
     private String groupId;
 
@@ -186,7 +189,7 @@ public class PluginDescriptor
         }
         else
         {
-            return artifactId.replaceAll( "-?maven-?", "" ).replaceAll( "-?plugin-?", "" );
+            return PATTERN_FILTER_1.matcher(artifactId).replaceAll("");
         }
     }
 
