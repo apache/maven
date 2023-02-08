@@ -44,7 +44,7 @@ import org.apache.maven.model.profile.ProfileActivationContext;
 @Singleton
 public class JdkVersionProfileActivator implements ProfileActivator {
 
-    private static final Pattern FILTER_1 = Pattern.compile("[^0-9._-]");
+    private static final Pattern FILTER_1 = Pattern.compile("[^\\d._-]");
     private static final Pattern FILTER_2 = Pattern.compile("[._-]");
     private static final Pattern FILTER_3 = Pattern.compile("\\."); // used for split now
 
