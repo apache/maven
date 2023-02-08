@@ -39,7 +39,7 @@ import static org.apache.maven.internal.impl.Utils.nonNull;
 @Singleton
 public class DefaultVersionParser implements VersionParser {
     private static final String SNAPSHOT = "SNAPSHOT";
-    private static final Pattern SNAPSHOT_TIMESTAMP = Pattern.compile("^(.*-)?([0-9]{8}\\.[0-9]{6}-[0-9]+)$");
+    private static final Pattern SNAPSHOT_TIMESTAMP = Pattern.compile("^(.*-)?(\\d{8}\\.\\d{6}-\\d+)$");
 
     @Override
     public Version parseVersion(String version) {
