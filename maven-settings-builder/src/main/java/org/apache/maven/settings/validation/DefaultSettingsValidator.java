@@ -22,6 +22,7 @@ package org.apache.maven.settings.validation;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -45,7 +46,8 @@ public class DefaultSettingsValidator
     implements SettingsValidator
 {
 
-    private static final String ID_REGEX = "[A-Za-z0-9_\\-.]+";
+    private static final String ID = "[\\w.-]+";
+    private static final Pattern ID_REGEX = Pattern.compile( ID );
 
     private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
 
@@ -72,10 +74,10 @@ public class DefaultSettingsValidator
                     addViolation( problems, Severity.ERROR, "pluginGroups.pluginGroup[" + i + "]", null,
                                   "must not be empty" );
                 }
-                else if ( !pluginGroup.matches( ID_REGEX ) )
+                 else if ( !ID_REGEX.matcher( pluginGroup ).matches() )
                 {
                     addViolation( problems, Severity.ERROR, "pluginGroups.pluginGroup[" + i + "]", null,
-                                  "must denote a valid group id and match the pattern " + ID_REGEX );
+                                  "must denote a valid group id and match the pattern " + ID );
                 }
             }
         }

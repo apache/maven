@@ -22,7 +22,7 @@ package org.apache.maven.model.profile.activation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
+import java.util.regex.Pattern;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -45,6 +45,10 @@ import org.apache.maven.model.profile.ProfileActivationContext;
 public class JdkVersionProfileActivator
     implements ProfileActivator
 {
+
+    private static final Pattern FILTER_1 = Pattern.compile( "[^0-9._-]" );
+    private static final Pattern FILTER_2 = Pattern.compile( "[._-]" );
+    private static final Pattern FILTER_3 = Pattern.compile( "\\." ); // used for split now
 
     @Override
     public boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
@@ -130,10 +134,10 @@ public class JdkVersionProfileActivator
             return isLeft ? 1 : -1;
         }
 
-        value = value.replaceAll( "[^0-9\\.\\-\\_]", "" );
+        value = FILTER_1.matcher( value ).replaceAll( "" );
 
-        List<String> valueTokens = new ArrayList<>( Arrays.asList( value.split( "[\\.\\-\\_]" ) ) );
-        List<String> rangeValueTokens = new ArrayList<>( Arrays.asList( rangeValue.value.split( "\\." ) ) );
+        List<String> valueTokens = new ArrayList<>( Arrays.asList( FILTER_2.split( value ) ) );
+        List<String> rangeValueTokens = new ArrayList<>( Arrays.asList( FILTER_3.split( rangeValue.value ) ) );
 
         addZeroTokens( valueTokens, 3 );
         addZeroTokens( rangeValueTokens, 3 );

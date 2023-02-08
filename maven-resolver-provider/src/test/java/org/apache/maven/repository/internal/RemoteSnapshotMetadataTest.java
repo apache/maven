@@ -28,6 +28,7 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -38,6 +39,8 @@ import org.junit.Test;
 public class RemoteSnapshotMetadataTest
 {
     private Locale defaultLocale;
+
+    private static final Pattern DATE_FILTER = Pattern.compile( "\\..*" );
 
     @Before
     public void setLocaleToUseBuddhistCalendar()
@@ -72,7 +75,7 @@ public class RemoteSnapshotMetadataTest
         String dateAfter = gregorianDate();
 
         String ts = metadata.metadata.getVersioning().getSnapshot().getTimestamp();
-        String datePart = ts.replaceAll( "\\..*", "" );
+        String datePart = DATE_FILTER.matcher( ts ).replaceAll( "" );
 
         /* Allow for this test running across midnight */
         Set<String> expected = new HashSet<String>( Arrays.asList( dateBefore, dateAfter ) );
