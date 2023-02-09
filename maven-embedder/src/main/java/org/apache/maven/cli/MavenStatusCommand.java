@@ -61,7 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MavenStatusCommand {
-    private static final Logger logger = LoggerFactory.getLogger(MavenStatusCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MavenStatusCommand.class);
 
     /**
      * In order to verify artifacts can be downloaded from the remote repositories we want to resolve an actual
@@ -122,7 +122,7 @@ public class MavenStatusCommand {
                         .map(Path::toFile)
                         .forEach(File::delete);
             } catch (IOException ioe) {
-                logger.debug("Failed to delete temporary local repository", ioe);
+                LOGGER.debug("Failed to delete temporary local repository", ioe);
             }
         }
     }
@@ -133,8 +133,8 @@ public class MavenStatusCommand {
             request.setLocalRepositoryPath(tempLocalRepository.toString());
             request.setLocalRepository(repositorySystem.createLocalRepository(request, tempLocalRepository.toFile()));
         } catch (Exception ex) {
-            logger.debug("Could not create temporary local repository", ex);
-            logger.warn("Artifact resolution test is less accurate as it may use earlier resolution results.");
+            LOGGER.debug("Could not create temporary local repository", ex);
+            LOGGER.warn("Artifact resolution test is less accurate as it may use earlier resolution results.");
         }
     }
 
@@ -170,14 +170,14 @@ public class MavenStatusCommand {
             resolverResult
                     .getArtifacts()
                     .forEach((key, value) ->
-                            logger.debug("Successfully resolved {} to {}", key.toString(), value.toString()));
+                            LOGGER.debug("Successfully resolved {} to {}", key.toString(), value.toString()));
 
             return Collections.emptyList();
         } catch (ArtifactResolverException are) {
             return extractIssuesFromArtifactResolverException(are);
         } finally {
             sessionScope.exit();
-            logger.info("Artifact resolution check completed");
+            LOGGER.info("Artifact resolution check completed");
         }
     }
 
@@ -211,7 +211,7 @@ public class MavenStatusCommand {
             issues.add(String.format("No write permissions on local repository %s.", localRepositoryPath));
         }
 
-        logger.info("Local repository setup check completed");
+        LOGGER.info("Local repository setup check completed");
         return issues;
     }
 }
