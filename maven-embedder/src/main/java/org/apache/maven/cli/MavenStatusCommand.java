@@ -19,6 +19,7 @@
 package org.apache.maven.cli;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,6 +27,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -67,6 +69,8 @@ public class MavenStatusCommand {
     public static final Artifact APACHE_MAVEN_ARTIFACT =
             new DefaultArtifact("org.apache.maven", "apache-maven", null, "pom", "3.8.6");
 
+    private String tempLocalRepository;
+
     private final MavenExecutionRequestPopulator mavenExecutionRequestPopulator;
     private final ArtifactResolver artifactResolver;
     private final RemoteRepositoryConnectionVerifier remoteRepositoryConnectionVerifier;
@@ -104,18 +108,33 @@ public class MavenStatusCommand {
                 verifyRemoteRepositoryConnections(cliRequest.getRemoteRepositories(), mavenExecutionRequest);
         final List<String> artifactResolutionIssues = verifyArtifactResolution(mavenExecutionRequest);
 
+        cleanupTempFiles();
+
         // Collect all issues into a single list
         return Stream.of(localRepositoryIssues, remoteRepositoryIssues, artifactResolutionIssues)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
 
+    private void cleanupTempFiles() {
+        if (tempLocalRepository != null) {
+            try {
+                Files.walk(new File(tempLocalRepository).toPath())
+                        .sorted(Comparator.reverseOrder()) // Sort in reverse order so that directories are deleted last
+                        .map(Path::toFile)
+                        .forEach(File::delete);
+            } catch (IOException ioe) {
+                logger.debug("Failed to delete temporary local repository", ioe);
+            }
+        }
+    }
+
     private void setTemporaryLocalRepositoryPathOnRequest(MavenExecutionRequest request) {
         try {
-            final String path =
+            tempLocalRepository =
                     Files.createTempDirectory("mvn-status").toAbsolutePath().toString();
-            request.setLocalRepositoryPath(path);
-            request.setLocalRepository(repositorySystem.createLocalRepository(request, new File(path)));
+            request.setLocalRepositoryPath(tempLocalRepository);
+            request.setLocalRepository(repositorySystem.createLocalRepository(request, new File(tempLocalRepository)));
         } catch (Exception ex) {
             logger.debug("Could not create temporary local repository", ex);
             logger.warn("Artifact resolution test is less accurate as it may use earlier resolution results.");
