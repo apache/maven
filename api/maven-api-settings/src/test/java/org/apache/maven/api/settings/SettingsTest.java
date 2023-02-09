@@ -30,12 +30,12 @@ public class SettingsTest {
         Settings s = Settings.newInstance();
 
         s = s.withLocalRepository("xxx");
-        assertEquals("xxx", s.getLocalRepository()); // OK
+        assertEquals("xxx", s.getLocalRepository());
 
         s = s.withLocalRepository("yyy");
-        assertEquals("yyy", s.getLocalRepository()); // OK
+        assertEquals("yyy", s.getLocalRepository());
 
         s = s.withLocalRepository(null);
-        assertNull(s.getLocalRepository()); // FAIL
+        assertNull(s.getLocalRepository());
     }
 }
