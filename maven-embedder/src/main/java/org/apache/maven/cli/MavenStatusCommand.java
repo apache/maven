@@ -61,6 +61,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MavenStatusCommand {
+    private static final Logger logger = LoggerFactory.getLogger(MavenStatusCommand.class);
+
     /**
      * In order to verify artifacts can be downloaded from the remote repositories we want to resolve an actual
      * artifact. The Apache Maven artifact was chosen as it eventually, be it by proxy, mirror or directly, will be
@@ -77,7 +79,6 @@ public class MavenStatusCommand {
     private final DefaultSessionFactory defaultSessionFactory;
     private final DefaultRepositorySystemSessionFactory repoSession;
     private final MavenRepositorySystem repositorySystem;
-    private final Logger logger;
     private final PlexusContainer container;
     private final SessionScope sessionScope;
 
@@ -85,7 +86,6 @@ public class MavenStatusCommand {
         this.container = container;
         this.remoteRepositoryConnectionVerifier = new RemoteRepositoryConnectionVerifier(container);
         mavenExecutionRequestPopulator = container.lookup(MavenExecutionRequestPopulator.class);
-        logger = LoggerFactory.getILoggerFactory().getLogger(MavenStatusCommand.class.getName());
         artifactResolver = container.lookup(ArtifactResolver.class);
         defaultSessionFactory = container.lookup(DefaultSessionFactory.class);
         repoSession = container.lookup(DefaultRepositorySystemSessionFactory.class);
