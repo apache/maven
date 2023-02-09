@@ -117,7 +117,7 @@ public class MavenStatusCommand {
 
     private void cleanupTempFiles() {
         if (tempLocalRepository != null) {
-            try (final Stream<Path> files = Files.walk(tempLocalRepository)) {
+            try (Stream<Path> files = Files.walk(tempLocalRepository)) {
                 files.sorted(Comparator.reverseOrder()) // Sort in reverse order so that directories are deleted last
                         .map(Path::toFile)
                         .forEach(File::delete);
