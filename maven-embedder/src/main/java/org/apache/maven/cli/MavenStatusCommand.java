@@ -79,7 +79,7 @@ public class MavenStatusCommand {
     private final MavenRepositorySystem repositorySystem;
     private final PlexusContainer container;
     private final SessionScope sessionScope;
-    private String tempLocalRepository;
+    private Path tempLocalRepository;
 
     public MavenStatusCommand(final PlexusContainer container) throws ComponentLookupException {
         this.container = container;
@@ -117,7 +117,7 @@ public class MavenStatusCommand {
 
     private void cleanupTempFiles() {
         if (tempLocalRepository != null) {
-            try(Stream<Path> files = Files.walk(new File(tempLocalRepository).toPath())) {
+            try (final Stream<Path> files = Files.walk(tempLocalRepository)) {
                 files.sorted(Comparator.reverseOrder()) // Sort in reverse order so that directories are deleted last
                         .map(Path::toFile)
                         .forEach(File::delete);
@@ -129,10 +129,9 @@ public class MavenStatusCommand {
 
     private void setTemporaryLocalRepositoryPathOnRequest(final MavenExecutionRequest request) {
         try {
-            tempLocalRepository =
-                    Files.createTempDirectory("mvn-status").toAbsolutePath().toString();
-            request.setLocalRepositoryPath(tempLocalRepository);
-            request.setLocalRepository(repositorySystem.createLocalRepository(request, new File(tempLocalRepository)));
+            tempLocalRepository = Files.createTempDirectory("mvn-status").toAbsolutePath();
+            request.setLocalRepositoryPath(tempLocalRepository.toString());
+            request.setLocalRepository(repositorySystem.createLocalRepository(request, tempLocalRepository.toFile()));
         } catch (Exception ex) {
             logger.debug("Could not create temporary local repository", ex);
             logger.warn("Artifact resolution test is less accurate as it may use earlier resolution results.");
