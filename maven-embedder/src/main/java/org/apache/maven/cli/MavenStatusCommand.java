@@ -214,6 +214,7 @@ public class MavenStatusCommand {
             issues.add(String.format("No write permissions on local repository %s.", localRepositoryPath));
         }
 
+        logger.info("Local repository setup check completed");
         return issues;
     }
 }
