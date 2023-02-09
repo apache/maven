@@ -85,12 +85,12 @@ public class MavenStatusCommand {
     public MavenStatusCommand(final PlexusContainer container) throws ComponentLookupException {
         this.container = container;
         this.remoteRepositoryConnectionVerifier = new RemoteRepositoryConnectionVerifier(container);
-        mavenExecutionRequestPopulator = container.lookup(MavenExecutionRequestPopulator.class);
-        artifactResolver = container.lookup(ArtifactResolver.class);
-        defaultSessionFactory = container.lookup(DefaultSessionFactory.class);
-        repoSession = container.lookup(DefaultRepositorySystemSessionFactory.class);
-        sessionScope = container.lookup(SessionScope.class);
-        repositorySystem = container.lookup(MavenRepositorySystem.class);
+        this.mavenExecutionRequestPopulator = container.lookup(MavenExecutionRequestPopulator.class);
+        this.artifactResolver = container.lookup(ArtifactResolver.class);
+        this.defaultSessionFactory = container.lookup(DefaultSessionFactory.class);
+        this.repoSession = container.lookup(DefaultRepositorySystemSessionFactory.class);
+        this.sessionScope = container.lookup(SessionScope.class);
+        this.repositorySystem = container.lookup(MavenRepositorySystem.class);
     }
 
     public List<String> verify(MavenExecutionRequest cliRequest) throws MavenExecutionRequestPopulationException {
