@@ -203,15 +203,15 @@ public class MavenStatusCommand {
         final List<String> issues = new ArrayList<>();
 
         if (!Files.isDirectory(localRepositoryPath)) {
-            issues.add("Local repository is not a directory.");
+            issues.add(String.format("Local repository path %s is not a directory.", localRepositoryPath));
         }
 
         if (!Files.isReadable(localRepositoryPath)) {
-            issues.add("No read permissions on local repository.");
+            issues.add(String.format("No read permissions on local repository %s.", localRepositoryPath));
         }
 
         if (!Files.isWritable(localRepositoryPath)) {
-            issues.add("No write permissions on local repository.");
+            issues.add(String.format("No write permissions on local repository %s.", localRepositoryPath));
         }
 
         return issues;
