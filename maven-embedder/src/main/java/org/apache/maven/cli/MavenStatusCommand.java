@@ -92,7 +92,7 @@ public class MavenStatusCommand {
         this.repositorySystem = container.lookup(MavenRepositorySystem.class);
     }
 
-    public List<String> verify(MavenExecutionRequest cliRequest) throws MavenExecutionRequestPopulationException {
+    public List<String> verify(final MavenExecutionRequest cliRequest) throws MavenExecutionRequestPopulationException {
         final MavenExecutionRequest mavenExecutionRequest = mavenExecutionRequestPopulator.populateDefaults(cliRequest);
 
         final ArtifactRepository localRepository = cliRequest.getLocalRepository();
@@ -127,7 +127,7 @@ public class MavenStatusCommand {
         }
     }
 
-    private void setTemporaryLocalRepositoryPathOnRequest(MavenExecutionRequest request) {
+    private void setTemporaryLocalRepositoryPathOnRequest(final MavenExecutionRequest request) {
         try {
             tempLocalRepository =
                     Files.createTempDirectory("mvn-status").toAbsolutePath().toString();
