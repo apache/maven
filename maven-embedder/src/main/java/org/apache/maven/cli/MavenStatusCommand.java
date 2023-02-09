@@ -71,8 +71,6 @@ public class MavenStatusCommand {
     public static final Artifact APACHE_MAVEN_ARTIFACT =
             new DefaultArtifact("org.apache.maven", "apache-maven", null, "pom", "3.8.6");
 
-    private String tempLocalRepository;
-
     private final MavenExecutionRequestPopulator mavenExecutionRequestPopulator;
     private final ArtifactResolver artifactResolver;
     private final RemoteRepositoryConnectionVerifier remoteRepositoryConnectionVerifier;
@@ -81,6 +79,7 @@ public class MavenStatusCommand {
     private final MavenRepositorySystem repositorySystem;
     private final PlexusContainer container;
     private final SessionScope sessionScope;
+    private String tempLocalRepository;
 
     public MavenStatusCommand(final PlexusContainer container) throws ComponentLookupException {
         this.container = container;
