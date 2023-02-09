@@ -100,7 +100,7 @@ public class MavenStatusCommand {
         final List<String> localRepositoryIssues =
                 verifyLocalRepository(Paths.get(URI.create(localRepository.getUrl())));
 
-        // We overwrite the local repository with a temporary folder to avoid using a cached version of the artifact.
+        // We overwrite the local repository with a temporary directory to avoid using a cached version of the artifact.
         setTemporaryLocalRepositoryPathOnRequest(cliRequest);
 
         final List<String> remoteRepositoryIssues =
@@ -169,8 +169,7 @@ public class MavenStatusCommand {
 
             resolverResult
                     .getArtifacts()
-                    .forEach((key, value) ->
-                            LOGGER.debug("Successfully resolved {} to {}", key.toString(), value.toString()));
+                    .forEach((key, value) -> LOGGER.debug("Successfully resolved {} to {}", key, value));
 
             return Collections.emptyList();
         } catch (ArtifactResolverException are) {
@@ -200,15 +199,15 @@ public class MavenStatusCommand {
         final List<String> issues = new ArrayList<>();
 
         if (!Files.isDirectory(localRepositoryPath)) {
-            issues.add(String.format("Local repository path %s is not a directory.", localRepositoryPath));
+            issues.add(String.format("Local repository path '%s' is not a directory.", localRepositoryPath));
         }
 
         if (!Files.isReadable(localRepositoryPath)) {
-            issues.add(String.format("No read permissions on local repository %s.", localRepositoryPath));
+            issues.add(String.format("No read permissions on local repository '%s'.", localRepositoryPath));
         }
 
         if (!Files.isWritable(localRepositoryPath)) {
-            issues.add(String.format("No write permissions on local repository %s.", localRepositoryPath));
+            issues.add(String.format("No write permissions on local repository '%s'.", localRepositoryPath));
         }
 
         LOGGER.info("Local repository setup check completed");

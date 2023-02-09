@@ -75,13 +75,16 @@ public class RemoteRepositoryConnectionVerifier {
             final Optional<String> maybeIssue = verifyConnectionUsingTransport(transporter, repository, artifactPath);
 
             if (!maybeIssue.isPresent()) {
-                logger.info("Connection check for {} [{}] completed", repository.getId(), repository.getUrl());
+                logger.info(
+                        "Connection check for repository '{}' at '{}' completed",
+                        repository.getId(),
+                        repository.getUrl());
             }
 
             return maybeIssue;
         } catch (final NoTransporterException nte) {
             final String message = String.format(
-                    "There is no compatible transport for remote repository %s with location %s",
+                    "There is no compatible transport for remote repository '%s' with location '%s'",
                     repository.getId(), repository.getUrl());
             return Optional.of(message);
         }
