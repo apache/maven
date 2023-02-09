@@ -409,7 +409,7 @@ public class MavenCli {
         slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
         if (cliRequest.commandLine.hasOption(CLIManager.INSTALLATION_STATUS)) {
             MavenStatusCommand mavenStatusCommand = new MavenStatusCommand(plexusContainer);
-            final List<String> mavenStatusIssues = mavenStatusCommand.verify(cliRequest);
+            final List<String> mavenStatusIssues = mavenStatusCommand.verify(cliRequest.getRequest());
             if (!mavenStatusIssues.isEmpty()) {
                 for (String issue : mavenStatusIssues) {
                     slf4jLogger.error(issue);
@@ -1241,9 +1241,7 @@ public class MavenCli {
         performProjectActivation(commandLine, request.getProjectActivation());
         performProfileActivation(commandLine, request.getProfileActivation());
 
-        // TODO: With --status we download to a newly created temp directory to ensure the artifact is not available,
-        // TODO: but we then validate that temp directory and not the actual artifact directory
-        final String localRepositoryPath = determineLocalRepositoryPath(cliRequest);
+        final String localRepositoryPath = determineLocalRepositoryPath(request);
         if (localRepositoryPath != null) {
             request.setLocalRepositoryPath(localRepositoryPath);
         }
@@ -1274,21 +1272,10 @@ public class MavenCli {
         return request;
     }
 
-    private String determineLocalRepositoryPath(final CliRequest cliRequest) {
-        final MavenExecutionRequest request = cliRequest.getRequest();
-        if (cliRequest.commandLine.hasOption(CLIManager.INSTALLATION_STATUS)) {
-            try {
-                return Files.createTempDirectory("mvn-status").toAbsolutePath().toString();
-            } catch (IOException ioe) {
-                final Logger logger = slf4jLoggerFactory.getLogger(getClass().getName());
-                logger.debug("Could not create temporary local repository", ioe);
-                logger.warn("Artifact resolution test is less accurate as it may user earlier resolution results.");
-            }
-        } else {
-            String userDefinedLocalRepo = request.getUserProperties().getProperty(MavenCli.LOCAL_REPO_PROPERTY);
-            if (userDefinedLocalRepo != null) {
-                return userDefinedLocalRepo;
-            }
+    private String determineLocalRepositoryPath(final MavenExecutionRequest request) {
+        String userDefinedLocalRepo = request.getUserProperties().getProperty(MavenCli.LOCAL_REPO_PROPERTY);
+        if (userDefinedLocalRepo != null) {
+            return userDefinedLocalRepo;
         }
 
         // TODO Investigate why this can also be a Java system property and not just a Maven user property like

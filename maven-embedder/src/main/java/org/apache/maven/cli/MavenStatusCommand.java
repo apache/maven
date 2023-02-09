@@ -18,6 +18,7 @@
  */
 package org.apache.maven.cli;
 
+import java.io.File;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,10 +36,11 @@ import org.apache.maven.api.services.ArtifactResolver;
 import org.apache.maven.api.services.ArtifactResolverException;
 import org.apache.maven.api.services.ArtifactResolverResult;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
+import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.internal.impl.DefaultArtifactCoordinate;
@@ -70,6 +72,7 @@ public class MavenStatusCommand {
     private final RemoteRepositoryConnectionVerifier remoteRepositoryConnectionVerifier;
     private final DefaultSessionFactory defaultSessionFactory;
     private final DefaultRepositorySystemSessionFactory repoSession;
+    private final MavenRepositorySystem repositorySystem;
     private final Logger logger;
     private final PlexusContainer container;
     private final SessionScope sessionScope;
@@ -83,25 +86,40 @@ public class MavenStatusCommand {
         defaultSessionFactory = container.lookup(DefaultSessionFactory.class);
         repoSession = container.lookup(DefaultRepositorySystemSessionFactory.class);
         sessionScope = container.lookup(SessionScope.class);
+        repositorySystem = container.lookup(MavenRepositorySystem.class);
     }
 
-    public List<String> verify(CliRequest cliRequest) throws MavenExecutionRequestPopulationException {
-        // Populate the cliRequest with defaults and user settings
-        final MavenExecutionRequest mavenExecutionRequest =
-                mavenExecutionRequestPopulator.populateDefaults(cliRequest.request);
+    public List<String> verify(MavenExecutionRequest cliRequest) throws MavenExecutionRequestPopulationException {
+        final MavenExecutionRequest mavenExecutionRequest = mavenExecutionRequestPopulator.populateDefaults(cliRequest);
 
-        final ArtifactRepository localRepository = cliRequest.getRequest().getLocalRepository();
+        final ArtifactRepository localRepository = cliRequest.getLocalRepository();
 
         final List<String> localRepositoryIssues =
                 verifyLocalRepository(Paths.get(URI.create(localRepository.getUrl())));
-        final List<String> remoteRepositoryIssues = verifyRemoteRepositoryConnections(
-                cliRequest.getRequest().getRemoteRepositories(), mavenExecutionRequest);
+
+        // We overwrite the local repository with a temporary folder to avoid using a cached version of the artifact.
+        setTemporaryLocalRepositoryPathOnRequest(cliRequest);
+
+        final List<String> remoteRepositoryIssues =
+                verifyRemoteRepositoryConnections(cliRequest.getRemoteRepositories(), mavenExecutionRequest);
         final List<String> artifactResolutionIssues = verifyArtifactResolution(mavenExecutionRequest);
 
         // Collect all issues into a single list
         return Stream.of(localRepositoryIssues, remoteRepositoryIssues, artifactResolutionIssues)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
+    }
+
+    private void setTemporaryLocalRepositoryPathOnRequest(MavenExecutionRequest request) {
+        try {
+            final String path =
+                    Files.createTempDirectory("mvn-status").toAbsolutePath().toString();
+            request.setLocalRepositoryPath(path);
+            request.setLocalRepository(repositorySystem.createLocalRepository(request, new File(path)));
+        } catch (Exception ex) {
+            logger.debug("Could not create temporary local repository", ex);
+            logger.warn("Artifact resolution test is less accurate as it may use earlier resolution results.");
+        }
     }
 
     private List<String> verifyRemoteRepositoryConnections(
