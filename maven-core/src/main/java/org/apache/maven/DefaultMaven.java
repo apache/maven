@@ -30,6 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -325,7 +326,7 @@ public class DefaultMaven
         throws ComponentLookupException
     {
         // Desired order of precedence for workspace readers before querying the local artifact repositories
-        List<WorkspaceReader> workspaceReaders = new ArrayList<WorkspaceReader>();
+        Set<WorkspaceReader> workspaceReaders = new LinkedHashSet<>();
         // 1) Reactor workspace reader
         workspaceReaders.add( container.lookup( WorkspaceReader.class, ReactorReader.HINT ) );
         // 2) Repository system session-scoped workspace reader
@@ -335,15 +336,7 @@ public class DefaultMaven
             workspaceReaders.add( repoWorkspaceReader );
         }
         // 3) .. n) Project-scoped workspace readers
-        for ( WorkspaceReader workspaceReader : getProjectScopedExtensionComponents( session.getProjects(),
-                                                                                     WorkspaceReader.class ) )
-        {
-            if ( workspaceReaders.contains( workspaceReader ) )
-            {
-                continue;
-            }
-            workspaceReaders.add( workspaceReader );
-        }
+        workspaceReaders.addAll( getProjectScopedExtensionComponents( session.getProjects(), WorkspaceReader.class ) );
         repoSession.setWorkspaceReader( MavenChainedWorkspaceReader.of( workspaceReaders ) );
     }
 
