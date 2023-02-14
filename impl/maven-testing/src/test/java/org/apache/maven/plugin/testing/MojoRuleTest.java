@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.testing;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.testing;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.testing;
 
 import java.io.File;
 import java.io.StringReader;
@@ -37,21 +36,19 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Mirko Friedenhagen
  */
-public class MojoRuleTest
-    
-{
+public class MojoRuleTest {
+
     private boolean beforeWasCalled = false;
 
     @Rule
     public MojoRule rule = new MojoRule() {
 
         @Override
-        protected void before() throws Throwable 
-        {
+        protected void before() throws Throwable {
             beforeWasCalled = true;
-        }      
+        }
     };
-    
+
     private String pom;
 
     private Xpp3Dom pomDom;
@@ -60,136 +57,114 @@ public class MojoRuleTest
 
     /** {@inheritDoc} */
     @Before
-    public void setUp()
-        throws Exception
-    {
+    public void setUp() throws Exception {
 
-        pom =
-            "<project>" +
-                "<build>" +
-                "<plugins>" +
-                "<plugin>" +
-                "<artifactId>maven-simple-plugin</artifactId>" +
-                "<configuration>" +
-                "<keyOne>valueOne</keyOne>" +
-                "<keyTwo>valueTwo</keyTwo>" +
-                "</configuration>" +
-                "</plugin>" +
-                "</plugins>" +
-                "</build>" +
-                "</project>";
+        pom = "<project>" + "<build>"
+                + "<plugins>"
+                + "<plugin>"
+                + "<artifactId>maven-simple-plugin</artifactId>"
+                + "<configuration>"
+                + "<keyOne>valueOne</keyOne>"
+                + "<keyTwo>valueTwo</keyTwo>"
+                + "</configuration>"
+                + "</plugin>"
+                + "</plugins>"
+                + "</build>"
+                + "</project>";
 
-        pomDom = Xpp3DomBuilder.build( new StringReader( pom ) );
+        pomDom = Xpp3DomBuilder.build(new StringReader(pom));
 
-        pluginConfiguration = rule.extractPluginConfiguration( "maven-simple-plugin", pomDom );
+        pluginConfiguration = rule.extractPluginConfiguration("maven-simple-plugin", pomDom);
     }
 
     /**
      * @throws Exception if any
      */
     @Test
-    public void testPluginConfigurationExtraction()
-        throws Exception
-    {
-        assertEquals( "valueOne", pluginConfiguration.getChild( "keyOne" ).getValue() );
+    public void testPluginConfigurationExtraction() throws Exception {
+        assertEquals("valueOne", pluginConfiguration.getChild("keyOne").getValue());
 
-        assertEquals( "valueTwo", pluginConfiguration.getChild( "keyTwo" ).getValue() );
+        assertEquals("valueTwo", pluginConfiguration.getChild("keyTwo").getValue());
     }
 
     /**
      * @throws Exception if any
      */
     @Test
-    public void testMojoConfiguration()
-        throws Exception
-    {
+    public void testMojoConfiguration() throws Exception {
         SimpleMojo mojo = new SimpleMojo();
 
-        mojo = rule.configureMojo( mojo, pluginConfiguration );
+        mojo = rule.configureMojo(mojo, pluginConfiguration);
 
-        assertEquals( "valueOne", mojo.getKeyOne() );
+        assertEquals("valueOne", mojo.getKeyOne());
 
-        assertEquals( "valueTwo", mojo.getKeyTwo() );
+        assertEquals("valueTwo", mojo.getKeyTwo());
     }
 
     /**
      * @throws Exception if any
      */
     @Test
-    public void testVariableAccessWithoutGetter()
-        throws Exception
-    {
+    public void testVariableAccessWithoutGetter() throws Exception {
         SimpleMojo mojo = new SimpleMojo();
 
-        mojo = rule.configureMojo( mojo, pluginConfiguration );
+        mojo = rule.configureMojo(mojo, pluginConfiguration);
 
-        assertEquals( "valueOne", rule.getVariableValueFromObject( mojo, "keyOne" ) );
+        assertEquals("valueOne", rule.getVariableValueFromObject(mojo, "keyOne"));
 
-        assertEquals( "valueTwo", rule.getVariableValueFromObject( mojo, "keyTwo" ) );
-    }
-
-    /**
-     * @throws Exception if any
-     */
-     @Test
-     public void testVariableAccessWithoutGetter2()
-        throws Exception
-     {
-        SimpleMojo mojo = new SimpleMojo();
-
-        mojo = rule.configureMojo( mojo, pluginConfiguration );
-
-        Map<String, Object> map = rule.getVariablesAndValuesFromObject( mojo );
-
-        assertEquals( "valueOne", map.get( "keyOne" ) );
-
-        assertEquals( "valueTwo", map.get( "keyTwo" ) );
+        assertEquals("valueTwo", rule.getVariableValueFromObject(mojo, "keyTwo"));
     }
 
     /**
      * @throws Exception if any
      */
     @Test
-    public void testSettingMojoVariables()
-        throws Exception
-    {
+    public void testVariableAccessWithoutGetter2() throws Exception {
         SimpleMojo mojo = new SimpleMojo();
 
-        mojo = rule.configureMojo( mojo, pluginConfiguration );
+        mojo = rule.configureMojo(mojo, pluginConfiguration);
 
-        rule.setVariableValueToObject( mojo, "keyOne", "myValueOne" );
+        Map<String, Object> map = rule.getVariablesAndValuesFromObject(mojo);
 
-        assertEquals( "myValueOne", rule.getVariableValueFromObject( mojo, "keyOne" ) );
+        assertEquals("valueOne", map.get("keyOne"));
 
+        assertEquals("valueTwo", map.get("keyTwo"));
+    }
+
+    /**
+     * @throws Exception if any
+     */
+    @Test
+    public void testSettingMojoVariables() throws Exception {
+        SimpleMojo mojo = new SimpleMojo();
+
+        mojo = rule.configureMojo(mojo, pluginConfiguration);
+
+        rule.setVariableValueToObject(mojo, "keyOne", "myValueOne");
+
+        assertEquals("myValueOne", rule.getVariableValueFromObject(mojo, "keyOne"));
     }
 
     @Test
     @WithoutMojo
-    public void testNoRuleWrapper()
-        throws Exception
-    {
-        assertFalse( "before executed although WithMojo annotation was added", beforeWasCalled );
+    public void testNoRuleWrapper() throws Exception {
+        assertFalse("before executed although WithMojo annotation was added", beforeWasCalled);
     }
 
-    @Test    
-    public void testWithRuleWrapper()
-        throws Exception
-    {
-        assertTrue( "before executed because WithMojo annotation was not added", beforeWasCalled );
+    @Test
+    public void testWithRuleWrapper() throws Exception {
+        assertTrue("before executed because WithMojo annotation was not added", beforeWasCalled);
     }
 
     /**
      * @throws Exception if any
      */
     @Test
-    public void testLookupInitializedMojo()
-            throws Exception
-    {
-        File pomBaseDir = new File( "src/test/projects/property" );
-        ParametersMojo mojo = rule.lookupConfiguredMojo( pomBaseDir, "parameters" );
-        assertEquals( "default", rule.getVariableValueFromObject( mojo, "withDefault" ) );
-        assertEquals( "propertyValue", rule.getVariableValueFromObject( mojo, "withProperty" ) );
-        assertEquals( "propertyValue", rule.getVariableValueFromObject( mojo, "withPropertyAndDefault" ) );
+    public void testLookupInitializedMojo() throws Exception {
+        File pomBaseDir = new File("src/test/projects/property");
+        ParametersMojo mojo = rule.lookupConfiguredMojo(pomBaseDir, "parameters");
+        assertEquals("default", rule.getVariableValueFromObject(mojo, "withDefault"));
+        assertEquals("propertyValue", rule.getVariableValueFromObject(mojo, "withProperty"));
+        assertEquals("propertyValue", rule.getVariableValueFromObject(mojo, "withPropertyAndDefault"));
     }
-
 }

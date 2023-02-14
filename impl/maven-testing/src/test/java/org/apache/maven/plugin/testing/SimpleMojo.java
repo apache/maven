@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.testing;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.testing;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.testing;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -25,26 +24,19 @@ import org.apache.maven.plugin.MojoExecutionException;
 /**
  * @author Jason van Zyl
  */
-public class SimpleMojo
-    extends AbstractMojo
-{
+public class SimpleMojo extends AbstractMojo {
     private String keyOne;
 
     private String keyTwo;
 
-    public String getKeyOne()
-    {
+    public String getKeyOne() {
         return keyOne;
     }
 
-    public String getKeyTwo()
-    {
+    public String getKeyTwo() {
         return keyTwo;
     }
 
     @Override
-    public void execute()
-        throws MojoExecutionException
-    {
-    }
+    public void execute() throws MojoExecutionException {}
 }

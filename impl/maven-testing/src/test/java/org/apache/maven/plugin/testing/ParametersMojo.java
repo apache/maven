@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.testing;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +16,13 @@ package org.apache.maven.plugin.testing;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.testing;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
-public class ParametersMojo
-    extends AbstractMojo
-{
+public class ParametersMojo extends AbstractMojo {
     public String plain;
 
     public String withProperty;
@@ -35,8 +32,5 @@ public class ParametersMojo
     public String withPropertyAndDefault;
 
     @Override
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
-    }
+    public void execute() throws MojoExecutionException, MojoFailureException {}
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.testing.stubs;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.testing.stubs;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.testing.stubs;
 
 import java.io.File;
 import java.util.Collection;
@@ -37,9 +36,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
  *
  * @author jesse
  */
-public class ArtifactStub
-    implements Artifact
-{
+public class ArtifactStub implements Artifact {
     private String groupId;
 
     private String artifactId;
@@ -62,50 +59,43 @@ public class ArtifactStub
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     @Override
-    public int compareTo( Artifact artifact )
-    {
+    public int compareTo(Artifact artifact) {
         return 0;
     }
 
     /** {@inheritDoc} */
     @Override
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return groupId;
     }
 
     /** {@inheritDoc} */
     @Override
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return artifactId;
     }
 
     /** {@inheritDoc} */
     @Override
-    public String getVersion()
-    {
+    public String getVersion() {
         return version;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void setVersion( String version )
-    {
+    public void setVersion(String version) {
         this.version = version;
     }
 
     /** {@inheritDoc} */
     @Override
-    public String getScope()
-    {
+    public String getScope() {
         return scope;
     }
 
     /** {@inheritDoc} */
     @Override
-    public String getType()
-    {
+    public String getType() {
         return type;
     }
 
@@ -114,36 +104,31 @@ public class ArtifactStub
      *
      * @param type
      */
-    public void setType( String type )
-    {
+    public void setType(String type) {
         this.type = type;
     }
 
     /** {@inheritDoc} */
     @Override
-    public String getClassifier()
-    {
+    public String getClassifier() {
         return classifier;
     }
 
     /** {@inheritDoc} */
     @Override
-    public boolean hasClassifier()
-    {
+    public boolean hasClassifier() {
         return classifier != null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public File getFile()
-    {
+    public File getFile() {
         return file;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void setFile( File file )
-    {
+    public void setFile(File file) {
         this.file = file;
     }
 
@@ -152,8 +137,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#getBaseVersion()
      */
     @Override
-    public String getBaseVersion()
-    {
+    public String getBaseVersion() {
         return null;
     }
 
@@ -163,8 +147,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#setBaseVersion(java.lang.String)
      */
     @Override
-    public void setBaseVersion( String string )
-    {
+    public void setBaseVersion(String string) {
         // nop
     }
 
@@ -173,8 +156,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#getId()
      */
     @Override
-    public String getId()
-    {
+    public String getId() {
         return null;
     }
 
@@ -183,14 +165,13 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#getDependencyConflictId()
      */
     @Override
-    public String getDependencyConflictId()
-    {
+    public String getDependencyConflictId() {
         StringBuffer buffer = new StringBuffer();
 
-        buffer.append( getGroupId() );
-        buffer.append( ":" ).append( getArtifactId() );
-        buffer.append( ":" ).append( getType() );
-        buffer.append( ":" ).append( getClassifier() );
+        buffer.append(getGroupId());
+        buffer.append(":").append(getArtifactId());
+        buffer.append(":").append(getType());
+        buffer.append(":").append(getClassifier());
 
         return buffer.toString();
     }
@@ -201,8 +182,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#addMetadata(org.apache.maven.artifact.metadata.ArtifactMetadata)
      */
     @Override
-    public void addMetadata( ArtifactMetadata artifactMetadata )
-    {
+    public void addMetadata(ArtifactMetadata artifactMetadata) {
         // nop
     }
 
@@ -211,22 +191,19 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#getMetadataList()
      */
     @Override
-    public Collection<ArtifactMetadata> getMetadataList()
-    {
+    public Collection<ArtifactMetadata> getMetadataList() {
         return null;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void setRepository( ArtifactRepository artifactRepository )
-    {
+    public void setRepository(ArtifactRepository artifactRepository) {
         this.artifactRepository = artifactRepository;
     }
 
     /** {@inheritDoc} */
     @Override
-    public ArtifactRepository getRepository()
-    {
+    public ArtifactRepository getRepository() {
         return artifactRepository;
     }
 
@@ -236,8 +213,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#updateVersion(java.lang.String, org.apache.maven.artifact.repository.ArtifactRepository)
      */
     @Override
-    public void updateVersion( String string, ArtifactRepository artifactRepository )
-    {
+    public void updateVersion(String string, ArtifactRepository artifactRepository) {
         // nop
     }
 
@@ -246,8 +222,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#getDownloadUrl()
      */
     @Override
-    public String getDownloadUrl()
-    {
+    public String getDownloadUrl() {
         return null;
     }
 
@@ -257,8 +232,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#setDownloadUrl(java.lang.String)
      */
     @Override
-    public void setDownloadUrl( String string )
-    {
+    public void setDownloadUrl(String string) {
         // nop
     }
 
@@ -267,8 +241,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#getDependencyFilter()
      */
     @Override
-    public ArtifactFilter getDependencyFilter()
-    {
+    public ArtifactFilter getDependencyFilter() {
         return null;
     }
 
@@ -278,8 +251,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#setDependencyFilter(org.apache.maven.artifact.resolver.filter.ArtifactFilter)
      */
     @Override
-    public void setDependencyFilter( ArtifactFilter artifactFilter )
-    {
+    public void setDependencyFilter(ArtifactFilter artifactFilter) {
         // nop
     }
 
@@ -288,8 +260,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#getArtifactHandler()
      */
     @Override
-    public ArtifactHandler getArtifactHandler()
-    {
+    public ArtifactHandler getArtifactHandler() {
         return null;
     }
 
@@ -298,8 +269,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#getDependencyTrail()
      */
     @Override
-    public List<String> getDependencyTrail()
-    {
+    public List<String> getDependencyTrail() {
         return null;
     }
 
@@ -309,15 +279,13 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#setDependencyTrail(java.util.List)
      */
     @Override
-    public void setDependencyTrail( List<String> list )
-    {
+    public void setDependencyTrail(List<String> list) {
         // nop
     }
 
     /** {@inheritDoc} */
     @Override
-    public void setScope( String scope )
-    {
+    public void setScope(String scope) {
         this.scope = scope;
     }
 
@@ -326,8 +294,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#getVersionRange()
      */
     @Override
-    public VersionRange getVersionRange()
-    {
+    public VersionRange getVersionRange() {
         return null;
     }
 
@@ -337,8 +304,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#setVersionRange(org.apache.maven.artifact.versioning.VersionRange)
      */
     @Override
-    public void setVersionRange( VersionRange versionRange )
-    {
+    public void setVersionRange(VersionRange versionRange) {
         // nop
     }
 
@@ -348,22 +314,19 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#selectVersion(java.lang.String)
      */
     @Override
-    public void selectVersion( String string )
-    {
+    public void selectVersion(String string) {
         // nop
     }
 
     /** {@inheritDoc} */
     @Override
-    public void setGroupId( String groupId )
-    {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 
     /** {@inheritDoc} */
     @Override
-    public void setArtifactId( String artifactId )
-    {
+    public void setArtifactId(String artifactId) {
         this.artifactId = artifactId;
     }
 
@@ -372,10 +335,9 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#isSnapshot()
      */
     @Override
-    public boolean isSnapshot()
-    {
-        return Artifact.VERSION_FILE_PATTERN.matcher( getVersion() ).matches()
-            || getVersion().endsWith( Artifact.SNAPSHOT_VERSION );
+    public boolean isSnapshot() {
+        return Artifact.VERSION_FILE_PATTERN.matcher(getVersion()).matches()
+                || getVersion().endsWith(Artifact.SNAPSHOT_VERSION);
     }
 
     /**
@@ -384,8 +346,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#setResolved(boolean)
      */
     @Override
-    public void setResolved( boolean b )
-    {
+    public void setResolved(boolean b) {
         // nop
     }
 
@@ -394,8 +355,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#isResolved()
      */
     @Override
-    public boolean isResolved()
-    {
+    public boolean isResolved() {
         return false;
     }
 
@@ -405,8 +365,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#setResolvedVersion(java.lang.String)
      */
     @Override
-    public void setResolvedVersion( String string )
-    {
+    public void setResolvedVersion(String string) {
         // nop
     }
 
@@ -416,8 +375,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#setArtifactHandler(org.apache.maven.artifact.handler.ArtifactHandler)
      */
     @Override
-    public void setArtifactHandler( ArtifactHandler artifactHandler )
-    {
+    public void setArtifactHandler(ArtifactHandler artifactHandler) {
         // nop
     }
 
@@ -426,8 +384,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#isRelease()
      */
     @Override
-    public boolean isRelease()
-    {
+    public boolean isRelease() {
         return !isSnapshot();
     }
 
@@ -437,8 +394,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#setRelease(boolean)
      */
     @Override
-    public void setRelease( boolean b )
-    {
+    public void setRelease(boolean b) {
         // nop
     }
 
@@ -447,8 +403,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#getAvailableVersions()
      */
     @Override
-    public List<ArtifactVersion> getAvailableVersions()
-    {
+    public List<ArtifactVersion> getAvailableVersions() {
         return null;
     }
 
@@ -458,8 +413,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#setAvailableVersions(java.util.List)
      */
     @Override
-    public void setAvailableVersions( List<ArtifactVersion> list )
-    {
+    public void setAvailableVersions(List<ArtifactVersion> list) {
         // nop
     }
 
@@ -468,8 +422,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#isOptional()
      */
     @Override
-    public boolean isOptional()
-    {
+    public boolean isOptional() {
         return false;
     }
 
@@ -479,8 +432,7 @@ public class ArtifactStub
      * @param b
      */
     @Override
-    public void setOptional( boolean b )
-    {
+    public void setOptional(boolean b) {
         // nop
     }
 
@@ -489,9 +441,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#getSelectedVersion()
      */
     @Override
-    public ArtifactVersion getSelectedVersion()
-        throws OverConstrainedVersionException
-    {
+    public ArtifactVersion getSelectedVersion() throws OverConstrainedVersionException {
         return null;
     }
 
@@ -500,9 +450,7 @@ public class ArtifactStub
      * @see org.apache.maven.artifact.Artifact#isSelectedVersionKnown()
      */
     @Override
-    public boolean isSelectedVersionKnown()
-        throws OverConstrainedVersionException
-    {
+    public boolean isSelectedVersionKnown() throws OverConstrainedVersionException {
         return false;
     }
 
@@ -510,47 +458,39 @@ public class ArtifactStub
      * @see java.lang.Object#toString()
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuffer sb = new StringBuffer();
-        if ( getGroupId() != null )
-        {
-            sb.append( getGroupId() );
-            sb.append( ":" );
+        if (getGroupId() != null) {
+            sb.append(getGroupId());
+            sb.append(":");
         }
-        appendArtifactTypeClassifierString( sb );
-        if ( version != null )
-        {
-            sb.append( ":" );
-            sb.append( getVersion() );
+        appendArtifactTypeClassifierString(sb);
+        if (version != null) {
+            sb.append(":");
+            sb.append(getVersion());
         }
-        if ( scope != null )
-        {
-            sb.append( ":" );
-            sb.append( scope );
+        if (scope != null) {
+            sb.append(":");
+            sb.append(scope);
         }
         return sb.toString();
     }
 
-    private void appendArtifactTypeClassifierString( StringBuffer sb )
-    {
-        sb.append( getArtifactId() );
-        sb.append( ":" );
-        sb.append( getType() );
-        if ( hasClassifier() )
-        {
-            sb.append( ":" );
-            sb.append( getClassifier() );
+    private void appendArtifactTypeClassifierString(StringBuffer sb) {
+        sb.append(getArtifactId());
+        sb.append(":");
+        sb.append(getType());
+        if (hasClassifier()) {
+            sb.append(":");
+            sb.append(getClassifier());
         }
     }
 
-    public boolean isFromAuthoritativeRepository()
-    {
+    public boolean isFromAuthoritativeRepository() {
         return true;
     }
 
-    public void setFromAuthoritativeRepository( boolean fromAuthoritativeRepository )
-    {
+    public void setFromAuthoritativeRepository(boolean fromAuthoritativeRepository) {
         // nothing
     }
 }

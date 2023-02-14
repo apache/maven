@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.testing;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,20 +16,18 @@ package org.apache.maven.plugin.testing;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.testing;
 
 import java.io.IOException;
 
-import junit.framework.TestCase;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ArtifactStubFactoryTest
-{
+public class ArtifactStubFactoryTest {
     @Test
-    public void testVersionChecks() throws IOException
-    {
+    public void testVersionChecks() throws IOException {
         ArtifactStubFactory factory = new ArtifactStubFactory();
         assertTrue(factory.getReleaseArtifact().isRelease());
         assertFalse(factory.getReleaseArtifact().isSnapshot());
@@ -40,8 +36,7 @@ public class ArtifactStubFactoryTest
     }
 
     @Test
-    public void testCreateFiles() throws IOException
-    {
+    public void testCreateFiles() throws IOException {
         ArtifactStubFactory factory = new ArtifactStubFactory();
         assertFalse(factory.isCreateFiles());
     }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.testing;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,24 +16,22 @@ package org.apache.maven.plugin.testing;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+package org.apache.maven.plugin.testing;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 /**
- * 
+ *
  * An annotation for test methods that do not require the {@link MojoRule} to create and tear down the instance.
  *
  * @author Mirko Friedenhagen
  */
-@Retention( RUNTIME )
+@Retention(RUNTIME)
 @Documented
-@Target( METHOD )
-public @interface WithoutMojo
-{
-
-}
+@Target(METHOD)
+public @interface WithoutMojo {}

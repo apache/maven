@@ -1,5 +1,3 @@
-package org.apache.maven.api.plugin.testing.stubs;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.plugin.testing.stubs;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api.plugin.testing.stubs;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.plugin.testing.stubs;
 
 import java.util.Objects;
 
@@ -31,16 +30,14 @@ import org.apache.maven.internal.impl.DefaultVersionParser;
 /**
  *
  */
-public class ArtifactStub implements Artifact
-{
+public class ArtifactStub implements Artifact {
     private String groupId;
     private String artifactId;
     private String classifier;
     private String version;
     private String extension;
 
-    public ArtifactStub()
-    {
+    public ArtifactStub() {
         groupId = "";
         artifactId = "";
         version = "";
@@ -48,8 +45,7 @@ public class ArtifactStub implements Artifact
         extension = "";
     }
 
-    public ArtifactStub( String groupId, String artifactId, String classifier, String version, String extension )
-    {
+    public ArtifactStub(String groupId, String artifactId, String classifier, String version, String extension) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.classifier = classifier;
@@ -59,110 +55,91 @@ public class ArtifactStub implements Artifact
 
     @Nonnull
     @Override
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return groupId;
     }
 
-    public void setGroupId( String groupId )
-    {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 
     @Nonnull
     @Override
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return artifactId;
     }
 
-    public void setArtifactId( String artifactId )
-    {
+    public void setArtifactId(String artifactId) {
         this.artifactId = artifactId;
     }
 
     @Nonnull
     @Override
-    public String getClassifier()
-    {
+    public String getClassifier() {
         return classifier;
     }
 
-    public void setClassifier( String classifier )
-    {
+    public void setClassifier(String classifier) {
         this.classifier = classifier;
     }
 
     @Nonnull
     @Override
-    public Version getVersion()
-    {
-        return new DefaultVersionParser().parseVersion( version );
+    public Version getVersion() {
+        return new DefaultVersionParser().parseVersion(version);
     }
 
-    public void setVersion( String version )
-    {
+    public void setVersion(String version) {
         this.version = version;
     }
 
     @Nonnull
     @Override
-    public String getExtension()
-    {
+    public String getExtension() {
         return extension;
     }
 
-    public void setExtension( String extension )
-    {
+    public void setExtension(String extension) {
         this.extension = extension;
     }
 
     @Override
-    public boolean isSnapshot()
-    {
+    public boolean isSnapshot() {
         return false;
     }
 
     @Override
-    public ArtifactCoordinate toCoordinate()
-    {
-        return new ArtifactCoordinate()
-        {
+    public ArtifactCoordinate toCoordinate() {
+        return new ArtifactCoordinate() {
             @Override
-            public String getGroupId()
-            {
+            public String getGroupId() {
                 return groupId;
             }
 
             @Override
-            public String getArtifactId()
-            {
+            public String getArtifactId() {
                 return artifactId;
             }
 
             @Override
-            public String getClassifier()
-            {
+            public String getClassifier() {
                 return classifier;
             }
 
             @Override
-            public VersionRange getVersion()
-            {
-                return new DefaultVersionParser().parseVersionRange( version );
+            public VersionRange getVersion() {
+                return new DefaultVersionParser().parseVersionRange(version);
             }
 
             @Override
-            public String getExtension()
-            {
+            public String getExtension() {
                 return extension;
             }
         };
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "ArtifactStub["
                 + "groupId='" + groupId + '\''
                 + ", artifactId='" + artifactId + '\''
@@ -173,28 +150,23 @@ public class ArtifactStub implements Artifact
     }
 
     @Override
-    public boolean equals( Object o )
-    {
-        if ( this == o )
-        {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if ( !( o instanceof ArtifactStub ) )
-        {
+        if (!(o instanceof ArtifactStub)) {
             return false;
         }
-        ArtifactStub that = ( ArtifactStub ) o;
-        return Objects.equals( groupId, that.groupId )
-                && Objects.equals( artifactId, that.artifactId )
-                && Objects.equals( classifier, that.classifier )
-                && Objects.equals( version, that.version )
-                && Objects.equals( extension, that.extension );
+        ArtifactStub that = (ArtifactStub) o;
+        return Objects.equals(groupId, that.groupId)
+                && Objects.equals(artifactId, that.artifactId)
+                && Objects.equals(classifier, that.classifier)
+                && Objects.equals(version, that.version)
+                && Objects.equals(extension, that.extension);
     }
 
     @Override
-    public int hashCode()
-    {
-        return Objects.hash( groupId, artifactId, classifier, version, extension );
+    public int hashCode() {
+        return Objects.hash(groupId, artifactId, classifier, version, extension);
     }
-
 }

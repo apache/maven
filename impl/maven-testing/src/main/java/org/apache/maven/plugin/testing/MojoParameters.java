@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.testing;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,20 +16,19 @@ package org.apache.maven.plugin.testing;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.testing;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Static helpers to create and manipulate mojo execution configuration parameters
- * 
+ *
  * @since 3.2.0
  */
-public class MojoParameters
-{
-    public static Xpp3Dom newParameter( String name, String value )
-    {
-        Xpp3Dom child = new Xpp3Dom( name );
-        child.setValue( value );
+public class MojoParameters {
+    public static Xpp3Dom newParameter(String name, String value) {
+        Xpp3Dom child = new Xpp3Dom(name);
+        child.setValue(value);
         return child;
     }
 }

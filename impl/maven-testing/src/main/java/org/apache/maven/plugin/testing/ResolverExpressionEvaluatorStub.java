@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.testing;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.testing;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.testing;
 
 import java.io.File;
 
@@ -32,90 +31,70 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator
  *
  * @author jesse
  */
-public class ResolverExpressionEvaluatorStub
-    implements ExpressionEvaluator
-{
+public class ResolverExpressionEvaluatorStub implements ExpressionEvaluator {
     /** {@inheritDoc} */
     @Override
-    public Object evaluate( String expr )
-        throws ExpressionEvaluationException
-    {
+    public Object evaluate(String expr) throws ExpressionEvaluationException {
 
         Object value = null;
 
-        if ( expr == null )
-        {
+        if (expr == null) {
             return null;
         }
 
-        String expression = stripTokens( expr );
+        String expression = stripTokens(expr);
 
-        if ( expression.equals( expr ) )
-        {
-            int index = expr.indexOf( "${" );
-            if ( index >= 0 )
-            {
-                int lastIndex = expr.indexOf( "}", index );
-                if ( lastIndex >= 0 )
-                {
-                    String retVal = expr.substring( 0, index );
+        if (expression.equals(expr)) {
+            int index = expr.indexOf("${");
+            if (index >= 0) {
+                int lastIndex = expr.indexOf("}", index);
+                if (lastIndex >= 0) {
+                    String retVal = expr.substring(0, index);
 
-                    if ( index > 0 && expr.charAt( index - 1 ) == '$' )
-                    {
-                        retVal += expr.substring( index + 1, lastIndex + 1 );
-                    }
-                    else
-                    {
-                        retVal += evaluate( expr.substring( index, lastIndex + 1 ) );
+                    if (index > 0 && expr.charAt(index - 1) == '$') {
+                        retVal += expr.substring(index + 1, lastIndex + 1);
+                    } else {
+                        retVal += evaluate(expr.substring(index, lastIndex + 1));
                     }
 
-                    retVal += evaluate( expr.substring( lastIndex + 1 ) );
+                    retVal += evaluate(expr.substring(lastIndex + 1));
                     return retVal;
                 }
             }
 
             // Was not an expression
-            if ( expression.indexOf( "$$" ) > -1 )
-            {
-                return expression.replaceAll( "\\$\\$", "\\$" );
+            if (expression.indexOf("$$") > -1) {
+                return expression.replaceAll("\\$\\$", "\\$");
             }
         }
 
-        if ( "basedir".equals( expression ) || "project.basedir".equals( expression ) )
-        {
+        if ("basedir".equals(expression) || "project.basedir".equals(expression)) {
             return PlexusTestCase.getBasedir();
-        }
-        else if ( expression.startsWith( "basedir" ) || expression.startsWith( "project.basedir" ) )
-        {
-            int pathSeparator = expression.indexOf( "/" );
+        } else if (expression.startsWith("basedir") || expression.startsWith("project.basedir")) {
+            int pathSeparator = expression.indexOf("/");
 
-            if ( pathSeparator > 0 )
-            {
-                value = PlexusTestCase.getBasedir() + expression.substring( pathSeparator );
-            }
-            else
-            {
-                System.out.println( "Got expression '" + expression + "' that was not recognised" );
+            if (pathSeparator > 0) {
+                value = PlexusTestCase.getBasedir() + expression.substring(pathSeparator);
+            } else {
+                System.out.println("Got expression '" + expression + "' that was not recognised");
             }
             return value;
-        }
-        else if ( "localRepository".equals( expression ) )
-        {
-            File localRepo = new File( PlexusTestCase.getBasedir(), "target/local-repo" );
-            return new MavenArtifactRepository( "localRepository", "file://" + localRepo.getAbsolutePath(),
-                    new DefaultRepositoryLayout(), null, null );
-        }
-        else
-        {
+        } else if ("localRepository".equals(expression)) {
+            File localRepo = new File(PlexusTestCase.getBasedir(), "target/local-repo");
+            return new MavenArtifactRepository(
+                    "localRepository",
+                    "file://" + localRepo.getAbsolutePath(),
+                    new DefaultRepositoryLayout(),
+                    null,
+                    null);
+        } else {
             return expr;
         }
     }
 
-    private String stripTokens( String expr )
-    {
-        if ( expr.startsWith( "${" ) && expr.indexOf( "}" ) == expr.length() - 1 )
-        {
-            expr = expr.substring( 2, expr.length() - 1 );
+    private String stripTokens(String expr) {
+        if (expr.startsWith("${") && expr.indexOf("}") == expr.length() - 1) {
+            expr = expr.substring(2, expr.length() - 1);
         }
 
         return expr;
@@ -123,19 +102,13 @@ public class ResolverExpressionEvaluatorStub
 
     /** {@inheritDoc} */
     @Override
-    public File alignToBaseDirectory( File file )
-    {
-        if ( file.getAbsolutePath().startsWith( PlexusTestCase.getBasedir() ) )
-        {
+    public File alignToBaseDirectory(File file) {
+        if (file.getAbsolutePath().startsWith(PlexusTestCase.getBasedir())) {
             return file;
-        }
-        else if ( file.isAbsolute() )
-        {
+        } else if (file.isAbsolute()) {
             return file;
-        }
-        else
-        {
-            return new File( PlexusTestCase.getBasedir(), file.getPath() );
+        } else {
+            return new File(PlexusTestCase.getBasedir(), file.getPath());
         }
     }
 }

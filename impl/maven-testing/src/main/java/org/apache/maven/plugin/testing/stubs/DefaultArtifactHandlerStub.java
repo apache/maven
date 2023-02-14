@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.testing.stubs;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.testing.stubs;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.testing.stubs;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.testing.stubs;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 
@@ -26,9 +25,7 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  */
-public class DefaultArtifactHandlerStub
-    implements ArtifactHandler
-{
+public class DefaultArtifactHandlerStub implements ArtifactHandler {
     private String extension;
 
     private String type;
@@ -49,31 +46,25 @@ public class DefaultArtifactHandlerStub
      * @param t the artifact handler type
      * @param c the artifact handler classifier
      */
-    public DefaultArtifactHandlerStub( String t, String c )
-    {
+    public DefaultArtifactHandlerStub(String t, String c) {
         type = t;
         classifier = c;
-        if ( t.equals( "test-jar" ) )
-        {
+        if (t.equals("test-jar")) {
             extension = "jar";
         }
-
     }
 
     /**
      * @param type the artifact handler type
      */
-    public DefaultArtifactHandlerStub( String type )
-    {
+    public DefaultArtifactHandlerStub(String type) {
         this.type = type;
     }
 
     /** {@inheritDoc} */
     @Override
-    public String getExtension()
-    {
-        if ( extension == null )
-        {
+    public String getExtension() {
+        if (extension == null) {
             extension = type;
         }
         return extension;
@@ -82,24 +73,20 @@ public class DefaultArtifactHandlerStub
     /**
      * @return the artifact handler type
      */
-    public String getType()
-    {
+    public String getType() {
         return type;
     }
 
     /** {@inheritDoc} */
     @Override
-    public String getClassifier()
-    {
+    public String getClassifier() {
         return classifier;
     }
 
     /** {@inheritDoc} */
     @Override
-    public String getDirectory()
-    {
-        if ( directory == null )
-        {
+    public String getDirectory() {
+        if (directory == null) {
             directory = getPackaging() + "s";
         }
         return directory;
@@ -107,10 +94,8 @@ public class DefaultArtifactHandlerStub
 
     /** {@inheritDoc} */
     @Override
-    public String getPackaging()
-    {
-        if ( packaging == null )
-        {
+    public String getPackaging() {
+        if (packaging == null) {
             packaging = getType();
         }
         return packaging;
@@ -118,17 +103,14 @@ public class DefaultArtifactHandlerStub
 
     /** {@inheritDoc} */
     @Override
-    public boolean isIncludesDependencies()
-    {
+    public boolean isIncludesDependencies() {
         return includesDependencies;
     }
 
     /** {@inheritDoc} */
     @Override
-    public String getLanguage()
-    {
-        if ( language == null )
-        {
+    public String getLanguage() {
+        if (language == null) {
             language = "none";
         }
 
@@ -137,72 +119,63 @@ public class DefaultArtifactHandlerStub
 
     /** {@inheritDoc} */
     @Override
-    public boolean isAddedToClasspath()
-    {
+    public boolean isAddedToClasspath() {
         return addedToClasspath;
     }
 
     /**
      * @param theAddedToClasspath The addedToClasspath to set.
      */
-    public void setAddedToClasspath( boolean theAddedToClasspath )
-    {
+    public void setAddedToClasspath(boolean theAddedToClasspath) {
         this.addedToClasspath = theAddedToClasspath;
     }
 
     /**
      * @param theClassifier The classifier to set.
      */
-    public void setClassifier( String theClassifier )
-    {
+    public void setClassifier(String theClassifier) {
         this.classifier = theClassifier;
     }
 
     /**
      * @param theDirectory The directory to set.
      */
-    public void setDirectory( String theDirectory )
-    {
+    public void setDirectory(String theDirectory) {
         this.directory = theDirectory;
     }
 
     /**
      * @param theExtension The extension to set.
      */
-    public void setExtension( String theExtension )
-    {
+    public void setExtension(String theExtension) {
         this.extension = theExtension;
     }
 
     /**
      * @param theIncludesDependencies The includesDependencies to set.
      */
-    public void setIncludesDependencies( boolean theIncludesDependencies )
-    {
+    public void setIncludesDependencies(boolean theIncludesDependencies) {
         this.includesDependencies = theIncludesDependencies;
     }
 
     /**
      * @param theLanguage The language to set.
      */
-    public void setLanguage( String theLanguage )
-    {
+    public void setLanguage(String theLanguage) {
         this.language = theLanguage;
     }
 
     /**
      * @param thePackaging The packaging to set.
      */
-    public void setPackaging( String thePackaging )
-    {
+    public void setPackaging(String thePackaging) {
         this.packaging = thePackaging;
     }
 
     /**
      * @param theType The type to set.
      */
-    public void setType( String theType )
-    {
+    public void setType(String theType) {
         this.type = theType;
     }
 }

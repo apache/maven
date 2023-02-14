@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.testing;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,22 +16,21 @@ package org.apache.maven.plugin.testing;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.testing;
+
+import java.io.StringReader;
+import java.util.Map;
 
 import org.apache.maven.api.plugin.testing.MojoTest;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 
-import java.io.StringReader;
-import java.util.Map;
-
 /**
  * @author Jason van Zyl
  */
 @MojoTest
-public class MojoTestCaseTest
-    extends AbstractMojoTestCase
-{
+public class MojoTestCaseTest extends AbstractMojoTestCase {
     private String pom;
 
     private Xpp3Dom pomDom;
@@ -42,103 +39,87 @@ public class MojoTestCaseTest
 
     /** {@inheritDoc} */
     @Override
-    protected void setUp()
-        throws Exception
-    {
+    protected void setUp() throws Exception {
         super.setUp();
 
-        pom =
-            "<project>" +
-                "<build>" +
-                "<plugins>" +
-                "<plugin>" +
-                "<artifactId>maven-simple-plugin</artifactId>" +
-                "<configuration>" +
-                "<keyOne>valueOne</keyOne>" +
-                "<keyTwo>valueTwo</keyTwo>" +
-                "</configuration>" +
-                "</plugin>" +
-                "</plugins>" +
-                "</build>" +
-                "</project>";
+        pom = "<project>" + "<build>"
+                + "<plugins>"
+                + "<plugin>"
+                + "<artifactId>maven-simple-plugin</artifactId>"
+                + "<configuration>"
+                + "<keyOne>valueOne</keyOne>"
+                + "<keyTwo>valueTwo</keyTwo>"
+                + "</configuration>"
+                + "</plugin>"
+                + "</plugins>"
+                + "</build>"
+                + "</project>";
 
-        pomDom = Xpp3DomBuilder.build( new StringReader( pom ) );
+        pomDom = Xpp3DomBuilder.build(new StringReader(pom));
 
-        pluginConfiguration = extractPluginConfiguration( "maven-simple-plugin", pomDom );
+        pluginConfiguration = extractPluginConfiguration("maven-simple-plugin", pomDom);
     }
 
     /**
      * @throws Exception if any
      */
-    public void testPluginConfigurationExtraction()
-        throws Exception
-    {
-        assertEquals( "valueOne", pluginConfiguration.getChild( "keyOne" ).getValue() );
+    public void testPluginConfigurationExtraction() throws Exception {
+        assertEquals("valueOne", pluginConfiguration.getChild("keyOne").getValue());
 
-        assertEquals( "valueTwo", pluginConfiguration.getChild( "keyTwo" ).getValue() );
+        assertEquals("valueTwo", pluginConfiguration.getChild("keyTwo").getValue());
     }
 
     /**
      * @throws Exception if any
      */
-    public void testMojoConfiguration()
-        throws Exception
-    {
+    public void testMojoConfiguration() throws Exception {
         SimpleMojo mojo = new SimpleMojo();
 
-        mojo = (SimpleMojo) configureMojo( mojo, pluginConfiguration );
+        mojo = (SimpleMojo) configureMojo(mojo, pluginConfiguration);
 
-        assertEquals( "valueOne", mojo.getKeyOne() );
+        assertEquals("valueOne", mojo.getKeyOne());
 
-        assertEquals( "valueTwo", mojo.getKeyTwo() );
+        assertEquals("valueTwo", mojo.getKeyTwo());
     }
 
     /**
      * @throws Exception if any
      */
-    public void testVariableAccessWithoutGetter()
-        throws Exception
-    {
+    public void testVariableAccessWithoutGetter() throws Exception {
         SimpleMojo mojo = new SimpleMojo();
 
-        mojo = (SimpleMojo) configureMojo( mojo, pluginConfiguration );
+        mojo = (SimpleMojo) configureMojo(mojo, pluginConfiguration);
 
-        assertEquals( "valueOne", (String)getVariableValueFromObject( mojo, "keyOne" ) );
+        assertEquals("valueOne", (String) getVariableValueFromObject(mojo, "keyOne"));
 
-        assertEquals( "valueTwo", (String)getVariableValueFromObject( mojo, "keyTwo" ) );
+        assertEquals("valueTwo", (String) getVariableValueFromObject(mojo, "keyTwo"));
     }
 
     /**
      * @throws Exception if any
      */
-     public void testVariableAccessWithoutGetter2()
-        throws Exception
-    {
+    public void testVariableAccessWithoutGetter2() throws Exception {
         SimpleMojo mojo = new SimpleMojo();
 
-        mojo = (SimpleMojo) configureMojo( mojo, pluginConfiguration );
+        mojo = (SimpleMojo) configureMojo(mojo, pluginConfiguration);
 
-        Map<String, Object> map = getVariablesAndValuesFromObject( mojo );
+        Map<String, Object> map = getVariablesAndValuesFromObject(mojo);
 
-        assertEquals( "valueOne", (String)map.get( "keyOne" ) );
+        assertEquals("valueOne", (String) map.get("keyOne"));
 
-        assertEquals( "valueTwo", (String)map.get( "keyTwo" ) );
+        assertEquals("valueTwo", (String) map.get("keyTwo"));
     }
 
     /**
      * @throws Exception if any
      */
-    public void testSettingMojoVariables()
-        throws Exception
-    {
+    public void testSettingMojoVariables() throws Exception {
         SimpleMojo mojo = new SimpleMojo();
 
-        mojo = (SimpleMojo) configureMojo( mojo, pluginConfiguration );
+        mojo = (SimpleMojo) configureMojo(mojo, pluginConfiguration);
 
-        setVariableValueToObject( mojo, "keyOne", "myValueOne" );
+        setVariableValueToObject(mojo, "keyOne", "myValueOne");
 
-        assertEquals( "myValueOne", (String)getVariableValueFromObject( mojo, "keyOne" ) );
-
+        assertEquals("myValueOne", (String) getVariableValueFromObject(mojo, "keyOne"));
     }
-
 }

@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.testing;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.testing;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.testing;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -91,31 +90,23 @@ import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
  *
  * @author jesse
  */
-public abstract class AbstractMojoTestCase
-    extends PlexusTestCase
-{
+public abstract class AbstractMojoTestCase extends PlexusTestCase {
     private static final DefaultArtifactVersion MAVEN_VERSION;
 
-    static
-    {
+    static {
         DefaultArtifactVersion version = null;
         String path = "/META-INF/maven/org.apache.maven/maven-core/pom.properties";
-        
-        try ( InputStream is = AbstractMojoTestCase.class.getResourceAsStream( path ) )
-        {
+
+        try (InputStream is = AbstractMojoTestCase.class.getResourceAsStream(path)) {
             Properties properties = new Properties();
-            if ( is != null )
-            {
-                properties.load( is );
+            if (is != null) {
+                properties.load(is);
             }
-            String property = properties.getProperty( "version" );
-            if ( property != null )
-            {
-                version = new DefaultArtifactVersion( property );
+            String property = properties.getProperty("version");
+            if (property != null) {
+                version = new DefaultArtifactVersion(property);
             }
-        }
-        catch ( IOException e )
-        {
+        } catch (IOException e) {
             // odd, where did this come from
         }
         MAVEN_VERSION = version;
@@ -126,49 +117,47 @@ public abstract class AbstractMojoTestCase
     private PlexusContainer container;
 
     private Map<String, MojoDescriptor> mojoDescriptors;
-    
+
     /*
      * for the harness I think we have decided against going the route of using the maven project builder.
      * instead I think we are going to try and make an instance of the localrespository and assign that
      * to either the project stub or into the mojo directly with injection...not sure yet though.
      */
-    //private MavenProjectBuilder projectBuilder;
+    // private MavenProjectBuilder projectBuilder;
     @Override
-    protected void setUp()
-        throws Exception
-    {
-        assertTrue( "Maven 3.2.4 or better is required",
-                    MAVEN_VERSION == null || new DefaultArtifactVersion( "3.2.3" ).compareTo( MAVEN_VERSION ) < 0 );
+    protected void setUp() throws Exception {
+        assertTrue(
+                "Maven 3.2.4 or better is required",
+                MAVEN_VERSION == null || new DefaultArtifactVersion("3.2.3").compareTo(MAVEN_VERSION) < 0);
 
-        configurator = getContainer().lookup( ComponentConfigurator.class, "basic" );
+        configurator = getContainer().lookup(ComponentConfigurator.class, "basic");
         Context context = container.getContext();
         Map<Object, Object> map = context.getContextData();
 
-        try ( InputStream is = getClass().getResourceAsStream( "/" + getPluginDescriptorLocation() );
-              Reader reader = new BufferedReader( new XmlStreamReader( is ) ); 
-              InterpolationFilterReader interpolationReader = new InterpolationFilterReader( reader, map, "${", "}" ) )
-        {
-            
-            PluginDescriptor pluginDescriptor = new PluginDescriptorBuilder().build( interpolationReader );
-    
-            Artifact artifact =
-                lookup( RepositorySystem.class ).createArtifact( pluginDescriptor.getGroupId(),
-                                                                 pluginDescriptor.getArtifactId(),
-                                                                 pluginDescriptor.getVersion(), ".jar" );
-    
-            artifact.setFile( getPluginArtifactFile() );
-            pluginDescriptor.setPluginArtifact( artifact );
-            pluginDescriptor.setArtifacts( Arrays.asList( artifact ) );
-    
-            for ( ComponentDescriptor<?> desc : pluginDescriptor.getComponents() )
-            {
-                getContainer().addComponentDescriptor( desc );
+        try (InputStream is = getClass().getResourceAsStream("/" + getPluginDescriptorLocation());
+                Reader reader = new BufferedReader(new XmlStreamReader(is));
+                InterpolationFilterReader interpolationReader = new InterpolationFilterReader(reader, map, "${", "}")) {
+
+            PluginDescriptor pluginDescriptor = new PluginDescriptorBuilder().build(interpolationReader);
+
+            Artifact artifact = lookup(RepositorySystem.class)
+                    .createArtifact(
+                            pluginDescriptor.getGroupId(),
+                            pluginDescriptor.getArtifactId(),
+                            pluginDescriptor.getVersion(),
+                            ".jar");
+
+            artifact.setFile(getPluginArtifactFile());
+            pluginDescriptor.setPluginArtifact(artifact);
+            pluginDescriptor.setArtifacts(Arrays.asList(artifact));
+
+            for (ComponentDescriptor<?> desc : pluginDescriptor.getComponents()) {
+                getContainer().addComponentDescriptor(desc);
             }
-    
+
             mojoDescriptors = new HashMap<>();
-            for ( MojoDescriptor mojoDescriptor : pluginDescriptor.getMojos() )
-            {
-                mojoDescriptors.put( mojoDescriptor.getGoal(), mojoDescriptor );
+            for (MojoDescriptor mojoDescriptor : pluginDescriptor.getMojos()) {
+                mojoDescriptors.put(mojoDescriptor.getGoal(), mojoDescriptor);
             }
         }
     }
@@ -179,122 +168,97 @@ public abstract class AbstractMojoTestCase
      * First, attempts to determine parent directory of META-INF directory holding the plugin descriptor. If META-INF
      * parent directory cannot be determined, falls back to test basedir.
      */
-    private File getPluginArtifactFile()
-        throws IOException
-    {
+    private File getPluginArtifactFile() throws IOException {
         final String pluginDescriptorLocation = getPluginDescriptorLocation();
-        final URL resource = getClass().getResource( "/" + pluginDescriptorLocation );
+        final URL resource = getClass().getResource("/" + pluginDescriptorLocation);
 
         File file = null;
 
         // attempt to resolve relative to META-INF/maven/plugin.xml first
-        if ( resource != null )
-        {
-            if ( "file".equalsIgnoreCase( resource.getProtocol() ) )
-            {
+        if (resource != null) {
+            if ("file".equalsIgnoreCase(resource.getProtocol())) {
                 String path = resource.getPath();
-                if ( path.endsWith( pluginDescriptorLocation ) )
-                {
-                    file = new File( path.substring( 0, path.length() - pluginDescriptorLocation.length() ) );
+                if (path.endsWith(pluginDescriptorLocation)) {
+                    file = new File(path.substring(0, path.length() - pluginDescriptorLocation.length()));
                 }
-            }
-            else if ( "jar".equalsIgnoreCase( resource.getProtocol() ) )
-            {
+            } else if ("jar".equalsIgnoreCase(resource.getProtocol())) {
                 // TODO is there a helper for this somewhere?
-                try
-                {
-                    URL jarfile = new URL( resource.getPath() );
-                    if ( "file".equalsIgnoreCase( jarfile.getProtocol() ) )
-                    {
+                try {
+                    URL jarfile = new URL(resource.getPath());
+                    if ("file".equalsIgnoreCase(jarfile.getProtocol())) {
                         String path = jarfile.getPath();
-                        if ( path.endsWith( pluginDescriptorLocation ) )
-                        {
-                            file =
-                                new File( path.substring( 0, path.length() - pluginDescriptorLocation.length() - 2 ) );
+                        if (path.endsWith(pluginDescriptorLocation)) {
+                            file = new File(path.substring(0, path.length() - pluginDescriptorLocation.length() - 2));
                         }
                     }
-                }
-                catch ( MalformedURLException e )
-                {
+                } catch (MalformedURLException e) {
                     // not jar:file:/ URL, too bad
                 }
             }
         }
 
         // fallback to test project basedir if couldn't resolve relative to META-INF/maven/plugin.xml
-        if ( file == null || ! file.exists() )
-        {
-            file = new File( getBasedir() );
+        if (file == null || !file.exists()) {
+            file = new File(getBasedir());
         }
 
         return file.getCanonicalFile();
     }
 
-    protected InputStream getPublicDescriptorStream()
-        throws Exception
-    {
-        return new FileInputStream( new File( getPluginDescriptorPath() ) );
+    protected InputStream getPublicDescriptorStream() throws Exception {
+        return new FileInputStream(new File(getPluginDescriptorPath()));
     }
 
-    protected String getPluginDescriptorPath()
-    {
+    protected String getPluginDescriptorPath() {
         return getBasedir() + "/target/classes/META-INF/maven/plugin.xml";
     }
 
-    protected String getPluginDescriptorLocation()
-    {
+    protected String getPluginDescriptorLocation() {
         return "META-INF/maven/plugin.xml";
     }
 
     @Override
-    protected void setupContainer()
-    {
+    protected void setupContainer() {
         ContainerConfiguration cc = setupContainerConfiguration();
-        try
-        {
+        try {
             List<Module> modules = new ArrayList<>();
-            addGuiceModules( modules );
-            container = new DefaultPlexusContainer( cc, modules.toArray( new Module[0] ) );
-        }
-        catch ( PlexusContainerException e )
-        {
+            addGuiceModules(modules);
+            container = new DefaultPlexusContainer(cc, modules.toArray(new Module[0]));
+        } catch (PlexusContainerException e) {
             e.printStackTrace();
-            fail( "Failed to create plexus container." );
-        }   
+            fail("Failed to create plexus container.");
+        }
     }
 
     /**
      * @since 3.0.0
      */
-    protected void addGuiceModules( List<Module> modules )
-    {
+    protected void addGuiceModules(List<Module> modules) {
         // no custom guice modules by default
     }
 
-    protected ContainerConfiguration setupContainerConfiguration()
-    {
-        ClassWorld classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
+    protected ContainerConfiguration setupContainerConfiguration() {
+        ClassWorld classWorld =
+                new ClassWorld("plexus.core", Thread.currentThread().getContextClassLoader());
 
         ContainerConfiguration cc = new DefaultContainerConfiguration()
-          .setClassWorld( classWorld )
-          .setClassPathScanning( PlexusConstants.SCANNING_INDEX )
-          .setAutoWiring( true )
-          .setName( "maven" );      
+                .setClassWorld(classWorld)
+                .setClassPathScanning(PlexusConstants.SCANNING_INDEX)
+                .setAutoWiring(true)
+                .setName("maven");
 
         return cc;
     }
-    
+
     @Override
-    protected PlexusContainer getContainer()
-    {
-        if ( container == null )
-        {
+    protected PlexusContainer getContainer() {
+        if (container == null) {
             setupContainer();
         }
 
         return container;
-    }    
-    
+    }
+
     /**
      * Lookup the mojo leveraging the subproject pom
      *
@@ -303,10 +267,8 @@ public abstract class AbstractMojoTestCase
      * @return a Mojo instance
      * @throws Exception
      */
-    protected <T extends Mojo> T lookupMojo( String goal, String pluginPom )
-        throws Exception
-    {
-        return lookupMojo( goal, new File( pluginPom ) );
+    protected <T extends Mojo> T lookupMojo(String goal, String pluginPom) throws Exception {
+        return lookupMojo(goal, new File(pluginPom));
     }
 
     /**
@@ -317,10 +279,8 @@ public abstract class AbstractMojoTestCase
      * @return a Mojo instance
      * @throws Exception
      */
-    protected <T extends Mojo> T lookupEmptyMojo( String goal, String pluginPom )
-        throws Exception
-    {
-        return lookupEmptyMojo( goal, new File( pluginPom ) );
+    protected <T extends Mojo> T lookupEmptyMojo(String goal, String pluginPom) throws Exception {
+        return lookupEmptyMojo(goal, new File(pluginPom));
     }
 
     /**
@@ -331,22 +291,20 @@ public abstract class AbstractMojoTestCase
      * @return a Mojo instance
      * @throws Exception
      */
-    protected <T extends Mojo> T lookupMojo( String goal, File pom )
-        throws Exception
-    {
-        File pluginPom = new File( getBasedir(), "pom.xml" );
+    protected <T extends Mojo> T lookupMojo(String goal, File pom) throws Exception {
+        File pluginPom = new File(getBasedir(), "pom.xml");
 
-        Xpp3Dom pluginPomDom = Xpp3DomBuilder.build( ReaderFactory.newXmlReader( pluginPom ) );
+        Xpp3Dom pluginPomDom = Xpp3DomBuilder.build(ReaderFactory.newXmlReader(pluginPom));
 
-        String artifactId = pluginPomDom.getChild( "artifactId" ).getValue();
+        String artifactId = pluginPomDom.getChild("artifactId").getValue();
 
-        String groupId = resolveFromRootThenParent( pluginPomDom, "groupId" );
+        String groupId = resolveFromRootThenParent(pluginPomDom, "groupId");
 
-        String version = resolveFromRootThenParent( pluginPomDom, "version" );
+        String version = resolveFromRootThenParent(pluginPomDom, "version");
 
-        PlexusConfiguration pluginConfiguration = extractPluginConfiguration( artifactId, pom );
+        PlexusConfiguration pluginConfiguration = extractPluginConfiguration(artifactId, pom);
 
-        return lookupMojo( groupId, artifactId, version, goal, pluginConfiguration );
+        return lookupMojo(groupId, artifactId, version, goal, pluginConfiguration);
     }
 
     /**
@@ -357,31 +315,29 @@ public abstract class AbstractMojoTestCase
      * @return a Mojo instance
      * @throws Exception
      */
-    protected <T extends Mojo> T lookupEmptyMojo( String goal, File pom )
-        throws Exception
-    {
-        File pluginPom = new File( getBasedir(), "pom.xml" );
+    protected <T extends Mojo> T lookupEmptyMojo(String goal, File pom) throws Exception {
+        File pluginPom = new File(getBasedir(), "pom.xml");
 
-        Xpp3Dom pluginPomDom = Xpp3DomBuilder.build( ReaderFactory.newXmlReader( pluginPom ) );
+        Xpp3Dom pluginPomDom = Xpp3DomBuilder.build(ReaderFactory.newXmlReader(pluginPom));
 
-        String artifactId = pluginPomDom.getChild( "artifactId" ).getValue();
+        String artifactId = pluginPomDom.getChild("artifactId").getValue();
 
-        String groupId = resolveFromRootThenParent( pluginPomDom, "groupId" );
+        String groupId = resolveFromRootThenParent(pluginPomDom, "groupId");
 
-        String version = resolveFromRootThenParent( pluginPomDom, "version" );
+        String version = resolveFromRootThenParent(pluginPomDom, "version");
 
-        return lookupMojo( groupId, artifactId, version, goal, null );
+        return lookupMojo(groupId, artifactId, version, goal, null);
     }
 
     /*
-     protected Mojo lookupMojo( String groupId, String artifactId, String version, String goal, File pom )
-     throws Exception
-     {
-     PlexusConfiguration pluginConfiguration = extractPluginConfiguration( artifactId, pom );
+    protected Mojo lookupMojo( String groupId, String artifactId, String version, String goal, File pom )
+    throws Exception
+    {
+    PlexusConfiguration pluginConfiguration = extractPluginConfiguration( artifactId, pom );
 
-     return lookupMojo( groupId, artifactId, version, goal, pluginConfiguration );
-     }
-     */
+    return lookupMojo( groupId, artifactId, version, goal, pluginConfiguration );
+    }
+    */
     /**
      * lookup the mojo while we have all of the relavent information
      *
@@ -393,25 +349,24 @@ public abstract class AbstractMojoTestCase
      * @return a Mojo instance
      * @throws Exception
      */
-    protected <T extends Mojo> T lookupMojo( String groupId, String artifactId, String version, String goal,
-                               PlexusConfiguration pluginConfiguration )
-        throws Exception
-    {
+    protected <T extends Mojo> T lookupMojo(
+            String groupId, String artifactId, String version, String goal, PlexusConfiguration pluginConfiguration)
+            throws Exception {
         validateContainerStatus();
 
         // pluginkey = groupId : artifactId : version : goal
 
-        T mojo = (T) lookup( Mojo.class, groupId + ":" + artifactId + ":" + version + ":" + goal );
+        T mojo = (T) lookup(Mojo.class, groupId + ":" + artifactId + ":" + version + ":" + goal);
 
-        if ( pluginConfiguration != null )
-        {
+        if (pluginConfiguration != null) {
             /* requires v10 of plexus container for lookup on expression evaluator
-             ExpressionEvaluator evaluator = (ExpressionEvaluator) getContainer().lookup( ExpressionEvaluator.ROLE,
-                                                                                         "stub-evaluator" );
-             */
+            ExpressionEvaluator evaluator = (ExpressionEvaluator) getContainer().lookup( ExpressionEvaluator.ROLE,
+                                                                                        "stub-evaluator" );
+            */
             ExpressionEvaluator evaluator = new ResolverExpressionEvaluatorStub();
 
-            configurator.configureComponent( mojo, pluginConfiguration, evaluator, getContainer().getContainerRealm() );
+            configurator.configureComponent(
+                    mojo, pluginConfiguration, evaluator, getContainer().getContainerRealm());
         }
 
         return mojo;
@@ -425,10 +380,8 @@ public abstract class AbstractMojoTestCase
      * @throws Exception
      * @since 2.0
      */
-    protected <T extends Mojo> T lookupConfiguredMojo( MavenProject project, String goal )
-        throws Exception
-    {
-        return lookupConfiguredMojo( newMavenSession( project ), newMojoExecution( goal ) );
+    protected <T extends Mojo> T lookupConfiguredMojo(MavenProject project, String goal) throws Exception {
+        return lookupConfiguredMojo(newMavenSession(project), newMojoExecution(goal));
     }
 
     /**
@@ -440,120 +393,107 @@ public abstract class AbstractMojoTestCase
      * @throws ComponentConfigurationException
      * @since 2.0
      */
-    protected <T extends Mojo> T lookupConfiguredMojo( MavenSession session, MojoExecution execution )
-        throws Exception, ComponentConfigurationException
-    {
+    protected <T extends Mojo> T lookupConfiguredMojo(MavenSession session, MojoExecution execution)
+            throws Exception, ComponentConfigurationException {
         MavenProject project = session.getCurrentProject();
         MojoDescriptor mojoDescriptor = execution.getMojoDescriptor();
 
-        T mojo = (T) lookup( mojoDescriptor.getRole(), mojoDescriptor.getRoleHint() );
+        T mojo = (T) lookup(mojoDescriptor.getRole(), mojoDescriptor.getRoleHint());
 
-        ExpressionEvaluator evaluator = new PluginParameterExpressionEvaluator( session, execution );
+        ExpressionEvaluator evaluator = new PluginParameterExpressionEvaluator(session, execution);
 
         Xpp3Dom configuration = null;
-        Plugin plugin = project.getPlugin( mojoDescriptor.getPluginDescriptor().getPluginLookupKey() );
-        if ( plugin != null )
-        {
+        Plugin plugin = project.getPlugin(mojoDescriptor.getPluginDescriptor().getPluginLookupKey());
+        if (plugin != null) {
             configuration = (Xpp3Dom) plugin.getConfiguration();
         }
-        if ( configuration == null )
-        {
-            configuration = new Xpp3Dom( "configuration" );
+        if (configuration == null) {
+            configuration = new Xpp3Dom("configuration");
         }
-        configuration = Xpp3Dom.mergeXpp3Dom( configuration, execution.getConfiguration() );
+        configuration = Xpp3Dom.mergeXpp3Dom(configuration, execution.getConfiguration());
 
-        PlexusConfiguration pluginConfiguration = new XmlPlexusConfiguration( configuration );
+        PlexusConfiguration pluginConfiguration = new XmlPlexusConfiguration(configuration);
 
-        if ( mojoDescriptor.getComponentConfigurator() != null )
-        {
+        if (mojoDescriptor.getComponentConfigurator() != null) {
             configurator =
-                getContainer().lookup( ComponentConfigurator.class, mojoDescriptor.getComponentConfigurator() );
-        }        
-        
-        configurator.configureComponent( mojo, pluginConfiguration, evaluator, getContainer().getContainerRealm() );
+                    getContainer().lookup(ComponentConfigurator.class, mojoDescriptor.getComponentConfigurator());
+        }
+
+        configurator.configureComponent(
+                mojo, pluginConfiguration, evaluator, getContainer().getContainerRealm());
 
         return mojo;
     }
 
     /**
-     * 
+     *
      * @param project
      * @return
      * @since 2.0
      */
-    protected MavenSession newMavenSession( MavenProject project )
-    {
+    protected MavenSession newMavenSession(MavenProject project) {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         MavenExecutionResult result = new DefaultMavenExecutionResult();
 
-        MavenSession session = new MavenSession( container, MavenRepositorySystemUtils.newSession(), request, result );
-        session.setCurrentProject( project );
-        session.setProjects( Arrays.asList( project ) );
+        MavenSession session = new MavenSession(container, MavenRepositorySystemUtils.newSession(), request, result);
+        session.setCurrentProject(project);
+        session.setProjects(Arrays.asList(project));
         return session;
     }
 
     /**
-     * 
+     *
      * @param goal
      * @return
      * @since 2.0
      */
-    protected MojoExecution newMojoExecution( String goal )
-    {
-        MojoDescriptor mojoDescriptor = mojoDescriptors.get( goal );
-        assertNotNull( String.format( "The MojoDescriptor for the goal %s cannot be null.", goal ), mojoDescriptor );
-        MojoExecution execution = new MojoExecution( mojoDescriptor );
-        finalizeMojoConfiguration( execution );
+    protected MojoExecution newMojoExecution(String goal) {
+        MojoDescriptor mojoDescriptor = mojoDescriptors.get(goal);
+        assertNotNull(String.format("The MojoDescriptor for the goal %s cannot be null.", goal), mojoDescriptor);
+        MojoExecution execution = new MojoExecution(mojoDescriptor);
+        finalizeMojoConfiguration(execution);
         return execution;
     }
 
     // copy&paste from o.a.m.l.i.DefaultLifecycleExecutionPlanCalculator.finalizeMojoConfiguration(MojoExecution)
-    private void finalizeMojoConfiguration( MojoExecution mojoExecution )
-    {
+    private void finalizeMojoConfiguration(MojoExecution mojoExecution) {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
         Xpp3Dom executionConfiguration = mojoExecution.getConfiguration();
-        if ( executionConfiguration == null )
-        {
-            executionConfiguration = new Xpp3Dom( "configuration" );
+        if (executionConfiguration == null) {
+            executionConfiguration = new Xpp3Dom("configuration");
         }
 
-        Xpp3Dom defaultConfiguration = new Xpp3Dom( MojoDescriptorCreator.convert( mojoDescriptor ) );
+        Xpp3Dom defaultConfiguration = new Xpp3Dom(MojoDescriptorCreator.convert(mojoDescriptor));
 
-        Xpp3Dom finalConfiguration = new Xpp3Dom( "configuration" );
+        Xpp3Dom finalConfiguration = new Xpp3Dom("configuration");
 
-        if ( mojoDescriptor.getParameters() != null )
-        {
-            for ( Parameter parameter : mojoDescriptor.getParameters() )
-            {
-                Xpp3Dom parameterConfiguration = executionConfiguration.getChild( parameter.getName() );
+        if (mojoDescriptor.getParameters() != null) {
+            for (Parameter parameter : mojoDescriptor.getParameters()) {
+                Xpp3Dom parameterConfiguration = executionConfiguration.getChild(parameter.getName());
 
-                if ( parameterConfiguration == null )
-                {
-                    parameterConfiguration = executionConfiguration.getChild( parameter.getAlias() );
+                if (parameterConfiguration == null) {
+                    parameterConfiguration = executionConfiguration.getChild(parameter.getAlias());
                 }
 
-                Xpp3Dom parameterDefaults = defaultConfiguration.getChild( parameter.getName() );
+                Xpp3Dom parameterDefaults = defaultConfiguration.getChild(parameter.getName());
 
-                parameterConfiguration =
-                    Xpp3Dom.mergeXpp3Dom( parameterConfiguration, parameterDefaults, Boolean.TRUE );
+                parameterConfiguration = Xpp3Dom.mergeXpp3Dom(parameterConfiguration, parameterDefaults, Boolean.TRUE);
 
-                if ( parameterConfiguration != null )
-                {
-                    parameterConfiguration = new Xpp3Dom( parameterConfiguration, parameter.getName() );
+                if (parameterConfiguration != null) {
+                    parameterConfiguration = new Xpp3Dom(parameterConfiguration, parameter.getName());
 
-                    if ( StringUtils.isEmpty( parameterConfiguration.getAttribute( "implementation" ) )
-                        && StringUtils.isNotEmpty( parameter.getImplementation() ) )
-                    {
-                        parameterConfiguration.setAttribute( "implementation", parameter.getImplementation() );
+                    if (StringUtils.isEmpty(parameterConfiguration.getAttribute("implementation"))
+                            && StringUtils.isNotEmpty(parameter.getImplementation())) {
+                        parameterConfiguration.setAttribute("implementation", parameter.getImplementation());
                     }
 
-                    finalConfiguration.addChild( parameterConfiguration );
+                    finalConfiguration.addChild(parameterConfiguration);
                 }
             }
         }
 
-        mojoExecution.setConfiguration( finalConfiguration );
+        mojoExecution.setConfiguration(finalConfiguration);
     }
 
     /**
@@ -562,14 +502,11 @@ public abstract class AbstractMojoTestCase
      * @return the plexus configuration
      * @throws Exception
      */
-    protected PlexusConfiguration extractPluginConfiguration( String artifactId, File pom )
-        throws Exception
-    {
-        
-        try ( Reader reader = ReaderFactory.newXmlReader( pom ) )
-        {
-            Xpp3Dom pomDom = Xpp3DomBuilder.build( reader );
-            return extractPluginConfiguration( artifactId, pomDom );
+    protected PlexusConfiguration extractPluginConfiguration(String artifactId, File pom) throws Exception {
+
+        try (Reader reader = ReaderFactory.newXmlReader(pom)) {
+            Xpp3Dom pomDom = Xpp3DomBuilder.build(reader);
+            return extractPluginConfiguration(artifactId, pomDom);
         }
     }
 
@@ -579,47 +516,40 @@ public abstract class AbstractMojoTestCase
      * @return the plexus configuration
      * @throws Exception
      */
-    protected PlexusConfiguration extractPluginConfiguration( String artifactId, Xpp3Dom pomDom )
-        throws Exception
-    {
+    protected PlexusConfiguration extractPluginConfiguration(String artifactId, Xpp3Dom pomDom) throws Exception {
         Xpp3Dom pluginConfigurationElement = null;
 
-        Xpp3Dom buildElement = pomDom.getChild( "build" );
-        if ( buildElement != null )
-        {
-            Xpp3Dom pluginsRootElement = buildElement.getChild( "plugins" );
+        Xpp3Dom buildElement = pomDom.getChild("build");
+        if (buildElement != null) {
+            Xpp3Dom pluginsRootElement = buildElement.getChild("plugins");
 
-            if ( pluginsRootElement != null )
-            {
+            if (pluginsRootElement != null) {
                 Xpp3Dom[] pluginElements = pluginsRootElement.getChildren();
 
-                for ( Xpp3Dom pluginElement : pluginElements )
-                {
-                    String pluginElementArtifactId = pluginElement.getChild( "artifactId" ).getValue();
+                for (Xpp3Dom pluginElement : pluginElements) {
+                    String pluginElementArtifactId =
+                            pluginElement.getChild("artifactId").getValue();
 
-                    if ( pluginElementArtifactId.equals( artifactId ) )
-                    {
-                        pluginConfigurationElement = pluginElement.getChild( "configuration" );
+                    if (pluginElementArtifactId.equals(artifactId)) {
+                        pluginConfigurationElement = pluginElement.getChild("configuration");
 
                         break;
                     }
                 }
 
-                if ( pluginConfigurationElement == null )
-                {
-                    throw new ConfigurationException( "Cannot find a configuration element for a plugin with an "
-                        + "artifactId of " + artifactId + "." );
+                if (pluginConfigurationElement == null) {
+                    throw new ConfigurationException("Cannot find a configuration element for a plugin with an "
+                            + "artifactId of " + artifactId + ".");
                 }
             }
         }
 
-        if ( pluginConfigurationElement == null )
-        {
-            throw new ConfigurationException( "Cannot find a configuration element for a plugin with an artifactId of "
-                + artifactId + "." );
+        if (pluginConfigurationElement == null) {
+            throw new ConfigurationException(
+                    "Cannot find a configuration element for a plugin with an artifactId of " + artifactId + ".");
         }
 
-        return new XmlPlexusConfiguration( pluginConfigurationElement );
+        return new XmlPlexusConfiguration(pluginConfigurationElement);
     }
 
     /**
@@ -631,16 +561,15 @@ public abstract class AbstractMojoTestCase
      * @return a Mojo instance
      * @throws Exception
      */
-    protected <T extends Mojo> T configureMojo( T mojo, String artifactId, File pom )
-        throws Exception
-    {
+    protected <T extends Mojo> T configureMojo(T mojo, String artifactId, File pom) throws Exception {
         validateContainerStatus();
 
-        PlexusConfiguration pluginConfiguration = extractPluginConfiguration( artifactId, pom );
+        PlexusConfiguration pluginConfiguration = extractPluginConfiguration(artifactId, pom);
 
         ExpressionEvaluator evaluator = new ResolverExpressionEvaluatorStub();
 
-        configurator.configureComponent( mojo, pluginConfiguration, evaluator, getContainer().getContainerRealm() );
+        configurator.configureComponent(
+                mojo, pluginConfiguration, evaluator, getContainer().getContainerRealm());
 
         return mojo;
     }
@@ -653,14 +582,13 @@ public abstract class AbstractMojoTestCase
      * @return a Mojo instance
      * @throws Exception
      */
-    protected <T extends Mojo> T configureMojo( T mojo, PlexusConfiguration pluginConfiguration )
-        throws Exception
-    {
+    protected <T extends Mojo> T configureMojo(T mojo, PlexusConfiguration pluginConfiguration) throws Exception {
         validateContainerStatus();
 
         ExpressionEvaluator evaluator = new ResolverExpressionEvaluatorStub();
 
-        configurator.configureComponent( mojo, pluginConfiguration, evaluator, getContainer().getContainerRealm() );
+        configurator.configureComponent(
+                mojo, pluginConfiguration, evaluator, getContainer().getContainerRealm());
 
         return mojo;
     }
@@ -675,14 +603,12 @@ public abstract class AbstractMojoTestCase
      * @return object value of variable
      * @throws IllegalArgumentException
      */
-    protected <T> T getVariableValueFromObject( Object object, String variable )
-        throws IllegalAccessException
-    {
-        Field field = ReflectionUtils.getFieldByNameIncludingSuperclasses( variable, object.getClass() );
+    protected <T> T getVariableValueFromObject(Object object, String variable) throws IllegalAccessException {
+        Field field = ReflectionUtils.getFieldByNameIncludingSuperclasses(variable, object.getClass());
 
-        field.setAccessible( true );
+        field.setAccessible(true);
 
-        return (T) field.get( object );
+        return (T) field.get(object);
     }
 
     /**
@@ -693,10 +619,8 @@ public abstract class AbstractMojoTestCase
      * @param object
      * @return map of variable names and values
      */
-    protected Map<String, Object> getVariablesAndValuesFromObject( Object object )
-        throws IllegalAccessException
-    {
-        return getVariablesAndValuesFromObject( object.getClass(), object );
+    protected Map<String, Object> getVariablesAndValuesFromObject(Object object) throws IllegalAccessException {
+        return getVariablesAndValuesFromObject(object.getClass(), object);
     }
 
     /**
@@ -708,25 +632,22 @@ public abstract class AbstractMojoTestCase
      * @param object
      * @return map of variable names and values
      */
-    protected Map<String, Object> getVariablesAndValuesFromObject( Class<?> clazz, Object object )
-        throws IllegalAccessException
-    {
+    protected Map<String, Object> getVariablesAndValuesFromObject(Class<?> clazz, Object object)
+            throws IllegalAccessException {
         Map<String, Object> map = new HashMap<>();
 
         Field[] fields = clazz.getDeclaredFields();
 
-        AccessibleObject.setAccessible( fields, true );
+        AccessibleObject.setAccessible(fields, true);
 
-        for ( Field field : fields )
-        {
-            map.put( field.getName(), field.get( object ) );
+        for (Field field : fields) {
+            map.put(field.getName(), field.get(object));
         }
 
         Class<?> superclass = clazz.getSuperclass();
 
-        if ( !Object.class.equals( superclass ) )
-        {
-            map.putAll( getVariablesAndValuesFromObject( superclass, object ) );
+        if (!Object.class.equals(superclass)) {
+            map.putAll(getVariablesAndValuesFromObject(superclass, object));
         }
 
         return map;
@@ -740,14 +661,12 @@ public abstract class AbstractMojoTestCase
      * @param value
      * @throws IllegalAccessException
      */
-    protected <T> void setVariableValueToObject( Object object, String variable, T value )
-        throws IllegalAccessException
-    {
-        Field field = ReflectionUtils.getFieldByNameIncludingSuperclasses( variable, object.getClass() );
+    protected <T> void setVariableValueToObject(Object object, String variable, T value) throws IllegalAccessException {
+        Field field = ReflectionUtils.getFieldByNameIncludingSuperclasses(variable, object.getClass());
 
-        field.setAccessible( true );
+        field.setAccessible(true);
 
-        field.set( object, value );
+        field.set(object, value);
     }
 
     /**
@@ -760,29 +679,24 @@ public abstract class AbstractMojoTestCase
      * @return
      * @throws Exception
      */
-    private String resolveFromRootThenParent( Xpp3Dom pluginPomDom, String element )
-        throws Exception
-    {
-        Xpp3Dom elementDom = pluginPomDom.getChild( element );
+    private String resolveFromRootThenParent(Xpp3Dom pluginPomDom, String element) throws Exception {
+        Xpp3Dom elementDom = pluginPomDom.getChild(element);
 
         // parent might have the group Id so resolve it
-        if ( elementDom == null )
-        {
-            Xpp3Dom pluginParentDom = pluginPomDom.getChild( "parent" );
+        if (elementDom == null) {
+            Xpp3Dom pluginParentDom = pluginPomDom.getChild("parent");
 
-            if ( pluginParentDom != null )
-            {
-                elementDom = pluginParentDom.getChild( element );
+            if (pluginParentDom != null) {
+                elementDom = pluginParentDom.getChild(element);
 
-                if ( elementDom == null )
-                {
-                    throw new Exception( "unable to determine " + element );
+                if (elementDom == null) {
+                    throw new Exception("unable to determine " + element);
                 }
 
                 return elementDom.getValue();
             }
 
-            throw new Exception( "unable to determine " + element );
+            throw new Exception("unable to determine " + element);
         }
 
         return elementDom.getValue();
@@ -796,14 +710,11 @@ public abstract class AbstractMojoTestCase
      *
      * @throws Exception
      */
-    private void validateContainerStatus()
-        throws Exception
-    {
-        if ( getContainer() != null )
-        {
+    private void validateContainerStatus() throws Exception {
+        if (getContainer() != null) {
             return;
         }
 
-        throw new Exception( "container is null, make sure super.setUp() is called" );
-    }    
+        throw new Exception("container is null, make sure super.setUp() is called");
+    }
 }

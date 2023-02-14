@@ -1,5 +1,3 @@
-package org.apache.maven.api.plugin.testing;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.plugin.testing;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.plugin.testing;
 
 import javax.inject.Named;
 
@@ -27,8 +26,6 @@ import java.util.Properties;
 import com.google.inject.Provides;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.plugin.MojoException;
-import org.apache.maven.api.plugin.testing.InjectMojo;
-import org.apache.maven.api.plugin.testing.MojoTest;
 import org.apache.maven.api.plugin.testing.stubs.SessionStub;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.jupiter.api.Test;
@@ -41,14 +38,12 @@ import static org.mockito.Mockito.doReturn;
  * @author Edwin Punzalan
  */
 @MojoTest
-public class ExpressionEvaluatorTest
-{
+public class ExpressionEvaluatorTest {
 
     private static final String LOCAL_REPO = "target/local-repo/";
     private static final String ARTIFACT_ID = "maven-test-mojo";
     private static final String COORDINATES = "groupId:" + ARTIFACT_ID + ":version:goal";
-    private static final String CONFIG =
-            "<project>\n"
+    private static final String CONFIG = "<project>\n"
             + "    <build>\n"
             + "        <plugins>\n"
             + "            <plugin>\n"
@@ -63,49 +58,39 @@ public class ExpressionEvaluatorTest
             + "</project>\n";
 
     @Test
-    @InjectMojo( goal = COORDINATES, pom = CONFIG )
-    public void testInjection( ExpressionEvaluatorMojo mojo )
-    {
-        assertDoesNotThrow( mojo::execute );
+    @InjectMojo(goal = COORDINATES, pom = CONFIG)
+    public void testInjection(ExpressionEvaluatorMojo mojo) {
+        assertDoesNotThrow(mojo::execute);
     }
 
-    @Named( COORDINATES )
-    public static class ExpressionEvaluatorMojo
-            implements org.apache.maven.api.plugin.Mojo
-    {
+    @Named(COORDINATES)
+    public static class ExpressionEvaluatorMojo implements org.apache.maven.api.plugin.Mojo {
         private String basedir;
 
         private String workdir;
 
         /** {@inheritDoc} */
         @Override
-        public void execute()
-                throws MojoException
-        {
-            if ( StringUtils.isEmpty( basedir ) )
-            {
-                throw new MojoException( "basedir was not injected." );
+        public void execute() throws MojoException {
+            if (StringUtils.isEmpty(basedir)) {
+                throw new MojoException("basedir was not injected.");
             }
 
-            if ( StringUtils.isEmpty( workdir ) )
-            {
-                throw new MojoException( "workdir was not injected." );
-            }
-            else if ( !workdir.startsWith( basedir ) )
-            {
-                throw new MojoException( "workdir does not start with basedir." );
+            if (StringUtils.isEmpty(workdir)) {
+                throw new MojoException("workdir was not injected.");
+            } else if (!workdir.startsWith(basedir)) {
+                throw new MojoException("workdir does not start with basedir.");
             }
         }
     }
 
-    @Provides @SuppressWarnings( "unused" )
-    Session session()
-    {
-        Session session = SessionStub.getMockSession( LOCAL_REPO );
-        doReturn( new Properties() ).when( session ).getSystemProperties();
-        doReturn( new Properties() ).when( session ).getUserProperties();
-        doAnswer( iom -> Paths.get( MojoExtension.getBasedir() ) ).when( session ).getExecutionRootDirectory();
+    @Provides
+    @SuppressWarnings("unused")
+    Session session() {
+        Session session = SessionStub.getMockSession(LOCAL_REPO);
+        doReturn(new Properties()).when(session).getSystemProperties();
+        doReturn(new Properties()).when(session).getUserProperties();
+        doAnswer(iom -> Paths.get(MojoExtension.getBasedir())).when(session).getExecutionRootDirectory();
         return session;
     }
-
 }

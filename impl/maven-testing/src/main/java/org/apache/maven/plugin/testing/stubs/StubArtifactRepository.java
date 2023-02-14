@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.testing.stubs;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.plugin.testing.stubs;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,11 @@ package org.apache.maven.plugin.testing.stubs;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.testing.stubs;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -27,16 +30,10 @@ import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.repository.Proxy;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  */
-public class StubArtifactRepository
-    implements ArtifactRepository
-{
+public class StubArtifactRepository implements ArtifactRepository {
     private String baseDir = null;
 
     /**
@@ -44,8 +41,7 @@ public class StubArtifactRepository
      *
      * @param dir the basedir
      */
-    public StubArtifactRepository( String dir )
-    {
+    public StubArtifactRepository(String dir) {
         baseDir = dir;
     }
 
@@ -54,8 +50,7 @@ public class StubArtifactRepository
      * @see org.apache.maven.artifact.repository.ArtifactRepository#pathOf(org.apache.maven.artifact.Artifact)
      */
     @Override
-    public String pathOf( Artifact artifact )
-    {
+    public String pathOf(Artifact artifact) {
         return artifact.getId();
     }
 
@@ -64,8 +59,7 @@ public class StubArtifactRepository
      * @see org.apache.maven.artifact.repository.ArtifactRepository#pathOfRemoteRepositoryMetadata(org.apache.maven.artifact.metadata.ArtifactMetadata)
      */
     @Override
-    public String pathOfRemoteRepositoryMetadata( ArtifactMetadata artifactMetadata )
-    {
+    public String pathOfRemoteRepositoryMetadata(ArtifactMetadata artifactMetadata) {
         return null;
     }
 
@@ -74,9 +68,8 @@ public class StubArtifactRepository
      * @see org.apache.maven.artifact.repository.ArtifactRepository#pathOfLocalRepositoryMetadata(org.apache.maven.artifact.metadata.ArtifactMetadata, org.apache.maven.artifact.repository.ArtifactRepository)
      */
     @Override
-    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
-    {
-        return metadata.getLocalFilename( repository );
+    public String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository) {
+        return metadata.getLocalFilename(repository);
     }
 
     /**
@@ -84,8 +77,7 @@ public class StubArtifactRepository
      * @see org.apache.maven.artifact.repository.ArtifactRepository#getUrl()
      */
     @Override
-    public String getUrl()
-    {
+    public String getUrl() {
         return null;
     }
 
@@ -94,8 +86,7 @@ public class StubArtifactRepository
      * @see org.apache.maven.artifact.repository.ArtifactRepository#getBasedir()
      */
     @Override
-    public String getBasedir()
-    {
+    public String getBasedir() {
         return baseDir;
     }
 
@@ -104,8 +95,7 @@ public class StubArtifactRepository
      * @see org.apache.maven.artifact.repository.ArtifactRepository#getProtocol()
      */
     @Override
-    public String getProtocol()
-    {
+    public String getProtocol() {
         return null;
     }
 
@@ -114,8 +104,7 @@ public class StubArtifactRepository
      * @see org.apache.maven.artifact.repository.ArtifactRepository#getId()
      */
     @Override
-    public String getId()
-    {
+    public String getId() {
         return null;
     }
 
@@ -124,8 +113,7 @@ public class StubArtifactRepository
      * @see org.apache.maven.artifact.repository.ArtifactRepository#getSnapshots()
      */
     @Override
-    public ArtifactRepositoryPolicy getSnapshots()
-    {
+    public ArtifactRepositoryPolicy getSnapshots() {
         return null;
     }
 
@@ -134,8 +122,7 @@ public class StubArtifactRepository
      * @see org.apache.maven.artifact.repository.ArtifactRepository#getReleases()
      */
     @Override
-    public ArtifactRepositoryPolicy getReleases()
-    {
+    public ArtifactRepositoryPolicy getReleases() {
         return null;
     }
 
@@ -144,8 +131,7 @@ public class StubArtifactRepository
      * @see org.apache.maven.artifact.repository.ArtifactRepository#getLayout()
      */
     @Override
-    public ArtifactRepositoryLayout getLayout()
-    {
+    public ArtifactRepositoryLayout getLayout() {
         return null;
     }
 
@@ -154,8 +140,7 @@ public class StubArtifactRepository
      * @see org.apache.maven.artifact.repository.ArtifactRepository#getKey()
      */
     @Override
-    public String getKey()
-    {
+    public String getKey() {
         return null;
     }
 
@@ -164,8 +149,7 @@ public class StubArtifactRepository
      * @see org.apache.maven.artifact.repository.ArtifactRepository#isUniqueVersion()
      */
     @Override
-    public boolean isUniqueVersion()
-    {
+    public boolean isUniqueVersion() {
         return false;
     }
 
@@ -175,8 +159,7 @@ public class StubArtifactRepository
      * @see org.apache.maven.artifact.repository.ArtifactRepository#setBlacklisted(boolean)
      */
     @Override
-    public void setBlacklisted( boolean blackListed )
-    {
+    public void setBlacklisted(boolean blackListed) {
         // nop
     }
 
@@ -185,105 +168,74 @@ public class StubArtifactRepository
      * @see org.apache.maven.artifact.repository.ArtifactRepository#isBlacklisted()
      */
     @Override
-    public boolean isBlacklisted()
-    {
+    public boolean isBlacklisted() {
         return false;
     }
 
     @Override
-    public Artifact find( Artifact artifact )
-    {
+    public Artifact find(Artifact artifact) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Authentication getAuthentication()
-    {
+    public Authentication getAuthentication() {
         return null;
     }
 
     @Override
-    public Proxy getProxy()
-    {
+    public Proxy getProxy() {
         return null;
     }
 
     @Override
-    public void setAuthentication( Authentication authentication )
-    {
-
-    }
+    public void setAuthentication(Authentication authentication) {}
 
     @Override
-    public void setId( String id )
-    {
-
-    }
+    public void setId(String id) {}
 
     @Override
-    public void setLayout( ArtifactRepositoryLayout layout )
-    {
-
-    }
+    public void setLayout(ArtifactRepositoryLayout layout) {}
 
     @Override
-    public void setProxy( Proxy proxy )
-    {
-
-    }
+    public void setProxy(Proxy proxy) {}
 
     @Override
-    public void setReleaseUpdatePolicy( ArtifactRepositoryPolicy policy )
-    {
-
-    }
+    public void setReleaseUpdatePolicy(ArtifactRepositoryPolicy policy) {}
 
     @Override
-    public void setSnapshotUpdatePolicy( ArtifactRepositoryPolicy policy )
-    {
-
-    }
+    public void setSnapshotUpdatePolicy(ArtifactRepositoryPolicy policy) {}
 
     @Override
-    public void setUrl( String url )
-    {
-
-    }
+    public void setUrl(String url) {}
 
     @Override
-    public List<String> findVersions( Artifact artifact )
-    {
+    public List<String> findVersions(Artifact artifact) {
         return Collections.emptyList();
     }
 
     @Override
-    public boolean isProjectAware()
-    {
+    public boolean isProjectAware() {
         return false;
     }
 
     @Override
-    public List<ArtifactRepository> getMirroredRepositories()
-    {
-        return new ArrayList<>( 0 );
+    public List<ArtifactRepository> getMirroredRepositories() {
+        return new ArrayList<>(0);
     }
 
     @Override
-    public void setMirroredRepositories( List<ArtifactRepository> artifactRepositories )
-    {
+    public void setMirroredRepositories(List<ArtifactRepository> artifactRepositories) {
         // no op
     }
 
     @Override
-    public boolean isBlocked()
-    {
+    public boolean isBlocked() {
         return false;
     }
 
     @Override
-    public void setBlocked( boolean blocked )
-    {
+    public void setBlocked(boolean blocked) {
         // no op
     }
 }

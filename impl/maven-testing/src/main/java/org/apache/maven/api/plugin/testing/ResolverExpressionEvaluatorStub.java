@@ -1,5 +1,3 @@
-package org.apache.maven.api.plugin.testing;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.api.plugin.testing;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.plugin.testing;
 
 import java.io.File;
 import java.util.Map;
@@ -34,101 +33,74 @@ import org.eclipse.aether.repository.LocalRepository;
  *
  * @author jesse
  */
-public class ResolverExpressionEvaluatorStub
-    implements TypeAwareExpressionEvaluator
-{
+public class ResolverExpressionEvaluatorStub implements TypeAwareExpressionEvaluator {
 
     private final Map<String, Object> properties;
 
-    public ResolverExpressionEvaluatorStub( Map<String, Object> properties )
-    {
+    public ResolverExpressionEvaluatorStub(Map<String, Object> properties) {
         this.properties = properties;
     }
 
     /** {@inheritDoc} */
     @Override
-    public Object evaluate( String expr )
-            throws ExpressionEvaluationException
-    {
-        return evaluate( expr, null );
+    public Object evaluate(String expr) throws ExpressionEvaluationException {
+        return evaluate(expr, null);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Object evaluate( String expr, Class<?> type )
-        throws ExpressionEvaluationException
-    {
+    public Object evaluate(String expr, Class<?> type) throws ExpressionEvaluationException {
 
         Object value = null;
 
-        if ( expr == null )
-        {
+        if (expr == null) {
             return null;
         }
 
-        String expression = stripTokens( expr );
+        String expression = stripTokens(expr);
 
-        if ( expression.equals( expr ) )
-        {
-            int index = expr.indexOf( "${" );
-            if ( index >= 0 )
-            {
-                int lastIndex = expr.indexOf( "}", index );
-                if ( lastIndex >= 0 )
-                {
-                    String retVal = expr.substring( 0, index );
+        if (expression.equals(expr)) {
+            int index = expr.indexOf("${");
+            if (index >= 0) {
+                int lastIndex = expr.indexOf("}", index);
+                if (lastIndex >= 0) {
+                    String retVal = expr.substring(0, index);
 
-                    if ( index > 0 && expr.charAt( index - 1 ) == '$' )
-                    {
-                        retVal += expr.substring( index + 1, lastIndex + 1 );
-                    }
-                    else
-                    {
-                        retVal += evaluate( expr.substring( index, lastIndex + 1 ) );
+                    if (index > 0 && expr.charAt(index - 1) == '$') {
+                        retVal += expr.substring(index + 1, lastIndex + 1);
+                    } else {
+                        retVal += evaluate(expr.substring(index, lastIndex + 1));
                     }
 
-                    retVal += evaluate( expr.substring( lastIndex + 1 ) );
+                    retVal += evaluate(expr.substring(lastIndex + 1));
                     return retVal;
                 }
             }
 
             // Was not an expression
-            return expression.contains( "$$" )
-                    ? expression.replaceAll( "\\$\\$", "\\$" )
-                    : expression;
-        }
-        else
-        {
-            if ( "basedir".equals( expression ) || "project.basedir".equals( expression ) )
-            {
+            return expression.contains("$$") ? expression.replaceAll("\\$\\$", "\\$") : expression;
+        } else {
+            if ("basedir".equals(expression) || "project.basedir".equals(expression)) {
                 value = PlexusExtension.getBasedir();
-            }
-            else if ( expression.startsWith( "basedir" ) || expression.startsWith( "project.basedir" ) )
-            {
-                int pathSeparator = expression.indexOf( "/" );
-                if ( pathSeparator > 0 )
-                {
-                    value = PlexusTestCase.getBasedir() + expression.substring( pathSeparator );
+            } else if (expression.startsWith("basedir") || expression.startsWith("project.basedir")) {
+                int pathSeparator = expression.indexOf("/");
+                if (pathSeparator > 0) {
+                    value = PlexusTestCase.getBasedir() + expression.substring(pathSeparator);
                 }
+            } else if ("localRepository".equals(expression)) {
+                File localRepo = new File(PlexusTestCase.getBasedir(), "target/local-repo");
+                return new LocalRepository("file://" + localRepo.getAbsolutePath());
             }
-            else if ( "localRepository".equals( expression ) )
-            {
-                File localRepo = new File( PlexusTestCase.getBasedir(), "target/local-repo" );
-                return new LocalRepository( "file://" + localRepo.getAbsolutePath() );
-            }
-            if ( value == null && properties != null && properties.containsKey( expression ) )
-            {
-                value = properties.get( expression );
+            if (value == null && properties != null && properties.containsKey(expression)) {
+                value = properties.get(expression);
             }
             return value;
         }
     }
 
-    private String stripTokens( String expr )
-    {
-        if ( expr.startsWith( "${" ) && expr.indexOf( "}" ) == expr.length() - 1 )
-        {
-            expr = expr.substring( 2, expr.length() - 1 );
+    private String stripTokens(String expr) {
+        if (expr.startsWith("${") && expr.indexOf("}") == expr.length() - 1) {
+            expr = expr.substring(2, expr.length() - 1);
         }
 
         return expr;
@@ -136,19 +108,13 @@ public class ResolverExpressionEvaluatorStub
 
     /** {@inheritDoc} */
     @Override
-    public File alignToBaseDirectory( File file )
-    {
-        if ( file.getAbsolutePath().startsWith( PlexusExtension.getBasedir() ) )
-        {
+    public File alignToBaseDirectory(File file) {
+        if (file.getAbsolutePath().startsWith(PlexusExtension.getBasedir())) {
             return file;
-        }
-        else if ( file.isAbsolute() )
-        {
+        } else if (file.isAbsolute()) {
             return file;
-        }
-        else
-        {
-            return new File( PlexusExtension.getBasedir(), file.getPath() );
+        } else {
+            return new File(PlexusExtension.getBasedir(), file.getPath());
         }
     }
 }

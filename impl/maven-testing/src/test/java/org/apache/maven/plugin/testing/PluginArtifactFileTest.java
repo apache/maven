@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.testing;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,31 +16,29 @@ package org.apache.maven.plugin.testing;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.testing;
 
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecution;
 
-public class PluginArtifactFileTest
-    extends AbstractMojoTestCase
-{
-    private static final String FS = System.getProperty( "file.separator" );
-    
-    public void testArtifact()
-        throws Exception
-    {
-        MojoExecution execution = newMojoExecution( "parameters" ); // TODO dedicated test mojo
+public class PluginArtifactFileTest extends AbstractMojoTestCase {
+    private static final String FS = System.getProperty("file.separator");
 
-        List<Artifact> artifacts = execution.getMojoDescriptor().getPluginDescriptor().getArtifacts();
+    public void testArtifact() throws Exception {
+        MojoExecution execution = newMojoExecution("parameters"); // TODO dedicated test mojo
 
-        assertEquals( 1, artifacts.size() );
+        List<Artifact> artifacts =
+                execution.getMojoDescriptor().getPluginDescriptor().getArtifacts();
 
-        Artifact artifact = artifacts.get( 0 );
-        assertEquals( "test", artifact.getGroupId() );
-        assertEquals( "test-plugin", artifact.getArtifactId() );
-        assertEquals( "0.0.1-SNAPSHOT", artifact.getBaseVersion() );
-        assertTrue( artifact.getFile().getAbsolutePath().endsWith( FS + "target" + FS + "test-classes" ) );
+        assertEquals(1, artifacts.size());
+
+        Artifact artifact = artifacts.get(0);
+        assertEquals("test", artifact.getGroupId());
+        assertEquals("test-plugin", artifact.getArtifactId());
+        assertEquals("0.0.1-SNAPSHOT", artifact.getBaseVersion());
+        assertTrue(artifact.getFile().getAbsolutePath().endsWith(FS + "target" + FS + "test-classes"));
     }
 
     // TODO find a way to automate testing of jar:file:/ test plugin URLs

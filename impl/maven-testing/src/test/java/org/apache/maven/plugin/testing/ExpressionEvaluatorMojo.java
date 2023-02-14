@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.testing;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,6 +16,7 @@ package org.apache.maven.plugin.testing;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.testing;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
@@ -28,9 +27,7 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * @author Edwin Punzalan
  */
-public class ExpressionEvaluatorMojo
-    extends AbstractMojo
-{
+public class ExpressionEvaluatorMojo extends AbstractMojo {
     private String basedir;
 
     private ArtifactRepository localRepository;
@@ -39,26 +36,19 @@ public class ExpressionEvaluatorMojo
 
     /** {@inheritDoc} */
     @Override
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
-        if ( StringUtils.isEmpty( basedir ) )
-        {
-            throw new MojoExecutionException( "basedir was not injected." );
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        if (StringUtils.isEmpty(basedir)) {
+            throw new MojoExecutionException("basedir was not injected.");
         }
 
-        if ( localRepository == null )
-        {
-            throw new MojoExecutionException( "localRepository was not injected." );
+        if (localRepository == null) {
+            throw new MojoExecutionException("localRepository was not injected.");
         }
 
-        if ( StringUtils.isEmpty( workdir ) )
-        {
-            throw new MojoExecutionException( "workdir was not injected." );
-        }
-        else if ( !workdir.startsWith( basedir ) )
-        {
-            throw new MojoExecutionException( "workdir does not start with basedir." );
+        if (StringUtils.isEmpty(workdir)) {
+            throw new MojoExecutionException("workdir was not injected.");
+        } else if (!workdir.startsWith(basedir)) {
+            throw new MojoExecutionException("workdir does not start with basedir.");
         }
     }
 }

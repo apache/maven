@@ -1,5 +1,3 @@
-package org.apache.maven.plugin.testing;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,40 +16,36 @@ package org.apache.maven.plugin.testing;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugin.testing;
 
 /**
  * ConfigurationException
  *
  * @author jesse
  */
-public class ConfigurationException
-    extends Exception
-{
+public class ConfigurationException extends Exception {
     /** serialVersionUID */
     static final long serialVersionUID = -6180939638742159065L;
 
     /**
      * @param message The detailed message.
      */
-    public ConfigurationException( String message )
-    {
-        super( message );
+    public ConfigurationException(String message) {
+        super(message);
     }
 
     /**
      * @param cause The detailed cause.
      */
-    public ConfigurationException( Throwable cause )
-    {
-        super( cause );
+    public ConfigurationException(Throwable cause) {
+        super(cause);
     }
 
     /**
      * @param message The detailed message.
      * @param cause The detailed cause.
      */
-    public ConfigurationException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public ConfigurationException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

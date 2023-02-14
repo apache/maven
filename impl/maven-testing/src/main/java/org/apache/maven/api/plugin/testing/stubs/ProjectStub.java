@@ -1,5 +1,3 @@
-package org.apache.maven.api.plugin.testing.stubs;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -9,7 +7,7 @@ package org.apache.maven.api.plugin.testing.stubs;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -18,6 +16,7 @@ package org.apache.maven.api.plugin.testing.stubs;
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.plugin.testing.stubs;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -37,9 +36,7 @@ import org.apache.maven.api.model.Model;
  * @since 1.0-beta-1
  *
  */
-public class ProjectStub
-        implements Project
-{
+public class ProjectStub implements Project {
 
     private Model model = Model.newInstance();
     private Path basedir;
@@ -47,156 +44,130 @@ public class ProjectStub
     private boolean executionRoot;
     private Artifact artifact;
 
-    public void setModel( Model model )
-    {
+    public void setModel(Model model) {
         this.model = model;
     }
 
     @Nonnull
     @Override
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return model.getGroupId();
     }
 
     @Nonnull
     @Override
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return model.getArtifactId();
     }
 
     @Nonnull
     @Override
-    public String getVersion()
-    {
+    public String getVersion() {
         return model.getVersion();
     }
 
-    public String getName()
-    {
+    public String getName() {
         return model.getName();
     }
 
     @Nonnull
     @Override
-    public String getPackaging()
-    {
+    public String getPackaging() {
         return model.getPackaging();
     }
 
     @Nonnull
     @Override
-    public Artifact getArtifact()
-    {
+    public Artifact getArtifact() {
         return artifact;
     }
 
     @Nonnull
     @Override
-    public Model getModel()
-    {
+    public Model getModel() {
         return model;
     }
 
     @Nonnull
     @Override
-    public Optional<Path> getPomPath()
-    {
-        return Optional.ofNullable( pomPath ).map( File::toPath );
+    public Optional<Path> getPomPath() {
+        return Optional.ofNullable(pomPath).map(File::toPath);
     }
 
     @Nonnull
     @Override
-    public List<DependencyCoordinate> getDependencies()
-    {
+    public List<DependencyCoordinate> getDependencies() {
         return null;
     }
 
     @Nonnull
     @Override
-    public List<DependencyCoordinate> getManagedDependencies()
-    {
+    public List<DependencyCoordinate> getManagedDependencies() {
         return null;
     }
 
     @Override
-    public Optional<Path> getBasedir()
-    {
-        return Optional.ofNullable( basedir );
+    public Optional<Path> getBasedir() {
+        return Optional.ofNullable(basedir);
     }
 
-    public void setBasedir( Path basedir )
-    {
+    public void setBasedir(Path basedir) {
         this.basedir = basedir;
     }
 
     @Override
-    public boolean isExecutionRoot()
-    {
+    public boolean isExecutionRoot() {
         return executionRoot;
     }
 
     @Override
-    public Optional<Project> getParent()
-    {
+    public Optional<Project> getParent() {
         return Optional.empty();
     }
 
     @Override
-    public List<RemoteRepository> getRemoteProjectRepositories()
-    {
+    public List<RemoteRepository> getRemoteProjectRepositories() {
         return Collections.emptyList();
     }
 
     @Override
-    public List<RemoteRepository> getRemotePluginRepositories()
-    {
+    public List<RemoteRepository> getRemotePluginRepositories() {
         return Collections.emptyList();
     }
 
-    public void setGroupId( String groupId )
-    {
-        model = model.withGroupId( groupId );
+    public void setGroupId(String groupId) {
+        model = model.withGroupId(groupId);
     }
 
-    public void setArtifactId( String artifactId )
-    {
-        model = model.withArtifactId( artifactId );
+    public void setArtifactId(String artifactId) {
+        model = model.withArtifactId(artifactId);
     }
 
-    public void setVersion( String version )
-    {
-        model = model.withVersion( version );
+    public void setVersion(String version) {
+        model = model.withVersion(version);
     }
 
-    public void setName( String name )
-    {
-        model = model.withName( name );
+    public void setName(String name) {
+        model = model.withName(name);
     }
 
-    public void setPackaging( String packaging )
-    {
-        model = model.withPackaging( packaging );
+    public void setPackaging(String packaging) {
+        model = model.withPackaging(packaging);
     }
 
-    public void setArtifact( Artifact artifact )
-    {
+    public void setArtifact(Artifact artifact) {
         this.artifact = artifact;
     }
 
-    public void setPomPath( File pomPath )
-    {
+    public void setPomPath(File pomPath) {
         this.pomPath = pomPath;
     }
 
-    public void setExecutionRoot( boolean executionRoot )
-    {
+    public void setExecutionRoot(boolean executionRoot) {
         this.executionRoot = executionRoot;
     }
 
-    public void setMavenModel( org.apache.maven.model.Model model )
-    {
+    public void setMavenModel(org.apache.maven.model.Model model) {
         this.model = model.getDelegate();
     }
 }
