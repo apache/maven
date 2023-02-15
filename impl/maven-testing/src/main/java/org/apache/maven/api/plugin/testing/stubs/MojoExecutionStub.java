@@ -23,7 +23,7 @@ import java.util.Optional;
 
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.model.Plugin;
-import org.apache.maven.api.xml.Dom;
+import org.apache.maven.api.xml.XmlNode;
 
 /**
  * Stub for {@link MojoExecution}.
@@ -33,14 +33,14 @@ public class MojoExecutionStub implements MojoExecution
     private final String artifactId;
     private final String executionId;
     private final String goal;
-    private final Dom dom;
+    private final XmlNode dom;
 
     public MojoExecutionStub( String artifactId, String executionId, String goal )
     {
         this( artifactId, executionId, goal, null );
     }
 
-    public MojoExecutionStub( String artifactId, String executionId, String goal, Dom dom )
+    public MojoExecutionStub( String artifactId, String executionId, String goal, XmlNode dom )
     {
         this.artifactId = artifactId;
         this.executionId = executionId;
@@ -69,7 +69,7 @@ public class MojoExecutionStub implements MojoExecution
     }
 
     @Override
-    public Optional<Dom> getConfiguration()
+    public Optional<XmlNode> getConfiguration()
     {
         return Optional.ofNullable( dom );
     }
