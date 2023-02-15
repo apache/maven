@@ -83,7 +83,7 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-archiver</artifactId>
-      <version>4.3.0</version>
+      <version>4.6.1</version>
     </dependency>
 
     <dependency>

@@ -273,17 +273,9 @@ public class ArtifactStubFactory {
         archiver.setDestFile(destFile);
         archiver.addFile(srcFile, getUnpackableFileName(artifact));
 
-        try {
-            setVariableValueToObject(archiver, "logger", new SilentLog());
-        } catch (IllegalAccessException e) {
-            System.out.println("Unable to override logger with silent log.");
-            e.printStackTrace();
-        }
         if (archiver instanceof WarArchiver) {
             WarArchiver war = (WarArchiver) archiver;
-            // the use of this is counter-intuitive:
-            // http://jira.codehaus.org/browse/PLX-286
-            war.setIgnoreWebxml(false);
+            war.setExpectWebXml(false);
         }
         archiver.createArchive();
     }
