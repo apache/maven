@@ -84,7 +84,8 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
             public void handle( String target, Request baseRequest, HttpServletRequest request,
                                 HttpServletResponse response )
             {
-                System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
+                String tn = Thread.currentThread().getName();
+                System.out.println( tn + " Handling (proxy) " + request.getMethod() + " " + request.getRequestURL() );
 
                 String auth = request.getHeader( "Proxy-Authorization" );
                 if ( auth != null )
@@ -92,7 +93,7 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
                     auth = auth.substring( auth.indexOf( ' ' ) + 1 ).trim();
                     auth = new String( Base64.getDecoder().decode( auth ), StandardCharsets.US_ASCII );
                 }
-                System.out.println( "Proxy-Authorization: " + auth );
+                System.out.println( tn + " Proxy-Authorization: " + auth );
 
                 if ( !"proxyuser:proxypass".equals( auth ) )
                 {
@@ -109,6 +110,7 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
                 deployedResource.contentLength = request.getHeader( "Content-Length" );
 
                 deployedResources.add( deployedResource );
+                System.out.println( tn + " Done (proxy) " + request.getMethod() + " " + request.getRequestURL() );
             }
         };
 
@@ -118,7 +120,8 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
             public void handle( String target, Request baseRequest, HttpServletRequest request,
                                 HttpServletResponse response )
             {
-                System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
+                String tn = Thread.currentThread().getName();
+                System.out.println( tn + " Handling (repos) " + request.getMethod() + " " + request.getRequestURL() );
 
                 if ( "PUT".equalsIgnoreCase( request.getMethod() ) )
                 {
@@ -140,6 +143,7 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
                 deployedResource.contentLength = request.getHeader( "Content-Length" );
 
                 deployedResources.add( deployedResource );
+                System.out.println( tn + " Done (repos) " + request.getMethod() + " " + request.getRequestURL() );
             }
         };
 
