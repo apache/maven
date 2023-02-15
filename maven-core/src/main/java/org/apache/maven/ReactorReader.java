@@ -318,11 +318,13 @@ class ReactorReader implements MavenWorkspaceReader {
         switch (event.getType()) {
             case MojoStarted:
                 String phase = event.getMojoExecution().getLifecyclePhase();
-                Deque<String> phases = getLifecycles(project);
-                if (!Objects.equals(phase, phases.peekLast())) {
-                    phases.addLast(phase);
-                    if ("clean".equals(phase)) {
-                        cleanProjectLocalRepository(project);
+                if (phase != null) {
+                    Deque<String> phases = getLifecycles(project);
+                    if (!Objects.equals(phase, phases.peekLast())) {
+                        phases.addLast(phase);
+                        if ("clean".equals(phase)) {
+                            cleanProjectLocalRepository(project);
+                        }
                     }
                 }
                 break;
