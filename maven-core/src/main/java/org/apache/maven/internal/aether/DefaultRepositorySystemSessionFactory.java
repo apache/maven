@@ -365,18 +365,16 @@ public class DefaultRepositorySystemSessionFactory {
         mavenRepositorySystem.injectProxy(session, request.getPluginArtifactRepositories());
         mavenRepositorySystem.injectAuthentication(session, request.getPluginArtifactRepositories());
 
-        Object resolverDependencyManager = configProps.get("maven.resolver.dependencyManager");
-        if (resolverDependencyManager != null) {
-            if ("classic".equals(resolverDependencyManager)) {
-                session.setDependencyManager(new ClassicDependencyManager());
-            } else if ("default".equals(resolverDependencyManager)) {
-                session.setDependencyManager(new DefaultDependencyManager());
-            } else if ("transitive".equals(resolverDependencyManager)) {
-                session.setDependencyManager(new TransitiveDependencyManager());
-            } else {
-                throw new IllegalArgumentException("Unknown resolver dependency manager '" + resolverDependencyManager
-                        + "'. Supported managers are: classic, default, transitive");
-            }
+        Object resolverDependencyManager = configProps.getOrDefault("maven.resolver.dependencyManager", "default");
+        if ("classic".equals(resolverDependencyManager)) {
+            session.setDependencyManager(new ClassicDependencyManager());
+        } else if ("default".equals(resolverDependencyManager)) {
+            session.setDependencyManager(new DefaultDependencyManager());
+        } else if ("transitive".equals(resolverDependencyManager)) {
+            session.setDependencyManager(new TransitiveDependencyManager());
+        } else {
+            throw new IllegalArgumentException("Unknown resolver dependency manager '" + resolverDependencyManager
+                    + "'. Supported managers are: classic, default, transitive");
         }
 
         setUpLocalRepositoryManager(request, session);
