@@ -365,7 +365,7 @@ public class DefaultRepositorySystemSessionFactory {
         mavenRepositorySystem.injectProxy(session, request.getPluginArtifactRepositories());
         mavenRepositorySystem.injectAuthentication(session, request.getPluginArtifactRepositories());
 
-        Object resolverDependencyManager = configProps.getOrDefault("maven.resolver.dependencyManager", "default");
+        Object resolverDependencyManager = configProps.getOrDefault("maven.resolver.dependencyManager", "transitive");
         if ("classic".equals(resolverDependencyManager)) {
             session.setDependencyManager(new ClassicDependencyManager());
         } else if ("default".equals(resolverDependencyManager)) {
