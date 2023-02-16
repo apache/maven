@@ -59,6 +59,9 @@ import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
 import org.eclipse.aether.spi.localrepo.LocalRepositoryManagerFactory;
 import org.eclipse.aether.util.ConfigUtils;
+import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
+import org.eclipse.aether.util.graph.manager.DefaultDependencyManager;
+import org.eclipse.aether.util.graph.manager.TransitiveDependencyManager;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.repository.ChainedLocalRepositoryManager;
@@ -361,6 +364,20 @@ public class DefaultRepositorySystemSessionFactory {
         mavenRepositorySystem.injectMirror(request.getPluginArtifactRepositories(), request.getMirrors());
         mavenRepositorySystem.injectProxy(session, request.getPluginArtifactRepositories());
         mavenRepositorySystem.injectAuthentication(session, request.getPluginArtifactRepositories());
+
+        Object resolverDependencyManager = configProps.get("maven.resolver.dependencyManager");
+        if (resolverDependencyManager != null) {
+            if ("classic".equals(resolverDependencyManager)) {
+                session.setDependencyManager(new ClassicDependencyManager());
+            } else if ("default".equals(resolverDependencyManager)) {
+                session.setDependencyManager(new DefaultDependencyManager());
+            } else if ("transitive".equals(resolverDependencyManager)) {
+                session.setDependencyManager(new TransitiveDependencyManager());
+            } else {
+                throw new IllegalArgumentException("Unknown resolver dependency manager '" + resolverDependencyManager
+                        + "'. Supported managers are: classic, default, transitive");
+            }
+        }
 
         setUpLocalRepositoryManager(request, session);
 
