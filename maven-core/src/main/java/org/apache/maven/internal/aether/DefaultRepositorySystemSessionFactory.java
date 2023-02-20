@@ -58,6 +58,10 @@ import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
 import org.eclipse.aether.spi.localrepo.LocalRepositoryManagerFactory;
+import org.eclipse.aether.transfer.AbstractTransferListener;
+import org.eclipse.aether.transfer.TransferCancelledException;
+import org.eclipse.aether.transfer.TransferEvent;
+import org.eclipse.aether.transfer.TransferListener;
 import org.eclipse.aether.util.ConfigUtils;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
@@ -119,6 +123,8 @@ public class DefaultRepositorySystemSessionFactory {
     private static final String NATIVE_FILE_TRANSPORTER_PRIORITY_KEY = "aether.priority.FileTransporterFactory";
 
     private static final String RESOLVER_MAX_PRIORITY = String.valueOf(Float.MAX_VALUE);
+
+    private static final String MAVEN_RESOLVER_TRANSFER_LOGGING = "maven.resolver.transfer.logging";
 
     @Inject
     private Logger logger;
@@ -344,7 +350,31 @@ public class DefaultRepositorySystemSessionFactory {
         session.setSystemProperties(request.getSystemProperties());
         session.setConfigProperties(configProps);
 
-        session.setTransferListener(request.getTransferListener());
+        Object transferLogging = configProps.getOrDefault(MAVEN_RESOLVER_TRANSFER_LOGGING, "half");
+        if ("full".equals(transferLogging)) {
+            session.setTransferListener(request.getTransferListener());
+        } else if ("half".equals(transferLogging)) {
+            final TransferListener listener = request.getTransferListener();
+            session.setTransferListener(new AbstractTransferListener() {
+                @Override
+                public void transferCorrupted(TransferEvent event) throws TransferCancelledException {
+                    listener.transferCorrupted(event);
+                }
+
+                @Override
+                public void transferSucceeded(TransferEvent event) {
+                    listener.transferSucceeded(event);
+                }
+
+                @Override
+                public void transferFailed(TransferEvent event) {
+                    listener.transferFailed(event);
+                }
+            });
+        } else {
+            throw new IllegalArgumentException("Unknown resolver transfer logging '" + transferLogging
+                    + "' mode. Supported modes are: full, half");
+        }
 
         session.setRepositoryListener(eventSpyDispatcher.chainListener(new LoggingRepositoryListener(logger)));
 
