@@ -27,13 +27,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.xml.XmlNode;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- *
+ * All methods in this class attempt to fully parse the XML and
+ * then close the supplied reader or input stream.
  */
 public class XmlNodeBuilder {
     private static final boolean DEFAULT_TRIM = true;
@@ -61,17 +61,13 @@ public class XmlNodeBuilder {
 
     public static XmlNodeImpl build(InputStream is, String encoding, boolean trim)
             throws XmlPullParserException, IOException {
-        try {
+        try (InputStream in = is) {
             final XmlPullParser parser = new MXParser();
-            parser.setInput(is, encoding);
+            parser.setInput(in, encoding);
 
             final XmlNodeImpl node = build(parser, trim);
-            is.close();
-            is = null;
 
             return node;
-        } finally {
-            IOUtil.close(is);
         }
     }
 
@@ -80,6 +76,8 @@ public class XmlNodeBuilder {
     }
 
     /**
+     * This method closes its reader.
+     *
      * @param reader the reader
      * @param trim to trim
      * @param locationBuilder the builder
@@ -90,17 +88,13 @@ public class XmlNodeBuilder {
      */
     public static XmlNodeImpl build(Reader reader, boolean trim, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
-        try {
+        try (Reader in = reader) {
             final XmlPullParser parser = new MXParser();
-            parser.setInput(reader);
+            parser.setInput(in);
 
             final XmlNodeImpl node = build(parser, trim, locationBuilder);
-            reader.close();
-            reader = null;
 
             return node;
-        } finally {
-            IOUtil.close(reader);
         }
     }
 

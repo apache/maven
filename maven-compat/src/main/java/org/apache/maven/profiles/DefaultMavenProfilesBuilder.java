@@ -22,14 +22,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.profiles.io.xpp3.ProfilesXpp3Reader;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.interpolation.EnvarBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -48,11 +47,9 @@ public class DefaultMavenProfilesBuilder extends AbstractLogEnabled implements M
 
         if (profilesXml.exists()) {
             ProfilesXpp3Reader reader = new ProfilesXpp3Reader();
-            try (Reader profileReader = ReaderFactory.newXmlReader(profilesXml);
-                    StringWriter sWriter = new StringWriter()) {
-                IOUtil.copy(profileReader, sWriter);
+            try (Reader profileReader = ReaderFactory.newXmlReader(profilesXml)) {
 
-                String rawInput = sWriter.toString();
+                String rawInput = IOUtils.toString(profileReader);
 
                 try {
                     RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
