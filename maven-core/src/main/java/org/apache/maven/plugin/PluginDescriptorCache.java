@@ -56,8 +56,15 @@ public interface PluginDescriptorCache {
 
     PluginDescriptor get(Key key);
 
-    PluginDescriptor get(Key key, PluginDescriptorSupplier supplier)
-            throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException;
+    default PluginDescriptor get(Key key, PluginDescriptorSupplier supplier)
+            throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException {
+        PluginDescriptor pd = get(key);
+        if (pd == null) {
+            pd = supplier.load();
+            put(key, pd);
+        }
+        return pd;
+    }
 
     void flush();
 }
