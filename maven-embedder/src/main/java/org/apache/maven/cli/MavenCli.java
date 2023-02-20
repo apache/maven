@@ -41,6 +41,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import com.google.inject.AbstractModule;
 import org.apache.commons.cli.CommandLine;
@@ -334,14 +335,14 @@ public class MavenCli {
             File configFile = new File(cliRequest.multiModuleProjectDirectory, MVN_MAVEN_CONFIG);
 
             if (configFile.isFile()) {
-                String[] args = Files.lines(configFile.toPath(), Charset.defaultCharset())
-                        .filter(arg -> !arg.isEmpty())
-                        .toArray(size -> new String[size]);
-                mavenConfig = cliManager.parse(args);
-                List<?> unrecognized = mavenConfig.getArgList();
-                if (!unrecognized.isEmpty()) {
-                    // This file can only contain options, not args (goals or phases)
-                    throw new ParseException("Unrecognized maven.config file entries: " + unrecognized);
+                try (Stream<String> lines = Files.lines(configFile.toPath(), Charset.defaultCharset())) {
+                    String[] args = lines.filter(arg -> !arg.isEmpty()).toArray(String[]::new);
+                    mavenConfig = cliManager.parse(args);
+                    List<?> unrecognized = mavenConfig.getArgList();
+                    if (!unrecognized.isEmpty()) {
+                        // This file can only contain options, not args (goals or phases)
+                        throw new ParseException("Unrecognized maven.config file entries: " + unrecognized);
+                    }
                 }
             }
         } catch (ParseException e) {
