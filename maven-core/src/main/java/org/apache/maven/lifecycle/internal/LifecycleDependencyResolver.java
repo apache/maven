@@ -95,7 +95,7 @@ public class LifecycleDependencyResolver
 
     public static List<MavenProject> getProjects( MavenProject project, MavenSession session, boolean aggregator )
     {
-        if ( aggregator )
+        if ( aggregator && project.getCollectedProjects() != null )
         {
             List<MavenProject> projects = new ArrayList<>();
             addProjectAndSubModules( projects, project );
