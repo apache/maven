@@ -18,43 +18,33 @@
  */
 package org.apache.maven.plugin.internal;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.shared.utils.logging.MessageUtils;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Print warnings if deprecated mojo or parameters of plugin are used in configuration.
  *
  * @author Slawomir Jaranowski
  */
-@Component(role = MavenPluginConfigurationValidator.class)
-class DeprecatedPluginValidator extends AbstractMavenPluginParametersValidator {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DeprecatedPluginValidator.class);
-
-    @Override
-    protected Logger getLogger() {
-        return LOGGER;
-    }
-
+@Singleton
+@Named
+class DeprecatedPluginValidator extends AbstractMavenPluginDescriptorSourcedParametersValidator {
     @Override
     protected String getParameterLogReason(Parameter parameter) {
         return "is deprecated: " + parameter.getDeprecated();
     }
 
     @Override
-    public void validate(
+    protected void doValidate(
             MojoDescriptor mojoDescriptor,
             PlexusConfiguration pomConfiguration,
             ExpressionEvaluator expressionEvaluator) {
-        if (!LOGGER.isWarnEnabled()) {
-            return;
-        }
-
         if (mojoDescriptor.getDeprecated() != null) {
             logDeprecatedMojo(mojoDescriptor);
         }
@@ -86,6 +76,6 @@ class DeprecatedPluginValidator extends AbstractMavenPluginParametersValidator {
                 .warning(mojoDescriptor.getDeprecated())
                 .toString();
 
-        LOGGER.warn(message);
+        logger.warn(message);
     }
 }

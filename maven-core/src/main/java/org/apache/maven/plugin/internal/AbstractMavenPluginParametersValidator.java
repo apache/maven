@@ -18,9 +18,7 @@
  */
 package org.apache.maven.plugin.internal;
 
-import java.util.Arrays;
-import java.util.List;
-
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.shared.utils.logging.MessageBuilder;
 import org.apache.maven.shared.utils.logging.MessageUtils;
@@ -28,6 +26,7 @@ import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluatio
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Common implementations for plugin parameters configuration validation.
@@ -36,28 +35,9 @@ import org.slf4j.Logger;
  */
 abstract class AbstractMavenPluginParametersValidator implements MavenPluginConfigurationValidator {
 
-    // plugin author can provide @Parameter( property = "session" ) in this case property will always evaluate
-    // so, we need ignore those
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    // source org.apache.maven.plugin.PluginParameterExpressionEvaluator
-    private static final List<String> IGNORED_PROPERTY_VALUES = Arrays.asList(
-            "basedir",
-            "executedProject",
-            "localRepository",
-            "mojo",
-            "mojoExecution",
-            "plugin",
-            "project",
-            "reactorProjects",
-            "session",
-            "settings");
-
-    private static final List<String> IGNORED_PROPERTY_PREFIX =
-            Arrays.asList("mojo.", "pom.", "plugin.", "project.", "session.", "settings.");
-
-    protected abstract Logger getLogger();
-
-    protected static boolean isValueSet(PlexusConfiguration config, ExpressionEvaluator expressionEvaluator) {
+    protected boolean isValueSet(PlexusConfiguration config, ExpressionEvaluator expressionEvaluator) {
         if (config == null) {
             return false;
         }
@@ -91,18 +71,25 @@ abstract class AbstractMavenPluginParametersValidator implements MavenPluginConf
         return false;
     }
 
-    private static boolean isIgnoredProperty(String strValue) {
-        if (!strValue.startsWith("${")) {
-            return false;
+    @Override
+    public final void validate(
+            MojoDescriptor mojoDescriptor,
+            PlexusConfiguration pomConfiguration,
+            ExpressionEvaluator expressionEvaluator) {
+        if (!logger.isWarnEnabled()) {
+            return;
         }
 
-        String propertyName = strValue.replace("${", "").replace("}", "");
+        doValidate(mojoDescriptor, pomConfiguration, expressionEvaluator);
+    }
 
-        if (IGNORED_PROPERTY_VALUES.contains(propertyName)) {
-            return true;
-        }
+    protected abstract void doValidate(
+            MojoDescriptor mojoDescriptor,
+            PlexusConfiguration pomConfiguration,
+            ExpressionEvaluator expressionEvaluator);
 
-        return IGNORED_PROPERTY_PREFIX.stream().anyMatch(propertyName::startsWith);
+    protected boolean isIgnoredProperty(String strValue) {
+        return false;
     }
 
     protected abstract String getParameterLogReason(Parameter parameter);
@@ -120,6 +107,6 @@ abstract class AbstractMavenPluginParametersValidator implements MavenPluginConf
 
         messageBuilder.warning(" ").warning(getParameterLogReason(parameter));
 
-        getLogger().warn(messageBuilder.toString());
+        logger.warn(messageBuilder.toString());
     }
 }

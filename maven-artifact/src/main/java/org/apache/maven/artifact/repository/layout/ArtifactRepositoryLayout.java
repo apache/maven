@@ -22,7 +22,13 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
-/** @author jdcasey */
+/**
+ * Repository layout.
+ *
+ * @author jdcasey
+ * @deprecated Avoid use of this type, if you need access to local repository use repository system session instead.
+ */
+@Deprecated
 public interface ArtifactRepositoryLayout {
     String ROLE = ArtifactRepositoryLayout.class.getName();
 
