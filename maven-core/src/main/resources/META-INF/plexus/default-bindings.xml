@@ -44,7 +44,7 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-install-plugin:3.1.0:install
               </install>
               <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:3.0.0:deploy
+                org.apache.maven.plugins:maven-deploy-plugin:3.1.0:deploy
               </deploy>
             </phases>
             <!-- END SNIPPET: pom-lifecycle -->
@@ -88,7 +88,7 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-install-plugin:3.1.0:install
               </install>
               <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:3.0.0:deploy
+                org.apache.maven.plugins:maven-deploy-plugin:3.1.0:deploy
               </deploy>
             </phases>
             <!-- END SNIPPET: jar-lifecycle -->
@@ -132,7 +132,7 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-install-plugin:3.1.0:install
               </install>
               <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:3.0.0:deploy
+                org.apache.maven.plugins:maven-deploy-plugin:3.1.0:deploy
               </deploy>
             </phases>
             <!-- END SNIPPET: ejb-lifecycle -->
@@ -180,7 +180,7 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-install-plugin:3.1.0:install
               </install>
               <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:3.0.0:deploy
+                org.apache.maven.plugins:maven-deploy-plugin:3.1.0:deploy
               </deploy>
             </phases>
             <!-- END SNIPPET: maven-plugin-lifecycle -->
@@ -224,7 +224,7 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-install-plugin:3.1.0:install
               </install>
               <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:3.0.0:deploy
+                org.apache.maven.plugins:maven-deploy-plugin:3.1.0:deploy
               </deploy>
             </phases>
             <!-- END SNIPPET: war-lifecycle -->
@@ -259,7 +259,7 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-install-plugin:3.1.0:install
               </install>
               <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:3.0.0:deploy
+                org.apache.maven.plugins:maven-deploy-plugin:3.1.0:deploy
               </deploy>
             </phases>
             <!-- END SNIPPET: ear-lifecycle -->
@@ -303,7 +303,7 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-install-plugin:3.1.0:install
               </install>
               <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:3.0.0:deploy
+                org.apache.maven.plugins:maven-deploy-plugin:3.1.0:deploy
               </deploy>
             </phases>
             <!-- END SNIPPET: rar-lifecycle -->
