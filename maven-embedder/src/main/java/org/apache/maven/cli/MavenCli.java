@@ -53,7 +53,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
-import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Problem;
 import org.apache.maven.building.Source;
@@ -86,8 +85,6 @@ import org.apache.maven.execution.ProjectActivation;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
-import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
-import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.logwrapper.LogLevelRecorder;
 import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
@@ -181,12 +178,6 @@ public class MavenCli {
     private CLIManager cliManager;
 
     private PlexusContainer plexusContainer;
-
-    private DefaultSessionFactory defaultSessionFactory;
-
-    private MavenRepositorySystem mavenRepositorySystem;
-
-    private DefaultRepositorySystemSessionFactory defaultRepositorySystemSessionFactory;
 
     private static final Pattern NEXT_LINE = Pattern.compile("\r?\n");
 
@@ -670,10 +661,6 @@ public class MavenCli {
         toolchainsBuilder = container.lookup(ToolchainsBuilder.class);
 
         dispatcher = (DefaultSecDispatcher) container.lookup(SecDispatcher.class, "maven");
-
-        defaultRepositorySystemSessionFactory = container.lookup(DefaultRepositorySystemSessionFactory.class);
-        defaultSessionFactory = container.lookup(DefaultSessionFactory.class);
-        mavenRepositorySystem = container.lookup(MavenRepositorySystem.class);
 
         plexusContainer = container;
 
