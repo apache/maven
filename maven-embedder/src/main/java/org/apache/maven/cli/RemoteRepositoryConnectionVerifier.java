@@ -52,16 +52,7 @@ public class RemoteRepositoryConnectionVerifier {
 
         try {
             final Transporter transporter = transporterProvider.newTransporter(session, repository);
-            final Optional<String> issue = verifyConnectionUsingTransport(transporter, repository);
-
-            if (!issue.isPresent()) {
-                logger.info(
-                        "Connection check for repository '{}' at '{}' completed",
-                        repository.getId(),
-                        repository.getUrl());
-            }
-
-            return issue;
+            return verifyConnectionUsingTransport(transporter, repository);
         } catch (final NoTransporterException nte) {
             final String message = String.format(
                     "There is no compatible transport for remote repository '%s' with location '%s'",
@@ -76,6 +67,10 @@ public class RemoteRepositoryConnectionVerifier {
             final GetTask task = new GetTask(URI.create(""));
             transporter.get(task);
             // We could connect, but uncertain to what. Could be the repository, could be a valid web page.
+            logger.info(
+                    "Connection check for repository '{}' at '{}' completed",
+                    remoteRepository.getId(),
+                    remoteRepository.getUrl());
             return Optional.empty();
         } catch (final Exception e) {
             final int errorOrArtifactNotFound = transporter.classify(e);
