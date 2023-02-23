@@ -26,7 +26,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.spi.connector.transport.GetTask;
 import org.eclipse.aether.spi.connector.transport.Transporter;
@@ -39,7 +38,6 @@ import org.slf4j.LoggerFactory;
  * Helper class to verify connection to a remote repository.
  */
 public class RemoteRepositoryConnectionVerifier {
-    private static final Artifact APACHE_MAVEN_ARTIFACT = MavenStatusCommand.APACHE_MAVEN_ARTIFACT;
     private final Logger logger;
     private final TransporterProvider transporterProvider;
 
@@ -48,30 +46,13 @@ public class RemoteRepositoryConnectionVerifier {
         this.transporterProvider = container.lookup(TransporterProvider.class);
     }
 
-    private boolean isCentralOrMirrorOfCentral(final RemoteRepository remoteRepository) {
-        return "central".equals(remoteRepository.getId())
-                || remoteRepository.getMirroredRepositories().stream()
-                        .map(RemoteRepository::getId)
-                        .anyMatch("central"::equals);
-    }
-
     public Optional<String> verifyConnectionToRemoteRepository(
             final RepositorySystemSession session, final ArtifactRepository artifactRepository) {
         final RemoteRepository repository = RepositoryUtils.toRepo(artifactRepository);
 
-        final String artifactPath;
-
-        if (isCentralOrMirrorOfCentral(repository)) {
-            // We can be sure the Apache Maven artifact should be resolvable.
-            artifactPath = artifactRepository.getLayout().pathOf(RepositoryUtils.toArtifact(APACHE_MAVEN_ARTIFACT));
-        } else {
-            // We cannot be sure about any artifact that lives here.
-            artifactPath = "";
-        }
-
         try {
             final Transporter transporter = transporterProvider.newTransporter(session, repository);
-            final Optional<String> issue = verifyConnectionUsingTransport(transporter, repository, artifactPath);
+            final Optional<String> issue = verifyConnectionUsingTransport(transporter, repository);
 
             if (!issue.isPresent()) {
                 logger.info(
@@ -90,14 +71,14 @@ public class RemoteRepositoryConnectionVerifier {
     }
 
     private Optional<String> verifyConnectionUsingTransport(
-            final Transporter transporter, final RemoteRepository remoteRepository, final String artifactPath) {
+            final Transporter transporter, final RemoteRepository remoteRepository) {
         try {
-            final GetTask task = new GetTask(URI.create(artifactPath));
-            // We could connect, but uncertain to what. Could be the repository, could be a valid web page.
+            final GetTask task = new GetTask(URI.create(""));
             transporter.get(task);
+            // We could connect, but uncertain to what. Could be the repository, could be a valid web page.
             return Optional.empty();
         } catch (final Exception e) {
-            int errorOrArtifactNotFound = transporter.classify(e);
+            final int errorOrArtifactNotFound = transporter.classify(e);
             if (Transporter.ERROR_NOT_FOUND == errorOrArtifactNotFound) {
                 // No-op since we could connect to the repository
                 // However we do not know what should or shouldn't be present
