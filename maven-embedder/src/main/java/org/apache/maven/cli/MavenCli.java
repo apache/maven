@@ -887,8 +887,7 @@ public class MavenCli {
     }
 
     private int execute(CliRequest cliRequest) throws MavenExecutionRequestPopulationException {
-        MavenExecutionRequest request =
-                executionRequestPopulator.populateDefaults(cliRequest.request); // Populate request
+        MavenExecutionRequest request = executionRequestPopulator.populateDefaults(cliRequest.request);
 
         if (cliRequest.request.getRepositoryCache() == null) {
             cliRequest.request.setRepositoryCache(new DefaultRepositoryCache());
