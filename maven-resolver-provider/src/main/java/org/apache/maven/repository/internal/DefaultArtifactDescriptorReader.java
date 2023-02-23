@@ -89,6 +89,9 @@ public class DefaultArtifactDescriptorReader
 
     private ModelBuilder modelBuilder;
 
+    private final ArtifactDescriptorReaderDelegate artifactDescriptorReaderDelegate =
+            new ArtifactDescriptorReaderDelegate();
+
     public DefaultArtifactDescriptorReader()
     {
         // enable no-arg constructor
@@ -177,7 +180,7 @@ public class DefaultArtifactDescriptorReader
 
             if ( delegate == null )
             {
-                delegate = new ArtifactDescriptorReaderDelegate();
+                delegate = artifactDescriptorReaderDelegate;
             }
 
             delegate.populateResult( session, result, model );
