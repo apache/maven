@@ -38,7 +38,7 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
  * <tr><td><code>session</code></td>           <td></td>               <td>the actual {@link MavenSession}</td></tr>
  * <tr><td><code>session.*</code></td>         <td>(since Maven 3)</td><td></td></tr>
  * <tr><td><code>localRepository</code></td>   <td></td>
- *                                             <td>{@link MavenSession#getLocalRepository()}</td></tr>
+ *                                             <td>{@link MavenSession#getLocalRepository()} DEPRECATED: Avoid use of {@link org.apache.maven.artifact.repository.ArtifactRepository} type. If you need access to local repository, switch to '${repositorySystemSession}' expression and get LRM from it instead. See <a href="https://issues.apache.org/jira/browse/MNG-7706">MNG-7706</a></td></tr>
  * <tr><td><code>reactorProjects</code></td>   <td></td>               <td>{@link MavenSession#getProjects()}</td></tr>
  * <tr><td><code>repositorySystemSession</code></td><td> (since Maven 3)</td>
  *                                             <td>{@link MavenSession#getRepositorySession()}</td></tr>
