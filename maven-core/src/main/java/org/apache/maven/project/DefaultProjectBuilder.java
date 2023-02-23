@@ -62,6 +62,7 @@ import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.StringModelSource;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
+import org.apache.maven.repository.internal.DefaultModelCacheFactory;
 import org.apache.maven.repository.internal.ModelCacheFactory;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -999,6 +1000,9 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     }
 
     private ModelCache createModelCache(RepositorySystemSession session) {
-        return modelCacheFactory.createCache(session);
+        // MNG-7693: for older clients (not injecting ModelCacheFactory), make this work OOTB w/ defaults
+        return modelCacheFactory != null
+                ? modelCacheFactory.createCache(session)
+                : new DefaultModelCacheFactory().createCache(session);
     }
 }
