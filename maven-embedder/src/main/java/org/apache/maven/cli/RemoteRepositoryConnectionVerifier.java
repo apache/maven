@@ -104,16 +104,15 @@ public class RemoteRepositoryConnectionVerifier {
                 return Optional.empty();
             }
             // In this case it is Transporter.ERROR_OTHER
-            return formatException(remoteRepository, e);
+            return Optional.of(formatException(remoteRepository, e));
         }
     }
 
-    private Optional<String> formatException(final RemoteRepository remoteRepository, final Exception e) {
+    private String formatException(final RemoteRepository remoteRepository, final Exception e) {
         final String repositoryId = remoteRepository.getId();
         final String repositoryUrl = remoteRepository.getUrl();
         final String repository = String.format("%s [%s]", repositoryId, repositoryUrl);
 
-        final String issue = String.format("Connection to %s not possible. Cause: %s", repository, e.getMessage());
-        return Optional.of(issue);
+        return String.format("Connection to %s not possible. Cause: %s", repository, e.getMessage());
     }
 }
