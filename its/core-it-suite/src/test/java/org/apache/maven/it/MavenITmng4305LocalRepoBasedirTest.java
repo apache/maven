@@ -64,7 +64,7 @@ public class MavenITmng4305LocalRepoBasedirTest
 
         // NOTE: This deliberately compares the paths on the String level, not via File.equals()
         assertEquals( new File( verifier.getLocalRepository() ).getAbsolutePath(),
-                      props.getProperty( "localRepository.basedir" ) );
+                      props.getProperty( "localRepositoryBasedir" ) );
     }
 
 }

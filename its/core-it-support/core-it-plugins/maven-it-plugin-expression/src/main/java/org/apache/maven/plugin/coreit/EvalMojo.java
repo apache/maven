@@ -117,8 +117,8 @@ public class EvalMojo
     /**
      * The local repository of the current build against which expressions are evaluated.
      */
-    @Parameter( defaultValue = "${localRepository}", readonly = true )
-    private Object localRepository;
+    @Parameter( defaultValue = "${session.request.localRepositoryPath}", readonly = true )
+    private Object localRepositoryBasedir;
 
     /**
      * Runs this mojo.
@@ -158,7 +158,7 @@ public class EvalMojo
             contexts.put( "pom", project );
             contexts.put( "settings", settings );
             contexts.put( "session", session );
-            contexts.put( "localRepository", localRepository );
+            contexts.put( "localRepositoryBasedir", localRepositoryBasedir );
 
             for ( String expression : expressions )
             {

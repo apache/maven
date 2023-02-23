@@ -41,7 +41,7 @@ under the License.
         <configuration>
           <outputFile>target/basedir.properties</outputFile>
           <expressions>
-            <expression>localRepository/basedir</expression>
+            <expression>localRepositoryBasedir</expression>
           </expressions>
         </configuration>
         <executions>
