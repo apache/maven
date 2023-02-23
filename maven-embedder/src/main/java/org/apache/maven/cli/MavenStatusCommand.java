@@ -56,7 +56,6 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.transfer.ArtifactNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -187,7 +186,6 @@ public class MavenStatusCommand {
             return are.getResults().stream()
                     .map(ArtifactResult::getExceptions)
                     .flatMap(List::stream)
-                    .map(ArtifactNotFoundException.class::cast)
                     .map(Throwable::getMessage)
                     .collect(Collectors.toList());
         } else {
