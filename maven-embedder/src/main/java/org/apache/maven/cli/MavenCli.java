@@ -674,11 +674,6 @@ public class MavenCli {
         defaultRepositorySystemSessionFactory = container.lookup(DefaultRepositorySystemSessionFactory.class);
         defaultSessionFactory = container.lookup(DefaultSessionFactory.class);
         mavenRepositorySystem = container.lookup(MavenRepositorySystem.class);
-        //
-        //        private DefaultSessionFactory defaultSessionFactory;
-        //
-        //        private MavenRepositorySystem mavenRepositorySystem;
-        //        private DefaultRepositorySystemSessionFactory defaultRepositorySystemSessionFactory;
 
         plexusContainer = container;
 
