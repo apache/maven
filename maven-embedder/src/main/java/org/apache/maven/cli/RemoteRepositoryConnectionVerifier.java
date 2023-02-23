@@ -21,7 +21,6 @@ package org.apache.maven.cli;
 import java.net.URI;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.codehaus.plexus.PlexusContainer;
@@ -72,16 +71,16 @@ public class RemoteRepositoryConnectionVerifier {
 
         try {
             final Transporter transporter = transporterProvider.newTransporter(session, repository);
-            final Optional<String> maybeIssue = verifyConnectionUsingTransport(transporter, repository, artifactPath);
+            final Optional<String> issue = verifyConnectionUsingTransport(transporter, repository, artifactPath);
 
-            if (!maybeIssue.isPresent()) {
+            if (!issue.isPresent()) {
                 logger.info(
                         "Connection check for repository '{}' at '{}' completed",
                         repository.getId(),
                         repository.getUrl());
             }
 
-            return maybeIssue;
+            return issue;
         } catch (final NoTransporterException nte) {
             final String message = String.format(
                     "There is no compatible transport for remote repository '%s' with location '%s'",
@@ -94,40 +93,27 @@ public class RemoteRepositoryConnectionVerifier {
             final Transporter transporter, final RemoteRepository remoteRepository, final String artifactPath) {
         try {
             final GetTask task = new GetTask(URI.create(artifactPath));
+            // We could connect, but uncertain to what. Could be the repository, could be a valid web page.
             transporter.get(task);
             return Optional.empty();
         } catch (final Exception e) {
-            return classifyException(remoteRepository, e);
+            int errorOrArtifactNotFound = transporter.classify(e);
+            if (Transporter.ERROR_NOT_FOUND == errorOrArtifactNotFound) {
+                // No-op since we could connect to the repository
+                // However we do not know what should or shouldn't be present
+                return Optional.empty();
+            }
+            // In this case it is Transporter.ERROR_OTHER
+            return formatException(remoteRepository, e);
         }
     }
 
-    private Optional<String> classifyException(final RemoteRepository remoteRepository, final Exception e) {
-        final String message = e.getMessage();
+    private Optional<String> formatException(final RemoteRepository remoteRepository, final Exception e) {
         final String repositoryId = remoteRepository.getId();
         final String repositoryUrl = remoteRepository.getUrl();
         final String repository = String.format("%s [%s]", repositoryId, repositoryUrl);
 
-        final boolean notFound = StringUtils.contains(message, "status code: 404");
-        final boolean unauthorized = StringUtils.contains(message, "status code: 401");
-        final boolean forbidden = StringUtils.contains(message, "status code: 403");
-
-        if (isCentralOrMirrorOfCentral(remoteRepository) && notFound) {
-            final String issue = String.format(
-                    "Connection to %s possible, but expected artifact %s cannot be resolved",
-                    repository, APACHE_MAVEN_ARTIFACT);
-            return Optional.of(issue);
-
-        } else if (notFound) {
-            // We tried to resolve the artifact from a repository that does not necessarily host it.
-            logger.warn("Connection to {} possible, but artifact {} not found", repository, APACHE_MAVEN_ARTIFACT);
-            return Optional.empty();
-
-        } else if (unauthorized || forbidden) {
-            final String issue = String.format("Connection to %s possible, but access denied", repository);
-            return Optional.of(issue);
-        }
-
-        logger.error("Error connecting to repository {}", repository, e);
-        return Optional.of("Unknown issue: " + e.getMessage());
+        final String issue = String.format("Connection to %s not possible. Cause: %s", repository, e.getMessage());
+        return Optional.of(issue);
     }
 }
