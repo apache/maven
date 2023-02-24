@@ -24,7 +24,7 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Olivier Lamy
  */
-@Disabled
+@Tag("disabled")
 public class MavenITmng5418FileProjectPropertiesActivatorTest
     extends AbstractMavenIntegrationTestCase
 {

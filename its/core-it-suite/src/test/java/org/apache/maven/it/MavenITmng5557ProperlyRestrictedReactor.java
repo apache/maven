@@ -25,7 +25,7 @@ import org.apache.maven.shared.verifier.VerificationException;
 
 import java.io.File;
 
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author jvanzyl
  */
-@Disabled
+@Tag("disabled")
 public class MavenITmng5557ProperlyRestrictedReactor
     extends AbstractMavenIntegrationTestCase
 {

@@ -25,6 +25,7 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -32,6 +33,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author jvz
  */
+@Tag( "disabled" )
 @Disabled
 public class MavenITmng5503ZipInReactorTest
     extends AbstractMavenIntegrationTestCase

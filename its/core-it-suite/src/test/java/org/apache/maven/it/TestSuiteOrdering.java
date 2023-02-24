@@ -22,14 +22,17 @@ package org.apache.maven.it;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.shared.verifier.Verifier;
 import org.junit.jupiter.api.ClassDescriptor;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.ClassOrdererContext;
+import org.junit.jupiter.api.Tag;
 
 /**
  * The Core IT suite.
@@ -38,6 +41,9 @@ public class TestSuiteOrdering implements ClassOrderer
 {
 
     private static PrintStream out = System.out;
+
+    // store missed test to show info only once
+    private final static List<Class<?>> MISSED_TESTS = new ArrayList<>();
 
     final Map<Class<?>, Integer> tests = new HashMap<>();
 
@@ -746,21 +752,36 @@ public class TestSuiteOrdering implements ClassOrderer
          */
     }
 
-    void addTestSuite( Class<?> clazz ) {
+    void addTestSuite( Class<?> clazz )
+    {
         addTestSuite( clazz, tests.size() );
     }
 
-    void addTestSuite( Class<?> clazz, int order ) {
+    void addTestSuite( Class<?> clazz, int order )
+    {
         tests.put( clazz, order );
     }
 
-    int getIndex( ClassDescriptor cd ) {
+    int getIndex( ClassDescriptor cd )
+    {
         Integer i = tests.get( cd.getTestClass() );
         return i != null ? i : -1;
     }
 
     public void orderClasses( ClassOrdererContext context )
     {
+        context.getClassDescriptors().stream()
+            .filter( cd -> !MISSED_TESTS.contains( cd.getTestClass() ) )
+            .filter( cd -> getIndex( cd ) == -1 )
+            .filter( cd -> cd.findRepeatableAnnotations( Tag.class ).stream()
+                .noneMatch( t -> "disabled".equals( t.value() ) ) )
+            .forEach( cd -> {
+                out.println( "Test " + cd.getTestClass()
+                                 + " is not present in TestSuiteOrdering " + System.lineSeparator()
+                                 + "\t- please add it or annotate with @Tag(\"disabled\")" + System.lineSeparator() );
+                MISSED_TESTS.add( cd.getTestClass() );
+            } );
+
         context.getClassDescriptors().sort( Comparator.comparing( this::getIndex ) );
     }
 

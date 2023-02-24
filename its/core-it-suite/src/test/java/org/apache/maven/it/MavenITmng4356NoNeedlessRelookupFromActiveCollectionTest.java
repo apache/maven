@@ -25,7 +25,7 @@ import org.apache.maven.shared.verifier.Verifier;
 import java.io.File;
 import java.util.Properties;
 
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-@Disabled
+@Tag("disabled")
 public class MavenITmng4356NoNeedlessRelookupFromActiveCollectionTest
     extends AbstractMavenIntegrationTestCase
 {

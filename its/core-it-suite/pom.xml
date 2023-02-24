@@ -498,6 +498,8 @@ under the License.
           <includes>
             <include>**/MavenIT*.java</include>
           </includes>
+          <!-- test annotated by @Tag("disabled") will be skipped from executions -->
+          <excludedGroups>disabled</excludedGroups>
           <forkCount>0</forkCount>
           <reuseForks>true</reuseForks>
           <skip>true</skip>

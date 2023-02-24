@@ -24,7 +24,7 @@ import org.apache.maven.shared.verifier.Verifier;
 
 import java.io.File;
 
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
  * When multiple activators are present in a profile they should be AND'd. All activator must
  * conditions must be satisfied in order for the profile to be activated.
  */
-@Disabled
+@Tag("disabled")
 public class MavenITmng4565MultiConditionProfileActivationTest
     extends AbstractMavenIntegrationTestCase
 {
