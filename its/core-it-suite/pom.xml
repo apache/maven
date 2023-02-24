@@ -501,20 +501,11 @@ under the License.
           <forkCount>0</forkCount>
           <reuseForks>true</reuseForks>
           <skip>true</skip>
-          <systemProperties>
-            <property>
-              <name>maven.version</name>
-              <value>${maven.version}</value>
-            </property>
-            <property>
-              <name>maven.home</name>
-              <value>${preparedMavenHome}</value>
-            </property>
-            <property>
-              <name>maven.it.global-settings.dir</name>
-              <value>${project.build.testOutputDirectory}</value>
-            </property>
-          </systemProperties>
+          <systemPropertyVariables>
+            <maven.version>${maven.version}</maven.version>
+            <maven.home>${preparedMavenHome}</maven.home>
+            <maven.it.global-settings.dir>${project.build.testOutputDirectory}</maven.it.global-settings.dir>
+          </systemPropertyVariables>
         </configuration>
       </plugin>
       <plugin>
@@ -594,14 +585,11 @@ under the License.
           <plugin>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <systemProperties combine.children="append">
-                <property>
-                  <!-- Pass this through to the tests (if set!) to have them
-                    pick the right repository -->
-                  <name>maven.repo.local</name>
-                  <value>${maven.repo.local}</value>
-                </property>
-              </systemProperties>
+              <systemPropertyVariables>
+                <!-- Pass this through to the tests (if set!) to have them
+                  pick the right repository -->
+                <maven.repo.local>${maven.repo.local}</maven.repo.local>
+              </systemPropertyVariables>
             </configuration>
           </plugin>
         </plugins>
@@ -619,14 +607,11 @@ under the License.
           <plugin>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <systemProperties combine.children="append">
-                <property>
-                  <!-- Pass this through to the tests (if set!) to have them
-                    pick the right repository layout -->
-                  <name>maven.repo.local.layout</name>
-                  <value>${maven.repo.local.layout}</value>
-                </property>
-              </systemProperties>
+              <systemPropertyVariables>
+                <!-- Pass this through to the tests (if set!) to have them
+                  pick the right repository layout -->
+                <maven.repo.local.layout>${maven.repo.local.layout}</maven.repo.local.layout>
+              </systemPropertyVariables>
             </configuration>
           </plugin>
         </plugins>
@@ -656,16 +641,10 @@ under the License.
               <!-- NOTE: Maven plugins have access to the system class path
                 so keep it clean -->
               <useSystemClassLoader>false</useSystemClassLoader>
-              <systemProperties combine.children="append">
-                <property>
-                  <name>verifier.forkMode</name>
-                  <value>auto</value>
-                </property>
-                <property>
-                  <name>emma.rt.control</name>
-                  <value>false</value>
-                </property>
-              </systemProperties>
+              <systemPropertyVariables>
+                <verifier.forkMode>auto</verifier.forkMode>
+                <emma.rt.control>false</emma.rt.control>
+              </systemPropertyVariables>
             </configuration>
           </plugin>
         </plugins>
