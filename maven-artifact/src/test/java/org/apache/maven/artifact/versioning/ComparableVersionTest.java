@@ -37,7 +37,6 @@ public class ComparableVersionTest {
         String canonical = ret.getCanonical();
         String parsedCanonical = new ComparableVersion(canonical).getCanonical();
 
-        System.out.println("canonical( " + version + " ) = " + canonical);
         assertEquals(
                 canonical,
                 parsedCanonical,
