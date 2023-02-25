@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @SuppressWarnings("unchecked")
 public class ComparableVersionTest {
-    private Comparable newComparable(String version) {
+    private ComparableVersion newComparable(String version) {
         ComparableVersion ret = new ComparableVersion(version);
         String canonical = ret.getCanonical();
         String parsedCanonical = new ComparableVersion(canonical).getCanonical();
@@ -94,11 +94,11 @@ public class ComparableVersionTest {
     private void checkVersionsEqual(String v1, String v2) {
         Comparable c1 = newComparable(v1);
         Comparable c2 = newComparable(v2);
-        assertTrue(c1.compareTo(c2) == 0, "expected " + v1 + " == " + v2);
-        assertTrue(c2.compareTo(c1) == 0, "expected " + v2 + " == " + v1);
-        assertTrue(c1.hashCode() == c2.hashCode(), "expected same hashcode for " + v1 + " and " + v2);
-        assertTrue(c1.equals(c2), "expected " + v1 + ".equals( " + v2 + " )");
-        assertTrue(c2.equals(c1), "expected " + v2 + ".equals( " + v1 + " )");
+        assertEquals(0, c1.compareTo(c2), "expected " + v1 + " == " + v2);
+        assertEquals(0, c2.compareTo(c1), "expected " + v2 + " == " + v1);
+        assertEquals(c1.hashCode(), c2.hashCode(), "expected same hashcode for " + v1 + " and " + v2);
+        assertEquals(c1, c2, "expected " + v1 + ".equals( " + v2 + " )");
+        assertEquals(c2, c1, "expected " + v2 + ".equals( " + v1 + " )");
     }
 
     private void checkVersionsArrayEqual(String[] array) {
@@ -207,7 +207,27 @@ public class ComparableVersionTest {
         checkVersionsOrder("2.0.1", "2.0.1-123");
         checkVersionsOrder("2.0.1-xyz", "2.0.1-123");
     }
-
+    
+    @Test
+    public void testLeadingZeroes() {
+        checkVersionsOrder("0.7", "2");
+        checkVersionsOrder( "0.2", "1.0.7");
+    }
+    
+    @Test
+    public void testGetCanonical() {
+    	// MNG-7700
+    	newComparable("0.x");
+    	newComparable("0-x");
+    	newComparable("0.rc");
+    	newComparable("0-1");
+    	
+    	ComparableVersion version = new ComparableVersion("0.x");
+    	assertEquals("x", version.getCanonical());
+    	ComparableVersion version2 = new ComparableVersion("0.2");
+    	assertEquals("0.2", version2.getCanonical());
+    }
+    
     /**
      * Test <a href="https://issues.apache.org/jira/browse/MNG-5568">MNG-5568</a> edge case
      * which was showing transitive inconsistency: since A &gt; B and B &gt; C then we should have A &gt; C
@@ -342,7 +362,7 @@ public class ComparableVersionTest {
         ComparableVersion c1 = new ComparableVersion("1");
         c1.parseVersion("2");
 
-        Comparable c2 = newComparable("2");
+        Comparable<?> c2 = newComparable("2");
 
         assertEquals(c1, c2, "reused instance should be equivalent to new instance");
     }
