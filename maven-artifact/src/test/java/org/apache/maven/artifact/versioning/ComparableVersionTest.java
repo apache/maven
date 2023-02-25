@@ -207,27 +207,27 @@ public class ComparableVersionTest {
         checkVersionsOrder("2.0.1", "2.0.1-123");
         checkVersionsOrder("2.0.1-xyz", "2.0.1-123");
     }
-    
+
     @Test
     public void testLeadingZeroes() {
         checkVersionsOrder("0.7", "2");
-        checkVersionsOrder( "0.2", "1.0.7");
+        checkVersionsOrder("0.2", "1.0.7");
     }
-    
+
     @Test
     public void testGetCanonical() {
-    	// MNG-7700
-    	newComparable("0.x");
-    	newComparable("0-x");
-    	newComparable("0.rc");
-    	newComparable("0-1");
-    	
-    	ComparableVersion version = new ComparableVersion("0.x");
-    	assertEquals("x", version.getCanonical());
-    	ComparableVersion version2 = new ComparableVersion("0.2");
-    	assertEquals("0.2", version2.getCanonical());
+        // MNG-7700
+        newComparable("0.x");
+        newComparable("0-x");
+        newComparable("0.rc");
+        newComparable("0-1");
+
+        ComparableVersion version = new ComparableVersion("0.x");
+        assertEquals("x", version.getCanonical());
+        ComparableVersion version2 = new ComparableVersion("0.2");
+        assertEquals("0.2", version2.getCanonical());
     }
-    
+
     /**
      * Test <a href="https://issues.apache.org/jira/browse/MNG-5568">MNG-5568</a> edge case
      * which was showing transitive inconsistency: since A &gt; B and B &gt; C then we should have A &gt; C
