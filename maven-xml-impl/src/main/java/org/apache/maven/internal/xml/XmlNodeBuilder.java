@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.xml.XmlNode;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -61,17 +60,12 @@ public class XmlNodeBuilder {
 
     public static XmlNodeImpl build(InputStream is, String encoding, boolean trim)
             throws XmlPullParserException, IOException {
-        try {
+        try (InputStream closeMe = is) {
             final XmlPullParser parser = new MXParser();
             parser.setInput(is, encoding);
 
             final XmlNodeImpl node = build(parser, trim);
-            is.close();
-            is = null;
-
             return node;
-        } finally {
-            IOUtil.close(is);
         }
     }
 
@@ -90,17 +84,13 @@ public class XmlNodeBuilder {
      */
     public static XmlNodeImpl build(Reader reader, boolean trim, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
-        try {
+        try (Reader closeMe = reader) {
             final XmlPullParser parser = new MXParser();
             parser.setInput(reader);
 
             final XmlNodeImpl node = build(parser, trim, locationBuilder);
-            reader.close();
-            reader = null;
 
             return node;
-        } finally {
-            IOUtil.close(reader);
         }
     }
 
