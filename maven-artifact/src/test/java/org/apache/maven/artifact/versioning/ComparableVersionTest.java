@@ -364,4 +364,12 @@ public class ComparableVersionTest {
             checkVersionsEqual("2.0." + x, "2.0.0." + x); // previously ordered, now equals
         }
     }
+
+    @Test
+    public void testMNG7701() {
+        ComparableVersion c1 = new ComparableVersion("1.x");
+        ComparableVersion c2 = new ComparableVersion("1_x");
+
+        assertTrue(c1.compareTo(c2) < 0);
+    }
 }

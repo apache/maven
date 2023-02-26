@@ -34,7 +34,6 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
 import org.apache.maven.settings.building.SettingsProblemCollector;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author Milos Kleint
@@ -60,7 +59,7 @@ public class DefaultSettingsValidator implements SettingsValidator {
             for (int i = 0; i < pluginGroups.size(); i++) {
                 String pluginGroup = pluginGroups.get(i).trim();
 
-                if (StringUtils.isBlank(pluginGroup)) {
+                if (pluginGroup.trim().isEmpty()) {
                     addViolation(
                             problems, Severity.ERROR, "pluginGroups.pluginGroup[" + i + "]", null, "must not be empty");
                 } else if (!ID_REGEX.matcher(pluginGroup).matches()) {
