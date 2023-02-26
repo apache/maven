@@ -79,7 +79,8 @@ public class MavenSettingsMerger {
             }
         }
 
-        if (dominant.getLocalRepository() == null || dominant.getLocalRepository().isEmpty()) {
+        if (dominant.getLocalRepository() == null
+                || dominant.getLocalRepository().isEmpty()) {
             dominant.setLocalRepository(recessive.getLocalRepository());
         }
 
