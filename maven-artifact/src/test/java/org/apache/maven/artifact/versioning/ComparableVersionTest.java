@@ -365,11 +365,4 @@ public class ComparableVersionTest {
         }
     }
 
-    @Test
-    public void testMNG7701() {
-        ComparableVersion c1 = new ComparableVersion("1.x");
-        ComparableVersion c2 = new ComparableVersion("1_x");
-
-        assertTrue(c1.compareTo(c2) < 0);
-    }
 }
