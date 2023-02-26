@@ -364,5 +364,4 @@ public class ComparableVersionTest {
             checkVersionsEqual("2.0." + x, "2.0.0." + x); // previously ordered, now equals
         }
     }
-
 }
