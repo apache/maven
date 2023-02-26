@@ -61,9 +61,9 @@ public class XmlNodeBuilder {
 
     public static XmlNodeImpl build(InputStream is, String encoding, boolean trim)
             throws XmlPullParserException, IOException {
-        try (InputStream in = is) {
+        try (InputStream closeMe = is) {
             final XmlPullParser parser = new MXParser();
-            parser.setInput(in, encoding);
+            parser.setInput(is, encoding);
 
             final XmlNodeImpl node = build(parser, trim);
 
@@ -88,9 +88,9 @@ public class XmlNodeBuilder {
      */
     public static XmlNodeImpl build(Reader reader, boolean trim, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
-        try (Reader in = reader) {
+        try (Reader closeMe = reader) {
             final XmlPullParser parser = new MXParser();
-            parser.setInput(in);
+            parser.setInput(reader);
 
             final XmlNodeImpl node = build(parser, trim, locationBuilder);
 
