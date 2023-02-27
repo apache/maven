@@ -256,8 +256,7 @@ public class CLIManager {
                 .build());
         options.addOption(Option.builder(LEGACY_LOCAL_REPOSITORY)
                 .longOpt("legacy-local-repository")
-                .desc(
-                        "Use Maven 2 Legacy Local Repository behaviour, ie no use of _remote.repositories. Can also be activated by using -Dmaven.legacyLocalRepo=true")
+                .desc("Ineffective, only kept for backward compatibility.")
                 .build());
         options.addOption(Option.builder(BUILDER)
                 .longOpt("builder")
