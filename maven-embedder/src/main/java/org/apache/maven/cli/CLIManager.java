@@ -283,7 +283,7 @@ public class CLIManager {
         // Adding this back to make Maven fail if used
         options.addOption(Option.builder("llr")
                 .longOpt("legacy-local-repository")
-                .desc("Ineffective, use of this option will make Maven invocation fail.")
+                .desc("UNSUPPORTED: Use of this option will make Maven invocation fail.")
                 .build());
 
         options.addOption(Option.builder()
