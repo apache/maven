@@ -443,12 +443,20 @@ public interface MavenExecutionRequest {
 
     /**
      * @since 3.1
+     * @deprecated Since 3.9 there is no direct Maven2 interop offered at LRM level. See
+     * <a href="https://maven.apache.org/resolver/configuration.html">Resolver Configuration</a> page option
+     * {@code aether.artifactResolver.simpleLrmInterop} that provides similar semantics.
      */
+    @Deprecated
     boolean isUseLegacyLocalRepository();
 
     /**
      * @since 3.1
+     * @deprecated Since 3.9 there is no direct Maven2 interop offered at LRM level. See
+     * <a href="https://maven.apache.org/resolver/configuration.html">Resolver Configuration</a> page option
+     * {@code aether.artifactResolver.simpleLrmInterop} that provides similar semantics.
      */
+    @Deprecated
     MavenExecutionRequest setUseLegacyLocalRepository(boolean useLegacyLocalRepository);
 
     /**
