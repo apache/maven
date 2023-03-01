@@ -101,8 +101,6 @@ public class CLIManager {
 
     public static final String THREADS = "T";
 
-    public static final String LEGACY_LOCAL_REPOSITORY = "llr";
-
     public static final String BUILDER = "b";
 
     public static final String NO_TRANSFER_PROGRESS = "ntp";
@@ -253,11 +251,6 @@ public class CLIManager {
                 .longOpt("threads")
                 .hasArg()
                 .desc("Thread count, for instance 4 (int) or 2C/2.5C (int/float) where C is core multiplied")
-                .build());
-        options.addOption(Option.builder(LEGACY_LOCAL_REPOSITORY)
-                .longOpt("legacy-local-repository")
-                .desc(
-                        "Use Maven 2 Legacy Local Repository behaviour, ie no use of _remote.repositories. Can also be activated by using -Dmaven.legacyLocalRepo=true")
                 .build());
         options.addOption(Option.builder(BUILDER)
                 .longOpt("builder")
