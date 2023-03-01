@@ -290,6 +290,12 @@ public class CLIManager {
                 .desc("Defines the color mode of the output. Supported are 'auto', 'always', 'never'.")
                 .build());
 
+        // Adding this back to make Maven fail if used
+        options.addOption(Option.builder("llr")
+                .longOpt("legacy-local-repository")
+                .desc("UNSUPPORTED: Use of this option will make Maven invocation fail.")
+                .build());
+
         // Deprecated
         options.addOption(Option.builder()
                 .longOpt(DEBUG)
