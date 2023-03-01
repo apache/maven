@@ -281,7 +281,6 @@ public class MavenCli {
             toolchains(cliRequest);
             populateRequest(cliRequest);
             encryption(cliRequest);
-            repository(cliRequest);
             return execute(cliRequest);
         } catch (ExitException e) {
             return e.exitCode;
@@ -840,13 +839,6 @@ public class MavenCli {
             System.out.println(cipher.encryptAndDecorate(passwd, masterPasswd));
 
             throw new ExitException(0);
-        }
-    }
-
-    private void repository(CliRequest cliRequest) throws Exception {
-        if (cliRequest.commandLine.hasOption(CLIManager.LEGACY_LOCAL_REPOSITORY)
-                || Boolean.getBoolean("maven.legacyLocalRepo")) {
-            cliRequest.request.setUseLegacyLocalRepository(true);
         }
     }
 
