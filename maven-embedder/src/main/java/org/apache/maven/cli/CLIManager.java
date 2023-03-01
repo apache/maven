@@ -280,6 +280,12 @@ public class CLIManager {
                 .desc("Ineffective, only kept for backward compatibility")
                 .build());
 
+        // Adding this back to make Maven fail if used
+        options.addOption(Option.builder("llr")
+                .longOpt("legacy-local-repository")
+                .desc("UNSUPPORTED: Use of this option will make Maven invocation fail.")
+                .build());
+
         options.addOption(Option.builder()
                 .longOpt(COLOR)
                 .hasArg()
