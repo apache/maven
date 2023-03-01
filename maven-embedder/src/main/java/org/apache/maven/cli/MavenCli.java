@@ -362,6 +362,17 @@ public class MavenCli {
             cliManager.displayHelp(System.out);
             throw e;
         }
+
+        // check for presence of unsupported command line options
+        try {
+            if (cliRequest.commandLine.hasOption("llr")) {
+                throw new UnrecognizedOptionException("Option '-llr' is not supported starting with Maven 3.9.1");
+            }
+        } catch (ParseException e) {
+            System.err.println("Unsupported options: " + e.getMessage());
+            cliManager.displayHelp(System.out);
+            throw e;
+        }
     }
 
     private void informativeCommands(CliRequest cliRequest) throws ExitException {
