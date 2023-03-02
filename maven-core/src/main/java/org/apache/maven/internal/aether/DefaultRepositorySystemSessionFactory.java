@@ -242,10 +242,10 @@ public class DefaultRepositorySystemSessionFactory
                 logger.info( "Disabling enhanced local repository: using legacy is strongly discouraged to ensure"
                                  + " build reproducibility." );
                 logger.warn( "" );
-                logger.warn( "WARNING: due issues listed above, but also due fact that with using this option" );
-                logger.warn( "Maven cannot provide the latest local repository features, this option is being DEPRECATED." );
-                logger.warn( "Moreover, this option is being DROPPED starting with Maven 3.9.1, and use of this option" );
-                logger.warn( "will prevent Maven execution." );
+                logger.warn( "WARNING: due issues listed above, but also due fact that with this option" );
+                logger.warn( "Maven cannot provide the latest local repository features, it is being " );
+                logger.warn( "DEPRECATED. Moreover, this option is being DROPPED starting with Maven 3.9.1, and use" );
+                logger.warn( "of this option will prevent Maven execution." );
                 logger.warn( "" );
             }
             catch ( NoLocalRepositoryManagerException e )
