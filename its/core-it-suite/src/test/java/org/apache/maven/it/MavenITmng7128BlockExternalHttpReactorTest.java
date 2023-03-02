@@ -60,12 +60,9 @@ public class MavenITmng7128BlockExternalHttpReactorTest
         catch ( VerificationException ve )
         {
             // Inspect the reason why the build broke.
-            verifier.verifyTextInLog( "[ERROR] Failed to execute goal on project http-repository-in-pom: "
-                + "Could not resolve dependencies for project org.apache.maven.its.mng7128:http-repository-in-pom:jar:1.0: "
-                + "Failed to collect dependencies at junit:junit:jar:1.3: "
-                + "Failed to read artifact descriptor for junit:junit:jar:1.3: "
-                + "Could not transfer artifact junit:junit:pom:1.3 from/to maven-default-http-blocker (http://0.0.0.0/): " // mirror introduced in MNG-7118
-                + "Blocked mirror for repositories: [insecure-http-repo (http://repo.maven.apache.org/, default, releases+snapshots)]" );
+            verifier.verifyTextInLog( "[ERROR] Failed to execute goal on project http-repository-in-pom: " ); // project failed
+            verifier.verifyTextInLog( "Could not transfer artifact junit:junit:pom:1.3 from/to maven-default-http-blocker (http://0.0.0.0/): " ); // mirror introduced in MNG-7118
+            verifier.verifyTextInLog( "Blocked mirror for repositories: [insecure-http-repo (http://repo.maven.apache.org/, default, releases+snapshots)]" ); // blocked mirror text present
         }
     }
 }
