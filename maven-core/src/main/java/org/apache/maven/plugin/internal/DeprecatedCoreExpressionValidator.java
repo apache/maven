@@ -22,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
@@ -43,14 +44,14 @@ class DeprecatedCoreExpressionValidator extends AbstractMavenPluginParametersVal
 
     static {
         HashMap<String, String> deprecatedCoreParameters = new HashMap<>();
-        deprecatedCoreParameters.put("localRepository", ARTIFACT_REPOSITORY_REASON);
-        deprecatedCoreParameters.put("session.localRepository", ARTIFACT_REPOSITORY_REASON);
+        deprecatedCoreParameters.put("${localRepository}", ARTIFACT_REPOSITORY_REASON);
+        deprecatedCoreParameters.put("${session.localRepository}", ARTIFACT_REPOSITORY_REASON);
         DEPRECATED_CORE_PARAMETERS = deprecatedCoreParameters;
     }
 
     @Override
     protected String getParameterLogReason(Parameter parameter) {
-        return "is deprecated core expression; " + DEPRECATED_CORE_PARAMETERS.get(parameter.getName());
+        return "is deprecated core expression; " + DEPRECATED_CORE_PARAMETERS.get(parameter.getDefaultValue());
     }
 
     @Override
@@ -62,8 +63,12 @@ class DeprecatedCoreExpressionValidator extends AbstractMavenPluginParametersVal
             return;
         }
 
-        mojoDescriptor.getParameters().stream()
-                .filter(parameter -> DEPRECATED_CORE_PARAMETERS.containsKey(parameter.getName()))
-                .forEach(this::logParameter);
+        mojoDescriptor.getParameters().stream().filter(this::isDeprecated).forEach(this::logParameter);
+    }
+
+    private boolean isDeprecated(Parameter parameter) {
+        return Objects.equals(
+                        org.apache.maven.artifact.repository.ArtifactRepository.class.getName(), parameter.getType())
+                && DEPRECATED_CORE_PARAMETERS.containsKey(parameter.getDefaultValue());
     }
 }
