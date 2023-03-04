@@ -52,7 +52,6 @@ import org.apache.maven.internal.xml.XmlNodeBuilder;
 #foreach ( $class in $model.allClasses )
 import ${packageModelV4}.${class.name};
 #end
-import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.EntityReplacementMap;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
@@ -565,13 +564,11 @@ public class ${className}
     } //-- int nextTag( XmlPullParser )
 
     /**
-     * @see ReaderFactory#newXmlReader
      *
-     * @param reader a reader object.
-     * @param strict a strict object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
+     * @param reader a reader object
+     * @param strict a strict object
+     * @throws IOException IOException if any
+     * @throws XmlPullParserException XmlPullParserException if any
      * @return ${root.name}
      */
     public ${root.name} read( Reader reader, boolean strict )
@@ -581,17 +578,14 @@ public class ${className}
 
         parser.setInput( reader );
 
-
         return read( parser, strict );
     } //-- ${root.name} read( Reader, boolean )
 
     /**
-     * @see ReaderFactory#newXmlReader
      *
-     * @param reader a reader object.
+     * @param reader a reader object
      * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
+     * @throws XmlPullParserException XmlPullParserException if any
      * @return ${root.name}
      */
     public ${root.name} read( Reader reader )
@@ -603,42 +597,43 @@ public class ${className}
     /**
      * Method read.
      *
-     * @param in a in object.
-     * @param strict a strict object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
+     * @param in a in object
+     * @param strict a strict object
+     * @throws IOException IOException if any
+     * @throws XmlPullParserException XmlPullParserException if any
      * @return ${root.name}
      */
     public ${root.name} read( InputStream in, boolean strict )
         throws IOException, XmlPullParserException
     {
-        return read( ReaderFactory.newXmlReader( in ), strict );
+        XmlPullParser parser = addDefaultEntities ? new MXParser(EntityReplacementMap.defaultEntityReplacementMap) : new MXParser( );
+
+        parser.setInput( in, null );
+
+        return read( in, strict );
     } //-- ${root.name} read( InputStream, boolean )
 
     /**
      * Method read.
      *
-     * @param in a in object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
+     * @param in a in object
+     * @throws IOException IOException if any
+     * @throws XmlPullParserException XmlPullParserException if any
      * @return ${root.name}
      */
     public ${root.name} read( InputStream in )
         throws IOException, XmlPullParserException
     {
-        return read( ReaderFactory.newXmlReader( in ) );
+        return read( in, true );
     } //-- ${root.name} read( InputStream )
 
     /**
      * Method read.
      *
-     * @param parser a parser object.
-     * @param strict a strict object.
-     * @throws IOException IOException if any.
-     * @throws XmlPullParserException XmlPullParserException if
-     * any.
+     * @param parser a parser object
+     * @param strict a strict object
+     * @throws IOException IOException if any
+     * @throws XmlPullParserException XmlPullParserException if any
      * @return ${root.name}
      */
     public ${root.name} read( XmlPullParser parser, boolean strict )
