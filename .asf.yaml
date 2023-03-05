@@ -12,6 +12,13 @@ github:
     squash: true
     merge: false
     rebase: true
+  protected_branches:
+    master:
+      required_status_checks:
+        # strict means "Require branches to be up to date before merging".
+        strict: true
+      required_pull_request_reviews:
+        required_approving_review_count: 1
 notifications:
   commits: commits@maven.apache.org
   issues: issues@maven.apache.org
