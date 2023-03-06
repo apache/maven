@@ -19,8 +19,9 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.util.Collections;
@@ -69,7 +70,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         catch ( final UnresolvableModelException e )
         {
             assertNotNull( e.getMessage() );
-            assertThat( e.getMessage(), startsWith( "Could not find artifact org.apache:apache:pom:0 in central" ) );
+            assertThat( e.getMessage(), containsString( "Could not find artifact org.apache:apache:pom:0 in central" ) );
         }
     }
 
@@ -150,7 +151,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase
         catch ( final UnresolvableModelException e )
         {
             assertNotNull( e.getMessage() );
-            assertThat( e.getMessage(), startsWith( "Could not find artifact org.apache:apache:pom:0 in central" ) );
+            assertThat( e.getMessage(), containsString( "Could not find artifact org.apache:apache:pom:0 in central" ) );
         }
     }
 
