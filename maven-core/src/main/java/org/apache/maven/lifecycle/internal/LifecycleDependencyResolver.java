@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -91,13 +92,20 @@ public class LifecycleDependencyResolver {
         if (aggregator && project.getCollectedProjects() != null) {
             List<MavenProject> downstreamProjects = session.getProjectDependencyGraph()
                     .getDownstreamProjects(project, true); // sorted but more than needed
-            List<MavenProject> collectedProjects = project.getCollectedProjects(); // not sorted but what we need
+            List<MavenProject> projectAndSubmodules =
+                    getProjectAndSubModules(project).collect(Collectors.toList()); // not sorted but what we need
             return downstreamProjects.stream()
-                    .filter(collectedProjects::contains)
+                    .filter(projectAndSubmodules::contains)
                     .collect(Collectors.toList()); // sorted what we need
         } else {
             return Collections.singletonList(project);
         }
+    }
+
+    private static Stream<MavenProject> getProjectAndSubModules(MavenProject project) {
+        return Stream.concat(
+                Stream.of(project),
+                project.getCollectedProjects().stream().flatMap(LifecycleDependencyResolver::getProjectAndSubModules));
     }
 
     public void resolveProjectDependencies(
