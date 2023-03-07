@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -90,8 +91,9 @@ public class LifecycleDependencyResolver {
 
     public static List<MavenProject> getProjects(MavenProject project, MavenSession session, boolean aggregator) {
         if (aggregator && project.getCollectedProjects() != null) {
-            List<MavenProject> downstreamProjects = session.getProjectDependencyGraph()
-                    .getDownstreamProjects(project, true); // sorted but more than needed
+            List<MavenProject> downstreamProjects = new ArrayList<>(session.getProjectDependencyGraph()
+                    .getDownstreamProjects(project, true)); // sorted but more than needed
+            downstreamProjects.add(0, project); // add this project as first
             List<MavenProject> projectAndSubmodules =
                     getProjectAndSubModules(project).collect(Collectors.toList()); // not sorted but what we need
             return downstreamProjects.stream()
