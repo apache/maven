@@ -21,22 +21,37 @@ package org.apache.maven.plugin.internal;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.HashMap;
+import java.util.Objects;
+
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 /**
- * Print warnings if read-only parameters of a plugin are used in configuration.
+ * Print warnings if deprecated core parameters are used in mojo.
  *
- * @author Slawomir Jaranowski
+ * @since 3.9.1
  */
-@Named
 @Singleton
-class ReadOnlyPluginParametersValidator extends AbstractMavenPluginDescriptorSourcedParametersValidator {
+@Named
+class DeprecatedCoreExpressionValidator extends AbstractMavenPluginParametersValidator {
+    private static final HashMap<String, String> DEPRECATED_CORE_PARAMETERS;
+
+    private static final String ARTIFACT_REPOSITORY_REASON =
+            "Avoid use of ArtifactRepository type. If you need access to local repository, switch to '${repositorySystemSession}' expression and get LRM from it instead.";
+
+    static {
+        HashMap<String, String> deprecatedCoreParameters = new HashMap<>();
+        deprecatedCoreParameters.put("${localRepository}", ARTIFACT_REPOSITORY_REASON);
+        deprecatedCoreParameters.put("${session.localRepository}", ARTIFACT_REPOSITORY_REASON);
+        DEPRECATED_CORE_PARAMETERS = deprecatedCoreParameters;
+    }
+
     @Override
     protected String getParameterLogReason(Parameter parameter) {
-        return "is read-only, must not be used in configuration";
+        return "is deprecated core expression; " + DEPRECATED_CORE_PARAMETERS.get(parameter.getDefaultValue());
     }
 
     @Override
@@ -48,17 +63,12 @@ class ReadOnlyPluginParametersValidator extends AbstractMavenPluginDescriptorSou
             return;
         }
 
-        mojoDescriptor.getParameters().stream()
-                .filter(parameter -> !parameter.isEditable())
-                .forEach(parameter -> checkParameter(parameter, pomConfiguration, expressionEvaluator));
+        mojoDescriptor.getParameters().stream().filter(this::isDeprecated).forEach(this::logParameter);
     }
 
-    private void checkParameter(
-            Parameter parameter, PlexusConfiguration pomConfiguration, ExpressionEvaluator expressionEvaluator) {
-        PlexusConfiguration config = pomConfiguration.getChild(parameter.getName(), false);
-
-        if (isValueSet(config, expressionEvaluator)) {
-            logParameter(parameter);
-        }
+    private boolean isDeprecated(Parameter parameter) {
+        return Objects.equals(
+                        org.apache.maven.artifact.repository.ArtifactRepository.class.getName(), parameter.getType())
+                && DEPRECATED_CORE_PARAMETERS.containsKey(parameter.getDefaultValue());
     }
 }

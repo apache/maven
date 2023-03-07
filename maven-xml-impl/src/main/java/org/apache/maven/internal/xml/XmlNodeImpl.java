@@ -249,6 +249,18 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                     }
                 }
 
+                Map<String, Iterator<XmlNode>> commonChildren = new HashMap<>();
+                Set<String> names =
+                        recessive.getChildren().stream().map(XmlNode::getName).collect(Collectors.toSet());
+                for (String name : names) {
+                    List<XmlNode> dominantChildren = dominant.getChildren().stream()
+                            .filter(n -> n.getName().equals(name))
+                            .collect(Collectors.toList());
+                    if (dominantChildren.size() > 0) {
+                        commonChildren.put(name, dominantChildren.iterator());
+                    }
+                }
+
                 String keysValue = recessive.getAttribute(KEYS_COMBINATION_MODE_ATTRIBUTE);
 
                 for (XmlNode recessiveChild : recessive.getChildren()) {
@@ -285,19 +297,6 @@ public class XmlNodeImpl implements Serializable, XmlNode {
                     }
 
                     if (mergeChildren && childDom != null) {
-                        Map<String, Iterator<XmlNode>> commonChildren = new HashMap<>();
-                        Set<String> names = recessive.getChildren().stream()
-                                .map(XmlNode::getName)
-                                .collect(Collectors.toSet());
-                        for (String name : names) {
-                            List<XmlNode> dominantChildren = dominant.getChildren().stream()
-                                    .filter(n -> n.getName().equals(name))
-                                    .collect(Collectors.toList());
-                            if (dominantChildren.size() > 0) {
-                                commonChildren.put(name, dominantChildren.iterator());
-                            }
-                        }
-
                         String name = recessiveChild.getName();
                         Iterator<XmlNode> it =
                                 commonChildren.computeIfAbsent(name, n1 -> Stream.of(dominant.getChildren().stream()

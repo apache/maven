@@ -66,7 +66,6 @@ public class XmlNodeBuilder {
             parser.setInput(is, encoding);
 
             final XmlNodeImpl node = build(parser, trim);
-
             return node;
         }
     }
