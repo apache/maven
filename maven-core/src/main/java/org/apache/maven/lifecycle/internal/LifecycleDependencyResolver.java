@@ -103,7 +103,10 @@ public class LifecycleDependencyResolver {
     private static Stream<MavenProject> getProjectAndSubModules(MavenProject project) {
         return Stream.concat(
                 Stream.of(project),
-                project.getCollectedProjects().stream().flatMap(LifecycleDependencyResolver::getProjectAndSubModules));
+                project.getCollectedProjects() == null
+                        ? Stream.empty()
+                        : project.getCollectedProjects().stream()
+                                .flatMap(LifecycleDependencyResolver::getProjectAndSubModules));
     }
 
     public void resolveProjectDependencies(
