@@ -90,7 +90,11 @@ public class LifecycleDependencyResolver {
 
     public static List<MavenProject> getProjects(MavenProject project, MavenSession session, boolean aggregator) {
         if (aggregator && project.getCollectedProjects() != null) {
-            return getProjectAndSubModules(project).collect(Collectors.toList());
+            List<MavenProject> projectAndSubmodules =
+                    getProjectAndSubModules(project).collect(Collectors.toList()); // not sorted but what we need
+            return session.getProjects().stream() // sorted all
+                    .filter(projectAndSubmodules::contains)
+                    .collect(Collectors.toList()); // sorted and filtered to what we need
         } else {
             return Collections.singletonList(project);
         }
