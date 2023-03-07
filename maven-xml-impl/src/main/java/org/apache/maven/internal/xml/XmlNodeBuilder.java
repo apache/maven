@@ -32,7 +32,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- *
+ * All methods in this class attempt to fully parse the XML.
+ * The caller is responsible for closing {@code InputStream} and {@code Reader} arguments.
  */
 public class XmlNodeBuilder {
     private static final boolean DEFAULT_TRIM = true;
@@ -60,13 +61,9 @@ public class XmlNodeBuilder {
 
     public static XmlNodeImpl build(InputStream is, String encoding, boolean trim)
             throws XmlPullParserException, IOException {
-        try (InputStream closeMe = is) {
-            final XmlPullParser parser = new MXParser();
-            parser.setInput(is, encoding);
-
-            final XmlNodeImpl node = build(parser, trim);
-            return node;
-        }
+        XmlPullParser parser = new MXParser();
+        parser.setInput(is, encoding);
+        return build(parser, trim);
     }
 
     public static XmlNodeImpl build(Reader reader, boolean trim) throws XmlPullParserException, IOException {
@@ -84,14 +81,9 @@ public class XmlNodeBuilder {
      */
     public static XmlNodeImpl build(Reader reader, boolean trim, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
-        try (Reader closeMe = reader) {
-            final XmlPullParser parser = new MXParser();
-            parser.setInput(reader);
-
-            final XmlNodeImpl node = build(parser, trim, locationBuilder);
-
-            return node;
-        }
+        XmlPullParser parser = new MXParser();
+        parser.setInput(reader);
+        return build(parser, trim, locationBuilder);
     }
 
     public static XmlNodeImpl build(XmlPullParser parser) throws XmlPullParserException, IOException {
