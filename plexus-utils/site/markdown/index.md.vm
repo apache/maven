@@ -23,4 +23,4 @@ The Maven 4.x API is based on immutable data objects. The Maven model contains a
 
 Given the new implementation of `org.codehaus.plexus.utils.xml.Xpp3Dom` now relies on `org.apache.maven.api.Dom`, the modifications can't be made inside the `plexus-utils` project, because Maven itself depends on it.
 
-This is drop-in replacement for `plexus-utils` 3.4.2.
+This is drop-in replacement for `plexus-utils` ${plexusUtilsVersionEmbedded}.
