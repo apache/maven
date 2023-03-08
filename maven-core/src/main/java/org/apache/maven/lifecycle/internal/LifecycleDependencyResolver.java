@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -97,9 +98,18 @@ public class LifecycleDependencyResolver
     {
         if ( aggregator && project.getCollectedProjects() != null )
         {
-            List<MavenProject> projects = new ArrayList<>();
-            addProjectAndSubModules( projects, project );
-            return projects;
+            List<MavenProject> sortedProjects = new ArrayList<>( session.getProjects() ); // sorted but all
+            List<MavenProject> projectAndSubmodules = new ArrayList<>();
+            addProjectAndSubModules( projectAndSubmodules, project ); // not sorted but what we need
+            Iterator<MavenProject> sortedProjectsIterator = sortedProjects.listIterator();
+            while ( sortedProjectsIterator.hasNext() )
+            {
+                if ( !projectAndSubmodules.contains( sortedProjectsIterator.next() ) )
+                {
+                    sortedProjectsIterator.remove();
+                }
+            }
+            return sortedProjects;
         }
         else
         {
