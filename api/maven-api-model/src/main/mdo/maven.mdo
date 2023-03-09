@@ -624,7 +624,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0+</version>
+          <version>4.0.0/4.1.0</version>
           <code>
             <![CDATA[
     Map<String, Plugin> pluginMap;
@@ -656,6 +656,31 @@
             }
         }
 
+        return pluginMap;
+    }
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.2.0+</version>
+          <code>
+            <![CDATA[
+    volatile Map<String, Plugin> pluginMap;
+
+    /**
+     * @return a Map of plugins field with {@code Plugins#getKey()} as key
+     * @see Plugin#getKey()
+     */
+    public Map<String, Plugin> getPluginsAsMap() {
+        if (pluginMap == null) {
+            synchronized (this) {
+                if (pluginMap == null) {
+                    pluginMap = ImmutableCollections.copy(plugins.stream().collect(
+                            java.util.stream.Collectors.toMap(
+                                Plugin::getKey, java.util.function.Function.identity())));
+                }
+            }
+        }
         return pluginMap;
     }
             ]]>
