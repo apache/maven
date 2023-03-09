@@ -230,7 +230,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
 
             for (Map.Entry<String, String> attr : recessive.getAttributes().entrySet()) {
                 String key = attr.getKey();
-                if (isEmpty(dominant.getAttribute(key)) && !SELF_COMBINATION_MODE_ATTRIBUTE.equals(key)) {
+                if (isEmpty(dominant.getAttribute(key))) {
                     if (attrs == null) {
                         attrs = new HashMap<>();
                     }
