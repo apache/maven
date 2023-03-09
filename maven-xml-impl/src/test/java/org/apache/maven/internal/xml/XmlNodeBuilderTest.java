@@ -16,27 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.artifact.repository.layout;
+package org.apache.maven.internal.xml;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.repository.ArtifactRepository;
+import java.io.IOException;
+import java.io.StringReader;
 
-/**
- * Repository layout.
- *
- * @author jdcasey
- * @deprecated Avoid use of this type, if you need access to local repository use repository system session instead.
- */
-@Deprecated
-public interface ArtifactRepositoryLayout {
-    String ROLE = ArtifactRepositoryLayout.class.getName();
+import org.apache.maven.api.xml.XmlNode;
+import org.junit.jupiter.api.Test;
 
-    String getId();
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    String pathOf(Artifact artifact);
+public class XmlNodeBuilderTest {
 
-    String pathOfLocalRepositoryMetadata(ArtifactMetadata metadata, ArtifactRepository repository);
-
-    String pathOfRemoteRepositoryMetadata(ArtifactMetadata metadata);
+    @Test
+    public void testReadMultiDoc() throws Exception {
+        String doc = "<?xml version='1.0'?><doc><child>foo</child></doc>";
+        StringReader r = new StringReader(doc + doc) {
+            @Override
+            public int read(char[] cbuf, int off, int len) throws IOException {
+                return super.read(cbuf, off, 1);
+            }
+        };
+        XmlNode node1 = XmlNodeBuilder.build(r);
+        XmlNode node2 = XmlNodeBuilder.build(r);
+        assertEquals(node1, node2);
+    }
 }

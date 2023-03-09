@@ -1022,7 +1022,7 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
 
     @Override
     public MavenExecutionRequest setUseLegacyLocalRepository(boolean useLegacyLocalRepositoryManager) {
-        this.useLegacyLocalRepositoryManager = useLegacyLocalRepositoryManager;
+        this.useLegacyLocalRepositoryManager = false;
         return this;
     }
 

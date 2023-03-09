@@ -41,6 +41,113 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class XmlNodeImplTest {
 
+    @Test
+    public void testCombineChildrenAppend() throws Exception {
+        String lhs = "<configuration>\n"
+                + "    <plugins>\n"
+                + "        <plugin>\n"
+                + "            <groupId>foo.bar</groupId>\n"
+                + "            <artifactId>foo-bar-plugin</artifactId>\n"
+                + "            <configuration>\n"
+                + "                <plugins>\n"
+                + "                    <plugin>\n"
+                + "                        <groupId>org.apache.maven.plugins</groupId>\n"
+                + "                        <artifactId>maven-compiler-plugin</artifactId>\n"
+                + "                    </plugin>\n"
+                + "                    <plugin>\n"
+                + "                        <groupId>org.apache.maven.plugins</groupId>\n"
+                + "                        <artifactId>maven-surefire-plugin</artifactId>\n"
+                + "                        <foo>\n"
+                + "                            <properties combine.children=\"append\">\n"
+                + "                                <property>\n"
+                + "                                    <name>prop2</name>\n"
+                + "                                    <value>value2</value>\n"
+                + "                                </property>\n"
+                + "                            </properties>\n"
+                + "                        </foo>\n"
+                + "                    </plugin>\n"
+                + "                </plugins>\n"
+                + "            </configuration>\n"
+                + "        </plugin>\n"
+                + "    </plugins>\n"
+                + "</configuration>";
+
+        String rhs = "<configuration>\n"
+                + "    <plugins>\n"
+                + "        <plugin>\n"
+                + "            <groupId>foo.bar</groupId>\n"
+                + "            <artifactId>foo-bar-plugin</artifactId>\n"
+                + "            <configuration>\n"
+                + "                <plugins>\n"
+                + "                    <plugin>\n"
+                + "                        <groupId>org.apache.maven.plugins</groupId>\n"
+                + "                        <artifactId>maven-compiler-plugin</artifactId>\n"
+                + "                        <bar>\n"
+                + "                            <value>foo</value>\n"
+                + "                        </bar>\n"
+                + "                    </plugin>\n"
+                + "                    <plugin>\n"
+                + "                        <groupId>org.apache.maven.plugins</groupId>\n"
+                + "                        <artifactId>maven-surefire-plugin</artifactId>\n"
+                + "                        <foo>\n"
+                + "                            <properties>\n"
+                + "                                <property>\n"
+                + "                                    <name>prop1</name>\n"
+                + "                                    <value>value1</value>\n"
+                + "                                </property>\n"
+                + "                            </properties>\n"
+                + "                        </foo>\n"
+                + "                    </plugin>\n"
+                + "                </plugins>\n"
+                + "            </configuration>\n"
+                + "        </plugin>\n"
+                + "    </plugins>\n"
+                + "</configuration>";
+
+        String result = "<configuration>\n"
+                + "    <plugins>\n"
+                + "        <plugin>\n"
+                + "            <groupId>foo.bar</groupId>\n"
+                + "            <artifactId>foo-bar-plugin</artifactId>\n"
+                + "            <configuration>\n"
+                + "                <plugins>\n"
+                + "                    <plugin>\n"
+                + "                        <groupId>org.apache.maven.plugins</groupId>\n"
+                + "                        <artifactId>maven-compiler-plugin</artifactId>\n"
+                + "                        <bar>\n"
+                + "                            <value>foo</value>\n"
+                + "                        </bar>\n"
+                + "                    </plugin>\n"
+                + "                    <plugin>\n"
+                + "                        <groupId>org.apache.maven.plugins</groupId>\n"
+                + "                        <artifactId>maven-surefire-plugin</artifactId>\n"
+                + "                        <foo>\n"
+                + "                            <properties combine.children=\"append\">\n"
+                + "                                <property>\n"
+                + "                                    <name>prop1</name>\n"
+                + "                                    <value>value1</value>\n"
+                + "                                </property>\n"
+                + "                                <property>\n"
+                + "                                    <name>prop2</name>\n"
+                + "                                    <value>value2</value>\n"
+                + "                                </property>\n"
+                + "                            </properties>\n"
+                + "                        </foo>\n"
+                + "                    </plugin>\n"
+                + "                </plugins>\n"
+                + "            </configuration>\n"
+                + "        </plugin>\n"
+                + "    </plugins>\n"
+                + "</configuration>";
+
+        XmlNode leftDom = toXmlNode(lhs);
+        XmlNode rightDom = toXmlNode(rhs);
+
+        XmlNode mergeResult = leftDom.merge(rightDom);
+
+        assertEquals(toXmlNode(result), mergeResult);
+    }
+
     /**
      * <p>testCombineId.</p>
      *
@@ -169,7 +276,7 @@ public class XmlNodeImplTest {
         XmlNodeImpl rightDom = XmlNodeBuilder.build(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
         XmlNode mergeResult = XmlNodeImpl.merge(leftDom, rightDom, true);
-        assertEquals(null, mergeResult.getValue());
+        assertNull(mergeResult.getValue());
     }
 
     /**
@@ -514,6 +621,15 @@ public class XmlNodeImplTest {
                 .skip(nth)
                 .findFirst()
                 .orElse(null);
+    }
+
+    private static XmlNode toXmlNode(String xml) throws XmlPullParserException, IOException {
+        return toXmlNode(xml, null);
+    }
+
+    private static XmlNode toXmlNode(String xml, XmlNodeBuilder.InputLocationBuilder locationBuilder)
+            throws XmlPullParserException, IOException {
+        return XmlNodeBuilder.build(new StringReader(xml), locationBuilder);
     }
 
     private static class FixedInputLocationBuilder implements XmlNodeBuilder.InputLocationBuilder {

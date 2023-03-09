@@ -41,6 +41,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import com.google.inject.AbstractModule;
 import org.apache.commons.cli.CommandLine;
@@ -280,7 +281,6 @@ public class MavenCli {
             toolchains(cliRequest);
             populateRequest(cliRequest);
             encryption(cliRequest);
-            repository(cliRequest);
             return execute(cliRequest);
         } catch (ExitException e) {
             return e.exitCode;
@@ -346,14 +346,14 @@ public class MavenCli {
             File configFile = new File(cliRequest.multiModuleProjectDirectory, MVN_MAVEN_CONFIG);
 
             if (configFile.isFile()) {
-                String[] args = Files.lines(configFile.toPath(), Charset.defaultCharset())
-                        .filter(arg -> !arg.isEmpty())
-                        .toArray(size -> new String[size]);
-                mavenConfig = cliManager.parse(args);
-                List<?> unrecognized = mavenConfig.getArgList();
-                if (!unrecognized.isEmpty()) {
-                    // This file can only contain options, not args (goals or phases)
-                    throw new ParseException("Unrecognized maven.config file entries: " + unrecognized);
+                try (Stream<String> lines = Files.lines(configFile.toPath(), Charset.defaultCharset())) {
+                    String[] args = lines.filter(arg -> !arg.isEmpty()).toArray(String[]::new);
+                    mavenConfig = cliManager.parse(args);
+                    List<?> unrecognized = mavenConfig.getArgList();
+                    if (!unrecognized.isEmpty()) {
+                        // This file can only contain options, not args (goals or phases)
+                        throw new ParseException("Unrecognized maven.config file entries: " + unrecognized);
+                    }
                 }
             }
         } catch (ParseException e) {
@@ -371,6 +371,17 @@ public class MavenCli {
             }
         } catch (ParseException e) {
             System.err.println("Unable to parse command line options: " + e.getMessage());
+            cliManager.displayHelp(System.out);
+            throw e;
+        }
+
+        // check for presence of unsupported command line options
+        try {
+            if (cliRequest.commandLine.hasOption("llr")) {
+                throw new UnrecognizedOptionException("Option '-llr' is not supported starting with Maven 3.9.1");
+            }
+        } catch (ParseException e) {
+            System.err.println("Unsupported options: " + e.getMessage());
             cliManager.displayHelp(System.out);
             throw e;
         }
@@ -839,13 +850,6 @@ public class MavenCli {
             System.out.println(cipher.encryptAndDecorate(passwd, masterPasswd));
 
             throw new ExitException(0);
-        }
-    }
-
-    private void repository(CliRequest cliRequest) throws Exception {
-        if (cliRequest.commandLine.hasOption(CLIManager.LEGACY_LOCAL_REPOSITORY)
-                || Boolean.getBoolean("maven.legacyLocalRepo")) {
-            cliRequest.request.setUseLegacyLocalRepository(true);
         }
     }
 

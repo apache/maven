@@ -50,7 +50,9 @@ public class Xpp3DomBuilder {
 
     public static Xpp3Dom build(InputStream is, String encoding, boolean trim)
             throws XmlPullParserException, IOException {
-        return new Xpp3Dom(XmlNodeBuilder.build(is, encoding, trim));
+        try (InputStream closeMe = is) {
+            return new Xpp3Dom(XmlNodeBuilder.build(is, encoding, trim));
+        }
     }
 
     public static Xpp3Dom build(Reader reader, boolean trim) throws XmlPullParserException, IOException {
@@ -62,8 +64,10 @@ public class Xpp3DomBuilder {
      */
     public static Xpp3Dom build(Reader reader, boolean trim, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
-        return new Xpp3Dom(
-                XmlNodeBuilder.build(reader, trim, locationBuilder != null ? locationBuilder::toInputLocation : null));
+        try (Reader closeMe = reader) {
+            return new Xpp3Dom(XmlNodeBuilder.build(
+                    reader, trim, locationBuilder != null ? locationBuilder::toInputLocation : null));
+        }
     }
 
     public static Xpp3Dom build(XmlPullParser parser) throws XmlPullParserException, IOException {

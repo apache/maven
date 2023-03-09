@@ -35,6 +35,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -69,8 +70,8 @@ class ReactorReader implements MavenWorkspaceReader {
 
     public static final String PROJECT_LOCAL_REPO = "project-local-repo";
 
-    private static final Collection<String> COMPILE_PHASE_TYPES =
-            Arrays.asList("jar", "ejb-client", "war", "rar", "ejb3", "par", "sar", "wsr", "har", "app-client");
+    private static final Collection<String> COMPILE_PHASE_TYPES = new HashSet<>(
+            Arrays.asList("jar", "ejb-client", "war", "rar", "ejb3", "par", "sar", "wsr", "har", "app-client"));
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReactorReader.class);
 
@@ -318,11 +319,13 @@ class ReactorReader implements MavenWorkspaceReader {
         switch (event.getType()) {
             case MojoStarted:
                 String phase = event.getMojoExecution().getLifecyclePhase();
-                Deque<String> phases = getLifecycles(project);
-                if (!Objects.equals(phase, phases.peekLast())) {
-                    phases.addLast(phase);
-                    if ("clean".equals(phase)) {
-                        cleanProjectLocalRepository(project);
+                if (phase != null) {
+                    Deque<String> phases = getLifecycles(project);
+                    if (!Objects.equals(phase, phases.peekLast())) {
+                        phases.addLast(phase);
+                        if ("clean".equals(phase)) {
+                            cleanProjectLocalRepository(project);
+                        }
                     }
                 }
                 break;
