@@ -18,7 +18,6 @@
  */
 package org.codehaus.plexus.util.xml;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +26,6 @@ import java.util.Map;
 
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.internal.xml.XmlNodeImpl;
-import org.codehaus.plexus.util.xml.pull.XmlSerializer;
 
 /**
  *  NOTE: remove all the util code in here when separated, this class should be pure data.
@@ -37,32 +35,13 @@ public class Xpp3Dom implements Serializable {
 
     public static final String CHILDREN_COMBINATION_MODE_ATTRIBUTE = "combine.children";
 
-    public static final String CHILDREN_COMBINATION_MERGE = "merge";
-
     public static final String CHILDREN_COMBINATION_APPEND = "append";
-
-    /**
-     * This default mode for combining children DOMs during merge means that where element names match, the process will
-     * try to merge the element data, rather than putting the dominant and recessive elements (which share the same
-     * element name) as siblings in the resulting DOM.
-     */
-    public static final String DEFAULT_CHILDREN_COMBINATION_MODE = CHILDREN_COMBINATION_MERGE;
 
     public static final String SELF_COMBINATION_MODE_ATTRIBUTE = "combine.self";
 
     public static final String SELF_COMBINATION_OVERRIDE = "override";
 
     public static final String SELF_COMBINATION_MERGE = "merge";
-
-    public static final String SELF_COMBINATION_REMOVE = "remove";
-
-    /**
-     * This default mode for combining a DOM node during merge means that where element names match, the process will
-     * try to merge the element attributes and values, rather than overriding the recessive element completely with the
-     * dominant one. This means that wherever the dominant element doesn't provide the value or a particular attribute,
-     * that value or attribute will be set from the recessive DOM node.
-     */
-    public static final String DEFAULT_SELF_COMBINATION_MODE = SELF_COMBINATION_MERGE;
 
     private ChildrenTracking childrenTracking;
     private XmlNode dom;
@@ -265,16 +244,6 @@ public class Xpp3Dom implements Serializable {
     // Helpers
     // ----------------------------------------------------------------------
 
-    public void writeToSerializer(String namespace, XmlSerializer serializer) throws IOException {
-        // TODO: WARNING! Later versions of plexus-utils psit out an <?xml ?> header due to thinking this is a new
-        // document - not the desired behaviour!
-        SerializerXMLWriter xmlWriter = new SerializerXMLWriter(namespace, serializer);
-        Xpp3DomWriter.write(xmlWriter, this);
-        if (xmlWriter.getExceptions().size() > 0) {
-            throw (IOException) xmlWriter.getExceptions().get(0);
-        }
-    }
-
     /**
      * Merges one DOM into another, given a specific algorithm and possible override points for that algorithm.<p>
      * The algorithm is as follows:
@@ -383,18 +352,6 @@ public class Xpp3Dom implements Serializable {
     @Override
     public String toString() {
         return dom.toString();
-    }
-
-    public String toUnescapedString() {
-        return ((Xpp3Dom) dom).toUnescapedString();
-    }
-
-    public static boolean isNotEmpty(String str) {
-        return ((str != null) && (str.length() > 0));
-    }
-
-    public static boolean isEmpty(String str) {
-        return ((str == null) || (str.trim().length() == 0));
     }
 
     private void update(XmlNode dom) {
