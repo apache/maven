@@ -67,6 +67,6 @@ public class Slf4jConfigurationFactory {
             e.printStackTrace();
         }
 
-        return new UnsupportedSlf4jBindingConfiguration(slf4jBinding, supported);
+        return new UnsupportedSlf4jBindingConfiguration();
     }
 }
