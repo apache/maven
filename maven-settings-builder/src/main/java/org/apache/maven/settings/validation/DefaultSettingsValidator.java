@@ -57,9 +57,9 @@ public class DefaultSettingsValidator implements SettingsValidator {
 
         if (pluginGroups != null) {
             for (int i = 0; i < pluginGroups.size(); i++) {
-                String pluginGroup = pluginGroups.get(i).trim();
+                String pluginGroup = pluginGroups.get(i);
 
-                if (pluginGroup.isEmpty()) {
+                if (pluginGroup == null || pluginGroup.isEmpty()) {
                     addViolation(
                             problems, Severity.ERROR, "pluginGroups.pluginGroup[" + i + "]", null, "must not be empty");
                 } else if (!ID_REGEX.matcher(pluginGroup).matches()) {
