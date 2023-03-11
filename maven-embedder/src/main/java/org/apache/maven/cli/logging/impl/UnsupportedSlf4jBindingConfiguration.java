@@ -23,43 +23,23 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Pseudo-configuration for unsupported slf4j binding.
+ * Pseudo-configuration for unsupported SLF4J binding.
  *
  * @author Hervé Boutemy
  * @since 3.2.4
  */
 public class UnsupportedSlf4jBindingConfiguration extends BaseSlf4jConfiguration {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UnsupportedSlf4jBindingConfiguration.class);
 
-    private String slf4jBinding;
+    /**
+     * @deprecated the arguments are ignored. Use the no-args constructor.
+     */
+    @Deprecated
+    public UnsupportedSlf4jBindingConfiguration(String slf4jBinding, Map<URL, Set<Object>> supported) {}
 
-    private Map<URL, Set<Object>> supported;
-
-    public UnsupportedSlf4jBindingConfiguration(String slf4jBinding, Map<URL, Set<Object>> supported) {
-        this.slf4jBinding = slf4jBinding;
-        this.supported = supported;
-    }
+    public UnsupportedSlf4jBindingConfiguration() {}
 
     @Override
-    public void activate() {
-        LOGGER.warn("The SLF4J binding actually used is not supported by Maven: {}", slf4jBinding);
-        LOGGER.warn("Maven supported bindings are:");
-
-        String ls = System.lineSeparator();
-
-        for (Map.Entry<URL, Set<Object>> entry : supported.entrySet()) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("(from ").append(entry.getKey().toExternalForm()).append(')');
-
-            for (Object binding : entry.getValue()) {
-                sb.append(ls).append("- ").append(binding);
-            }
-
-            LOGGER.warn(sb.toString());
-        }
-    }
+    public void activate() {}
 }
