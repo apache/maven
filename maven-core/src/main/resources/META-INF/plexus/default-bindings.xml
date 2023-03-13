@@ -79,7 +79,7 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-compiler-plugin:3.10.1:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:3.0.0-M8:test
+                org.apache.maven.plugins:maven-surefire-plugin:3.0.0:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-jar-plugin:3.3.0:jar
@@ -123,7 +123,7 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-compiler-plugin:3.10.1:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:3.0.0-M8:test
+                org.apache.maven.plugins:maven-surefire-plugin:3.0.0:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-ejb-plugin:3.2.1:ejb
@@ -170,7 +170,7 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-compiler-plugin:3.10.1:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:3.0.0-M8:test
+                org.apache.maven.plugins:maven-surefire-plugin:3.0.0:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-jar-plugin:3.3.0:jar,
@@ -215,7 +215,7 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-compiler-plugin:3.10.1:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:3.0.0-M8:test
+                org.apache.maven.plugins:maven-surefire-plugin:3.0.0:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-war-plugin:3.3.2:war
@@ -294,7 +294,7 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-compiler-plugin:3.10.1:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:3.0.0-M8:test
+                org.apache.maven.plugins:maven-surefire-plugin:3.0.0:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-rar-plugin:3.0.0:rar
