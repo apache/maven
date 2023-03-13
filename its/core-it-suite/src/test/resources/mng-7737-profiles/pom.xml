@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng7737</groupId>
+  <artifactId>test</artifactId>
+  <version>0.1</version>
+  <packaging>jar</packaging>
+
+  <name>Maven Integration Test :: MNG-7737</name>
+  <description>
+    Verify profile activations.
+  </description>
+
+  <properties>
+    <pom-file1.txt>pom-file1.txt</pom-file1.txt>
+    <pom-file2.txt>pom-file2.txt</pom-file2.txt>
+  </properties>
+
+  <profiles>
+    <profile>
+      <id>pom-active-default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+    </profile>
+    <profile>
+      <id>pom-jdk-8</id>
+      <activation>
+        <jdk>[1.8,)</jdk>
+      </activation>
+    </profile>
+    <profile>
+      <id>pom-jdk-11</id>
+      <activation>
+        <jdk>[11,)</jdk>
+      </activation>
+    </profile>
+    <profile>
+      <id>pom-jdk-17</id>
+      <activation>
+        <jdk>[17,)</jdk>
+      </activation>
+    </profile>
+    <profile>
+      <id>pom-os-unix</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+    </profile>
+    <profile>
+      <id>pom-os-mac</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+    </profile>
+    <profile>
+      <id>pom-os-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+    </profile>
+    <profile>
+      <id>pom-property</id>
+      <activation>
+        <property>
+          <name>pom-property</name>
+        </property>
+      </activation>
+    </profile>
+    <profile>
+      <id>pom-file-exists-present</id>
+      <activation>
+        <file>
+          <exists>${pom-file1.txt}</exists>
+        </file>
+      </activation>
+    </profile>
+    <profile>
+      <id>pom-file-exists-absent</id>
+      <activation>
+        <file>
+          <exists>${pom-file2.txt}</exists>
+        </file>
+      </activation>
+    </profile>
+    <profile>
+      <id>pom-file-missing-present</id>
+      <activation>
+        <file>
+          <missing>${pom-file1.txt}</missing>
+        </file>
+      </activation>
+    </profile>
+    <profile>
+      <id>pom-file-missing-absent</id>
+      <activation>
+        <file>
+          <missing>${pom-file2.txt}</missing>
+        </file>
+      </activation>
+    </profile>
+  </profiles>
+</project>

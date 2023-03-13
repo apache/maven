@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<settings>
+  <profiles>
+    <profile>
+      <id>settings-active-default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+    </profile>
+    <profile>
+      <id>settings-active</id>
+    </profile>
+    <profile>
+      <id>settings-jdk-8</id>
+      <activation>
+        <jdk>[1.8,)</jdk>
+      </activation>
+    </profile>
+    <profile>
+      <id>settings-jdk-11</id>
+      <activation>
+        <jdk>[11,)</jdk>
+      </activation>
+    </profile>
+    <profile>
+      <id>settings-jdk-17</id>
+      <activation>
+        <jdk>[17,)</jdk>
+      </activation>
+    </profile>
+    <profile>
+      <id>settings-os-unix</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+    </profile>
+    <profile>
+      <id>settings-os-mac</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+    </profile>
+    <profile>
+      <id>settings-os-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+    </profile>
+    <profile>
+      <id>settings-property</id>
+      <activation>
+        <property>
+          <name>settings-property</name>
+        </property>
+      </activation>
+    </profile>
+    <profile>
+      <id>settings-file-exists-present</id>
+      <activation>
+        <file>
+          <exists>settings-file1.txt</exists>
+        </file>
+      </activation>
+    </profile>
+    <profile>
+      <id>settings-file-exists-absent</id>
+      <activation>
+        <file>
+          <exists>settings-file2.txt</exists>
+        </file>
+      </activation>
+    </profile>
+    <profile>
+      <id>settings-file-missing-present</id>
+      <activation>
+        <file>
+          <missing>settings-file1.txt</missing>
+        </file>
+      </activation>
+    </profile>
+    <profile>
+      <id>settings-file-missing-absent</id>
+      <activation>
+        <file>
+          <missing>settings-file2.txt</missing>
+        </file>
+      </activation>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>settings-active</activeProfile>
+  </activeProfiles>
+</settings>

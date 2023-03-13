@@ -86,6 +86,7 @@ org.apache.maven.plugins:maven-ear-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-ear-plugin:3.2.0
 org.apache.maven.plugins:maven-ejb-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-ejb-plugin:3.1.0
+org.apache.maven.plugins:maven-help-plugin:3.3.0
 org.apache.maven.plugins:maven-install-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-install-plugin:3.0.1
 org.apache.maven.plugins:maven-jar-plugin:${stubPluginVersion}
