@@ -62,10 +62,10 @@ under the License.
           <area shape="rect" coords="71,0,222,41"      alt="maven-slf4j-provider" href="maven-slf4j-provider/" />
           <area shape="rect" coords="73,66,220,108"    alt="maven-slf4j-wrapper" href="maven-slf4j-wrapper/" />
           <area shape="rect" coords="1,517,192,680"    alt="maven-resolver" href="https://maven.apache.org/resolver/" />
-          <area shape="rect" coords="87,132,204,172"   alt="slf4j-api" href="http://www.slf4j.org/manual.html" />
-          <area shape="rect" coords="679,66,827,106"   alt="commons-cli" href="http://commons.apache.org/cli/" />
+          <area shape="rect" coords="87,132,204,172"   alt="slf4j-api" href="https://www.slf4j.org/manual.html" />
+          <area shape="rect" coords="679,66,827,106"   alt="commons-cli" href="https://commons.apache.org/cli/" />
           <area shape="rect" coords="82,197,216,237"   alt="maven-shared-utils" href="https://maven.apache.org/shared/maven-shared-utils/" />
-          <area shape="rect" coords="109,263,189,304"  alt="jansi" href="http://fusesource.github.io/jansi/" />
+          <area shape="rect" coords="109,263,189,304"  alt="jansi" href="https://fusesource.github.io/jansi/" />
           <area shape="rect" coords="679,132,892,171"  alt="wagon-provider-api" href="https://maven.apache.org/wagon/wagon-provider-api/" />
           <area shape="rect" coords="674,437,831,477"  alt="plexus-sec-dispatcher" href="https://github.com/codehaus-plexus/plexus-sec-dispatcher" />
           <area shape="rect" coords="859,436,949,479"  alt="plexus-cipher" href="https://github.com/codehaus-plexus/plexus-cipher" />
@@ -74,7 +74,7 @@ under the License.
           <area shape="rect" coords="868,324,951,366"  alt="plexus-utils" href="https://codehaus-plexus.github.io/plexus-utils" />
           <area shape="rect" coords="660,310,965,520"  alt="plexus" href="https://codehaus-plexus.github.io/" />
           <area shape="rect" coords="679,183,910,281"  alt="sisu" href="https://projects.eclipse.org/projects/technology.sisu" />
-          <area shape="rect" coords="921,195,1004,239" alt="guice" href="http://code.google.com/p/google-guice/" />
+          <area shape="rect" coords="921,195,1004,239" alt="guice" href="https://github.com/google/guice" />
         </map>
       </p>
     </section>
