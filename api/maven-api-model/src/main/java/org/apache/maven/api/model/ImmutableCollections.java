@@ -485,7 +485,11 @@ class ImmutableCollections {
         private final Object[] entries;
 
         private MapN(Map<K, V> map) {
-            entries = map != null ? map.entrySet().toArray() : new Object[0];
+            entries = map != null
+                    ? map.entrySet().stream()
+                            .map(e -> new SimpleImmutableEntry<>(e.getKey(), e.getValue()))
+                            .toArray()
+                    : new Object[0];
         }
 
         @Override
