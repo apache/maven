@@ -60,7 +60,7 @@ public class DefaultSettingsValidator implements SettingsValidator {
                 String pluginGroup = pluginGroups.get(i);
 
                 validateStringNotEmpty(problems, "pluginGroups.pluginGroup[" + i + "]", pluginGroup, null);
-                
+
                 if (!ID_REGEX.matcher(pluginGroup).matches()) {
                     addViolation(
                             problems,
