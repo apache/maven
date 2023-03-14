@@ -39,7 +39,7 @@ public abstract class AbstractLifecycleMappingProvider implements Provider<Lifec
 
     protected static final String COMPILER_PLUGIN_VERSION = "3.10.1";
 
-    protected static final String SUREFIRE_PLUGIN_VERSION = "3.0.0-M8";
+    protected static final String SUREFIRE_PLUGIN_VERSION = "3.0.0";
 
     protected static final String INSTALL_PLUGIN_VERSION = "3.1.0";
 
