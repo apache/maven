@@ -28,7 +28,7 @@ under the License.
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>3.9.1-SNAPSHOT</version>
+  <version>3.9.1</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -104,7 +104,7 @@ under the License.
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
-    <tag>maven-3.8.5</tag>
+    <tag>maven-3.9.1</tag>
     <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
   </scm>
   <issueManagement>
@@ -155,7 +155,7 @@ under the License.
     <maven.site.path>ref/3-LATEST</maven.site.path>
     <checkstyle.violation.ignore>None</checkstyle.violation.ignore>
     <checkstyle.excludes>**/package-info.java</checkstyle.excludes>
-    <project.build.outputTimestamp>2023-01-31T09:58:16Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2023-03-15T09:39:04Z</project.build.outputTimestamp>
   </properties>
 
   <!--bootstrap-start-comment-->
