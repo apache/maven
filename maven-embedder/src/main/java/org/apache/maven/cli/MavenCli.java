@@ -72,6 +72,7 @@ import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
+import org.apache.maven.exception.PluginVersionUpgradeAvailableExceptionHandler;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -868,7 +869,9 @@ public class MavenCli {
         eventSpyDispatcher.close();
 
         if (result.hasExceptions()) {
-            ExceptionHandler handler = new DefaultExceptionHandler();
+            ExceptionHandler defaultExceptionHandler = new DefaultExceptionHandler();
+            PluginVersionUpgradeAvailableExceptionHandler handler =
+                    new PluginVersionUpgradeAvailableExceptionHandler(defaultExceptionHandler);
 
             Map<String, String> references = new LinkedHashMap<>();
 
