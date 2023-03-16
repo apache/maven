@@ -53,6 +53,7 @@ import org.mockito.InOrder;
 import static java.util.Arrays.asList;
 import static org.apache.maven.cli.MavenCli.performProfileActivation;
 import static org.apache.maven.cli.MavenCli.performProjectActivation;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -550,6 +551,38 @@ class MavenCliTest {
     public void findRootProjectWithAttribute() {
         Path test = Paths.get("src/test/projects/root-attribute");
         assertEquals(test, new DefaultRootLocator().findRoot(test.resolve("child")));
+    }
+
+    @Test
+    public void testPropertiesInterpolation() throws Exception {
+        // Arrange
+        CliRequest request = new CliRequest(
+                new String[] {
+                    "-Dfoo=bar",
+                    "-DvalFound=s${foo}i",
+                    "-DvalNotFound=s${foz}i",
+                    "-DvalRootDirectory=${session.rootDirectory}/.mvn/foo",
+                    "-DvalTopDirectory=${session.topDirectory}/pom.xml",
+                    "-f",
+                    "${session.rootDirectory}/my-child",
+                    "prefix:3.0.0:${foo}",
+                    "validate"
+                },
+                null);
+        request.rootDirectory = Paths.get("myRootDirectory");
+        request.topDirectory = Paths.get("myTopDirectory");
+
+        // Act
+        cli.cli(request);
+        cli.properties(request);
+
+        // Assert
+        assertThat(request.getUserProperties().getProperty("valFound"), is("sbari"));
+        assertThat(request.getUserProperties().getProperty("valNotFound"), is("s${foz}i"));
+        assertThat(request.getUserProperties().getProperty("valRootDirectory"), is("myRootDirectory/.mvn/foo"));
+        assertThat(request.getUserProperties().getProperty("valTopDirectory"), is("myTopDirectory/pom.xml"));
+        assertThat(request.getCommandLine().getOptionValue('f'), is("myRootDirectory/my-child"));
+        assertThat(request.getCommandLine().getArgs(), equalTo(new String[] {"prefix:3.0.0:bar", "validate"}));
     }
 
     private MavenProject createMavenProject(String groupId, String artifactId) {
