@@ -18,6 +18,8 @@
  */
 package org.apache.maven.plugin;
 
+import java.util.Optional;
+
 /**
  * Base exception.
  *
@@ -27,6 +29,8 @@ public abstract class AbstractMojoExecutionException extends Exception {
     protected Object source;
 
     protected String longMessage;
+
+    protected MojoMetadata mojoMetadata;
 
     public AbstractMojoExecutionException(String message) {
         super(message);
@@ -53,5 +57,13 @@ public abstract class AbstractMojoExecutionException extends Exception {
 
     public Object getSource() {
         return source;
+    }
+
+    public Optional<MojoMetadata> getMojoMetadata() {
+        return mojoMetadata == null ? Optional.empty() : Optional.of(mojoMetadata);
+    }
+
+    public void setMojoMetadata(MojoMetadata metadata) {
+        this.mojoMetadata = metadata;
     }
 }
