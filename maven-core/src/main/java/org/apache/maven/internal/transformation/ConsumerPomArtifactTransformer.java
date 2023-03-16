@@ -62,6 +62,11 @@ public final class ConsumerPomArtifactTransformer {
     private static final String CONSUMER_POM_CLASSIFIER = "consumer";
 
     public void injectTransformedArtifacts(MavenProject project, RepositorySystemSession session) throws IOException {
+        if (project.getFile() == null) {
+            // If there is no build POM there is no reason to inject artifacts for the consumer POM.
+            // https://issues.apache.org/jira/browse/MNG-7707
+            return;
+        }
         if (isActive(session)) {
             Path generatedFile;
             String buildDirectory =
