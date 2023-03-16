@@ -110,4 +110,12 @@ public class CliRequest {
     public void setUserProperties(Properties properties) {
         this.userProperties.putAll(properties);
     }
+
+    public Path getRootDirectory() {
+        return rootDirectory;
+    }
+
+    public Path getTopDirectory() {
+        return topDirectory;
+    }
 }

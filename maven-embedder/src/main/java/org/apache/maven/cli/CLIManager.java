@@ -78,6 +78,8 @@ public class CLIManager {
 
     public static final char ALTERNATE_USER_SETTINGS = 's';
 
+    public static final String ALTERNATE_PROJECT_SETTINGS = "ps";
+
     public static final String ALTERNATE_GLOBAL_SETTINGS = "gs";
 
     public static final char ALTERNATE_USER_TOOLCHAINS = 't';
@@ -203,6 +205,11 @@ public class CLIManager {
         options.addOption(Option.builder(Character.toString(ALTERNATE_USER_SETTINGS))
                 .longOpt("settings")
                 .desc("Alternate path for the user settings file")
+                .hasArg()
+                .build());
+        options.addOption(Option.builder(ALTERNATE_PROJECT_SETTINGS)
+                .longOpt("project-settings")
+                .desc("Alternate path for the project settings file")
                 .hasArg()
                 .build());
         options.addOption(Option.builder(ALTERNATE_GLOBAL_SETTINGS)

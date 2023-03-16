@@ -32,6 +32,7 @@ import java.util.Map;
 
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;
+import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.TrackableBase;
 import org.apache.maven.settings.io.SettingsParseException;
@@ -90,12 +91,17 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
         Source globalSettingsSource =
                 getSettingsSource(request.getGlobalSettingsFile(), request.getGlobalSettingsSource());
-        Settings globalSettings = readSettings(globalSettingsSource, request, problems);
+        Settings globalSettings = readSettings(globalSettingsSource, false, request, problems);
+
+        Source projectSettingsSource =
+                getSettingsSource(request.getProjectSettingsFile(), request.getProjectSettingsSource());
+        Settings projectSettings = readSettings(projectSettingsSource, true, request, problems);
 
         Source userSettingsSource = getSettingsSource(request.getUserSettingsFile(), request.getUserSettingsSource());
-        Settings userSettings = readSettings(userSettingsSource, request, problems);
+        Settings userSettings = readSettings(userSettingsSource, false, request, problems);
 
-        settingsMerger.merge(userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL);
+        settingsMerger.merge(projectSettings, globalSettings, TrackableBase.GLOBAL_LEVEL);
+        settingsMerger.merge(userSettings, projectSettings, TrackableBase.PROJECT_LEVEL);
 
         problems.setSource("");
 
@@ -139,7 +145,10 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     }
 
     private Settings readSettings(
-            Source settingsSource, SettingsBuildingRequest request, DefaultSettingsProblemCollector problems) {
+            Source settingsSource,
+            boolean isProjectSettings,
+            SettingsBuildingRequest request,
+            DefaultSettingsProblemCollector problems) {
         if (settingsSource == null) {
             return new Settings();
         }
@@ -179,7 +188,23 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             return new Settings();
         }
 
-        settingsValidator.validate(settings, problems);
+        settingsValidator.validate(settings, isProjectSettings, problems);
+
+        if (isProjectSettings) {
+            settings.setLocalRepository(null);
+            settings.setInteractiveMode(true);
+            settings.setOffline(false);
+            settings.setProxies(Collections.emptyList());
+            settings.setUsePluginRegistry(false);
+            for (Server server : settings.getServers()) {
+                server.setUsername(null);
+                server.setPassword(null);
+                server.setPrivateKey(null);
+                server.setPassword(null);
+                server.setFilePermissions(null);
+                server.setDirectoryPermissions(null);
+            }
+        }
 
         return settings;
     }

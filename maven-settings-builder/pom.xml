@@ -78,7 +78,13 @@ under the License.
       <plugin>
         <groupId>com.github.siom79.japicmp</groupId>
         <artifactId>japicmp-maven-plugin</artifactId>
-        <configuration />
+        <configuration>
+          <parameter>
+            <excludes>
+              <exclude>org.apache.maven.settings.validation.SettingsValidator#validate(org.apache.maven.settings.Settings,boolean,org.apache.maven.settings.building.SettingsProblemCollector):METHOD_NEW_DEFAULT</exclude>
+            </excludes>
+          </parameter>
+        </configuration>
       </plugin>
     </plugins>
   </build>

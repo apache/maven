@@ -48,7 +48,7 @@ public interface SettingsBuilder extends Service {
     @Nonnull
     default SettingsBuilderResult build(
             @Nonnull Session session, @Nonnull Source globalSettingsSource, @Nonnull Source userSettingsSource) {
-        return build(SettingsBuilderRequest.build(session, globalSettingsSource, userSettingsSource));
+        return build(session, globalSettingsSource, null, userSettingsSource);
     }
 
     /**
@@ -60,6 +60,37 @@ public interface SettingsBuilder extends Service {
     @Nonnull
     default SettingsBuilderResult build(
             @Nonnull Session session, @Nonnull Path globalSettingsPath, @Nonnull Path userSettingsPath) {
-        return build(SettingsBuilderRequest.build(session, globalSettingsPath, userSettingsPath));
+        return build(session, globalSettingsPath, null, userSettingsPath);
+    }
+
+    /**
+     * Builds the effective settings of the specified settings sources.
+     *
+     * @return the result of the settings building, never {@code null}
+     * @throws SettingsBuilderException if the effective settings could not be built
+     */
+    @Nonnull
+    default SettingsBuilderResult build(
+            @Nonnull Session session,
+            @Nonnull Source globalSettingsSource,
+            @Nonnull Source projectSettingsSource,
+            @Nonnull Source userSettingsSource) {
+        return build(
+                SettingsBuilderRequest.build(session, globalSettingsSource, projectSettingsSource, userSettingsSource));
+    }
+
+    /**
+     * Builds the effective settings of the specified settings paths.
+     *
+     * @return the result of the settings building, never {@code null}
+     * @throws SettingsBuilderException if the effective settings could not be built
+     */
+    @Nonnull
+    default SettingsBuilderResult build(
+            @Nonnull Session session,
+            @Nonnull Path globalSettingsPath,
+            @Nonnull Path projectSettingsPath,
+            @Nonnull Path userSettingsPath) {
+        return build(SettingsBuilderRequest.build(session, globalSettingsPath, projectSettingsPath, userSettingsPath));
     }
 }

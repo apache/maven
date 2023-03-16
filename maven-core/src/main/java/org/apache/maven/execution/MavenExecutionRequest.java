@@ -393,6 +393,10 @@ public interface MavenExecutionRequest {
 
     MavenExecutionRequest setUserSettingsFile(File userSettingsFile);
 
+    File getProjectSettingsFile();
+
+    MavenExecutionRequest setProjectSettingsFile(File projectSettingsFile);
+
     File getGlobalSettingsFile();
 
     MavenExecutionRequest setGlobalSettingsFile(File globalSettingsFile);
