@@ -37,9 +37,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-public class ConsumerPomArtifactTransformerTest {
+class ConsumerPomArtifactTransformerTest {
     @Test
-    public void transform() throws Exception {
+    void transform() throws Exception {
         Path beforePomFile =
                 Paths.get("src/test/resources/projects/transform/before.pom").toAbsolutePath();
         Path afterPomFile =
@@ -53,7 +53,7 @@ public class ConsumerPomArtifactTransformerTest {
     }
 
     @Test
-    public void injectTransformedArtifactsWithoutPomShouldNotInjectAnyArtifacts() throws IOException {
+    void injectTransformedArtifactsWithoutPomShouldNotInjectAnyArtifacts() throws IOException {
         MavenProject emptyProject = new MavenProject();
 
         RepositorySystemSession systemSessionMock = Mockito.mock(RepositorySystemSession.class);
