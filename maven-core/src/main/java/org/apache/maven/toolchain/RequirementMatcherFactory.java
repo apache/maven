@@ -73,8 +73,6 @@ public final class RequirementMatcherFactory {
                     return range.getRecommendedVersion().compareTo(version) == 0;
                 }
             } catch (InvalidVersionSpecificationException ex) {
-                // TODO error reporting
-                ex.printStackTrace();
                 return false;
             }
         }

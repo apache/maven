@@ -229,7 +229,7 @@ public class TestRepositorySystem implements RepositorySystem {
                             .map(Dependency::new)
                             .collect(Collectors.toList());
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    // ignore
                 }
             }
 

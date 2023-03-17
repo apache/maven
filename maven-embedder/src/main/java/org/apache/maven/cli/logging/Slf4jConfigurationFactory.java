@@ -21,10 +21,7 @@ package org.apache.maven.cli.logging;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.maven.cli.logging.impl.UnsupportedSlf4jBindingConfiguration;
 import org.codehaus.plexus.util.PropertyUtils;
@@ -42,8 +39,6 @@ public class Slf4jConfigurationFactory {
     public static final String RESOURCE = "META-INF/maven/slf4j-configuration.properties";
 
     public static Slf4jConfiguration getConfiguration(ILoggerFactory loggerFactory) {
-        Map<URL, Set<Object>> supported = new LinkedHashMap<>();
-
         String slf4jBinding = loggerFactory.getClass().getCanonicalName();
 
         try {
@@ -52,19 +47,18 @@ public class Slf4jConfigurationFactory {
 
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
-
-                Properties conf = PropertyUtils.loadProperties(resource.openStream());
-
-                String impl = conf.getProperty(slf4jBinding);
-
-                if (impl != null) {
-                    return (Slf4jConfiguration) Class.forName(impl).newInstance();
+                try {
+                    Properties conf = PropertyUtils.loadProperties(resource.openStream());
+                    String impl = conf.getProperty(slf4jBinding);
+                    if (impl != null) {
+                        return (Slf4jConfiguration) Class.forName(impl).newInstance();
+                    }
+                } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
+                    // ignore and move on to the next
                 }
-
-                supported.put(resource, conf.keySet());
             }
-        } catch (IOException | ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            // ignore
         }
 
         return new UnsupportedSlf4jBindingConfiguration();
