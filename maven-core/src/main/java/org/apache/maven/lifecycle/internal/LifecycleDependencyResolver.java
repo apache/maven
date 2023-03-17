@@ -90,23 +90,15 @@ public class LifecycleDependencyResolver {
 
     public static List<MavenProject> getProjects(MavenProject project, MavenSession session, boolean aggregator) {
         if (aggregator && project.getCollectedProjects() != null) {
-            List<MavenProject> projectAndSubmodules =
-                    getProjectAndSubModules(project).collect(Collectors.toList()); // not sorted but what we need
+            // get the unsorted list of wanted projects
+            Set<MavenProject> projectAndSubmodules = new HashSet<>(project.getCollectedProjects());
+            projectAndSubmodules.add(project);
             return session.getProjects().stream() // sorted all
                     .filter(projectAndSubmodules::contains)
                     .collect(Collectors.toList()); // sorted and filtered to what we need
         } else {
             return Collections.singletonList(project);
         }
-    }
-
-    private static Stream<MavenProject> getProjectAndSubModules(MavenProject project) {
-        return Stream.concat(
-                Stream.of(project),
-                project.getCollectedProjects() == null
-                        ? Stream.empty()
-                        : project.getCollectedProjects().stream()
-                                .flatMap(LifecycleDependencyResolver::getProjectAndSubModules));
     }
 
     public void resolveProjectDependencies(
