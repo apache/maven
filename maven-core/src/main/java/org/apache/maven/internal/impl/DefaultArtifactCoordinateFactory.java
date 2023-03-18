@@ -21,11 +21,11 @@ package org.apache.maven.internal.impl;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.api.ArtifactCoordinate;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.ArtifactCoordinateFactory;
 import org.apache.maven.api.services.ArtifactCoordinateFactoryRequest;
-import org.apache.maven.shared.utils.StringUtils;
 import org.eclipse.aether.artifact.ArtifactType;
 
 import static org.apache.maven.internal.impl.Utils.cast;
