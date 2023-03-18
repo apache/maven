@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
@@ -37,7 +38,6 @@ import org.apache.maven.api.model.Reporting;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Handles inheritance of model values.

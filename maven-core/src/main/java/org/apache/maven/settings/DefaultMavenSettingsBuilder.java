@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.properties.internal.SystemProperties;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
@@ -32,7 +33,6 @@ import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingException;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**

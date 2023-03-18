@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -56,7 +57,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.repository.Proxy;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Mirror;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.AuthenticationContext;
 import org.eclipse.aether.repository.AuthenticationSelector;

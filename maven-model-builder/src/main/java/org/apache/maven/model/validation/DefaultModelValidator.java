@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.ActivationFile;
 import org.apache.maven.api.model.Build;
@@ -59,7 +60,6 @@ import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.interpolation.ModelVersionProcessor;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
@@ -1719,7 +1719,7 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private static boolean equals(String s1, String s2) {
-        return StringUtils.clean(s1).equals(StringUtils.clean(s2));
+        return StringUtils.trimToEmpty(s1).equals(StringUtils.trimToEmpty(s2));
     }
 
     private static Severity getSeverity(ModelBuildingRequest request, int errorThreshold) {

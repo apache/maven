@@ -25,13 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Extension;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.artifact.ArtifactUtils;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;

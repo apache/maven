@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidArtifactRTException;
@@ -72,7 +73,6 @@ import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.apache.maven.repository.internal.ModelCacheFactory;
 import org.codehaus.plexus.util.Os;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;

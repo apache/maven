@@ -41,6 +41,7 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
@@ -100,7 +101,6 @@ import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;

@@ -33,6 +33,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.MetadataReader;
@@ -45,7 +46,6 @@ import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.plugin.version.PluginVersionResult;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositoryListener;
@@ -301,7 +301,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
     private void mergeMetadata(Versions versions, Metadata source, ArtifactRepository repository) {
         Versioning versioning = source.getVersioning();
         if (versioning != null) {
-            String timestamp = StringUtils.clean(versioning.getLastUpdated());
+            String timestamp = StringUtils.trimToEmpty(versioning.getLastUpdated());
 
             if (StringUtils.isNotEmpty(versioning.getRelease()) && timestamp.compareTo(versions.releaseTimestamp) > 0) {
                 versions.releaseVersion = versioning.getRelease();

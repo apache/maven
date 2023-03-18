@@ -18,12 +18,12 @@
  */
 package org.apache.maven.profiles.activation;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * JdkPrefixProfileActivator

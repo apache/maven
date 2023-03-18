@@ -18,9 +18,9 @@
  */
 package org.apache.maven.plugin;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Exception in the plugin manager.

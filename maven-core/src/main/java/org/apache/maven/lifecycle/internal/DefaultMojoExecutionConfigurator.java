@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
@@ -37,7 +38,6 @@ import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.logging.MessageBuilder;
 import org.apache.maven.shared.utils.logging.MessageUtils;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

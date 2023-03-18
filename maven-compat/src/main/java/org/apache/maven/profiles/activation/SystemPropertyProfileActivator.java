@@ -20,13 +20,13 @@ package org.apache.maven.profiles.activation;
 
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * SystemPropertyProfileActivator

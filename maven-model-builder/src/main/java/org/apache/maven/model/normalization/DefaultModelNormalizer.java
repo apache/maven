@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Model;
@@ -35,7 +36,6 @@ import org.apache.maven.api.model.Plugin;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Handles normalization of a model.

@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.ProjectCycleException;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -49,7 +50,6 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.collector.MultiModuleCollectionStrategy;
 import org.apache.maven.project.collector.PomlessCollectionStrategy;
 import org.apache.maven.project.collector.RequestPomCollectionStrategy;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

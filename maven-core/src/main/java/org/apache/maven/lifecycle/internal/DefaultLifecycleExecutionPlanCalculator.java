@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.xml.XmlNodeImpl;
@@ -59,7 +60,6 @@ import org.apache.maven.plugin.lifecycle.Phase;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**

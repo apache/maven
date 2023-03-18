@@ -34,6 +34,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
 import org.apache.maven.extension.internal.CoreExports;
@@ -44,7 +45,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.artifact.Artifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

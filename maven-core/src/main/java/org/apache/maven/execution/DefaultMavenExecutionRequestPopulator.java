@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
@@ -41,7 +42,6 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Assists in populating an execution request for invocation of Maven.

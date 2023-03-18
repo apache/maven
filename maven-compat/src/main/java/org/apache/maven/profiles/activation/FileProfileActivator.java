@@ -20,6 +20,7 @@ package org.apache.maven.profiles.activation;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Profile;
@@ -30,7 +31,6 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * FileProfileActivator

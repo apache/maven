@@ -22,11 +22,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.settings.Mirror;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * DefaultMirrorSelector

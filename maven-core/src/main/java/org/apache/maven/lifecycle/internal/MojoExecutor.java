@@ -36,6 +36,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
@@ -56,7 +57,6 @@ import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.SessionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

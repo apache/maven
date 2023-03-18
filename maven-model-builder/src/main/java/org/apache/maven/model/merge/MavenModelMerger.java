@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.api.model.BuildBase;
 import org.apache.maven.api.model.CiManagement;
 import org.apache.maven.api.model.Dependency;
@@ -47,7 +48,6 @@ import org.apache.maven.api.model.RepositoryBase;
 import org.apache.maven.api.model.Scm;
 import org.apache.maven.api.model.Site;
 import org.apache.maven.model.v4.MavenMerger;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * The domain-specific model merger for the Maven POM, overriding generic code from parent class when necessary with

@@ -22,9 +22,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MavenPluginPrerequisitesChecker;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;

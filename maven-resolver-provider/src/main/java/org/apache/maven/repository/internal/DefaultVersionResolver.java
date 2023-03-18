@@ -33,11 +33,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
@@ -352,7 +352,7 @@ public class DefaultVersionResolver implements VersionResolver {
     }
 
     private String getKey(String classifier, String extension) {
-        return StringUtils.clean(classifier) + ':' + StringUtils.clean(extension);
+        return StringUtils.trimToEmpty(classifier) + ':' + StringUtils.trimToEmpty(extension);
     }
 
     private ArtifactRepository getRepository(

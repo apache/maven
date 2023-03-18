@@ -22,6 +22,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.execution.AbstractExecutionListener;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
@@ -36,7 +37,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.logging.MessageBuilder;
 import org.apache.maven.shared.utils.logging.MessageUtils;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

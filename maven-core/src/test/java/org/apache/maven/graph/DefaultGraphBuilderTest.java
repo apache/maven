@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.execution.BuildResumptionDataRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -47,7 +48,6 @@ import org.apache.maven.project.collector.MultiModuleCollectionStrategy;
 import org.apache.maven.project.collector.PomlessCollectionStrategy;
 import org.apache.maven.project.collector.ProjectsSelector;
 import org.apache.maven.project.collector.RequestPomCollectionStrategy;
-import org.codehaus.plexus.util.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
