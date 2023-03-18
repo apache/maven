@@ -69,10 +69,6 @@ under the License.
       <artifactId>maven-resolver-impl</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>plexus-utils</artifactId>
-    </dependency>
-    <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
     </dependency>
