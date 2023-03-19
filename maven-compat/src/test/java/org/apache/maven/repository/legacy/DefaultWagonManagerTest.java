@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -44,7 +45,6 @@ import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.observers.AbstractTransferListener;
 import org.apache.maven.wagon.observers.Debug;
 import org.codehaus.plexus.testing.PlexusTest;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -140,7 +140,7 @@ public class DefaultWagonManagerTest {
         wagonManager.getArtifact(artifact, repo, null, false);
 
         assertTrue(artifact.getFile().exists());
-        assertEquals("expected", FileUtils.fileRead(artifact.getFile(), "UTF-8"));
+        assertEquals("expected", FileUtils.readFileToString(artifact.getFile(), "UTF-8"));
     }
 
     private Artifact createTestPomArtifact(String directory) throws IOException {

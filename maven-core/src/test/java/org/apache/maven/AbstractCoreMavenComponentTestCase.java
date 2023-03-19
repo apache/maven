@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -48,7 +49,6 @@ import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
-import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.DefaultRepositorySystem;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;

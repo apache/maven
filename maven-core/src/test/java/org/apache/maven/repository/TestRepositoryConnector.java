@@ -24,7 +24,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.metadata.Metadata;
 import org.eclipse.aether.repository.RemoteRepository;
