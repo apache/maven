@@ -133,6 +133,10 @@ under the License.
     </dependency>
     <!-- Plexus -->
     <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>plexus-utils</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-classworlds</artifactId>
     </dependency>
