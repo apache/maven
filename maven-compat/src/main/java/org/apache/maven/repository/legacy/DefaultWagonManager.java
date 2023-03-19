@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -610,7 +609,7 @@ public class DefaultWagonManager implements WagonManager {
             tempChecksumFile.deleteOnExit();
             wagon.get(remotePath + checksumFileExtension, tempChecksumFile);
 
-            String expectedChecksum = FileUtils.readFileToString(tempChecksumFile, "UTF-8");
+            String expectedChecksum = FileUtils.fileRead(tempChecksumFile, "UTF-8");
 
             // remove whitespaces at the end
             expectedChecksum = expectedChecksum.trim();

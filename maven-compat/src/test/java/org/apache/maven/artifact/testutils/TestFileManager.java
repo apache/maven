@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.FileUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -131,7 +130,7 @@ public class TestFileManager {
 
         File file = new File(dir, filename);
 
-        String contents = FileUtils.readFileToString(file, encoding);
+        String contents = FileUtils.fileRead(file, encoding);
 
         assertEquals(contentsTest, contents);
     }
@@ -149,7 +148,7 @@ public class TestFileManager {
     }
 
     public String getFileContents(File file, String encoding) throws IOException {
-        return FileUtils.readFileToString(file, encoding);
+        return FileUtils.fileRead(file, encoding);
     }
 
     protected void finalize() throws Throwable {
