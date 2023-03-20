@@ -29,7 +29,7 @@ import org.apache.maven.api.annotations.Immutable;
  * It is also used to determine if a given dependency should be
  * included in the classpath or if its transitive dependencies should.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Immutable

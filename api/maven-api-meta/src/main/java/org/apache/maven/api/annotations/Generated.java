@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 /**
  * This annotation indicates that a type is automatically generated.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Documented

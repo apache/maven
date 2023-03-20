@@ -25,7 +25,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * An artifact points to a resource such as a jar file or war application.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Immutable

@@ -36,7 +36,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Interface to manage the project during its lifecycle.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface ProjectManager extends Service {

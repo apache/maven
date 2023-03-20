@@ -43,7 +43,7 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
  * retrieved from the artifact descriptor of the root dependency. And last, only direct dependencies can be specified in
  * which case the root node of the resulting graph has no associated dependency.
  *
- * @since 4.0
+ * @since 4.0.0
  * @see DependencyCollector#collect(DependencyCollectorRequest)
  */
 @Experimental

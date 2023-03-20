@@ -23,7 +23,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * The Exception class thrown by {@link VersionParser}.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public class VersionParserException extends MavenException {

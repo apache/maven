@@ -23,7 +23,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * The Exception class throw by the {@link ToolchainsBuilder}.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public class ToolchainsBuilderException extends MavenException {

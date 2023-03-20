@@ -34,7 +34,7 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
 /**
  * A request for installing one or more artifacts in the local repository.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Immutable

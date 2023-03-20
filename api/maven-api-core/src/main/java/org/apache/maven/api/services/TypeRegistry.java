@@ -26,7 +26,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Access to {@link Type} registry.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface TypeRegistry extends Service {

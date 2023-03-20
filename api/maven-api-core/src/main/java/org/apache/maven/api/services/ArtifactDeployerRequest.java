@@ -32,7 +32,7 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
 /**
  * A request for deploying one or more artifacts to a remote repository.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Immutable
