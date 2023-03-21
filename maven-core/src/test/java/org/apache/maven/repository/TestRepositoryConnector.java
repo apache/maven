@@ -57,7 +57,6 @@ public class TestRepositoryConnector implements RepositoryConnector {
         } else {
             try {
                 basedir = FileUtils.toFile(new URL(repositoryUrl));
-                System.out.println(basedir);
             } catch (MalformedURLException e) {
                 throw new IllegalStateException(e);
             }
