@@ -28,7 +28,6 @@ import org.apache.maven.project.artifact.DefaultMavenMetadataCache.CacheKey;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.TestRepositorySystem;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -42,13 +41,8 @@ public class DefaultMavenMetadataCacheTest {
     private RepositorySystem repositorySystem;
 
     @BeforeEach
-    public void setUp() throws Exception {
-        repositorySystem = new TestRepositorySystem(null, null);
-    }
-
-    @AfterEach
-    public void tearDown() throws Exception {
-        repositorySystem = null;
+    public void setUp() {
+        repositorySystem = new TestRepositorySystem();
     }
 
     @Test

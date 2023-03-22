@@ -28,7 +28,6 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
@@ -39,7 +38,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
-import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -53,7 +51,7 @@ import org.eclipse.aether.RepositorySystemSession;
 public class TestRepositorySystem implements RepositorySystem {
 
     @Inject
-    public TestRepositorySystem(ModelReader modelReader, ArtifactFactory artifactFactory) {}
+    public TestRepositorySystem() {}
 
     public ArtifactRepository buildArtifactRepository(Repository repository) throws InvalidRepositoryException {
         return new MavenArtifactRepository(
