@@ -53,8 +53,7 @@ import org.eclipse.aether.RepositorySystemSession;
 public class TestRepositorySystem implements RepositorySystem {
 
     @Inject
-    public TestRepositorySystem(ModelReader modelReader, ArtifactFactory artifactFactory) {
-    }
+    public TestRepositorySystem(ModelReader modelReader, ArtifactFactory artifactFactory) {}
 
     public ArtifactRepository buildArtifactRepository(Repository repository) throws InvalidRepositoryException {
         return new MavenArtifactRepository(
@@ -155,8 +154,7 @@ public class TestRepositorySystem implements RepositorySystem {
     public void injectProxy(List<ArtifactRepository> repositories, List<Proxy> proxies) {}
 
     public void publish(
-            ArtifactRepository repository, File source, String remotePath, ArtifactTransferListener transferListener {
-    }
+            ArtifactRepository repository, File source, String remotePath, ArtifactTransferListener transferListener) {}
 
     public ArtifactResolutionResult resolve(ArtifactResolutionRequest request) {
         throw new UnsupportedOperationException();
@@ -166,9 +164,7 @@ public class TestRepositorySystem implements RepositorySystem {
             ArtifactRepository repository,
             File destination,
             String remotePath,
-            ArtifactTransferListener transferListener) {
-
-    }
+            ArtifactTransferListener transferListener) {}
 
     public void injectMirror(RepositorySystemSession session, List<ArtifactRepository> repositories) {}
 
