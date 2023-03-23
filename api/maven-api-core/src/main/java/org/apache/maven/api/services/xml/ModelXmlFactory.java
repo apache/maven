@@ -24,7 +24,7 @@ import org.apache.maven.api.model.Model;
 /**
  * Reads or writes a {@link Model} using XML.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface ModelXmlFactory extends XmlFactory<Model> {}

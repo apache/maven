@@ -34,7 +34,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * Generic interface to read/write objects to/from XML.
  *
  * @param <T> the object type to read/write
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface XmlFactory<T> extends Service {

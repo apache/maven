@@ -32,7 +32,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * The dependencies collection mechanism will not download any artifacts,
  * and only the pom files will be downloaded.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface DependencyCollector extends Service {

@@ -28,7 +28,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * Such events can be listened to using {@link Listener}s objects
  * registered in the {@link Session}.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface Event {

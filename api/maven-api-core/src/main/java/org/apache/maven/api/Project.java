@@ -31,7 +31,7 @@ import org.apache.maven.api.model.Model;
  * Interface representing a Maven project.
  * Projects can be built using the {@link org.apache.maven.api.services.ProjectBuilder} service.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface Project {
