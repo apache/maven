@@ -26,11 +26,11 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -46,20 +46,23 @@ public class MavenCompatUsageDumper {
 
     public static final String DUMPER_ENABLED = MavenCompatUsageDumper.class.getName() + ".enabled";
     public static final String DUMPER_FILE = MavenCompatUsageDumper.class.getName() + ".file";
+    // number of lines from the stack trace to discard
+    // those come from the interception mechanism
+    private static final int LINES_TO_IGNORE = 6;
 
     private final boolean enabled;
     private final PrintWriter writer;
     private final boolean printStackTrace;
-    private final Map<String, Set<String>> invocations = new ConcurrentHashMap<>();
+    private final Map<String, Set<List<String>>> invocations = new ConcurrentHashMap<>();
 
     public MavenCompatUsageDumper(Properties sysProps, Properties userProps) {
         Properties props = new Properties();
         props.putAll(sysProps);
         props.putAll(userProps);
-        enabled = Boolean.parseBoolean(props.getProperty(DUMPER_ENABLED, "false"));
+        this.enabled = Boolean.parseBoolean(props.getProperty(DUMPER_ENABLED, "false"));
         PrintWriter pw = null;
         boolean printStackTrace = false;
-        if (enabled) {
+        if (this.enabled) {
             String file = props.getProperty(DUMPER_FILE);
             if (file != null) {
                 try {
@@ -68,29 +71,29 @@ public class MavenCompatUsageDumper {
                 } catch (IOException e) {
                     System.err.println("Unable to write to " + file + ", using stdout (" + e + ")");
                     pw = new PrintWriter(new OutputStreamWriter(System.out));
-                    printStackTrace = false;
                 }
             }
             if (pw == null) {
                 pw = new PrintWriter(new OutputStreamWriter(System.out));
             }
         }
-        writer = pw;
+        this.writer = pw;
         this.printStackTrace = printStackTrace;
     }
 
     private void log(MethodInvocation methodInvocation) {
         String method = methodInvocation.getMethod().toGenericString();
-        Set<String> stackTraces = this.invocations.computeIfAbsent(method, k -> new ConcurrentSkipListSet<>());
+        Set<List<String>> stackTraces = this.invocations.computeIfAbsent(method, k -> ConcurrentHashMap.newKeySet());
         StringWriter sw = new StringWriter();
         new Throwable().printStackTrace(new PrintWriter(sw));
-        String stackTrace = Stream.of(sw.toString().split("\n")).skip(6).collect(Collectors.joining("\n"));
+        List<String> stackTrace =
+                Stream.of(sw.toString().split("\n")).skip(LINES_TO_IGNORE).collect(Collectors.toList());
         if (stackTraces.add(stackTrace)) {
-            if (!stackTrace.contains(MavenCompatUsageDumper.class.getName())) {
+            if (!isInternalCall(stackTrace) && !isFromDefaultModelBuilder(stackTrace)) {
                 synchronized (writer) {
                     if (printStackTrace) {
                         writer.println(method);
-                        writer.println(stackTrace);
+                        stackTrace.forEach(writer::println);
                     } else {
                         writer.println("Using maven-compat deprecated method: " + method);
                     }
@@ -100,6 +103,22 @@ public class MavenCompatUsageDumper {
                 }
             }
         }
+    }
+
+    /**
+     * Disable calls from the DefaultProjectBuildingHelper
+     */
+    private boolean isFromDefaultModelBuilder(List<String> stackTrace) {
+        return stackTrace.get(0).contains("org.apache.maven.project.DefaultProjectBuildingHelper")
+                && stackTrace.get(1).contains("org.apache.maven.project.DefaultModelBuildingListener")
+                && stackTrace.get(2).contains("org.apache.maven.model.building.DefaultModelBuilder.fireEvent");
+    }
+
+    /**
+     * Disable calls from within maven-compat
+     */
+    private boolean isInternalCall(List<String> stackTrace) {
+        return stackTrace.stream().anyMatch(s -> s.contains(MavenCompatUsageDumper.class.getName()));
     }
 
     private Object invoke(MethodInvocation methodInvocation) throws Throwable {
