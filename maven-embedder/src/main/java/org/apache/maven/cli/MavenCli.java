@@ -603,6 +603,11 @@ public class MavenCli {
         DefaultPlexusContainer container = new DefaultPlexusContainer(cc, new AbstractModule() {
             @Override
             protected void configure() {
+                MavenCompatUsageDumper dumper =
+                        new MavenCompatUsageDumper(cliRequest.systemProperties, cliRequest.userProperties);
+                if (dumper.isEnabled()) {
+                    bindInterceptor(dumper.getClassMatcher(), dumper.getMethodMatcher(), dumper.getMethodInterceptor());
+                }
                 bind(ILoggerFactory.class).toInstance(slf4jLoggerFactory);
                 bind(CoreExports.class).toInstance(exports);
             }
