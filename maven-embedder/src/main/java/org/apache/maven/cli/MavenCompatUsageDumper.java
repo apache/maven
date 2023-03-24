@@ -38,6 +38,7 @@ import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matcher;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  * Helper class that will dump all maven-compat invocations to a file
@@ -128,7 +129,7 @@ public class MavenCompatUsageDumper {
 
     private boolean matchClass(Class<?> aClass) {
         if (!aClass.isInterface() && !aClass.isEnum()) {
-            return isMavenCompat(aClass);
+            return isMavenCompat(aClass) || ArtifactRepository.class.isAssignableFrom(aClass);
         }
         return false;
     }
