@@ -22,12 +22,12 @@ import javax.inject.Inject;
 
 import java.io.File;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.session.scope.internal.SessionScope;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
@@ -60,14 +60,15 @@ public class ArtifactDeployerTest extends AbstractArtifactComponentTestCase {
             Artifact artifact = createArtifact("artifact", "1.0");
 
             File file = new File(artifactBasedir, "artifact-1.0.jar");
-            assertEquals("dummy", FileUtils.fileRead(file, "UTF-8").trim());
+            assertEquals("dummy", FileUtils.readFileToString(file, "UTF-8").trim());
 
             artifactDeployer.deploy(file, artifact, remoteRepository(), localRepository());
 
             ArtifactRepository remoteRepository = remoteRepository();
             File deployedFile = new File(remoteRepository.getBasedir(), remoteRepository.pathOf(artifact));
             assertTrue(deployedFile.exists());
-            assertEquals("dummy", FileUtils.fileRead(deployedFile, "UTF-8").trim());
+            assertEquals(
+                    "dummy", FileUtils.readFileToString(deployedFile, "UTF-8").trim());
         } finally {
             sessionScope.exit();
         }

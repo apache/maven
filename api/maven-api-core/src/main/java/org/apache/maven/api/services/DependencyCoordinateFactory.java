@@ -30,7 +30,7 @@ import org.apache.maven.api.model.ReportPlugin;
 
 /**
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface DependencyCoordinateFactory extends Service {

@@ -26,7 +26,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * The source for a project's XML model.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface Source {

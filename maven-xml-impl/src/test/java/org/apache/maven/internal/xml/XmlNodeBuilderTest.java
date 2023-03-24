@@ -16,19 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.profiles;
+package org.apache.maven.internal.xml;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.apache.maven.api.xml.XmlNode;
+import org.junit.jupiter.api.Test;
 
-/**
- * @author jdcasey
- */
-@Deprecated
-public interface MavenProfilesBuilder {
-    String ROLE = MavenProfilesBuilder.class.getName();
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    ProfilesRoot buildProfiles(File basedir) throws IOException, XmlPullParserException;
+public class XmlNodeBuilderTest {
+
+    @Test
+    public void testReadMultiDoc() throws Exception {
+        String doc = "<?xml version='1.0'?><doc><child>foo</child></doc>";
+        StringReader r = new StringReader(doc + doc) {
+            @Override
+            public int read(char[] cbuf, int off, int len) throws IOException {
+                return super.read(cbuf, off, 1);
+            }
+        };
+        XmlNode node1 = XmlNodeBuilder.build(r);
+        XmlNode node2 = XmlNodeBuilder.build(r);
+        assertEquals(node1, node2);
+    }
 }

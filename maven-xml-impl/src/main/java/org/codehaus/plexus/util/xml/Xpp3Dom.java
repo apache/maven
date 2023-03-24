@@ -27,7 +27,6 @@ import java.util.Map;
 
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.internal.xml.XmlNodeImpl;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlSerializer;
 
 /**
@@ -35,8 +34,6 @@ import org.codehaus.plexus.util.xml.pull.XmlSerializer;
  */
 public class Xpp3Dom implements Serializable {
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
-
-    private static final Xpp3Dom[] EMPTY_DOM_ARRAY = new Xpp3Dom[0];
 
     public static final String CHILDREN_COMBINATION_MODE_ATTRIBUTE = "combine.children";
 
@@ -157,7 +154,7 @@ public class Xpp3Dom implements Serializable {
      * @since 3.4.0
      */
     public boolean removeAttribute(String name) {
-        if (!StringUtils.isEmpty(name)) {
+        if (name != null && !name.isEmpty()) {
             Map<String, String> attrs = new HashMap<>(dom.getAttributes());
             boolean ret = attrs.remove(name) != null;
             if (ret) {

@@ -31,6 +31,10 @@ Plugins Bindings for <<<default>>> Lifecycle Reference
 
 %{toc|fromDepth=2}
 
+  Versions of the plugins are shared in a few constants:
+
+%{snippet|id=versions|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/AbstractLifecycleMappingProvider.java}
+
 * Plugin bindings for <<<pom>>> packaging
 
 %{snippet|id=pom|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/PomLifecycleMappingProvider.java}

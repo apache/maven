@@ -21,8 +21,9 @@ package org.apache.maven.artifact.repository.metadata;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -42,8 +43,6 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -267,19 +266,17 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
      * TODO share with DefaultPluginMappingManager.
      */
     protected Metadata readMetadata(File mappingFile) throws RepositoryMetadataReadException {
-        Metadata result;
 
-        try (Reader reader = ReaderFactory.newXmlReader(mappingFile)) {
-            MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
-
-            result = mappingReader.read(reader, false);
+        MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
+        try (InputStream in = Files.newInputStream(mappingFile.toPath())) {
+            Metadata result = mappingReader.read(in, false);
+            return result;
         } catch (FileNotFoundException e) {
             throw new RepositoryMetadataReadException("Cannot read metadata from '" + mappingFile + "'", e);
         } catch (IOException | XmlPullParserException e) {
             throw new RepositoryMetadataReadException(
                     "Cannot read metadata from '" + mappingFile + "': " + e.getMessage(), e);
         }
-        return result;
     }
 
     /**
@@ -310,8 +307,8 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
         if (changed) {
             getLogger().debug("Repairing metadata in " + metadataFile);
 
-            try (Writer writer = WriterFactory.newXmlWriter(metadataFile)) {
-                new MetadataXpp3Writer().write(writer, metadata);
+            try (OutputStream out = Files.newOutputStream(metadataFile.toPath())) {
+                new MetadataXpp3Writer().write(out, metadata);
             } catch (IOException e) {
                 String msg = "Could not write fixed metadata to " + metadataFile + ": " + e.getMessage();
                 if (getLogger().isDebugEnabled()) {

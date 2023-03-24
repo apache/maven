@@ -16,24 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.xml;
+package org.apache.maven.api.settings;
 
-public class MavenXmlException extends RuntimeException {
-    public MavenXmlException() {}
+import org.junit.jupiter.api.Test;
 
-    public MavenXmlException(String message) {
-        super(message);
-    }
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-    public MavenXmlException(String message, Throwable cause) {
-        super(message, cause);
-    }
+public class SettingsTest {
 
-    public MavenXmlException(Throwable cause) {
-        super(cause);
-    }
+    @Test
+    void testSetLocalRepository() {
+        Settings s = Settings.newInstance();
 
-    public MavenXmlException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+        s = s.withLocalRepository("xxx");
+        assertEquals("xxx", s.getLocalRepository());
+
+        s = s.withLocalRepository("yyy");
+        assertEquals("yyy", s.getLocalRepository());
+
+        s = s.withLocalRepository(null);
+        assertNull(s.getLocalRepository());
     }
 }

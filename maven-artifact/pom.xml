@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.0.0-alpha-5-SNAPSHOT</version>
+    <version>4.0.0-alpha-6-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-artifact</artifactId>
@@ -31,10 +31,6 @@ under the License.
   <name>Maven Artifact</name>
 
   <dependencies>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>plexus-utils</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>

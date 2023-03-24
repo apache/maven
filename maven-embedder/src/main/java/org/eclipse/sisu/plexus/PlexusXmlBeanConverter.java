@@ -40,7 +40,6 @@ import com.google.inject.spi.TypeConverterBinding;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.internal.xml.XmlNodeBuilder;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -116,7 +115,7 @@ public final class PlexusXmlBeanConverter implements PlexusBeanConverter {
             return XmlNodeBuilder.build(parser);
         }
         if (Xpp3Dom.class.isAssignableFrom(rawType)) {
-            return parseXpp3Dom(parser);
+            return new Xpp3Dom(XmlNodeBuilder.build(parser));
         }
         if (Properties.class.isAssignableFrom(rawType)) {
             return parseProperties(parser);
@@ -131,16 +130,6 @@ public final class PlexusXmlBeanConverter implements PlexusBeanConverter {
             return parseArray(parser, TypeArguments.get(toType, 0));
         }
         return parseBean(parser, toType, rawType);
-    }
-
-    /**
-     * Parses an XML subtree and converts it to the {@link Xpp3Dom} type.
-     *
-     * @param parser The XML parser
-     * @return Converted Xpp3Dom instance
-     */
-    private static Xpp3Dom parseXpp3Dom(final XmlPullParser parser) throws Exception {
-        return Xpp3DomBuilder.build(parser);
     }
 
     /**

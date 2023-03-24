@@ -66,12 +66,34 @@ under the License.
     <release>
       <Version>
         <name>Latest stable release</name>
+        <created>2023-03-15</created>
+        <revision>3.9.1</revision>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.1/binaries/apache-maven-3.9.1-bin.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.1/binaries/apache-maven-3.9.1-bin.tar.gz</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.1/source/apache-maven-3.9.1-src.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.1/source/apache-maven-3.9.1-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 3.9.0</name>
         <created>2023-01-31</created>
         <revision>3.9.0</revision>
-        <file-release>http://archive.apache.org/dist/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.zip</file-release>
-        <file-release>http://archive.apache.org/dist/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.tar.gz</file-release>
-        <file-release>http://archive.apache.org/dist/maven/maven-3/3.9.0/source/apache-maven-3.9.0-src.zip</file-release>
-        <file-release>http://archive.apache.org/dist/maven/maven-3/3.9.0/source/apache-maven-3.9.0-src.tar.gz</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.tar.gz</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.0/source/apache-maven-3.9.0-src.zip</file-release>
+        <file-release>https://archive.apache.org/dist/maven/maven-3/3.9.0/source/apache-maven-3.9.0-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 3.8.8</name>
+        <created>2023-03-08</created>
+        <revision>3.8.8</revision>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.8/source/apache-maven-3.8.8-src.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.8.8/source/apache-maven-3.8.8-src.tar.gz</file-release>
       </Version>
     </release>
     <release>

@@ -30,7 +30,7 @@ import org.apache.maven.api.model.Repository;
 /**
  * Factory service to create {@link LocalRepository} or {@link RemoteRepository} objects.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface RepositoryFactory extends Service {

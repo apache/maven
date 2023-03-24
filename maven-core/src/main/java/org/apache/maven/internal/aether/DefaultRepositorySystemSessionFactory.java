@@ -54,11 +54,9 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
-import org.eclipse.aether.repository.NoLocalRepositoryManagerException;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
-import org.eclipse.aether.spi.localrepo.LocalRepositoryManagerFactory;
 import org.eclipse.aether.util.ConfigUtils;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
@@ -129,8 +127,6 @@ public class DefaultRepositorySystemSessionFactory {
 
     private final RepositorySystem repoSystem;
 
-    private final LocalRepositoryManagerFactory simpleLocalRepoMgrFactory;
-
     private final WorkspaceReader workspaceRepository;
 
     private final SettingsDecrypter settingsDecrypter;
@@ -146,7 +142,6 @@ public class DefaultRepositorySystemSessionFactory {
     public DefaultRepositorySystemSessionFactory(
             ArtifactHandlerManager artifactHandlerManager,
             RepositorySystem repoSystem,
-            @Nullable @Named("simple") LocalRepositoryManagerFactory simpleLocalRepoMgrFactory,
             @Nullable @Named("ide") WorkspaceReader workspaceRepository,
             SettingsDecrypter settingsDecrypter,
             EventSpyDispatcher eventSpyDispatcher,
@@ -154,7 +149,6 @@ public class DefaultRepositorySystemSessionFactory {
             RuntimeInformation runtimeInformation) {
         this.artifactHandlerManager = artifactHandlerManager;
         this.repoSystem = repoSystem;
-        this.simpleLocalRepoMgrFactory = simpleLocalRepoMgrFactory;
         this.workspaceRepository = workspaceRepository;
         this.settingsDecrypter = settingsDecrypter;
         this.eventSpyDispatcher = eventSpyDispatcher;
@@ -372,33 +366,22 @@ public class DefaultRepositorySystemSessionFactory {
         LocalRepository localRepo =
                 new LocalRepository(request.getLocalRepository().getBasedir());
 
-        if (request.isUseLegacyLocalRepository()) {
-            try {
-                session.setLocalRepositoryManager(simpleLocalRepoMgrFactory.newInstance(session, localRepo));
-                logger.info("Disabling enhanced local repository: using legacy is strongly discouraged to ensure"
-                        + " build reproducibility.");
-            } catch (NoLocalRepositoryManagerException e) {
-                logger.error("Failed to configure legacy local repository: falling back to default");
-                session.setLocalRepositoryManager(repoSystem.newLocalRepositoryManager(session, localRepo));
-            }
-        } else {
-            LocalRepositoryManager lrm = repoSystem.newLocalRepositoryManager(session, localRepo);
+        LocalRepositoryManager lrm = repoSystem.newLocalRepositoryManager(session, localRepo);
 
-            String localRepoTail = ConfigUtils.getString(session, null, MAVEN_REPO_LOCAL_TAIL);
-            if (localRepoTail != null) {
-                boolean ignoreTailAvailability =
-                        ConfigUtils.getBoolean(session, true, MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY);
-                List<LocalRepositoryManager> tail = new ArrayList<>();
-                List<String> paths = Arrays.stream(localRepoTail.split(","))
-                        .filter(p -> p != null && !p.trim().isEmpty())
-                        .collect(toList());
-                for (String path : paths) {
-                    tail.add(repoSystem.newLocalRepositoryManager(session, new LocalRepository(path)));
-                }
-                session.setLocalRepositoryManager(new ChainedLocalRepositoryManager(lrm, tail, ignoreTailAvailability));
-            } else {
-                session.setLocalRepositoryManager(lrm);
+        String localRepoTail = ConfigUtils.getString(session, null, MAVEN_REPO_LOCAL_TAIL);
+        if (localRepoTail != null) {
+            boolean ignoreTailAvailability =
+                    ConfigUtils.getBoolean(session, true, MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY);
+            List<LocalRepositoryManager> tail = new ArrayList<>();
+            List<String> paths = Arrays.stream(localRepoTail.split(","))
+                    .filter(p -> p != null && !p.trim().isEmpty())
+                    .collect(toList());
+            for (String path : paths) {
+                tail.add(repoSystem.newLocalRepositoryManager(session, new LocalRepository(path)));
             }
+            session.setLocalRepositoryManager(new ChainedLocalRepositoryManager(lrm, tail, ignoreTailAvailability));
+        } else {
+            session.setLocalRepositoryManager(lrm);
         }
     }
 

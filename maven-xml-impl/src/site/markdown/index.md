@@ -19,4 +19,4 @@ Apache Maven XML Impl
 
 This module contains the implementation of the `org.apache.maven.api.xml.XmlNode` interface used to convey XML snippets in the object model, and also the modified `org.codehaus.plexus.util.xml` package which wraps the immutable objects from `org.apache.maven.api.xml.XmlNode` in order to provide compatibility and interoperability between the API v3.x and v4.x.
 
-See [plexus-utils](../plexus-utils/README.md) for more information.
+See [Maven Plexus Utils](../plexus-utils/) for more information.

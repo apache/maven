@@ -31,7 +31,7 @@ import org.apache.maven.api.annotations.NotThreadSafe;
 /**
  * An XML reader request.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Immutable

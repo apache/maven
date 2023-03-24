@@ -339,7 +339,7 @@ public class DefaultMaven implements Maven {
     private void setupWorkspaceReader(MavenSession session, DefaultRepositorySystemSession repoSession)
             throws ComponentLookupException {
         // Desired order of precedence for workspace readers before querying the local artifact repositories
-        List<WorkspaceReader> workspaceReaders = new ArrayList<>();
+        Set<WorkspaceReader> workspaceReaders = new LinkedHashSet<>();
         // 1) Reactor workspace reader
         WorkspaceReader reactorReader = container.lookup(WorkspaceReader.class, ReactorReader.HINT);
         workspaceReaders.add(reactorReader);
@@ -349,13 +349,7 @@ public class DefaultMaven implements Maven {
             workspaceReaders.add(repoWorkspaceReader);
         }
         // 3) .. n) Project-scoped workspace readers
-        for (WorkspaceReader workspaceReader :
-                getProjectScopedExtensionComponents(session.getProjects(), WorkspaceReader.class)) {
-            if (workspaceReaders.contains(workspaceReader)) {
-                continue;
-            }
-            workspaceReaders.add(workspaceReader);
-        }
+        workspaceReaders.addAll(getProjectScopedExtensionComponents(session.getProjects(), WorkspaceReader.class));
         repoSession.setWorkspaceReader(MavenChainedWorkspaceReader.of(workspaceReaders));
     }
 

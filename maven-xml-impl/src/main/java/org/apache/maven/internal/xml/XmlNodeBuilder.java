@@ -27,13 +27,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.xml.XmlNode;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- *
+ * All methods in this class attempt to fully parse the XML.
+ * The caller is responsible for closing {@code InputStream} and {@code Reader} arguments.
  */
 public class XmlNodeBuilder {
     private static final boolean DEFAULT_TRIM = true;
@@ -61,18 +61,9 @@ public class XmlNodeBuilder {
 
     public static XmlNodeImpl build(InputStream is, String encoding, boolean trim)
             throws XmlPullParserException, IOException {
-        try {
-            final XmlPullParser parser = new MXParser();
-            parser.setInput(is, encoding);
-
-            final XmlNodeImpl node = build(parser, trim);
-            is.close();
-            is = null;
-
-            return node;
-        } finally {
-            IOUtil.close(is);
-        }
+        XmlPullParser parser = new MXParser();
+        parser.setInput(is, encoding);
+        return build(parser, trim);
     }
 
     public static XmlNodeImpl build(Reader reader, boolean trim) throws XmlPullParserException, IOException {
@@ -90,18 +81,9 @@ public class XmlNodeBuilder {
      */
     public static XmlNodeImpl build(Reader reader, boolean trim, InputLocationBuilder locationBuilder)
             throws XmlPullParserException, IOException {
-        try {
-            final XmlPullParser parser = new MXParser();
-            parser.setInput(reader);
-
-            final XmlNodeImpl node = build(parser, trim, locationBuilder);
-            reader.close();
-            reader = null;
-
-            return node;
-        } finally {
-            IOUtil.close(reader);
-        }
+        XmlPullParser parser = new MXParser();
+        parser.setInput(reader);
+        return build(parser, trim, locationBuilder);
     }
 
     public static XmlNodeImpl build(XmlPullParser parser) throws XmlPullParserException, IOException {

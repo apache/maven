@@ -30,7 +30,7 @@ import org.apache.maven.api.annotations.ThreadSafe;
 /**
  * An immutable xml node.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @ThreadSafe

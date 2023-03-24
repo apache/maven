@@ -23,9 +23,9 @@ import javax.inject.Inject;
 import java.io.File;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
@@ -40,7 +40,7 @@ public class ArtifactHandlerTest {
     public void testAptConsistency() throws Exception {
         File apt = getTestFile("src/site/apt/artifact-handlers.apt");
 
-        List<String> lines = FileUtils.loadFile(apt);
+        List<String> lines = FileUtils.readLines(apt);
 
         for (String line : lines) {
             if (line.startsWith("||")) {

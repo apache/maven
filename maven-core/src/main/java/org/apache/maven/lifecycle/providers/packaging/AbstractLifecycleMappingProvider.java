@@ -34,11 +34,12 @@ import static java.util.Objects.requireNonNull;
  * Base lifecycle mapping provider, ie per-packaging plugin bindings for {@code default} lifecycle.
  */
 public abstract class AbstractLifecycleMappingProvider implements Provider<LifecycleMapping> {
+    // START SNIPPET: versions
     protected static final String RESOURCES_PLUGIN_VERSION = "3.3.0";
 
     protected static final String COMPILER_PLUGIN_VERSION = "3.10.1";
 
-    protected static final String SUREFIRE_PLUGIN_VERSION = "3.0.0-M8";
+    protected static final String SUREFIRE_PLUGIN_VERSION = "3.0.0";
 
     protected static final String INSTALL_PLUGIN_VERSION = "3.1.0";
 
@@ -57,6 +58,7 @@ public abstract class AbstractLifecycleMappingProvider implements Provider<Lifec
     protected static final String RAR_PLUGIN_VERSION = "3.0.0";
 
     protected static final String WAR_PLUGIN_VERSION = "3.3.2";
+    // END SNIPPET: versions
 
     private final LifecycleMapping lifecycleMapping;
 

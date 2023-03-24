@@ -30,7 +30,7 @@ import static org.apache.maven.api.services.BaseRequest.nonNull;
 /**
  * A request for creating a {@link ArtifactCoordinate} object.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @Immutable
