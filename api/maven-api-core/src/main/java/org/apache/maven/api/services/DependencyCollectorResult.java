@@ -26,7 +26,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * The result of a dependency collection request.
  *
- * @since 4.0
+ * @since 4.0.0
  * @see DependencyCollector#collect(DependencyCollectorRequest)
  */
 @Experimental

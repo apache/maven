@@ -24,7 +24,7 @@ import org.apache.maven.api.toolchain.PersistedToolchains;
 /**
  * Reads and writes a {@link PersistedToolchains} object to/from XML.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface ToolchainsXmlFactory extends XmlFactory<PersistedToolchains> {}

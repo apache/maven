@@ -23,7 +23,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * Base class for all maven exceptions.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public class MavenException extends RuntimeException {

@@ -29,7 +29,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * Installs {@link Artifact}s to the local repository.
  *
- * @since 4.0
+ * @since 4.0.0
  * @see Session#withLocalRepository(org.apache.maven.api.LocalRepository)
  */
 @Experimental

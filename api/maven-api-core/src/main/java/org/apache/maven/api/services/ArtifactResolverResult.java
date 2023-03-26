@@ -28,7 +28,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * The Artifact Result
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface ArtifactResolverResult {

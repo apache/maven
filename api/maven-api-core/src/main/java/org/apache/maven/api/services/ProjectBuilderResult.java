@@ -29,7 +29,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Result of a project build call.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface ProjectBuilderResult {
