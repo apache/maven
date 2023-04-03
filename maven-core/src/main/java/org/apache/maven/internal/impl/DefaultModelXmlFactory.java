@@ -39,7 +39,7 @@ import org.apache.maven.api.services.xml.XmlWriterException;
 import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.apache.maven.model.v4.MavenXpp3ReaderEx;
 import org.apache.maven.model.v4.MavenXpp3WriterEx;
-import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
 
 import static org.apache.maven.internal.impl.Utils.nonNull;
 
@@ -64,11 +64,11 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
             MavenXpp3ReaderEx xml = new MavenXpp3ReaderEx();
             xml.setAddDefaultEntities(request.isAddDefaultEntities());
             if (path != null) {
-                reader = ReaderFactory.newXmlReader(path.toFile());
+                reader = new XmlStreamReader(path.toFile());
             } else if (url != null) {
-                reader = ReaderFactory.newXmlReader(url);
+                reader = new XmlStreamReader(url);
             } else if (inputStream != null) {
-                reader = ReaderFactory.newXmlReader(inputStream);
+                reader = new XmlStreamReader(inputStream);
             }
             return xml.read(reader, request.isStrict(), source);
         } catch (Exception e) {

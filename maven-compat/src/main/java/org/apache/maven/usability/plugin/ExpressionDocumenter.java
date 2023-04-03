@@ -18,11 +18,9 @@
  */
 package org.apache.maven.usability.plugin;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -31,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.usability.plugin.io.xpp3.ParamdocXpp3Reader;
-import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -100,11 +97,9 @@ public class ExpressionDocumenter {
      */
     private static Map<String, Expression> parseExpressionDocumentation(InputStream docStream)
             throws IOException, XmlPullParserException {
-        Reader reader = new BufferedReader(ReaderFactory.newXmlReader(docStream));
-
         ParamdocXpp3Reader paramdocReader = new ParamdocXpp3Reader();
 
-        ExpressionDocumentation documentation = paramdocReader.read(reader, true);
+        ExpressionDocumentation documentation = paramdocReader.read(docStream, true);
 
         List<Expression> expressions = documentation.getExpressions();
 

@@ -19,6 +19,7 @@
 package org.apache.maven.plugin.descriptor;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +43,10 @@ public class PluginDescriptorBuilder {
 
     public PluginDescriptor build(Reader reader, String source) throws PlexusConfigurationException {
         return build(source, buildConfiguration(reader));
+    }
+
+    public PluginDescriptor build(InputStream input, String source) throws PlexusConfigurationException {
+        return build(source, buildConfiguration(input));
     }
 
     private PluginDescriptor build(String source, PlexusConfiguration c) throws PlexusConfigurationException {
@@ -370,6 +375,14 @@ public class PluginDescriptorBuilder {
     public PlexusConfiguration buildConfiguration(Reader configuration) throws PlexusConfigurationException {
         try {
             return XmlPlexusConfiguration.toPlexusConfiguration(XmlNodeBuilder.build(configuration));
+        } catch (IOException | XmlPullParserException e) {
+            throw new PlexusConfigurationException(e.getMessage(), e);
+        }
+    }
+
+    public PlexusConfiguration buildConfiguration(InputStream configuration) throws PlexusConfigurationException {
+        try {
+            return XmlPlexusConfiguration.toPlexusConfiguration(XmlNodeBuilder.build(configuration, null));
         } catch (IOException | XmlPullParserException e) {
             throw new PlexusConfigurationException(e.getMessage(), e);
         }

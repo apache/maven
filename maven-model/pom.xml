@@ -42,6 +42,10 @@ under the License.
       <artifactId>maven-xml-impl</artifactId>
       <version>4.0.0-alpha-6-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-xml</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
