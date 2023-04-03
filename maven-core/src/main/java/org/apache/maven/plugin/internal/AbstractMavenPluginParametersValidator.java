@@ -96,7 +96,7 @@ abstract class AbstractMavenPluginParametersValidator implements MavenPluginConf
 
     protected void logParameter(Parameter parameter) {
         MessageBuilder messageBuilder = MessageUtils.buffer()
-                .warning("Parameter '")
+                .warning("Mojo parameter '")
                 .warning(parameter.getName())
                 .warning('\'');
 

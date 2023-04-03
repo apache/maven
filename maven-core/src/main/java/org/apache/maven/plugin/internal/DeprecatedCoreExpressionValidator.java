@@ -40,7 +40,7 @@ class DeprecatedCoreExpressionValidator extends AbstractMavenPluginParametersVal
     private static final HashMap<String, String> DEPRECATED_CORE_PARAMETERS;
 
     private static final String ARTIFACT_REPOSITORY_REASON =
-            "Avoid use of ArtifactRepository type. If you need access to local repository, switch to '${repositorySystemSession}' expression and get LRM from it instead.";
+            "Use of ArtifactRepository type in Mojos is deprecated and should be avoided. Upgrade this plugin, or if it does not help, notify plugin developers about this warning.";
 
     static {
         HashMap<String, String> deprecatedCoreParameters = new HashMap<>();
