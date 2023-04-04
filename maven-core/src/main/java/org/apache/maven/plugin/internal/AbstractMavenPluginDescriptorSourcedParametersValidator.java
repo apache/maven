@@ -21,6 +21,8 @@ package org.apache.maven.plugin.internal;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.maven.plugin.PluginValidationManager;
+
 /**
  * Common implementations for plugin parameters configuration validation that relies on Mojo descriptor (leaves out
  * core parameters by default).
