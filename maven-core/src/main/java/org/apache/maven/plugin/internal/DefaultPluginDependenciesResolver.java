@@ -110,7 +110,8 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             if (result.getDependencies() != null) {
                 for (org.eclipse.aether.graph.Dependency dependency : result.getDependencies()) {
                     if ("org.apache.maven".equals(dependency.getArtifact().getGroupId())
-                            && "maven-compat".equals(dependency.getArtifact().getArtifactId())) {
+                            && "maven-compat".equals(dependency.getArtifact().getArtifactId())
+                            && !JavaScopes.TEST.equals(dependency.getScope())) {
                         pluginValidationManager.reportPluginValidationIssue(
                                 session,
                                 pluginValidationManager.pluginKey(plugin),
