@@ -48,6 +48,10 @@ abstract class AbstractMavenPluginDescriptorSourcedParametersValidator extends A
     private static final List<String> IGNORED_PROPERTY_PREFIX =
             Arrays.asList("mojo.", "pom.", "plugin.", "project.", "session.", "settings.");
 
+    protected AbstractMavenPluginDescriptorSourcedParametersValidator(PluginValidationManager pluginValidationManager) {
+        super(pluginValidationManager);
+    }
+
     @Override
     protected boolean isIgnoredProperty(String strValue) {
         if (!strValue.startsWith("${")) {

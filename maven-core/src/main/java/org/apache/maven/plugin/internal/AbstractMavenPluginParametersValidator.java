@@ -18,15 +18,14 @@
  */
 package org.apache.maven.plugin.internal;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
-import org.apache.maven.shared.utils.logging.MessageBuilder;
-import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Common implementations for plugin parameters configuration validation.
@@ -35,7 +34,11 @@ import org.slf4j.LoggerFactory;
  */
 abstract class AbstractMavenPluginParametersValidator implements MavenPluginConfigurationValidator {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final PluginValidationManager pluginValidationManager;
+
+    protected AbstractMavenPluginParametersValidator(PluginValidationManager pluginValidationManager) {
+        this.pluginValidationManager = requireNonNull(pluginValidationManager);
+    }
 
     protected boolean isValueSet(PlexusConfiguration config, ExpressionEvaluator expressionEvaluator) {
         if (config == null) {
@@ -73,18 +76,18 @@ abstract class AbstractMavenPluginParametersValidator implements MavenPluginConf
 
     @Override
     public final void validate(
+            MavenSession mavenSession,
             MojoDescriptor mojoDescriptor,
+            Class<?> mojoClass,
             PlexusConfiguration pomConfiguration,
             ExpressionEvaluator expressionEvaluator) {
-        if (!logger.isWarnEnabled()) {
-            return;
-        }
-
-        doValidate(mojoDescriptor, pomConfiguration, expressionEvaluator);
+        doValidate(mavenSession, mojoDescriptor, mojoClass, pomConfiguration, expressionEvaluator);
     }
 
     protected abstract void doValidate(
+            MavenSession mavenSession,
             MojoDescriptor mojoDescriptor,
+            Class<?> mojoClass,
             PlexusConfiguration pomConfiguration,
             ExpressionEvaluator expressionEvaluator);
 
@@ -94,19 +97,19 @@ abstract class AbstractMavenPluginParametersValidator implements MavenPluginConf
 
     protected abstract String getParameterLogReason(Parameter parameter);
 
-    protected void logParameter(Parameter parameter) {
-        MessageBuilder messageBuilder = MessageUtils.buffer()
-                .warning("Mojo parameter '")
-                .warning(parameter.getName())
-                .warning('\'');
+    protected String formatParameter(Parameter parameter) {
+        StringBuilder messageBuilder = new StringBuilder()
+                .append("Parameter '")
+                .append(parameter.getName())
+                .append('\'');
 
         if (parameter.getExpression() != null) {
             String userProperty = parameter.getExpression().replace("${", "'").replace('}', '\'');
-            messageBuilder.warning(" (user property ").warning(userProperty).warning(")");
+            messageBuilder.append(" (user property ").append(userProperty).append(")");
         }
 
-        messageBuilder.warning(" ").warning(getParameterLogReason(parameter));
+        messageBuilder.append(" ").append(getParameterLogReason(parameter));
 
-        logger.warn(messageBuilder.toString());
+        return messageBuilder.toString();
     }
 }

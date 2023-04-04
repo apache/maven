@@ -18,12 +18,14 @@
  */
 package org.apache.maven.plugin.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.HashMap;
 import java.util.Objects;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
@@ -40,7 +42,7 @@ class DeprecatedCoreExpressionValidator extends AbstractMavenPluginParametersVal
     private static final HashMap<String, String> DEPRECATED_CORE_PARAMETERS;
 
     private static final String ARTIFACT_REPOSITORY_REASON =
-            "Use of ArtifactRepository type in Mojos is deprecated and should be avoided. Upgrade this plugin, or if it does not help, notify plugin developers about this warning.";
+            "ArtifactRepository type is deprecated and it's use in Mojos should be avoided.";
 
     static {
         HashMap<String, String> deprecatedCoreParameters = new HashMap<>();
@@ -49,21 +51,32 @@ class DeprecatedCoreExpressionValidator extends AbstractMavenPluginParametersVal
         DEPRECATED_CORE_PARAMETERS = deprecatedCoreParameters;
     }
 
+    @Inject
+    DeprecatedCoreExpressionValidator(PluginValidationManager pluginValidationManager) {
+        super(pluginValidationManager);
+    }
+
     @Override
     protected String getParameterLogReason(Parameter parameter) {
-        return "is deprecated core expression; " + DEPRECATED_CORE_PARAMETERS.get(parameter.getDefaultValue());
+        return "uses deprecated parameter expression; " + DEPRECATED_CORE_PARAMETERS.get(parameter.getDefaultValue());
     }
 
     @Override
     protected void doValidate(
+            MavenSession mavenSession,
             MojoDescriptor mojoDescriptor,
+            Class<?> mojoClass,
             PlexusConfiguration pomConfiguration,
             ExpressionEvaluator expressionEvaluator) {
         if (mojoDescriptor.getParameters() == null) {
             return;
         }
 
-        mojoDescriptor.getParameters().stream().filter(this::isDeprecated).forEach(this::logParameter);
+        mojoDescriptor.getParameters().stream()
+                .filter(this::isDeprecated)
+                .map(this::formatParameter)
+                .forEach(m -> pluginValidationManager.reportPluginMojoValidationIssue(
+                        mavenSession, mojoDescriptor, mojoClass, m));
     }
 
     private boolean isDeprecated(Parameter parameter) {

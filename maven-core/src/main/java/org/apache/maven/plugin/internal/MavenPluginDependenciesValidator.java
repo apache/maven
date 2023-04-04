@@ -20,22 +20,15 @@ package org.apache.maven.plugin.internal;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 /**
- * Service responsible for validating plugin configuration.
+ * Service responsible for validating plugin dependencies.
  *
- * @author Slawomir Jaranowski
+ * @since 3.9.2
  */
-interface MavenPluginConfigurationValidator {
+interface MavenPluginDependenciesValidator {
     /**
-     * Returns mojo configuration issues.
+     * Returns mojo dependency issues.
      */
-    void validate(
-            MavenSession mavenSession,
-            MojoDescriptor mojoDescriptor,
-            Class<?> mojoClass,
-            PlexusConfiguration pomConfiguration,
-            ExpressionEvaluator expressionEvaluator);
+    void validate(MavenSession mavenSession, MojoDescriptor mojoDescriptor);
 }
