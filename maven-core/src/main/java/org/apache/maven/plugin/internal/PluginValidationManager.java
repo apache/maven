@@ -85,6 +85,9 @@ public class PluginValidationManager extends AbstractMavenLifecycleParticipant {
     }
 
     public void reportSessionCollectedValidationIssues(MavenSession session) {
+        if (!logger.isWarnEnabled()) {
+            return;
+        }
         ConcurrentHashMap<String, PluginValidationIssues> issuesMap = pluginIssues(session);
         if (!issuesMap.isEmpty()) {
             logger.warn("");

@@ -552,9 +552,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                         session,
                         mojoDescriptor,
                         mojo.getClass(),
-                        "Mojo `"
-                                + mojo.getClass().getSimpleName()
-                                + "` implements `Contextualizable` interface from Plexus Container that is EOL.");
+                        "Implements `Contextualizable` interface from Plexus Container, that is EOL.");
             }
 
             for (MavenPluginDependenciesValidator validator : dependenciesValidators) {

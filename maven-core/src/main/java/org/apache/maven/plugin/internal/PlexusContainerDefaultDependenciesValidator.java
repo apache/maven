@@ -46,7 +46,7 @@ class PlexusContainerDefaultDependenciesValidator extends AbstractMavenPluginDep
 
         if (pcdPresent) {
             pluginValidationManager.reportPluginValidationIssue(
-                    mavenSession, mojoDescriptor, "Plugin depends on plexus-container-default that is EOL");
+                    mavenSession, mojoDescriptor, "Plugin depends on plexus-container-default, that is EOL");
         }
     }
 }
