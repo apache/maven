@@ -115,7 +115,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                         pluginValidationManager.reportPluginValidationIssue(
                                 session,
                                 pluginValidationManager.pluginKey(plugin),
-                                "Plugin depends on Maven 2.x compatibility layer, will be not supported in Maven 4.x");
+                                "Plugin depends on the deprecated Maven 2.x compatibility layer, which may not be supported in Maven 4.x");
                     }
                 }
             }
