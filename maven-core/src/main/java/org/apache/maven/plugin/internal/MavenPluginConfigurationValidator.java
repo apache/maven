@@ -30,7 +30,7 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
  */
 interface MavenPluginConfigurationValidator {
     /**
-     * Returns mojo configuration issues.
+     * Checks mojo configuration issues.
      */
     void validate(
             MavenSession mavenSession,

@@ -28,7 +28,7 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
  */
 interface MavenPluginDependenciesValidator {
     /**
-     * Returns mojo dependency issues.
+     * Checks mojo dependency issues.
      */
     void validate(MavenSession mavenSession, MojoDescriptor mojoDescriptor);
 }

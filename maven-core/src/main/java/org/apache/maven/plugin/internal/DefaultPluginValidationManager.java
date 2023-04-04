@@ -156,20 +156,6 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
                     "To fix these issues, please upgrade listed plugins, or notify their maintainers about these issues.");
             logger.warn("");
         }
-        // - plugin
-        //   - used in
-        //     - issues
-        //     - mojo
-        //       - issues
-        //        if (!validationIssues.isEmpty()) {
-        //            logger.warn("Mojo validation issues:");
-        //            for (String validationIssue : validationIssues) {
-        //                logger.warn("  * " + validationIssue);
-        //            }
-        //            logger.warn("");
-        //            logger.warn("Please upgrade this plugin, or, contact plugin developers to fix the reported
-        // issue(s).");
-        //            logger.warn("");
     }
 
     private String pluginDeclaration(MojoDescriptor mojoDescriptor) {
