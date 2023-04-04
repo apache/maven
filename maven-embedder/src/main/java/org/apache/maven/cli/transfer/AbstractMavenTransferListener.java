@@ -23,7 +23,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import org.apache.commons.lang3.Validate;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -100,7 +99,9 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
             public abstract String symbol();
 
             public static ScaleUnit getScaleUnit(long size) {
-                Validate.isTrue(size >= 0L, "file size cannot be negative: %s", size);
+                if (size < 0L) {
+                    throw new IllegalArgumentException("file size cannot be negative: " + size);
+                }
 
                 if (size >= GIGABYTE.bytes()) {
                     return GIGABYTE;
@@ -132,7 +133,9 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
 
         @SuppressWarnings("checkstyle:magicnumber")
         public String format(long size, ScaleUnit unit, boolean omitSymbol) {
-            Validate.isTrue(size >= 0L, "file size cannot be negative: %s", size);
+            if (size < 0L) {
+                throw new IllegalArgumentException("file size cannot be negative: " + size);
+            }
 
             if (unit == null) {
                 unit = ScaleUnit.getScaleUnit(size);
@@ -157,12 +160,13 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         }
 
         public String formatProgress(long progressedSize, long size) {
-            Validate.isTrue(progressedSize >= 0L, "progressed file size cannot be negative: %s", progressedSize);
-            Validate.isTrue(
-                    size < 0L || progressedSize <= size,
-                    "progressed file size cannot be greater than size: %s > %s",
-                    progressedSize,
-                    size);
+            if (progressedSize < 0L) {
+                throw new IllegalArgumentException("progressed file size cannot be negative: " + size);
+            }
+            if (size >= 0 && progressedSize > size) {
+                throw new IllegalArgumentException(
+                        "progressed file size cannot be greater than size: " + progressedSize + " > " + size);
+            }
 
             if (size >= 0L && progressedSize != size) {
                 ScaleUnit unit = ScaleUnit.getScaleUnit(size);

@@ -18,13 +18,13 @@
  */
 package org.apache.maven.configuration;
 
-import org.apache.commons.lang3.Validate;
+import java.util.Objects;
+
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * A basic bean configuration request.
@@ -89,7 +89,7 @@ public class DefaultBeanConfigurationRequest implements BeanConfigurationRequest
             Model model, String pluginGroupId, String pluginArtifactId, String pluginExecutionId) {
         Plugin plugin = findPlugin(model, pluginGroupId, pluginArtifactId);
         if (plugin != null) {
-            if (StringUtils.isNotEmpty(pluginExecutionId)) {
+            if (pluginExecutionId != null && !pluginExecutionId.isEmpty()) {
                 for (PluginExecution execution : plugin.getExecutions()) {
                     if (pluginExecutionId.equals(execution.getId())) {
                         setConfiguration(execution.getConfiguration());
@@ -104,8 +104,12 @@ public class DefaultBeanConfigurationRequest implements BeanConfigurationRequest
     }
 
     private Plugin findPlugin(Model model, String groupId, String artifactId) {
-        Validate.notBlank(groupId, "groupId can neither be null, empty nor blank");
-        Validate.notBlank(artifactId, "artifactId can neither be null, empty nor blank");
+        if (Objects.requireNonNull(groupId, "groupId cannot be null").isEmpty()) {
+            throw new IllegalArgumentException("groupId cannot be empty");
+        }
+        if (Objects.requireNonNull(artifactId, "artifactId cannot be null").isEmpty()) {
+            throw new IllegalArgumentException("artifactId cannot be empty");
+        }
 
         if (model != null) {
             Build build = model.getBuild();

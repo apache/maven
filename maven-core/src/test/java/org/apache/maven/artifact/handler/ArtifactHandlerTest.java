@@ -21,9 +21,9 @@ package org.apache.maven.artifact.handler;
 import javax.inject.Inject;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ public class ArtifactHandlerTest {
     public void testAptConsistency() throws Exception {
         File apt = getTestFile("src/site/apt/artifact-handlers.apt");
 
-        List<String> lines = FileUtils.readLines(apt);
+        List<String> lines = Files.readAllLines(apt.toPath());
 
         for (String line : lines) {
             if (line.startsWith("||")) {

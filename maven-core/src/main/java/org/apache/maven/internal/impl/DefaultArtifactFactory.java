@@ -21,7 +21,6 @@ package org.apache.maven.internal.impl;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.ArtifactFactory;
@@ -43,12 +42,12 @@ public class DefaultArtifactFactory implements ArtifactFactory {
         if (request.getType() != null) {
             type = session.getSession().getArtifactTypeRegistry().get(request.getType());
         }
-        String classifier = StringUtils.isNotEmpty(request.getClassifier())
-                ? request.getClassifier()
-                : type != null ? type.getClassifier() : null;
-        String extension = StringUtils.isNotEmpty(request.getExtension())
-                ? request.getExtension()
-                : type != null ? type.getExtension() : null;
+        String str1 = request.getClassifier();
+        String classifier =
+                str1 != null && !str1.isEmpty() ? request.getClassifier() : type != null ? type.getClassifier() : null;
+        String str = request.getExtension();
+        String extension =
+                str != null && !str.isEmpty() ? request.getExtension() : type != null ? type.getExtension() : null;
         return new DefaultArtifact(
                 session,
                 new org.eclipse.aether.artifact.DefaultArtifact(

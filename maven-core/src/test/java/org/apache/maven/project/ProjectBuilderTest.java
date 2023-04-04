@@ -19,6 +19,8 @@
 package org.apache.maven.project;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -178,11 +180,11 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         projectBuilder.build(child, configuration);
         // modify parent
         File parent = new File(tempDir.toFile(), "pom.xml");
-        String parentContent = FileUtils.readFileToString(parent, "UTF-8");
+        String parentContent = new String(Files.readAllBytes(parent.toPath()), StandardCharsets.UTF_8);
         parentContent = parentContent.replace(
                 "<packaging>pom</packaging>",
                 "<packaging>pom</packaging><properties><addedProperty>addedValue</addedProperty></properties>");
-        FileUtils.write(parent, parentContent, "UTF-8");
+        Files.write(parent.toPath(), parentContent.getBytes(StandardCharsets.UTF_8));
         // re-build pom with modified parent
         ProjectBuildingResult result = projectBuilder.build(child, configuration);
         assertThat(result.getProject().getProperties(), hasKey((Object) "addedProperty"));

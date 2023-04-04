@@ -24,12 +24,12 @@ import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -274,7 +274,8 @@ public class TestRepositorySystem implements RepositorySystem {
 
             File remoteFile = new File(remoteRepo.getBasedir(), remoteRepo.pathOf(artifact));
 
-            FileUtils.copyFile(remoteFile, localFile);
+            Files.createDirectories(localFile.toPath().getParent());
+            Files.copy(remoteFile.toPath(), localFile.toPath());
         }
 
         artifact.setResolved(true);
