@@ -20,8 +20,8 @@ package org.apache.maven.project.artifact;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.AbstractArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -74,7 +74,8 @@ public class ProjectArtifactMetadata extends AbstractArtifactMetadata {
         // ----------------------------------------------------------------------------
 
         try {
-            FileUtils.copyFile(file, destination);
+            Files.createDirectories(destination.toPath().getParent());
+            Files.copy(file.toPath(), destination.toPath());
         } catch (IOException e) {
             throw new RepositoryMetadataStoreException("Error copying POM to the local repository.", e);
         }
