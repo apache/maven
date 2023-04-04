@@ -35,6 +35,7 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.util.ConfigUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,11 +46,17 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
 
     private static final String ISSUES_KEY = DefaultPluginValidationManager.class.getName() + ".issues";
 
+    private static final String MAVEN_PLUGIN_VALIDATION_ENABLED_KEY = "maven.plugin.validation.enabled";
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public void afterSessionEnd(MavenSession session) {
         reportSessionCollectedValidationIssues(session);
+    }
+
+    private boolean isEnabled(RepositorySystemSession session) {
+        return ConfigUtils.getBoolean(session, true, MAVEN_PLUGIN_VALIDATION_ENABLED_KEY);
     }
 
     public String pluginKey(String groupId, String artifactId, String version) {
@@ -70,6 +77,9 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
     @Override
     public void reportPluginValidationIssue(MavenSession mavenSession, MojoDescriptor mojoDescriptor, String issue) {
         String pluginKey = pluginKey(mojoDescriptor);
+        if (!isEnabled(mavenSession.getRepositorySession())) {
+            return;
+        }
         PluginValidationIssues pluginIssues = pluginIssues(mavenSession.getRepositorySession())
                 .computeIfAbsent(pluginKey, k -> new PluginValidationIssues(pluginKey));
         pluginIssues.reportPluginIssue(pluginDeclaration(mojoDescriptor), pluginOccurence(mavenSession), issue);
@@ -77,6 +87,9 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
 
     @Override
     public void reportPluginValidationIssue(RepositorySystemSession session, String pluginKey, String issue) {
+        if (!isEnabled(session)) {
+            return;
+        }
         PluginValidationIssues pluginIssues =
                 pluginIssues(session).computeIfAbsent(pluginKey, k -> new PluginValidationIssues(pluginKey));
         pluginIssues.reportPluginIssue(null, null, issue);
@@ -86,6 +99,9 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
     public void reportPluginMojoValidationIssue(
             MavenSession mavenSession, MojoDescriptor mojoDescriptor, Class<?> mojoClass, String issue) {
         String pluginKey = pluginKey(mojoDescriptor);
+        if (!isEnabled(mavenSession.getRepositorySession())) {
+            return;
+        }
         PluginValidationIssues pluginIssues = pluginIssues(mavenSession.getRepositorySession())
                 .computeIfAbsent(pluginKey, k -> new PluginValidationIssues(pluginKey));
         pluginIssues.reportPluginMojoIssue(
