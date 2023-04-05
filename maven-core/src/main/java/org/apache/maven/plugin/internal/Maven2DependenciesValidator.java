@@ -48,14 +48,16 @@ class Maven2DependenciesValidator extends AbstractMavenPluginDependenciesValidat
     protected void doValidate(MavenSession mavenSession, MojoDescriptor mojoDescriptor) {
         Set<String> maven2Versions = mojoDescriptor.getPluginDescriptor().getDependencies().stream()
                 .filter(d -> "org.apache.maven".equals(d.getGroupId()))
-                .filter(d -> !"maven-archiver".equals(d.getArtifactId()))
+                .filter(d -> !expectedProvidedScopeExclusions.contains(d.getGroupId() + ":" + d.getArtifactId()))
                 .map(ComponentDependency::getVersion)
                 .filter(v -> v.startsWith("2."))
                 .collect(Collectors.toSet());
 
         if (!maven2Versions.isEmpty()) {
             pluginValidationManager.reportPluginValidationIssue(
-                    mavenSession, mojoDescriptor, "Plugin is a Maven 2.x plugin, will be not supported in Maven 4.x");
+                    mavenSession,
+                    mojoDescriptor,
+                    "Plugin is a Maven 2.x plugin, which will be not supported in Maven 4.x");
         }
     }
 }

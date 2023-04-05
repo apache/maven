@@ -47,7 +47,7 @@ class MavenScopeDependenciesValidator extends AbstractMavenPluginDependenciesVal
     protected void doValidate(MavenSession mavenSession, MojoDescriptor mojoDescriptor) {
         Set<String> mavenArtifacts = mojoDescriptor.getPluginDescriptor().getDependencies().stream()
                 .filter(d -> "org.apache.maven".equals(d.getGroupId()))
-                .filter(d -> !"maven-archiver".equals(d.getArtifactId()))
+                .filter(d -> !expectedProvidedScopeExclusions.contains(d.getGroupId() + ":" + d.getArtifactId()))
                 .filter(d -> d.getVersion().startsWith("3."))
                 .map(d -> d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion())
                 .collect(Collectors.toSet());

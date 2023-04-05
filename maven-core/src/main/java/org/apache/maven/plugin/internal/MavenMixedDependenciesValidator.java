@@ -48,7 +48,7 @@ class MavenMixedDependenciesValidator extends AbstractMavenPluginDependenciesVal
     protected void doValidate(MavenSession mavenSession, MojoDescriptor mojoDescriptor) {
         Set<String> mavenVersions = mojoDescriptor.getPluginDescriptor().getDependencies().stream()
                 .filter(d -> "org.apache.maven".equals(d.getGroupId()))
-                .filter(d -> !"maven-archiver".equals(d.getArtifactId()))
+                .filter(d -> !expectedProvidedScopeExclusions.contains(d.getGroupId() + ":" + d.getArtifactId()))
                 .map(ComponentDependency::getVersion)
                 .collect(Collectors.toSet());
 

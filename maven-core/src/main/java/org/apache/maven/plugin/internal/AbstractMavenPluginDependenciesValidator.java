@@ -18,6 +18,9 @@
  */
 package org.apache.maven.plugin.internal;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.PluginValidationManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -30,6 +33,9 @@ import static java.util.Objects.requireNonNull;
  * @since 3.9.2
  */
 abstract class AbstractMavenPluginDependenciesValidator implements MavenPluginDependenciesValidator {
+
+    protected final List<String> expectedProvidedScopeExclusions = Arrays.asList(
+            "org.apache.maven:maven-archiver", "org.apache.maven:maven-jxr", "org.apache.maven:plexus-utils");
 
     protected final PluginValidationManager pluginValidationManager;
 
