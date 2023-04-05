@@ -107,7 +107,8 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
         String pluginKey = pluginKey(mojoDescriptor);
         PluginValidationIssues pluginIssues = pluginIssues(mavenSession.getRepositorySession())
                 .computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
-        pluginIssues.reportPluginIssue(pluginDeclaration(mojoDescriptor), pluginOccurrence(mavenSession), issue);
+        pluginIssues.reportPluginIssue(
+                pluginDeclaration(mavenSession, mojoDescriptor), pluginOccurrence(mavenSession), issue);
     }
 
     @Override
@@ -117,7 +118,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
         PluginValidationIssues pluginIssues = pluginIssues(mavenSession.getRepositorySession())
                 .computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
         pluginIssues.reportPluginMojoIssue(
-                pluginDeclaration(mojoDescriptor),
+                pluginDeclaration(mavenSession, mojoDescriptor),
                 pluginOccurrence(mavenSession),
                 mojoInfo(mojoDescriptor, mojoClass),
                 issue);
@@ -178,11 +179,31 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
         }
     }
 
-    private String pluginDeclaration(MojoDescriptor mojoDescriptor) {
+    private String pluginDeclaration(MavenSession mavenSession, MojoDescriptor mojoDescriptor) {
         InputLocation inputLocation =
                 mojoDescriptor.getPluginDescriptor().getPlugin().getLocation("");
-        if (inputLocation != null) {
-            return inputLocation.toString();
+        if (inputLocation != null && inputLocation.getSource() != null) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(inputLocation.getSource().getModelId());
+            String location = inputLocation.getSource().getLocation();
+            if (location != null) {
+                if (location.contains("://")) {
+                    stringBuilder.append(" (").append(location).append(")");
+                } else {
+                    File rootBasedir = mavenSession.getTopLevelProject().getBasedir();
+                    File locationFile = new File(location);
+                    if (location.startsWith(rootBasedir.getPath())) {
+                        stringBuilder
+                                .append(" (")
+                                .append(rootBasedir.toPath().relativize(locationFile.toPath()))
+                                .append(")");
+                    } else {
+                        stringBuilder.append(" (").append(location).append(")");
+                    }
+                }
+            }
+            stringBuilder.append(" @ line ").append(inputLocation.getLineNumber());
+            return stringBuilder.toString();
         } else {
             return "unknown";
         }
@@ -190,11 +211,11 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
 
     private String pluginOccurrence(MavenSession mavenSession) {
         MavenProject prj = mavenSession.getCurrentProject();
-        String result = prj.getName() + " " + prj.getVersion();
+        String result = prj.getGroupId() + ":" + prj.getArtifactId() + ":" + prj.getVersion();
         File currentPom = prj.getFile();
         if (currentPom != null) {
             File rootBasedir = mavenSession.getTopLevelProject().getBasedir();
-            result += " (from " + rootBasedir.toPath().relativize(currentPom.toPath()) + ")";
+            result += " (" + rootBasedir.toPath().relativize(currentPom.toPath()) + ")";
         }
         return result;
     }
