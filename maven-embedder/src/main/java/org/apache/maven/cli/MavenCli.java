@@ -48,7 +48,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
@@ -1422,43 +1421,30 @@ public class MavenCli {
     }
 
     int calculateDegreeOfConcurrency(String threadConfiguration) {
-        if (threadConfiguration.endsWith("C")) {
-            threadConfiguration = threadConfiguration.substring(0, threadConfiguration.length() - 1);
+        try {
+            if (threadConfiguration.endsWith("C")) {
+                String str = threadConfiguration.substring(0, threadConfiguration.length() - 1);
+                float coreMultiplier = Float.parseFloat(str);
 
-            if (!NumberUtils.isParsable(threadConfiguration)) {
-                throw new IllegalArgumentException("Invalid threads core multiplier value: '" + threadConfiguration
-                        + "C'. Supported are int and float values ending with C.");
-            }
+                if (coreMultiplier <= 0.0f) {
+                    throw new IllegalArgumentException("Invalid threads core multiplier value: '" + threadConfiguration
+                            + "'. Value must be positive.");
+                }
 
-            float coreMultiplier = Float.parseFloat(threadConfiguration);
-
-            if (coreMultiplier <= 0.0f) {
-                throw new IllegalArgumentException("Invalid threads core multiplier value: '" + threadConfiguration
-                        + "C'. Value must be positive.");
-            }
-
-            int procs = Runtime.getRuntime().availableProcessors();
-            int threads = (int) (coreMultiplier * procs);
-            return threads == 0 ? 1 : threads;
-        } else {
-            if (!NumberUtils.isParsable(threadConfiguration)) {
-                throw new IllegalArgumentException(
-                        "Invalid threads value: '" + threadConfiguration + "'. Supported are int values.");
-            }
-
-            try {
+                int procs = Runtime.getRuntime().availableProcessors();
+                int threads = (int) (coreMultiplier * procs);
+                return threads == 0 ? 1 : threads;
+            } else {
                 int threads = Integer.parseInt(threadConfiguration);
-
                 if (threads <= 0) {
                     throw new IllegalArgumentException(
                             "Invalid threads value: '" + threadConfiguration + "'. Value must be positive.");
                 }
-
                 return threads;
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException(
-                        "Invalid threads value: '" + threadConfiguration + "'. Supported are integer values.");
             }
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid threads value: '" + threadConfiguration
+                    + "'. Supported are int and float values ending with C.");
         }
     }
 
