@@ -19,9 +19,9 @@
 package org.apache.maven.plugin;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
 
 /**
  * Component collecting plugin validation issues and reporting them.
@@ -29,17 +29,27 @@ import org.eclipse.aether.RepositorySystemSession;
  * @since 3.9.2
  */
 public interface PluginValidationManager {
+    /**
+     * Reports plugin issues applicable to the plugin as whole.
+     * <p>
+     * This method should be used in "early" phase of plugin execution, possibly even when plugin or mojo descriptor
+     * does not exist yet. In turn, this method will not record extra information like plugin occurrence or declaration
+     * location as those are not yet available.
+     */
+    void reportPluginValidationIssue(RepositorySystemSession session, Artifact pluginArtifact, String issue);
 
-    String pluginKey(String groupId, String artifactId, String version);
-
-    String pluginKey(Plugin plugin);
-
-    String pluginKey(MojoDescriptor mojoDescriptor);
-
-    void reportPluginValidationIssue(RepositorySystemSession session, String pluginKey, String issue);
-
+    /**
+     * Reports plugin issues applicable to the plugin as whole.
+     * <p>
+     * This method will record extra information as well, like plugin occurrence or declaration location.
+     */
     void reportPluginValidationIssue(MavenSession mavenSession, MojoDescriptor mojoDescriptor, String issue);
 
+    /**
+     * Reports plugin Mojo issues applicable to the Mojo itself.
+     * <p>
+     * This method will record extra information as well, like plugin occurrence or declaration location.
+     */
     void reportPluginMojoValidationIssue(
             MavenSession mavenSession, MojoDescriptor mojoDescriptor, Class<?> mojoClass, String issue);
 }

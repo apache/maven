@@ -114,7 +114,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                             && !JavaScopes.TEST.equals(dependency.getScope())) {
                         pluginValidationManager.reportPluginValidationIssue(
                                 session,
-                                pluginValidationManager.pluginKey(plugin),
+                                pluginArtifact,
                                 "Plugin depends on the deprecated Maven 2.x compatibility layer, which may not be supported in Maven 4.x");
                     }
                 }

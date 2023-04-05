@@ -30,12 +30,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.InputLocation;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginValidationManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.util.ConfigUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,19 +73,28 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
         }
     }
 
-    public String pluginKey(String groupId, String artifactId, String version) {
+    private String pluginKey(String groupId, String artifactId, String version) {
         return groupId + ":" + artifactId + ":" + version;
     }
 
-    @Override
-    public String pluginKey(Plugin plugin) {
-        return pluginKey(plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion());
+    private String pluginKey(MojoDescriptor mojoDescriptor) {
+        PluginDescriptor pd = mojoDescriptor.getPluginDescriptor();
+        return pluginKey(pd.getGroupId(), pd.getArtifactId(), pd.getVersion());
+    }
+
+    private String pluginKey(Artifact pluginArtifact) {
+        return pluginKey(pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), pluginArtifact.getVersion());
     }
 
     @Override
-    public String pluginKey(MojoDescriptor mojoDescriptor) {
-        PluginDescriptor pd = mojoDescriptor.getPluginDescriptor();
-        return pluginKey(pd.getGroupId(), pd.getArtifactId(), pd.getVersion());
+    public void reportPluginValidationIssue(RepositorySystemSession session, Artifact pluginArtifact, String issue) {
+        if (validationLevel(session) == ValidationLevel.DISABLED) {
+            return;
+        }
+        String pluginKey = pluginKey(pluginArtifact);
+        PluginValidationIssues pluginIssues =
+                pluginIssues(session).computeIfAbsent(pluginKey, k -> new PluginValidationIssues(pluginKey));
+        pluginIssues.reportPluginIssue(null, null, issue);
     }
 
     @Override
@@ -96,17 +105,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
         String pluginKey = pluginKey(mojoDescriptor);
         PluginValidationIssues pluginIssues = pluginIssues(mavenSession.getRepositorySession())
                 .computeIfAbsent(pluginKey, k -> new PluginValidationIssues(pluginKey));
-        pluginIssues.reportPluginIssue(pluginDeclaration(mojoDescriptor), pluginOccurence(mavenSession), issue);
-    }
-
-    @Override
-    public void reportPluginValidationIssue(RepositorySystemSession session, String pluginKey, String issue) {
-        if (validationLevel(session) == ValidationLevel.DISABLED) {
-            return;
-        }
-        PluginValidationIssues pluginIssues =
-                pluginIssues(session).computeIfAbsent(pluginKey, k -> new PluginValidationIssues(pluginKey));
-        pluginIssues.reportPluginIssue(null, null, issue);
+        pluginIssues.reportPluginIssue(pluginDeclaration(mojoDescriptor), pluginoccurrence(mavenSession), issue);
     }
 
     @Override
@@ -120,7 +119,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
                 .computeIfAbsent(pluginKey, k -> new PluginValidationIssues(pluginKey));
         pluginIssues.reportPluginMojoIssue(
                 pluginDeclaration(mojoDescriptor),
-                pluginOccurence(mavenSession),
+                pluginoccurrence(mavenSession),
                 mojoInfo(mojoDescriptor, mojoClass),
                 issue);
     }
@@ -143,10 +142,10 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
                         logger.warn("   * {}", pluginDeclaration);
                     }
                 }
-                if (validationLevel == ValidationLevel.VERBOSE && !issues.pluginOccurences.isEmpty()) {
+                if (validationLevel == ValidationLevel.VERBOSE && !issues.pluginOccurrences.isEmpty()) {
                     logger.warn("  Used in module(s):");
-                    for (String pluginOccurence : issues.pluginOccurences) {
-                        logger.warn("   * {}", pluginOccurence);
+                    for (String pluginOccurrence : issues.pluginOccurrences) {
+                        logger.warn("   * {}", pluginOccurrence);
                     }
                 }
                 if (!issues.pluginIssues.isEmpty()) {
@@ -186,7 +185,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
         }
     }
 
-    private String pluginOccurence(MavenSession mavenSession) {
+    private String pluginoccurrence(MavenSession mavenSession) {
         MavenProject prj = mavenSession.getCurrentProject();
         String result = prj.getName() + " " + prj.getVersion();
         File currentPom = prj.getFile();
@@ -212,7 +211,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
 
         private final LinkedHashSet<String> pluginDeclarations;
 
-        private final LinkedHashSet<String> pluginOccurences;
+        private final LinkedHashSet<String> pluginOccurrences;
 
         private final LinkedHashSet<String> pluginIssues;
 
@@ -221,28 +220,28 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
         private PluginValidationIssues(String pluginKey) {
             this.pluginKey = pluginKey;
             this.pluginDeclarations = new LinkedHashSet<>();
-            this.pluginOccurences = new LinkedHashSet<>();
+            this.pluginOccurrences = new LinkedHashSet<>();
             this.pluginIssues = new LinkedHashSet<>();
             this.mojoIssues = new LinkedHashMap<>();
         }
 
-        private synchronized void reportPluginIssue(String pluginDeclaration, String pluginOccurence, String issue) {
+        private synchronized void reportPluginIssue(String pluginDeclaration, String pluginOccurrence, String issue) {
             if (pluginDeclaration != null) {
                 pluginDeclarations.add(pluginDeclaration);
             }
-            if (pluginOccurence != null) {
-                pluginOccurences.add(pluginOccurence);
+            if (pluginOccurrence != null) {
+                pluginOccurrences.add(pluginOccurrence);
             }
             pluginIssues.add(issue);
         }
 
         private synchronized void reportPluginMojoIssue(
-                String pluginDeclaration, String pluginOccurence, String mojoInfo, String issue) {
+                String pluginDeclaration, String pluginOccurrence, String mojoInfo, String issue) {
             if (pluginDeclaration != null) {
                 pluginDeclarations.add(pluginDeclaration);
             }
-            if (pluginOccurence != null) {
-                pluginOccurences.add(pluginOccurence);
+            if (pluginOccurrence != null) {
+                pluginOccurrences.add(pluginOccurrence);
             }
             mojoIssues.computeIfAbsent(mojoInfo, k -> new LinkedHashSet<>()).add(issue);
         }
