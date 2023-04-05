@@ -22,9 +22,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.AbstractMavenLifecycleParticipant;
@@ -70,8 +72,12 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
         try {
             return ValidationLevel.valueOf(level.toUpperCase(Locale.ENGLISH));
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(
-                    "Invalid value specified for property " + MAVEN_PLUGIN_VALIDATION_KEY + ": '" + level + "'", e);
+            logger.warn(
+                    "Invalid value specified for property '{}': '{}'. Supported values are (case insensitive): {}",
+                    MAVEN_PLUGIN_VALIDATION_KEY,
+                    level,
+                    Arrays.toString(ValidationLevel.values()));
+            return ValidationLevel.DEFAULT;
         }
     }
 
@@ -90,54 +96,48 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
 
     @Override
     public void reportPluginValidationIssue(RepositorySystemSession session, Artifact pluginArtifact, String issue) {
-        if (validationLevel(session) == ValidationLevel.DISABLED) {
-            return;
-        }
         String pluginKey = pluginKey(pluginArtifact);
         PluginValidationIssues pluginIssues =
-                pluginIssues(session).computeIfAbsent(pluginKey, k -> new PluginValidationIssues(pluginKey));
+                pluginIssues(session).computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
         pluginIssues.reportPluginIssue(null, null, issue);
     }
 
     @Override
     public void reportPluginValidationIssue(MavenSession mavenSession, MojoDescriptor mojoDescriptor, String issue) {
-        if (validationLevel(mavenSession.getRepositorySession()) == ValidationLevel.DISABLED) {
-            return;
-        }
         String pluginKey = pluginKey(mojoDescriptor);
         PluginValidationIssues pluginIssues = pluginIssues(mavenSession.getRepositorySession())
-                .computeIfAbsent(pluginKey, k -> new PluginValidationIssues(pluginKey));
-        pluginIssues.reportPluginIssue(pluginDeclaration(mojoDescriptor), pluginoccurrence(mavenSession), issue);
+                .computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
+        pluginIssues.reportPluginIssue(pluginDeclaration(mojoDescriptor), pluginOccurrence(mavenSession), issue);
     }
 
     @Override
     public void reportPluginMojoValidationIssue(
             MavenSession mavenSession, MojoDescriptor mojoDescriptor, Class<?> mojoClass, String issue) {
         String pluginKey = pluginKey(mojoDescriptor);
-        if (validationLevel(mavenSession.getRepositorySession()) == ValidationLevel.DISABLED) {
-            return;
-        }
         PluginValidationIssues pluginIssues = pluginIssues(mavenSession.getRepositorySession())
-                .computeIfAbsent(pluginKey, k -> new PluginValidationIssues(pluginKey));
+                .computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
         pluginIssues.reportPluginMojoIssue(
                 pluginDeclaration(mojoDescriptor),
-                pluginoccurrence(mavenSession),
+                pluginOccurrence(mavenSession),
                 mojoInfo(mojoDescriptor, mojoClass),
                 issue);
     }
 
-    public void reportSessionCollectedValidationIssues(MavenSession mavenSession) {
+    private void reportSessionCollectedValidationIssues(MavenSession mavenSession) {
         ValidationLevel validationLevel = validationLevel(mavenSession.getRepositorySession());
-        if (validationLevel == ValidationLevel.DISABLED || !logger.isWarnEnabled()) {
-            return;
-        }
         ConcurrentHashMap<String, PluginValidationIssues> issuesMap = pluginIssues(mavenSession.getRepositorySession());
         if (!issuesMap.isEmpty()) {
+
             logger.warn("");
-            logger.warn("Plugin issues were detected in build:");
+            logger.warn("Plugin validation issues were detected in {} plugin(s)", issuesMap.size());
             logger.warn("");
-            for (PluginValidationIssues issues : issuesMap.values()) {
-                logger.warn("Plugin {}", issues.pluginKey);
+            if (validationLevel == ValidationLevel.DISABLED || !logger.isWarnEnabled()) {
+                return;
+            }
+
+            for (Map.Entry<String, PluginValidationIssues> entry : issuesMap.entrySet()) {
+                logger.warn("Plugin {}", entry.getKey());
+                PluginValidationIssues issues = entry.getValue();
                 if (validationLevel == ValidationLevel.VERBOSE && !issues.pluginDeclarations.isEmpty()) {
                     logger.warn("  Declared at location(s):");
                     for (String pluginDeclaration : issues.pluginDeclarations) {
@@ -169,10 +169,10 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
             }
             logger.warn("");
             logger.warn(
-                    "To fix these issues, please upgrade listed plugins, or notify their maintainers about these issues.");
+                    "To fix these issues, please upgrade above listed plugins, or, notify their maintainers about reported issues.");
             logger.warn("");
             logger.warn(
-                    "To get more or less details, use 'maven.plugin.validation' user property with one of the values: 'disabled', 'verbose' or (implied) 'default'");
+                    "For more or less details in this report, use 'maven.plugin.validation' user property with one of the values: 'disabled', 'verbose' or (implied) 'default'");
             logger.warn("");
         }
     }
@@ -187,7 +187,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
         }
     }
 
-    private String pluginoccurrence(MavenSession mavenSession) {
+    private String pluginOccurrence(MavenSession mavenSession) {
         MavenProject prj = mavenSession.getCurrentProject();
         String result = prj.getName() + " " + prj.getVersion();
         File currentPom = prj.getFile();
@@ -209,8 +209,6 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
     }
 
     private static class PluginValidationIssues {
-        private final String pluginKey;
-
         private final LinkedHashSet<String> pluginDeclarations;
 
         private final LinkedHashSet<String> pluginOccurrences;
@@ -219,8 +217,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
 
         private final LinkedHashMap<String, LinkedHashSet<String>> mojoIssues;
 
-        private PluginValidationIssues(String pluginKey) {
-            this.pluginKey = pluginKey;
+        private PluginValidationIssues() {
             this.pluginDeclarations = new LinkedHashSet<>();
             this.pluginOccurrences = new LinkedHashSet<>();
             this.pluginIssues = new LinkedHashSet<>();
