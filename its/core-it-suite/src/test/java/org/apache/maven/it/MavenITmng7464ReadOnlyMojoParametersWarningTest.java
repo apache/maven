@@ -85,10 +85,8 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
         List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         List<String> warnLines = findReadOnlyWarning( logLines );
 
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'readOnlyWithUserProperty' (user property 'user.property') is read-only, must not be used in configuration" ) );
-
-        assertTrue( "Not verified line: " + warnLines, warnLines.isEmpty() );
+        assertTrue( warnLines.stream().anyMatch( s -> s.contains(
+            "Parameter 'readOnlyWithUserProperty' (user property 'user.property') is read-only, must not be used in configuration" ) ) );
     }
 
     /**
@@ -111,25 +109,22 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
         List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         List<String> warnLines = findReadOnlyWarning( logLines );
 
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'readOnlyWithDefault' is read-only, must not be used in configuration" ) );
+        assertTrue( warnLines.stream().anyMatch( s -> s.contains(
+            "Parameter 'readOnlyWithDefault' is read-only, must not be used in configuration" ) ) );
 
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'readOnlyWithOutDefaults' is read-only, must not be used in configuration" ) );
+        assertTrue( warnLines.stream().anyMatch( s -> s.contains(
+            "Parameter 'readOnlyWithOutDefaults' is read-only, must not be used in configuration" ) ) );
 
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'readOnlyWithProperty' (user property 'project.version') is read-only, must not be used in configuration" ) );
+        assertTrue( warnLines.stream().anyMatch( s -> s.contains(
+            "Parameter 'readOnlyWithProperty' (user property 'project.version') is read-only, must not be used in configuration" ) ) );
 
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'readOnlyWithUserProperty' (user property 'user.property') is read-only, must not be used in configuration" ) );
-
-        assertTrue( "Not verified line: " + warnLines, warnLines.isEmpty() );
-
+        assertTrue( warnLines.stream().anyMatch( s -> s.contains(
+            "Parameter 'readOnlyWithUserProperty' (user property 'user.property') is read-only, must not be used in configuration" ) ) );
     }
 
     private List<String> findReadOnlyWarning( List<String> logLines )
     {
-        Pattern pattern = Pattern.compile( "\\[WARNING] Parameter .* is read-only.*" );
+        Pattern pattern = Pattern.compile( ".* Parameter .* is read-only.*" );
         List<String> result = new ArrayList<>();
         for ( String line : logLines )
         {

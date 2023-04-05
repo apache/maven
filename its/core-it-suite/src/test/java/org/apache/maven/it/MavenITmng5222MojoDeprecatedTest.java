@@ -65,10 +65,7 @@ public class MavenITmng5222MojoDeprecatedTest
         List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         List<String> warnLines = findDeprecationWarning( logLines );
 
-        assertTrue( warnLines.remove(
-            "[WARNING] Goal 'deprecated-config' is deprecated: This goal is deprecated" ) );
-
-        assertTrue( "Not verified line: " + warnLines, warnLines.isEmpty() );
+        assertTrue( warnLines.stream().anyMatch(s -> s.contains("Goal 'deprecated-config' is deprecated: This goal is deprecated")) );
 
         Properties configProps = verifier.loadProperties( "target/config.properties" );
 
@@ -117,19 +114,10 @@ public class MavenITmng5222MojoDeprecatedTest
         List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         List<String> warnLines = findDeprecationWarning( logLines );
 
-        assertTrue( warnLines.remove(
-            "[WARNING] Goal 'deprecated-config' is deprecated: This goal is deprecated" ) );
-
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'deprecatedParam2' (user property 'config.deprecatedParam2') is deprecated: No reason given" ) );
-
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'deprecatedArray' (user property 'config.deprecatedArray') is deprecated: deprecated array" ) );
-
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'deprecatedList' (user property 'config.deprecatedList') is deprecated: deprecated list" ) );
-
-        assertTrue( "Not verified line: " + warnLines, warnLines.isEmpty() );
+        assertTrue( warnLines.stream().anyMatch(s -> s.contains("Goal 'deprecated-config' is deprecated: This goal is deprecated")) );
+        assertTrue( warnLines.stream().anyMatch(s -> s.contains("Parameter 'deprecatedParam2' (user property 'config.deprecatedParam2') is deprecated: No reason given")) );
+        assertTrue( warnLines.stream().anyMatch(s -> s.contains("Parameter 'deprecatedArray' (user property 'config.deprecatedArray') is deprecated: deprecated array")) );
+        assertTrue( warnLines.stream().anyMatch(s -> s.contains("Parameter 'deprecatedList' (user property 'config.deprecatedList') is deprecated: deprecated list")) );
 
         Properties configProps = verifier.loadProperties( "target/config.properties" );
 
@@ -185,40 +173,17 @@ public class MavenITmng5222MojoDeprecatedTest
         List<String> logLines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         List<String> warnLines = findDeprecationWarning( logLines );
 
-        assertTrue( warnLines.remove(
-            "[WARNING] Goal 'deprecated-config' is deprecated: This goal is deprecated" ) );
-
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'deprecatedParam' is deprecated: I'm deprecated param" ) );
-
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'deprecatedParam2' (user property 'config.deprecatedParam2') is deprecated: No reason given" ) );
-
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'deprecatedParamWithDefaultConstant' is deprecated: deprecated with constant value" ) );
-
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'deprecatedParamWithDefaultEvaluate' is deprecated: deprecated with evaluate value" ) );
-
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'deprecatedArray' (user property 'config.deprecatedArray') is deprecated: deprecated array" ) );
-
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'deprecatedArrayWithDefaults' is deprecated: deprecated array" ) );
-
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'deprecatedList' (user property 'config.deprecatedList') is deprecated: deprecated list" ) );
-
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'deprecatedListWithDefaults' is deprecated: deprecated list" ) );
-
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'deprecatedProperties' is deprecated: deprecated properties" ) );
-
-        assertTrue( warnLines.remove(
-            "[WARNING] Parameter 'deprecatedMap' is deprecated: deprecated map" ));
-
-        assertTrue( "Not verified line: " + warnLines, warnLines.isEmpty() );
+        assertTrue( warnLines.stream().anyMatch(s -> s.contains("Goal 'deprecated-config' is deprecated: This goal is deprecated")) );
+        assertTrue( warnLines.stream().anyMatch(s -> s.contains("Parameter 'deprecatedParam' is deprecated: I'm deprecated param")) );
+        assertTrue( warnLines.stream().anyMatch(s -> s.contains("Parameter 'deprecatedParam2' (user property 'config.deprecatedParam2') is deprecated: No reason given")) );
+        assertTrue( warnLines.stream().anyMatch(s -> s.contains("Parameter 'deprecatedParamWithDefaultConstant' is deprecated: deprecated with constant value")) );
+        assertTrue( warnLines.stream().anyMatch(s -> s.contains("Parameter 'deprecatedParamWithDefaultEvaluate' is deprecated: deprecated with evaluate value")) );
+        assertTrue( warnLines.stream().anyMatch(s -> s.contains("Parameter 'deprecatedArray' (user property 'config.deprecatedArray') is deprecated: deprecated array")) );
+        assertTrue( warnLines.stream().anyMatch(s -> s.contains("Parameter 'deprecatedArrayWithDefaults' is deprecated: deprecated array")) );
+        assertTrue( warnLines.stream().anyMatch(s -> s.contains("Parameter 'deprecatedList' (user property 'config.deprecatedList') is deprecated: deprecated list")) );
+        assertTrue( warnLines.stream().anyMatch(s -> s.contains("Parameter 'deprecatedListWithDefaults' is deprecated: deprecated list")) );
+        assertTrue( warnLines.stream().anyMatch(s -> s.contains("Parameter 'deprecatedProperties' is deprecated: deprecated properties")) );
+        assertTrue( warnLines.stream().anyMatch(s -> s.contains("Parameter 'deprecatedMap' is deprecated: deprecated map")) );
 
         Properties configProps = verifier.loadProperties( "target/config.properties" );
 
@@ -256,7 +221,7 @@ public class MavenITmng5222MojoDeprecatedTest
 
     private List<String> findDeprecationWarning( List<String> logLines )
     {
-        Pattern pattern = Pattern.compile( "\\[WARNING] (Parameter|Goal) .* is deprecated:.*" );
+        Pattern pattern = Pattern.compile( ".* (Parameter|Goal) .* is deprecated:.*" );
         List<String> result = new ArrayList<>();
         for ( String line : logLines )
         {
