@@ -53,7 +53,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
 
     private enum ValidationLevel {
         DISABLED,
-        DEFAULT,
+        ENABLED,
         VERBOSE
     }
 
@@ -67,7 +67,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
     private ValidationLevel validationLevel(RepositorySystemSession session) {
         String level = ConfigUtils.getString(session, null, MAVEN_PLUGIN_VALIDATION_KEY);
         if (level == null || level.isEmpty()) {
-            return ValidationLevel.DEFAULT;
+            return ValidationLevel.ENABLED;
         }
         try {
             return ValidationLevel.valueOf(level.toUpperCase(Locale.ENGLISH));
@@ -77,7 +77,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
                     MAVEN_PLUGIN_VALIDATION_KEY,
                     level,
                     Arrays.toString(ValidationLevel.values()));
-            return ValidationLevel.DEFAULT;
+            return ValidationLevel.ENABLED;
         }
     }
 
@@ -172,7 +172,8 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
                     "To fix these issues, please upgrade above listed plugins, or, notify their maintainers about reported issues.");
             logger.warn("");
             logger.warn(
-                    "For more or less details in this report, use 'maven.plugin.validation' user property with one of the values: 'disabled', 'verbose' or (implied) 'default'");
+                    "For more or less details, use 'maven.plugin.validation' property with one of the values (case insensitive): {}",
+                    Arrays.toString(ValidationLevel.values()));
             logger.warn("");
         }
     }
