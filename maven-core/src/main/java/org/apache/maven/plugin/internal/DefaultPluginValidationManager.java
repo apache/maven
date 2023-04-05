@@ -73,7 +73,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
             return ValidationLevel.valueOf(level.toUpperCase(Locale.ENGLISH));
         } catch (IllegalArgumentException e) {
             logger.warn(
-                    "Invalid value specified for property '{}': '{}'. Supported values are (case insensitive): {}",
+                    "Invalid value specified for property {}: '{}'. Supported values are (case insensitive): {}",
                     MAVEN_PLUGIN_VALIDATION_KEY,
                     level,
                     Arrays.toString(ValidationLevel.values()));
