@@ -64,10 +64,15 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
 
     private ValidationLevel validationLevel(RepositorySystemSession session) {
         String level = ConfigUtils.getString(session, null, MAVEN_PLUGIN_VALIDATION_KEY);
-        if (level == null) {
+        if (level == null || level.isEmpty()) {
             return ValidationLevel.DEFAULT;
         }
-        return ValidationLevel.valueOf(level.toUpperCase(Locale.ENGLISH));
+        try {
+            return ValidationLevel.valueOf(level.toUpperCase(Locale.ENGLISH));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "Invalid value specified for property " + MAVEN_PLUGIN_VALIDATION_KEY + ": '" + level + "'", e);
+        }
     }
 
     private String pluginKey(String groupId, String artifactId, String version) {
