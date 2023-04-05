@@ -99,18 +99,18 @@ abstract class AbstractMavenPluginParametersValidator implements MavenPluginConf
     protected abstract String getParameterLogReason(Parameter parameter);
 
     protected String formatParameter(Parameter parameter) {
-        StringBuilder messageBuilder = new StringBuilder()
+        StringBuilder stringBuilder = new StringBuilder()
                 .append("Parameter '")
                 .append(parameter.getName())
                 .append('\'');
 
         if (parameter.getExpression() != null) {
             String userProperty = parameter.getExpression().replace("${", "'").replace('}', '\'');
-            messageBuilder.append(" (user property ").append(userProperty).append(")");
+            stringBuilder.append(" (user property ").append(userProperty).append(")");
         }
 
-        messageBuilder.append(" ").append(getParameterLogReason(parameter));
+        stringBuilder.append(" ").append(getParameterLogReason(parameter));
 
-        return messageBuilder.toString();
+        return stringBuilder.toString();
     }
 }
