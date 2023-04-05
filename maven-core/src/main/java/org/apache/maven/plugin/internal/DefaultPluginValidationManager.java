@@ -221,7 +221,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
     }
 
     private String mojoInfo(MojoDescriptor mojoDescriptor, Class<?> mojoClass) {
-        return mojoDescriptor.getFullGoalName() + " (class: " + mojoClass.getName() + ")";
+        return mojoDescriptor.getFullGoalName() + " (" + mojoClass.getName() + ")";
     }
 
     @SuppressWarnings("unchecked")
