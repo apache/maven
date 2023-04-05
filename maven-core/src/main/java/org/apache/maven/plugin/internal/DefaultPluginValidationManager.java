@@ -49,8 +49,6 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
 
     private static final String MAVEN_PLUGIN_VALIDATION_KEY = "maven.plugin.validation";
 
-    private static final String MAVEN_PLUGIN_VALIDATION_DEFAULT = "default";
-
     private enum ValidationLevel {
         DISABLED,
         DEFAULT,
@@ -65,12 +63,11 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
     }
 
     private ValidationLevel validationLevel(RepositorySystemSession session) {
-        String level = ConfigUtils.getString(session, MAVEN_PLUGIN_VALIDATION_DEFAULT, MAVEN_PLUGIN_VALIDATION_KEY);
-        try {
-            return ValidationLevel.valueOf(level.toUpperCase(Locale.ENGLISH));
-        } catch (IllegalArgumentException e) {
+        String level = ConfigUtils.getString(session, null, MAVEN_PLUGIN_VALIDATION_KEY);
+        if (level == null) {
             return ValidationLevel.DEFAULT;
         }
+        return ValidationLevel.valueOf(level.toUpperCase(Locale.ENGLISH));
     }
 
     private String pluginKey(String groupId, String artifactId, String version) {
