@@ -30,7 +30,7 @@ import org.eclipse.aether.artifact.Artifact;
  */
 public interface PluginValidationManager {
     /**
-     * Reports plugin issues applicable to the plugin as whole.
+     * Reports plugin issues applicable to the plugin as a whole.
      * <p>
      * This method should be used in "early" phase of plugin execution, possibly even when plugin or mojo descriptor
      * does not exist yet. In turn, this method will not record extra information like plugin occurrence or declaration
@@ -39,7 +39,7 @@ public interface PluginValidationManager {
     void reportPluginValidationIssue(RepositorySystemSession session, Artifact pluginArtifact, String issue);
 
     /**
-     * Reports plugin issues applicable to the plugin as whole.
+     * Reports plugin issues applicable to the plugin as a whole.
      * <p>
      * This method will record extra information as well, like plugin occurrence or declaration location.
      */
