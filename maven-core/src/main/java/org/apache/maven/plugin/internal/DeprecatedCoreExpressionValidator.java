@@ -40,7 +40,7 @@ class DeprecatedCoreExpressionValidator extends AbstractMavenPluginParametersVal
     private static final HashMap<String, String> DEPRECATED_CORE_PARAMETERS;
 
     private static final String ARTIFACT_REPOSITORY_REASON =
-            "Avoid use of ArtifactRepository type. If you need access to local repository, switch to '${repositorySystemSession}' expression and get LRM from it instead.";
+            "Avoid use of ArtifactRepository type. If you need access to local repository, switch to expression '${repositorySystemSession}' and get LRM from it instead.";
 
     static {
         HashMap<String, String> deprecatedCoreParameters = new HashMap<>();
@@ -51,7 +51,7 @@ class DeprecatedCoreExpressionValidator extends AbstractMavenPluginParametersVal
 
     @Override
     protected String getParameterLogReason(Parameter parameter) {
-        return "is deprecated core expression; " + DEPRECATED_CORE_PARAMETERS.get(parameter.getDefaultValue());
+        return "is leveraging a deprecated core expression: " + DEPRECATED_CORE_PARAMETERS.get(parameter.getDefaultValue());
     }
 
     @Override
