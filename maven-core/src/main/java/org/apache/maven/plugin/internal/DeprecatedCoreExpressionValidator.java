@@ -59,7 +59,7 @@ class DeprecatedCoreExpressionValidator extends AbstractMavenPluginParametersVal
 
     @Override
     protected String getParameterLogReason(Parameter parameter) {
-        return "uses deprecated parameter expression; " + DEPRECATED_CORE_PARAMETERS.get(parameter.getDefaultValue());
+        return "uses deprecated parameter expression '" + parameter.getDefaultValue() + "': " + DEPRECATED_CORE_PARAMETERS.get(parameter.getDefaultValue());
     }
 
     @Override
