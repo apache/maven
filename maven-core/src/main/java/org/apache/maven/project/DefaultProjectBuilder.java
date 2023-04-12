@@ -1000,6 +1000,10 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     }
 
     private ModelCache createModelCache(RepositorySystemSession session) {
+        // MNG-7759: very old clients (Maven2 plugins) will not even have session, as setter was added in Maven 3
+        if (session == null) {
+            return null;
+        }
         // MNG-7693: for older clients (not injecting ModelCacheFactory), make this work OOTB w/ defaults
         return modelCacheFactory != null
                 ? modelCacheFactory.createCache(session)
