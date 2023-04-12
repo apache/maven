@@ -64,6 +64,7 @@ import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.PluginRealmCache;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.PluginValidationManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -96,6 +97,7 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -163,6 +165,12 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
     @Requirement
     private List<MavenPluginConfigurationValidator> configurationValidators;
+
+    @Requirement
+    private List<MavenPluginDependenciesValidator> dependenciesValidators;
+
+    @Requirement
+    private PluginValidationManager pluginValidationManager;
 
     private ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
 
@@ -540,6 +548,18 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 ((Mojo) mojo).setLog(new DefaultLog(mojoLogger));
             }
 
+            if (mojo instanceof Contextualizable) {
+                pluginValidationManager.reportPluginMojoValidationIssue(
+                        session,
+                        mojoDescriptor,
+                        mojo.getClass(),
+                        "Implements `Contextualizable` interface from Plexus Container, which is EOL.");
+            }
+
+            for (MavenPluginDependenciesValidator validator : dependenciesValidators) {
+                validator.validate(session, mojoDescriptor);
+            }
+
             Xpp3Dom dom = mojoExecution.getConfiguration();
 
             PlexusConfiguration pomConfiguration;
@@ -553,7 +573,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             ExpressionEvaluator expressionEvaluator = new PluginParameterExpressionEvaluator(session, mojoExecution);
 
             for (MavenPluginConfigurationValidator validator : configurationValidators) {
-                validator.validate(mojoDescriptor, pomConfiguration, expressionEvaluator);
+                validator.validate(session, mojoDescriptor, mojo.getClass(), pomConfiguration, expressionEvaluator);
             }
 
             populateMojoExecutionFields(

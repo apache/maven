@@ -28,6 +28,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.PluginValidationManager;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -78,6 +79,9 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
     @Requirement
     private RepositorySystem repoSystem;
 
+    @Requirement
+    private PluginValidationManager pluginValidationManager;
+
     private Artifact toArtifact(Plugin plugin, RepositorySystemSession session) {
         return new DefaultArtifact(
                 plugin.getGroupId(),
@@ -102,6 +106,19 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                     new ArtifactDescriptorRequest(pluginArtifact, repositories, REPOSITORY_CONTEXT);
             request.setTrace(trace);
             ArtifactDescriptorResult result = repoSystem.readArtifactDescriptor(pluginSession, request);
+
+            if (result.getDependencies() != null) {
+                for (org.eclipse.aether.graph.Dependency dependency : result.getDependencies()) {
+                    if ("org.apache.maven".equals(dependency.getArtifact().getGroupId())
+                            && "maven-compat".equals(dependency.getArtifact().getArtifactId())
+                            && !JavaScopes.TEST.equals(dependency.getScope())) {
+                        pluginValidationManager.reportPluginValidationIssue(
+                                session,
+                                pluginArtifact,
+                                "Plugin depends on the deprecated Maven 2.x compatibility layer, which may not be supported in Maven 4.x");
+                    }
+                }
+            }
 
             pluginArtifact = result.getArtifact();
 
