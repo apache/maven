@@ -160,7 +160,9 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
         if (dependencySource == null
                 || bomSource == null
                 || Objects.equals(dependencySource.getModelId(), bomSource.getModelId())) {
-            return Dependency.newBuilder(dependency, true).importedFrom(bomLocation).build();
+            return Dependency.newBuilder(dependency, true)
+                    .importedFrom(bomLocation)
+                    .build();
         }
 
         while (dependencySource.getImportedFrom() != null) {

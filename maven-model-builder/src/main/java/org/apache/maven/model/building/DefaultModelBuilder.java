@@ -1693,10 +1693,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                 if (request.isLocationTracking()) {
                     // Keep track of why this DependencyManagement was imported.
                     importMgmts.add(
-                        org.apache.maven.api.model.DependencyManagement.newBuilder(importMgmt.getDelegate(), true)
-                                .importedFrom(dependency.getDelegate().getLocation(""))
-                                .build()
-                    );
+                            org.apache.maven.api.model.DependencyManagement.newBuilder(importMgmt.getDelegate(), true)
+                                    .importedFrom(dependency.getDelegate().getLocation(""))
+                                    .build());
                 } else {
                     importMgmts.add(importMgmt.getDelegate());
                 }
