@@ -38,6 +38,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -173,7 +174,7 @@ public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurat
 
     private Set<String> getUnknownParameters(MojoExecution mojoExecution, Set<String> parameters) {
         return stream(mojoExecution.getConfiguration().getChildren())
-                .map(x -> x.getName())
+                .map(Xpp3Dom::getName)
                 .filter(name -> !parameters.contains(name))
                 .collect(Collectors.toSet());
     }
