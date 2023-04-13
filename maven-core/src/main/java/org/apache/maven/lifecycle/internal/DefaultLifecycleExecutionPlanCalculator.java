@@ -82,6 +82,9 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
     @Requirement
     private LifecyclePluginResolver lifecyclePluginResolver;
 
+    @Requirement
+    private LifecyclePluginSkipper lifecyclePluginSkipper;
+
     @Requirement(hint = DefaultLifecycleMappingDelegate.HINT)
     private LifecycleMappingDelegate standardDelegate;
 
@@ -99,11 +102,13 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
             BuildPluginManager pluginManager,
             DefaultLifecycles defaultLifeCycles,
             MojoDescriptorCreator mojoDescriptorCreator,
-            LifecyclePluginResolver lifecyclePluginResolver) {
+            LifecyclePluginResolver lifecyclePluginResolver,
+            LifecyclePluginSkipper lifecyclePluginSkipper) {
         this.pluginManager = pluginManager;
         this.defaultLifeCycles = defaultLifeCycles;
         this.mojoDescriptorCreator = mojoDescriptorCreator;
         this.lifecyclePluginResolver = lifecyclePluginResolver;
+        this.lifecyclePluginSkipper = lifecyclePluginSkipper;
         this.mojoExecutionConfigurators =
                 Collections.singletonMap("default", (MojoExecutionConfigurator) new DefaultMojoExecutionConfigurator());
     }
@@ -121,6 +126,8 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
         if (setup) {
             setupMojoExecutions(session, project, executions);
         }
+
+        lifecyclePluginSkipper.processMojoExecutions(session, executions);
 
         final List<ExecutionPlanItem> planItem = ExecutionPlanItem.createExecutionPlanItems(project, executions);
 

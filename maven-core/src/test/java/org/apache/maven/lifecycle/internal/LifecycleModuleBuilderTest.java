@@ -33,6 +33,7 @@ import org.apache.maven.lifecycle.internal.stub.MojoExecutorStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
@@ -61,7 +62,8 @@ public class LifecycleModuleBuilderTest extends PlexusTestCase {
         MavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
         mavenExecutionRequest.setExecutionListener(new AbstractExecutionListener());
         mavenExecutionRequest.setGoals(Arrays.asList("clean"));
-        final MavenSession session = new MavenSession(null, null, mavenExecutionRequest, defaultMavenExecutionResult);
+        final MavenSession session = new MavenSession(
+                null, MavenRepositorySystemUtils.newSession(), mavenExecutionRequest, defaultMavenExecutionResult);
         final ProjectDependencyGraphStub dependencyGraphStub = new ProjectDependencyGraphStub();
         session.setProjectDependencyGraph(dependencyGraphStub);
         session.setProjects(dependencyGraphStub.getSortedProjects());
