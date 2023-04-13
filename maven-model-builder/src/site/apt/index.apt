@@ -225,11 +225,13 @@ Maven Model Builder
 
     * <<<$\{project.build.sourceEncoding\}>>> for
     {{{https://cwiki.apache.org/confluence/display/MAVEN/POM+Element+for+Source+File+Encoding}source files encoding}}
-    (defaults to platform encoding)
+    (defaults to <<<UTF-8>>> since Maven 4.0.0, no default value was provided in Maven 3.x, meaning that the platform
+    encoding was used by plugins)
 
     * <<<$\{project.reporting.outputEncoding\}>>> for
     {{{https://cwiki.apache.org/confluence/display/MAVENOLD/Reporting+Encoding+Configuration}reporting output files encoding}}
-    (defaults to <<<UTF-8>>>)
+    (defaults to <<<UTF-8>>> since Maven 4.0.0, no default value was provided in Maven 3.x, plugins usually defaulting
+    to <<<UTF-8>>>)
 
     []
 
