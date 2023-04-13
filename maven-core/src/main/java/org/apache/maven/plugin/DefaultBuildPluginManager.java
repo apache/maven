@@ -142,10 +142,8 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
                 mojoExecutionListener.beforeMojoExecution(mojoExecutionEvent);
                 mojo.execute();
                 mojoExecutionListener.afterMojoExecutionSuccess(mojoExecutionEvent);
-            } catch (AbstractMojoExecutionException e) {
-                MojoMetadata metadata = new MojoMetadata(
-                        mojoExecution.getGroupId(), mojoExecution.getArtifactId(), mojoExecution.getVersion());
-                e.setMojoMetadata(metadata);
+            } catch (MojoExecutionException e) {
+                e.setPlugin(mojoExecution.getPlugin());
                 throw e;
             } catch (ClassCastException e) {
                 // to be processed in the outer catch block

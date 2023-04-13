@@ -70,13 +70,11 @@ import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
-import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.exception.PluginVersionUpgradeAvailableExceptionHandler;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.ProfileActivation;
@@ -88,6 +86,7 @@ import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.logwrapper.LogLevelRecorder;
 import org.apache.maven.logwrapper.MavenSlf4jWrapperFactory;
 import org.apache.maven.model.building.ModelProcessor;
+import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
@@ -853,7 +852,7 @@ public class MavenCli {
         }
     }
 
-    private int execute(CliRequest cliRequest) throws MavenExecutionRequestPopulationException {
+    private int execute(CliRequest cliRequest) throws Exception {
         MavenExecutionRequest request = executionRequestPopulator.populateDefaults(cliRequest.request);
 
         if (cliRequest.request.getRepositoryCache() == null) {
@@ -869,16 +868,19 @@ public class MavenCli {
         eventSpyDispatcher.close();
 
         if (result.hasExceptions()) {
-            ExceptionHandler defaultExceptionHandler = new DefaultExceptionHandler();
-            PluginVersionUpgradeAvailableExceptionHandler handler =
-                    new PluginVersionUpgradeAvailableExceptionHandler(defaultExceptionHandler);
+            PluginVersionResolver pluginVersionResolver = container(cliRequest).lookup(PluginVersionResolver.class);
+            PluginVersionUpgradeAvailableExceptionHandler handler = new PluginVersionUpgradeAvailableExceptionHandler(
+                    new DefaultExceptionHandler(), pluginVersionResolver);
 
             Map<String, String> references = new LinkedHashMap<>();
 
             List<MavenProject> failedProjects = new ArrayList<>();
 
             for (Throwable exception : result.getExceptions()) {
-                ExceptionSummary summary = handler.handleException(exception);
+                ExceptionSummary summary = handler.handleException(
+                        exception,
+                        cliRequest.getRequest().getProjectBuildingRequest().getRepositorySession(),
+                        result.getProject().getRemotePluginRepositories());
 
                 logSummary(summary, references, "", cliRequest.showErrors);
 

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.exception;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -49,7 +49,7 @@ public class ExceptionSummary {
         this.exception = exception;
         this.message = (message != null) ? message : "";
         this.reference = (reference != null) ? reference : "";
-        this.children = (children != null) ? children : new ArrayList<>(); // Not sure if I like this change
+        this.children = (children != null) ? Collections.unmodifiableList(children) : Collections.emptyList();
     }
 
     public Throwable getException() {

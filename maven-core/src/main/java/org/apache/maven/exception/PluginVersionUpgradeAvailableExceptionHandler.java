@@ -18,25 +18,66 @@
  */
 package org.apache.maven.exception;
 
-import org.apache.maven.plugin.AbstractMojoExecutionException;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public final class PluginVersionUpgradeAvailableExceptionHandler
-        implements ExceptionHandler { // TODO: extend DefaultExceptionHandler to use getReference and other stuff?
+import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
+import org.apache.maven.plugin.version.PluginVersionResolver;
+import org.apache.maven.plugin.version.PluginVersionResult;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
+
+public final class PluginVersionUpgradeAvailableExceptionHandler {
     private final ExceptionHandler defaultExceptionHandler;
+    private final PluginVersionResolver pluginVersionResolver;
 
-    public PluginVersionUpgradeAvailableExceptionHandler(ExceptionHandler defaultExceptionHandler) {
+    public PluginVersionUpgradeAvailableExceptionHandler(
+            ExceptionHandler defaultExceptionHandler, PluginVersionResolver pluginVersionResolver) {
         this.defaultExceptionHandler = defaultExceptionHandler;
+        this.pluginVersionResolver = pluginVersionResolver;
     }
 
-    @Override
-    public ExceptionSummary handleException(Throwable e) {
-        ExceptionSummary summary = defaultExceptionHandler.handleException(e);
-        if (e.getCause() instanceof AbstractMojoExecutionException) {
-            // TODO: probably needs resolver to check for new versions available.
-            ExceptionSummary possibleUpgrade =
-                    new ExceptionSummary(e, "Consider upgrading to version XXX", "link to plugin page would be cool");
-            summary.getChildren().add(possibleUpgrade);
+    public ExceptionSummary handleException(
+            Throwable exception, RepositorySystemSession session, List<RemoteRepository> repositories) {
+        ExceptionSummary summary = defaultExceptionHandler.handleException(exception);
+        if (!(exception.getCause() instanceof MojoExecutionException)) {
+            return summary;
+        }
+
+        Optional<String> suggestion =
+                getNewestVersionAvailable((MojoExecutionException) exception.getCause(), session, repositories);
+
+        if (suggestion.isPresent()) {
+            ExceptionSummary possibleUpgrade = new ExceptionSummary(exception, suggestion.get(), "");
+            List<ExceptionSummary> children = Stream.concat(summary.getChildren().stream(), Stream.of(possibleUpgrade))
+                    .collect(Collectors.toList());
+            summary = new ExceptionSummary(
+                    summary.getException(), summary.getMessage(), summary.getReference(), children);
         }
         return summary;
+    }
+
+    private Optional<String> getNewestVersionAvailable(
+            MojoExecutionException exception, RepositorySystemSession session, List<RemoteRepository> repositories) {
+        String suggestion = null;
+        try {
+            if (exception.getPlugin().isPresent()) {
+                Plugin plugin = exception.getPlugin().get();
+                PluginVersionResult result =
+                        pluginVersionResolver.resolve(new DefaultPluginVersionRequest(plugin, session, repositories));
+                if (plugin.getVersion() != null && !plugin.getVersion().equals(result.getVersion())) {
+                    suggestion = String.format("Consider upgrading to version '%s'", result.getVersion());
+                }
+            }
+        } catch (PluginVersionResolutionException ex) {
+            // Failed to resolve plugin, seems unlikely as it has been resolved in the first phases, silently continue.
+        }
+
+        return Optional.ofNullable(suggestion);
     }
 }

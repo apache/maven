@@ -20,6 +20,8 @@ package org.apache.maven.plugin;
 
 import java.util.Optional;
 
+import org.apache.maven.model.Plugin;
+
 /**
  * Base exception.
  *
@@ -30,7 +32,7 @@ public abstract class AbstractMojoExecutionException extends Exception {
 
     protected String longMessage;
 
-    protected MojoMetadata mojoMetadata;
+    protected Plugin plugin;
 
     public AbstractMojoExecutionException(String message) {
         super(message);
@@ -59,11 +61,11 @@ public abstract class AbstractMojoExecutionException extends Exception {
         return source;
     }
 
-    public Optional<MojoMetadata> getMojoMetadata() {
-        return mojoMetadata == null ? Optional.empty() : Optional.of(mojoMetadata);
+    public Optional<Plugin> getPlugin() {
+        return plugin == null ? Optional.empty() : Optional.of(plugin);
     }
 
-    public void setMojoMetadata(MojoMetadata metadata) {
-        this.mojoMetadata = metadata;
+    public void setPlugin(Plugin plugin) {
+        this.plugin = plugin;
     }
 }
