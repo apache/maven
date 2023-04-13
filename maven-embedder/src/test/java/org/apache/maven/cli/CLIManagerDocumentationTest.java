@@ -27,7 +27,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.cli.Option;
-import org.codehaus.plexus.util.FileUtils;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -88,6 +88,6 @@ public class CLIManagerDocumentationTest {
     @Test
     public void testOptionsAsHtml() throws IOException {
         File options = new File("target/test-classes/options.html");
-        FileUtils.fileWrite(options, "UTF-8", getOptionsAsHtml());
+        FileUtils.write(options, getOptionsAsHtml(), "UTF-8");
     }
 }

@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -55,7 +56,6 @@ import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
 
@@ -274,7 +274,8 @@ public class TestRepositorySystem implements RepositorySystem {
 
             File remoteFile = new File(remoteRepo.getBasedir(), remoteRepo.pathOf(artifact));
 
-            FileUtils.copyFile(remoteFile, localFile);
+            Files.createDirectories(localFile.toPath().getParent());
+            Files.copy(remoteFile.toPath(), localFile.toPath());
         }
 
         artifact.setResolved(true);

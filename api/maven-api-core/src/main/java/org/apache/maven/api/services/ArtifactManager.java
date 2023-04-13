@@ -28,7 +28,7 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface ArtifactManager extends Service {

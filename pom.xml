@@ -408,11 +408,6 @@ under the License.
         <version>${jxpathVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-lang3</artifactId>
-        <version>${commonsLangVersion}</version>
-      </dependency>
-      <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-sec-dispatcher</artifactId>
         <version>${securityDispatcherVersion}</version>
@@ -573,7 +568,7 @@ under the License.
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
-        <version>1.21</version>
+        <version>1.23</version>
         <configuration>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>

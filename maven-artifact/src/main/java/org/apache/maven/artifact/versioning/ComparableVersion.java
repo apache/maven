@@ -37,7 +37,7 @@ import java.util.Properties;
  * <ul>
  * <li>mixing of '<code>-</code>' (hyphen) and '<code>.</code>' (dot) separators,</li>
  * <li>transition between characters and digits also constitutes a separator:
- *     <code>1.0alpha1 =&gt; [1, 0, alpha, 1]</code></li>
+ *     <code>1.0alpha1 =&gt; [1, [alpha, 1]]</code></li>
  * <li>unlimited number of version components,</li>
  * <li>version components in the text can be digits or strings,</li>
  * <li>strings are checked for well-known qualifiers and the qualifier ordering is used for version ordering.

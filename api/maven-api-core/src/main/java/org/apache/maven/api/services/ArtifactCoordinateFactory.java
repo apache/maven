@@ -28,7 +28,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Service used to create {@link ArtifactCoordinate} objects.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface ArtifactCoordinateFactory extends Service {

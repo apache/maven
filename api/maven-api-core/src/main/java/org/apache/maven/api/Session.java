@@ -36,7 +36,7 @@ import org.apache.maven.api.settings.Settings;
 /**
  * The session to install / deploy / resolve artifacts and dependencies.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 @ThreadSafe

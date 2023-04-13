@@ -26,7 +26,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * Service used to interact with the end user.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public interface Prompter extends Service {

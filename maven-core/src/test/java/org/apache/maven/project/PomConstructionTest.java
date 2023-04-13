@@ -28,8 +28,12 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.Profile;
+import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.repository.RepositorySystem;
@@ -47,11 +51,13 @@ import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @PlexusTest
 public class PomConstructionTest {
@@ -133,6 +139,202 @@ public class PomConstructionTest {
         PomTestWrapper pom = buildPom("profile-properties-interpolation", "interpolation-profile");
         assertEquals("PASSED", pom.getValue("properties[1]/test"));
         assertEquals("PASSED", pom.getValue("properties[1]/property"));
+    }
+
+    /*MNG-7750*/
+    private void checkBuildPluginWithArtifactId(
+            List<Plugin> plugins, String artifactId, String expectedId, String expectedConfig) {
+        Plugin plugin = plugins.stream()
+                .filter(p -> p.getArtifactId().equals(artifactId))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(plugin, "Unable to find plugin with artifactId: " + artifactId);
+        List<PluginExecution> pluginExecutions = plugin.getExecutions();
+        PluginExecution pluginExecution = pluginExecutions.stream()
+                .filter(pe -> pe.getId().equals(expectedId))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(pluginExecution, "Wrong id for \"" + artifactId + "\"");
+
+        String config = pluginExecution.getConfiguration().toString();
+        assertTrue(
+                config.contains(expectedConfig),
+                "Wrong config for \"" + artifactId + "\": (" + config + ") does not contain :" + expectedConfig);
+    }
+
+    private boolean isActiveProfile(MavenProject project, Profile activeProfile) {
+        return project.getActiveProfiles().stream().anyMatch(p -> p.getId().equals(activeProfile.getId()));
+    }
+
+    @Test
+    void testBuildPluginInterpolation() throws Exception {
+        PomTestWrapper pom = buildPom("plugin-interpolation-build", "activeProfile");
+        Model originalModel = pom.getMavenProject().getOriginalModel();
+
+        // =============================================
+        assertEquals("||${project.basedir}||", originalModel.getProperties().get("prop-outside"));
+
+        List<Plugin> outsidePlugins = originalModel.getBuild().getPlugins();
+        assertEquals(2, outsidePlugins.size());
+
+        checkBuildPluginWithArtifactId(
+                outsidePlugins,
+                "plugin-all-profiles",
+                "Outside ||${project.basedir}||",
+                "<plugin-all-profiles-out>Outside ||${project.basedir}||</plugin-all-profiles-out>");
+
+        // =============================================
+        Profile activeProfile = originalModel.getProfiles().stream()
+                .filter(profile -> profile.getId().equals("activeProfile"))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(activeProfile, "Unable to find the activeProfile");
+
+        assertTrue(
+                isActiveProfile(pom.getMavenProject(), activeProfile),
+                "The activeProfile should be active in the maven project");
+
+        assertEquals("||${project.basedir}||", activeProfile.getProperties().get("prop-active"));
+
+        List<Plugin> activeProfilePlugins = activeProfile.getBuild().getPlugins();
+        assertEquals(2, activeProfilePlugins.size(), "Number of active profile plugins");
+
+        checkBuildPluginWithArtifactId(
+                activeProfilePlugins,
+                "plugin-all-profiles",
+                "Active all ||${project.basedir}||",
+                "<plugin-all-profiles-in>Active all ||${project.basedir}||</plugin-all-profiles-in>");
+
+        checkBuildPluginWithArtifactId(
+                activeProfilePlugins,
+                "only-active-profile",
+                "Active only ||${project.basedir}||",
+                "<plugin-in-active-profile-only>Active only ||${project.basedir}||</plugin-in-active-profile-only>");
+
+        // =============================================
+
+        Profile inactiveProfile = originalModel.getProfiles().stream()
+                .filter(profile -> profile.getId().equals("inactiveProfile"))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(inactiveProfile, "Unable to find the inactiveProfile");
+
+        assertFalse(
+                isActiveProfile(pom.getMavenProject(), inactiveProfile),
+                "The inactiveProfile should NOT be active in the maven project");
+
+        assertEquals("||${project.basedir}||", inactiveProfile.getProperties().get("prop-inactive"));
+
+        List<Plugin> inactiveProfilePlugins = inactiveProfile.getBuild().getPlugins();
+        assertEquals(2, inactiveProfilePlugins.size(), "Number of active profile plugins");
+
+        checkBuildPluginWithArtifactId(
+                inactiveProfilePlugins,
+                "plugin-all-profiles",
+                "Inactive all ||${project.basedir}||",
+                "<plugin-all-profiles-ina>Inactive all ||${project.basedir}||</plugin-all-profiles-ina>");
+
+        checkBuildPluginWithArtifactId(
+                inactiveProfilePlugins,
+                "only-inactive-profile",
+                "Inactive only ||${project.basedir}||",
+                "<plugin-in-inactive-only>Inactive only ||${project.basedir}||</plugin-in-inactive-only>");
+    }
+
+    private void checkReportPluginWithArtifactId(
+            List<ReportPlugin> plugins, String artifactId, String expectedId, String expectedConfig) {
+        ReportPlugin plugin = plugins.stream()
+                .filter(p -> p.getArtifactId().equals(artifactId))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(plugin, "Unable to find plugin with artifactId: " + artifactId);
+        List<ReportSet> pluginReportSets = plugin.getReportSets();
+        ReportSet reportSet = pluginReportSets.stream()
+                .filter(rs -> rs.getId().equals(expectedId))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(reportSet, "Wrong id for \"" + artifactId + "\"");
+
+        String config = reportSet.getConfiguration().toString();
+        assertTrue(
+                config.contains(expectedConfig),
+                "Wrong config for \"" + artifactId + "\": (" + config + ") does not contain :" + expectedConfig);
+    }
+
+    @Test
+    void testReportingPluginInterpolation() throws Exception {
+        PomTestWrapper pom = buildPom("plugin-interpolation-reporting", "activeProfile");
+        Model originalModel = pom.getMavenProject().getOriginalModel();
+
+        // =============================================
+        assertEquals("||${project.basedir}||", originalModel.getProperties().get("prop-outside"));
+
+        List<ReportPlugin> outsidePlugins = originalModel.getReporting().getPlugins();
+        assertEquals(2, outsidePlugins.size(), "Wrong number of plugins found");
+
+        checkReportPluginWithArtifactId(
+                outsidePlugins,
+                "plugin-all-profiles",
+                "Outside ||${project.basedir}||",
+                "<plugin-all-profiles-out>Outside ||${project.basedir}||</plugin-all-profiles-out>");
+
+        // =============================================
+        Profile activeProfile = originalModel.getProfiles().stream()
+                .filter(profile -> profile.getId().equals("activeProfile"))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(activeProfile, "Unable to find the activeProfile");
+
+        assertTrue(
+                isActiveProfile(pom.getMavenProject(), activeProfile),
+                "The activeProfile should be active in the maven project");
+
+        assertEquals("||${project.basedir}||", activeProfile.getProperties().get("prop-active"));
+
+        List<ReportPlugin> activeProfilePlugins = activeProfile.getReporting().getPlugins();
+        assertEquals(2, activeProfilePlugins.size(), "The activeProfile should be active in the maven project");
+
+        checkReportPluginWithArtifactId(
+                activeProfilePlugins,
+                "plugin-all-profiles",
+                "Active all ||${project.basedir}||",
+                "<plugin-all-profiles-in>Active all ||${project.basedir}||</plugin-all-profiles-in>");
+
+        checkReportPluginWithArtifactId(
+                activeProfilePlugins,
+                "only-active-profile",
+                "Active only ||${project.basedir}||",
+                "<plugin-in-active-profile-only>Active only ||${project.basedir}||</plugin-in-active-profile-only>");
+
+        // =============================================
+
+        Profile inactiveProfile = originalModel.getProfiles().stream()
+                .filter(profile -> profile.getId().equals("inactiveProfile"))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(inactiveProfile, "Unable to find the inactiveProfile");
+
+        assertFalse(
+                isActiveProfile(pom.getMavenProject(), inactiveProfile),
+                "The inactiveProfile should NOT be active in the maven project");
+
+        assertEquals("||${project.basedir}||", inactiveProfile.getProperties().get("prop-inactive"));
+
+        List<ReportPlugin> inactiveProfilePlugins =
+                inactiveProfile.getReporting().getPlugins();
+        assertEquals(2, inactiveProfilePlugins.size(), "Number of active profile plugins");
+
+        checkReportPluginWithArtifactId(
+                inactiveProfilePlugins,
+                "plugin-all-profiles",
+                "Inactive all ||${project.basedir}||",
+                "<plugin-all-profiles-ina>Inactive all ||${project.basedir}||</plugin-all-profiles-ina>");
+
+        checkReportPluginWithArtifactId(
+                inactiveProfilePlugins,
+                "only-inactive-profile",
+                "Inactive only ||${project.basedir}||",
+                "<plugin-in-inactive-only>Inactive only ||${project.basedir}||</plugin-in-inactive-only>");
     }
 
     // Some better conventions for the test poms needs to be created and each of these tests

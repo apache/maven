@@ -23,7 +23,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * Component instantiation strategy.
  *
- * @since 4.0
+ * @since 4.0.0
  */
 @Experimental
 public enum InstantiationStrategy {

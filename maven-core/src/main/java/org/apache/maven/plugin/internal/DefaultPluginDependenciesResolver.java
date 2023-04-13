@@ -32,6 +32,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.PluginValidationManager;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -77,9 +78,13 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
 
     private final RepositorySystem repoSystem;
 
+    private final PluginValidationManager pluginValidationManager;
+
     @Inject
-    public DefaultPluginDependenciesResolver(RepositorySystem repoSystem) {
+    public DefaultPluginDependenciesResolver(
+            RepositorySystem repoSystem, PluginValidationManager pluginValidationManager) {
         this.repoSystem = repoSystem;
+        this.pluginValidationManager = pluginValidationManager;
     }
 
     private Artifact toArtifact(Plugin plugin, RepositorySystemSession session) {
@@ -106,6 +111,19 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                     new ArtifactDescriptorRequest(pluginArtifact, repositories, REPOSITORY_CONTEXT);
             request.setTrace(trace);
             ArtifactDescriptorResult result = repoSystem.readArtifactDescriptor(pluginSession, request);
+
+            if (result.getDependencies() != null) {
+                for (org.eclipse.aether.graph.Dependency dependency : result.getDependencies()) {
+                    if ("org.apache.maven".equals(dependency.getArtifact().getGroupId())
+                            && "maven-compat".equals(dependency.getArtifact().getArtifactId())
+                            && !JavaScopes.TEST.equals(dependency.getScope())) {
+                        pluginValidationManager.reportPluginValidationIssue(
+                                session,
+                                pluginArtifact,
+                                "Plugin depends on the deprecated Maven 2.x compatibility layer, which may not be supported in Maven 4.x");
+                    }
+                }
+            }
 
             pluginArtifact = result.getArtifact();
 
