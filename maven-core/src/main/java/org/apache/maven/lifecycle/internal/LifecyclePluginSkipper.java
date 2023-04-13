@@ -24,6 +24,8 @@ import java.util.function.Predicate;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.annotations.Component;
 import org.eclipse.aether.util.ConfigUtils;
 
@@ -35,9 +37,9 @@ import org.eclipse.aether.util.ConfigUtils;
 @Component(role = LifecyclePluginSkipper.class)
 public class LifecyclePluginSkipper {
     private static final String PARSED_FILTER_KEY = LifecyclePluginSkipper.class.getName() + ".filter";
-    private static final String MAVEN_LIFECYCLE_FILTER = "maven.lifecycle.filter";
-    private static final Predicate<MojoExecution> NO_FILTER = t -> true;
-    private static final Predicate<String> TRUE = t -> true;
+    private static final String MAVEN_LIFECYCLE_FILTER_KEY = "maven.lifecycle.filter";
+    private static final Predicate<MojoExecution> NO_FILTER = t -> false;
+    private static final Predicate<String> ANY_STRING = t -> true;
 
     void processMojoExecutions(MavenSession session, List<MojoExecution> executions) {
         Predicate<MojoExecution> filter = getFilter(session);
@@ -56,7 +58,8 @@ public class LifecyclePluginSkipper {
     }
 
     private Predicate<MojoExecution> createFilter(MavenSession mavenSession) {
-        String filterString = ConfigUtils.getString(mavenSession.getRepositorySession(), null, MAVEN_LIFECYCLE_FILTER);
+        String filterString =
+                ConfigUtils.getString(mavenSession.getRepositorySession(), null, MAVEN_LIFECYCLE_FILTER_KEY);
         if (filterString == null) {
             return NO_FILTER;
         }
@@ -74,29 +77,10 @@ public class LifecyclePluginSkipper {
     }
 
     private Predicate<MojoExecution> parseFilterExpression(List<String> pluginGroups, String filterExpression) {
-        // G:A:Goal:ExecId
-        //
-        // G values
-        // "" - default plugins (org.apache org codehaus)
-        // "*" - any
-        // "foo.bar" - exact G match
-        //
-        // A values
-        // "*" - any
-        // "foo-maven-plugin" - exact A match
-        //
-        // Goal values
-        // "*" - any
-        // "foo" - exact match
-        //
-        // ExecId values
-        // "*" - any
-        // "foo" - exact match
-
         Predicate<String> groupIdPredicate;
-        Predicate<String> artifactIdPredicate = TRUE;
-        Predicate<String> goalPredicate = TRUE;
-        Predicate<String> executionIdPredicate = TRUE;
+        Predicate<String> artifactIdPredicate = ANY_STRING;
+        Predicate<String> goalPredicate = ANY_STRING;
+        Predicate<String> executionIdPredicate = ANY_STRING;
 
         String[] elements = filterExpression.split(":");
         if (elements.length == 0 || elements.length > 4) {
@@ -106,7 +90,7 @@ public class LifecyclePluginSkipper {
         if (Objects.equals(groupId, "")) {
             groupIdPredicate = pluginGroups::contains;
         } else if (Objects.equals(groupId, "*")) {
-            groupIdPredicate = TRUE;
+            groupIdPredicate = ANY_STRING;
         } else {
             groupIdPredicate = t -> Objects.equals(groupId, t);
         }
@@ -154,15 +138,11 @@ public class LifecyclePluginSkipper {
 
         @Override
         public boolean test(MojoExecution mojoExecution) {
-            return groupIdPredicate.test(mojoExecution
-                            .getMojoDescriptor()
-                            .getPluginDescriptor()
-                            .getGroupId())
-                    && artifactIdPredicate.test(mojoExecution
-                            .getMojoDescriptor()
-                            .getPluginDescriptor()
-                            .getArtifactId())
-                    && goalPredicate.test(mojoExecution.getMojoDescriptor().getGoal())
+            final MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+            final PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+            return groupIdPredicate.test(pluginDescriptor.getGroupId())
+                    && artifactIdPredicate.test(pluginDescriptor.getArtifactId())
+                    && goalPredicate.test(mojoDescriptor.getGoal())
                     && executionIdPredicate.test(mojoExecution.getExecutionId());
         }
     }
