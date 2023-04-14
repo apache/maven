@@ -66,7 +66,7 @@ Quick Build
 -------
 If you want to bootstrap Maven, you'll need:
 - Java 8+
-- Maven 3.0.5 or later
+- Maven 3.2.5 or later
 - Run Maven, specifying a location into which the completed Maven distro should be installed:
     ```
     mvn -DdistributionTargetDir="$HOME/app/maven/apache-maven-4.0.x-SNAPSHOT" clean package
