@@ -29,28 +29,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
-public class ExtensionTest {
+class ExtensionTest {
 
     @Test
-    public void testHashCodeNullSafe() {
+    void testHashCodeNullSafe() {
         new Extension().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe() {
+    void testEqualsNullSafe() {
         assertFalse(new Extension().equals(null));
 
         new Extension().equals(new Extension());
     }
 
     @Test
-    public void testEqualsIdentity() {
+    void testEqualsIdentity() {
         Extension thing = new Extension();
         assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe() {
+    void testToStringNullSafe() {
         assertNotNull(new Extension().toString());
     }
 }

@@ -34,9 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 /**
  * @author Jason van Zyl
  */
-public class CanonicalProjectBuilderTest extends AbstractMavenProjectTestCase {
+class CanonicalProjectBuilderTest extends AbstractMavenProjectTestCase {
     @Test
-    public void testProjectBuilder() throws Exception {
+    void testProjectBuilder() throws Exception {
         File f = getFileForClasspathResource("canonical-pom.xml");
 
         MavenProject project = getProject(f);

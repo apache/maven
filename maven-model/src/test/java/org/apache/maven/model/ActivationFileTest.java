@@ -29,28 +29,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
-public class ActivationFileTest {
+class ActivationFileTest {
 
     @Test
-    public void testHashCodeNullSafe() {
+    void testHashCodeNullSafe() {
         new ActivationFile().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe() {
+    void testEqualsNullSafe() {
         assertFalse(new ActivationFile().equals(null));
 
         new ActivationFile().equals(new ActivationFile());
     }
 
     @Test
-    public void testEqualsIdentity() {
+    void testEqualsIdentity() {
         ActivationFile thing = new ActivationFile();
         assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe() {
+    void testToStringNullSafe() {
         assertNotNull(new ActivationFile().toString());
     }
 }

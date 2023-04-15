@@ -31,31 +31,31 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Kristian Rosenvold
  */
-public class ProjectDependencyGraphStubTest {
+class ProjectDependencyGraphStubTest {
     ProjectDependencyGraphStub stub = new ProjectDependencyGraphStub();
 
     @Test
-    public void testADependencies() {
+    void testADependencies() {
         final List<MavenProject> mavenProjects = stub.getUpstreamProjects(ProjectDependencyGraphStub.A, false);
         assertEquals(0, mavenProjects.size());
     }
 
     @Test
-    public void testBDependencies() {
+    void testBDependencies() {
         final List<MavenProject> bProjects = stub.getUpstreamProjects(ProjectDependencyGraphStub.B, false);
         assertEquals(1, bProjects.size());
         assertTrue(bProjects.contains(ProjectDependencyGraphStub.A));
     }
 
     @Test
-    public void testCDependencies() {
+    void testCDependencies() {
         final List<MavenProject> cProjects = stub.getUpstreamProjects(ProjectDependencyGraphStub.C, false);
         assertEquals(1, cProjects.size());
         assertTrue(cProjects.contains(ProjectDependencyGraphStub.A));
     }
 
     @Test
-    public void testXDependencies() {
+    void testXDependencies() {
         final List<MavenProject> cProjects = stub.getUpstreamProjects(ProjectDependencyGraphStub.X, false);
         assertEquals(2, cProjects.size());
         assertTrue(cProjects.contains(ProjectDependencyGraphStub.C));

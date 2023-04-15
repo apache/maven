@@ -31,9 +31,9 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MavenLoggerFactoryTest {
+class MavenLoggerFactoryTest {
     @Test
-    public void createsSimpleLogger() {
+    void createsSimpleLogger() {
         MavenLoggerFactory mavenLoggerFactory = new MavenLoggerFactory();
 
         Logger logger = mavenLoggerFactory.getLogger("Test");
@@ -42,7 +42,7 @@ public class MavenLoggerFactoryTest {
     }
 
     @Test
-    public void loggerCachingWorks() {
+    void loggerCachingWorks() {
         MavenLoggerFactory mavenLoggerFactory = new MavenLoggerFactory();
 
         Logger logger = mavenLoggerFactory.getLogger("Test");
@@ -56,7 +56,7 @@ public class MavenLoggerFactoryTest {
     }
 
     @Test
-    public void reportsWhenFailOnSeverityThresholdHasBeenHit() {
+    void reportsWhenFailOnSeverityThresholdHasBeenHit() {
         MavenLoggerFactory mavenLoggerFactory = new MavenLoggerFactory();
         mavenLoggerFactory.setLogLevelRecorder(new LogLevelRecorder("ERROR"));
 
@@ -78,7 +78,7 @@ public class MavenLoggerFactoryTest {
     }
 
     @Test
-    public void failOnSeverityThresholdCanOnlyBeSetOnce() {
+    void failOnSeverityThresholdCanOnlyBeSetOnce() {
         MavenLoggerFactory mavenLoggerFactory = new MavenLoggerFactory();
         mavenLoggerFactory.setLogLevelRecorder(new LogLevelRecorder("WARN"));
         assertThrows(

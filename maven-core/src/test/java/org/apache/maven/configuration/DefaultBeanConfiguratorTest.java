@@ -35,17 +35,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Benjamin Bentmann
  */
-public class DefaultBeanConfiguratorTest {
+class DefaultBeanConfiguratorTest {
 
     private BeanConfigurator configurator;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         configurator = new DefaultBeanConfigurator();
     }
 
     @AfterEach
-    public void tearDown() throws Exception {
+    void tearDown() throws Exception {
         configurator = null;
     }
 
@@ -58,7 +58,7 @@ public class DefaultBeanConfiguratorTest {
     }
 
     @Test
-    public void testMinimal() throws BeanConfigurationException {
+    void testMinimal() throws BeanConfigurationException {
         SomeBean bean = new SomeBean();
 
         Xpp3Dom config = toConfig("<file>test</file>");
@@ -72,7 +72,7 @@ public class DefaultBeanConfiguratorTest {
     }
 
     @Test
-    public void testPreAndPostProcessing() throws BeanConfigurationException {
+    void testPreAndPostProcessing() throws BeanConfigurationException {
         SomeBean bean = new SomeBean();
 
         Xpp3Dom config = toConfig("<file>${test}</file>");
@@ -96,7 +96,7 @@ public class DefaultBeanConfiguratorTest {
     }
 
     @Test
-    public void testChildConfigurationElement() throws BeanConfigurationException {
+    void testChildConfigurationElement() throws BeanConfigurationException {
         SomeBean bean = new SomeBean();
 
         Xpp3Dom config = toConfig("<wrapper><file>test</file></wrapper>");

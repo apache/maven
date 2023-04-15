@@ -37,10 +37,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class SettingsUtilsTest {
+class SettingsUtilsTest {
 
     @Test
-    public void testShouldAppendRecessivePluginGroupIds() {
+    void testShouldAppendRecessivePluginGroupIds() {
         Settings dominant = Settings.newBuilder()
                 .pluginGroups(Arrays.asList("org.apache.maven.plugins", "org.codehaus.modello"))
                 .build();
@@ -61,7 +61,7 @@ public class SettingsUtilsTest {
     }
 
     @Test
-    public void testRoundTripProfiles() {
+    void testRoundTripProfiles() {
         Random entropy = new Random();
         ActivationFile af = ActivationFile.newBuilder()
                 .exists("exists" + Long.toHexString(entropy.nextLong()))

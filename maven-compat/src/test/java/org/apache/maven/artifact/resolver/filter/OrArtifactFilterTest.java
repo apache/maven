@@ -31,14 +31,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
-public class OrArtifactFilterTest {
+class OrArtifactFilterTest {
 
     private ArtifactFilter newSubFilter() {
         return artifact -> false;
     }
 
     @Test
-    public void testEquals() {
+    void testEquals() {
         OrArtifactFilter filter1 = new OrArtifactFilter();
 
         OrArtifactFilter filter2 = new OrArtifactFilter(Arrays.asList(newSubFilter()));

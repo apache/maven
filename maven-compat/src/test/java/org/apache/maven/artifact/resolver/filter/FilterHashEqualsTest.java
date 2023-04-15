@@ -28,10 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Igor Fedorenko
  */
-public class FilterHashEqualsTest {
+class FilterHashEqualsTest {
 
     @Test
-    public void testIncludesExcludesArtifactFilter() {
+    void testIncludesExcludesArtifactFilter() {
         List<String> patterns = Arrays.asList("c", "d", "e");
 
         IncludesArtifactFilter f1 = new IncludesArtifactFilter(patterns);

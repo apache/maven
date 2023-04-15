@@ -30,14 +30,14 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 /**
  * @author Konstantin Perikov
  */
-public class ComplexActivationTest {
+class ComplexActivationTest {
 
     private File getPom(String name) {
         return new File("src/test/resources/poms/factory/" + name + ".xml").getAbsoluteFile();
     }
 
     @Test
-    public void testAndConditionInActivation() throws Exception {
+    void testAndConditionInActivation() throws Exception {
         Properties sysProperties = new Properties();
         sysProperties.setProperty("myproperty", "test");
 

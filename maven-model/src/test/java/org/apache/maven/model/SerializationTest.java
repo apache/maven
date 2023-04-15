@@ -29,10 +29,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class SerializationTest {
+class SerializationTest {
 
     @Test
-    public void testModelSerialization() throws Exception {
+    void testModelSerialization() throws Exception {
         Model model;
         try (InputStream is = getClass().getResourceAsStream("/xml/pom.xml")) {
             model = new MavenXpp3Reader().read(is);

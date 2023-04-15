@@ -31,14 +31,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
-public class AndArtifactFilterTest {
+class AndArtifactFilterTest {
 
     private ArtifactFilter newSubFilter() {
         return artifact -> false;
     }
 
     @Test
-    public void testEquals() {
+    void testEquals() {
         AndArtifactFilter filter1 = new AndArtifactFilter();
 
         AndArtifactFilter filter2 = new AndArtifactFilter(Arrays.asList(newSubFilter()));

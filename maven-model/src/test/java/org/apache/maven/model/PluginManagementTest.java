@@ -29,28 +29,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
-public class PluginManagementTest {
+class PluginManagementTest {
 
     @Test
-    public void testHashCodeNullSafe() {
+    void testHashCodeNullSafe() {
         new PluginManagement().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe() {
+    void testEqualsNullSafe() {
         assertFalse(new PluginManagement().equals(null));
 
         new PluginManagement().equals(new PluginManagement());
     }
 
     @Test
-    public void testEqualsIdentity() {
+    void testEqualsIdentity() {
         PluginManagement thing = new PluginManagement();
         assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe() {
+    void testToStringNullSafe() {
         assertNotNull(new PluginManagement().toString());
     }
 }

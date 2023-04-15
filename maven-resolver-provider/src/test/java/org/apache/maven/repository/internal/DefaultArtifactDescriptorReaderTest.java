@@ -34,10 +34,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-public class DefaultArtifactDescriptorReaderTest extends AbstractRepositoryTestCase {
+class DefaultArtifactDescriptorReaderTest extends AbstractRepositoryTestCase {
 
     @Test
-    public void testMng5459() throws Exception {
+    void testMng5459() throws Exception {
         // prepare
         DefaultArtifactDescriptorReader reader =
                 (DefaultArtifactDescriptorReader) getContainer().lookup(ArtifactDescriptorReader.class);

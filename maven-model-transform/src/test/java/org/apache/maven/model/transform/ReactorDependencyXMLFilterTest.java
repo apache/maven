@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
-public class ReactorDependencyXMLFilterTest extends AbstractXMLFilterTests {
+class ReactorDependencyXMLFilterTest extends AbstractXMLFilterTests {
     private BiFunction<String, String, String> reactorVersionMapper;
 
     @BeforeEach
@@ -41,7 +41,7 @@ public class ReactorDependencyXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void testDefaultDependency() throws Exception {
+    void testDefaultDependency() throws Exception {
         String input = "<dependency>"
                 + "<groupId>GROUPID</groupId>"
                 + "<artifactId>ARTIFACTID</artifactId>"
@@ -55,7 +55,7 @@ public class ReactorDependencyXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void testManagedDependency() throws Exception {
+    void testManagedDependency() throws Exception {
         reactorVersionMapper = (g, a) -> null;
 
         String input =
@@ -68,7 +68,7 @@ public class ReactorDependencyXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void testReactorDependency() throws Exception {
+    void testReactorDependency() throws Exception {
         String input =
                 "<dependency>" + "<groupId>GROUPID</groupId>" + "<artifactId>ARTIFACTID</artifactId>" + "</dependency>";
         String expected = "<dependency>"
@@ -83,7 +83,7 @@ public class ReactorDependencyXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void testReactorDependencyLF() throws Exception {
+    void testReactorDependencyLF() throws Exception {
         String input = "<dependency>\n"
                 + "  <groupId>GROUPID</groupId>\n"
                 + "  <artifactId>ARTIFACTID</artifactId>\n"
@@ -102,7 +102,7 @@ public class ReactorDependencyXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void multipleDependencies() throws Exception {
+    void multipleDependencies() throws Exception {
         String input = "<project>\n" + "  <modelVersion>4.0.0</modelVersion>\n"
                 + "    <groupId>tests.project</groupId>\n"
                 + "    <artifactId>duplicate-plugin-defs-merged</artifactId>\n"

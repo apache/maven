@@ -34,10 +34,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
-public class GlobalSettingsTest {
+class GlobalSettingsTest {
 
     @Test
-    public void testValidGlobalSettings() throws Exception {
+    void testValidGlobalSettings() throws Exception {
         String basedir = System.getProperty("basedir", System.getProperty("user.dir"));
 
         File globalSettingsFile = new File(basedir, "src/assembly/maven/conf/settings.xml");

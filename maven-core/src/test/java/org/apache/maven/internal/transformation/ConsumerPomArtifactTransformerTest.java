@@ -28,9 +28,9 @@ import org.apache.maven.model.building.TransformerContext;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.assertj.XmlAssert;
 
-public class ConsumerPomArtifactTransformerTest {
+class ConsumerPomArtifactTransformerTest {
     @Test
-    public void transform() throws Exception {
+    void transform() throws Exception {
         Path beforePomFile =
                 Paths.get("src/test/resources/projects/transform/before.pom").toAbsolutePath();
         Path afterPomFile =

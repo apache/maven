@@ -30,28 +30,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
-public class MailingListTest {
+class MailingListTest {
 
     @Test
-    public void testHashCodeNullSafe() {
+    void testHashCodeNullSafe() {
         new MailingList().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe() {
+    void testEqualsNullSafe() {
         assertFalse(new MailingList().equals(null));
 
         new MailingList().equals(new MailingList());
     }
 
     @Test
-    public void testEqualsIdentity() {
+    void testEqualsIdentity() {
         MailingList thing = new MailingList();
         assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe() {
+    void testToStringNullSafe() {
         assertNotNull(new MailingList().toString());
     }
 

@@ -36,7 +36,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ProjectDependenciesResolverTest extends AbstractCoreMavenComponentTestCase {
+class ProjectDependenciesResolverTest extends AbstractCoreMavenComponentTestCase {
     @Inject
     private ProjectDependenciesResolver resolver;
 
@@ -70,7 +70,7 @@ public class ProjectDependenciesResolverTest extends AbstractCoreMavenComponentT
     */
 
     @Test
-    public void testSystemScopeDependencies() throws Exception {
+    void testSystemScopeDependencies() throws Exception {
         MavenSession session = createMavenSession(null);
         MavenProject project = session.getCurrentProject();
 
@@ -88,7 +88,7 @@ public class ProjectDependenciesResolverTest extends AbstractCoreMavenComponentT
     }
 
     @Test
-    public void testSystemScopeDependencyIsPresentInTheCompileClasspathElements() throws Exception {
+    void testSystemScopeDependencyIsPresentInTheCompileClasspathElements() throws Exception {
         File pom = getProject("it0063");
 
         Properties eps = new Properties();

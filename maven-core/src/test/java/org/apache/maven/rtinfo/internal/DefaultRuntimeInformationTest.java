@@ -30,19 +30,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @PlexusTest
-public class DefaultRuntimeInformationTest {
+class DefaultRuntimeInformationTest {
     @Inject
     RuntimeInformation rtInfo;
 
     @Test
-    public void testGetMavenVersion() {
+    void testGetMavenVersion() {
         String mavenVersion = rtInfo.getMavenVersion();
         assertNotNull(mavenVersion);
         assertTrue(mavenVersion.length() > 0);
     }
 
     @Test
-    public void testIsMavenVersion() {
+    void testIsMavenVersion() {
         assertTrue(rtInfo.isMavenVersion("2.0"));
         assertFalse(rtInfo.isMavenVersion("9.9"));
 

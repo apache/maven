@@ -46,7 +46,7 @@ import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @PlexusTest
-public class PomConstructionWithSettingsTest {
+class PomConstructionWithSettingsTest {
     private static final String BASE_DIR = "src/test";
 
     private static final String BASE_POM_DIR = BASE_DIR + "/resources-settings";
@@ -60,12 +60,12 @@ public class PomConstructionWithSettingsTest {
     private File testDirectory;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         testDirectory = new File(getBasedir(), BASE_POM_DIR);
     }
 
     @Test
-    public void testSettingsNoPom() throws Exception {
+    void testSettingsNoPom() throws Exception {
         PomTestWrapper pom = buildPom("settings-no-pom");
         assertEquals("local-profile-prop-value", pom.getValue("properties/local-profile-prop"));
     }
@@ -74,7 +74,7 @@ public class PomConstructionWithSettingsTest {
      * MNG-4107
      */
     @Test
-    public void testPomAndSettingsInterpolation() throws Exception {
+    void testPomAndSettingsInterpolation() throws Exception {
         PomTestWrapper pom = buildPom("test-pom-and-settings-interpolation");
         assertEquals("applied", pom.getValue("properties/settingsProfile"));
         assertEquals("applied", pom.getValue("properties/pomProfile"));
@@ -86,7 +86,7 @@ public class PomConstructionWithSettingsTest {
      * MNG-4107
      */
     @Test
-    public void testRepositories() throws Exception {
+    void testRepositories() throws Exception {
         PomTestWrapper pom = buildPom("repositories");
         assertEquals("maven-core-it-0", pom.getValue("repositories[1]/id"));
     }

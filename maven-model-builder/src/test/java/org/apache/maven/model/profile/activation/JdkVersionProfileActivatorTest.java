@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Benjamin Bentmann
  */
-public class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest<JdkVersionProfileActivator> {
+class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest<JdkVersionProfileActivator> {
 
     @Override
     @BeforeEach
@@ -53,7 +53,7 @@ public class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest
     }
 
     @Test
-    public void testNullSafe() throws Exception {
+    void testNullSafe() throws Exception {
         Profile p = Profile.newInstance();
 
         assertActivation(false, p, newContext(null, null));
@@ -64,7 +64,7 @@ public class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest
     }
 
     @Test
-    public void testPrefix() throws Exception {
+    void testPrefix() throws Exception {
         Profile profile = newProfile("1.4");
 
         assertActivation(true, profile, newContext(null, newProperties("1.4")));
@@ -78,7 +78,7 @@ public class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest
     }
 
     @Test
-    public void testPrefixNegated() throws Exception {
+    void testPrefixNegated() throws Exception {
         Profile profile = newProfile("!1.4");
 
         assertActivation(false, profile, newContext(null, newProperties("1.4")));
@@ -92,7 +92,7 @@ public class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest
     }
 
     @Test
-    public void testVersionRangeInclusiveBounds() throws Exception {
+    void testVersionRangeInclusiveBounds() throws Exception {
         Profile profile = newProfile("[1.5,1.6]");
 
         assertActivation(false, profile, newContext(null, newProperties("1.4")));
@@ -113,7 +113,7 @@ public class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest
     }
 
     @Test
-    public void testVersionRangeExclusiveBounds() throws Exception {
+    void testVersionRangeExclusiveBounds() throws Exception {
         Profile profile = newProfile("(1.3,1.6)");
 
         assertActivation(false, profile, newContext(null, newProperties("1.3")));
@@ -135,7 +135,7 @@ public class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest
     }
 
     @Test
-    public void testVersionRangeInclusiveLowerBound() throws Exception {
+    void testVersionRangeInclusiveLowerBound() throws Exception {
         Profile profile = newProfile("[1.5,)");
 
         assertActivation(false, profile, newContext(null, newProperties("1.4")));
@@ -156,7 +156,7 @@ public class JdkVersionProfileActivatorTest extends AbstractProfileActivatorTest
     }
 
     @Test
-    public void testVersionRangeExclusiveUpperBound() throws Exception {
+    void testVersionRangeExclusiveUpperBound() throws Exception {
         Profile profile = newProfile("(,1.6)");
 
         assertActivation(true, profile, newContext(null, newProperties("1.5")));

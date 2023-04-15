@@ -25,10 +25,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SuppressWarnings("deprecation")
-public class DefaultPathTranslatorTest {
+class DefaultPathTranslatorTest {
 
     @Test
-    public void testAlignToBasedirWhereBasedirExpressionIsTheCompleteValue() {
+    void testAlignToBasedirWhereBasedirExpressionIsTheCompleteValue() {
         File basedir = new File(System.getProperty("java.io.tmpdir"), "test").getAbsoluteFile();
 
         String aligned = new DefaultPathTranslator().alignToBaseDirectory("${basedir}", basedir);
@@ -37,7 +37,7 @@ public class DefaultPathTranslatorTest {
     }
 
     @Test
-    public void testAlignToBasedirWhereBasedirExpressionIsTheValuePrefix() {
+    void testAlignToBasedirWhereBasedirExpressionIsTheValuePrefix() {
         File basedir = new File(System.getProperty("java.io.tmpdir"), "test").getAbsoluteFile();
 
         String aligned = new DefaultPathTranslator().alignToBaseDirectory("${basedir}/dir", basedir);
@@ -46,7 +46,7 @@ public class DefaultPathTranslatorTest {
     }
 
     @Test
-    public void testUnalignToBasedirWherePathEqualsBasedir() {
+    void testUnalignToBasedirWherePathEqualsBasedir() {
         File basedir = new File(System.getProperty("java.io.tmpdir"), "test").getAbsoluteFile();
 
         String unaligned = new DefaultPathTranslator().unalignFromBaseDirectory(basedir.getAbsolutePath(), basedir);

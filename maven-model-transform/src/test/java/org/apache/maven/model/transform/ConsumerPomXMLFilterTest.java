@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
-public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests {
+class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests {
     @Override
     protected XmlPullParser getFilter(XmlPullParser orgParser) {
         final BuildToRawPomXMLFilterFactory buildPomXMLFilterFactory = new BuildToRawPomXMLFilterFactory(true) {
@@ -65,7 +65,7 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void aggregatorWithParent() throws Exception {
+    void aggregatorWithParent() throws Exception {
         String input = "<project>\n"
                 + "  <parent>\n"
                 + "    <groupId>GROUPID</groupId>\n"
@@ -92,7 +92,7 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void aggregatorWithCliFriendlyVersion() throws Exception {
+    void aggregatorWithCliFriendlyVersion() throws Exception {
         String input = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n"
                 + "       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
@@ -139,7 +139,7 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void licenseHeader() throws Exception {
+    void licenseHeader() throws Exception {
         String input = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "\n"
                 + "<!--\n"
                 + "Licensed to the Apache Software Foundation (ASF) under one\n"
@@ -213,7 +213,7 @@ public class ConsumerPomXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void lexicalHandler() throws Exception {
+    void lexicalHandler() throws Exception {
         String input = "<project><!--before--><modules>"
                 + "<!--pre-in-->"
                 + "<module><!--in-->ab</module>"

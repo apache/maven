@@ -30,12 +30,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 /**
  * @author Kristian Rosenvold
  */
-public class DefaultLegacySupportTest {
+class DefaultLegacySupportTest {
     final CountDownLatch latch = new CountDownLatch(1);
     final DefaultLegacySupport defaultLegacySupport = new DefaultLegacySupport();
 
     @Test
-    public void testSetSession() throws Exception {
+    void testSetSession() throws Exception {
 
         MavenExecutionRequest mavenExecutionRequest = new DefaultMavenExecutionRequest();
         MavenSession m1 = new MavenSession(null, null, mavenExecutionRequest, null);

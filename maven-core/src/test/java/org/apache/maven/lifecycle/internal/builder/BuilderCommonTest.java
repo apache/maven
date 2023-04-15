@@ -37,11 +37,11 @@ import static org.mockito.Mockito.verify;
 /**
  * @author Kristian Rosenvold
  */
-public class BuilderCommonTest {
+class BuilderCommonTest {
     private Logger logger = mock(Logger.class);
 
     @Test
-    public void testResolveBuildPlan() throws Exception {
+    void testResolveBuildPlan() throws Exception {
         MavenSession original = ProjectDependencyGraphStub.getMavenSession();
 
         final TaskSegment taskSegment1 = new TaskSegment(false);
@@ -56,7 +56,7 @@ public class BuilderCommonTest {
     }
 
     @Test
-    public void testDefaultBindingPluginsWarning() throws Exception {
+    void testDefaultBindingPluginsWarning() throws Exception {
         MavenSession original = ProjectDependencyGraphStub.getMavenSession();
 
         final TaskSegment taskSegment1 = new TaskSegment(false);
@@ -80,13 +80,13 @@ public class BuilderCommonTest {
     }
 
     @Test
-    public void testHandleBuildError() throws Exception {}
+    void testHandleBuildError() throws Exception {}
 
     @Test
-    public void testAttachToThread() throws Exception {}
+    void testAttachToThread() throws Exception {}
 
     @Test
-    public void testGetKey() throws Exception {}
+    void testGetKey() throws Exception {}
 
     public BuilderCommon getBuilderCommon(Logger logger) {
         final LifecycleDebugLogger debugLogger = new LifecycleDebugLogger();

@@ -37,16 +37,16 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 /**
  * @author Igor Fedorenko
  */
-public class DefaultMavenMetadataCacheTest {
+class DefaultMavenMetadataCacheTest {
     private RepositorySystem repositorySystem;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         repositorySystem = new TestRepositorySystem();
     }
 
     @Test
-    public void testCacheKey() throws Exception {
+    void testCacheKey() throws Exception {
         Artifact a1 = repositorySystem.createArtifact("testGroup", "testArtifact", "1.2.3", "jar");
         @SuppressWarnings("deprecation")
         ArtifactRepository lr1 = new DelegatingLocalArtifactRepository(repositorySystem.createDefaultLocalRepository());

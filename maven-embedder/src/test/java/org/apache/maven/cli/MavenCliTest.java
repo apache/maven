@@ -65,19 +65,19 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
-public class MavenCliTest {
+class MavenCliTest {
     private MavenCli cli;
 
     private String origBasedir;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         cli = new MavenCli();
         origBasedir = System.getProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
     }
 
     @AfterEach
-    public void tearDown() throws Exception {
+    void tearDown() throws Exception {
         if (origBasedir != null) {
             System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, origBasedir);
         } else {
@@ -86,7 +86,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void testPerformProfileActivation() throws ParseException {
+    void testPerformProfileActivation() throws ParseException {
         final CommandLineParser parser = new DefaultParser();
 
         final Options options = new Options();
@@ -114,7 +114,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void testDetermineProjectActivation() throws ParseException {
+    void testDetermineProjectActivation() throws ParseException {
         final CommandLineParser parser = new DefaultParser();
 
         final Options options = new Options();
@@ -141,7 +141,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void testCalculateDegreeOfConcurrency() {
+    void testCalculateDegreeOfConcurrency() {
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("0"));
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("-1"));
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("0x4"));
@@ -163,7 +163,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void testMavenConfig() throws Exception {
+    void testMavenConfig() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY, new File("src/test/projects/config").getCanonicalPath());
         CliRequest request = new CliRequest(new String[0], null);
@@ -181,7 +181,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void testMavenConfigInvalid() throws Exception {
+    void testMavenConfigInvalid() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
                 new File("src/test/projects/config-illegal").getCanonicalPath());
@@ -205,7 +205,7 @@ public class MavenCliTest {
      * @throws Exception in case of failure.
      */
     @Test
-    public void testMVNConfigurationThreadCanBeOverwrittenViaCommandLine() throws Exception {
+    void testMVNConfigurationThreadCanBeOverwrittenViaCommandLine() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
                 new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
@@ -232,7 +232,7 @@ public class MavenCliTest {
      * @throws Exception
      */
     @Test
-    public void testMVNConfigurationDefinedPropertiesCanBeOverwrittenViaCommandLine() throws Exception {
+    void testMVNConfigurationDefinedPropertiesCanBeOverwrittenViaCommandLine() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
                 new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
@@ -261,7 +261,7 @@ public class MavenCliTest {
      * @throws Exception
      */
     @Test
-    public void testMVNConfigurationCLIRepeatedPropertiesLastWins() throws Exception {
+    void testMVNConfigurationCLIRepeatedPropertiesLastWins() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
                 new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
@@ -290,7 +290,7 @@ public class MavenCliTest {
      * @throws Exception
      */
     @Test
-    public void testMVNConfigurationFunkyArguments() throws Exception {
+    void testMVNConfigurationFunkyArguments() throws Exception {
         System.setProperty(
                 MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
                 new File("src/test/projects/mavenConfigProperties").getCanonicalPath());
@@ -318,7 +318,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void testStyleColors() throws Exception {
+    void testStyleColors() throws Exception {
         assumeTrue(MessageUtils.isColorEnabled(), "ANSI not supported");
         CliRequest request;
 
@@ -373,7 +373,7 @@ public class MavenCliTest {
      * Verifies MNG-6558
      */
     @Test
-    public void testToolchainsBuildingEvents() throws Exception {
+    void testToolchainsBuildingEvents() throws Exception {
         final EventSpyDispatcher eventSpyDispatcherMock = mock(EventSpyDispatcher.class);
         MavenCli customizedMavenCli = new MavenCli() {
             @Override
@@ -404,7 +404,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void resumeFromSelectorIsSuggestedWithoutGroupId() {
+    void resumeFromSelectorIsSuggestedWithoutGroupId() {
         List<MavenProject> allProjects =
                 asList(createMavenProject("group", "module-a"), createMavenProject("group", "module-b"));
         MavenProject failedProject = allProjects.get(0);
@@ -415,7 +415,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void resumeFromSelectorContainsGroupIdWhenArtifactIdIsNotUnique() {
+    void resumeFromSelectorContainsGroupIdWhenArtifactIdIsNotUnique() {
         List<MavenProject> allProjects =
                 asList(createMavenProject("group-a", "module"), createMavenProject("group-b", "module"));
         MavenProject failedProject = allProjects.get(0);
@@ -426,7 +426,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void verifyLocalRepositoryPath() {
+    void verifyLocalRepositoryPath() {
         MavenCli cli = new MavenCli();
         CliRequest request = new CliRequest(new String[] {}, null);
         request.commandLine = new CommandLine.Builder().build();
@@ -454,7 +454,7 @@ public class MavenCliTest {
      * @throws Exception cli invocation.
      */
     @Test
-    public void testVersionStringWithoutAnsi() throws Exception {
+    void testVersionStringWithoutAnsi() throws Exception {
         // given
         // - request with version and batch mode
         CliRequest cliRequest = new CliRequest(new String[] {"--version", "--batch-mode"}, null);
@@ -478,7 +478,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void populatePropertiesCanContainEqualsSign() throws Exception {
+    void populatePropertiesCanContainEqualsSign() throws Exception {
         // Arrange
         CliRequest request = new CliRequest(new String[] {"-Dw=x=y", "validate"}, null);
 
@@ -491,7 +491,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void populatePropertiesSpace() throws Exception {
+    void populatePropertiesSpace() throws Exception {
         // Arrange
         CliRequest request = new CliRequest(new String[] {"-D", "z=2", "validate"}, null);
 
@@ -504,7 +504,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void populatePropertiesShorthand() throws Exception {
+    void populatePropertiesShorthand() throws Exception {
         // Arrange
         CliRequest request = new CliRequest(new String[] {"-Dx", "validate"}, null);
 
@@ -517,7 +517,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void populatePropertiesMultiple() throws Exception {
+    void populatePropertiesMultiple() throws Exception {
         // Arrange
         CliRequest request = new CliRequest(new String[] {"-Dx=1", "-Dy", "validate"}, null);
 
@@ -531,7 +531,7 @@ public class MavenCliTest {
     }
 
     @Test
-    public void populatePropertiesOverwrite() throws Exception {
+    void populatePropertiesOverwrite() throws Exception {
         // Arrange
         CliRequest request = new CliRequest(new String[] {"-Dx", "-Dx=false", "validate"}, null);
 

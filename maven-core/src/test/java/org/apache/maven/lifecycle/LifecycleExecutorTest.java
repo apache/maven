@@ -56,7 +56,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
+class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     @Inject
     private DefaultLifecycleExecutor lifecycleExecutor;
 
@@ -78,7 +78,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     // -----------------------------------------------------------------------------------------------
 
     @Test
-    public void testCalculationOfBuildPlanWithIndividualTaskWherePluginIsSpecifiedInThePom() throws Exception {
+    void testCalculationOfBuildPlanWithIndividualTaskWherePluginIsSpecifiedInThePom() throws Exception {
         // We are doing something like "mvn resources:resources" where no version is specified but this
         // project we are working on has the version specified in the POM so the version should come from there.
         File pom = getProject("project-basic");
@@ -100,7 +100,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanLifecycle() throws Exception {
+    void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanLifecycle() throws Exception {
         // We are doing something like "mvn clean:clean" where no version is specified but this
         // project we are working on has the version specified in the POM so the version should come from there.
         File pom = getProject("project-basic");
@@ -122,7 +122,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanCleanGoal() throws Exception {
+    void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanCleanGoal() throws Exception {
         // We are doing something like "mvn clean:clean" where no version is specified but this
         // project we are working on has the version specified in the POM so the version should come from there.
         File pom = getProject("project-basic");
@@ -258,7 +258,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testLifecycleQueryingUsingADefaultLifecyclePhase() throws Exception {
+    void testLifecycleQueryingUsingADefaultLifecyclePhase() throws Exception {
         File pom = getProject("project-with-additional-lifecycle-elements");
         MavenSession session = createMavenSession(pom);
         assertEquals(
@@ -297,14 +297,14 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testLifecyclePluginsRetrievalForDefaultLifecycle() throws Exception {
+    void testLifecyclePluginsRetrievalForDefaultLifecycle() throws Exception {
         List<Plugin> plugins = new ArrayList<>(lifecycleExecutor.getPluginsBoundByDefaultToAllLifecycles("jar"));
 
         assertThat(plugins.toString(), plugins, hasSize(9));
     }
 
     @Test
-    public void testPluginConfigurationCreation() throws Exception {
+    void testPluginConfigurationCreation() throws Exception {
         File pom = getProject("project-with-additional-lifecycle-elements");
         MavenSession session = createMavenSession(pom);
         MojoDescriptor mojoDescriptor = mojoDescriptorCreator.getMojoDescriptor(
@@ -328,7 +328,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testInvalidGoalName() throws Exception {
+    void testInvalidGoalName() throws Exception {
         File pom = getProject("project-basic");
         MavenSession session = createMavenSession(pom);
         MojoNotFoundException e = assertThrows(
@@ -346,7 +346,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testPluginPrefixRetrieval() throws Exception {
+    void testPluginPrefixRetrieval() throws Exception {
         File pom = getProject("project-basic");
         MavenSession session = createMavenSession(pom);
         Plugin plugin = mojoDescriptorCreator.findPluginForPrefix("resources", session);
@@ -357,7 +357,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     // Prefixes
 
     @Test
-    public void testFindingPluginPrefixForCleanClean() throws Exception {
+    void testFindingPluginPrefixForCleanClean() throws Exception {
         File pom = getProject("project-basic");
         MavenSession session = createMavenSession(pom);
         Plugin plugin = mojoDescriptorCreator.findPluginForPrefix("clean", session);
@@ -365,7 +365,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testSetupMojoExecution() throws Exception {
+    void testSetupMojoExecution() throws Exception {
         File pom = getProject("mojo-configuration");
 
         MavenSession session = createMavenSession(pom);
@@ -385,7 +385,7 @@ public class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testExecutionListeners() throws Exception {
+    void testExecutionListeners() throws Exception {
         final File pom = getProject("project-basic");
         final MavenSession session = createMavenSession(pom);
         session.setProjectDependencyGraph(new ProjectDependencyGraph() {

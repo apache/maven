@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @see NewestConflictResolver
  */
-public class NewestConflictResolverTest extends AbstractConflictResolverTest {
+class NewestConflictResolverTest extends AbstractConflictResolverTest {
     // constructors -----------------------------------------------------------
 
     public NewestConflictResolverTest() throws Exception {
@@ -44,7 +44,7 @@ public class NewestConflictResolverTest extends AbstractConflictResolverTest {
      * </pre>
      */
     @Test
-    public void testDepth() {
+    void testDepth() {
         ResolutionNode a1n = createResolutionNode(a1);
         ResolutionNode b1n = createResolutionNode(b1);
         ResolutionNode a2n = createResolutionNode(a2, b1n);
@@ -60,7 +60,7 @@ public class NewestConflictResolverTest extends AbstractConflictResolverTest {
      * </pre>
      */
     @Test
-    public void testDepthReversed() {
+    void testDepthReversed() {
         ResolutionNode b1n = createResolutionNode(b1);
         ResolutionNode a2n = createResolutionNode(a2, b1n);
         ResolutionNode a1n = createResolutionNode(a1);
@@ -76,7 +76,7 @@ public class NewestConflictResolverTest extends AbstractConflictResolverTest {
      * </pre>
      */
     @Test
-    public void testEqual() {
+    void testEqual() {
         ResolutionNode a1n = createResolutionNode(a1);
         ResolutionNode a2n = createResolutionNode(a2);
 
@@ -91,7 +91,7 @@ public class NewestConflictResolverTest extends AbstractConflictResolverTest {
      * </pre>
      */
     @Test
-    public void testEqualReversed() {
+    void testEqualReversed() {
         ResolutionNode a2n = createResolutionNode(a2);
         ResolutionNode a1n = createResolutionNode(a1);
 

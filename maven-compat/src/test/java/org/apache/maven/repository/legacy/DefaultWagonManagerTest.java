@@ -60,7 +60,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
  */
 @PlexusTest
-public class DefaultWagonManagerTest {
+class DefaultWagonManagerTest {
     @Inject
     private WagonManager wagonManager;
 
@@ -73,7 +73,7 @@ public class DefaultWagonManagerTest {
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     @Test
-    public void testUnnecessaryRepositoryLookup() throws Exception {
+    void testUnnecessaryRepositoryLookup() throws Exception {
         Artifact artifact = createTestPomArtifact("target/test-data/get-missing-pom");
 
         List<ArtifactRepository> repos = new ArrayList<>();
@@ -105,7 +105,7 @@ public class DefaultWagonManagerTest {
     }
 
     @Test
-    public void testGetMissingJar() throws TransferFailedException, UnsupportedProtocolException, IOException {
+    void testGetMissingJar() throws TransferFailedException, UnsupportedProtocolException, IOException {
         Artifact artifact = createTestArtifact("target/test-data/get-missing-jar", "jar");
 
         ArtifactRepository repo = createStringRepo();
@@ -116,7 +116,7 @@ public class DefaultWagonManagerTest {
     }
 
     @Test
-    public void testGetMissingJarForced() throws TransferFailedException, UnsupportedProtocolException, IOException {
+    void testGetMissingJarForced() throws TransferFailedException, UnsupportedProtocolException, IOException {
         Artifact artifact = createTestArtifact("target/test-data/get-missing-jar", "jar");
 
         ArtifactRepository repo = createStringRepo();
@@ -127,7 +127,7 @@ public class DefaultWagonManagerTest {
     }
 
     @Test
-    public void testGetRemoteJar()
+    void testGetRemoteJar()
             throws TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException, IOException {
         Artifact artifact = createTestArtifact("target/test-data/get-remote-jar", "jar");
 
@@ -198,7 +198,7 @@ public class DefaultWagonManagerTest {
     }
 
     @Test
-    public void testDefaultWagonManager() throws Exception {
+    void testDefaultWagonManager() throws Exception {
         assertWagon("a");
 
         assertWagon("b");
@@ -214,7 +214,7 @@ public class DefaultWagonManagerTest {
      * Check that transfer listeners are properly removed after getArtifact and putArtifact
      */
     @Test
-    public void testWagonTransferListenerRemovedAfterGetArtifactAndPutArtifact() throws Exception {
+    void testWagonTransferListenerRemovedAfterGetArtifactAndPutArtifact() throws Exception {
         Artifact artifact = createTestArtifact("target/test-data/transfer-listener", "jar");
         ArtifactRepository repo = createStringRepo();
         StringWagon wagon = (StringWagon) wagonManager.getWagon("string");
@@ -248,7 +248,7 @@ public class DefaultWagonManagerTest {
      */
     @Disabled
     @Test
-    public void testChecksumVerification() throws Exception {
+    void testChecksumVerification() throws Exception {
         ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy(
                 true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL);
 
@@ -305,7 +305,7 @@ public class DefaultWagonManagerTest {
     }
 
     @Test
-    public void testPerLookupInstantiation() throws Exception {
+    void testPerLookupInstantiation() throws Exception {
         String protocol = "perlookup";
 
         Wagon one = wagonManager.getWagon(protocol);

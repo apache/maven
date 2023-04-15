@@ -37,9 +37,9 @@ import static org.mockito.Mockito.when;
 /**
  * UT for {@link ReverseTreeRepositoryListener}.
  */
-public class ReverseTreeRepositoryListenerTest {
+class ReverseTreeRepositoryListenerTest {
     @Test
-    public void isLocalRepositoryArtifactTest() {
+    void isLocalRepositoryArtifactTest() {
         File baseDir = new File("local/repository");
         LocalRepository localRepository = new LocalRepository(baseDir);
         RepositorySystemSession session = mock(RepositorySystemSession.class);
@@ -60,7 +60,7 @@ public class ReverseTreeRepositoryListenerTest {
     }
 
     @Test
-    public void isMissingArtifactTest() {
+    void isMissingArtifactTest() {
         File baseDir = new File("local/repository");
         LocalRepository localRepository = new LocalRepository(baseDir);
         RepositorySystemSession session = mock(RepositorySystemSession.class);
@@ -75,7 +75,7 @@ public class ReverseTreeRepositoryListenerTest {
     }
 
     @Test
-    public void lookupCollectStepDataTest() {
+    void lookupCollectStepDataTest() {
         RequestTrace doesNotHaveIt =
                 RequestTrace.newChild(null, "foo").newChild("bar").newChild("baz");
         assertThat(ReverseTreeRepositoryListener.lookupCollectStepData(doesNotHaveIt), nullValue());

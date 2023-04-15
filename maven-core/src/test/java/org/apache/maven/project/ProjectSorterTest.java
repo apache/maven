@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-public class ProjectSorterTest {
+class ProjectSorterTest {
     private Parent createParent(MavenProject project) {
         return createParent(project.getGroupId(), project.getArtifactId(), project.getVersion());
     }
@@ -96,7 +96,7 @@ public class ProjectSorterTest {
     }
 
     @Test
-    public void testShouldNotFailWhenPluginDepReferencesCurrentProject() throws Exception {
+    void testShouldNotFailWhenPluginDepReferencesCurrentProject() throws Exception {
         MavenProject project = createProject("group", "artifact", "1.0");
 
         Build build = project.getModel().getBuild();
@@ -113,7 +113,7 @@ public class ProjectSorterTest {
     }
 
     @Test
-    public void testShouldNotFailWhenManagedPluginDepReferencesCurrentProject() throws Exception {
+    void testShouldNotFailWhenManagedPluginDepReferencesCurrentProject() throws Exception {
         MavenProject project = createProject("group", "artifact", "1.0");
 
         Build build = project.getModel().getBuild();
@@ -134,7 +134,7 @@ public class ProjectSorterTest {
     }
 
     @Test
-    public void testShouldNotFailWhenProjectReferencesNonExistentProject() throws Exception {
+    void testShouldNotFailWhenProjectReferencesNonExistentProject() throws Exception {
         MavenProject project = createProject("group", "artifact", "1.0");
 
         Build build = project.getModel().getBuild();
@@ -147,7 +147,7 @@ public class ProjectSorterTest {
     }
 
     @Test
-    public void testMatchingArtifactIdsDifferentGroupIds() throws Exception {
+    void testMatchingArtifactIdsDifferentGroupIds() throws Exception {
         List<MavenProject> projects = new ArrayList<>();
         MavenProject project1 = createProject("groupId1", "artifactId", "1.0");
         projects.add(project1);
@@ -162,7 +162,7 @@ public class ProjectSorterTest {
     }
 
     @Test
-    public void testMatchingGroupIdsDifferentArtifactIds() throws Exception {
+    void testMatchingGroupIdsDifferentArtifactIds() throws Exception {
         List<MavenProject> projects = new ArrayList<>();
         MavenProject project1 = createProject("groupId", "artifactId1", "1.0");
         projects.add(project1);
@@ -177,7 +177,7 @@ public class ProjectSorterTest {
     }
 
     @Test
-    public void testMatchingIdsAndVersions() throws Exception {
+    void testMatchingIdsAndVersions() throws Exception {
         List<MavenProject> projects = new ArrayList<>();
         MavenProject project1 = createProject("groupId", "artifactId", "1.0");
         projects.add(project1);
@@ -191,7 +191,7 @@ public class ProjectSorterTest {
     }
 
     @Test
-    public void testMatchingIdsAndDifferentVersions() throws Exception {
+    void testMatchingIdsAndDifferentVersions() throws Exception {
         List<MavenProject> projects = new ArrayList<>();
         MavenProject project1 = createProject("groupId", "artifactId", "1.0");
         projects.add(project1);
@@ -204,7 +204,7 @@ public class ProjectSorterTest {
     }
 
     @Test
-    public void testPluginDependenciesInfluenceSorting() throws Exception {
+    void testPluginDependenciesInfluenceSorting() throws Exception {
         List<MavenProject> projects = new ArrayList<>();
 
         MavenProject parentProject = createProject("groupId", "parent", "1.0");
@@ -248,7 +248,7 @@ public class ProjectSorterTest {
     }
 
     @Test
-    public void testPluginDependenciesInfluenceSorting_DeclarationInParent() throws Exception {
+    void testPluginDependenciesInfluenceSorting_DeclarationInParent() throws Exception {
         List<MavenProject> projects = new ArrayList<>();
 
         MavenProject parentProject = createProject("groupId", "parent-declarer", "1.0");
@@ -282,7 +282,7 @@ public class ProjectSorterTest {
     }
 
     @Test
-    public void testPluginVersionsAreConsidered() throws Exception {
+    void testPluginVersionsAreConsidered() throws Exception {
         List<MavenProject> projects = new ArrayList<>();
 
         MavenProject pluginProjectA = createProject("group", "plugin-a", "2.0-SNAPSHOT");
@@ -300,7 +300,7 @@ public class ProjectSorterTest {
     }
 
     @Test
-    public void testDependencyPrecedesProjectThatUsesSpecificDependencyVersion() throws Exception {
+    void testDependencyPrecedesProjectThatUsesSpecificDependencyVersion() throws Exception {
         List<MavenProject> projects = new ArrayList<>();
 
         MavenProject usingProject = createProject("group", "project", "1.0");
@@ -317,7 +317,7 @@ public class ProjectSorterTest {
     }
 
     @Test
-    public void testDependencyPrecedesProjectThatUsesUnresolvedDependencyVersion() throws Exception {
+    void testDependencyPrecedesProjectThatUsesUnresolvedDependencyVersion() throws Exception {
         List<MavenProject> projects = new ArrayList<>();
 
         MavenProject usingProject = createProject("group", "project", "1.0");

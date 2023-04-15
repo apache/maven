@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  *
  */
 @PlexusTest
-public class DefaultClasspathTransformationTest {
+class DefaultClasspathTransformationTest {
     @Inject
     ClasspathTransformation transform;
 
@@ -44,9 +44,10 @@ public class DefaultClasspathTransformationTest {
     MetadataGraphVertex v2;
     MetadataGraphVertex v3;
     MetadataGraphVertex v4;
+
     // ------------------------------------------------------------------------------------------
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         graph = new MetadataGraph(4, 3);
         /*
          *       v2
@@ -72,9 +73,10 @@ public class DefaultClasspathTransformationTest {
         graph.addEdge(v3, v4, new MetadataGraphEdge("1.1", true, ArtifactScopeEnum.runtime, null, 2, 2));
         graph.addEdge(v3, v4, new MetadataGraphEdge("1.2", true, ArtifactScopeEnum.test, null, 2, 2));
     }
+
     // ------------------------------------------------------------------------------------------
     @Test
-    public void testCompileClasspathTransform() throws Exception {
+    void testCompileClasspathTransform() throws Exception {
         ClasspathContainer res;
 
         res = transform.transform(graph, ArtifactScopeEnum.compile, false);
@@ -83,9 +85,10 @@ public class DefaultClasspathTransformationTest {
         assertNotNull(res.getClasspath(), "null classpath after compile transform");
         assertEquals(3, res.getClasspath().size(), "compile classpath should have 3 entries");
     }
+
     // ------------------------------------------------------------------------------------------
     @Test
-    public void testRuntimeClasspathTransform() throws Exception {
+    void testRuntimeClasspathTransform() throws Exception {
         ClasspathContainer res;
 
         res = transform.transform(graph, ArtifactScopeEnum.runtime, false);
@@ -97,9 +100,10 @@ public class DefaultClasspathTransformationTest {
         ArtifactMetadata md = res.getClasspath().get(3);
         assertEquals("1.1", md.getVersion(), "runtime artifact version should be 1.1");
     }
+
     // ------------------------------------------------------------------------------------------
     @Test
-    public void testTestClasspathTransform() throws Exception {
+    void testTestClasspathTransform() throws Exception {
         ClasspathContainer res;
 
         res = transform.transform(graph, ArtifactScopeEnum.test, false);

@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Jason van Zyl
  */
-public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
+class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
     // p4 inherits from p3
@@ -51,7 +51,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    public void testProjectInheritance() throws Exception {
+    void testProjectInheritance() throws Exception {
         MavenProject p4 = getProject(projectFile("p4"));
 
         assertEquals("p4", p4.getName());

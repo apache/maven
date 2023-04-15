@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @PlexusTest
-public class MavenMetadataSourceTest {
+class MavenMetadataSourceTest {
     @Inject
     private RepositorySystem repositorySystem;
 
@@ -36,7 +36,7 @@ public class MavenMetadataSourceTest {
 
     @Test
     @Disabled
-    public void testShouldNotCarryExclusionsOverFromDependencyToDependency() throws Exception {
+    void testShouldNotCarryExclusionsOverFromDependencyToDependency() throws Exception {
         /*
         Dependency dep1 = new Dependency();
         dep1.setGroupId( "test" );
@@ -84,7 +84,7 @@ public class MavenMetadataSourceTest {
 
     @Test
     @Disabled("TODO restore these if it makes sense")
-    public void testShouldUseCompileScopeIfDependencyScopeEmpty() throws Exception {
+    void testShouldUseCompileScopeIfDependencyScopeEmpty() throws Exception {
         /*
         String groupId = "org.apache.maven";
         String artifactId = "maven-model";
@@ -122,7 +122,7 @@ public class MavenMetadataSourceTest {
 
     @Test
     @Disabled
-    public void testShouldUseInjectedTestScopeFromDependencyManagement() throws Exception {
+    void testShouldUseInjectedTestScopeFromDependencyManagement() throws Exception {
         /*
         String groupId = "org.apache.maven";
         String artifactId = "maven-model";

@@ -39,19 +39,19 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @author Benjamin Bentmann
  */
 @PlexusTest
-public class LegacyRepositorySystemTest {
+class LegacyRepositorySystemTest {
     @Inject
     private RepositorySystem repositorySystem;
 
     @Test
-    public void testThatLocalRepositoryWithSpacesIsProperlyHandled() throws Exception {
+    void testThatLocalRepositoryWithSpacesIsProperlyHandled() throws Exception {
         File basedir = new File("target/spacy path").getAbsoluteFile();
         ArtifactRepository repo = repositorySystem.createLocalRepository(basedir);
         assertEquals(basedir, new File(repo.getBasedir()));
     }
 
     @Test
-    public void testAuthenticationHandling() {
+    void testAuthenticationHandling() {
         Server server = new Server();
         server.setId("repository");
         server.setUsername("jason");

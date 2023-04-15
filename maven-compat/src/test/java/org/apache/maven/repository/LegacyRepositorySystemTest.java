@@ -55,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Benjamin Bentmann
  */
 @PlexusTest
-public class LegacyRepositorySystemTest {
+class LegacyRepositorySystemTest {
     @Inject
     private RepositorySystem repositorySystem;
 
@@ -89,7 +89,7 @@ public class LegacyRepositorySystemTest {
     }
 
     @Test
-    public void testThatASystemScopedDependencyIsNotResolvedFromRepositories() throws Exception {
+    void testThatASystemScopedDependencyIsNotResolvedFromRepositories() throws Exception {
         //
         // We should get a whole slew of dependencies resolving this artifact transitively
         //
@@ -170,7 +170,7 @@ public class LegacyRepositorySystemTest {
     }
 
     @Test
-    public void testLocalRepositoryBasedir() throws Exception {
+    void testLocalRepositoryBasedir() throws Exception {
         File localRepoDir = new File("").getAbsoluteFile();
 
         ArtifactRepository localRepo = repositorySystem.createLocalRepository(localRepoDir);

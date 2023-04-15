@@ -32,10 +32,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PropertiesAsMapTest {
+class PropertiesAsMapTest {
 
     @Test
-    public void testPropertiesAsMap() {
+    void testPropertiesAsMap() {
         Properties props = new Properties();
         props.setProperty("foo1", "bar1");
         props.setProperty("foo2", "bar2");

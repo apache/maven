@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
+class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
     @Singleton
     @Named("WsrClassCatcher")
     private static final class WsrClassCatcher extends AbstractMavenLifecycleParticipant {
@@ -62,7 +62,7 @@ public class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testEnsureResolverSessionHasMavenWorkspaceReader() throws Exception {
+    void testEnsureResolverSessionHasMavenWorkspaceReader() throws Exception {
         WsrClassCatcher wsrClassCatcher =
                 (WsrClassCatcher) getContainer().lookup(AbstractMavenLifecycleParticipant.class, "WsrClassCatcher");
         Maven maven = getContainer().lookup(Maven.class);
@@ -77,7 +77,7 @@ public class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testThatErrorDuringProjectDependencyGraphCreationAreStored() throws Exception {
+    void testThatErrorDuringProjectDependencyGraphCreationAreStored() throws Exception {
         MavenExecutionRequest request =
                 createMavenExecutionRequest(getProject("cyclic-reference")).setGoals(asList("validate"));
 
@@ -87,7 +87,7 @@ public class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testMavenProjectNoDuplicateArtifacts() throws Exception {
+    void testMavenProjectNoDuplicateArtifacts() throws Exception {
         MavenProjectHelper mavenProjectHelper = getContainer().lookup(MavenProjectHelper.class);
         MavenProject mavenProject = new MavenProject();
         mavenProject.setArtifact(new DefaultArtifact("g", "a", "1.0", Artifact.SCOPE_TEST, "jar", "", null));

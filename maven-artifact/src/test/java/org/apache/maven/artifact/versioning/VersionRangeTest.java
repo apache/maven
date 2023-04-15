@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-public class VersionRangeTest {
+class VersionRangeTest {
     private static final String CHECK_NUM_RESTRICTIONS = "check number of restrictions";
 
     private static final String CHECK_UPPER_BOUND = "check upper bound";
@@ -53,7 +53,7 @@ public class VersionRangeTest {
     private static final String CHECK_SELECTED_VERSION = "check selected version";
 
     @Test
-    public void testRange() throws InvalidVersionSpecificationException, OverConstrainedVersionException {
+    void testRange() throws InvalidVersionSpecificationException, OverConstrainedVersionException {
         Artifact artifact = null;
 
         VersionRange range = VersionRange.createFromVersionSpec("(,1.0]");
@@ -157,14 +157,14 @@ public class VersionRangeTest {
     }
 
     @Test
-    public void testSameUpperAndLowerBoundRoundtrip() throws InvalidVersionSpecificationException {
+    void testSameUpperAndLowerBoundRoundtrip() throws InvalidVersionSpecificationException {
         VersionRange range = VersionRange.createFromVersionSpec("[1.0]");
         VersionRange range2 = VersionRange.createFromVersionSpec(range.toString());
         assertEquals(range, range2);
     }
 
     @Test
-    public void testInvalidRanges() {
+    void testInvalidRanges() {
         checkInvalidRange("(1.0)");
         checkInvalidRange("[1.0)");
         checkInvalidRange("(1.0]");
@@ -182,7 +182,7 @@ public class VersionRangeTest {
     }
 
     @Test
-    public void testIntersections() throws InvalidVersionSpecificationException {
+    void testIntersections() throws InvalidVersionSpecificationException {
         VersionRange range1 = VersionRange.createFromVersionSpec("1.0");
         VersionRange range2 = VersionRange.createFromVersionSpec("1.1");
         VersionRange mergedRange = range1.restrict(range2);
@@ -664,7 +664,7 @@ public class VersionRangeTest {
     }
 
     @Test
-    public void testReleaseRangeBoundsContainsSnapshots() throws InvalidVersionSpecificationException {
+    void testReleaseRangeBoundsContainsSnapshots() throws InvalidVersionSpecificationException {
         VersionRange range = VersionRange.createFromVersionSpec("[1.0,1.2]");
 
         assertTrue(range.containsVersion(new DefaultArtifactVersion("1.1-SNAPSHOT")));
@@ -673,7 +673,7 @@ public class VersionRangeTest {
     }
 
     @Test
-    public void testSnapshotRangeBoundsCanContainSnapshots() throws InvalidVersionSpecificationException {
+    void testSnapshotRangeBoundsCanContainSnapshots() throws InvalidVersionSpecificationException {
         VersionRange range = VersionRange.createFromVersionSpec("[1.0,1.2-SNAPSHOT]");
 
         assertTrue(range.containsVersion(new DefaultArtifactVersion("1.1-SNAPSHOT")));
@@ -686,7 +686,7 @@ public class VersionRangeTest {
     }
 
     @Test
-    public void testSnapshotSoftVersionCanContainSnapshot() throws InvalidVersionSpecificationException {
+    void testSnapshotSoftVersionCanContainSnapshot() throws InvalidVersionSpecificationException {
         VersionRange range = VersionRange.createFromVersionSpec("1.0-SNAPSHOT");
 
         assertTrue(range.containsVersion(new DefaultArtifactVersion("1.0-SNAPSHOT")));
@@ -700,7 +700,7 @@ public class VersionRangeTest {
     }
 
     @Test
-    public void testContains() throws InvalidVersionSpecificationException {
+    void testContains() throws InvalidVersionSpecificationException {
         ArtifactVersion actualVersion = new DefaultArtifactVersion("2.0.5");
         assertTrue(enforceVersion("2.0.5", actualVersion));
         assertTrue(enforceVersion("2.0.4", actualVersion));
@@ -723,13 +723,13 @@ public class VersionRangeTest {
     }
 
     @Test
-    public void testOrder0() {
+    void testOrder0() {
         // assertTrue( new DefaultArtifactVersion( "1.0-alpha10" ).compareTo( new DefaultArtifactVersion( "1.0-alpha1" )
         // ) > 0 );
     }
 
     @Test
-    public void testCache() throws InvalidVersionSpecificationException {
+    void testCache() throws InvalidVersionSpecificationException {
         VersionRange range = VersionRange.createFromVersionSpec("[1.0,1.2]");
         assertSame(range, VersionRange.createFromVersionSpec("[1.0,1.2]")); // same instance from spec cache
 

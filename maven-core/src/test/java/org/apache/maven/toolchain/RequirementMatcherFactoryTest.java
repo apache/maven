@@ -28,13 +28,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author mkleint
  */
-public class RequirementMatcherFactoryTest {
+class RequirementMatcherFactoryTest {
 
     /**
      * Test of createExactMatcher method, of class RequirementMatcherFactory.
      */
     @Test
-    public void testCreateExactMatcher() {
+    void testCreateExactMatcher() {
         RequirementMatcher matcher;
         matcher = RequirementMatcherFactory.createExactMatcher("foo");
         assertFalse(matcher.matches("bar"));
@@ -47,7 +47,7 @@ public class RequirementMatcherFactoryTest {
      * Test of createVersionMatcher method, of class RequirementMatcherFactory.
      */
     @Test
-    public void testCreateVersionMatcher() {
+    void testCreateVersionMatcher() {
         RequirementMatcher matcher;
         matcher = RequirementMatcherFactory.createVersionMatcher("1.5.2");
         assertFalse(matcher.matches("1.5"));

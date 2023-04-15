@@ -30,14 +30,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
-public class ScopeArtifactFilterTest {
+class ScopeArtifactFilterTest {
 
     private Artifact newArtifact(String scope) {
         return new DefaultArtifact("g", "a", "1.0", scope, "jar", "", null);
     }
 
     @Test
-    public void testInclude_Compile() {
+    void testInclude_Compile() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_COMPILE);
 
         assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));
@@ -48,7 +48,7 @@ public class ScopeArtifactFilterTest {
     }
 
     @Test
-    public void testInclude_CompilePlusRuntime() {
+    void testInclude_CompilePlusRuntime() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_COMPILE_PLUS_RUNTIME);
 
         assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));
@@ -59,7 +59,7 @@ public class ScopeArtifactFilterTest {
     }
 
     @Test
-    public void testInclude_Runtime() {
+    void testInclude_Runtime() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_RUNTIME);
 
         assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));
@@ -70,7 +70,7 @@ public class ScopeArtifactFilterTest {
     }
 
     @Test
-    public void testInclude_RuntimePlusSystem() {
+    void testInclude_RuntimePlusSystem() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_RUNTIME_PLUS_SYSTEM);
 
         assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));
@@ -81,7 +81,7 @@ public class ScopeArtifactFilterTest {
     }
 
     @Test
-    public void testInclude_Test() {
+    void testInclude_Test() {
         ScopeArtifactFilter filter = new ScopeArtifactFilter(Artifact.SCOPE_TEST);
 
         assertTrue(filter.include(newArtifact(Artifact.SCOPE_COMPILE)));

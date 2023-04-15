@@ -29,10 +29,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ConcurrencyDependencyGraphTest {
+class ConcurrencyDependencyGraphTest {
 
     @Test
-    public void testGraph() throws Exception {
+    void testGraph() throws Exception {
 
         ProjectBuildList projectBuildList =
                 ProjectDependencyGraphStub.getProjectBuildList(ProjectDependencyGraphStub.getMavenSession());

@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
-public class PluginDescriptorBuilderTest {
+class PluginDescriptorBuilderTest {
 
     private PluginDescriptor build(String resource) throws IOException, PlexusConfigurationException {
         Reader reader = ReaderFactory.newXmlReader(getClass().getResourceAsStream(resource));
@@ -48,7 +48,7 @@ public class PluginDescriptorBuilderTest {
     }
 
     @Test
-    public void testBuildReader() throws Exception {
+    void testBuildReader() throws Exception {
         PluginDescriptor pd = build("/plugin.xml");
 
         assertEquals("org.apache.maven.plugins", pd.getGroupId());

@@ -42,7 +42,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class DefaultToolchainManagerTest {
+class DefaultToolchainManagerTest {
     // Mocks to inject into toolchainManager
     @Mock
     private Logger logger;
@@ -57,7 +57,7 @@ public class DefaultToolchainManagerTest {
     private ToolchainFactory toolchainFactory_rareType;
 
     @BeforeEach
-    public void onSetup() throws Exception {
+    void onSetup() throws Exception {
         MockitoAnnotations.initMocks(this);
 
         Map<String, ToolchainFactory> factories = new HashMap<>();
@@ -67,7 +67,7 @@ public class DefaultToolchainManagerTest {
     }
 
     @Test
-    public void testNoModels() {
+    void testNoModels() {
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
         when(session.getRequest()).thenReturn(executionRequest);
@@ -78,7 +78,7 @@ public class DefaultToolchainManagerTest {
     }
 
     @Test
-    public void testModelNoFactory() {
+    void testModelNoFactory() {
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
         Map<String, List<ToolchainModel>> toolchainModels = new HashMap<>();
@@ -93,7 +93,7 @@ public class DefaultToolchainManagerTest {
     }
 
     @Test
-    public void testModelAndFactory() {
+    void testModelAndFactory() {
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
         Map<String, List<ToolchainModel>> toolchainModels = new HashMap<>();
@@ -108,7 +108,7 @@ public class DefaultToolchainManagerTest {
     }
 
     @Test
-    public void testModelsAndFactory() {
+    void testModelsAndFactory() {
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
         Map<String, List<ToolchainModel>> toolchainModels = new HashMap<>();
@@ -123,7 +123,7 @@ public class DefaultToolchainManagerTest {
     }
 
     @Test
-    public void testRequirements() throws Exception {
+    void testRequirements() throws Exception {
         MavenSession session = mock(MavenSession.class);
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
         Map<String, List<ToolchainModel>> toolchainModels = new HashMap<>();

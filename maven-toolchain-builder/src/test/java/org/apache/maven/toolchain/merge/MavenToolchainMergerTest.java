@@ -30,13 +30,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MavenToolchainMergerTest {
+class MavenToolchainMergerTest {
     private MavenToolchainMerger merger = new MavenToolchainMerger();
 
     private DefaultToolchainsReader reader = new DefaultToolchainsReader();
 
     @Test
-    public void testMergeNulls() {
+    void testMergeNulls() {
         merger.merge(null, null, null);
 
         PersistedToolchains pt = new PersistedToolchains();
@@ -45,7 +45,7 @@ public class MavenToolchainMergerTest {
     }
 
     @Test
-    public void testMergeJdk() throws Exception {
+    void testMergeJdk() throws Exception {
         try (InputStream isDominant = MavenToolchainMergerTest.class.getResourceAsStream("toolchains-jdks.xml");
                 InputStream isRecessive = MavenToolchainMergerTest.class.getResourceAsStream("toolchains-jdks.xml")) {
             PersistedToolchains dominant = read(isDominant);
@@ -58,7 +58,7 @@ public class MavenToolchainMergerTest {
     }
 
     @Test
-    public void testMergeJdkExtra() throws Exception {
+    void testMergeJdkExtra() throws Exception {
         try (InputStream jdksIS = MavenToolchainMergerTest.class.getResourceAsStream("toolchains-jdks.xml");
                 InputStream jdksExtraIS =
                         MavenToolchainMergerTest.class.getResourceAsStream("toolchains-jdks-extra.xml")) {
@@ -85,7 +85,7 @@ public class MavenToolchainMergerTest {
     }
 
     @Test
-    public void testMergeJdkExtend() throws Exception {
+    void testMergeJdkExtend() throws Exception {
         try (InputStream jdksIS = MavenToolchainMergerTest.class.getResourceAsStream("toolchains-jdks.xml");
                 InputStream jdksExtendIS =
                         MavenToolchainMergerTest.class.getResourceAsStream("toolchains-jdks-extend.xml")) {

@@ -38,17 +38,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  *
  * @author Benjamin Bentmann
  */
-public class ExtensionDescriptorBuilderTest {
+class ExtensionDescriptorBuilderTest {
 
     private ExtensionDescriptorBuilder builder;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         builder = new ExtensionDescriptorBuilder();
     }
 
     @AfterEach
-    public void tearDown() throws Exception {
+    void tearDown() throws Exception {
         builder = null;
     }
 
@@ -57,7 +57,7 @@ public class ExtensionDescriptorBuilderTest {
     }
 
     @Test
-    public void testEmptyDescriptor() throws Exception {
+    void testEmptyDescriptor() throws Exception {
         String xml = "<extension></extension>";
 
         ExtensionDescriptor ed = builder.build(toStream(xml));
@@ -70,7 +70,7 @@ public class ExtensionDescriptorBuilderTest {
     }
 
     @Test
-    public void testCompleteDescriptor() throws Exception {
+    void testCompleteDescriptor() throws Exception {
         String xml = "<?xml version='1.0' encoding='UTF-8'?>" + "<extension>" + "<exportedPackages>"
                 + "<exportedPackage>a</exportedPackage>" + "<exportedPackage>b</exportedPackage>"
                 + "<exportedPackage>c</exportedPackage>" + "</exportedPackages>" + "<exportedArtifacts>"

@@ -30,11 +30,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Mauro Talevi
  */
-public class ArtifactResolutionExceptionTest {
+class ArtifactResolutionExceptionTest {
     private static final String LS = System.lineSeparator();
 
     @Test
-    public void testMissingArtifactMessageFormat() {
+    void testMissingArtifactMessageFormat() {
         String message = "Missing artifact";
         String indentation = "  ";
         String groupId = "aGroupId";

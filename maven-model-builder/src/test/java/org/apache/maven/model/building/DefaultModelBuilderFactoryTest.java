@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Benjamin Bentmann
  */
-public class DefaultModelBuilderFactoryTest {
+class DefaultModelBuilderFactoryTest {
 
     private static final String BASE_DIR =
             Paths.get("src", "test", "resources", "poms", "factory").toString();
@@ -44,7 +44,7 @@ public class DefaultModelBuilderFactoryTest {
     }
 
     @Test
-    public void testCompleteWiring() throws Exception {
+    void testCompleteWiring() throws Exception {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
         assertNotNull(builder);
 
@@ -64,7 +64,7 @@ public class DefaultModelBuilderFactoryTest {
     }
 
     @Test
-    public void testPomChanges() throws Exception {
+    void testPomChanges() throws Exception {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
         assertNotNull(builder);
         File pom = getPom("simple");

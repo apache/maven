@@ -55,14 +55,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
+class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     @Override
     protected String getProjectsDirectory() {
         return "src/test/projects/project-builder";
     }
 
     @Test
-    public void testSystemScopeDependencyIsPresentInTheCompileClasspathElements() throws Exception {
+    void testSystemScopeDependencyIsPresentInTheCompileClasspathElements() throws Exception {
         File pom = getProject("it0063");
 
         Properties eps = new Properties();
@@ -78,7 +78,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testBuildFromModelSource() throws Exception {
+    void testBuildFromModelSource() throws Exception {
         File pomFile = new File("src/test/resources/projects/modelsource/module01/pom.xml");
         MavenSession mavenSession = createMavenSession(pomFile);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -92,7 +92,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testVersionlessManagedDependency() throws Exception {
+    void testVersionlessManagedDependency() throws Exception {
         File pomFile = new File("src/test/resources/projects/versionless-managed-dependency.xml");
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -109,7 +109,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testResolveDependencies() throws Exception {
+    void testResolveDependencies() throws Exception {
         File pomFile = new File("src/test/resources/projects/basic-resolveDependencies.xml");
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -143,7 +143,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testDontResolveDependencies() throws Exception {
+    void testDontResolveDependencies() throws Exception {
         File pomFile = new File("src/test/resources/projects/basic-resolveDependencies.xml");
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -165,7 +165,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testReadModifiedPoms(@TempDir Path tempDir) throws Exception {
+    void testReadModifiedPoms(@TempDir Path tempDir) throws Exception {
         // TODO a similar test should be created to test the dependency management (basically all usages
         // of DefaultModelBuilder.getCache() are affected by MNG-6530
 
@@ -191,7 +191,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testReadErroneousMavenProjectContainsReference() throws Exception {
+    void testReadErroneousMavenProjectContainsReference() throws Exception {
         File pomFile = new File("src/test/resources/projects/artifactMissingVersion.xml").getAbsoluteFile();
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -223,7 +223,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testReadInvalidPom() throws Exception {
+    void testReadInvalidPom() throws Exception {
         File pomFile = new File("src/test/resources/projects/badPom.xml").getAbsoluteFile();
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -249,7 +249,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testReadParentAndChildWithRegularVersionSetParentFile() throws Exception {
+    void testReadParentAndChildWithRegularVersionSetParentFile() throws Exception {
         List<File> toRead = new ArrayList<>(2);
         File parentPom = getProject("MNG-6723");
         toRead.add(parentPom);
@@ -302,7 +302,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testBuildProperties() throws Exception {
+    void testBuildProperties() throws Exception {
         File file = new File(getProject("MNG-6716").getParentFile(), "project/pom.xml");
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -318,7 +318,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testPropertyInPluginManagementGroupId() throws Exception {
+    void testPropertyInPluginManagementGroupId() throws Exception {
         File pom = getProject("MNG-6983");
 
         MavenSession session = createMavenSession(pom);
@@ -330,7 +330,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testBuildFromModelSourceResolvesBasedir() throws Exception {
+    void testBuildFromModelSourceResolvesBasedir() throws Exception {
         File pomFile = new File("src/test/resources/projects/modelsourcebasedir/pom.xml");
         MavenSession mavenSession = createMavenSession(null);
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
@@ -353,7 +353,7 @@ public class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    public void testLocationTrackingResolution() throws Exception {
+    void testLocationTrackingResolution() throws Exception {
         File pom = getProject("MNG-7648");
 
         MavenSession session = createMavenSession(pom);

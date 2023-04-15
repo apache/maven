@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @PlexusTest
-public class DefaultProfileManagerTest {
+class DefaultProfileManagerTest {
 
     @Inject
     PlexusContainer container;
@@ -47,7 +47,7 @@ public class DefaultProfileManagerTest {
     }
 
     @Test
-    public void testShouldActivateDefaultProfile() throws Exception {
+    void testShouldActivateDefaultProfile() throws Exception {
         Profile notActivated = new Profile();
         notActivated.setId("notActivated");
 
@@ -81,7 +81,7 @@ public class DefaultProfileManagerTest {
     }
 
     @Test
-    public void testShouldNotActivateDefaultProfile() throws Exception {
+    void testShouldNotActivateDefaultProfile() throws Exception {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
 
@@ -118,7 +118,7 @@ public class DefaultProfileManagerTest {
     }
 
     @Test
-    public void testShouldNotActivateReversalOfPresentSystemProperty() throws Exception {
+    void testShouldNotActivateReversalOfPresentSystemProperty() throws Exception {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
 
@@ -144,7 +144,7 @@ public class DefaultProfileManagerTest {
     }
 
     @Test
-    public void testShouldOverrideAndActivateInactiveProfile() throws Exception {
+    void testShouldOverrideAndActivateInactiveProfile() throws Exception {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
 
@@ -173,7 +173,7 @@ public class DefaultProfileManagerTest {
     }
 
     @Test
-    public void testShouldOverrideAndDeactivateActiveProfile() throws Exception {
+    void testShouldOverrideAndDeactivateActiveProfile() throws Exception {
         Profile syspropActivated = new Profile();
         syspropActivated.setId("syspropActivated");
 
@@ -202,7 +202,7 @@ public class DefaultProfileManagerTest {
 
     @Test
     @Disabled
-    public void testOsActivationProfile() throws Exception {
+    void testOsActivationProfile() throws Exception {
         /*
         Profile osActivated = new Profile();
         osActivated.setId( "os-profile" );

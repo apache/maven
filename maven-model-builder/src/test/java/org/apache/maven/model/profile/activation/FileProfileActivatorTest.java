@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Ravil Galeyev
  */
-public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileActivator> {
+class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileActivator> {
 
     @TempDir
     Path tempDir;
@@ -60,7 +60,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
     }
 
     @Test
-    public void testIsActiveNoFile() {
+    void testIsActiveNoFile() {
         assertActivation(false, newExistsProfile(null), context);
         assertActivation(false, newExistsProfile("someFile.txt"), context);
         assertActivation(false, newExistsProfile("${basedir}/someFile.txt"), context);
@@ -71,7 +71,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
     }
 
     @Test
-    public void testIsActiveExistsFileExists() {
+    void testIsActiveExistsFileExists() {
         assertActivation(true, newExistsProfile("file.txt"), context);
         assertActivation(true, newExistsProfile("${basedir}"), context);
         assertActivation(true, newExistsProfile("${basedir}/" + "file.txt"), context);
@@ -82,7 +82,7 @@ public class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileP
     }
 
     @Test
-    public void testIsActiveExistsLeavesFileUnchanged() {
+    void testIsActiveExistsLeavesFileUnchanged() {
         Profile profile = newExistsProfile("file.txt");
         assertEquals("file.txt", profile.getActivation().getFile().getExists());
 

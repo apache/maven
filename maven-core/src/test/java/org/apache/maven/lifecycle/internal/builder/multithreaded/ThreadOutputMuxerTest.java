@@ -51,7 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Kristian Rosenvold
  */
-public class ThreadOutputMuxerTest {
+class ThreadOutputMuxerTest {
 
     final String paid = "Paid";
 
@@ -60,7 +60,7 @@ public class ThreadOutputMuxerTest {
     final String full = "Full";
 
     @Test
-    public void testSingleThreaded() throws Exception {
+    void testSingleThreaded() throws Exception {
         ProjectBuildList src = getProjectBuildList();
         ProjectBuildList projectBuildList = new ProjectBuildList(Arrays.asList(src.get(0), src.get(1), src.get(2)));
 
@@ -86,7 +86,7 @@ public class ThreadOutputMuxerTest {
     }
 
     @Test
-    public void testMultiThreaded() throws Exception {
+    void testMultiThreaded() throws Exception {
         ProjectBuildList projectBuildList = getProjectBuildList();
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

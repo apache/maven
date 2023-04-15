@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Jason van Zyl
  */
-public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
+class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
     // p1 inherits from p0
@@ -50,7 +50,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    public void testProjectInheritance() throws Exception {
+    void testProjectInheritance() throws Exception {
         File localRepo = getLocalRepositoryPath();
         File pom0 = new File(localRepo, "p0/pom.xml");
 

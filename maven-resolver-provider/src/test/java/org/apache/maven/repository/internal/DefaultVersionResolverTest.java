@@ -28,12 +28,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DefaultVersionResolverTest extends AbstractRepositoryTestCase {
+class DefaultVersionResolverTest extends AbstractRepositoryTestCase {
     @Inject
     private DefaultVersionResolver versionResolver;
 
     @Test
-    public void testResolveSeparateInstalledClassifiedNonUniqueVersionedArtifacts() throws Exception {
+    void testResolveSeparateInstalledClassifiedNonUniqueVersionedArtifacts() throws Exception {
         VersionRequest requestB = new VersionRequest();
         requestB.addRepository(newTestRepository());
         Artifact artifactB =
@@ -55,7 +55,7 @@ public class DefaultVersionResolverTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    public void testResolveSeparateInstalledClassifiedNonVersionedArtifacts() throws Exception {
+    void testResolveSeparateInstalledClassifiedNonVersionedArtifacts() throws Exception {
         VersionRequest requestA = new VersionRequest();
         requestA.addRepository(newTestRepository());
         String versionA = "07.20.3-20120809.112124-88";

@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  *
  */
 @PlexusTest
-public class DefaultGraphConflictResolverTest {
+class DefaultGraphConflictResolverTest {
     @Inject
     GraphConflictResolver resolver;
 
@@ -44,9 +44,10 @@ public class DefaultGraphConflictResolverTest {
     MetadataGraphVertex v2;
     MetadataGraphVertex v3;
     MetadataGraphVertex v4;
+
     // ------------------------------------------------------------------------------------------
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         /*
          *       v2
          *   v1<
@@ -72,9 +73,10 @@ public class DefaultGraphConflictResolverTest {
         graph.addEdge(v3, v4, new MetadataGraphEdge("1.1", true, ArtifactScopeEnum.runtime, null, 2, 1));
         graph.addEdge(v3, v4, new MetadataGraphEdge("1.2", true, ArtifactScopeEnum.provided, null, 2, 2));
     }
+
     // ------------------------------------------------------------------------------------------
     @Test
-    public void testCompileResolution() throws Exception {
+    void testCompileResolution() throws Exception {
         MetadataGraph res;
 
         res = resolver.resolveConflicts(graph, ArtifactScopeEnum.compile);
@@ -113,9 +115,10 @@ public class DefaultGraphConflictResolverTest {
                 res.getIncidentEdges(v4).get(0).getVersion(),
                 "wrong edge v3-v4 in the resulting graph after resolver");
     }
+
     // ------------------------------------------------------------------------------------------
     @Test
-    public void testRuntimeResolution() throws Exception {
+    void testRuntimeResolution() throws Exception {
         MetadataGraph res;
 
         res = resolver.resolveConflicts(graph, ArtifactScopeEnum.runtime);
@@ -153,9 +156,10 @@ public class DefaultGraphConflictResolverTest {
                 res.getIncidentEdges(v4).get(0).getVersion(),
                 "wrong edge v3-v4 in the resulting graph after resolver");
     }
+
     // ------------------------------------------------------------------------------------------
     @Test
-    public void testTestResolution() throws Exception {
+    void testTestResolution() throws Exception {
         MetadataGraph res;
 
         res = resolver.resolveConflicts(graph, ArtifactScopeEnum.test);

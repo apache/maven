@@ -25,10 +25,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-public class DefaultProblemTest {
+class DefaultProblemTest {
 
     @Test
-    public void testGetSeverity() {
+    void testGetSeverity() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
         assertEquals(Severity.ERROR, problem.getSeverity());
 
@@ -43,7 +43,7 @@ public class DefaultProblemTest {
     }
 
     @Test
-    public void testGetLineNumber() {
+    void testGetLineNumber() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
         assertEquals(-1, problem.getLineNumber());
 
@@ -59,7 +59,7 @@ public class DefaultProblemTest {
     }
 
     @Test
-    public void testGetColumnNumber() {
+    void testGetColumnNumber() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
         assertEquals(-1, problem.getColumnNumber());
 
@@ -75,7 +75,7 @@ public class DefaultProblemTest {
     }
 
     @Test
-    public void testGetException() {
+    void testGetException() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
         assertNull(problem.getException());
 
@@ -85,7 +85,7 @@ public class DefaultProblemTest {
     }
 
     @Test
-    public void testGetSource() {
+    void testGetSource() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
         assertEquals("", problem.getSource());
 
@@ -97,7 +97,7 @@ public class DefaultProblemTest {
     }
 
     @Test
-    public void testGetLocation() {
+    void testGetLocation() {
         DefaultProblem problem = new DefaultProblem(null, null, null, -1, -1, null);
         assertEquals("", problem.getLocation());
 
@@ -115,7 +115,7 @@ public class DefaultProblemTest {
     }
 
     @Test
-    public void testGetMessage() {
+    void testGetMessage() {
         DefaultProblem problem = new DefaultProblem("MESSAGE", null, null, -1, -1, null);
         assertEquals("MESSAGE", problem.getMessage());
 

@@ -28,17 +28,17 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-public class DefaultProjectArtifactsCacheTest {
+class DefaultProjectArtifactsCacheTest {
 
     private ProjectArtifactsCache cache;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         cache = new DefaultProjectArtifactsCache();
     }
 
     @Test
-    public void testProjectDependencyOrder() throws Exception {
+    void testProjectDependencyOrder() throws Exception {
         ProjectArtifactsCache.Key project1 = new ProjectArtifactsCache.Key() {};
 
         Set<Artifact> artifacts = new LinkedHashSet<>(4);

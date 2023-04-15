@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author <a href="mailto:pschneider@gmail.com">Patrick Schneider</a>
  */
-public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
+class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
     //
     // p1 inherits from p0
@@ -55,7 +55,7 @@ public class ProjectInheritanceTest extends AbstractProjectInheritanceTestCase {
     // ----------------------------------------------------------------------
 
     @Test
-    public void testDependencyManagementOverridesTransitiveDependencyVersion() throws Exception {
+    void testDependencyManagementOverridesTransitiveDependencyVersion() throws Exception {
         File localRepo = getLocalRepositoryPath();
 
         File pom0 = new File(localRepo, "p0/pom.xml");

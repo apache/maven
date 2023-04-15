@@ -26,9 +26,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class LogLevelRecorderTest {
+class LogLevelRecorderTest {
     @Test
-    public void createsLogLevelRecorder() {
+    void createsLogLevelRecorder() {
         LogLevelRecorder logLevelRecorder = new LogLevelRecorder("WARN");
         logLevelRecorder.record(Level.ERROR);
 
@@ -36,12 +36,12 @@ public class LogLevelRecorderTest {
     }
 
     @Test
-    public void failsOnLowerThanWarn() {
+    void failsOnLowerThanWarn() {
         assertThrows(IllegalArgumentException.class, () -> new LogLevelRecorder("INFO"));
     }
 
     @Test
-    public void createsLogLevelRecorderWithWarning() {
+    void createsLogLevelRecorderWithWarning() {
         LogLevelRecorder logLevelRecorder = new LogLevelRecorder("WARNING");
         logLevelRecorder.record(Level.ERROR);
 
@@ -49,7 +49,7 @@ public class LogLevelRecorderTest {
     }
 
     @Test
-    public void failsOnUnknownLogLevel() {
+    void failsOnUnknownLogLevel() {
         Throwable thrown = assertThrows(IllegalArgumentException.class, () -> new LogLevelRecorder("SEVERE"));
         String message = thrown.getMessage();
         assertThat(message, containsString("SEVERE is not a valid log severity threshold"));

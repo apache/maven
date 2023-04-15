@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
-public class ModulesXMLFilterTest extends AbstractXMLFilterTests {
+class ModulesXMLFilterTest extends AbstractXMLFilterTests {
 
     @Override
     protected ModulesXMLFilter getFilter(XmlPullParser parser) {
@@ -31,7 +31,7 @@ public class ModulesXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void emptyModules() throws Exception {
+    void emptyModules() throws Exception {
         String input = "<project><modules/></project>";
         String expected = "<project/>";
         String actual = transform(input);
@@ -39,7 +39,7 @@ public class ModulesXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void setOfModules() throws Exception {
+    void setOfModules() throws Exception {
         String input = "<project><modules>" + "<module>ab</module>" + "<module>../cd</module>" + "</modules></project>";
         String expected = "<project/>";
         String actual = transform(input);
@@ -47,7 +47,7 @@ public class ModulesXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void noModules() throws Exception {
+    void noModules() throws Exception {
         String input = "<project><name>NAME</name></project>";
         String expected = input;
         String actual = transform(input);
@@ -55,7 +55,7 @@ public class ModulesXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void comment() throws Exception {
+    void comment() throws Exception {
 
         String input = "<project><!--before--><modules>"
                 + "<!--pre-in-->"
@@ -70,7 +70,7 @@ public class ModulesXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void setOfModulesLF() throws Exception {
+    void setOfModulesLF() throws Exception {
         String input = "<project>\n"
                 + "\n"
                 + "  <modules>\n"

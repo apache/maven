@@ -28,13 +28,13 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @PlexusTest
-public class DefaultArtifactFactoryTest {
+class DefaultArtifactFactoryTest {
 
     @Inject
     ArtifactFactory factory;
 
     @Test
-    public void testPropagationOfSystemScopeRegardlessOfInheritedScope() {
+    void testPropagationOfSystemScopeRegardlessOfInheritedScope() {
         Artifact artifact = factory.createDependencyArtifact(
                 "test-grp", "test-artifact", VersionRange.createFromVersion("1.0"), "type", null, "system", "provided");
         Artifact artifact2 = factory.createDependencyArtifact(

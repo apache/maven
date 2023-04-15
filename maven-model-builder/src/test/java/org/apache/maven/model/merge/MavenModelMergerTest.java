@@ -28,12 +28,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class MavenModelMergerTest {
+class MavenModelMergerTest {
     private MavenModelMerger modelMerger = new MavenModelMerger();
 
     // modelVersion is neither inherited nor injected
     @Test
-    public void testMergeModel_ModelVersion() {
+    void testMergeModel_ModelVersion() {
         Model parent = Model.newBuilder().modelVersion("4.0.0").build();
         Model model = Model.newInstance();
         Model.Builder builder = Model.newBuilder(model);
@@ -48,7 +48,7 @@ public class MavenModelMergerTest {
 
     // ArtifactId is neither inherited nor injected
     @Test
-    public void testMergeModel_ArtifactId() {
+    void testMergeModel_ArtifactId() {
         Model parent = Model.newBuilder().artifactId("PARENT").build();
         Model model = Model.newInstance();
         Model.Builder builder = Model.newBuilder(model);
@@ -63,7 +63,7 @@ public class MavenModelMergerTest {
 
     // Prerequisites are neither inherited nor injected
     @Test
-    public void testMergeModel_Prerequisites() {
+    void testMergeModel_Prerequisites() {
         Model parent =
                 Model.newBuilder().prerequisites(Prerequisites.newInstance()).build();
         Model model = Model.newInstance();
@@ -81,7 +81,7 @@ public class MavenModelMergerTest {
 
     // Profiles are neither inherited nor injected
     @Test
-    public void testMergeModel_Profiles() {
+    void testMergeModel_Profiles() {
         Model parent = Model.newBuilder()
                 .profiles(Collections.singletonList(Profile.newInstance()))
                 .build();

@@ -29,28 +29,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @author Benjamin Bentmann
  */
-public class ActivationPropertyTest {
+class ActivationPropertyTest {
 
     @Test
-    public void testHashCodeNullSafe() {
+    void testHashCodeNullSafe() {
         new ActivationProperty().hashCode();
     }
 
     @Test
-    public void testEqualsNullSafe() {
+    void testEqualsNullSafe() {
         assertFalse(new ActivationProperty().equals(null));
 
         new ActivationProperty().equals(new ActivationProperty());
     }
 
     @Test
-    public void testEqualsIdentity() {
+    void testEqualsIdentity() {
         ActivationProperty thing = new ActivationProperty();
         assertTrue(thing.equals(thing));
     }
 
     @Test
-    public void testToStringNullSafe() {
+    void testToStringNullSafe() {
         assertNotNull(new ActivationProperty().toString());
     }
 }

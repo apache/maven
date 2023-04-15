@@ -33,12 +33,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Robert Scholte
  *
  */
-public class PluginParameterExceptionTest {
+class PluginParameterExceptionTest {
 
     private final String LS = System.lineSeparator();
 
     @Test
-    public void testMissingRequiredStringArrayTypeParameter() {
+    void testMissingRequiredStringArrayTypeParameter() {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setGoal("goal");
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
@@ -70,7 +70,7 @@ public class PluginParameterExceptionTest {
     }
 
     @Test
-    public void testMissingRequiredCollectionTypeParameter() {
+    void testMissingRequiredCollectionTypeParameter() {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setGoal("goal");
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
@@ -102,7 +102,7 @@ public class PluginParameterExceptionTest {
     }
 
     @Test
-    public void testMissingRequiredMapTypeParameter() {
+    void testMissingRequiredMapTypeParameter() {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setGoal("goal");
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
@@ -134,7 +134,7 @@ public class PluginParameterExceptionTest {
     }
 
     @Test
-    public void testMissingRequiredPropertiesTypeParameter() {
+    void testMissingRequiredPropertiesTypeParameter() {
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setGoal("goal");
         PluginDescriptor pluginDescriptor = new PluginDescriptor();

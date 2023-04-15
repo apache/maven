@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * @author Guillaume Nodet
  */
-public class DefaultModelBuilderTest {
+class DefaultModelBuilderTest {
 
     private static final String BASE1_ID = "thegroup:base1:pom";
 
@@ -79,7 +79,7 @@ public class DefaultModelBuilderTest {
             + "</project>\n";
 
     @Test
-    public void testCycleInImports() throws Exception {
+    void testCycleInImports() throws Exception {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
         assertNotNull(builder);
 
@@ -154,7 +154,7 @@ public class DefaultModelBuilderTest {
     }
 
     @Test
-    public void testBuildRawModel() throws Exception {
+    void testBuildRawModel() throws Exception {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
         assertNotNull(builder);
 

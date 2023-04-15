@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Christian Schulte
  * @since 3.5.0
  */
-public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
+class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
 
     /**
      * Creates a new {@code ProjectModelResolverTest} instance.
@@ -58,7 +58,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveParentThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
+    void testResolveParentThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
         parent.setArtifactId("apache");
@@ -73,7 +73,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
+    void testResolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
         parent.setArtifactId("apache");
@@ -87,7 +87,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
+    void testResolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
         parent.setArtifactId("apache");
@@ -101,7 +101,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception {
+    void testResolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
         parent.setArtifactId("apache");
@@ -112,7 +112,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveParentSuccessfullyResolvesExistingParentUsingHighestVersion() throws Exception {
+    void testResolveParentSuccessfullyResolvesExistingParentUsingHighestVersion() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
         parent.setArtifactId("apache");
@@ -124,7 +124,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
+    void testResolveDependencyThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("org.apache");
         dependency.setArtifactId("apache");
@@ -139,7 +139,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
+    void testResolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("org.apache");
         dependency.setArtifactId("apache");
@@ -153,8 +153,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound()
-            throws Exception {
+    void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("org.apache");
         dependency.setArtifactId("apache");
@@ -168,7 +167,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveDependencySuccessfullyResolvesExistingDependencyWithoutRange() throws Exception {
+    void testResolveDependencySuccessfullyResolvesExistingDependencyWithoutRange() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("org.apache");
         dependency.setArtifactId("apache");
@@ -179,7 +178,7 @@ public class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testResolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion() throws Exception {
+    void testResolveDependencySuccessfullyResolvesExistingDependencyUsingHighestVersion() throws Exception {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("org.apache");
         dependency.setArtifactId("apache");

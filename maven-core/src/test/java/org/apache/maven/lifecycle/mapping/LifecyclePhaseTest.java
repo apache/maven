@@ -30,9 +30,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 /**
  * @author atanasenko
  */
-public class LifecyclePhaseTest {
+class LifecyclePhaseTest {
     @Test
-    public void testToString() {
+    void testToString() {
         LifecyclePhase phase = new LifecyclePhase();
         assertEquals("", phase.toString());
 
@@ -48,7 +48,7 @@ public class LifecyclePhaseTest {
     }
 
     @Test
-    public void testSet() {
+    void testSet() {
         LifecyclePhase phase = new LifecyclePhase();
         assertNull(phase.getMojos());
 

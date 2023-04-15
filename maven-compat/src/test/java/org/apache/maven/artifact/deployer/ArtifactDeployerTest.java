@@ -39,7 +39,7 @@ import static org.mockito.Mockito.mock;
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
-public class ArtifactDeployerTest extends AbstractArtifactComponentTestCase {
+class ArtifactDeployerTest extends AbstractArtifactComponentTestCase {
     @Inject
     private ArtifactDeployer artifactDeployer;
 
@@ -51,7 +51,7 @@ public class ArtifactDeployerTest extends AbstractArtifactComponentTestCase {
     }
 
     @Test
-    public void testArtifactInstallation() throws Exception {
+    void testArtifactInstallation() throws Exception {
         sessionScope.enter();
         try {
             sessionScope.seed(MavenSession.class, mock(MavenSession.class));

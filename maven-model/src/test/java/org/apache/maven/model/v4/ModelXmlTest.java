@@ -30,10 +30,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ModelXmlTest {
+class ModelXmlTest {
 
     @Test
-    public void testXmlRoundtripWithProperties() throws Exception {
+    void testXmlRoundtripWithProperties() throws Exception {
         Map<String, String> props = new LinkedHashMap<>();
         props.put("javax.version", "3.1.0");
         props.put("mockito.version", "1.10.19");

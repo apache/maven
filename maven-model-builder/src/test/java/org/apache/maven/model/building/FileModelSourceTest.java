@@ -32,13 +32,13 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * Test that validate the solution of MNG-6261 issue
  *
  */
-public class FileModelSourceTest {
+class FileModelSourceTest {
 
     /**
      * Test of equals method, of class FileModelSource.
      */
     @Test
-    public void testEquals() throws Exception {
+    void testEquals() throws Exception {
         File tempFile = createTempFile("pomTest");
         FileModelSource instance = new FileModelSource(tempFile);
 
@@ -49,7 +49,7 @@ public class FileModelSourceTest {
     }
 
     @Test
-    public void testWindowsPaths() throws Exception {
+    void testWindowsPaths() throws Exception {
         assumeTrue(Os.isFamily("Windows"));
 
         File upperCaseFile = createTempFile("TESTE");

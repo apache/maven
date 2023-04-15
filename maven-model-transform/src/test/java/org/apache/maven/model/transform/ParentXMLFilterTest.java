@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ParentXMLFilterTest extends AbstractXMLFilterTests {
+class ParentXMLFilterTest extends AbstractXMLFilterTests {
     private Function<XmlPullParser, XmlPullParser> filterCreator;
 
     @BeforeEach
@@ -57,7 +57,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void testWithFastForward() throws Exception {
+    void testWithFastForward() throws Exception {
         String input = "<project>"
                 + "<build>"
                 + "<plugins>"
@@ -80,7 +80,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void testWithFastForwardAfterByPass() throws Exception {
+    void testWithFastForwardAfterByPass() throws Exception {
         String input = "<project>"
                 + "<build>"
                 + "<plugins>"
@@ -125,7 +125,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void testMinimum() throws Exception {
+    void testMinimum() throws Exception {
         String input = "<project><parent /></project>";
         String expected = input;
         String actual = transform(input);
@@ -133,7 +133,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void testNoRelativePath() throws Exception {
+    void testNoRelativePath() throws Exception {
         String input = "<project><parent>"
                 + "<groupId>GROUPID</groupId>"
                 + "<artifactId>ARTIFACTID</artifactId>"
@@ -147,7 +147,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void testDefaultRelativePath() throws Exception {
+    void testDefaultRelativePath() throws Exception {
         String input = "<project>\n"
                 + "  <parent>\n"
                 + "    <groupId>GROUPID</groupId>\n"
@@ -174,7 +174,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests {
      * @throws Exception
      */
     @Test
-    public void testEmptyRelativePathNoVersion() throws Exception {
+    void testEmptyRelativePathNoVersion() throws Exception {
         String input = "<project><parent>"
                 + "<groupId>GROUPID</groupId>"
                 + "<artifactId>ARTIFACTID</artifactId>"
@@ -192,7 +192,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void testNoVersion() throws Exception {
+    void testNoVersion() throws Exception {
         String input = "<project><parent>"
                 + "<groupId>GROUPID</groupId>"
                 + "<artifactId>ARTIFACTID</artifactId>"
@@ -211,7 +211,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void testInvalidRelativePath() throws Exception {
+    void testInvalidRelativePath() throws Exception {
         filterCreator = parser -> createFilter(
                 parser, x -> Optional.ofNullable(null), Paths.get("pom.xml").toAbsolutePath());
 
@@ -228,7 +228,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void testRelativePathAndVersion() throws Exception {
+    void testRelativePathAndVersion() throws Exception {
         String input = "<project><parent>"
                 + "<groupId>GROUPID</groupId>"
                 + "<artifactId>ARTIFACTID</artifactId>"
@@ -248,7 +248,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void testWithWeirdNamespace() throws Exception {
+    void testWithWeirdNamespace() throws Exception {
         String input = "<relativePath:project xmlns:relativePath=\"relativePath\">"
                 + "<relativePath:parent>"
                 + "<relativePath:groupId>GROUPID</relativePath:groupId>"
@@ -270,7 +270,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void comment() throws Exception {
+    void comment() throws Exception {
         String input = "<project><!--before--><parent>"
                 + "<groupId>GROUPID</groupId>"
                 + "<artifactId>ARTIFACTID</artifactId>"
@@ -291,7 +291,7 @@ public class ParentXMLFilterTest extends AbstractXMLFilterTests {
     }
 
     @Test
-    public void testIndent() throws Exception {
+    void testIndent() throws Exception {
         String input = "<project>\n"
                 + "  <parent>\n"
                 + "    <groupId>GROUPID</groupId>\n"

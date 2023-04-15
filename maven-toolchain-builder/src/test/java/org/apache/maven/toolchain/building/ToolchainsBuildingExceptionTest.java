@@ -27,17 +27,17 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ToolchainsBuildingExceptionTest {
+class ToolchainsBuildingExceptionTest {
     private static final String LS = System.lineSeparator();
 
     @Test
-    public void testNoProblems() {
+    void testNoProblems() {
         ToolchainsBuildingException e = new ToolchainsBuildingException(Collections.<Problem>emptyList());
         assertEquals("0 problems were encountered while building the effective toolchains" + LS, e.getMessage());
     }
 
     @Test
-    public void testOneProblem() {
+    void testOneProblem() {
         ProblemCollector problemCollector = ProblemCollectorFactory.newInstance(null);
         problemCollector.add(Problem.Severity.ERROR, "MESSAGE", 3, 5, new Exception());
         ToolchainsBuildingException e = new ToolchainsBuildingException(problemCollector.getProblems());
@@ -48,7 +48,7 @@ public class ToolchainsBuildingExceptionTest {
     }
 
     @Test
-    public void testUnknownPositionAndSource() {
+    void testUnknownPositionAndSource() {
         ProblemCollector problemCollector = ProblemCollectorFactory.newInstance(null);
         problemCollector.add(Problem.Severity.ERROR, "MESSAGE", -1, -1, new Exception());
         ToolchainsBuildingException e = new ToolchainsBuildingException(problemCollector.getProblems());
@@ -58,7 +58,7 @@ public class ToolchainsBuildingExceptionTest {
     }
 
     @Test
-    public void testUnknownPosition() {
+    void testUnknownPosition() {
         ProblemCollector problemCollector = ProblemCollectorFactory.newInstance(null);
         problemCollector.setSource("SOURCE");
         problemCollector.add(Problem.Severity.ERROR, "MESSAGE", -1, -1, new Exception());

@@ -26,10 +26,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class XmlNodeBuilderTest {
+class XmlNodeBuilderTest {
 
     @Test
-    public void testReadMultiDoc() throws Exception {
+    void testReadMultiDoc() throws Exception {
         String doc = "<?xml version='1.0'?><doc><child>foo</child></doc>";
         StringReader r = new StringReader(doc + doc) {
             @Override

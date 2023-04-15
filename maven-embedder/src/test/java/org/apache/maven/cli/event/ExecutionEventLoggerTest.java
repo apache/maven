@@ -46,12 +46,12 @@ class ExecutionEventLoggerTest {
     private ExecutionEventLogger executionEventLogger;
 
     @BeforeAll
-    public static void setUp() {
+    static void setUp() {
         MessageUtils.setColorEnabled(false);
     }
 
     @AfterAll
-    public static void tearDown() {
+    static void tearDown() {
         MessageUtils.setColorEnabled(true);
     }
 
@@ -166,7 +166,7 @@ class ExecutionEventLoggerTest {
     }
 
     @Test
-    public void testProjectStartedNoPom() {
+    void testProjectStartedNoPom() {
         // prepare
         File basedir = new File("").getAbsoluteFile();
         ExecutionEvent event = mock(ExecutionEvent.class);
