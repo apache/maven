@@ -154,7 +154,7 @@ under the License.
     <commonsIoVersion>2.11.0</commonsIoVersion>
     <commonsLangVersion>3.12.0</commonsLangVersion>
     <junitVersion>5.9.1</junitVersion>
-    <mockitoVersion>3.2.0</mockitoVersion>
+    <mockitoVersion>4.11.0</mockitoVersion>
     <plexusVersion>2.1.0</plexusVersion>
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusUtilsVersion>4.0.0-alpha-6-SNAPSHOT</plexusUtilsVersion>
@@ -418,12 +418,6 @@ under the License.
         <version>${cipherVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>${mockitoVersion}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
         <groupId>org.xmlunit</groupId>
         <artifactId>xmlunit-assertj</artifactId>
         <version>${xmlunitVersion}</version>
@@ -463,6 +457,13 @@ under the License.
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
         <version>${junitVersion}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-bom</artifactId>
+        <version>${mockitoVersion}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
