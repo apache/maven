@@ -52,8 +52,8 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
     private static final String MAVEN_PLUGIN_VALIDATION_KEY = "maven.plugin.validation";
 
     private enum ValidationLevel {
-        DISABLED,
-        ENABLED,
+        BRIEF,
+        DEFAULT,
         VERBOSE
     }
 
@@ -67,7 +67,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
     private ValidationLevel validationLevel(RepositorySystemSession session) {
         String level = ConfigUtils.getString(session, null, MAVEN_PLUGIN_VALIDATION_KEY);
         if (level == null || level.isEmpty()) {
-            return ValidationLevel.ENABLED;
+            return ValidationLevel.DEFAULT;
         }
         try {
             return ValidationLevel.valueOf(level.toUpperCase(Locale.ENGLISH));
@@ -77,7 +77,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
                     MAVEN_PLUGIN_VALIDATION_KEY,
                     level,
                     Arrays.toString(ValidationLevel.values()));
-            return ValidationLevel.ENABLED;
+            return ValidationLevel.DEFAULT;
         }
     }
 
@@ -132,46 +132,49 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
             logger.warn("");
             logger.warn("Plugin validation issues were detected in {} plugin(s)", issuesMap.size());
             logger.warn("");
-            if (validationLevel == ValidationLevel.DISABLED || !logger.isWarnEnabled()) {
+            if (validationLevel == ValidationLevel.BRIEF || !logger.isWarnEnabled()) {
                 return;
             }
 
             for (Map.Entry<String, PluginValidationIssues> entry : issuesMap.entrySet()) {
-                logger.warn("Plugin {}", entry.getKey());
-                PluginValidationIssues issues = entry.getValue();
-                if (validationLevel == ValidationLevel.VERBOSE && !issues.pluginDeclarations.isEmpty()) {
-                    logger.warn("  Declared at location(s):");
-                    for (String pluginDeclaration : issues.pluginDeclarations) {
-                        logger.warn("   * {}", pluginDeclaration);
-                    }
-                }
-                if (validationLevel == ValidationLevel.VERBOSE && !issues.pluginOccurrences.isEmpty()) {
-                    logger.warn("  Used in module(s):");
-                    for (String pluginOccurrence : issues.pluginOccurrences) {
-                        logger.warn("   * {}", pluginOccurrence);
-                    }
-                }
-                if (!issues.pluginIssues.isEmpty()) {
-                    logger.warn("  Plugin issue(s):");
-                    for (String pluginIssue : issues.pluginIssues) {
-                        logger.warn("   * {}", pluginIssue);
-                    }
-                }
-                if (!issues.mojoIssues.isEmpty()) {
-                    logger.warn("  Mojo issue(s):");
-                    for (String mojoInfo : issues.mojoIssues.keySet()) {
-                        logger.warn("   * Mojo {}", mojoInfo);
-                        for (String mojoIssue : issues.mojoIssues.get(mojoInfo)) {
-                            logger.warn("     - {}", mojoIssue);
+                logger.warn(" * {}", entry.getKey());
+                if (validationLevel == ValidationLevel.VERBOSE) {
+                    PluginValidationIssues issues = entry.getValue();
+                    if (!issues.pluginDeclarations.isEmpty()) {
+                        logger.warn("  Declared at location(s):");
+                        for (String pluginDeclaration : issues.pluginDeclarations) {
+                            logger.warn("   * {}", pluginDeclaration);
                         }
                     }
+                    if (!issues.pluginOccurrences.isEmpty()) {
+                        logger.warn("  Used in module(s):");
+                        for (String pluginOccurrence : issues.pluginOccurrences) {
+                            logger.warn("   * {}", pluginOccurrence);
+                        }
+                    }
+                    if (!issues.pluginIssues.isEmpty()) {
+                        logger.warn("  Plugin issue(s):");
+                        for (String pluginIssue : issues.pluginIssues) {
+                            logger.warn("   * {}", pluginIssue);
+                        }
+                    }
+                    if (!issues.mojoIssues.isEmpty()) {
+                        logger.warn("  Mojo issue(s):");
+                        for (String mojoInfo : issues.mojoIssues.keySet()) {
+                            logger.warn("   * Mojo {}", mojoInfo);
+                            for (String mojoIssue : issues.mojoIssues.get(mojoInfo)) {
+                                logger.warn("     - {}", mojoIssue);
+                            }
+                        }
+                    }
+                    logger.warn("");
                 }
-                logger.warn("");
             }
             logger.warn("");
-            logger.warn(
-                    "To fix these issues, please upgrade above listed plugins, or, notify their maintainers about reported issues.");
-            logger.warn("");
+            if (validationLevel == ValidationLevel.VERBOSE) {
+                logger.warn(
+                        "Fix reported issues by adjusting plugin configuration or by upgrading above listed plugins. If no upgrade available, please notify plugin maintainers about reported issues." );
+            }
             logger.warn(
                     "For more or less details, use 'maven.plugin.validation' property with one of the values (case insensitive): {}",
                     Arrays.toString(ValidationLevel.values()));
