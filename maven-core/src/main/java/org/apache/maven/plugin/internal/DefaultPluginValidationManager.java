@@ -125,6 +125,9 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
     }
 
     private void reportSessionCollectedValidationIssues(MavenSession mavenSession) {
+        if (!logger.isWarnEnabled()) {
+            return; // nothing can be reported
+        }
         ValidationLevel validationLevel = validationLevel(mavenSession.getRepositorySession());
         ConcurrentHashMap<String, PluginValidationIssues> issuesMap = pluginIssues(mavenSession.getRepositorySession());
         if (!issuesMap.isEmpty()) {
@@ -132,7 +135,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
             logger.warn("");
             logger.warn("Plugin validation issues were detected in {} plugin(s)", issuesMap.size());
             logger.warn("");
-            if (validationLevel == ValidationLevel.BRIEF || !logger.isWarnEnabled()) {
+            if (validationLevel == ValidationLevel.BRIEF) {
                 return;
             }
 
@@ -173,7 +176,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
             logger.warn("");
             if (validationLevel == ValidationLevel.VERBOSE) {
                 logger.warn(
-                        "Fix reported issues by adjusting plugin configuration or by upgrading above listed plugins. If no upgrade available, please notify plugin maintainers about reported issues." );
+                        "Fix reported issues by adjusting plugin configuration or by upgrading above listed plugins. If no upgrade available, please notify plugin maintainers about reported issues.");
             }
             logger.warn(
                     "For more or less details, use 'maven.plugin.validation' property with one of the values (case insensitive): {}",
