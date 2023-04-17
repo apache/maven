@@ -58,6 +58,7 @@ public class MavenITmng5222MojoDeprecatedTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-empty-configuration.txt" );
+        verifier.addCliArgument( "-Dmaven.plugin.validation=verbose" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -107,6 +108,7 @@ public class MavenITmng5222MojoDeprecatedTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-deprecated-property.txt" );
+        verifier.addCliArgument( "-Dmaven.plugin.validation=verbose" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -166,6 +168,7 @@ public class MavenITmng5222MojoDeprecatedTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-deprecated-config.txt" );
+        verifier.addCliArgument( "-Dmaven.plugin.validation=verbose" );
         verifier.addCliArgument( "validate" );
         verifier.execute();
         verifier.verifyErrorFreeLog();
