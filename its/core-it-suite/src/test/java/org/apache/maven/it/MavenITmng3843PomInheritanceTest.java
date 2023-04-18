@@ -84,7 +84,16 @@ public class MavenITmng3843PomInheritanceTest
         assertEquals( "", props.getProperty( "project.url", "" ) );
         assertEquals( "", props.getProperty( "project.inceptionYear", "" ) );
         assertEquals( "", props.getProperty( "project.build.defaultGoal", "" ) );
-        assertMissing( props, "project.properties." );
+        if ( matchesVersionRange( "[4.0.0-alpha-6,)" ) )
+        {
+            assertEquals( "2", props.getProperty( "project.properties" ) );
+            assertEquals( "UTF-8", props.getProperty( "project.properties.project.build.sourceEncoding" ) );
+            assertEquals( "UTF-8", props.getProperty( "project.properties.project.reporting.outputEncoding" ) );
+        }
+        else
+        {
+            assertMissing( props, "project.properties." );
+        }
         assertMissing( props, "project.prerequisites." );
         assertMissing( props, "project.modules." );
         assertMissing( props, "project.licenses." );
