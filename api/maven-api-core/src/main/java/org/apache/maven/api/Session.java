@@ -84,9 +84,34 @@ public interface Session {
     @Nonnull
     Instant getStartTime();
 
+    /**
+     * Gets the directory of the topmost project being built, usually the current directory or the
+     * directory pointed at by the {@code -f/--file} command line argument.
+     */
     @Nonnull
+    Path getTopDirectory();
+
+    /**
+     * Gets the root directory of the session, which is the root directory for the top directory project.
+     *
+     * @throws IllegalStateException if the root directory could not be found
+     * @see #getTopDirectory()
+     * @see Project#getRootDirectory()
+     */
+    @Nonnull
+    Path getRootDirectory();
+
+    /**
+     * @deprecated use {@link #getRootDirectory()} instead
+     */
+    @Nonnull
+    @Deprecated
     Path getMultiModuleProjectDirectory();
 
+    /**
+     * @deprecated use {@link #getTopDirectory()} instead
+     */
+    @Deprecated
     @Nonnull
     Path getExecutionRootDirectory();
 
@@ -97,8 +122,8 @@ public interface Session {
      * Returns the plugin context for mojo being executed and the specified
      * {@link Project}, never returns {@code null} as if context not present, creates it.
      *
-     * <strong>Implementation note:</strong> while this method return type is {@link Map}, the returned map instance
-     * implements {@link java.util.concurrent.ConcurrentMap} as well.
+     * <strong>Implementation note:</strong> while this method return type is {@link Map}, the
+     * returned map instance implements {@link java.util.concurrent.ConcurrentMap} as well.
      *
      * @throws org.apache.maven.api.services.MavenException if not called from the within a mojo execution
      */

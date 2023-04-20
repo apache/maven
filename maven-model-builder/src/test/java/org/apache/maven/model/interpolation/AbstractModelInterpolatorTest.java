@@ -19,6 +19,8 @@
 package org.apache.maven.model.interpolation;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -41,11 +43,13 @@ import org.apache.maven.api.model.Scm;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
+import org.apache.maven.model.root.RootLocator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -307,8 +311,49 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
+    void testRootDirectory() throws Exception {
+        Path rootDirectory = Paths.get("myRootDirectory");
+
+        Model model = Model.newBuilder()
+                .version("3.8.1")
+                .artifactId("foo")
+                .repositories(Collections.singletonList(Repository.newBuilder()
+                        .url("file:${project.rootDirectory}/temp-repo")
+                        .build()))
+                .build();
+
+        ModelInterpolator interpolator = createInterpolator();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        Model out = interpolator.interpolateModel(
+                model, rootDirectory.toFile(), createModelBuildingRequest(context), collector);
+        assertProblemFree(collector);
+
+        assertEquals("file:myRootDirectory/temp-repo", (out.getRepositories().get(0)).getUrl());
+    }
+
+    @Test
+    void testRootDirectoryWithNull() throws Exception {
+        Model model = Model.newBuilder()
+                .version("3.8.1")
+                .artifactId("foo")
+                .repositories(Collections.singletonList(Repository.newBuilder()
+                        .url("file:///${project.rootDirectory}/temp-repo")
+                        .build()))
+                .build();
+
+        ModelInterpolator interpolator = createInterpolator();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        IllegalStateException e = assertThrows(
+                IllegalStateException.class,
+                () -> interpolator.interpolateModel(model, null, createModelBuildingRequest(context), collector));
+
+        assertEquals(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE, e.getMessage());
+    }
+
+    @Test
     public void testEnvars() throws Exception {
-        Properties context = new Properties();
         context.put("env.HOME", "/path/to/home");
 
         Map<String, String> modelProperties = new HashMap<>();

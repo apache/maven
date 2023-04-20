@@ -35,6 +35,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.path.UrlNormalizer;
+import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.model.v4.MavenTransformer;
 import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
@@ -51,8 +52,9 @@ import org.codehaus.plexus.interpolation.ValueSource;
 @Singleton
 public class StringVisitorModelInterpolator extends AbstractStringBasedModelInterpolator {
     @Inject
-    public StringVisitorModelInterpolator(PathTranslator pathTranslator, UrlNormalizer urlNormalizer) {
-        super(pathTranslator, urlNormalizer);
+    public StringVisitorModelInterpolator(
+            PathTranslator pathTranslator, UrlNormalizer urlNormalizer, RootLocator rootLocator) {
+        super(pathTranslator, urlNormalizer, rootLocator);
     }
 
     interface InnerInterpolator {

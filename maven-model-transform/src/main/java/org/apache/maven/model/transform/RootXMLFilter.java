@@ -18,35 +18,36 @@
  */
 package org.apache.maven.model.transform;
 
-import java.nio.file.Path;
+import java.io.IOException;
+import java.util.stream.Stream;
 
+import org.apache.maven.model.transform.pull.BufferingParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
+ * Remove the root attribute on the model
+ *
  * @author Guillaume Nodet
- * @author Robert Scholte
  * @since 4.0.0
  */
-public class RawToConsumerPomXMLFilterFactory {
-    private BuildToRawPomXMLFilterFactory buildPomXMLFilterFactory;
-
-    public RawToConsumerPomXMLFilterFactory(BuildToRawPomXMLFilterFactory buildPomXMLFilterFactory) {
-        this.buildPomXMLFilterFactory = buildPomXMLFilterFactory;
+class RootXMLFilter extends BufferingParser {
+    RootXMLFilter(XmlPullParser xmlPullParser) {
+        super(xmlPullParser);
     }
 
-    public final XmlPullParser get(XmlPullParser orgParser, Path projectPath) {
-        // Ensure that xs:any elements aren't touched by next filters
-        XmlPullParser parser = orgParser instanceof FastForwardFilter ? orgParser : new FastForwardFilter(orgParser);
-
-        parser = buildPomXMLFilterFactory.get(parser, projectPath);
-
-        // Remove root model attribute
-        parser = new RootXMLFilter(parser);
-        // Strip modules
-        parser = new ModulesXMLFilter(parser);
-        // Adjust relativePath
-        parser = new RelativePathXMLFilter(parser);
-
-        return parser;
+    @Override
+    protected boolean accept() throws XmlPullParserException, IOException {
+        if (xmlPullParser.getEventType() == XmlPullParser.START_TAG) {
+            if (xmlPullParser.getDepth() == 1 && "project".equals(xmlPullParser.getName())) {
+                Event event = bufferEvent();
+                event.attributes = Stream.of(event.attributes)
+                        .filter(a -> !"root".equals(a.name))
+                        .toArray(Attribute[]::new);
+                pushEvent(event);
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -22,6 +22,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,6 +38,7 @@ import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.ProfileActivation;
 import org.apache.maven.execution.ProjectActivation;
+import org.apache.maven.model.root.DefaultRootLocator;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
@@ -541,6 +544,12 @@ class MavenCliTest {
 
         // Assert
         assertThat(request.getUserProperties().getProperty("x"), is("false"));
+    }
+
+    @Test
+    public void findRootProjectWithAttribute() {
+        Path test = Paths.get("src/test/projects/root-attribute");
+        assertEquals(test, new DefaultRootLocator().findRoot(test.resolve("child")));
     }
 
     private MavenProject createMavenProject(String groupId, String artifactId) {

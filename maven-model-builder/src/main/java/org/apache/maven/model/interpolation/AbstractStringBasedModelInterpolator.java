@@ -21,6 +21,7 @@ package org.apache.maven.model.interpolation;
 import javax.inject.Inject;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +34,7 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.path.UrlNormalizer;
+import org.apache.maven.model.root.RootLocator;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
@@ -74,10 +76,14 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
     private final PathTranslator pathTranslator;
     private final UrlNormalizer urlNormalizer;
 
+    private final RootLocator rootLocator;
+
     @Inject
-    public AbstractStringBasedModelInterpolator(PathTranslator pathTranslator, UrlNormalizer urlNormalizer) {
+    public AbstractStringBasedModelInterpolator(
+            PathTranslator pathTranslator, UrlNormalizer urlNormalizer, RootLocator rootLocator) {
         this.pathTranslator = pathTranslator;
         this.urlNormalizer = urlNormalizer;
+        this.rootLocator = rootLocator;
     }
 
     @Override
@@ -132,6 +138,20 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
             valueSources.add(baseUriValueSource);
             valueSources.add(new BuildTimestampValueSource(config.getBuildStartTime(), modelProperties));
         }
+
+        valueSources.add(new PrefixedValueSourceWrapper(
+                new AbstractValueSource(false) {
+                    @Override
+                    public Object getValue(String expression) {
+                        if ("rootDirectory".equals(expression)) {
+                            Path base = projectDir != null ? projectDir.toPath() : null;
+                            Path root = rootLocator.findMandatoryRoot(base);
+                            return root.toFile().getPath();
+                        }
+                        return null;
+                    }
+                },
+                PROJECT_PREFIXES));
 
         valueSources.add(projectPrefixValueSource);
 

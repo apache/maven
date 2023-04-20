@@ -74,6 +74,9 @@ public final class ConsumerPomArtifactTransformer {
                 generatedFile = Files.createTempFile(buildDir, CONSUMER_POM_CLASSIFIER, "pom");
             }
             project.addAttachedArtifact(new ConsumerPomArtifact(project, generatedFile, session));
+        } else if (project.getModel().isRoot()) {
+            throw new IllegalStateException(
+                    "The use of the root attribute on the model requires the buildconsumer feature to be active");
         }
     }
 
