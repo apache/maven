@@ -86,7 +86,44 @@ public interface Project {
         return getModel().getId();
     }
 
+    /**
+     * @deprecated use {@link #isTopProject()} instead
+     */
+    @Deprecated
     boolean isExecutionRoot();
+
+    /**
+     * Returns a boolean indicating if the project is the top level project for
+     * this reactor build.  The top level project may be different from the
+     * {@code rootDirectory}, especially if a subtree of the project is being
+     * built, either because Maven has been launched in a subdirectory or using
+     * a {@code -f} option.
+     *
+     * @return {@code true} if the project is the top level project for this build
+     */
+    boolean isTopProject();
+
+    /**
+     * Returns a boolean indicating if the project is a root project,
+     * meaning that the {@link #getRootDirectory()} and {@link #getBasedir()}
+     * points to the same directory, and that either {@link Model#isRoot()}
+     * is {@code true} or that {@code basedir} contains a {@code .mvn} child
+     * directory.
+     *
+     * @return {@code true} if the project is the root project
+     * @see Model#isRoot()
+     */
+    boolean isRootProject();
+
+    /**
+     * Gets the root directory of the project, which is the parent directory
+     * containing the {@code .mvn} directory or flagged with {@code root="true"}.
+     *
+     * @throws IllegalStateException if the root directory could not be found
+     * @see Session#getRootDirectory()
+     */
+    @Nonnull
+    Path getRootDirectory();
 
     @Nonnull
     Optional<Project> getParent();

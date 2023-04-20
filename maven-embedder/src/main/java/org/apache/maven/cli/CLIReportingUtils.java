@@ -135,6 +135,13 @@ public final class CLIReportingUtils {
     }
 
     public static void showError(Logger logger, String message, Throwable e, boolean showStackTrace) {
+        if (logger == null) {
+            System.err.println(message);
+            if (showStackTrace && e != null) {
+                e.printStackTrace(System.err);
+            }
+            return;
+        }
         if (showStackTrace) {
             logger.error(message, e);
         } else {

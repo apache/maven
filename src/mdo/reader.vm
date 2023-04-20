@@ -175,7 +175,7 @@ public class ${className}
     private boolean getBooleanValue( String s, String attribute, XmlPullParser parser )
         throws XmlPullParserException
     {
-        return getBooleanValue( s, attribute, parser, null );
+        return getBooleanValue( s, attribute, parser, false );
     } //-- boolean getBooleanValue( String, String, XmlPullParser )
 
     /**
@@ -189,18 +189,14 @@ public class ${className}
      * any.
      * @return boolean
      */
-    private boolean getBooleanValue( String s, String attribute, XmlPullParser parser, String defaultValue )
+    private boolean getBooleanValue( String s, String attribute, XmlPullParser parser, boolean defaultValue )
         throws XmlPullParserException
     {
         if ( s != null && s.length() != 0 )
         {
             return Boolean.valueOf( s ).booleanValue();
         }
-        if ( defaultValue != null )
-        {
-            return Boolean.valueOf( defaultValue ).booleanValue();
-        }
-        return false;
+        return defaultValue;
     } //-- boolean getBooleanValue( String, String, XmlPullParser, String )
 
     /**
@@ -709,7 +705,7 @@ public class ${className}
       #if ( $field.type == "String" )
                 ${classLcapName}.${field.name}( interpolatedTrimmed( value, "$fieldTagName" ) );
       #elseif ( $field.type == "boolean" || $field.type == "Boolean" )
-                ${classLcapName}.${field.name}( getBooleanValue( interpolatedTrimmed( value, "$fieldTagName" ), "$fieldTagName", parser, "${field.defaultValue}" ) );
+                ${classLcapName}.${field.name}( getBooleanValue( interpolatedTrimmed( value, "$fieldTagName" ), "$fieldTagName", parser, ${field.defaultValue} ) );
       #else
                 // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
       #end
@@ -749,7 +745,7 @@ public class ${className}
                     ${classLcapName}.${field.name}( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ) );
                     break;
       #elseif ( $field.type == "boolean" || $field.type == "Boolean" )
-                    ${classLcapName}.${field.name}( getBooleanValue( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ), "${fieldTagName}", parser, "${field.defaultValue}" ) );
+                    ${classLcapName}.${field.name}( getBooleanValue( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ), "${fieldTagName}", parser, ${field.defaultValue} ) );
                     break;
       #elseif ( $field.type == "int" )
                     ${classLcapName}.${field.name}( getIntegerValue( interpolatedTrimmed( parser.nextText(), "${fieldTagName}" ), "${fieldTagName}", parser, strict, ${field.defaultValue} ) );

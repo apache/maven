@@ -28,11 +28,13 @@ import org.apache.maven.api.model.Profile;
 import org.apache.maven.model.path.DefaultPathTranslator;
 import org.apache.maven.model.path.ProfileActivationFilePathInterpolator;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
+import org.apache.maven.model.root.RootLocator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests {@link FileProfileActivator}.
@@ -49,14 +51,35 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
     @BeforeEach
     @Override
     void setUp() throws Exception {
-        activator = new FileProfileActivator(new ProfileActivationFilePathInterpolator(new DefaultPathTranslator()));
+        activator = new FileProfileActivator(
+                new ProfileActivationFilePathInterpolator(new DefaultPathTranslator(), bd -> true));
 
-        context.setProjectDirectory(new File(tempDir.toString()));
+        context.setProjectDirectory(tempDir.toFile());
 
         File file = new File(tempDir.resolve("file.txt").toString());
         if (!file.createNewFile()) {
             throw new IOException("Can't create " + file);
         }
+    }
+
+    @Test
+    void testRootDirectoryWithNull() {
+        context.setProjectDirectory(null);
+
+        IllegalStateException e = assertThrows(
+                IllegalStateException.class,
+                () -> assertActivation(false, newExistsProfile("${rootDirectory}"), context));
+        assertEquals(RootLocator.UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE, e.getMessage());
+    }
+
+    @Test
+    void testRootDirectory() {
+        assertActivation(false, newExistsProfile("${rootDirectory}/someFile.txt"), context);
+        assertActivation(true, newMissingProfile("${rootDirectory}/someFile.txt"), context);
+        assertActivation(true, newExistsProfile("${rootDirectory}"), context);
+        assertActivation(true, newExistsProfile("${rootDirectory}/" + "file.txt"), context);
+        assertActivation(false, newMissingProfile("${rootDirectory}"), context);
+        assertActivation(false, newMissingProfile("${rootDirectory}/" + "file.txt"), context);
     }
 
     @Test

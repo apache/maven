@@ -20,6 +20,6 @@ package org.apache.maven.model.interpolation;
 
 public class StringVisitorModelInterpolatorTest extends AbstractModelInterpolatorTest {
     protected ModelInterpolator createInterpolator() {
-        return new StringVisitorModelInterpolator(null, null);
+        return new StringVisitorModelInterpolator(null, null, bd -> true);
     }
 }

@@ -192,8 +192,15 @@ public class ${className}
       #set ( $fieldCapName = $Helper.capitalise( $field.name ) )
       #if ( $field.type == "String" )
             writeAttr( "$fieldTagName", ${classLcapName}.get${fieldCapName}(), serializer );
+      #elseif ( $field.type == "boolean" )
+        #set ( $def = ${field.defaultValue} )
+        #if ( ${def} == "true" )
+            writeAttr( "$fieldTagName", ${classLcapName}.is${fieldCapName}() ? null : "false", serializer );
+        #else
+            writeAttr( "$fieldTagName", ${classLcapName}.is${fieldCapName}() ? "true" : null, serializer );
+        #end
       #else
-        // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
+            // TODO: type=${field.type} to=${field.to} multiplicity=${field.multiplicity}
       #end
     #end
   #end

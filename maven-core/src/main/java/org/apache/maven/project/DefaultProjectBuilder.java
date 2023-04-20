@@ -69,6 +69,7 @@ import org.apache.maven.model.building.StringModelSource;
 import org.apache.maven.model.building.TransformerContext;
 import org.apache.maven.model.building.TransformerContextBuilder;
 import org.apache.maven.model.resolution.ModelResolver;
+import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.apache.maven.repository.internal.ModelCacheFactory;
 import org.codehaus.plexus.util.Os;
@@ -101,6 +102,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     private final ProjectDependenciesResolver dependencyResolver;
     private final ModelCacheFactory modelCacheFactory;
 
+    private final RootLocator rootLocator;
+
     @SuppressWarnings("checkstyle:ParameterNumber")
     @Inject
     public DefaultProjectBuilder(
@@ -111,7 +114,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             RepositorySystem repoSystem,
             RemoteRepositoryManager repositoryManager,
             ProjectDependenciesResolver dependencyResolver,
-            ModelCacheFactory modelCacheFactory) {
+            ModelCacheFactory modelCacheFactory,
+            RootLocator rootLocator) {
         this.modelBuilder = modelBuilder;
         this.modelProcessor = modelProcessor;
         this.projectBuildingHelper = projectBuildingHelper;
@@ -120,6 +124,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         this.repositoryManager = repositoryManager;
         this.dependencyResolver = dependencyResolver;
         this.modelCacheFactory = modelCacheFactory;
+        this.rootLocator = rootLocator;
     }
     // ----------------------------------------------------------------------
     // MavenProjectBuilder Implementation
@@ -161,6 +166,11 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 request.setPomFile(pomFile);
                 request.setModelSource(modelSource);
                 request.setLocationTracking(true);
+
+                if (pomFile != null) {
+                    project.setRootDirectory(
+                            rootLocator.findRoot(pomFile.getParentFile().toPath()));
+                }
 
                 ModelBuildingResult result;
                 try {
@@ -444,6 +454,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
         MavenProject project = new MavenProject();
         project.setFile(pomFile);
+
+        project.setRootDirectory(rootLocator.findRoot(pomFile.getParentFile().toPath()));
 
         ModelBuildingRequest request = getModelBuildingRequest(config)
                 .setPomFile(pomFile)

@@ -212,6 +212,19 @@
           </description>
           <type>String</type>
         </field>
+        <field xml.attribute="true" xml.tagName="root">
+          <name>root</name>
+          <version>4.0.0+</version>
+          <description>
+            <![CDATA[
+            Indicates that this project is the root project, located in the upper directory of the source tree.
+            This is the directory which may contain the .mvn directory.
+            <br><b>Since</b>: Maven 4.0.0
+            ]]>
+          </description>
+          <type>boolean</type>
+          <defaultValue>false</defaultValue>
+        </field>
         <field>
           <name>inceptionYear</name>
           <version>3.0.0+</version>

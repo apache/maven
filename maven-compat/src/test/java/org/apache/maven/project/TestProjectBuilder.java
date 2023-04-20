@@ -29,6 +29,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.model.building.ModelBuilder;
 import org.apache.maven.model.building.ModelProcessor;
+import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.repository.internal.ModelCacheFactory;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
@@ -45,7 +46,8 @@ public class TestProjectBuilder extends DefaultProjectBuilder {
             RepositorySystem repoSystem,
             RemoteRepositoryManager repositoryManager,
             ProjectDependenciesResolver dependencyResolver,
-            ModelCacheFactory modelCacheFactory) {
+            ModelCacheFactory modelCacheFactory,
+            RootLocator rootLocator) {
         super(
                 modelBuilder,
                 modelProcessor,
@@ -54,7 +56,8 @@ public class TestProjectBuilder extends DefaultProjectBuilder {
                 repoSystem,
                 repositoryManager,
                 dependencyResolver,
-                modelCacheFactory);
+                modelCacheFactory,
+                rootLocator);
     }
 
     @Override

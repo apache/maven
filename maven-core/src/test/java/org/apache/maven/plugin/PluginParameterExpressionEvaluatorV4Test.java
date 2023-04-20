@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
+import org.apache.maven.api.Session;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -38,6 +39,8 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultProject;
+import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
@@ -51,6 +54,11 @@ import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.internal.impl.DefaultRepositorySystem;
+import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.NoLocalRepositoryManagerException;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getTestFile;
@@ -65,7 +73,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @author Jason van Zyl
  */
-class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentTestCase {
+public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenComponentTestCase {
     private static final String FS = File.separator;
 
     @Inject
@@ -74,12 +82,12 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     private Path rootDirectory;
 
     @Test
-    void testPluginDescriptorExpressionReference() throws Exception {
+    public void testPluginDescriptorExpressionReference() throws Exception {
         MojoExecution exec = newMojoExecution();
 
-        MavenSession session = newMavenSession();
+        Session session = newSession();
 
-        Object result = new PluginParameterExpressionEvaluator(session, exec).evaluate("${plugin}");
+        Object result = new PluginParameterExpressionEvaluatorV4(session, null, exec).evaluate("${plugin}");
 
         System.out.println("Result: " + result);
 
@@ -90,7 +98,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     }
 
     @Test
-    void testPluginArtifactsExpressionReference() throws Exception {
+    public void testPluginArtifactsExpressionReference() throws Exception {
         MojoExecution exec = newMojoExecution();
 
         Artifact depArtifact = createArtifact("group", "artifact", "1");
@@ -100,11 +108,11 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
 
         exec.getMojoDescriptor().getPluginDescriptor().setArtifacts(deps);
 
-        MavenSession session = newMavenSession();
+        Session session = newSession();
 
         @SuppressWarnings("unchecked")
-        List<Artifact> depResults =
-                (List<Artifact>) new PluginParameterExpressionEvaluator(session, exec).evaluate("${plugin.artifacts}");
+        List<Artifact> depResults = (List<Artifact>)
+                new PluginParameterExpressionEvaluatorV4(session, null, exec).evaluate("${plugin.artifacts}");
 
         System.out.println("Result: " + depResults);
 
@@ -114,7 +122,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     }
 
     @Test
-    void testPluginArtifactMapExpressionReference() throws Exception {
+    public void testPluginArtifactMapExpressionReference() throws Exception {
         MojoExecution exec = newMojoExecution();
 
         Artifact depArtifact = createArtifact("group", "artifact", "1");
@@ -124,11 +132,11 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
 
         exec.getMojoDescriptor().getPluginDescriptor().setArtifacts(deps);
 
-        MavenSession session = newMavenSession();
+        Session session = newSession();
 
         @SuppressWarnings("unchecked")
         Map<String, Artifact> depResults = (Map<String, Artifact>)
-                new PluginParameterExpressionEvaluator(session, exec).evaluate("${plugin.artifactMap}");
+                new PluginParameterExpressionEvaluatorV4(session, null, exec).evaluate("${plugin.artifactMap}");
 
         System.out.println("Result: " + depResults);
 
@@ -141,12 +149,12 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     }
 
     @Test
-    void testPluginArtifactIdExpressionReference() throws Exception {
+    public void testPluginArtifactIdExpressionReference() throws Exception {
         MojoExecution exec = newMojoExecution();
 
-        MavenSession session = newMavenSession();
+        Session session = newSession();
 
-        Object result = new PluginParameterExpressionEvaluator(session, exec).evaluate("${plugin.artifactId}");
+        Object result = new PluginParameterExpressionEvaluatorV4(session, null, exec).evaluate("${plugin.artifactId}");
 
         System.out.println("Result: " + result);
 
@@ -157,7 +165,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     }
 
     @Test
-    void testValueExtractionWithAPomValueContainingAPath() throws Exception {
+    public void testValueExtractionWithAPomValueContainingAPath() throws Exception {
         String expected = getTestFile("target/test-classes/target/classes").getCanonicalPath();
 
         Build build = new Build();
@@ -178,7 +186,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     }
 
     @Test
-    void testEscapedVariablePassthrough() throws Exception {
+    public void testEscapedVariablePassthrough() throws Exception {
         String var = "${var}";
 
         Model model = new Model();
@@ -194,7 +202,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     }
 
     @Test
-    void testEscapedVariablePassthroughInLargerExpression() throws Exception {
+    public void testEscapedVariablePassthroughInLargerExpression() throws Exception {
         String var = "${var}";
         String key = var + " with version: ${project.version}";
 
@@ -211,7 +219,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     }
 
     @Test
-    void testMultipleSubExpressionsInLargerExpression() throws Exception {
+    public void testMultipleSubExpressionsInLargerExpression() throws Exception {
         String key = "${project.artifactId} with version: ${project.version}";
 
         Model model = new Model();
@@ -228,7 +236,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     }
 
     @Test
-    void testMissingPOMPropertyRefInLargerExpression() throws Exception {
+    public void testMissingPOMPropertyRefInLargerExpression() throws Exception {
         String expr = "/path/to/someproject-${baseVersion}";
 
         MavenProject project = new MavenProject(new Model());
@@ -241,7 +249,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     }
 
     @Test
-    void testPOMPropertyExtractionWithMissingProject_WithDotNotation() throws Exception {
+    public void testPOMPropertyExtractionWithMissingProject_WithDotNotation() throws Exception {
         String key = "m2.name";
         String checkValue = "value";
 
@@ -261,7 +269,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     }
 
     @Test
-    void testBasedirExtractionWithMissingProject() throws Exception {
+    public void testBasedirExtractionWithMissingProject() throws Exception {
         ExpressionEvaluator ee = createExpressionEvaluator(null, null, new Properties());
 
         Object value = ee.evaluate("${basedir}");
@@ -270,7 +278,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     }
 
     @Test
-    void testValueExtractionFromSystemPropertiesWithMissingProject() throws Exception {
+    public void testValueExtractionFromSystemPropertiesWithMissingProject() throws Exception {
         String sysprop = "PPEET_sysprop1";
 
         Properties executionProperties = new Properties();
@@ -287,7 +295,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     }
 
     @Test
-    void testValueExtractionFromSystemPropertiesWithMissingProject_WithDotNotation() throws Exception {
+    public void testValueExtractionFromSystemPropertiesWithMissingProject_WithDotNotation() throws Exception {
         String sysprop = "PPEET.sysprop2";
 
         Properties executionProperties = new Properties();
@@ -305,28 +313,33 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
 
     @SuppressWarnings("deprecation")
     private static MavenSession createSession(PlexusContainer container, ArtifactRepository repo, Properties properties)
-            throws CycleDetectedException, DuplicateProjectException {
+            throws CycleDetectedException, DuplicateProjectException, NoLocalRepositoryManagerException {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
                 .setSystemProperties(properties)
                 .setGoals(Collections.<String>emptyList())
                 .setBaseDirectory(new File(""))
                 .setLocalRepository(repo);
 
-        return new MavenSession(
-                container, request, new DefaultMavenExecutionResult(), Collections.<MavenProject>emptyList());
+        DefaultRepositorySystemSession repositorySession = new DefaultRepositorySystemSession();
+        repositorySession.setLocalRepositoryManager(new SimpleLocalRepositoryManagerFactory()
+                .newInstance(repositorySession, new LocalRepository(repo.getUrl())));
+        MavenSession session =
+                new MavenSession(container, repositorySession, request, new DefaultMavenExecutionResult());
+        session.setProjects(Collections.<MavenProject>emptyList());
+        return session;
     }
 
     @Test
-    void testLocalRepositoryExtraction() throws Exception {
+    public void testLocalRepositoryExtraction() throws Exception {
         ExpressionEvaluator expressionEvaluator =
                 createExpressionEvaluator(createDefaultProject(), null, new Properties());
         Object value = expressionEvaluator.evaluate("${localRepository}");
 
-        assertEquals("local", ((ArtifactRepository) value).getId());
+        assertEquals("local", ((org.apache.maven.api.LocalRepository) value).getId());
     }
 
     @Test
-    void testTwoExpressions() throws Exception {
+    public void testTwoExpressions() throws Exception {
         Build build = new Build();
         build.setDirectory("expected-directory");
         build.setFinalName("expected-finalName");
@@ -343,7 +356,7 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     }
 
     @Test
-    void testShouldExtractPluginArtifacts() throws Exception {
+    public void testShouldExtractPluginArtifacts() throws Exception {
         PluginDescriptor pd = new PluginDescriptor();
 
         Artifact artifact = createArtifact("testGroup", "testArtifact", "1.0");
@@ -397,9 +410,12 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
         ArtifactRepository repo = factory.createDefaultLocalRepository();
 
         MutablePlexusContainer container = (MutablePlexusContainer) getContainer();
-        MavenSession session = createSession(container, repo, executionProperties);
-        session.setCurrentProject(project);
-        session.getRequest().setRootDirectory(rootDirectory);
+        MavenSession mavenSession = createSession(container, repo, executionProperties);
+        mavenSession.setCurrentProject(project);
+        mavenSession.getRequest().setRootDirectory(rootDirectory);
+
+        DefaultSession session =
+                new DefaultSession(mavenSession, new DefaultRepositorySystem(), null, null, null, null);
 
         MojoDescriptor mojo = new MojoDescriptor();
         mojo.setPluginDescriptor(pluginDescriptor);
@@ -407,7 +423,8 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
 
         MojoExecution mojoExecution = new MojoExecution(mojo);
 
-        return new PluginParameterExpressionEvaluator(session, mojoExecution);
+        return new PluginParameterExpressionEvaluatorV4(
+                session, project != null ? new DefaultProject(session, project) : null, mojoExecution);
     }
 
     protected Artifact createArtifact(String groupId, String artifactId, String version) throws Exception {
@@ -433,6 +450,10 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
         pd.addComponentDescriptor(md);
 
         return new MojoExecution(md);
+    }
+
+    private DefaultSession newSession() throws Exception {
+        return new DefaultSession(newMavenSession(), new DefaultRepositorySystem(), null, null, null, null);
     }
 
     private MavenSession newMavenSession() throws Exception {

@@ -395,6 +395,16 @@ public class BufferingParser implements XmlPullParser {
                 event.prefix = pp.getPrefix();
                 event.empty = pp.isEmptyElementTag();
                 event.text = pp.getText();
+                event.attributes = new Attribute[pp.getAttributeCount()];
+                for (int i = 0; i < pp.getAttributeCount(); i++) {
+                    Attribute attr = new Attribute();
+                    attr.name = pp.getAttributeName(i);
+                    attr.namespace = pp.getAttributeNamespace(i);
+                    attr.value = pp.getAttributeValue(i);
+                    attr.type = pp.getAttributeType(i);
+                    attr.isDefault = pp.isAttributeDefault(i);
+                    event.attributes[i] = attr;
+                }
                 break;
             case END_TAG:
                 event.name = pp.getName();

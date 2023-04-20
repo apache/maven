@@ -19,6 +19,7 @@
 package org.apache.maven.execution;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -141,8 +142,28 @@ public class MavenSession implements Cloneable {
         return projects;
     }
 
+    /**
+     * @deprecated use {@link #getTopDirectory()} ()}
+     */
+    @Deprecated
     public String getExecutionRootDirectory() {
         return request.getBaseDirectory();
+    }
+
+    /**
+     * @see MavenExecutionRequest#getTopDirectory()
+     * @since 4.0.0
+     */
+    public Path getTopDirectory() {
+        return request.getTopDirectory();
+    }
+
+    /**
+     * @see MavenExecutionRequest#getRootDirectory()
+     * @since 4.0.0
+     */
+    public Path getRootDirectory() {
+        return request.getRootDirectory();
     }
 
     public MavenExecutionRequest getRequest() {

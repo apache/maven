@@ -64,6 +64,8 @@ import org.apache.maven.model.profile.activation.JdkVersionProfileActivator;
 import org.apache.maven.model.profile.activation.OperatingSystemProfileActivator;
 import org.apache.maven.model.profile.activation.ProfileActivator;
 import org.apache.maven.model.profile.activation.PropertyProfileActivator;
+import org.apache.maven.model.root.DefaultRootLocator;
+import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.model.superpom.DefaultSuperPomProvider;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.DefaultModelValidator;
@@ -99,6 +101,8 @@ public class DefaultModelBuilderFactory {
     private ReportConfigurationExpander reportConfigurationExpander;
     private ProfileActivationFilePathInterpolator profileActivationFilePathInterpolator;
     private ModelVersionProcessor versionProcessor;
+
+    private RootLocator rootLocator;
 
     public DefaultModelBuilderFactory setModelProcessor(ModelProcessor modelProcessor) {
         this.modelProcessor = modelProcessor;
@@ -201,6 +205,11 @@ public class DefaultModelBuilderFactory {
         return this;
     }
 
+    public DefaultModelBuilderFactory setRootLocator(RootLocator rootLocator) {
+        this.rootLocator = rootLocator;
+        return this;
+    }
+
     protected ModelProcessor newModelProcessor() {
         return new DefaultModelProcessor(newModelLocator(), newModelReader());
     }
@@ -227,7 +236,7 @@ public class DefaultModelBuilderFactory {
     }
 
     protected ProfileActivationFilePathInterpolator newProfileActivationFilePathInterpolator() {
-        return new ProfileActivationFilePathInterpolator(newPathTranslator());
+        return new ProfileActivationFilePathInterpolator(newPathTranslator(), newRootLocator());
     }
 
     protected UrlNormalizer newUrlNormalizer() {
@@ -238,10 +247,15 @@ public class DefaultModelBuilderFactory {
         return new DefaultPathTranslator();
     }
 
+    protected RootLocator newRootLocator() {
+        return new DefaultRootLocator();
+    }
+
     protected ModelInterpolator newModelInterpolator() {
         UrlNormalizer normalizer = newUrlNormalizer();
         PathTranslator pathTranslator = newPathTranslator();
-        return new StringVisitorModelInterpolator(pathTranslator, normalizer);
+        RootLocator rootLocator = newRootLocator();
+        return new StringVisitorModelInterpolator(pathTranslator, normalizer, rootLocator);
     }
 
     protected ModelVersionProcessor newModelVersionPropertiesProcessor() {
