@@ -24,6 +24,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,66 +51,56 @@ class ExpressionUtil
      * Evaluates the specified expression. Expressions are composed of segments which are separated by a forward slash
      * ('/'). Each segment specifies a (public) bean property of the current object and drives the evaluation further
      * down the object graph. For lists, arrays and maps segments can additionally specify the index/key of an element.
-     * The initial segment denotes the root object and the parameter <code>contexts</code> is used to specify which
-     * root objects are available. For instance, if <code>contexts</code> maps the token "project" to a Maven project
+     * The initial segment denotes the root object and the parameter <code>contexts</code> is used to specify which root
+     * objects are available. For instance, if <code>contexts</code> maps the token "project" to a Maven project
      * instance, the expression "project/build/resources/0/directory" specifies the first resource directory of the
      * project.
      *
      * @param expression The expression to evaluate, may be <code>null</code>.
-     * @param contexts   The possible root objects for the expression evaluation, indexed by their identifying token,
-     *                   must
-     *                   not be <code>null</code>.
-     * @return The value of the expression or <code>null</code> if the expression could not be evaluated.
+     * @param context    The object to start expression evaluation at, must not be <code>null</code>.
+     * @return The values of the evaluation, indexed by expression, or an empty map if the segments could not be
+     * evaluated.
      */
-    public static Object evaluate( String expression, Map contexts )
+    public static Map evaluate( String expression, Object context )
     {
-        Object value = null;
+        Map values = Collections.EMPTY_MAP;
 
         if ( expression != null && expression.length() > 0 )
         {
             List segments = Arrays.asList( expression.split( "/", 0 ) );
-            if ( !segments.isEmpty() )
-            {
-                Object context = contexts.get( segments.get( 0 ) );
-                if ( context != null )
-                {
-                    value = evaluate( context, segments.subList( 1, segments.size() ) );
-                }
-            }
+            values = evaluate( "", segments, context );
         }
 
-        return value;
+        return values;
     }
 
     /**
      * Evaluates the given expression segments against the specified object.
      *
-     * @param context  The object to evaluate the segments against, may be <code>null</code>.
+     * @param prefix   The expression prefix that led to the current context, must not be <code>null</code>.
      * @param segments The expression segments to evaluate, must not be <code>null</code>.
-     * @return The value of the evaluation or <code>null</code> if the segments could not be evaluated.
+     * @param context  The object to evaluate the segments against, may be <code>null</code>.
+     * @return The values of the evaluation, indexed by expression, or an empty map if the segments could not be
+     * evaluated.
      */
-    private static Object evaluate( Object context, List segments )
+    private static Map evaluate( String prefix, List segments, Object context )
     {
-        Object value = null;
+        Map values = Collections.EMPTY_MAP;
 
         if ( segments.isEmpty() )
         {
-            value = context;
+            values = Collections.singletonMap( prefix, context );
         }
         else if ( context != null )
         {
-            Object target = null;
+            Map targets = Collections.EMPTY_MAP;
             String segment = (String) segments.get( 0 );
-            if ( segment.length() <= 0 )
-            {
-                value = context;
-            }
-            else if ( context.getClass().isArray() && Character.isDigit( segment.charAt( 0 ) ) )
+            if ( context.getClass().isArray() && Character.isDigit( segment.charAt( 0 ) ) )
             {
                 try
                 {
                     int index = Integer.parseInt( segment );
-                    target = Array.get( context, index );
+                    targets = Collections.singletonMap( segment, Array.get( context, index ) );
                 }
                 catch ( RuntimeException e )
                 {
@@ -119,21 +112,51 @@ class ExpressionUtil
                 try
                 {
                     int index = Integer.parseInt( segment );
-                    target = ( (List) context ).get( index );
+                    targets = Collections.singletonMap( segment, ( (List) context ).get( index ) );
                 }
                 catch ( RuntimeException e )
                 {
                     // invalid index, just ignore
                 }
             }
+            else if ( ( context instanceof Collection ) && "*".equals( segment ) )
+            {
+                targets = new LinkedHashMap();
+                int index = 0;
+                for ( Iterator it = ( (Collection) context ).iterator(); it.hasNext(); index++ )
+                {
+                    targets.put( Integer.toString( index ), it.next() );
+                }
+            }
+            else if ( context.getClass().isArray() && "*".equals( segment ) )
+            {
+                targets = new LinkedHashMap();
+                for ( int index = 0, n = Array.getLength( context ); index < n; index++ )
+                {
+                    targets.put( Integer.toString( index ), Array.get( context, index ) );
+                }
+            }
             else
             {
-                target = getProperty( context, segment );
+                targets = Collections.singletonMap( segment, getProperty( context, segment ) );
             }
-            value = evaluate( target, segments.subList( 1, segments.size() ) );
+
+            values = new LinkedHashMap();
+            for ( Object key : targets.keySet() )
+            {
+                Object target = targets.get( key );
+                values.putAll(
+                    evaluate( concat( prefix, String.valueOf( key ) ), segments.subList( 1, segments.size() ),
+                              target ) );
+            }
         }
 
-        return value;
+        return values;
+    }
+
+    private static String concat( String prefix, String segment )
+    {
+        return ( prefix == null || prefix.length() <= 0 ) ? segment : ( prefix + '/' + segment );
     }
 
     /**
@@ -162,6 +185,7 @@ class ExpressionUtil
             try
             {
                 Method method = type.getMethod( property, NO_PARAMS );
+                method.setAccessible( true );
                 value = method.invoke( context, NO_ARGS );
             }
             catch ( NoSuchMethodException e )
@@ -170,6 +194,7 @@ class ExpressionUtil
                 {
                     String name = "get" + Character.toUpperCase( property.charAt( 0 ) ) + property.substring( 1 );
                     Method method = type.getMethod( name, NO_PARAMS );
+                    method.setAccessible( true );
                     value = method.invoke( context, NO_ARGS );
                 }
                 catch ( NoSuchMethodException e1 )
@@ -178,6 +203,7 @@ class ExpressionUtil
                     {
                         String name = "is" + Character.toUpperCase( property.charAt( 0 ) ) + property.substring( 1 );
                         Method method = type.getMethod( name, NO_PARAMS );
+                        method.setAccessible( true );
                         value = method.invoke( context, NO_ARGS );
                     }
                     catch ( NoSuchMethodException e2 )
@@ -193,6 +219,7 @@ class ExpressionUtil
                             {
                                 method = type.getMethod( "get", OBJECT_PARAM );
                             }
+                            method.setAccessible( true );
                             value = method.invoke( context, new Object[]{ property } );
                         }
                         catch ( NoSuchMethodException e3 )
@@ -200,6 +227,7 @@ class ExpressionUtil
                             try
                             {
                                 Field field = type.getField( property );
+                                field.setAccessible( true );
                                 value = field.get( context );
                             }
                             catch ( NoSuchFieldException e4 )

@@ -107,7 +107,7 @@ public class InstanceofMojo
             for ( String expression : objectExpressions )
             {
                 getLog().info( "[MAVEN-CORE-IT-LOG] Evaluating expression " + expression );
-                Object object = ExpressionUtil.evaluate( expression, contexts );
+                Object object = ExpressionUtil.evaluate( expression, contexts ).get( expression );
                 getLog().info( "[MAVEN-CORE-IT-LOG] Checking object " + object );
                 if ( object != null )
                 {

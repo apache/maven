@@ -76,7 +76,15 @@ public class MavenITmng3183LoggingToFileTest
             }
         }
 
-        assertEquals( Collections.EMPTY_LIST, stdout );
+        if ( getMavenVersion().getMajorVersion() < 4 )
+        {
+            assertEquals(Collections.EMPTY_LIST, stdout);
+        }
+        else
+        {
+            assertEquals( 1, stdout.size() );
+            assertEquals( "Unable to find the root directory. Create a .mvn directory in the root directory or add the root=\"true\" attribute on the root project's model to identify it.", stdout.iterator().next() );
+        }
 
         List<String> log = verifier.loadLines( "maven.log", "UTF-8" );
 

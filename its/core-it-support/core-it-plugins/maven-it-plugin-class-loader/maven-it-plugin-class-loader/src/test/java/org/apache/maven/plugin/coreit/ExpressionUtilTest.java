@@ -19,12 +19,12 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
-import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -51,35 +51,48 @@ public class ExpressionUtilTest
         contexts.put( "map", map );
         contexts.put( "bean", bean );
 
-        assertSame( array, ExpressionUtil.evaluate( "array", contexts ) );
-        assertSame( array, ExpressionUtil.evaluate( "array/", contexts ) );
-        assertSame( list, ExpressionUtil.evaluate( "list", contexts ) );
-        assertSame( map, ExpressionUtil.evaluate( "map", contexts ) );
-        assertSame( bean, ExpressionUtil.evaluate( "bean", contexts ) );
-        assertNull( ExpressionUtil.evaluate( "no-root", contexts ) );
+        assertSame( array, evaluate( "array", contexts ) );
+        assertSame( array, ExpressionUtil.evaluate( "array/", contexts ).get( "array" ) );
+        assertSame( list, evaluate( "list", contexts ) );
+        assertSame( map, evaluate( "map", contexts ) );
+        assertSame( bean, evaluate( "bean", contexts ) );
+        assertNull( evaluate( "no-root", contexts ) );
 
-        assertEquals( 3, ExpressionUtil.evaluate( "array/length", contexts ) );
-        assertEquals( "three", ExpressionUtil.evaluate( "array/2", contexts ) );
-        assertEquals( 5, ExpressionUtil.evaluate( "array/2/length", contexts ) );
-        assertNull( ExpressionUtil.evaluate( "array/invalid", contexts ) );
-        assertNull( ExpressionUtil.evaluate( "array/-1", contexts ) );
-        assertNull( ExpressionUtil.evaluate( "array/999", contexts ) );
+        assertEquals( 3, evaluate( "array/length", contexts ) );
+        assertEquals( "three", evaluate( "array/2", contexts ) );
+        assertEquals( 5, evaluate( "array/2/length", contexts ) );
+        assertNull( evaluate( "array/invalid", contexts ) );
+        assertNull( evaluate( "array/-1", contexts ) );
+        assertNull( evaluate( "array/999", contexts ) );
+        assertEquals( 3, ExpressionUtil.evaluate( "array/*", contexts ).size() );
+        assertEquals( "one", ExpressionUtil.evaluate( "array/*", contexts ).get( "array/0" ) );
+        assertEquals( "two", ExpressionUtil.evaluate( "array/*", contexts ).get( "array/1" ) );
+        assertEquals( "three", ExpressionUtil.evaluate( "array/*", contexts ).get( "array/2" ) );
 
-        assertEquals( 3, ExpressionUtil.evaluate( "list/size", contexts ) );
-        assertEquals( "-2", ExpressionUtil.evaluate( "list/2", contexts ) );
-        assertNull( ExpressionUtil.evaluate( "list/invalid", contexts ) );
-        assertNull( ExpressionUtil.evaluate( "list/-1", contexts ) );
-        assertNull( ExpressionUtil.evaluate( "list/999", contexts ) );
+        assertEquals( 3, evaluate( "list/size", contexts ) );
+        assertEquals( "-2", evaluate( "list/2", contexts ) );
+        assertNull( evaluate( "list/invalid", contexts ) );
+        assertNull( evaluate( "list/-1", contexts ) );
+        assertNull( evaluate( "list/999", contexts ) );
+        assertEquals( 3, ExpressionUtil.evaluate( "list/*", contexts ).size() );
+        assertEquals( "0", ExpressionUtil.evaluate( "list/*", contexts ).get( "list/0" ) );
+        assertEquals( "-1", ExpressionUtil.evaluate( "list/*", contexts ).get( "list/1" ) );
+        assertEquals( "-2", ExpressionUtil.evaluate( "list/*", contexts ).get( "list/2" ) );
 
-        assertEquals( 1, ExpressionUtil.evaluate( "map/size", contexts ) );
-        assertEquals( "value", ExpressionUtil.evaluate( "map/some.key", contexts ) );
-        assertNull( ExpressionUtil.evaluate( "map/invalid", contexts ) );
+        assertEquals( 1, evaluate( "map/size", contexts ) );
+        assertEquals( "value", evaluate( "map/some.key", contexts ) );
+        assertNull( evaluate( "map/invalid", contexts ) );
 
-        assertEquals( "field", ExpressionUtil.evaluate( "bean/field", contexts ) );
-        assertNull( ExpressionUtil.evaluate( "bean/invalid", contexts ) );
-        assertEquals( "prop", ExpressionUtil.evaluate( "bean/bean/prop", contexts ) );
-        assertEquals( "flag", ExpressionUtil.evaluate( "bean/bean/flag", contexts ) );
-        assertEquals( "arg", ExpressionUtil.evaluate( "bean/bean/arg", contexts ) );
+        assertEquals( "field", evaluate( "bean/field", contexts ) );
+        assertNull( evaluate( "bean/invalid", contexts ) );
+        assertEquals( "prop", evaluate( "bean/bean/prop", contexts ) );
+        assertEquals( "flag", evaluate( "bean/bean/flag", contexts ) );
+        assertEquals( "arg", evaluate( "bean/bean/arg", contexts ) );
+    }
+
+    private static Object evaluate( String expression, Object context )
+    {
+        return ExpressionUtil.evaluate( expression, context ).get( expression );
     }
 
     @Test

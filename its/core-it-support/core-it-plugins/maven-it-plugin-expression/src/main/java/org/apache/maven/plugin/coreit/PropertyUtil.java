@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -75,7 +76,7 @@ class PropertyUtil
         {
             visited.add( obj );
             if ( ( obj instanceof String ) || ( obj instanceof Number ) || ( obj instanceof Boolean )
-                || ( obj instanceof File ) )
+                || ( obj instanceof File ) || ( obj instanceof Path ) )
             {
                 props.put( key, obj.toString() );
             }
