@@ -18,6 +18,7 @@
  */
 package org.apache.maven.internal.transformation;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,8 +26,16 @@ import java.nio.file.Paths;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.TransformerContext;
+import org.apache.maven.project.MavenProject;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.SessionData;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.xmlunit.assertj.XmlAssert;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 class ConsumerPomArtifactTransformerTest {
     @Test
@@ -41,6 +50,20 @@ class ConsumerPomArtifactTransformerTest {
                         ConsumerPomArtifactTransformer.transform(beforePomFile, new NoTransformerContext())) {
             XmlAssert.assertThat(result).and(expected).areIdentical();
         }
+    }
+
+    @Test
+    void injectTransformedArtifactsWithoutPomShouldNotInjectAnyArtifacts() throws IOException {
+        MavenProject emptyProject = new MavenProject();
+
+        RepositorySystemSession systemSessionMock = Mockito.mock(RepositorySystemSession.class);
+        SessionData sessionDataMock = Mockito.mock(SessionData.class);
+        when(systemSessionMock.getData()).thenReturn(sessionDataMock);
+        when(sessionDataMock.get(any())).thenReturn(new NoTransformerContext());
+
+        new ConsumerPomArtifactTransformer().injectTransformedArtifacts(emptyProject, systemSessionMock);
+
+        assertThat(emptyProject.getAttachedArtifacts()).isEmpty();
     }
 
     private static class NoTransformerContext implements TransformerContext {
