@@ -307,7 +307,10 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             pomArtifact = pomResult.getArtifact();
             localProject = pomResult.getRepository() instanceof WorkspaceRepository;
         } catch (org.eclipse.aether.resolution.ArtifactResolutionException e) {
-            if (e.getResults().get(0).isMissing() && allowStubModel) {
+            // This is a workaround for MNG-7758/MRESOLVER-335
+            if (e.getResult().getExceptions().stream()
+                            .anyMatch(re -> re instanceof org.eclipse.aether.transfer.ArtifactNotFoundException)
+                    && allowStubModel) {
                 return build(null, createStubModelSource(artifact), config);
             }
             throw new ProjectBuildingException(artifact.getId(), "Error resolving project artifact", e);

@@ -170,8 +170,12 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 pomArtifact = resolveResult.getArtifact();
                 result.setRepository(resolveResult.getRepository());
             } catch (ArtifactResolutionException e) {
-                if (e.getCause() instanceof ArtifactNotFoundException) {
-                    missingDescriptor(session, trace, a, (Exception) e.getCause());
+                // This is a workaround for MNG-7758/MRESOLVER-335
+                if (e.getResult().getExceptions().stream().anyMatch(re -> re instanceof ArtifactNotFoundException)) {
+                    missingDescriptor(session, trace, a, (Exception) e.getResult().getExceptions().stream()
+                            .filter(re -> re instanceof ArtifactNotFoundException)
+                            .findFirst()
+                            .get());
                     if ((getPolicy(session, a, request) & ArtifactDescriptorPolicy.IGNORE_MISSING) != 0) {
                         return null;
                     }
