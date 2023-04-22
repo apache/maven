@@ -157,7 +157,12 @@ class DefaultModelResolver implements ModelResolver {
             request.setTrace(trace);
             pomArtifact = resolver.resolveArtifact(session, request).getArtifact();
         } catch (ArtifactResolutionException e) {
-            throw new UnresolvableModelException(e.getMessage(), groupId, artifactId, version, e);
+            throw new UnresolvableModelException(
+                    String.format("Failed to resolve model artifact '%s'", pomArtifact),
+                    groupId,
+                    artifactId,
+                    version,
+                    e);
         }
 
         return new ArtifactModelSource(pomArtifact.getFile(), groupId, artifactId, version);

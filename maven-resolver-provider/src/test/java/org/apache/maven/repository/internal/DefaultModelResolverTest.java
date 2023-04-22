@@ -65,7 +65,7 @@ final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
                 () -> newModelResolver().resolveModel(parent, new AtomicReference<>()),
                 "Expected 'UnresolvableModelException' not thrown.");
         assertNotNull(e.getMessage());
-        assertTrue(e.getMessage().contains("Could not find artifact ut.simple:artifact:pom:0 in repo"));
+        assertTrue(e.getMessage().contains("Failed to resolve model artifact 'ut.simple:artifact:pom:0'"));
     }
 
     @Test
@@ -138,7 +138,7 @@ final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
                 () -> newModelResolver().resolveModel(dependency, new AtomicReference<>()),
                 "Expected 'UnresolvableModelException' not thrown.");
         assertNotNull(e.getMessage());
-        assertTrue(e.getMessage().contains("Could not find artifact ut.simple:artifact:pom:0 in repo"));
+        assertTrue(e.getMessage().contains("Failed to resolve model artifact 'ut.simple:artifact:pom:0'"));
     }
 
     @Test

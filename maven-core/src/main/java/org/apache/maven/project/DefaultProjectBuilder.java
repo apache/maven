@@ -310,8 +310,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             if (e.getResults().get(0).isMissing() && allowStubModel) {
                 return build(null, createStubModelSource(artifact), config);
             }
-            throw new ProjectBuildingException(
-                    artifact.getId(), "Error resolving project artifact: " + e.getMessage(), e);
+            throw new ProjectBuildingException(artifact.getId(), "Error resolving project artifact", e);
         }
 
         File pomFile = pomArtifact.getFile();

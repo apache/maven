@@ -188,9 +188,11 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
                 result = repoSystem.resolveArtifact(session, artifactRequest);
             } catch (org.eclipse.aether.resolution.ArtifactResolutionException e) {
                 if (e.getCause() instanceof org.eclipse.aether.transfer.ArtifactNotFoundException) {
-                    throw new ArtifactNotFoundException(e.getMessage(), artifact, remoteRepositories, e);
+                    throw new ArtifactNotFoundException(
+                            "Could not find artifact '" + artifact + "'", artifact, remoteRepositories, e);
                 } else {
-                    throw new ArtifactResolutionException(e.getMessage(), artifact, remoteRepositories, e);
+                    throw new ArtifactResolutionException(
+                            "Failed to resolve artifact '" + artifact + "'", artifact, remoteRepositories, e);
                 }
             }
 
