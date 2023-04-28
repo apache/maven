@@ -1549,14 +1549,9 @@ public class MavenCli {
                         throw new IllegalUseOfUndefinedProperty(expression);
                     }
                 } else if ("session.rootDirectory".equals(expression)) {
-                    String rootDirectory = cliRequest.request.getMultiModuleProjectDirectory() == null
-                            ? null
-                            : cliRequest
-                                    .request
-                                    .getMultiModuleProjectDirectory()
-                                    .getAbsolutePath();
+                    File rootDirectory = cliRequest.request.getMultiModuleProjectDirectory();
                     if (rootDirectory != null) {
-                        return rootDirectory;
+                        return rootDirectory.getAbsolutePath();
                     } else {
                         throw new IllegalUseOfUndefinedProperty(expression);
                     }
