@@ -36,6 +36,10 @@ import org.junit.Test;
 import org.junit.function.ThrowingRunnable;
 import org.mockito.InOrder;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
@@ -236,6 +240,7 @@ public class MavenCliTest {
         cli.initialize(request);
         // read .mvn/maven.config
         cli.cli(request);
+        cli.initializeRequest(request);
         cli.properties(request);
 
         assertEquals("3", request.commandLine.getOptionValue(CLIManager.THREADS));
@@ -362,6 +367,39 @@ public class MavenCliTest {
 
         // then
         assertEquals(MessageUtils.stripAnsiCodes(versionOut), versionOut);
+    }
+
+    @Test
+    public void testPropertiesInterpolation() throws Exception {
+        // Arrange
+        CliRequest request = new CliRequest(
+                new String[] {
+                    "-Dfoo=bar",
+                    "-DvalFound=s${foo}i",
+                    "-DvalNotFound=s${foz}i",
+                    "-DvalRootDirectory=${session.rootDirectory}/.mvn/foo",
+                    "-DvalTopDirectory=${session.topDirectory}/pom.xml",
+                    "-f",
+                    "${session.rootDirectory}/my-child",
+                    "prefix:3.0.0:${foo}",
+                    "validate"
+                },
+                null);
+        request.multiModuleProjectDirectory = new File("myRootDirectory");
+        request.workingDirectory = "myTopDirectory";
+
+        // Act
+        cli.cli(request);
+        cli.initializeRequest(request);
+        cli.properties(request);
+
+        // Assert
+        assertThat(request.getUserProperties().getProperty("valFound"), is("sbari"));
+        assertThat(request.getUserProperties().getProperty("valNotFound"), is("s${foz}i"));
+        assertThat(request.getUserProperties().getProperty("valRootDirectory"), endsWith("myRootDirectory/.mvn/foo"));
+        assertThat(request.getUserProperties().getProperty("valTopDirectory"), endsWith("myTopDirectory/pom.xml"));
+        assertThat(request.getCommandLine().getOptionValue('f'), endsWith("myRootDirectory/my-child"));
+        assertThat(request.getCommandLine().getArgs(), equalTo(new String[] {"prefix:3.0.0:bar", "validate"}));
     }
 
     class ConcurrencyCalculator implements ThrowingRunnable {
