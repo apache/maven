@@ -38,9 +38,9 @@ public class CLIManager {
 
     public static final char BATCH_MODE = 'B';
 
-    public static final String NON_INTERACTIVE = "ni";
+    public static final String NON_INTERACTIVE = "non-interactive";
 
-    public static final String FORCE_INTERACTIVE = "fi";
+    public static final String FORCE_INTERACTIVE = "force-interactive";
 
     public static final char SET_USER_PROPERTY = 'D';
 
@@ -177,17 +177,16 @@ public class CLIManager {
                 .build());
         options.addOption(Option.builder(Character.toString(BATCH_MODE))
                 .longOpt("batch-mode")
-                .desc(
-                        "Run in non-interactive (batch) mode (disables output color) - alias for --non-interactive (kept for backwards compatability)")
+                .desc("Run in non-interactive mode. Alias for --non-interactive (kept for backwards compatability)")
                 .build());
-        options.addOption(Option.builder(NON_INTERACTIVE)
-                .longOpt("non-interactive")
-                .desc("Run in non-interactive (batch) mode (disables output color) - alias for --batch-mode")
+        options.addOption(Option.builder()
+                .longOpt(NON_INTERACTIVE)
+                .desc("Run in non-interactive mode. Alias for --batch-mode")
                 .build());
-        options.addOption(Option.builder(FORCE_INTERACTIVE)
-                .longOpt("force-interactive")
+        options.addOption(Option.builder()
+                .longOpt(FORCE_INTERACTIVE)
                 .desc(
-                        "Run in interactive mode - even when the environment variable CI is set to true and --non-interactive or --batch-mode are set")
+                        "Run in interactive mode. Overrides, if applicable, the CI environment variable and --non-interactive/--batch-mode options")
                 .build());
         options.addOption(Option.builder(SUPPRESS_SNAPSHOT_UPDATES)
                 .longOpt("no-snapshot-updates")
