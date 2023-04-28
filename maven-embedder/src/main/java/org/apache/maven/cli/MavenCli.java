@@ -141,7 +141,7 @@ public class MavenCli {
             new File(System.getProperty("maven.conf"), "toolchains.xml");
 
     private static final String UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE =
-            "Unable to find the root directory. Create a .mvn directory in the root directory to identify it.";
+            "Unable to find the root directory. Create a .mvn directory in the project root directory to identify it.";
 
     private static final String EXT_CLASS_PATH = "maven.ext.class.path";
 
@@ -554,25 +554,40 @@ public class MavenCli {
 
     // Needed to make this method package visible to make writing a unit test possible
     // Maybe it's better to move some of those methods to separate class (SoC).
-    void properties(CliRequest cliRequest) throws Exception {
-        populateProperties(cliRequest, cliRequest.systemProperties, cliRequest.userProperties);
+    void properties(CliRequest cliRequest) throws UnrecognizedOptionException {
+        try {
+            populateProperties(cliRequest, cliRequest.systemProperties, cliRequest.userProperties);
 
-        StringSearchInterpolator interpolator =
-                createInterpolator(cliRequest, cliRequest.systemProperties, cliRequest.userProperties);
-        CommandLine.Builder commandLineBuilder = new CommandLine.Builder();
-        for (Option option : cliRequest.commandLine.getOptions()) {
-            if (!String.valueOf(CLIManager.SET_USER_PROPERTY).equals(option.getOpt())) {
-                List<String> values = option.getValuesList();
-                for (ListIterator<String> it = values.listIterator(); it.hasNext(); ) {
-                    it.set(interpolator.interpolate(it.next()));
+            StringSearchInterpolator interpolator =
+                    createInterpolator(cliRequest, cliRequest.systemProperties, cliRequest.userProperties);
+            CommandLine.Builder commandLineBuilder = new CommandLine.Builder();
+            for (Option option : cliRequest.commandLine.getOptions()) {
+                if (!String.valueOf(CLIManager.SET_USER_PROPERTY).equals(option.getOpt())) {
+                    List<String> values = option.getValuesList();
+                    for (ListIterator<String> it = values.listIterator(); it.hasNext(); ) {
+                        it.set(interpolator.interpolate(it.next()));
+                    }
                 }
+                commandLineBuilder.addOption(option);
             }
-            commandLineBuilder.addOption(option);
+            for (String arg : cliRequest.commandLine.getArgList()) {
+                commandLineBuilder.addArg(interpolator.interpolate(arg));
+            }
+            cliRequest.commandLine = commandLineBuilder.build();
+        } catch (InterpolationException e) {
+            String message = "ERROR: Could not interpolate properties and/or arguments: " + e.getMessage();
+            System.err.println(message);
+            throw new UnrecognizedOptionException(message);
+        } catch (IllegalUseOfUndefinedProperty e) {
+            String message = "ERROR: Invalid use of undefined property: " + e.property;
+            System.err.println(message);
+            if (cliRequest.multiModuleProjectDirectory == null) {
+                System.err.println();
+                System.err.println(UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
+            }
+
+            throw new UnrecognizedOptionException(message);
         }
-        for (String arg : cliRequest.commandLine.getArgList()) {
-            commandLineBuilder.addArg(interpolator.interpolate(arg));
-        }
-        cliRequest.commandLine = commandLineBuilder.build();
     }
 
     PlexusContainer container(CliRequest cliRequest) throws Exception {
@@ -1189,10 +1204,6 @@ public class MavenCli {
             }
         }
 
-        if (cliRequest.multiModuleProjectDirectory == null) {
-            System.err.println(UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
-        }
-
         return request;
     }
 
@@ -1535,7 +1546,7 @@ public class MavenCli {
                     if (topDirectory != null) {
                         return topDirectory;
                     } else {
-                        throw new IllegalStateException("Property 'session.topDirectory' was not defined!");
+                        throw new IllegalUseOfUndefinedProperty(expression);
                     }
                 } else if ("session.rootDirectory".equals(expression)) {
                     String rootDirectory = cliRequest.request.getMultiModuleProjectDirectory() == null
@@ -1547,7 +1558,7 @@ public class MavenCli {
                     if (rootDirectory != null) {
                         return rootDirectory;
                     } else {
-                        throw new IllegalStateException("Property 'session.rootDirectory' was not defined!");
+                        throw new IllegalUseOfUndefinedProperty(expression);
                     }
                 }
                 return null;
@@ -1573,6 +1584,14 @@ public class MavenCli {
 
         ExitException(int exitCode) {
             this.exitCode = exitCode;
+        }
+    }
+
+    static class IllegalUseOfUndefinedProperty extends IllegalArgumentException {
+        final String property;
+
+        IllegalUseOfUndefinedProperty(String property) {
+            this.property = property;
         }
     }
 
