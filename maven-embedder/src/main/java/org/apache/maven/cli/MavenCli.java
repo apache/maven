@@ -579,7 +579,7 @@ public class MavenCli {
             System.err.println(message);
             throw new UnrecognizedOptionException(message);
         } catch (IllegalUseOfUndefinedProperty e) {
-            String message = "ERROR: Invalid use of undefined property: " + e.property;
+            String message = "ERROR: Illegal use of undefined property: " + e.property;
             System.err.println(message);
             if (cliRequest.multiModuleProjectDirectory == null) {
                 System.err.println();
