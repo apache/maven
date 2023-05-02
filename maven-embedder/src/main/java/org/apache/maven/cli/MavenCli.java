@@ -332,10 +332,10 @@ public class MavenCli {
         for (String arg : cliRequest.args) {
             if (isAltFile) {
                 // this is the argument following -f/--file
-                Path path = Paths.get(arg);
+                Path path = topDirectory.resolve(arg);
                 if (Files.isDirectory(path)) {
                     topDirectory = path;
-                } else if (Files.isRegularFile(topDirectory)) {
+                } else if (Files.isRegularFile(path)) {
                     topDirectory = path.getParent();
                     if (!Files.isDirectory(topDirectory)) {
                         System.err.println("Directory " + topDirectory
