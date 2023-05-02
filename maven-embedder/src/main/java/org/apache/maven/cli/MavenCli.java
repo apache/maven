@@ -358,12 +358,7 @@ public class MavenCli {
         // so we rely on the JDK services to eventually lookup a custom RootLocator.
         // This is used to compute {@code session.rootDirectory} but all {@code project.rootDirectory}
         // properties will be compute through the RootLocator found in the container.
-        Path rootDirectory = searchAcceptableRootDirectory(topDirectory);
-        if (rootDirectory == null) {
-            // fail when used, otherwise remain silent
-            // System.err.println(UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
-        }
-        cliRequest.rootDirectory = rootDirectory;
+        cliRequest.rootDirectory = searchAcceptableRootDirectory(topDirectory);;
 
         //
         // Make sure the Maven home directory is an absolute path to save us from confusion with say drive-relative
@@ -1554,11 +1549,11 @@ public class MavenCli {
         systemProperties.setProperty("maven.build.version", mavenBuildVersion);
     }
 
-    private boolean isAcceptableRootDirectory(Path path) {
+    protected boolean isAcceptableRootDirectory(Path path) {
         return path != null && Files.isDirectory(path.resolve(".mvn"));
     }
 
-    private Path searchAcceptableRootDirectory(Path path) {
+    protected Path searchAcceptableRootDirectory(Path path) {
         if (path == null) {
             return null;
         }
