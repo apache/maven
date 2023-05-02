@@ -326,10 +326,10 @@ public class MavenCli {
         for (String arg : cliRequest.args) {
             if (isAltFile) {
                 // this is the argument following -f/--file
-                Path path = Paths.get(arg);
+                Path path = topDirectory.resolve(arg);
                 if (Files.isDirectory(path)) {
                     topDirectory = path;
-                } else if (Files.isRegularFile(topDirectory)) {
+                } else if (Files.isRegularFile(path)) {
                     topDirectory = path.getParent();
                     if (!Files.isDirectory(topDirectory)) {
                         System.err.println("Directory " + topDirectory
@@ -360,7 +360,8 @@ public class MavenCli {
         // properties will be compute through the RootLocator found in the container.
         Path rootDirectory = searchAcceptableRootDirectory(topDirectory);
         if (rootDirectory == null) {
-            System.err.println(UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
+            // fail when used, otherwise remain silent
+            // System.err.println(UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
         }
         cliRequest.rootDirectory = rootDirectory;
 
