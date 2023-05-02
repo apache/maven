@@ -144,14 +144,16 @@ public class MavenCli {
     public static final File DEFAULT_GLOBAL_TOOLCHAINS_FILE =
             new File(System.getProperty("maven.conf"), "toolchains.xml");
 
-    private static final String UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE =
-            "Unable to find the root directory. Create a .mvn directory in the project root directory to identify it.";
-
     private static final String EXT_CLASS_PATH = "maven.ext.class.path";
 
-    private static final String EXTENSIONS_FILENAME = ".mvn/extensions.xml";
+    private static final String DOT_MVN = ".mvn";
 
-    private static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
+    private static final String UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE = "Unable to find the root directory. Create a "
+            + DOT_MVN + " directory in the project root directory to identify it.";
+
+    private static final String EXTENSIONS_FILENAME = DOT_MVN + "/extensions.xml";
+
+    private static final String MVN_MAVEN_CONFIG = DOT_MVN + "/maven.config";
 
     public static final String STYLE_COLOR_PROPERTY = "style.color";
 
@@ -1550,7 +1552,7 @@ public class MavenCli {
     }
 
     protected boolean isAcceptableRootDirectory(Path path) {
-        return path != null && Files.isDirectory(path.resolve(".mvn"));
+        return path != null && Files.isDirectory(path.resolve(DOT_MVN));
     }
 
     protected Path searchAcceptableRootDirectory(Path path) {
