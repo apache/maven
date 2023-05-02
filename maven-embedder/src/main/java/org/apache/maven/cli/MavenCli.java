@@ -357,9 +357,8 @@ public class MavenCli {
         }
         cliRequest.topDirectory = topDirectory;
         // We're very early in the process and we don't have the container set up yet,
-        // so we rely on the JDK services to eventually lookup a custom RootLocator.
-        // This is used to compute {@code session.rootDirectory} but all {@code project.rootDirectory}
-        // properties will be compute through the RootLocator found in the container.
+        // so we on searchAcceptableRootDirectory method to find us acceptable directory.
+        // The method may return null if nothing acceptable found.
         cliRequest.rootDirectory = searchAcceptableRootDirectory(topDirectory);
 
         //
