@@ -352,7 +352,7 @@ public class MavenCli {
         try {
             topDirectory = topDirectory.toAbsolutePath().toRealPath();
         } catch (IOException e) {
-            System.err.println("Error computing real path from " + topDirectory);
+            System.err.println("Error computing real path from " + topDirectory + ": " + e.getMessage());
             throw new ExitException(1);
         }
         cliRequest.topDirectory = topDirectory;
