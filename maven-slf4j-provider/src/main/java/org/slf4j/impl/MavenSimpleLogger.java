@@ -71,29 +71,42 @@ public class MavenSimpleLogger
         }
         stream.println();
 
-        while ( t != null )
-        {
-            for ( StackTraceElement e : t.getStackTrace() )
-            {
-                stream.print( "    " );
-                stream.print( buffer().strong( "at" ) );
-                stream.print( " " + e.getClassName() + "." + e.getMethodName() );
-                stream.print( buffer().a( " (" ).strong( getLocation( e ) ).a( ")" ) );
-                stream.println();
-            }
+        printStackTrace( t, stream, "" );
+    }
 
-            t = t.getCause();
-            if ( t != null )
-            {
-                stream.print( buffer().strong( "Caused by" ).a( ": " ).a( t.getClass().getName() ) );
-                if ( t.getMessage() != null )
-                {
-                    stream.print( ": " );
-                    stream.print( buffer().failure( t.getMessage() ) );
-                }
-                stream.println();
-            }
+    private void printStackTrace( Throwable t, PrintStream stream, String prefix )
+    {
+        for ( StackTraceElement e : t.getStackTrace() )
+        {
+            stream.print( prefix );
+            stream.print( "    " );
+            stream.print( buffer().strong( "at" ) );
+            stream.print( " " + e.getClassName() + "." + e.getMethodName() );
+            stream.print( buffer().a( " (" ).strong( getLocation( e ) ).a( ")" ) );
+            stream.println();
         }
+        for ( Throwable se : t.getSuppressed() )
+        {
+            writeThrowable( se, stream, "Suppressed", prefix + "    " );
+        }
+        Throwable cause = t.getCause();
+        if ( cause != null )
+        {
+            writeThrowable( cause, stream, "Caused by", prefix );
+        }
+    }
+
+    private void writeThrowable( Throwable t, PrintStream stream, String caption, String prefix )
+    {
+        stream.print( buffer().a( prefix ).strong( caption ).a( ": " ).a( t.getClass().getName() ) );
+        if ( t.getMessage() != null )
+        {
+            stream.print( ": " );
+            stream.print( buffer().failure( t.getMessage() ) );
+        }
+        stream.println();
+
+        printStackTrace( t, stream, prefix );
     }
 
     protected String getLocation( final StackTraceElement e )
