@@ -29,11 +29,14 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -102,6 +105,9 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.interpolation.AbstractValueSource;
+import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.StringSearchInterpolator;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -140,9 +146,14 @@ public class MavenCli {
 
     private static final String EXT_CLASS_PATH = "maven.ext.class.path";
 
-    private static final String EXTENSIONS_FILENAME = ".mvn/extensions.xml";
+    private static final String DOT_MVN = ".mvn";
 
-    private static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
+    private static final String UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE = "Unable to find the root directory. Create a "
+            + DOT_MVN + " directory in the project root directory to identify it.";
+
+    private static final String EXTENSIONS_FILENAME = DOT_MVN + "/extensions.xml";
+
+    private static final String MVN_MAVEN_CONFIG = DOT_MVN + "/maven.config";
 
     public static final String STYLE_COLOR_PROPERTY = "style.color";
 
@@ -308,6 +319,47 @@ public class MavenCli {
                 cliRequest.multiModuleProjectDirectory = basedir.getAbsoluteFile();
             }
         }
+
+        // We need to locate the top level project which may be pointed at using
+        // the -f/--file option.  However, the command line isn't parsed yet, so
+        // we need to iterate through the args to find it and act upon it.
+        Path topDirectory = Paths.get(cliRequest.workingDirectory);
+        boolean isAltFile = false;
+        for (String arg : cliRequest.args) {
+            if (isAltFile) {
+                // this is the argument following -f/--file
+                Path path = topDirectory.resolve(arg);
+                if (Files.isDirectory(path)) {
+                    topDirectory = path;
+                } else if (Files.isRegularFile(path)) {
+                    topDirectory = path.getParent();
+                    if (!Files.isDirectory(topDirectory)) {
+                        System.err.println("Directory " + topDirectory
+                                + " extracted from the -f/--file command-line argument " + arg + " does not exist");
+                        throw new ExitException(1);
+                    }
+                } else {
+                    System.err.println(
+                            "POM file " + arg + " specified with the -f/--file command line argument does not exist");
+                    throw new ExitException(1);
+                }
+                break;
+            } else {
+                // Check if this is the -f/--file option
+                isAltFile = arg.equals(String.valueOf(CLIManager.ALTERNATE_POM_FILE)) || arg.equals("file");
+            }
+        }
+        try {
+            topDirectory = topDirectory.toAbsolutePath().toRealPath();
+        } catch (IOException e) {
+            System.err.println("Error computing real path from " + topDirectory + ": " + e.getMessage());
+            throw new ExitException(1);
+        }
+        cliRequest.topDirectory = topDirectory;
+        // We're very early in the process and we don't have the container set up yet,
+        // so we on searchAcceptableRootDirectory method to find us acceptable directory.
+        // The method may return null if nothing acceptable found.
+        cliRequest.rootDirectory = searchAcceptableRootDirectory(topDirectory);
 
         //
         // Make sure the Maven home directory is an absolute path to save us from confusion with say drive-relative
@@ -526,8 +578,39 @@ public class MavenCli {
 
     // Needed to make this method package visible to make writing a unit test possible
     // Maybe it's better to move some of those methods to separate class (SoC).
-    void properties(CliRequest cliRequest) {
-        populateProperties(cliRequest.commandLine, cliRequest.systemProperties, cliRequest.userProperties);
+    void properties(CliRequest cliRequest) throws ExitException {
+        try {
+            populateProperties(cliRequest, cliRequest.systemProperties, cliRequest.userProperties);
+
+            StringSearchInterpolator interpolator =
+                    createInterpolator(cliRequest, cliRequest.systemProperties, cliRequest.userProperties);
+            CommandLine.Builder commandLineBuilder = new CommandLine.Builder();
+            for (Option option : cliRequest.commandLine.getOptions()) {
+                if (!String.valueOf(CLIManager.SET_USER_PROPERTY).equals(option.getOpt())) {
+                    List<String> values = option.getValuesList();
+                    for (ListIterator<String> it = values.listIterator(); it.hasNext(); ) {
+                        it.set(interpolator.interpolate(it.next()));
+                    }
+                }
+                commandLineBuilder.addOption(option);
+            }
+            for (String arg : cliRequest.commandLine.getArgList()) {
+                commandLineBuilder.addArg(interpolator.interpolate(arg));
+            }
+            cliRequest.commandLine = commandLineBuilder.build();
+        } catch (InterpolationException e) {
+            String message = "ERROR: Could not interpolate properties and/or arguments: " + e.getMessage();
+            System.err.println(message);
+            throw new ExitException(1); // user error
+        } catch (IllegalUseOfUndefinedProperty e) {
+            String message = "ERROR: Illegal use of undefined property: " + e.property;
+            System.err.println(message);
+            if (cliRequest.rootDirectory == null) {
+                System.err.println();
+                System.err.println(UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE);
+            }
+            throw new ExitException(1); // user error
+        }
     }
 
     PlexusContainer container(CliRequest cliRequest) throws Exception {
@@ -1405,8 +1488,8 @@ public class MavenCli {
     // Properties handling
     // ----------------------------------------------------------------------
 
-    static void populateProperties(CommandLine commandLine, Properties systemProperties, Properties userProperties) {
-        EnvironmentUtils.addEnvVars(systemProperties);
+    static void populateProperties(CliRequest cliRequest, Properties systemProperties, Properties userProperties)
+            throws InterpolationException {
 
         // ----------------------------------------------------------------------
         // Options that are set on the command line become system properties
@@ -1414,17 +1497,44 @@ public class MavenCli {
         // are most dominant.
         // ----------------------------------------------------------------------
 
-        if (commandLine.hasOption(CLIManager.SET_USER_PROPERTY)) {
-            String[] defStrs = commandLine.getOptionValues(CLIManager.SET_USER_PROPERTY);
+        Properties cliProperties = new Properties();
+        if (cliRequest.commandLine.hasOption(CLIManager.SET_USER_PROPERTY)) {
+            String[] defStrs = cliRequest.commandLine.getOptionValues(CLIManager.SET_USER_PROPERTY);
 
             if (defStrs != null) {
-                for (String defStr : defStrs) {
-                    setCliProperty(defStr, userProperties);
+                String name;
+                String value;
+                for (String property : defStrs) {
+                    int i = property.indexOf('=');
+                    if (i <= 0) {
+                        name = property.trim();
+                        value = "true";
+                    } else {
+                        name = property.substring(0, i).trim();
+                        value = property.substring(i + 1);
+                    }
+                    cliProperties.setProperty(name, value);
                 }
             }
         }
 
+        EnvironmentUtils.addEnvVars(systemProperties);
         SystemProperties.addSystemProperties(systemProperties);
+
+        StringSearchInterpolator interpolator = createInterpolator(cliRequest, cliProperties, systemProperties);
+        for (Map.Entry<Object, Object> e : cliProperties.entrySet()) {
+            String name = (String) e.getKey();
+            String value = interpolator.interpolate((String) e.getValue());
+            userProperties.setProperty(name, value);
+        }
+
+        systemProperties.putAll(userProperties);
+
+        // ----------------------------------------------------------------------
+        // I'm leaving the setting of system properties here as not to break
+        // the SystemPropertyProfileActivator. This won't harm embedding. jvz.
+        // ----------------------------------------------------------------------
+        userProperties.forEach((k, v) -> System.setProperty((String) k, (String) v));
 
         // ----------------------------------------------------------------------
         // Properties containing info about the currently running version of Maven
@@ -1440,31 +1550,56 @@ public class MavenCli {
         systemProperties.setProperty("maven.build.version", mavenBuildVersion);
     }
 
-    private static void setCliProperty(String property, Properties properties) {
-        String name;
+    protected boolean isAcceptableRootDirectory(Path path) {
+        return path != null && Files.isDirectory(path.resolve(DOT_MVN));
+    }
 
-        String value;
-
-        int i = property.indexOf('=');
-
-        if (i <= 0) {
-            name = property.trim();
-
-            value = "true";
-        } else {
-            name = property.substring(0, i).trim();
-
-            value = property.substring(i + 1);
+    protected Path searchAcceptableRootDirectory(Path path) {
+        if (path == null) {
+            return null;
         }
+        if (isAcceptableRootDirectory(path)) {
+            return path;
+        }
+        return searchAcceptableRootDirectory(path.getParent());
+    }
 
-        properties.setProperty(name, value);
-
-        // ----------------------------------------------------------------------
-        // I'm leaving the setting of system properties here as not to break
-        // the SystemPropertyProfileActivator. This won't harm embedding. jvz.
-        // ----------------------------------------------------------------------
-
-        System.setProperty(name, value);
+    protected static StringSearchInterpolator createInterpolator(CliRequest cliRequest, Properties... properties) {
+        StringSearchInterpolator interpolator = new StringSearchInterpolator();
+        interpolator.addValueSource(new AbstractValueSource(false) {
+            @Override
+            public Object getValue(String expression) {
+                if ("session.topDirectory".equals(expression)) {
+                    Path topDirectory = cliRequest.topDirectory;
+                    if (topDirectory != null) {
+                        return topDirectory.toString();
+                    } else {
+                        throw new IllegalUseOfUndefinedProperty(expression);
+                    }
+                } else if ("session.rootDirectory".equals(expression)) {
+                    Path rootDirectory = cliRequest.rootDirectory;
+                    if (rootDirectory != null) {
+                        return rootDirectory.toString();
+                    } else {
+                        throw new IllegalUseOfUndefinedProperty(expression);
+                    }
+                }
+                return null;
+            }
+        });
+        interpolator.addValueSource(new AbstractValueSource(false) {
+            @Override
+            public Object getValue(String expression) {
+                for (Properties props : properties) {
+                    Object val = props.getProperty(expression);
+                    if (val != null) {
+                        return val;
+                    }
+                }
+                return null;
+            }
+        });
+        return interpolator;
     }
 
     static class ExitException extends Exception {
@@ -1472,6 +1607,14 @@ public class MavenCli {
 
         ExitException(int exitCode) {
             this.exitCode = exitCode;
+        }
+    }
+
+    static class IllegalUseOfUndefinedProperty extends IllegalArgumentException {
+        final String property;
+
+        IllegalUseOfUndefinedProperty(String property) {
+            this.property = property;
         }
     }
 
