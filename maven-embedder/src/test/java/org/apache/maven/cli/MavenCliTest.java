@@ -38,7 +38,6 @@ import org.junit.function.ThrowingRunnable;
 import org.mockito.InOrder;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
@@ -395,9 +394,9 @@ public class MavenCliTest {
         // Assert
         assertThat(request.getUserProperties().getProperty("valFound"), is("sbari"));
         assertThat(request.getUserProperties().getProperty("valNotFound"), is("s${foz}i"));
-        assertThat(request.getUserProperties().getProperty("valRootDirectory"), endsWith("myRootDirectory/.mvn/foo"));
-        assertThat(request.getUserProperties().getProperty("valTopDirectory"), endsWith("myTopDirectory/pom.xml"));
-        assertThat(request.getCommandLine().getOptionValue('f'), endsWith("myRootDirectory/my-child"));
+        assertThat(request.getUserProperties().getProperty("valRootDirectory"), is("myRootDirectory/.mvn/foo"));
+        assertThat(request.getUserProperties().getProperty("valTopDirectory"), is("myTopDirectory/pom.xml"));
+        assertThat(request.getCommandLine().getOptionValue('f'), is("myRootDirectory/my-child"));
         assertThat(request.getCommandLine().getArgs(), equalTo(new String[] {"prefix:3.0.0:bar", "validate"}));
     }
 
