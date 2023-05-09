@@ -169,10 +169,10 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
         String version = null;
         ArtifactRepository repo = null;
 
-        if (StringUtils.isNotEmpty(versions.releaseVersion)) {
+        if (versions.releaseVersion != null && !versions.releaseVersion.isEmpty()) {
             version = versions.releaseVersion;
             repo = versions.releaseRepository;
-        } else if (StringUtils.isNotEmpty(versions.latestVersion)) {
+        } else if (versions.latestVersion != null && !versions.latestVersion.isEmpty()) {
             version = versions.latestVersion;
             repo = versions.latestRepository;
         }

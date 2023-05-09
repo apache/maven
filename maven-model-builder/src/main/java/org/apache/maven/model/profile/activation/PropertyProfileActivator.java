@@ -29,7 +29,6 @@ import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.profile.ProfileActivationContext;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Determines profile activation based on the existence or value of some execution property.
@@ -76,7 +75,7 @@ public class PropertyProfileActivator implements ProfileActivator {
         }
 
         String propValue = property.getValue();
-        if (StringUtils.isNotEmpty(propValue)) {
+        if (propValue != null && !propValue.isEmpty()) {
             boolean reverseValue = false;
             if (propValue.startsWith("!")) {
                 reverseValue = true;
@@ -86,7 +85,7 @@ public class PropertyProfileActivator implements ProfileActivator {
             // we have a value, so it has to match the system value...
             return reverseValue != propValue.equals(sysValue);
         } else {
-            return reverseName != StringUtils.isNotEmpty(sysValue);
+            return reverseName != (sysValue != null && !sysValue.isEmpty());
         }
     }
 

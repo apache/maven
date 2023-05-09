@@ -31,7 +31,6 @@ import org.apache.maven.api.model.Extension;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.artifact.ArtifactUtils;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
 import org.codehaus.plexus.util.dag.TopologicalSorter;
@@ -245,7 +244,7 @@ public class ProjectSorter {
     }
 
     private boolean isSpecificVersion(String version) {
-        return !(StringUtils.isEmpty(version) || version.startsWith("[") || version.startsWith("("));
+        return !((version == null || version.isEmpty()) || version.startsWith("[") || version.startsWith("("));
     }
 
     // TODO !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in

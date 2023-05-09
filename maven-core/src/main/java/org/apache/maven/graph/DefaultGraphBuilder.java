@@ -266,7 +266,7 @@ public class DefaultGraphBuilder implements GraphBuilder {
         boolean makeUpstream = makeBoth || MavenExecutionRequest.REACTOR_MAKE_UPSTREAM.equals(makeBehavior);
         boolean makeDownstream = makeBoth || MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM.equals(makeBehavior);
 
-        if (StringUtils.isNotEmpty(makeBehavior) && !makeUpstream && !makeDownstream) {
+        if ((makeBehavior != null && !makeBehavior.isEmpty()) && !makeUpstream && !makeDownstream) {
             throw new MavenExecutionException("Invalid reactor make behavior: " + makeBehavior, request.getPom());
         }
 

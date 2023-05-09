@@ -61,7 +61,7 @@ public class FileProfileActivator extends DetectedProfileActivator implements Lo
             interpolator.addValueSource(new MapBasedValueSource(System.getProperties()));
 
             try {
-                if (StringUtils.isNotEmpty(fileString)) {
+                if (fileString != null && !fileString.isEmpty()) {
                     fileString = StringUtils.replace(interpolator.interpolate(fileString, ""), "\\", "/");
                     return FileUtils.fileExists(fileString);
                 }
@@ -69,7 +69,7 @@ public class FileProfileActivator extends DetectedProfileActivator implements Lo
                 // check if the file is missing, if it is then the profile will be active
                 fileString = actFile.getMissing();
 
-                if (StringUtils.isNotEmpty(fileString)) {
+                if (fileString != null && !fileString.isEmpty()) {
                     fileString = StringUtils.replace(interpolator.interpolate(fileString, ""), "\\", "/");
                     return !FileUtils.fileExists(fileString);
                 }

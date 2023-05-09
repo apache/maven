@@ -47,7 +47,6 @@ import org.apache.maven.project.collector.MultiModuleCollectionStrategy;
 import org.apache.maven.project.collector.PomlessCollectionStrategy;
 import org.apache.maven.project.collector.ProjectsSelector;
 import org.apache.maven.project.collector.RequestPomCollectionStrategy;
-import org.codehaus.plexus.util.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -299,7 +298,7 @@ class DefaultGraphBuilderTest {
         when(mavenExecutionRequest.getMakeBehavior()).thenReturn(parameterMakeBehavior);
         when(mavenExecutionRequest.getPom()).thenReturn(parameterRequestedPom);
         when(mavenExecutionRequest.isRecursive()).thenReturn(parameterRecursive);
-        if (StringUtils.isNotEmpty(parameterResumeFrom)) {
+        if (parameterResumeFrom != null && !parameterResumeFrom.isEmpty()) {
             when(mavenExecutionRequest.getResumeFrom()).thenReturn(":" + parameterResumeFrom);
         }
 

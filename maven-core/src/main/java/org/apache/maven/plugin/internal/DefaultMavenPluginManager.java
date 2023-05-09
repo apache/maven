@@ -631,7 +631,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
         String configuratorId = mojoDescriptor.getComponentConfigurator();
 
-        if (StringUtils.isEmpty(configuratorId)) {
+        if (configuratorId == null || configuratorId.isEmpty()) {
             configuratorId = mojoDescriptor.isV4Api() ? "enhanced" : "basic";
         }
 

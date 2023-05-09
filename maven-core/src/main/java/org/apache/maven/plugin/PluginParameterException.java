@@ -26,7 +26,6 @@ import java.util.Properties;
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * PluginParameterException
@@ -123,7 +122,7 @@ public class PluginParameterException extends PluginConfigurationException {
             messageBuffer.append("</configuration>");
 
             String alias = param.getAlias();
-            if (StringUtils.isNotEmpty(alias) && !alias.equals(param.getName())) {
+            if ((alias != null && !alias.isEmpty()) && !alias.equals(param.getName())) {
                 messageBuffer.append(LS).append(LS).append("-OR-").append(LS).append(LS);
                 messageBuffer
                         .append("<configuration>")
@@ -142,7 +141,7 @@ public class PluginParameterException extends PluginConfigurationException {
             }
         }
 
-        if (StringUtils.isEmpty(expression)) {
+        if (expression == null || expression.isEmpty()) {
             messageBuffer.append('.');
         } else {
             if (param.isEditable()) {

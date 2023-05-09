@@ -492,7 +492,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             File basedir = pomFile.getParentFile();
             List<File> moduleFiles = new ArrayList<>();
             for (String module : model.getModules()) {
-                if (StringUtils.isEmpty(module)) {
+                if (module == null || module.isEmpty()) {
                     continue;
                 }
 
