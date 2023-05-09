@@ -41,7 +41,6 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Assists in populating an execution request for invocation of Maven.
@@ -157,7 +156,7 @@ public class DefaultMavenExecutionRequestPopulator implements MavenExecutionRequ
             localRepositoryPath = request.getLocalRepositoryPath().getAbsolutePath();
         }
 
-        if (StringUtils.isEmpty(localRepositoryPath)) {
+        if (localRepositoryPath == null || localRepositoryPath.isEmpty()) {
             localRepositoryPath = RepositorySystem.defaultUserLocalRepository.getAbsolutePath();
         }
 

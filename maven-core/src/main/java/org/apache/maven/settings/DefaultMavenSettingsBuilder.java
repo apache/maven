@@ -32,7 +32,6 @@ import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingException;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -111,7 +110,7 @@ public class DefaultMavenSettingsBuilder extends AbstractLogEnabled implements M
 
         String path = System.getProperty(altLocationSysProp);
 
-        if (StringUtils.isEmpty(path)) {
+        if (path == null || path.isEmpty()) {
             // TODO This replacing shouldn't be necessary as user.home should be in the
             // context of the container and thus the value would be interpolated by Plexus
             String basedir = System.getProperty(basedirSysProp);

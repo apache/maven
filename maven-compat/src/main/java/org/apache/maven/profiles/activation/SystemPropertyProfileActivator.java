@@ -26,7 +26,6 @@ import org.apache.maven.model.Profile;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * SystemPropertyProfileActivator
@@ -65,7 +64,7 @@ public class SystemPropertyProfileActivator extends DetectedProfileActivator imp
             String sysValue = properties.getProperty(name);
 
             String propValue = property.getValue();
-            if (StringUtils.isNotEmpty(propValue)) {
+            if (propValue != null && !propValue.isEmpty()) {
                 boolean reverseValue = false;
                 if (propValue.startsWith("!")) {
                     reverseValue = true;
@@ -81,7 +80,7 @@ public class SystemPropertyProfileActivator extends DetectedProfileActivator imp
                     return result;
                 }
             } else {
-                boolean result = StringUtils.isNotEmpty(sysValue);
+                boolean result = sysValue != null && !sysValue.isEmpty();
 
                 if (reverseName) {
                     return !result;

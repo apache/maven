@@ -145,7 +145,7 @@ public class MavenRepositorySystem {
         VersionRange versionRange;
         try {
             String version = plugin.getVersion();
-            if (StringUtils.isEmpty(version)) {
+            if (version == null || version.isEmpty()) {
                 version = "RELEASE";
             }
             versionRange = VersionRange.createFromVersionSpec(version);
@@ -323,13 +323,13 @@ public class MavenRepositorySystem {
         if (repo != null) {
             String id = repo.getId();
 
-            if (StringUtils.isEmpty(id)) {
+            if (id == null || id.isEmpty()) {
                 throw new InvalidRepositoryException("Repository identifier missing", "");
             }
 
             String url = repo.getUrl();
 
-            if (StringUtils.isEmpty(url)) {
+            if (url == null || url.isEmpty()) {
                 throw new InvalidRepositoryException("URL missing for repository " + id, id);
             }
 
@@ -787,7 +787,7 @@ public class MavenRepositorySystem {
         boolean result = false;
 
         // simple checks first to short circuit processing below.
-        if (StringUtils.isEmpty(mirrorLayout) || WILDCARD.equals(mirrorLayout)) {
+        if ((mirrorLayout == null || mirrorLayout.isEmpty()) || WILDCARD.equals(mirrorLayout)) {
             result = true;
         } else if (mirrorLayout.equals(repoLayout)) {
             result = true;

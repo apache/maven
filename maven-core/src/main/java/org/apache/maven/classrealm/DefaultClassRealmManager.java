@@ -44,7 +44,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.artifact.Artifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -272,7 +271,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
     }
 
     private static String getId(String gid, String aid, String type, String cls, String ver) {
-        return gid + ':' + aid + ':' + type + (StringUtils.isNotEmpty(cls) ? ':' + cls : "") + ':' + ver;
+        return gid + ':' + aid + ':' + type + ((cls != null && !cls.isEmpty()) ? ':' + cls : "") + ':' + ver;
     }
 
     private void callDelegates(

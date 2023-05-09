@@ -52,7 +52,7 @@ public class LifecyclePhase {
     public void set(String goals) {
         mojos = new ArrayList<>();
 
-        if (StringUtils.isNotEmpty(goals)) {
+        if (goals != null && !goals.isEmpty()) {
             String[] mojoGoals = StringUtils.split(goals, ",");
 
             for (String mojoGoal : mojoGoals) {

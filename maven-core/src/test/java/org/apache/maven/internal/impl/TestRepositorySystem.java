@@ -56,7 +56,6 @@ import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
 
 /**
@@ -156,7 +155,7 @@ public class TestRepositorySystem implements RepositorySystem {
         VersionRange versionRange;
         try {
             String version = plugin.getVersion();
-            if (StringUtils.isEmpty(version)) {
+            if (version == null || version.isEmpty()) {
                 version = "RELEASE";
             }
             versionRange = VersionRange.createFromVersionSpec(version);

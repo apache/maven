@@ -32,7 +32,6 @@ import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,12 +136,12 @@ public class LifecycleDebugLogger {
             MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
             String scopeToCollect = mojoDescriptor.getDependencyCollectionRequired();
-            if (StringUtils.isNotEmpty(scopeToCollect)) {
+            if (scopeToCollect != null && !scopeToCollect.isEmpty()) {
                 scopesToCollect.add(scopeToCollect);
             }
 
             String scopeToResolve = mojoDescriptor.getDependencyResolutionRequired();
-            if (StringUtils.isNotEmpty(scopeToResolve)) {
+            if (scopeToResolve != null && !scopeToResolve.isEmpty()) {
                 scopesToResolve.add(scopeToResolve);
             }
         }

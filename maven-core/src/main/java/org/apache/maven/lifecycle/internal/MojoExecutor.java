@@ -56,7 +56,6 @@ import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.SessionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,7 +125,7 @@ public class MojoExecutor {
     private Collection<String> toScopes(String classpath) {
         Collection<String> scopes = Collections.emptyList();
 
-        if (StringUtils.isNotEmpty(classpath)) {
+        if (classpath != null && !classpath.isEmpty()) {
             if (Artifact.SCOPE_COMPILE.equals(classpath)) {
                 scopes = Arrays.asList(Artifact.SCOPE_COMPILE, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_PROVIDED);
             } else if (Artifact.SCOPE_RUNTIME.equals(classpath)) {
@@ -398,10 +397,10 @@ public class MojoExecutor {
         String scopeToCollect = mojoDescriptor.getDependencyCollectionRequired();
 
         List<String> scopes = new ArrayList<>(2);
-        if (StringUtils.isNotEmpty(scopeToCollect)) {
+        if (scopeToCollect != null && !scopeToCollect.isEmpty()) {
             scopes.add(scopeToCollect);
         }
-        if (StringUtils.isNotEmpty(scopeToResolve)) {
+        if (scopeToResolve != null && !scopeToResolve.isEmpty()) {
             scopes.add(scopeToResolve);
         }
 

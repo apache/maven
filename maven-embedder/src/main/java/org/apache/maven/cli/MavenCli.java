@@ -846,7 +846,7 @@ public class MavenCli {
 
         List<File> jars = new ArrayList<>();
 
-        if (StringUtils.isNotEmpty(extClassPath)) {
+        if (extClassPath != null && !extClassPath.isEmpty()) {
             for (String jar : StringUtils.split(extClassPath, File.pathSeparator)) {
                 File file = resolveFile(new File(jar), cliRequest.workingDirectory);
 
@@ -1055,7 +1055,7 @@ public class MavenCli {
 
         String msg = summary.getMessage();
 
-        if (StringUtils.isNotEmpty(referenceKey)) {
+        if (referenceKey != null && !referenceKey.isEmpty()) {
             if (msg.indexOf('\n') < 0) {
                 msg += " -> " + buffer().strong(referenceKey);
             } else {

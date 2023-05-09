@@ -37,7 +37,6 @@ import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.logging.MessageBuilder;
 import org.apache.maven.shared.utils.logging.MessageUtils;
-import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +97,7 @@ public class DefaultMojoExecutionConfigurator implements MojoExecutionConfigurat
     }
 
     private PluginExecution findPluginExecution(String executionId, Collection<PluginExecution> executions) {
-        if (StringUtils.isNotEmpty(executionId)) {
+        if (executionId != null && !executionId.isEmpty()) {
             for (PluginExecution execution : executions) {
                 if (executionId.equals(execution.getId())) {
                     return execution;

@@ -454,7 +454,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
 
         String forkedLifecycle = mojoDescriptor.getExecuteLifecycle();
 
-        if (StringUtils.isEmpty(forkedLifecycle)) {
+        if (forkedLifecycle == null || forkedLifecycle.isEmpty()) {
             return;
         }
 

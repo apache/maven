@@ -191,7 +191,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
 
     public Artifact createPluginArtifact(Plugin plugin) {
         String version = plugin.getVersion();
-        if (StringUtils.isEmpty(version)) {
+        if (version == null || version.isEmpty()) {
             version = "RELEASE";
         }
 
@@ -683,13 +683,13 @@ public class LegacyRepositorySystem implements RepositorySystem {
         if (repo != null) {
             String id = repo.getId();
 
-            if (StringUtils.isEmpty(id)) {
+            if (id == null || id.isEmpty()) {
                 throw new InvalidRepositoryException("Repository identifier missing", "");
             }
 
             String url = repo.getUrl();
 
-            if (StringUtils.isEmpty(url)) {
+            if (url == null || url.isEmpty()) {
                 throw new InvalidRepositoryException("URL missing for repository " + id, id);
             }
 
@@ -738,7 +738,7 @@ public class LegacyRepositorySystem implements RepositorySystem {
             return def;
         }
         String msg = error.getMessage();
-        if (StringUtils.isNotEmpty(msg)) {
+        if (msg != null && !msg.isEmpty()) {
             return msg;
         }
         return getMessage(error.getCause(), def);
