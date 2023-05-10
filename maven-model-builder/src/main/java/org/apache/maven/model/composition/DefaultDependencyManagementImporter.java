@@ -26,9 +26,9 @@ import java.util.*;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Exclusion;
-import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemCollector;
@@ -156,7 +156,7 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
         InputSource dependencySource = dependencyLocation.getSource();
         InputSource bomSource = bomLocation.getSource();
 
-        // TODO If the dependency and BOM have the same source, it means we found the root where the dependency is declared.
+        // If the dependency and BOM have the same source, it means we found the root where the dependency is declared.
         if (dependencySource == null
                 || bomSource == null
                 || Objects.equals(dependencySource.getModelId(), bomSource.getModelId())) {

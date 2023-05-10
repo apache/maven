@@ -1667,7 +1667,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             return;
         }
 
-        String importing = model.getGroupId() + ':' + model.getArtifactId() + ':' + model.getVersion();// the one that's causing the iport to happen?
+        // the one that's causing the import to happen?
+        String importing = model.getGroupId() + ':' + model.getArtifactId() + ':' + model.getVersion();
 
         importIds.add(importing);
 

@@ -45,6 +45,7 @@ public class InputSource implements Serializable {
     private InputSource(String modelId, String location, InputLocation importedFrom) {
         this.modelId = modelId;
         this.location = location;
+        this.inputs = null;
         this.importedFrom = importedFrom;
     }
 
@@ -52,6 +53,7 @@ public class InputSource implements Serializable {
         this.modelId = null;
         this.location = null;
         this.inputs = ImmutableCollections.copy(inputs);
+        this.importedFrom = null;
     }
 
     /**
