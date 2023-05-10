@@ -29,7 +29,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.feature.Features;
 import org.apache.maven.model.building.DefaultBuildPomXMLFilterFactory;
@@ -77,10 +80,31 @@ public final class ConsumerPomArtifactTransformer {
                 Files.createDirectories(buildDir);
                 generatedFile = Files.createTempFile(buildDir, CONSUMER_POM_CLASSIFIER, "pom");
             }
+
+            removeOldConsumerPomFiles(generatedFile);
+
             project.addAttachedArtifact(new ConsumerPomArtifact(project, generatedFile, session));
         } else if (project.getModel().isRoot()) {
             throw new IllegalStateException(
                     "The use of the root attribute on the model requires the buildconsumer feature to be active");
+        }
+    }
+
+    private void removeOldConsumerPomFiles(Path generatedFile) throws IOException {
+        List<Path> oldConsumerPomFiles;
+        String newestFileName = generatedFile.getFileName().toString();
+        try (Stream<Path> stream = Files.walk(generatedFile.getParent(), 1)) {
+            oldConsumerPomFiles = stream.filter(path -> {
+                        String fileName = path.getFileName().toString();
+                        return !fileName.equals(newestFileName)
+                                && fileName.startsWith(CONSUMER_POM_CLASSIFIER)
+                                && fileName.endsWith("pom");
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        for (Path path : oldConsumerPomFiles) {
+            Files.delete(path);
         }
     }
 
