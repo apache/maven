@@ -162,7 +162,8 @@ public class MavenStatusCommand {
         try {
             sessionScope.seed(DefaultSession.class, (DefaultSession) session);
 
-            ArtifactCoordinate artifactCoordinate = new DefaultArtifactCoordinate(session, APACHE_MAVEN_ARTIFACT);
+            ArtifactCoordinate artifactCoordinate =
+                    new DefaultArtifactCoordinate((DefaultSession) session, APACHE_MAVEN_ARTIFACT);
             ArtifactResolverResult resolverResult =
                     artifactResolver.resolve(session, Collections.singleton(artifactCoordinate));
 
