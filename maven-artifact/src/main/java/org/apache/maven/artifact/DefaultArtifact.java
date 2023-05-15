@@ -314,7 +314,9 @@ public class DefaultArtifact implements Artifact {
             return false;
         } else if (!a.getArtifactId().equals(artifactId)) {
             return false;
-        } else if (!a.getVersion().equals(version)) {
+        } else if (a.getVersion() != null && !a.getVersion().equals(version)) {
+            return false;
+        } else if (a.getVersion() == null && version != null) {
             return false;
         } else if (!a.getType().equals(type)) {
             return false;
