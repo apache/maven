@@ -140,4 +140,16 @@ class DefaultArtifactTest {
         assertNull(artifact.getVersion());
         assertNull(artifact.getBaseVersion());
     }
+
+    @Test
+    void testMNG7780() throws Exception {
+        VersionRange vr = VersionRange.createFromVersionSpec("[1.0,2.0)");
+        artifact = new DefaultArtifact(groupId, artifactId, vr, scope, type, null, artifactHandler);
+        assertNull(artifact.getVersion());
+        assertNull(artifact.getBaseVersion());
+
+        DefaultArtifact nullVersionArtifact =
+                new DefaultArtifact(groupId, artifactId, vr, scope, type, null, artifactHandler);
+        assertEquals(artifact, nullVersionArtifact);
+    }
 }
