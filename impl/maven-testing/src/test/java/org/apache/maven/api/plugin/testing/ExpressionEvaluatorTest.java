@@ -27,7 +27,6 @@ import com.google.inject.Provides;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.plugin.MojoException;
 import org.apache.maven.api.plugin.testing.stubs.SessionStub;
-import org.codehaus.plexus.util.StringUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -72,11 +71,11 @@ public class ExpressionEvaluatorTest {
         /** {@inheritDoc} */
         @Override
         public void execute() throws MojoException {
-            if (StringUtils.isEmpty(basedir)) {
+            if (basedir == null || basedir.isEmpty()) {
                 throw new MojoException("basedir was not injected.");
             }
 
-            if (StringUtils.isEmpty(workdir)) {
+            if (workdir == null || workdir.isEmpty()) {
                 throw new MojoException("workdir was not injected.");
             } else if (!workdir.startsWith(basedir)) {
                 throw new MojoException("workdir does not start with basedir.");

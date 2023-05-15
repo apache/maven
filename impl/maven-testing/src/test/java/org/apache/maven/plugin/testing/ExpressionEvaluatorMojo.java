@@ -22,7 +22,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author Edwin Punzalan
@@ -37,7 +36,7 @@ public class ExpressionEvaluatorMojo extends AbstractMojo {
     /** {@inheritDoc} */
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (StringUtils.isEmpty(basedir)) {
+        if (basedir == null || basedir.isEmpty()) {
             throw new MojoExecutionException("basedir was not injected.");
         }
 
@@ -45,7 +44,7 @@ public class ExpressionEvaluatorMojo extends AbstractMojo {
             throw new MojoExecutionException("localRepository was not injected.");
         }
 
-        if (StringUtils.isEmpty(workdir)) {
+        if (workdir == null || workdir.isEmpty()) {
             throw new MojoExecutionException("workdir was not injected.");
         } else if (!workdir.startsWith(basedir)) {
             throw new MojoExecutionException("workdir does not start with basedir.");
