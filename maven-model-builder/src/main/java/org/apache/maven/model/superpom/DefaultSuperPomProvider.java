@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.maven.api.model.InputSource;
-import org.apache.maven.api.model.Model;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelProcessor;
 
 /**
@@ -74,7 +74,7 @@ public class DefaultSuperPomProvider implements SuperPomProvider {
                         modelId, getClass().getResource(resource).toExternalForm());
                 options.put(ModelProcessor.INPUT_SOURCE, new org.apache.maven.model.InputSource(inputSource));
 
-                superModel = modelProcessor.read(is, options).getDelegate();
+                superModel = modelProcessor.read(is, options);
             } catch (IOException e) {
                 throw new IllegalStateException(
                         "The super POM " + resource + " is damaged"

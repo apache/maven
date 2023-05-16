@@ -508,7 +508,7 @@ public class DefaultMaven implements Maven {
      * @return A {@link Set} of profile identifiers, never {@code null}.
      */
     private Set<String> getAllProfiles(MavenSession session) {
-        final Model superPomModel = superPomProvider.getSuperModel("4.0.0");
+        final Model superPomModel = superPomProvider.getSuperModel("4.0.0").getDelegate();
         final Set<MavenProject> projectsIncludingParents = new HashSet<>();
         for (MavenProject project : session.getProjects()) {
             boolean isAdded = projectsIncludingParents.add(project);
