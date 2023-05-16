@@ -78,10 +78,9 @@ public final class ConsumerPomArtifactTransformer {
             } else {
                 Path buildDir = Paths.get(buildDirectory);
                 Files.createDirectories(buildDir);
+                removeOldConsumerPomFiles(buildDir);
                 generatedFile = Files.createTempFile(buildDir, CONSUMER_POM_CLASSIFIER, "pom");
             }
-
-            removeOldConsumerPomFiles(generatedFile);
 
             project.addAttachedArtifact(new ConsumerPomArtifact(project, generatedFile, session));
         } else if (project.getModel().isRoot()) {
@@ -90,15 +89,12 @@ public final class ConsumerPomArtifactTransformer {
         }
     }
 
-    private void removeOldConsumerPomFiles(Path generatedFile) throws IOException {
+    private void removeOldConsumerPomFiles(Path buildDir) throws IOException {
         List<Path> oldConsumerPomFiles;
-        String newestFileName = generatedFile.getFileName().toString();
-        try (Stream<Path> stream = Files.walk(generatedFile.getParent(), 1)) {
+        try (Stream<Path> stream = Files.walk(buildDir, 1)) {
             oldConsumerPomFiles = stream.filter(path -> {
                         String fileName = path.getFileName().toString();
-                        return !fileName.equals(newestFileName)
-                                && fileName.startsWith(CONSUMER_POM_CLASSIFIER)
-                                && fileName.endsWith("pom");
+                        return fileName.startsWith(CONSUMER_POM_CLASSIFIER) && fileName.endsWith("pom");
                     })
                     .collect(Collectors.toList());
         }
