@@ -273,16 +273,8 @@ public class MojoExecutor {
         @SuppressWarnings({"unchecked", "rawtypes"})
         private OwnerReentrantLock getProjectLock(MavenSession session) {
             SessionData data = session.getRepositorySession().getData();
-            // TODO: when resolver 1.7.3 is released, the code below should be changed to
-            // TODO: Map<MavenProject, Lock> locks = ( Map ) ((Map) data).computeIfAbsent(
-            // TODO:         ProjectLock.class, l -> new ConcurrentHashMap<>() );
-            Map<MavenProject, OwnerReentrantLock> locks = (Map) data.get(ProjectLock.class);
-            // initialize the value if not already done (in case of a concurrent access) to the method
-            if (locks == null) {
-                // the call to data.set(k, null, v) is effectively a call to data.putIfAbsent(k, v)
-                data.set(ProjectLock.class, null, new ConcurrentHashMap<>());
-                locks = (Map) data.get(ProjectLock.class);
-            }
+            Map<MavenProject, OwnerReentrantLock> locks =
+                    (Map) data.computeIfAbsent(ProjectLock.class, ConcurrentHashMap::new);
             return locks.computeIfAbsent(session.getCurrentProject(), p -> new OwnerReentrantLock());
         }
     }
