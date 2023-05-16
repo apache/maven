@@ -19,11 +19,7 @@
 package org.apache.maven.artifact;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -287,46 +283,25 @@ public class DefaultArtifact implements Artifact {
         return sb.toString();
     }
 
-    public int hashCode() {
-        int result = 17;
-        result = 37 * result + groupId.hashCode();
-        result = 37 * result + artifactId.hashCode();
-        result = 37 * result + type.hashCode();
-        if (version != null) {
-            result = 37 * result + version.hashCode();
-        }
-        result = 37 * result + (classifier != null ? classifier.hashCode() : 0);
-        return result;
-    }
-
+    @Override
     public boolean equals(Object o) {
-        if (o == this) {
+        if (this == o) {
             return true;
         }
-
-        if (!(o instanceof Artifact)) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        DefaultArtifact that = (DefaultArtifact) o;
+        return Objects.equals(groupId, that.groupId)
+                && Objects.equals(artifactId, that.artifactId)
+                && Objects.equals(type, that.type)
+                && Objects.equals(classifier, that.classifier)
+                && Objects.equals(version, that.version);
+    }
 
-        Artifact a = (Artifact) o;
-
-        if (!a.getGroupId().equals(groupId)) {
-            return false;
-        } else if (!a.getArtifactId().equals(artifactId)) {
-            return false;
-        } else if (a.getVersion() != null && !a.getVersion().equals(version)) {
-            return false;
-        } else if (a.getVersion() == null && version != null) {
-            return false;
-        } else if (!a.getType().equals(type)) {
-            return false;
-        } else {
-            return a.getClassifier() == null
-                    ? classifier == null
-                    : a.getClassifier().equals(classifier);
-        }
-
-        // We don't consider the version range in the comparison, just the resolved version
+    @Override
+    public int hashCode() {
+        return Objects.hash(groupId, artifactId, type, classifier, version);
     }
 
     public String getBaseVersion() {
