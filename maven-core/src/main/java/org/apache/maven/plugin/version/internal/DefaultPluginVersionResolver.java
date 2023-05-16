@@ -91,8 +91,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
         PluginVersionResult result = resolveFromProject(request);
 
         if (result == null) {
-            ConcurrentMap<Key, PluginVersionResult> cache =
-                    getCache(request.getRepositorySession().getData());
+            ConcurrentMap<Key, PluginVersionResult> cache = getCache(request);
             Key key = getKey(request);
             result = cache.get(key);
 
@@ -347,16 +346,10 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
     }
 
     @SuppressWarnings("unchecked")
-    private ConcurrentMap<Key, PluginVersionResult> getCache(SessionData data) {
-        ConcurrentMap<Key, PluginVersionResult> cache = (ConcurrentMap<Key, PluginVersionResult>) data.get(CACHE_KEY);
-        while (cache == null) {
-            cache = new ConcurrentHashMap<>(256);
-            if (data.set(CACHE_KEY, null, cache)) {
-                break;
-            }
-            cache = (ConcurrentMap<Key, PluginVersionResult>) data.get(CACHE_KEY);
-        }
-        return cache;
+    private ConcurrentMap<Key, PluginVersionResult> getCache(PluginVersionRequest request) {
+        SessionData data = request.getRepositorySession().getData();
+        return (ConcurrentMap<Key, PluginVersionResult>)
+                data.computeIfAbsent(CACHE_KEY, () -> new ConcurrentHashMap<>(256));
     }
 
     private static Key getKey(PluginVersionRequest request) {
