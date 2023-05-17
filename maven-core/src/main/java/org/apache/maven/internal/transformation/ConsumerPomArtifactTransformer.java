@@ -18,6 +18,7 @@
  */
 package org.apache.maven.internal.transformation;
 
+import javax.annotation.PreDestroy;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -29,10 +30,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.maven.feature.Features;
 import org.apache.maven.model.building.DefaultBuildPomXMLFilterFactory;
@@ -64,6 +64,8 @@ public final class ConsumerPomArtifactTransformer {
 
     private static final String CONSUMER_POM_CLASSIFIER = "consumer";
 
+    private final Set<String> toDelete = new CopyOnWriteArraySet<>();
+
     public void injectTransformedArtifacts(MavenProject project, RepositorySystemSession session) throws IOException {
         if (project.getFile() == null) {
             // If there is no build POM there is no reason to inject artifacts for the consumer POM.
@@ -78,10 +80,9 @@ public final class ConsumerPomArtifactTransformer {
             } else {
                 Path buildDir = Paths.get(buildDirectory);
                 Files.createDirectories(buildDir);
-                removeOldConsumerPomFiles(buildDir);
                 generatedFile = Files.createTempFile(buildDir, CONSUMER_POM_CLASSIFIER, "pom");
             }
-
+            deferDeleteFile(generatedFile);
             project.addAttachedArtifact(new ConsumerPomArtifact(project, generatedFile, session));
         } else if (project.getModel().isRoot()) {
             throw new IllegalStateException(
@@ -89,18 +90,18 @@ public final class ConsumerPomArtifactTransformer {
         }
     }
 
-    private void removeOldConsumerPomFiles(Path buildDir) throws IOException {
-        List<Path> oldConsumerPomFiles;
-        try (Stream<Path> stream = Files.walk(buildDir, 1)) {
-            oldConsumerPomFiles = stream.filter(path -> {
-                        String fileName = path.getFileName().toString();
-                        return fileName.startsWith(CONSUMER_POM_CLASSIFIER) && fileName.endsWith("pom");
-                    })
-                    .collect(Collectors.toList());
-        }
+    private void deferDeleteFile(Path generatedFile) {
+        toDelete.add(generatedFile.toAbsolutePath().toString());
+    }
 
-        for (Path path : oldConsumerPomFiles) {
-            Files.delete(path);
+    @PreDestroy
+    private void doDeleteFiles() {
+        for (String file : toDelete) {
+            try {
+                Files.delete(Paths.get(file));
+            } catch (IOException e) {
+                // ignore, we did our best...
+            }
         }
     }
 
