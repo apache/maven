@@ -81,4 +81,9 @@ public class ArtifactModelSource extends FileSource implements ModelSource {
                 && Objects.equals(groupId, other.groupId)
                 && Objects.equals(version, other.version);
     }
+
+    @Override
+    public String toString() {
+        return groupId + ":" + artifactId + ":" + version;
+    }
 }
