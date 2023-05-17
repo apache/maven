@@ -1575,7 +1575,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     private Model getSuperModel() {
-        return new Model(superPomProvider.getSuperModel("4.0.0"));
+        return superPomProvider.getSuperModel("4.0.0");
     }
 
     private void importDependencyManagement(
