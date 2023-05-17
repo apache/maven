@@ -24,6 +24,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
@@ -363,34 +364,35 @@ public class DefaultRepositorySystemSessionFactoryTest {
         request.setLocalRepository(getLocalRepository());
 
         // native
-        System.setProperty("maven.resolver.transport", "native");
-        request.setSystemProperties(System.getProperties());
+        Properties properties = new Properties();
+        properties.setProperty("maven.resolver.transport", "native");
+        request.setSystemProperties(properties);
         Map<String, Object> configProperties =
                 systemSessionFactory.newRepositorySession(request).getConfigProperties();
         assertEquals(String.valueOf(Float.MAX_VALUE), configProperties.get("aether.priority.FileTransporterFactory"));
         assertEquals(String.valueOf(Float.MAX_VALUE), configProperties.get("aether.priority.HttpTransporterFactory"));
-        System.clearProperty("maven.resolver.transport");
+        properties.remove("maven.resolver.transport");
 
         // wagon
-        System.setProperty("maven.resolver.transport", "wagon");
-        request.setSystemProperties(System.getProperties());
+        properties.setProperty("maven.resolver.transport", "wagon");
+        request.setSystemProperties(properties);
         assertEquals(
                 String.valueOf(Float.MAX_VALUE),
                 systemSessionFactory
                         .newRepositorySession(request)
                         .getConfigProperties()
                         .get("aether.priority.WagonTransporterFactory"));
-        System.clearProperty("maven.resolver.transport");
+        properties.remove("maven.resolver.transport");
 
         // illegal
-        System.setProperty("maven.resolver.transport", "illegal");
-        request.setSystemProperties(System.getProperties());
+        properties.setProperty("maven.resolver.transport", "illegal");
+        request.setSystemProperties(properties);
         IllegalArgumentException exception = assertThrowsExactly(
                 IllegalArgumentException.class, () -> systemSessionFactory.newRepositorySession(request));
         assertEquals(
                 "Unknown resolver transport 'illegal'. Supported transports are: wagon, native, auto",
                 exception.getMessage());
-        System.clearProperty("maven.resolver.transport");
+        properties.remove("maven.resolver.transport");
     }
 
     protected ArtifactRepository getLocalRepository() throws InvalidRepositoryException {
