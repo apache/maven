@@ -29,7 +29,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.maven.AbstractMavenLifecycleParticipant;
+import org.apache.maven.eventspy.AbstractEventSpy;
+import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.plugin.PluginValidationManager;
@@ -44,8 +45,7 @@ import org.slf4j.LoggerFactory;
 
 @Singleton
 @Named
-public final class DefaultPluginValidationManager extends AbstractMavenLifecycleParticipant
-        implements PluginValidationManager {
+public final class DefaultPluginValidationManager extends AbstractEventSpy implements PluginValidationManager {
 
     private static final String ISSUES_KEY = DefaultPluginValidationManager.class.getName() + ".issues";
 
@@ -62,8 +62,13 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public void afterSessionEnd(MavenSession session) {
-        reportSessionCollectedValidationIssues(session);
+    public void onEvent(Object event) {
+        if (event instanceof ExecutionEvent) {
+            ExecutionEvent executionEvent = (ExecutionEvent) event;
+            if (executionEvent.getType() == ExecutionEvent.Type.SessionEnded) {
+                reportSessionCollectedValidationIssues(executionEvent.getSession());
+            }
+        }
     }
 
     private ValidationReportLevel validationReportLevel(RepositorySystemSession session) {
