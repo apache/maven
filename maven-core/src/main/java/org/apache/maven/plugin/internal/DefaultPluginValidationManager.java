@@ -53,10 +53,10 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
 
     private enum ValidationReportLevel {
         NONE, // mute validation completely (validation issue collection still happens, it is just not reported!)
-        INLINE, // each problem one line, inline, next to mojo invocation, repeated as many times as mojo is executed
-        BRIEF, // one line with count of plugins in the build having validation issues
-        DEFAULT, // list of plugin GAVs in the build having validation issues
-        VERBOSE // detailed report (GAV, declaration, use and problems) of plugins in the build having validation issues
+        INLINE, // inline, each problem one line next to mojo invocation, repeated as many times as mojo is executed
+        BRIEF, // at end, one line with count of plugins in the build having validation issues
+        DEFAULT, // at end, list of plugin GAVs in the build having validation issues
+        VERBOSE // at end, detailed report of plugins in the build having validation issues
     }
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -66,7 +66,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
         reportSessionCollectedValidationIssues(session);
     }
 
-    private ValidationReportLevel validationLevel(RepositorySystemSession session) {
+    private ValidationReportLevel validationReportLevel(RepositorySystemSession session) {
         String level = ConfigUtils.getString(session, null, MAVEN_PLUGIN_VALIDATION_KEY);
         if (level == null || level.isEmpty()) {
             return ValidationReportLevel.DEFAULT;
@@ -102,8 +102,8 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
         PluginValidationIssues pluginIssues =
                 pluginIssues(session).computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
         pluginIssues.reportPluginIssue(null, null, issue);
-        ValidationReportLevel validationLevel = validationLevel(session);
-        if (validationLevel == ValidationReportLevel.INLINE) {
+        ValidationReportLevel validationReportLevel = validationReportLevel(session);
+        if (validationReportLevel == ValidationReportLevel.INLINE) {
             logger.warn("{}", issue);
         }
     }
@@ -115,8 +115,8 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
                 .computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
         pluginIssues.reportPluginIssue(
                 pluginDeclaration(mavenSession, mojoDescriptor), pluginOccurrence(mavenSession), issue);
-        ValidationReportLevel validationLevel = validationLevel(mavenSession.getRepositorySession());
-        if (validationLevel == ValidationReportLevel.INLINE) {
+        ValidationReportLevel validationReportLevel = validationReportLevel(mavenSession.getRepositorySession());
+        if (validationReportLevel == ValidationReportLevel.INLINE) {
             logger.warn("{}", issue);
         }
     }
@@ -132,8 +132,8 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
                 pluginOccurrence(mavenSession),
                 mojoInfo(mojoDescriptor, mojoClass),
                 issue);
-        ValidationReportLevel validationLevel = validationLevel(mavenSession.getRepositorySession());
-        if (validationLevel == ValidationReportLevel.INLINE) {
+        ValidationReportLevel validationReportLevel = validationReportLevel(mavenSession.getRepositorySession());
+        if (validationReportLevel == ValidationReportLevel.INLINE) {
             logger.warn("{}", issue);
         }
     }
@@ -142,8 +142,9 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
         if (!logger.isWarnEnabled()) {
             return; // nothing can be reported
         }
-        ValidationReportLevel validationLevel = validationLevel(mavenSession.getRepositorySession());
-        if (validationLevel == ValidationReportLevel.NONE || validationLevel == ValidationReportLevel.INLINE) {
+        ValidationReportLevel validationReportLevel = validationReportLevel(mavenSession.getRepositorySession());
+        if (validationReportLevel == ValidationReportLevel.NONE
+                || validationReportLevel == ValidationReportLevel.INLINE) {
             return; // we were asked to not report anything OR reporting already happened inline
         }
         ConcurrentHashMap<String, PluginValidationIssues> issuesMap = pluginIssues(mavenSession.getRepositorySession());
@@ -152,13 +153,13 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
             logger.warn("");
             logger.warn("Plugin validation issues were detected in {} plugin(s)", issuesMap.size());
             logger.warn("");
-            if (validationLevel == ValidationReportLevel.BRIEF) {
+            if (validationReportLevel == ValidationReportLevel.BRIEF) {
                 return;
             }
 
             for (Map.Entry<String, PluginValidationIssues> entry : issuesMap.entrySet()) {
                 logger.warn(" * {}", entry.getKey());
-                if (validationLevel == ValidationReportLevel.VERBOSE) {
+                if (validationReportLevel == ValidationReportLevel.VERBOSE) {
                     PluginValidationIssues issues = entry.getValue();
                     if (!issues.pluginDeclarations.isEmpty()) {
                         logger.warn("  Declared at location(s):");
@@ -191,7 +192,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
                 }
             }
             logger.warn("");
-            if (validationLevel == ValidationReportLevel.VERBOSE) {
+            if (validationReportLevel == ValidationReportLevel.VERBOSE) {
                 logger.warn(
                         "Fix reported issues by adjusting plugin configuration or by upgrading above listed plugins. If no upgrade available, please notify plugin maintainers about reported issues.");
             }
