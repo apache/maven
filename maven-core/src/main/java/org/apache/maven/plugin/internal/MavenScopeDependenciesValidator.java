@@ -30,7 +30,7 @@ import org.apache.maven.plugin.PluginValidationManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
 /**
- * Detects Maven3 artifacts in bad scope in plugins.
+ * Detects presence of Maven3 artifacts in plugin descriptor.
  *
  * @since 3.9.2
  */
@@ -47,7 +47,7 @@ class MavenScopeDependenciesValidator extends AbstractMavenPluginDependenciesVal
     protected void doValidate(MavenSession mavenSession, MojoDescriptor mojoDescriptor) {
         Set<String> mavenArtifacts = mojoDescriptor.getPluginDescriptor().getDependencies().stream()
                 .filter(d -> "org.apache.maven".equals(d.getGroupId()))
-                .filter(d -> !expectedProvidedScopeExclusions.contains(d.getGroupId() + ":" + d.getArtifactId()))
+                .filter(d -> !EXPECTED_PROVIDED_SCOPE_EXCLUSIONS_GA.contains(d.getGroupId() + ":" + d.getArtifactId()))
                 .filter(d -> d.getVersion().startsWith("3."))
                 .map(d -> d.getGroupId() + ":" + d.getArtifactId() + ":" + d.getVersion())
                 .collect(Collectors.toSet());
@@ -56,7 +56,7 @@ class MavenScopeDependenciesValidator extends AbstractMavenPluginDependenciesVal
             pluginValidationManager.reportPluginValidationIssue(
                     mavenSession,
                     mojoDescriptor,
-                    "Plugin should declare these Maven artifacts in `provided` scope: " + mavenArtifacts);
+                    "Plugin descriptor should not contain these Maven artifacts: " + mavenArtifacts);
         }
     }
 }

@@ -18,6 +18,10 @@
  */
 package org.apache.maven.plugin.internal;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
@@ -27,6 +31,14 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
  * @since 3.9.2
  */
 interface MavenPluginDependenciesValidator {
+
+    /**
+     * The collection of "G:A" combinations that do NOT belong to Maven Core, hence, should be excluded from
+     * "expected in provided scope" type of checks.
+     */
+    Collection<String> EXPECTED_PROVIDED_SCOPE_EXCLUSIONS_GA = Collections.unmodifiableCollection(Arrays.asList(
+            "org.apache.maven:maven-archiver", "org.apache.maven:maven-jxr", "org.apache.maven:plexus-utils"));
+
     /**
      * Checks mojo dependency issues.
      */
