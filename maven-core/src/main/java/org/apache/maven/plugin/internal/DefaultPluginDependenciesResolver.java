@@ -122,7 +122,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                 }
 
                 Set<String> mavenArtifacts = result.getDependencies().stream()
-                        .filter(d -> !JavaScopes.PROVIDED.equals(d.getScope()))
+                        .filter(d -> !JavaScopes.PROVIDED.equals(d.getScope()) && !JavaScopes.TEST.equals(d.getScope()))
                         .map(org.eclipse.aether.graph.Dependency::getArtifact)
                         .filter(a -> "org.apache.maven".equals(a.getGroupId()))
                         .filter(a -> !MavenPluginDependenciesValidator.EXPECTED_PROVIDED_SCOPE_EXCLUSIONS_GA.contains(
