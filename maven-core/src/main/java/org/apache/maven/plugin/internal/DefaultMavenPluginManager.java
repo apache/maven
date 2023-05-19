@@ -167,7 +167,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
     private List<MavenPluginConfigurationValidator> configurationValidators;
 
     @Requirement
-    private List<MavenPluginDependenciesValidator> dependenciesValidators;
+    private List<MavenPluginDescriptorDependenciesValidator> dependenciesValidators;
 
     @Requirement
     private PluginValidationManager pluginValidationManager;
@@ -556,7 +556,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                         "Mojo implements `Contextualizable` interface from Plexus Container, which is EOL.");
             }
 
-            for (MavenPluginDependenciesValidator validator : dependenciesValidators) {
+            for (MavenPluginDescriptorDependenciesValidator validator : dependenciesValidators) {
                 validator.validate(session, mojoDescriptor);
             }
 

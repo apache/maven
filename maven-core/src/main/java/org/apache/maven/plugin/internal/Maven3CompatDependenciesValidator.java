@@ -18,38 +18,44 @@
  */
 package org.apache.maven.plugin.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.plugin.PluginValidationManager;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
-
-import static java.util.Objects.requireNonNull;
+import org.eclipse.aether.util.artifact.JavaScopes;
 
 /**
- * Service responsible for validating plugin dependencies.
+ * Detects Maven3 plugins using maven-compat Maven2 compatibility layer.
  *
- * @since 3.9.2
+ * @since 3.9.3
  */
-abstract class AbstractMavenPluginDependenciesValidator implements MavenPluginDependenciesValidator {
+@Singleton
+@Named
+class Maven3CompatDependenciesValidator extends AbstractMavenPluginDependenciesValidator {
 
-    protected final PluginValidationManager pluginValidationManager;
-
-    protected AbstractMavenPluginDependenciesValidator(PluginValidationManager pluginValidationManager) {
-        this.pluginValidationManager = requireNonNull(pluginValidationManager);
+    @Inject
+    Maven3CompatDependenciesValidator(PluginValidationManager pluginValidationManager) {
+        super(pluginValidationManager);
     }
 
     @Override
-    public void validate(
+    protected void doValidate(
             RepositorySystemSession session,
             Artifact pluginArtifact,
             ArtifactDescriptorResult artifactDescriptorResult) {
-        if (artifactDescriptorResult.getDependencies() != null) {
-            doValidate(session, pluginArtifact, artifactDescriptorResult);
+        for (org.eclipse.aether.graph.Dependency dependency : artifactDescriptorResult.getDependencies()) {
+            if ("org.apache.maven".equals(dependency.getArtifact().getGroupId())
+                    && "maven-compat".equals(dependency.getArtifact().getArtifactId())
+                    && !JavaScopes.TEST.equals(dependency.getScope())) {
+                pluginValidationManager.reportPluginValidationIssue(
+                        session,
+                        pluginArtifact,
+                        "Plugin depends on the deprecated Maven 2.x compatibility layer, which may not be supported in Maven 4.x");
+            }
         }
     }
-
-    protected abstract void doValidate(
-            RepositorySystemSession session,
-            Artifact pluginArtifact,
-            ArtifactDescriptorResult artifactDescriptorResult);
 }

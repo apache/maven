@@ -23,8 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
@@ -84,6 +82,9 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
     @Requirement
     private PluginValidationManager pluginValidationManager;
 
+    @Requirement
+    private List<MavenPluginDependenciesValidator> dependenciesValidators;
+
     private Artifact toArtifact(Plugin plugin, RepositorySystemSession session) {
         return new DefaultArtifact(
                 plugin.getGroupId(),
@@ -109,34 +110,8 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             request.setTrace(trace);
             ArtifactDescriptorResult result = repoSystem.readArtifactDescriptor(pluginSession, request);
 
-            if (result.getDependencies() != null) {
-                for (org.eclipse.aether.graph.Dependency dependency : result.getDependencies()) {
-                    if ("org.apache.maven".equals(dependency.getArtifact().getGroupId())
-                            && "maven-compat".equals(dependency.getArtifact().getArtifactId())
-                            && !JavaScopes.TEST.equals(dependency.getScope())) {
-                        pluginValidationManager.reportPluginValidationIssue(
-                                session,
-                                pluginArtifact,
-                                "Plugin depends on the deprecated Maven 2.x compatibility layer, which may not be supported in Maven 4.x");
-                    }
-                }
-
-                Set<String> mavenArtifacts = result.getDependencies().stream()
-                        .filter(d -> !JavaScopes.PROVIDED.equals(d.getScope()) && !JavaScopes.TEST.equals(d.getScope()))
-                        .map(org.eclipse.aether.graph.Dependency::getArtifact)
-                        .filter(a -> "org.apache.maven".equals(a.getGroupId()))
-                        .filter(a -> !MavenPluginDependenciesValidator.EXPECTED_PROVIDED_SCOPE_EXCLUSIONS_GA.contains(
-                                a.getGroupId() + ":" + a.getArtifactId()))
-                        .filter(a -> a.getVersion().startsWith("3."))
-                        .map(a -> a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion())
-                        .collect(Collectors.toSet());
-
-                if (!mavenArtifacts.isEmpty()) {
-                    pluginValidationManager.reportPluginValidationIssue(
-                            session,
-                            pluginArtifact,
-                            "Plugin should declare these Maven artifacts in `provided` scope: " + mavenArtifacts);
-                }
+            for (MavenPluginDependenciesValidator dependenciesValidator : dependenciesValidators) {
+                dependenciesValidator.validate(session, pluginArtifact, result);
             }
 
             pluginArtifact = result.getArtifact();

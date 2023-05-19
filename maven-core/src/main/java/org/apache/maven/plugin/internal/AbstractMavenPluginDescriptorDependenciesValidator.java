@@ -18,38 +18,33 @@
  */
 package org.apache.maven.plugin.internal;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.PluginValidationManager;
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.resolution.ArtifactDescriptorResult;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Service responsible for validating plugin dependencies.
+ * Service responsible for validating plugin dependencies in plugin descriptor.
  *
- * @since 3.9.2
+ * @since 3.9.3
  */
-abstract class AbstractMavenPluginDependenciesValidator implements MavenPluginDependenciesValidator {
+abstract class AbstractMavenPluginDescriptorDependenciesValidator
+        implements MavenPluginDescriptorDependenciesValidator {
 
     protected final PluginValidationManager pluginValidationManager;
 
-    protected AbstractMavenPluginDependenciesValidator(PluginValidationManager pluginValidationManager) {
+    protected AbstractMavenPluginDescriptorDependenciesValidator(PluginValidationManager pluginValidationManager) {
         this.pluginValidationManager = requireNonNull(pluginValidationManager);
     }
 
     @Override
-    public void validate(
-            RepositorySystemSession session,
-            Artifact pluginArtifact,
-            ArtifactDescriptorResult artifactDescriptorResult) {
-        if (artifactDescriptorResult.getDependencies() != null) {
-            doValidate(session, pluginArtifact, artifactDescriptorResult);
+    public void validate(MavenSession mavenSession, MojoDescriptor mojoDescriptor) {
+        if (mojoDescriptor.getPluginDescriptor() != null
+                && mojoDescriptor.getPluginDescriptor().getDependencies() != null) {
+            doValidate(mavenSession, mojoDescriptor);
         }
     }
 
-    protected abstract void doValidate(
-            RepositorySystemSession session,
-            Artifact pluginArtifact,
-            ArtifactDescriptorResult artifactDescriptorResult);
+    protected abstract void doValidate(MavenSession mavenSession, MojoDescriptor mojoDescriptor);
 }
