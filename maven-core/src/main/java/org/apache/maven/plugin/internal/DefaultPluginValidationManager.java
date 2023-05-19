@@ -104,7 +104,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
         pluginIssues.reportPluginIssue(null, null, issue);
         ValidationReportLevel validationReportLevel = validationReportLevel(session);
         if (validationReportLevel == ValidationReportLevel.INLINE) {
-            logger.warn("{}", issue);
+            logger.warn(" {}", issue);
         }
     }
 
@@ -117,7 +117,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
                 pluginDeclaration(mavenSession, mojoDescriptor), pluginOccurrence(mavenSession), issue);
         ValidationReportLevel validationReportLevel = validationReportLevel(mavenSession.getRepositorySession());
         if (validationReportLevel == ValidationReportLevel.INLINE) {
-            logger.warn("{}", issue);
+            logger.warn(" {}", issue);
         }
     }
 
@@ -134,7 +134,7 @@ public final class DefaultPluginValidationManager extends AbstractMavenLifecycle
                 issue);
         ValidationReportLevel validationReportLevel = validationReportLevel(mavenSession.getRepositorySession());
         if (validationReportLevel == ValidationReportLevel.INLINE) {
-            logger.warn("{}", issue);
+            logger.warn(" {}", issue);
         }
     }
 
