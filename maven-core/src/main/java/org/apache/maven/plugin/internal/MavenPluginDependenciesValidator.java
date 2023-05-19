@@ -35,6 +35,8 @@ interface MavenPluginDependenciesValidator {
     /**
      * The collection of "G:A" combinations that do NOT belong to Maven Core, hence, should be excluded from
      * "expected in provided scope" type of checks.
+     *
+     * @since 3.9.3
      */
     Collection<String> EXPECTED_PROVIDED_SCOPE_EXCLUSIONS_GA = Collections.unmodifiableCollection(Arrays.asList(
             "org.apache.maven:maven-archiver", "org.apache.maven:maven-jxr", "org.apache.maven:plexus-utils"));
