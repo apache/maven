@@ -30,8 +30,8 @@ import org.apache.maven.plugin.PluginValidationManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
 /**
- * Detects presence of unwanted Maven3 artifacts in plugin descriptor (for multitude reasons, among them is
- * "wrong scope" dependency declaration as well).
+ * Detects presence of unwanted Maven3 artifacts in plugin descriptor, possibly caused by multitude reasons, among
+ * them is "wrong scope" dependency declaration as well.
  * <p>
  * Historically this class was named as "MavenScopeDependenciesValidator" due original intent to check "wrong Maven
  * Artifact scopes", but since then it turned out that the value set (the plugin descriptor dependencies), that is
