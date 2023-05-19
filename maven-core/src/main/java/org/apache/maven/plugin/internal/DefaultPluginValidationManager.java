@@ -52,10 +52,10 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
     private static final String MAVEN_PLUGIN_VALIDATION_KEY = "maven.plugin.validation";
 
     private enum ValidationReportLevel {
-        NONE, // mute validation completely (validation issue collection still happens, it is just not reported!)
+        DEFAULT, // mute validation completely (validation issue collection still happens, it is just not reported!)
         INLINE, // inline, each problem one line next to mojo invocation, repeated as many times as mojo is executed
         BRIEF, // at end, one line with count of plugins in the build having validation issues
-        DEFAULT, // at end, list of plugin GAVs in the build having validation issues
+        SUMMARY, // at end, list of plugin GAVs in the build having validation issues
         VERBOSE // at end, detailed report of plugins in the build having validation issues
     }
 
@@ -148,7 +148,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
             return; // nothing can be reported
         }
         ValidationReportLevel validationReportLevel = validationReportLevel(mavenSession.getRepositorySession());
-        if (validationReportLevel == ValidationReportLevel.NONE
+        if (validationReportLevel == ValidationReportLevel.DEFAULT
                 || validationReportLevel == ValidationReportLevel.INLINE) {
             return; // we were asked to not report anything OR reporting already happened inline
         }
