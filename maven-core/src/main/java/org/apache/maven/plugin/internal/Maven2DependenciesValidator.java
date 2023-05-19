@@ -48,7 +48,7 @@ class Maven2DependenciesValidator extends AbstractMavenPluginDependenciesValidat
     protected void doValidate(MavenSession mavenSession, MojoDescriptor mojoDescriptor) {
         Set<String> maven2Versions = mojoDescriptor.getPluginDescriptor().getDependencies().stream()
                 .filter(d -> "org.apache.maven".equals(d.getGroupId()))
-                .filter(d -> !expectedProvidedScopeExclusions.contains(d.getGroupId() + ":" + d.getArtifactId()))
+                .filter(d -> !EXPECTED_PROVIDED_SCOPE_EXCLUSIONS_GA.contains(d.getGroupId() + ":" + d.getArtifactId()))
                 .map(ComponentDependency::getVersion)
                 .filter(v -> v.startsWith("2."))
                 .collect(Collectors.toSet());
