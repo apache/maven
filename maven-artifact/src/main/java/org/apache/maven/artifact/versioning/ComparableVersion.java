@@ -130,6 +130,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     return -1;
 
                 case STRING_ITEM:
+                    return 1;
                 case COMBINATION_ITEM:
                     return 1; // 1.1 > 1-sp
 
@@ -202,6 +203,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     return -1;
 
                 case STRING_ITEM:
+                    return 1;
                 case COMBINATION_ITEM:
                     return 1; // 1.1 > 1-sp
 
@@ -273,6 +275,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     return value.compareTo(((BigIntegerItem) item).value);
 
                 case STRING_ITEM:
+                    return 1;
                 case COMBINATION_ITEM:
                     return 1; // 1.1 > 1-sp
 
@@ -446,18 +449,18 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 
         Item digitValue;
 
-        CombinationItem(String v) {
+        CombinationItem(String value) {
             int index = 0;
-            for (int i = 0; i < v.length(); i++) {
-                char c = v.charAt(i);
+            for (int i = 0; i < value.length(); i++) {
+                char c = value.charAt(i);
                 if (Character.isDigit(c)) {
                     index = i;
                     break;
                 }
             }
 
-            stringValue = new StringItem(v.substring(0, index), true);
-            digitValue = parseItem(true, v.substring(index));
+            stringValue = new StringItem(value.substring(0, index), true);
+            digitValue = parseItem(true, value.substring(index));
         }
 
         @Override
@@ -590,6 +593,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     return -1; // 1-1 < 1.0.x
 
                 case STRING_ITEM:
+                    return 1;
                 case COMBINATION_ITEM:
                     return 1; // 1-1 > 1-sp
 
