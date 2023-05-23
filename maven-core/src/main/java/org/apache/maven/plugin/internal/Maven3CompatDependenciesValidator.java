@@ -54,7 +54,7 @@ class Maven3CompatDependenciesValidator extends AbstractMavenPluginDependenciesV
                 pluginValidationManager.reportPluginValidationIssue(
                         session,
                         pluginArtifact,
-                        "Plugin depends on the deprecated Maven 2.x compatibility layer, which may not be supported in Maven 4.x");
+                        "Plugin depends on the deprecated Maven 2.x compatibility layer, which will be not supported in Maven 4.x");
             }
         }
     }

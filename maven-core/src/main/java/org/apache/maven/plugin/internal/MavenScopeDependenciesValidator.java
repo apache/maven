@@ -64,7 +64,8 @@ class MavenScopeDependenciesValidator extends AbstractMavenPluginDependenciesVal
             pluginValidationManager.reportPluginValidationIssue(
                     session,
                     pluginArtifact,
-                    "Plugin should declare these Maven artifacts in `provided` scope: " + mavenArtifacts);
+                    "Plugin should declare Maven artifacts in `provided` scope. If the plugin already declares them in `provided` scope, update the maven-plugin-plugin to latest version. Artifacts found with wrong scope: "
+                            + mavenArtifacts);
         }
     }
 }
