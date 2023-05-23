@@ -343,7 +343,7 @@ public interface Session {
     Node collectDependencies(@Nonnull Project project);
 
     /**
-     * Shortcut for <code>getService(DependencyResolver.class).resolve(...)</code>
+     * Shortcut for <code>getService(DependencyCollector.class).resolve(...)</code>
      * @see org.apache.maven.api.services.DependencyCollector#collect(Session, DependencyCoordinate)
      *
      * @throws org.apache.maven.api.services.DependencyCollectorException if the dependency collection failed
