@@ -32,7 +32,6 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
-import org.apache.maven.plugin.PluginValidationManager;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -78,17 +77,12 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
 
     private final RepositorySystem repoSystem;
 
-    private final PluginValidationManager pluginValidationManager;
-
     private final List<MavenPluginDependenciesValidator> dependenciesValidators;
 
     @Inject
     public DefaultPluginDependenciesResolver(
-            RepositorySystem repoSystem,
-            PluginValidationManager pluginValidationManager,
-            List<MavenPluginDependenciesValidator> dependenciesValidators) {
+            RepositorySystem repoSystem, List<MavenPluginDependenciesValidator> dependenciesValidators) {
         this.repoSystem = repoSystem;
-        this.pluginValidationManager = pluginValidationManager;
         this.dependenciesValidators = dependenciesValidators;
     }
 
