@@ -76,7 +76,11 @@ class ReadOnlyPluginParametersValidator extends AbstractMavenPluginDescriptorSou
 
         if (isValueSet(config, expressionEvaluator)) {
             pluginValidationManager.reportPluginMojoValidationIssue(
-                    mavenSession, mojoDescriptor, mojoClass, formatParameter(parameter));
+                    PluginValidationManager.IssueLocality.INTERNAL,
+                    mavenSession,
+                    mojoDescriptor,
+                    mojoClass,
+                    formatParameter(parameter));
         }
     }
 }
