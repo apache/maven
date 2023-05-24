@@ -148,7 +148,6 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
     private PluginArtifactsCache pluginArtifactsCache;
     private MavenPluginValidator pluginValidator;
     private List<MavenPluginConfigurationValidator> configurationValidators;
-    private List<MavenPluginDependenciesValidator> dependenciesValidators;
     private PluginValidationManager pluginValidationManager;
     private List<MavenPluginPrerequisitesChecker> prerequisitesCheckers;
     private final ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
@@ -168,7 +167,6 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             PluginArtifactsCache pluginArtifactsCache,
             MavenPluginValidator pluginValidator,
             List<MavenPluginConfigurationValidator> configurationValidators,
-            List<MavenPluginDependenciesValidator> dependencyValidators,
             PluginValidationManager pluginValidationManager,
             List<MavenPluginPrerequisitesChecker> prerequisitesCheckers) {
         this.container = container;
@@ -182,7 +180,6 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         this.pluginArtifactsCache = pluginArtifactsCache;
         this.pluginValidator = pluginValidator;
         this.configurationValidators = configurationValidators;
-        this.dependenciesValidators = dependencyValidators;
         this.pluginValidationManager = pluginValidationManager;
         this.prerequisitesCheckers = prerequisitesCheckers;
     }
@@ -572,10 +569,6 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                         mojoDescriptor,
                         mojo.getClass(),
                         "Mojo implements `Contextualizable` interface from Plexus Container, which is EOL.");
-            }
-
-            for (MavenPluginDependenciesValidator validator : dependenciesValidators) {
-                validator.validate(session, mojoDescriptor);
             }
 
             XmlNode dom = mojoExecution.getConfiguration() != null

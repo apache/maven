@@ -22,9 +22,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.PluginValidationManager;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
 /**
  * Detects Plexus Container Default in plugins.
@@ -40,14 +41,17 @@ class PlexusContainerDefaultDependenciesValidator extends AbstractMavenPluginDep
         super(pluginValidationManager);
     }
 
-    protected void doValidate(MavenSession mavenSession, MojoDescriptor mojoDescriptor) {
-        boolean pcdPresent = mojoDescriptor.getPluginDescriptor().getDependencies().stream()
-                .filter(d -> "org.codehaus.plexus".equals(d.getGroupId()))
-                .anyMatch(d -> "plexus-container-default".equals(d.getArtifactId()));
+    protected void doValidate(
+            RepositorySystemSession session,
+            Artifact pluginArtifact,
+            ArtifactDescriptorResult artifactDescriptorResult) {
+        boolean pcdPresent = artifactDescriptorResult.getDependencies().stream()
+                .filter(d -> "org.codehaus.plexus".equals(d.getArtifact().getGroupId()))
+                .anyMatch(d -> "plexus-container-default".equals(d.getArtifact().getArtifactId()));
 
         if (pcdPresent) {
             pluginValidationManager.reportPluginValidationIssue(
-                    mavenSession, mojoDescriptor, "Plugin depends on plexus-container-default, which is EOL");
+                    session, pluginArtifact, "Plugin depends on plexus-container-default, which is EOL");
         }
     }
 }

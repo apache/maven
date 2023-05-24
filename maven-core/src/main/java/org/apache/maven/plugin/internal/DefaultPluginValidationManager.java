@@ -22,11 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.eventspy.AbstractEventSpy;
@@ -46,6 +42,13 @@ import org.slf4j.LoggerFactory;
 @Singleton
 @Named
 public final class DefaultPluginValidationManager extends AbstractEventSpy implements PluginValidationManager {
+    /**
+     * The collection of "G:A" combinations that do NOT belong to Maven Core, hence, should be excluded from
+     * "expected in provided scope" type of checks.
+     */
+    static final Collection<String> EXPECTED_PROVIDED_SCOPE_EXCLUSIONS_GA =
+            Collections.unmodifiableCollection(Arrays.asList(
+                    "org.apache.maven:maven-archiver", "org.apache.maven:maven-jxr", "org.apache.maven:plexus-utils"));
 
     private static final String ISSUES_KEY = DefaultPluginValidationManager.class.getName() + ".issues";
 

@@ -18,31 +18,21 @@
  */
 package org.apache.maven.plugin.internal;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 
 /**
  * Service responsible for validating plugin dependencies.
  *
- * @since 3.9.2
+ * @since 3.9.3
  */
 interface MavenPluginDependenciesValidator {
-
-    /**
-     * The collection of "G:A" combinations that do NOT belong to Maven Core, hence, should be excluded from
-     * "expected in provided scope" type of checks.
-     *
-     * @since 3.9.3
-     */
-    Collection<String> EXPECTED_PROVIDED_SCOPE_EXCLUSIONS_GA = Collections.unmodifiableCollection(Arrays.asList(
-            "org.apache.maven:maven-archiver", "org.apache.maven:maven-jxr", "org.apache.maven:plexus-utils"));
-
     /**
      * Checks mojo dependency issues.
      */
-    void validate(MavenSession mavenSession, MojoDescriptor mojoDescriptor);
+    void validate(
+            RepositorySystemSession session,
+            Artifact pluginArtifact,
+            ArtifactDescriptorResult artifactDescriptorResult);
 }

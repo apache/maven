@@ -28,20 +28,20 @@ import java.util.stream.Collectors;
 import org.apache.maven.plugin.PluginValidationManager;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
+import org.eclipse.aether.util.artifact.JavaScopes;
 
 /**
- * Detects Maven2 plugins.
+ * Detects Maven3 dependencies scope.
  *
- * @since 3.9.2
+ * @since 3.9.3
  */
 @Singleton
 @Named
-class Maven2DependenciesValidator extends AbstractMavenPluginDependenciesValidator {
+class MavenScopeDependenciesValidator extends AbstractMavenPluginDependenciesValidator {
 
     @Inject
-    Maven2DependenciesValidator(PluginValidationManager pluginValidationManager) {
+    MavenScopeDependenciesValidator(PluginValidationManager pluginValidationManager) {
         super(pluginValidationManager);
     }
 
@@ -50,18 +50,22 @@ class Maven2DependenciesValidator extends AbstractMavenPluginDependenciesValidat
             RepositorySystemSession session,
             Artifact pluginArtifact,
             ArtifactDescriptorResult artifactDescriptorResult) {
-        Set<String> maven2Versions = artifactDescriptorResult.getDependencies().stream()
-                .map(Dependency::getArtifact)
-                .filter(d -> "org.apache.maven".equals(d.getGroupId()))
-                .filter(d -> !DefaultPluginValidationManager.EXPECTED_PROVIDED_SCOPE_EXCLUSIONS_GA.contains(
-                        d.getGroupId() + ":" + d.getArtifactId()))
-                .map(Artifact::getVersion)
-                .filter(v -> v.startsWith("2."))
+        Set<String> mavenArtifacts = artifactDescriptorResult.getDependencies().stream()
+                .filter(d -> !JavaScopes.PROVIDED.equals(d.getScope()) && !JavaScopes.TEST.equals(d.getScope()))
+                .map(org.eclipse.aether.graph.Dependency::getArtifact)
+                .filter(a -> "org.apache.maven".equals(a.getGroupId()))
+                .filter(a -> !DefaultPluginValidationManager.EXPECTED_PROVIDED_SCOPE_EXCLUSIONS_GA.contains(
+                        a.getGroupId() + ":" + a.getArtifactId()))
+                .filter(a -> a.getVersion().startsWith("3."))
+                .map(a -> a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion())
                 .collect(Collectors.toSet());
 
-        if (!maven2Versions.isEmpty()) {
+        if (!mavenArtifacts.isEmpty()) {
             pluginValidationManager.reportPluginValidationIssue(
-                    session, pluginArtifact, "Plugin is a Maven 2.x plugin, which will be not supported in Maven 4.x");
+                    session,
+                    pluginArtifact,
+                    "Plugin should declare Maven artifacts in `provided` scope. If the plugin already declares them in `provided` scope, update the maven-plugin-plugin to latest version. Artifacts found with wrong scope: "
+                            + mavenArtifacts);
         }
     }
 }
