@@ -315,18 +315,18 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
     private static class CoreDependencySelector implements DependencySelector {
         private final HashSet<String> coreArtifacts;
 
-        private CoreDependencySelector(final Collection<String> coreArtifacts) {
+        private CoreDependencySelector(Collection<String> coreArtifacts) {
             this.coreArtifacts = new HashSet<>(coreArtifacts);
         }
 
         @Override
-        public boolean selectDependency(final org.eclipse.aether.graph.Dependency dependency) {
+        public boolean selectDependency(org.eclipse.aether.graph.Dependency dependency) {
             final Artifact artifact = dependency.getArtifact();
             return !coreArtifacts.contains(artifact.getGroupId() + ":" + artifact.getArtifactId());
         }
 
         @Override
-        public DependencySelector deriveChildSelector(final DependencyCollectionContext dependencyCollectionContext) {
+        public DependencySelector deriveChildSelector(DependencyCollectionContext dependencyCollectionContext) {
             return this;
         }
 
