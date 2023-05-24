@@ -159,6 +159,7 @@ under the License.
     <plexusInterpolationVersion>1.26</plexusInterpolationVersion>
     <plexusUtilsVersion>4.0.0-alpha-6-SNAPSHOT</plexusUtilsVersion>
     <plexusUtilsVersionEmbedded>3.5.1</plexusUtilsVersionEmbedded>
+    <sisuVersion>0.9.0.M2</sisuVersion>
     <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>30.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
