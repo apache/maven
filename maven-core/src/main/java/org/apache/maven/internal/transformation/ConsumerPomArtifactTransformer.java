@@ -64,7 +64,7 @@ public final class ConsumerPomArtifactTransformer {
 
     private static final String CONSUMER_POM_CLASSIFIER = "consumer";
 
-    private final Set<String> toDelete = new CopyOnWriteArraySet<>();
+    private final Set<Path> toDelete = new CopyOnWriteArraySet<>();
 
     public void injectTransformedArtifacts(MavenProject project, RepositorySystemSession session) throws IOException {
         if (project.getFile() == null) {
@@ -91,14 +91,14 @@ public final class ConsumerPomArtifactTransformer {
     }
 
     private void deferDeleteFile(Path generatedFile) {
-        toDelete.add(generatedFile.toAbsolutePath().toString());
+        toDelete.add(generatedFile.toAbsolutePath());
     }
 
     @PreDestroy
     private void doDeleteFiles() {
-        for (String file : toDelete) {
+        for (Path file : toDelete) {
             try {
-                Files.delete(Paths.get(file));
+                Files.delete(file);
             } catch (IOException e) {
                 // ignore, we did our best...
             }
