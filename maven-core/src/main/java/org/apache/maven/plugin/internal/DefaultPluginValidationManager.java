@@ -167,9 +167,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
                     : EnumSet.of(IssueLocality.INTERNAL);
 
             logger.warn("");
-            logger.warn(
-                    "Plugin {} validation issues were detected in following plugin(s)",
-                    issueLocalitiesToReport);
+            logger.warn("Plugin {} validation issues were detected in following plugin(s)", issueLocalitiesToReport);
             logger.warn("");
             for (Map.Entry<String, PluginValidationIssues> entry : issuesMap.entrySet()) {
                 PluginValidationIssues issues = entry.getValue();
