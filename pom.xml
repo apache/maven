@@ -217,6 +217,7 @@ under the License.
         <groupId>com.google.inject</groupId>
         <artifactId>guice</artifactId>
         <version>${guiceVersion}</version>
+        <classifier>classes</classifier>
         <exclusions>
           <exclusion>
             <groupId>com.google.guava</groupId>
@@ -272,12 +273,18 @@ under the License.
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
           </exclusion>
+          <!-- we use the no_asm classifier for sisu.inject -->
+          <exclusion>
+            <groupId>org.eclipse.sisu</groupId>
+            <artifactId>org.eclipse.sisu.inject</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>org.eclipse.sisu.inject</artifactId>
         <version>${sisuVersion}</version>
+        <classifier>no_asm</classifier>
       </dependency>
       <dependency>
         <groupId>javax.inject</groupId>
