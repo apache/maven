@@ -25,7 +25,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>36</version>
+    <version>39</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
 
@@ -131,6 +131,11 @@ under the License.
         <groupId>org.apache.maven.plugin-tools</groupId>
         <artifactId>maven-plugin-tools-java</artifactId>
         <version>${maven-plugin-tools-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-annotations</artifactId>
+        <version>2.1.1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
