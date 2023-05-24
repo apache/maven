@@ -166,6 +166,7 @@ under the License.
     <jxpathVersion>1.3</jxpathVersion>
     <resolverVersion>1.9.14</resolverVersion>
     <sisuVersion>0.9.0.M2</sisuVersion>
+    <asmVersion>9.5</asmVersion>
     <slf4jVersion>1.7.36</slf4jVersion>
     <xmlunitVersion>2.6.4</xmlunitVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
@@ -285,6 +286,11 @@ under the License.
         <artifactId>org.eclipse.sisu.inject</artifactId>
         <version>${sisuVersion}</version>
         <classifier>no_asm</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.ow2.asm</groupId>
+        <artifactId>asm</artifactId>
+        <version>${asmVersion}</version>
       </dependency>
       <dependency>
         <groupId>javax.inject</groupId>

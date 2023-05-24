@@ -93,6 +93,10 @@ under the License.
       </exclusions>
     </dependency>
     <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <optional>true</optional>
