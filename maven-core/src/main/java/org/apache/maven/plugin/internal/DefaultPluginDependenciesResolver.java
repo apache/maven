@@ -19,12 +19,14 @@
 package org.apache.maven.plugin.internal;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.extension.internal.CoreExportsProvider;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
@@ -39,6 +41,7 @@ import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.DependencyCollectionContext;
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.graph.DependencyFilter;
@@ -80,6 +83,9 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
 
     @Requirement
     private List<MavenPluginDependenciesValidator> dependenciesValidators;
+
+    @Requirement
+    private CoreExportsProvider coreExportsProvider;
 
     private Artifact toArtifact(Plugin plugin, RepositorySystemSession session) {
         return new DefaultArtifact(
@@ -184,8 +190,9 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         DependencyNode node;
 
         try {
-            DependencySelector selector =
-                    AndDependencySelector.newInstance(session.getDependencySelector(), new WagonExcluder());
+            DependencySelector selector = AndDependencySelector.newInstance(
+                    session.getDependencySelector(),
+                    AndDependencySelector.newInstance(new WagonExcluder(), coreDependencySelector()));
 
             DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession(session);
             pluginSession.setDependencySelector(selector);
@@ -224,6 +231,10 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         }
 
         return node;
+    }
+
+    private DependencySelector coreDependencySelector() {
+        return new CoreDependencySelector(coreExportsProvider.get().getExportedArtifacts());
     }
 
     // Keep this class in sync with org.apache.maven.project.DefaultProjectDependenciesResolver.GraphLogger
@@ -298,6 +309,42 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         public boolean visitLeave(DependencyNode node) {
             indent = indent.substring(0, indent.length() - 3);
             return true;
+        }
+    }
+
+    private static class CoreDependencySelector implements DependencySelector {
+        private final HashSet<String> coreArtifacts;
+
+        private CoreDependencySelector(final Collection<String> coreArtifacts) {
+            this.coreArtifacts = new HashSet<>(coreArtifacts);
+        }
+
+        @Override
+        public boolean selectDependency(final org.eclipse.aether.graph.Dependency dependency) {
+            final Artifact artifact = dependency.getArtifact();
+            return !coreArtifacts.contains(artifact.getGroupId() + ":" + artifact.getArtifactId());
+        }
+
+        @Override
+        public DependencySelector deriveChildSelector(final DependencyCollectionContext dependencyCollectionContext) {
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) {
+                return true;
+            } else if (obj == null || !getClass().equals(obj.getClass())) {
+                return false;
+            }
+
+            CoreDependencySelector that = (CoreDependencySelector) obj;
+            return coreArtifacts.equals(that.coreArtifacts);
+        }
+
+        @Override
+        public int hashCode() {
+            return getClass().hashCode() * 31 + coreArtifacts.hashCode();
         }
     }
 }
