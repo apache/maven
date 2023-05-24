@@ -28,7 +28,6 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
-import org.apache.maven.plugin.PluginValidationManager;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -78,9 +77,6 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
 
     @Requirement
     private RepositorySystem repoSystem;
-
-    @Requirement
-    private PluginValidationManager pluginValidationManager;
 
     @Requirement
     private List<MavenPluginDependenciesValidator> dependenciesValidators;
