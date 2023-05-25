@@ -61,6 +61,7 @@
                 <![CDATA[
         public static final String USER_LEVEL = "user-level";
         public static final String GLOBAL_LEVEL = "global-level";
+        public static final String DISCOVERED_LEVEL = "discovered-level";
 
         private String sourceLevel = USER_LEVEL;
         private boolean sourceLevelSet = false;
@@ -71,9 +72,10 @@
             {
                 throw new IllegalStateException( "Cannot reset sourceLevel attribute; it is already set to: " + sourceLevel );
             }
-            else if ( !( USER_LEVEL.equals( sourceLevel ) || GLOBAL_LEVEL.equals( sourceLevel ) ) )
+            else if ( !( USER_LEVEL.equals( sourceLevel ) || GLOBAL_LEVEL.equals( sourceLevel )
+                        || DISCOVERED_LEVEL.equals( sourceLevel ) ) )
             {
-                throw new IllegalArgumentException( "sourceLevel must be one of: {" + USER_LEVEL + "," + GLOBAL_LEVEL + "}" );
+                throw new IllegalArgumentException( "sourceLevel must be one of: {" + USER_LEVEL + "," + GLOBAL_LEVEL + "," + DISCOVERED_LEVEL + "}" );
             }
             else
             {

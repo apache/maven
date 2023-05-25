@@ -33,6 +33,7 @@ import org.apache.maven.building.Problem;
 import org.apache.maven.building.ProblemCollector;
 import org.apache.maven.building.ProblemCollectorFactory;
 import org.apache.maven.building.Source;
+import org.apache.maven.toolchain.discovery.ToolchainDiscoverer;
 import org.apache.maven.toolchain.io.ToolchainsParseException;
 import org.apache.maven.toolchain.io.ToolchainsReader;
 import org.apache.maven.toolchain.io.ToolchainsWriter;
@@ -54,22 +55,43 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
     private final MavenToolchainMerger toolchainsMerger = new MavenToolchainMerger();
     private final ToolchainsWriter toolchainsWriter;
     private final ToolchainsReader toolchainsReader;
+    private final List<ToolchainDiscoverer> toolchainDiscoverers;
 
     @Inject
-    public DefaultToolchainsBuilder(ToolchainsWriter toolchainsWriter, ToolchainsReader toolchainsReader) {
+    public DefaultToolchainsBuilder(
+            ToolchainsWriter toolchainsWriter,
+            ToolchainsReader toolchainsReader,
+            List<ToolchainDiscoverer> toolchainDiscoverers) {
         this.toolchainsWriter = toolchainsWriter;
         this.toolchainsReader = toolchainsReader;
+        this.toolchainDiscoverers = toolchainDiscoverers;
     }
 
     @Override
     public ToolchainsBuildingResult build(ToolchainsBuildingRequest request) throws ToolchainsBuildingException {
         ProblemCollector problems = ProblemCollectorFactory.newInstance(null);
 
+        PersistedToolchains discoveredToolchains = null;
+        if (toolchainDiscoverers != null) {
+            for (ToolchainDiscoverer discoverer : toolchainDiscoverers) {
+                PersistedToolchains toolchains = discoverer.discoverToolchains();
+                if (toolchains != null) {
+                    if (discoveredToolchains == null) {
+                        discoveredToolchains = toolchains;
+                    } else {
+                        toolchainsMerger.merge(discoveredToolchains, toolchains, TrackableBase.DISCOVERED_LEVEL);
+                    }
+                }
+            }
+        }
+
         PersistedToolchains globalToolchains = readToolchains(request.getGlobalToolchainsSource(), request, problems);
 
         PersistedToolchains userToolchains = readToolchains(request.getUserToolchainsSource(), request, problems);
 
         toolchainsMerger.merge(userToolchains, globalToolchains, TrackableBase.GLOBAL_LEVEL);
+
+        toolchainsMerger.merge(userToolchains, discoveredToolchains, TrackableBase.DISCOVERED_LEVEL);
 
         problems.setSource("");
 
