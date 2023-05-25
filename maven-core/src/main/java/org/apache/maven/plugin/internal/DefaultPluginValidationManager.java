@@ -247,7 +247,11 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
         File currentPom = prj.getFile();
         if (currentPom != null) {
             File rootBasedir = mavenSession.getTopLevelProject().getBasedir();
-            result += " (" + rootBasedir.toPath().relativize(currentPom.toPath()) + ")";
+            if (currentPom.getPath().startsWith(rootBasedir.getPath())) {
+                result += " (" + rootBasedir.toPath().relativize(currentPom.toPath()) + ")";
+            } else {
+                result += " (" + currentPom + ")";
+            }
         }
         return result;
     }
