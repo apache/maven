@@ -135,7 +135,11 @@ public class MavenProject implements Cloneable {
 
     private List<String> compileSourceRoots = new ArrayList<>();
 
+    private List<String> generatedCompileSourceRoots = new ArrayList<>();
+
     private List<String> testCompileSourceRoots = new ArrayList<>();
+
+    private List<String> generatedTestCompileSourceRoots = new ArrayList<>();
 
     private List<String> scriptSourceRoots = new ArrayList<>();
 
@@ -308,7 +312,17 @@ public class MavenProject implements Cloneable {
         addPath(getCompileSourceRoots(), path);
     }
 
+    public void addGeneratedCompileSourceRoot(String path) {
+        addPath(getGeneratedCompileSourceRoots(), path);
+        addPath(getCompileSourceRoots(), path);
+    }
+
     public void addTestCompileSourceRoot(String path) {
+        addPath(getTestCompileSourceRoots(), path);
+    }
+
+    public void addGeneratedTestCompileSourceRoot(String path) {
+        addPath(getGeneratedTestCompileSourceRoots(), path);
         addPath(getTestCompileSourceRoots(), path);
     }
 
@@ -316,8 +330,16 @@ public class MavenProject implements Cloneable {
         return compileSourceRoots;
     }
 
+    public List<String> getGeneratedCompileSourceRoots() {
+        return generatedCompileSourceRoots;
+    }
+
     public List<String> getTestCompileSourceRoots() {
         return testCompileSourceRoots;
+    }
+
+    public List<String> getGeneratedTestCompileSourceRoots() {
+        return generatedTestCompileSourceRoots;
     }
 
     public List<String> getCompileClasspathElements() throws DependencyResolutionRequiredException {
@@ -1082,8 +1104,16 @@ public class MavenProject implements Cloneable {
             setCompileSourceRoots((new ArrayList<>(project.getCompileSourceRoots())));
         }
 
+        if (project.getGeneratedCompileSourceRoots() != null) {
+            generatedCompileSourceRoots = new ArrayList<>(project.getGeneratedCompileSourceRoots());
+        }
+
         if (project.getTestCompileSourceRoots() != null) {
             setTestCompileSourceRoots((new ArrayList<>(project.getTestCompileSourceRoots())));
+        }
+
+        if (project.getGeneratedTestCompileSourceRoots() != null) {
+            generatedTestCompileSourceRoots = new ArrayList<>(project.getGeneratedTestCompileSourceRoots());
         }
 
         if (project.getScriptSourceRoots() != null) {
