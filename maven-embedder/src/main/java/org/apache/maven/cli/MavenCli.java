@@ -348,12 +348,7 @@ public class MavenCli {
                 isAltFile = arg.equals(String.valueOf(CLIManager.ALTERNATE_POM_FILE)) || arg.equals("file");
             }
         }
-        try {
-            topDirectory = topDirectory.toAbsolutePath().toRealPath();
-        } catch (IOException e) {
-            System.err.println("Error computing real path from " + topDirectory);
-            throw new ExitException(1);
-        }
+        topDirectory = getCanonicalPath(topDirectory);
         cliRequest.topDirectory = topDirectory;
         // We're very early in the process and we don't have the container set up yet,
         // so we rely on the JDK services to eventually lookup a custom RootLocator.
@@ -1587,6 +1582,14 @@ public class MavenCli {
             }
         });
         return interpolator;
+    }
+
+    private static Path getCanonicalPath(Path path) {
+        try {
+            return path.toRealPath();
+        } catch (IOException e) {
+            return getCanonicalPath(path.getParent()).resolve(path.getFileName());
+        }
     }
 
     static class ExitException extends Exception {
