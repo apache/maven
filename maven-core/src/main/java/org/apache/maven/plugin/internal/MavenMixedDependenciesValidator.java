@@ -60,7 +60,10 @@ class MavenMixedDependenciesValidator extends AbstractMavenPluginDependenciesVal
 
         if (mavenVersions.size() > 1) {
             pluginValidationManager.reportPluginValidationIssue(
-                    session, pluginArtifact, "Plugin mixes multiple Maven versions: " + mavenVersions);
+                    PluginValidationManager.IssueLocality.EXTERNAL,
+                    session,
+                    pluginArtifact,
+                    "Plugin mixes multiple Maven versions: " + mavenVersions);
         }
     }
 }

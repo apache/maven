@@ -547,6 +547,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
             if (mojo instanceof Contextualizable) {
                 pluginValidationManager.reportPluginMojoValidationIssue(
+                        PluginValidationManager.IssueLocality.EXTERNAL,
                         session,
                         mojoDescriptor,
                         mojo.getClass(),

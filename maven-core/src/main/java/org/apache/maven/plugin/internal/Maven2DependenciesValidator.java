@@ -61,7 +61,10 @@ class Maven2DependenciesValidator extends AbstractMavenPluginDependenciesValidat
 
         if (!maven2Versions.isEmpty()) {
             pluginValidationManager.reportPluginValidationIssue(
-                    session, pluginArtifact, "Plugin is a Maven 2.x plugin, which will be not supported in Maven 4.x");
+                    PluginValidationManager.IssueLocality.EXTERNAL,
+                    session,
+                    pluginArtifact,
+                    "Plugin is a Maven 2.x plugin, which will be not supported in Maven 4.x");
         }
     }
 }
