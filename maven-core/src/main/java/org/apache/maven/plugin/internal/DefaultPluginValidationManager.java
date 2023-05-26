@@ -223,12 +223,12 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
                 if (location.contains("://")) {
                     stringBuilder.append(" (").append(location).append(")");
                 } else {
-                    Path rootBasedir =
+                    Path topLevelBasedir =
                             mavenSession.getTopLevelProject().getBasedir().toPath();
                     Path locationPath =
                             new File(location).toPath().toAbsolutePath().normalize();
-                    if (locationPath.startsWith(rootBasedir)) {
-                        locationPath = rootBasedir.relativize(locationPath);
+                    if (locationPath.startsWith(topLevelBasedir)) {
+                        locationPath = topLevelBasedir.relativize(locationPath);
                     }
                     stringBuilder.append(" (").append(locationPath).append(")");
                 }
@@ -245,10 +245,11 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
         String result = prj.getGroupId() + ":" + prj.getArtifactId() + ":" + prj.getVersion();
         File currentPom = prj.getFile();
         if (currentPom != null) {
-            Path rootBasedir = mavenSession.getTopLevelProject().getBasedir().toPath();
+            Path topLevelBasedir =
+                    mavenSession.getTopLevelProject().getBasedir().toPath();
             Path current = currentPom.toPath().toAbsolutePath().normalize();
-            if (current.startsWith(rootBasedir)) {
-                current = rootBasedir.relativize(current);
+            if (current.startsWith(topLevelBasedir)) {
+                current = topLevelBasedir.relativize(current);
             }
             result += " (" + current + ")";
         }
