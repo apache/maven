@@ -22,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -222,16 +223,14 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
                 if (location.contains("://")) {
                     stringBuilder.append(" (").append(location).append(")");
                 } else {
-                    File rootBasedir = mavenSession.getTopLevelProject().getBasedir();
-                    File locationFile = new File(location);
-                    if (location.startsWith(rootBasedir.getPath())) {
-                        stringBuilder
-                                .append(" (")
-                                .append(rootBasedir.toPath().relativize(locationFile.toPath()))
-                                .append(")");
-                    } else {
-                        stringBuilder.append(" (").append(location).append(")");
+                    Path rootBasedir =
+                            mavenSession.getTopLevelProject().getBasedir().toPath();
+                    Path locationPath =
+                            new File(location).toPath().toAbsolutePath().normalize();
+                    if (locationPath.startsWith(rootBasedir)) {
+                        locationPath = rootBasedir.relativize(locationPath);
                     }
+                    stringBuilder.append(" (").append(locationPath).append(")");
                 }
             }
             stringBuilder.append(" @ line ").append(inputLocation.getLineNumber());
@@ -246,12 +245,12 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
         String result = prj.getGroupId() + ":" + prj.getArtifactId() + ":" + prj.getVersion();
         File currentPom = prj.getFile();
         if (currentPom != null) {
-            File rootBasedir = mavenSession.getTopLevelProject().getBasedir();
-            if (currentPom.getPath().startsWith(rootBasedir.getPath())) {
-                result += " (" + rootBasedir.toPath().relativize(currentPom.toPath()) + ")";
-            } else {
-                result += " (" + currentPom + ")";
+            Path rootBasedir = mavenSession.getTopLevelProject().getBasedir().toPath();
+            Path current = currentPom.toPath().toAbsolutePath().normalize();
+            if (current.startsWith(rootBasedir)) {
+                current = rootBasedir.relativize(current);
             }
+            result += " (" + current + ")";
         }
         return result;
     }
