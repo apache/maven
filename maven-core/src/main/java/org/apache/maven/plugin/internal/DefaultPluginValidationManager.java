@@ -56,10 +56,9 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
 
     private enum ValidationReportLevel {
         NONE, // mute validation completely (validation issue collection still happens, it is just not reported!)
-        INLINE, // inline, each problem one line next to mojo invocation, repeated as many times as mojo is executed
-        BRIEF, // at end, one line with count of plugins in the build having validation issues
-        DEFAULT, // at end, list of plugin GAVs in the build having validation issues
-        VERBOSE // at end, detailed report of plugins in the build having validation issues
+        INLINE, // inline, each "internal" problem one line next to mojo invocation
+        SUMMARY, // at end, list of plugin GAVs along with "internal" issues
+        VERBOSE // at end, list of plugin GAVs along with detailed report of ANY validation issues
     }
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -77,7 +76,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
     private ValidationReportLevel validationReportLevel(RepositorySystemSession session) {
         String level = ConfigUtils.getString(session, null, MAVEN_PLUGIN_VALIDATION_KEY);
         if (level == null || level.isEmpty()) {
-            return ValidationReportLevel.DEFAULT;
+            return ValidationReportLevel.INLINE;
         }
         try {
             return ValidationReportLevel.valueOf(level.toUpperCase(Locale.ENGLISH));
@@ -87,7 +86,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
                     MAVEN_PLUGIN_VALIDATION_KEY,
                     level,
                     Arrays.toString(ValidationReportLevel.values()));
-            return ValidationReportLevel.DEFAULT;
+            return ValidationReportLevel.INLINE;
         }
     }
 
@@ -104,46 +103,51 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
         return pluginKey(pluginArtifact.getGroupId(), pluginArtifact.getArtifactId(), pluginArtifact.getVersion());
     }
 
-    @Override
-    public void reportPluginValidationIssue(RepositorySystemSession session, Artifact pluginArtifact, String issue) {
-        String pluginKey = pluginKey(pluginArtifact);
-        PluginValidationIssues pluginIssues =
-                pluginIssues(session).computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
-        pluginIssues.reportPluginIssue(null, null, issue);
+    private void mayReportInline(RepositorySystemSession session, IssueLocality locality, String issue) {
         ValidationReportLevel validationReportLevel = validationReportLevel(session);
-        if (validationReportLevel == ValidationReportLevel.INLINE) {
+        if (locality == IssueLocality.INTERNAL && validationReportLevel == ValidationReportLevel.INLINE) {
             logger.warn(" {}", issue);
         }
     }
 
     @Override
-    public void reportPluginValidationIssue(MavenSession mavenSession, MojoDescriptor mojoDescriptor, String issue) {
+    public void reportPluginValidationIssue(
+            IssueLocality locality, RepositorySystemSession session, Artifact pluginArtifact, String issue) {
+        String pluginKey = pluginKey(pluginArtifact);
+        PluginValidationIssues pluginIssues =
+                pluginIssues(session).computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
+        pluginIssues.reportPluginIssue(locality, null, null, issue);
+        mayReportInline(session, locality, issue);
+    }
+
+    @Override
+    public void reportPluginValidationIssue(
+            IssueLocality locality, MavenSession mavenSession, MojoDescriptor mojoDescriptor, String issue) {
         String pluginKey = pluginKey(mojoDescriptor);
         PluginValidationIssues pluginIssues = pluginIssues(mavenSession.getRepositorySession())
                 .computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
         pluginIssues.reportPluginIssue(
-                pluginDeclaration(mavenSession, mojoDescriptor), pluginOccurrence(mavenSession), issue);
-        ValidationReportLevel validationReportLevel = validationReportLevel(mavenSession.getRepositorySession());
-        if (validationReportLevel == ValidationReportLevel.INLINE) {
-            logger.warn(" {}", issue);
-        }
+                locality, pluginDeclaration(mavenSession, mojoDescriptor), pluginOccurrence(mavenSession), issue);
+        mayReportInline(mavenSession.getRepositorySession(), locality, issue);
     }
 
     @Override
     public void reportPluginMojoValidationIssue(
-            MavenSession mavenSession, MojoDescriptor mojoDescriptor, Class<?> mojoClass, String issue) {
+            IssueLocality locality,
+            MavenSession mavenSession,
+            MojoDescriptor mojoDescriptor,
+            Class<?> mojoClass,
+            String issue) {
         String pluginKey = pluginKey(mojoDescriptor);
         PluginValidationIssues pluginIssues = pluginIssues(mavenSession.getRepositorySession())
                 .computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
         pluginIssues.reportPluginMojoIssue(
+                locality,
                 pluginDeclaration(mavenSession, mojoDescriptor),
                 pluginOccurrence(mavenSession),
                 mojoInfo(mojoDescriptor, mojoClass),
                 issue);
-        ValidationReportLevel validationReportLevel = validationReportLevel(mavenSession.getRepositorySession());
-        if (validationReportLevel == ValidationReportLevel.INLINE) {
-            logger.warn(" {}", issue);
-        }
+        mayReportInline(mavenSession.getRepositorySession(), locality, issue);
     }
 
     private void reportSessionCollectedValidationIssues(MavenSession mavenSession) {
@@ -158,46 +162,57 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
         ConcurrentHashMap<String, PluginValidationIssues> issuesMap = pluginIssues(mavenSession.getRepositorySession());
         if (!issuesMap.isEmpty()) {
 
-            logger.warn("");
-            logger.warn("Plugin validation issues were detected in {} plugin(s)", issuesMap.size());
-            logger.warn("");
-            if (validationReportLevel == ValidationReportLevel.BRIEF) {
-                return;
-            }
+            EnumSet<IssueLocality> issueLocalitiesToReport = validationReportLevel == ValidationReportLevel.VERBOSE
+                    ? EnumSet.allOf(IssueLocality.class)
+                    : EnumSet.of(IssueLocality.INTERNAL);
 
+            logger.warn("");
+            logger.warn("Plugin {} validation issues were detected in following plugin(s)", issueLocalitiesToReport);
+            logger.warn("");
             for (Map.Entry<String, PluginValidationIssues> entry : issuesMap.entrySet()) {
+                PluginValidationIssues issues = entry.getValue();
+                if (!hasAnythingToReport(issues, issueLocalitiesToReport)) {
+                    continue;
+                }
                 logger.warn(" * {}", entry.getKey());
-                if (validationReportLevel == ValidationReportLevel.VERBOSE) {
-                    PluginValidationIssues issues = entry.getValue();
-                    if (!issues.pluginDeclarations.isEmpty()) {
-                        logger.warn("  Declared at location(s):");
-                        for (String pluginDeclaration : issues.pluginDeclarations) {
-                            logger.warn("   * {}", pluginDeclaration);
-                        }
+                if (!issues.pluginDeclarations.isEmpty()) {
+                    logger.warn("  Declared at location(s):");
+                    for (String pluginDeclaration : issues.pluginDeclarations) {
+                        logger.warn("   * {}", pluginDeclaration);
                     }
-                    if (!issues.pluginOccurrences.isEmpty()) {
-                        logger.warn("  Used in module(s):");
-                        for (String pluginOccurrence : issues.pluginOccurrences) {
-                            logger.warn("   * {}", pluginOccurrence);
-                        }
+                }
+                if (!issues.pluginOccurrences.isEmpty()) {
+                    logger.warn("  Used in module(s):");
+                    for (String pluginOccurrence : issues.pluginOccurrences) {
+                        logger.warn("   * {}", pluginOccurrence);
                     }
-                    if (!issues.pluginIssues.isEmpty()) {
-                        logger.warn("  Plugin issue(s):");
-                        for (String pluginIssue : issues.pluginIssues) {
-                            logger.warn("   * {}", pluginIssue);
-                        }
-                    }
-                    if (!issues.mojoIssues.isEmpty()) {
-                        logger.warn("  Mojo issue(s):");
-                        for (String mojoInfo : issues.mojoIssues.keySet()) {
-                            logger.warn("   * Mojo {}", mojoInfo);
-                            for (String mojoIssue : issues.mojoIssues.get(mojoInfo)) {
-                                logger.warn("     - {}", mojoIssue);
+                }
+                if (!issues.pluginIssues.isEmpty()) {
+                    for (IssueLocality issueLocality : issueLocalitiesToReport) {
+                        Set<String> pluginIssues = issues.pluginIssues.get(issueLocality);
+                        if (pluginIssues != null && !pluginIssues.isEmpty()) {
+                            logger.warn("  Plugin {} issue(s):", issueLocality);
+                            for (String pluginIssue : pluginIssues) {
+                                logger.warn("   * {}", pluginIssue);
                             }
                         }
                     }
-                    logger.warn("");
                 }
+                if (!issues.mojoIssues.isEmpty()) {
+                    for (IssueLocality issueLocality : issueLocalitiesToReport) {
+                        Map<String, LinkedHashSet<String>> mojoIssues = issues.mojoIssues.get(issueLocality);
+                        if (mojoIssues != null && !mojoIssues.isEmpty()) {
+                            logger.warn("  Mojo {} issue(s):", issueLocality);
+                            for (String mojoInfo : mojoIssues.keySet()) {
+                                logger.warn("   * Mojo {}", mojoInfo);
+                                for (String mojoIssue : mojoIssues.get(mojoInfo)) {
+                                    logger.warn("     - {}", mojoIssue);
+                                }
+                            }
+                        }
+                    }
+                }
+                logger.warn("");
             }
             logger.warn("");
             if (validationReportLevel == ValidationReportLevel.VERBOSE) {
@@ -209,6 +224,20 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
                     Arrays.toString(ValidationReportLevel.values()));
             logger.warn("");
         }
+    }
+
+    private boolean hasAnythingToReport(PluginValidationIssues issues, EnumSet<IssueLocality> issueLocalitiesToReport) {
+        for (IssueLocality issueLocality : issueLocalitiesToReport) {
+            Set<String> pluginIssues = issues.pluginIssues.get(issueLocality);
+            if (pluginIssues != null && !pluginIssues.isEmpty()) {
+                return true;
+            }
+            Map<String, LinkedHashSet<String>> mojoIssues = issues.mojoIssues.get(issueLocality);
+            if (mojoIssues != null && !mojoIssues.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String pluginDeclaration(MavenSession mavenSession, MojoDescriptor mojoDescriptor) {
@@ -267,36 +296,46 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
 
         private final LinkedHashSet<String> pluginOccurrences;
 
-        private final LinkedHashSet<String> pluginIssues;
+        private final HashMap<IssueLocality, LinkedHashSet<String>> pluginIssues;
 
-        private final LinkedHashMap<String, LinkedHashSet<String>> mojoIssues;
+        private final HashMap<IssueLocality, LinkedHashMap<String, LinkedHashSet<String>>> mojoIssues;
 
         private PluginValidationIssues() {
             this.pluginDeclarations = new LinkedHashSet<>();
             this.pluginOccurrences = new LinkedHashSet<>();
-            this.pluginIssues = new LinkedHashSet<>();
-            this.mojoIssues = new LinkedHashMap<>();
+            this.pluginIssues = new HashMap<>();
+            this.mojoIssues = new HashMap<>();
         }
 
-        private synchronized void reportPluginIssue(String pluginDeclaration, String pluginOccurrence, String issue) {
+        private synchronized void reportPluginIssue(
+                IssueLocality issueLocality, String pluginDeclaration, String pluginOccurrence, String issue) {
             if (pluginDeclaration != null) {
                 pluginDeclarations.add(pluginDeclaration);
             }
             if (pluginOccurrence != null) {
                 pluginOccurrences.add(pluginOccurrence);
             }
-            pluginIssues.add(issue);
+            pluginIssues
+                    .computeIfAbsent(issueLocality, k -> new LinkedHashSet<>())
+                    .add(issue);
         }
 
         private synchronized void reportPluginMojoIssue(
-                String pluginDeclaration, String pluginOccurrence, String mojoInfo, String issue) {
+                IssueLocality issueLocality,
+                String pluginDeclaration,
+                String pluginOccurrence,
+                String mojoInfo,
+                String issue) {
             if (pluginDeclaration != null) {
                 pluginDeclarations.add(pluginDeclaration);
             }
             if (pluginOccurrence != null) {
                 pluginOccurrences.add(pluginOccurrence);
             }
-            mojoIssues.computeIfAbsent(mojoInfo, k -> new LinkedHashSet<>()).add(issue);
+            mojoIssues
+                    .computeIfAbsent(issueLocality, k -> new LinkedHashMap<>())
+                    .computeIfAbsent(mojoInfo, k -> new LinkedHashSet<>())
+                    .add(issue);
         }
     }
 }

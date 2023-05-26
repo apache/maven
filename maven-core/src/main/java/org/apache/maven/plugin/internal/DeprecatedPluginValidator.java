@@ -58,7 +58,11 @@ class DeprecatedPluginValidator extends AbstractMavenPluginDescriptorSourcedPara
             ExpressionEvaluator expressionEvaluator) {
         if (mojoDescriptor.getDeprecated() != null) {
             pluginValidationManager.reportPluginMojoValidationIssue(
-                    mavenSession, mojoDescriptor, mojoClass, logDeprecatedMojo(mojoDescriptor));
+                    PluginValidationManager.IssueLocality.INTERNAL,
+                    mavenSession,
+                    mojoDescriptor,
+                    mojoClass,
+                    logDeprecatedMojo(mojoDescriptor));
         }
 
         if (mojoDescriptor.getParameters() != null) {
@@ -81,7 +85,11 @@ class DeprecatedPluginValidator extends AbstractMavenPluginDescriptorSourcedPara
 
         if (isValueSet(config, expressionEvaluator)) {
             pluginValidationManager.reportPluginMojoValidationIssue(
-                    mavenSession, mojoDescriptor, mojoClass, formatParameter(parameter));
+                    PluginValidationManager.IssueLocality.INTERNAL,
+                    mavenSession,
+                    mojoDescriptor,
+                    mojoClass,
+                    formatParameter(parameter));
         }
     }
 

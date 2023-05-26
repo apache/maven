@@ -78,7 +78,7 @@ class DeprecatedCoreExpressionValidator extends AbstractMavenPluginParametersVal
                 .filter(this::isDeprecated)
                 .map(this::formatParameter)
                 .forEach(m -> pluginValidationManager.reportPluginMojoValidationIssue(
-                        mavenSession, mojoDescriptor, mojoClass, m));
+                        PluginValidationManager.IssueLocality.EXTERNAL, mavenSession, mojoDescriptor, mojoClass, m));
     }
 
     private boolean isDeprecated(Parameter parameter) {
