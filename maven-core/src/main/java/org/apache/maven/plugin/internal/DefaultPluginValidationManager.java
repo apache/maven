@@ -58,6 +58,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
         NONE, // mute validation completely (validation issue collection still happens, it is just not reported!)
         INLINE, // inline, each "internal" problem one line next to mojo invocation
         SUMMARY, // at end, list of plugin GAVs along with "internal" issues
+        BRIEF, // synonym to SUMMARY
         VERBOSE // at end, list of plugin GAVs along with detailed report of ANY validation issues
     }
 
