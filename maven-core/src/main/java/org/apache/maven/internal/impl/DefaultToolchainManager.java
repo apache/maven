@@ -22,11 +22,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.maven.api.JavaToolchain;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Toolchain;
 import org.apache.maven.api.services.ToolchainManager;
@@ -35,6 +38,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.toolchain.DefaultToolchainManagerPrivate;
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
 import org.apache.maven.toolchain.ToolchainPrivate;
+import org.apache.maven.toolchain.java.JavaToolchainImpl;
 
 @Named
 @Singleton
@@ -70,7 +74,7 @@ public class DefaultToolchainManager implements ToolchainManager {
             ToolchainPrivate[] toolchains = toolchainManagerPrivate.getToolchainsForType(type, s);
             return new MappedList<>(Arrays.asList(toolchains), this::toToolchain);
         } catch (MisconfiguredToolchainException e) {
-            throw new ToolchainManagerException("Unable to get toochains for type " + type, e);
+            throw new ToolchainManagerException("Unable to get toolchains for type " + type, e);
         }
     }
 
@@ -83,11 +87,13 @@ public class DefaultToolchainManager implements ToolchainManager {
     }
 
     private Toolchain toToolchain(org.apache.maven.toolchain.Toolchain toolchain) {
-        return new ToolchainWrapper(toolchain);
+        return toolchain instanceof JavaToolchainImpl
+                ? new JavaToolchainWrapper((JavaToolchainImpl) toolchain)
+                : new ToolchainWrapper(toolchain);
     }
 
     private static class ToolchainWrapper implements Toolchain {
-        private final org.apache.maven.toolchain.Toolchain toolchain;
+        protected final org.apache.maven.toolchain.Toolchain toolchain;
 
         ToolchainWrapper(org.apache.maven.toolchain.Toolchain toolchain) {
             this.toolchain = toolchain;
@@ -99,13 +105,24 @@ public class DefaultToolchainManager implements ToolchainManager {
         }
 
         @Override
-        public String findTool(String toolName) {
-            return toolchain.findTool(toolName);
+        public Path findTool(String toolName) {
+            return Paths.get(toolchain.findTool(toolName));
         }
 
         @Override
         public boolean matchesRequirements(Map<String, String> requirements) {
             return ((ToolchainPrivate) toolchain).matchesRequirements(requirements);
+        }
+    }
+
+    private static class JavaToolchainWrapper extends ToolchainWrapper implements JavaToolchain {
+        JavaToolchainWrapper(org.apache.maven.toolchain.java.JavaToolchainImpl toolchain) {
+            super(toolchain);
+        }
+
+        @Override
+        public String getJavaHome() {
+            return ((org.apache.maven.toolchain.java.JavaToolchainImpl) toolchain).getJavaHome();
         }
     }
 }

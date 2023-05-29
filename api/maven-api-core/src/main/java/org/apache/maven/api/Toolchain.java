@@ -18,6 +18,7 @@
  */
 package org.apache.maven.api;
 
+import java.nio.file.Path;
 import java.util.Map;
 
 import org.apache.maven.api.annotations.Experimental;
@@ -42,7 +43,7 @@ public interface Toolchain {
      * @param toolName the tool platform independent tool name
      * @return file representing the tool executable, or null if the tool cannot be found
      */
-    String findTool(String toolName);
+    Path findTool(String toolName);
 
     /**
      * Let the toolchain decide if it matches requirements defined
