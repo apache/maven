@@ -20,12 +20,15 @@ package org.apache.maven.toolchain.building;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.building.StringSource;
+import org.apache.maven.toolchain.discovery.ToolchainDiscoverer;
 import org.apache.maven.toolchain.io.DefaultToolchainsReader;
 import org.apache.maven.toolchain.io.DefaultToolchainsWriter;
 import org.apache.maven.toolchain.io.ToolchainsParseException;
@@ -54,6 +57,9 @@ class DefaultToolchainsBuilderTest {
 
     @Spy
     private DefaultToolchainsWriter toolchainsWriter;
+
+    @Spy
+    private List<ToolchainDiscoverer> toolchainDiscoverers = new ArrayList<>();
 
     @InjectMocks
     private DefaultToolchainsBuilder toolchainBuilder;
