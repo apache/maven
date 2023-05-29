@@ -22,6 +22,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,12 +34,21 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.maven.api.toolchain.ToolchainModel;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.toolchain.model.PersistedToolchains;
+import org.apache.maven.toolchain.model.ToolchainModel;
+import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Reader;
+import org.apache.maven.toolchain.v4.MavenToolchainsXpp3Writer;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of ToolchainDiscoverer service
@@ -46,49 +57,130 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
 @Singleton
 public class DefaultToolchainDiscoverer implements ToolchainDiscoverer {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultToolchainDiscoverer.class);
+
+    private Map<Path, ToolchainModel> cache;
+    private boolean cacheModified;
+
     @Override
     public PersistedToolchains discoverToolchains() {
         try {
             Set<String> jdks = JavaHomeFinder.suggestHomePaths(true);
-            List<ToolchainModel> tcs = new ArrayList<>();
-            for (Path jdk : jdks.stream().map(Paths::get).collect(Collectors.toList())) {
-                ToolchainModel tc = getToolchainModel(jdk);
-                if (tc != null) {
-                    tcs.add(tc);
-                }
+            LOGGER.info("Found {} possible jdks: {}", jdks.size(), jdks);
+            cacheModified = false;
+            readCache();
+            Path currentJdkHome = getCanonicalPath(Paths.get(System.getProperty("java.home")));
+            List<ToolchainModel> tcs = jdks.parallelStream()
+                    .map(s -> getToolchainModel(currentJdkHome, s))
+                    .filter(Objects::nonNull)
+                    .sorted(getToolchainModelComparator())
+                    .collect(Collectors.toList());
+            if (this.cacheModified) {
+                writeCache();
             }
-            tcs.sort(getToolchainModelComparator());
-            return new PersistedToolchains(org.apache.maven.api.toolchain.PersistedToolchains.newBuilder()
-                    .toolchains(tcs)
-                    .build());
+            PersistedToolchains ps = new PersistedToolchains();
+            ps.setToolchains(tcs);
+            return ps;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.warn("Error discovering toolchains: " + e, e);
+            } else {
+                LOGGER.warn("Error discovering toolchains (enable debug level for more information): " + e);
+            }
+            return new PersistedToolchains();
         }
     }
 
-    ToolchainModel getToolchainModel(Path jdk) throws IOException, InterruptedException {
+    private void readCache() {
+        cache = new ConcurrentHashMap<>();
+        Path cacheFile =
+                Paths.get(System.getProperty("user.home")).resolve(".m2").resolve("toolchains-cache.xml");
+        try {
+            if (Files.isRegularFile(cacheFile)) {
+                try (Reader r = Files.newBufferedReader(cacheFile)) {
+                    PersistedToolchains pt = new PersistedToolchains(new MavenToolchainsXpp3Reader().read(r, false));
+                    cache = pt.getToolchains().stream()
+                            .collect(Collectors.toConcurrentMap(this::getJdkHome, Function.identity()));
+                }
+            }
+        } catch (IOException | XmlPullParserException e) {
+            LOGGER.warn("Error reading toolchains cache: " + e);
+        }
+    }
+
+    private void writeCache() {
+        Path cacheFile = Paths.get(System.getProperty("user.home")).resolve(".m2/toolchains-cache.xml");
+        try {
+            Files.createDirectories(cacheFile.getParent());
+            try (Writer w = Files.newBufferedWriter(cacheFile)) {
+                PersistedToolchains pt = new PersistedToolchains();
+                List<ToolchainModel> toolchains = new ArrayList<>();
+                for (ToolchainModel tc : cache.values()) {
+                    tc = new ToolchainModel(tc.getDelegate());
+                    tc.getProvides().remove("current");
+                    toolchains.add(tc);
+                }
+                pt.setToolchains(toolchains);
+                new MavenToolchainsXpp3Writer().write(w, pt.getDelegate());
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Error writing toolchains cache: " + e);
+        }
+    }
+
+    private Path getJdkHome(ToolchainModel toolchain) {
+        Xpp3Dom dom = (Xpp3Dom) toolchain.getConfiguration();
+        Xpp3Dom javahome = dom != null ? dom.getChild("jdkHome") : null;
+        String jdk = javahome != null ? javahome.getValue() : null;
+        return Paths.get(Objects.requireNonNull(jdk));
+    }
+
+    ToolchainModel getToolchainModel(Path currentJdkHome, String jdkPath) {
+        LOGGER.debug("Computing model for " + jdkPath);
+        Path jdk = getCanonicalPath(Paths.get(jdkPath));
+
+        ToolchainModel model = cache.get(jdk);
+        if (model == null) {
+            model = doGetToolchainModel(jdk);
+            cache.put(jdk, model);
+            cacheModified = true;
+        }
+
+        if (Objects.equals(jdk, currentJdkHome)
+                || currentJdkHome.getFileName().toString().equals("jre")
+                        && Objects.equals(jdk, currentJdkHome.getParent())) {
+            model.getProvides().setProperty("current", "true");
+        }
+        return model;
+    }
+
+    ToolchainModel doGetToolchainModel(Path jdk) {
         Path bin = jdk.resolve("bin");
         Path java = bin.resolve("java");
-        if (!Files.isRegularFile(java)) {
+        if (!java.toFile().canExecute()) {
             java = bin.resolve("java.exe");
-            if (!Files.isRegularFile(java)) {
-                System.err.println("Unable to find java executable for " + jdk);
+            if (!java.toFile().canExecute()) {
+                LOGGER.debug("JDK toolchain discovered at {} will be ignored: unable to find java executable", jdk);
                 return null;
             }
         }
-        Path temp = Files.createTempFile("jdk-opts-", ".out");
-        new ProcessBuilder()
-                .command(java.toString(), "-XshowSettings:properties", "-version")
-                .redirectError(temp.toFile())
-                .start()
-                .waitFor();
-        List<String> lines = Files.readAllLines(temp);
-        Files.delete(temp);
-        String jdkHome = lines.stream()
-                .filter(l -> l.contains("java.home"))
-                .map(l -> l.replaceFirst(".*=\\s*(.*)", "$1"))
-                .findFirst()
-                .get();
+        List<String> lines;
+        try {
+            Path temp = Files.createTempFile("jdk-opts-", ".out");
+            try {
+                new ProcessBuilder()
+                        .command(java.toString(), "-XshowSettings:properties", "-version")
+                        .redirectError(temp.toFile())
+                        .start()
+                        .waitFor();
+                lines = Files.readAllLines(temp);
+            } finally {
+                Files.delete(temp);
+            }
+        } catch (IOException | InterruptedException e) {
+            LOGGER.debug("JDK toolchain discovered at {} will be ignored: unable to execute java: " + e, jdk);
+            return null;
+        }
 
         Map<String, String> properties = new LinkedHashMap<>();
         for (String name : Arrays.asList(
@@ -103,21 +195,34 @@ public class DefaultToolchainDiscoverer implements ToolchainDiscoverer {
                 properties.put(k, v);
             }
         }
-        return ToolchainModel.newBuilder()
+        if (!properties.containsKey("version")) {
+            LOGGER.debug("JDK toolchain discovered at {} will be ignored: could not obtain java.version", jdk);
+            return null;
+        }
+
+        return new ToolchainModel(org.apache.maven.api.toolchain.ToolchainModel.newBuilder()
                 .type("jdk")
                 .provides(properties)
                 .configuration(new XmlNodeImpl(
                         "configuration",
                         null,
                         null,
-                        Collections.singletonList(new XmlNodeImpl("jdkHome", jdkHome)),
+                        Collections.singletonList(new XmlNodeImpl("jdkHome", jdk.toString())),
                         null))
-                .build();
+                .build());
+    }
+
+    private static Path getCanonicalPath(Path path) {
+        try {
+            return path.toRealPath();
+        } catch (IOException e) {
+            return getCanonicalPath(path.getParent()).resolve(path.getFileName());
+        }
     }
 
     Comparator<ToolchainModel> getToolchainModelComparator() {
-        return Comparator.comparing((ToolchainModel tc) -> tc.getProvides().get("vendor"))
-                .thenComparing(tc -> tc.getProvides().get("version"), this::compareVersion);
+        return Comparator.comparing((ToolchainModel tc) -> tc.getProvides().getProperty("vendor"))
+                .thenComparing(tc -> tc.getProvides().getProperty("version"), this::compareVersion);
     }
 
     int compareVersion(String v1, String v2) {

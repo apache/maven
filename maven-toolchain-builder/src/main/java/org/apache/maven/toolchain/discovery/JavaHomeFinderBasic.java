@@ -33,7 +33,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -94,17 +93,16 @@ public class JavaHomeFinderBasic {
     }
 
     public final Set<String> findExistingJdks() {
-        Set<String> result = new TreeSet<>();
-
-        for (Supplier<? extends Set<String>> action : myFinders) {
-            try {
-                result.addAll(action.get());
-            } catch (Exception e) {
-                log.warn("Failed to find Java Home. " + e.getMessage(), e);
-            }
-        }
-
-        return result;
+        return myFinders.parallelStream()
+                .flatMap(finder -> {
+                    try {
+                        return finder.get().stream();
+                    } catch (Exception e) {
+                        log.warn("Failed to find Java Home. " + e.getMessage(), e);
+                        return Stream.empty();
+                    }
+                })
+                .collect(Collectors.toSet());
     }
 
     private Set<String> findInJavaHome() {
