@@ -24,5 +24,10 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
  * Service used to discover JDK toolchains
  */
 public interface ToolchainDiscoverer {
+
+    /**
+     * Returns a PersistedToolchains object containing a list of discovered toolchains,
+     * never <code>null</code>.
+     */
     PersistedToolchains discoverToolchains();
 }
