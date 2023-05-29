@@ -23,11 +23,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -60,17 +58,8 @@ public class DefaultMavenExecutionRequestPopulator implements MavenExecutionRequ
     public MavenExecutionRequest populateFromToolchains(MavenExecutionRequest request, PersistedToolchains toolchains)
             throws MavenExecutionRequestPopulationException {
         if (toolchains != null) {
-            Map<String, List<ToolchainModel>> groupedToolchains = new HashMap<>(2);
-
-            for (ToolchainModel model : toolchains.getToolchains()) {
-                if (!groupedToolchains.containsKey(model.getType())) {
-                    groupedToolchains.put(model.getType(), new ArrayList<>());
-                }
-
-                groupedToolchains.get(model.getType()).add(model);
-            }
-
-            request.setToolchains(groupedToolchains);
+            request.setToolchains(
+                    toolchains.getToolchains().stream().collect(Collectors.groupingBy(ToolchainModel::getType)));
         }
         return request;
     }
