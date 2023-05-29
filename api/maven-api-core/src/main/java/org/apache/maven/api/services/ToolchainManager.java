@@ -37,6 +37,11 @@ import org.apache.maven.api.annotations.Nonnull;
 public interface ToolchainManager extends Service {
 
     /**
+     * The type identifying JDK toolchains
+     */
+    String TYPE_JDK = "jdk";
+
+    /**
      *
      * @param session
      * @param type
