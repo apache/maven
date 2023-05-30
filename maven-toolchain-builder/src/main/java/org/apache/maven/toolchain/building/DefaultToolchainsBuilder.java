@@ -72,19 +72,20 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
     public ToolchainsBuildingResult build(ToolchainsBuildingRequest request) throws ToolchainsBuildingException {
         ProblemCollector problems = ProblemCollectorFactory.newInstance(null);
 
-        PersistedToolchains discoveredToolchains = new PersistedToolchains();
-        for (ToolchainDiscoverer discoverer : toolchainDiscoverers) {
-            PersistedToolchains toolchains = discoverer.discoverToolchains();
-            toolchainsMerger.merge(discoveredToolchains, toolchains, TrackableBase.DISCOVERED_LEVEL);
-        }
-
-        PersistedToolchains globalToolchains = readToolchains(request.getGlobalToolchainsSource(), request, problems);
-
         PersistedToolchains userToolchains = readToolchains(request.getUserToolchainsSource(), request, problems);
 
+        PersistedToolchains globalToolchains = readToolchains(request.getGlobalToolchainsSource(), request, problems);
         toolchainsMerger.merge(userToolchains, globalToolchains, TrackableBase.GLOBAL_LEVEL);
 
-        toolchainsMerger.merge(userToolchains, discoveredToolchains, TrackableBase.DISCOVERED_LEVEL);
+        if (request.getDiscoveryMode() == ToolchainsBuildingRequest.DiscoveryMode.Always
+                || request.getDiscoveryMode() == ToolchainsBuildingRequest.DiscoveryMode.IfNoneConfigured
+                        && userToolchains.getToolchains().isEmpty()) {
+
+            for (ToolchainDiscoverer discoverer : toolchainDiscoverers) {
+                PersistedToolchains toolchains = discoverer.discoverToolchains();
+                toolchainsMerger.merge(userToolchains, toolchains, TrackableBase.DISCOVERED_LEVEL);
+            }
+        }
 
         problems.setSource("");
 

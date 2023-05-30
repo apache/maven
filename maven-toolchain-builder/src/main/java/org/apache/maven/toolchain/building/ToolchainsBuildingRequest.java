@@ -28,6 +28,16 @@ import org.apache.maven.building.Source;
  */
 public interface ToolchainsBuildingRequest {
 
+    /** Toolchains discovery mode */
+    enum DiscoveryMode {
+        /** Always add discovered toolchains */
+        Always,
+        /** Discover toolchains if none are configured */
+        IfNoneConfigured,
+        /** Never discover toolchains */
+        Never
+    }
+
     /**
      * Gets the global toolchains source.
      *
@@ -59,4 +69,8 @@ public interface ToolchainsBuildingRequest {
      * @return This request, never {@code null}.
      */
     ToolchainsBuildingRequest setUserToolchainsSource(Source userToolchainsSource);
+
+    DiscoveryMode getDiscoveryMode();
+
+    ToolchainsBuildingRequest setDiscoveryMode(DiscoveryMode discoveryMode);
 }

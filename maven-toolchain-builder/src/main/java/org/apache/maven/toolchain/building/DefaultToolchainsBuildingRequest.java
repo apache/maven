@@ -31,6 +31,8 @@ public class DefaultToolchainsBuildingRequest implements ToolchainsBuildingReque
 
     private Source userToolchainsSource;
 
+    private DiscoveryMode discoveryMode = DiscoveryMode.IfNoneConfigured;
+
     @Override
     public Source getGlobalToolchainsSource() {
         return globalToolchainsSource;
@@ -50,6 +52,17 @@ public class DefaultToolchainsBuildingRequest implements ToolchainsBuildingReque
     @Override
     public ToolchainsBuildingRequest setUserToolchainsSource(Source userToolchainsSource) {
         this.userToolchainsSource = userToolchainsSource;
+        return this;
+    }
+
+    @Override
+    public DiscoveryMode getDiscoveryMode() {
+        return discoveryMode;
+    }
+
+    @Override
+    public ToolchainsBuildingRequest setDiscoveryMode(DiscoveryMode discoveryMode) {
+        this.discoveryMode = discoveryMode;
         return this;
     }
 }

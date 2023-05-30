@@ -169,8 +169,8 @@ class DefaultToolchainsBuilderTest {
         PersistedToolchains globalResult = new PersistedToolchains();
         globalResult.setToolchains(Collections.singletonList(toolchain));
 
-        doReturn(globalResult)
-                .doReturn(userResult)
+        doReturn(userResult)
+                .doReturn(globalResult)
                 .when(toolchainsReader)
                 .read(any(InputStream.class), ArgumentMatchers.<String, Object>anyMap());
 

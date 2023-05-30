@@ -91,6 +91,7 @@ import org.apache.maven.shared.utils.logging.MessageBuilder;
 import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuilder;
+import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
@@ -132,6 +133,8 @@ public class MavenCli {
     public static final String LOCAL_REPO_PROPERTY = "maven.repo.local";
 
     public static final String MULTIMODULE_PROJECT_DIRECTORY = "maven.multiModuleProjectDirectory";
+
+    public static final String TOOLCHAINS_DISCOVERY_MODE = "maven.toolchainsDiscoveryMode";
 
     public static final String USER_HOME = System.getProperty("user.home");
 
@@ -1198,6 +1201,14 @@ public class MavenCli {
         if (userToolchainsFile.isFile()) {
             toolchainsRequest.setUserToolchainsSource(new FileSource(userToolchainsFile));
         }
+        String discoveryModeStr = cliRequest.getUserProperties().getProperty(TOOLCHAINS_DISCOVERY_MODE);
+        if (discoveryModeStr == null) {
+            discoveryModeStr = cliRequest.getSystemProperties().getProperty(TOOLCHAINS_DISCOVERY_MODE);
+        }
+        if (discoveryModeStr == null) {
+            discoveryModeStr = ToolchainsBuildingRequest.DiscoveryMode.IfNoneConfigured.toString();
+        }
+        toolchainsRequest.setDiscoveryMode(ToolchainsBuildingRequest.DiscoveryMode.valueOf(discoveryModeStr));
 
         eventSpyDispatcher.onEvent(toolchainsRequest);
 
