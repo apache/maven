@@ -58,6 +58,7 @@ import org.slf4j.LoggerFactory;
 public class DefaultToolchainDiscoverer implements ToolchainDiscoverer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultToolchainDiscoverer.class);
+    private static final String DISCOVERED_TOOLCHAINS_CACHE_XML = ".m2/discovered-toolchains-cache.xml";
 
     private Map<Path, ToolchainModel> cache;
     private boolean cacheModified;
@@ -92,10 +93,9 @@ public class DefaultToolchainDiscoverer implements ToolchainDiscoverer {
     }
 
     private void readCache() {
-        cache = new ConcurrentHashMap<>();
-        Path cacheFile =
-                Paths.get(System.getProperty("user.home")).resolve(".m2").resolve("toolchains-cache.xml");
         try {
+            cache = new ConcurrentHashMap<>();
+            Path cacheFile = getCacheFile();
             if (Files.isRegularFile(cacheFile)) {
                 try (Reader r = Files.newBufferedReader(cacheFile)) {
                     PersistedToolchains pt = new PersistedToolchains(new MavenToolchainsXpp3Reader().read(r, false));
@@ -109,8 +109,8 @@ public class DefaultToolchainDiscoverer implements ToolchainDiscoverer {
     }
 
     private void writeCache() {
-        Path cacheFile = Paths.get(System.getProperty("user.home")).resolve(".m2/toolchains-cache.xml");
         try {
+            Path cacheFile = getCacheFile();
             Files.createDirectories(cacheFile.getParent());
             try (Writer w = Files.newBufferedWriter(cacheFile)) {
                 PersistedToolchains pt = new PersistedToolchains();
@@ -126,6 +126,10 @@ public class DefaultToolchainDiscoverer implements ToolchainDiscoverer {
         } catch (IOException e) {
             LOGGER.warn("Error writing toolchains cache: " + e);
         }
+    }
+
+    private static Path getCacheFile() {
+        return Paths.get(System.getProperty("user.home")).resolve(DISCOVERED_TOOLCHAINS_CACHE_XML);
     }
 
     private Path getJdkHome(ToolchainModel toolchain) {
