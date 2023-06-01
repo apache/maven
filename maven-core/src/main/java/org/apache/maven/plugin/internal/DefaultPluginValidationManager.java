@@ -161,12 +161,11 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
             return; // we were asked to not report anything OR reporting already happened inline
         }
         ConcurrentHashMap<String, PluginValidationIssues> issuesMap = pluginIssues(mavenSession.getRepositorySession());
-        if (!issuesMap.isEmpty()) {
+        EnumSet<IssueLocality> issueLocalitiesToReport = validationReportLevel == ValidationReportLevel.VERBOSE
+                ? EnumSet.allOf(IssueLocality.class)
+                : EnumSet.of(IssueLocality.INTERNAL);
 
-            EnumSet<IssueLocality> issueLocalitiesToReport = validationReportLevel == ValidationReportLevel.VERBOSE
-                    ? EnumSet.allOf(IssueLocality.class)
-                    : EnumSet.of(IssueLocality.INTERNAL);
-
+        if (hasAnythingToReport(issuesMap, issueLocalitiesToReport)) {
             logger.warn("");
             logger.warn("Plugin {} validation issues were detected in following plugin(s)", issueLocalitiesToReport);
             logger.warn("");
@@ -225,6 +224,16 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
                     Arrays.toString(ValidationReportLevel.values()));
             logger.warn("");
         }
+    }
+
+    private boolean hasAnythingToReport(
+            Map<String, PluginValidationIssues> issuesMap, EnumSet<IssueLocality> issueLocalitiesToReport) {
+        for (PluginValidationIssues issues : issuesMap.values()) {
+            if (hasAnythingToReport(issues, issueLocalitiesToReport)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean hasAnythingToReport(PluginValidationIssues issues, EnumSet<IssueLocality> issueLocalitiesToReport) {
