@@ -487,19 +487,47 @@ public abstract class AbstractModelInterpolatorTest {
     @Test
     public void shouldIgnorePropertiesWithPomPrefix() throws Exception {
         final String orgName = "MyCo";
-        final String expectedName = "${pom.organization.name} Tools";
+        final String uninterpolatedName = "${pom.organization.name} Tools";
+        final String interpolatedName = uninterpolatedName;
 
         Model model = Model.newBuilder()
-                .name(expectedName)
+                .name(uninterpolatedName)
                 .organization(Organization.newBuilder().name(orgName).build())
                 .build();
 
         ModelInterpolator interpolator = createInterpolator();
         SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out = interpolator.interpolateModel(model, null, createModelBuildingRequest(context), collector);
+        Model out = interpolator.interpolateModel(
+                model,
+                null,
+                createModelBuildingRequest(context).setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_4_0),
+                collector);
 
         assertCollectorState(0, 0, 0, collector);
-        assertEquals(out.getName(), expectedName);
+        assertEquals(interpolatedName, out.getName());
+    }
+
+    @Test
+    public void shouldWarnPropertiesWithPomPrefix() throws Exception {
+        final String orgName = "MyCo";
+        final String uninterpolatedName = "${pom.organization.name} Tools";
+        final String interpolatedName = "MyCo Tools";
+
+        Model model = Model.newBuilder()
+                .name(uninterpolatedName)
+                .organization(Organization.newBuilder().name(orgName).build())
+                .build();
+
+        ModelInterpolator interpolator = createInterpolator();
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+        Model out = interpolator.interpolateModel(
+                model,
+                null,
+                createModelBuildingRequest(context).setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1),
+                collector);
+
+        assertCollectorState(0, 0, 1, collector);
+        assertEquals(interpolatedName, out.getName());
     }
 
     protected abstract ModelInterpolator createInterpolator() throws Exception;

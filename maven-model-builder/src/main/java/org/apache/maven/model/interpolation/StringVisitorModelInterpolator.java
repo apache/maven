@@ -64,10 +64,10 @@ public class StringVisitorModelInterpolator extends AbstractStringBasedModelInte
     @Override
     public Model interpolateModel(
             Model model, File projectDir, ModelBuildingRequest config, ModelProblemCollector problems) {
-        List<? extends ValueSource> valueSources = createValueSources(model, projectDir, config);
+        List<? extends ValueSource> valueSources = createValueSources(model, projectDir, config, problems);
         List<? extends InterpolationPostProcessor> postProcessors = createPostProcessors(model, projectDir, config);
 
-        InnerInterpolator innerInterpolator = createInterpolator(valueSources, postProcessors, problems);
+        InnerInterpolator innerInterpolator = createInterpolator(valueSources, postProcessors, problems, config);
 
         return new MavenTransformer(innerInterpolator::interpolate).visit(model);
     }
@@ -75,7 +75,8 @@ public class StringVisitorModelInterpolator extends AbstractStringBasedModelInte
     private InnerInterpolator createInterpolator(
             List<? extends ValueSource> valueSources,
             List<? extends InterpolationPostProcessor> postProcessors,
-            final ModelProblemCollector problems) {
+            final ModelProblemCollector problems,
+            ModelBuildingRequest config) {
         final Map<String, String> cache = new HashMap<>();
         final StringSearchInterpolator interpolator = new StringSearchInterpolator();
         interpolator.setCacheAnswers(true);
@@ -85,7 +86,7 @@ public class StringVisitorModelInterpolator extends AbstractStringBasedModelInte
         for (InterpolationPostProcessor postProcessor : postProcessors) {
             interpolator.addPostProcessor(postProcessor);
         }
-        final RecursionInterceptor recursionInterceptor = createRecursionInterceptor();
+        final RecursionInterceptor recursionInterceptor = createRecursionInterceptor(config);
         return value -> {
             if (value != null && value.contains("${")) {
                 String c = cache.get(value);
