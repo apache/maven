@@ -201,6 +201,22 @@ public class SettingsXmlConfigurationProcessor implements ConfigurationProcessor
             request.addMirror(mirror);
         }
 
+        for (Repository remoteRepository : settings.getRepositories()) {
+            try {
+                request.addRemoteRepository(MavenRepositorySystem.buildArtifactRepository(remoteRepository));
+            } catch (InvalidRepositoryException e) {
+                // do nothing for now
+            }
+        }
+
+        for (Repository pluginRepository : settings.getPluginRepositories()) {
+            try {
+                request.addPluginArtifactRepository(MavenRepositorySystem.buildArtifactRepository(pluginRepository));
+            } catch (InvalidRepositoryException e) {
+                // do nothing for now
+            }
+        }
+
         request.setActiveProfiles(settings.getActiveProfiles());
 
         for (Profile rawProfile : settings.getProfiles()) {

@@ -223,6 +223,39 @@
           </association>
         </field>
         <field xdoc.separator="blank">
+          <name>repositories</name>
+          <version>1.3.0+</version>
+          <description>
+            <![CDATA[
+            The lists of the remote repositories.
+            ]]>
+          </description>
+          <association>
+            <type>Repository</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>pluginRepositories</name>
+          <version>1.3.0+</version>
+          <description>
+            <![CDATA[
+            The lists of the remote repositories for discovering plugins.
+            ]]>
+          </description>
+          <association>
+            <type>Repository</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <comment>
+            <![CDATA[
+            This may be removed or relocated in the near
+            future. It is undecided whether plugins really need a remote
+            repository set of their own.
+            ]]>
+          </comment>
+        </field>
+        <field xdoc.separator="blank">
           <name>profiles</name>
           <version>1.0.0+</version>
           <description>
@@ -815,6 +848,7 @@
     <class java.clone="deep">
       <name>RepositoryBase</name>
       <version>1.0.0+</version>
+      <superClass>IdentifiableBase</superClass>
       <description>
         <![CDATA[
         Repository contains the information needed
@@ -822,18 +856,6 @@
         ]]>
       </description>
       <fields>
-        <field>
-          <name>id</name>
-          <version>1.0.0+</version>
-          <required>true</required>
-          <identifier>true</identifier>
-          <description>
-            <![CDATA[
-            A unique identifier for a repository.
-            ]]>
-          </description>
-          <type>String</type>
-        </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>

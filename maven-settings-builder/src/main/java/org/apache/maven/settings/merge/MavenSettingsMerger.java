@@ -88,6 +88,8 @@ public class MavenSettingsMerger {
         shallowMergeById(dominant.getServers(), recessive.getServers(), recessiveSourceLevel);
         shallowMergeById(dominant.getProxies(), recessive.getProxies(), recessiveSourceLevel);
         shallowMergeById(dominant.getProfiles(), recessive.getProfiles(), recessiveSourceLevel);
+        shallowMergeById(dominant.getRepositories(), recessive.getRepositories(), recessiveSourceLevel);
+        shallowMergeById(dominant.getPluginRepositories(), recessive.getPluginRepositories(), recessiveSourceLevel);
     }
 
     /**
