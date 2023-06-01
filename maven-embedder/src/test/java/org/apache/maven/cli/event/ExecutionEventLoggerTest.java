@@ -80,6 +80,7 @@ class ExecutionEventLoggerTest {
         when(rootProject.getBasedir()).thenReturn(basedir);
         MavenSession session = mock(MavenSession.class);
         when(session.getTopLevelProject()).thenReturn(rootProject);
+        when(session.getTopDirectory()).thenReturn(basedir.toPath());
         when(event.getSession()).thenReturn(session);
 
         // execute
@@ -112,6 +113,7 @@ class ExecutionEventLoggerTest {
         MavenSession session = mock(MavenSession.class);
         when(session.getTopLevelProject()).thenReturn(project);
         when(event.getSession()).thenReturn(session);
+        when(session.getTopDirectory()).thenReturn(basedir.toPath());
 
         // execute
         executionEventLogger.projectStarted(event);
