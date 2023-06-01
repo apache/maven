@@ -34,18 +34,13 @@ abstract class MavenSnapshotMetadata extends MavenMetadata {
 
     protected final Collection<Artifact> artifacts = new ArrayList<>();
 
-    protected final boolean legacyFormat;
-
-    protected MavenSnapshotMetadata(Metadata metadata, File file, boolean legacyFormat, Date timestamp) {
+    protected MavenSnapshotMetadata(Metadata metadata, File file, Date timestamp) {
         super(metadata, file, timestamp);
-        this.legacyFormat = legacyFormat;
     }
 
-    protected static Metadata createRepositoryMetadata(Artifact artifact, boolean legacyFormat) {
+    protected static Metadata createRepositoryMetadata(Artifact artifact) {
         Metadata metadata = new Metadata();
-        if (!legacyFormat) {
-            metadata.setModelVersion("1.1.0");
-        }
+        metadata.setModelVersion("1.1.0");
         metadata.setGroupId(artifact.getGroupId());
         metadata.setArtifactId(artifact.getArtifactId());
         metadata.setVersion(artifact.getBaseVersion());

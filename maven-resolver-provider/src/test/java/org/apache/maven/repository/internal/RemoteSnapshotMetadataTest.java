@@ -62,8 +62,7 @@ class RemoteSnapshotMetadataTest {
     void gregorianCalendarIsUsed() {
         String dateBefore = gregorianDate();
 
-        RemoteSnapshotMetadata metadata =
-                new RemoteSnapshotMetadata(new DefaultArtifact("a:b:1-SNAPSHOT"), false, new Date());
+        RemoteSnapshotMetadata metadata = new RemoteSnapshotMetadata(new DefaultArtifact("a:b:1-SNAPSHOT"), new Date());
         metadata.merge(new Metadata());
 
         String dateAfter = gregorianDate();

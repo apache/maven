@@ -38,19 +38,15 @@ final class LocalSnapshotMetadata extends MavenMetadata {
 
     private final Collection<Artifact> artifacts = new ArrayList<>();
 
-    private final boolean legacyFormat;
-
-    LocalSnapshotMetadata(Artifact artifact, boolean legacyFormat, Date timestamp) {
-        super(createMetadata(artifact, legacyFormat), null, timestamp);
-        this.legacyFormat = legacyFormat;
+    LocalSnapshotMetadata(Artifact artifact, Date timestamp) {
+        super(createMetadata(artifact), null, timestamp);
     }
 
-    LocalSnapshotMetadata(Metadata metadata, File file, boolean legacyFormat, Date timestamp) {
+    LocalSnapshotMetadata(Metadata metadata, File file, Date timestamp) {
         super(metadata, file, timestamp);
-        this.legacyFormat = legacyFormat;
     }
 
-    private static Metadata createMetadata(Artifact artifact, boolean legacyFormat) {
+    private static Metadata createMetadata(Artifact artifact) {
         Snapshot snapshot = new Snapshot();
         snapshot.setLocalCopy(true);
         Versioning versioning = new Versioning();
@@ -61,11 +57,7 @@ final class LocalSnapshotMetadata extends MavenMetadata {
         metadata.setGroupId(artifact.getGroupId());
         metadata.setArtifactId(artifact.getArtifactId());
         metadata.setVersion(artifact.getBaseVersion());
-
-        if (!legacyFormat) {
-            metadata.setModelVersion("1.1.0");
-        }
-
+        metadata.setModelVersion("1.1.0");
         return metadata;
     }
 
@@ -74,7 +66,7 @@ final class LocalSnapshotMetadata extends MavenMetadata {
     }
 
     public MavenMetadata setFile(File file) {
-        return new LocalSnapshotMetadata(metadata, file, legacyFormat, timestamp);
+        return new LocalSnapshotMetadata(metadata, file, timestamp);
     }
 
     public Object getKey() {
@@ -89,32 +81,30 @@ final class LocalSnapshotMetadata extends MavenMetadata {
     protected void merge(Metadata recessive) {
         metadata.getVersioning().setLastUpdatedTimestamp(timestamp);
 
-        if (!legacyFormat) {
-            String lastUpdated = metadata.getVersioning().getLastUpdated();
+        String lastUpdated = metadata.getVersioning().getLastUpdated();
 
-            Map<String, SnapshotVersion> versions = new LinkedHashMap<>();
+        Map<String, SnapshotVersion> versions = new LinkedHashMap<>();
 
-            for (Artifact artifact : artifacts) {
-                SnapshotVersion sv = new SnapshotVersion();
-                sv.setClassifier(artifact.getClassifier());
-                sv.setExtension(artifact.getExtension());
-                sv.setVersion(getVersion());
-                sv.setUpdated(lastUpdated);
-                versions.put(getKey(sv.getClassifier(), sv.getExtension()), sv);
-            }
+        for (Artifact artifact : artifacts) {
+            SnapshotVersion sv = new SnapshotVersion();
+            sv.setClassifier(artifact.getClassifier());
+            sv.setExtension(artifact.getExtension());
+            sv.setVersion(getVersion());
+            sv.setUpdated(lastUpdated);
+            versions.put(getKey(sv.getClassifier(), sv.getExtension()), sv);
+        }
 
-            Versioning versioning = recessive.getVersioning();
-            if (versioning != null) {
-                for (SnapshotVersion sv : versioning.getSnapshotVersions()) {
-                    String key = getKey(sv.getClassifier(), sv.getExtension());
-                    if (!versions.containsKey(key)) {
-                        versions.put(key, sv);
-                    }
+        Versioning versioning = recessive.getVersioning();
+        if (versioning != null) {
+            for (SnapshotVersion sv : versioning.getSnapshotVersions()) {
+                String key = getKey(sv.getClassifier(), sv.getExtension());
+                if (!versions.containsKey(key)) {
+                    versions.put(key, sv);
                 }
             }
-
-            metadata.getVersioning().setSnapshotVersions(new ArrayList<>(versions.values()));
         }
+
+        metadata.getVersioning().setSnapshotVersions(new ArrayList<>(versions.values()));
 
         artifacts.clear();
     }
