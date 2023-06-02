@@ -96,6 +96,7 @@ org.apache.maven.plugins:maven-plugin-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-plugin-plugin:3.2
 org.apache.maven.plugins:maven-plugin-plugin:3.3
 org.apache.maven.plugins:maven-plugin-plugin:3.6.0
+org.apache.maven.plugins:maven-plugin-plugin:3.9.0
 org.apache.maven.plugins:maven-rar-plugin:${stubPluginVersion}
 org.apache.maven.plugins:maven-release-plugin:3.0.0-M5
 org.apache.maven.plugins:maven-resources-plugin:${stubPluginVersion}
@@ -135,6 +136,7 @@ org.apache.maven:maven-resolver-provider:3.8.6
 org.apache.maven:maven-script-ant:2.1.0
 org.apache.maven:maven-settings-builder:3.1.1
 org.apache.maven:maven-settings:3.1.1
+org.apache.maven.plugin-testing:maven-plugin-testing-harness:3.3.0
 org.codehaus.gmavenplus:gmavenplus-plugin:1.11.0
 org.codehaus.mojo:build-helper-maven-plugin:3.2.0
 org.codehaus.mojo:flatten-maven-plugin:1.0.0
