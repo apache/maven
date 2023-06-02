@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -33,10 +31,8 @@ under the License.
   <version>1.0-SNAPSHOT</version>
 
   <name>Maven Integration Test :: MNG-3217 :: Module 1</name>
-  <description>
-    Verify that the dependency of plugin A on some plugin B does not influence the build of another module in the
-    reactor that uses a different version of plugin B for normal build tasks.
-  </description>
+  <description>Verify that the dependency of plugin A on some plugin B does not influence the build of another module in the
+    reactor that uses a different version of plugin B for normal build tasks.</description>
 
   <build>
     <plugins>
@@ -47,15 +43,6 @@ under the License.
         <configuration>
           <logFile>target/touch-1.txt</logFile>
         </configuration>
-        <executions>
-          <execution>
-            <id>test-1</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>reset</goal>
-            </goals>
-          </execution>
-        </executions>
         <dependencies>
           <!-- In broken Maven versions, this dependency screws up the plugin container used in the other module -->
           <dependency>
@@ -65,6 +52,15 @@ under the License.
             <version>0.1</version>
           </dependency>
         </dependencies>
+        <executions>
+          <execution>
+            <id>test-1</id>
+            <goals>
+              <goal>reset</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

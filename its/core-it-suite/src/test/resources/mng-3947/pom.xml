@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-3947</name>
-  <description>
-    Test that the configuration for a plugin execution with the identifier "default" does not pollute the
-    configuration of standalone plugin executions from the CLI.
-  </description>
+  <description>Test that the configuration for a plugin execution with the identifier "default" does not pollute the
+    configuration of standalone plugin executions from the CLI.</description>
 
   <build>
     <plugins>
@@ -42,10 +38,10 @@ under the License.
         <executions>
           <execution>
             <id>default</id>
-            <phase>verify</phase>
             <goals>
               <goal>resources</goal>
             </goals>
+            <phase>verify</phase>
             <configuration>
               <!-- This should not apply to the standalone execution of resources:resources from the CLI -->
               <pathname>target/failed.txt</pathname>

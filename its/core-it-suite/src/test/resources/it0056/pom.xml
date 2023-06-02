@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: it0056</name>
-  <description>
-    Test that multiple executions of a goal with different
-    parameter values will succeed.
-  </description>
+  <description>Test that multiple executions of a goal with different
+    parameter values will succeed.</description>
 
   <build>
     <plugins>
@@ -42,20 +38,20 @@ under the License.
         <executions>
           <execution>
             <id>first-exec</id>
-            <phase>validate</phase>
             <goals>
               <goal>reset</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <logFile>target/first-exec.txt</logFile>
             </configuration>
           </execution>
           <execution>
             <id>second-exec</id>
-            <phase>initialize</phase>
             <goals>
               <goal>reset</goal>
             </goals>
+            <phase>initialize</phase>
             <configuration>
               <logFile>target/second-exec.txt</logFile>
             </configuration>

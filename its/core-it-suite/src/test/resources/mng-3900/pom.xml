@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,9 +26,7 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-3900</name>
-  <description>
-    Test that build properties defined via active profiles are used for interpolation.
-  </description>
+  <description>Test that build properties defined via active profiles are used for interpolation.</description>
 
   <!-- These are some POM elements we would like to interpolate with properties from the profile. -->
   <url>http://maven.apache.org/${test}</url>
@@ -47,10 +43,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <outputFile>target/pom.properties</outputFile>
               <expressions>

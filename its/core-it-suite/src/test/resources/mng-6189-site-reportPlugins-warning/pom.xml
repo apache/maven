@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,9 +26,7 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-6189</name>
-  <description>
-    Check that using maven-site-plugin reportPlugins parameter causes a warning.
-  </description>
+  <description>Check that using maven-site-plugin reportPlugins parameter causes a warning.</description>
 
   <build>
     <plugins>
@@ -38,17 +34,9 @@ under the License.
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
         <version>0.1-stub-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <id>site</id>
-            <phase>site</phase>
-            <goals>
-              <goal>site</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
-          <reportPlugins><!-- reporting section is preferred -->
+          <reportPlugins>
+            <!-- reporting section is preferred -->
             <reportPlugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-surefire-report-plugin</artifactId>
@@ -56,6 +44,15 @@ under the License.
             </reportPlugin>
           </reportPlugins>
         </configuration>
+        <executions>
+          <execution>
+            <id>site</id>
+            <goals>
+              <goal>site</goal>
+            </goals>
+            <phase>site</phase>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

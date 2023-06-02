@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4412</name>
-  <description>
-    Verify that plugins using the 2.x style artifact resolver/collector directly are subject to the offline mode of
-    the current Maven session.
-  </description>
+  <description>Verify that plugins using the 2.x style artifact resolver/collector directly are subject to the offline mode of
+    the current Maven session.</description>
 
   <profiles>
     <profile>
@@ -45,10 +41,10 @@ under the License.
             <executions>
               <execution>
                 <id>test</id>
-                <phase>validate</phase>
                 <goals>
                   <goal>resolve</goal>
                 </goals>
+                <phase>validate</phase>
                 <configuration>
                   <dependencies>
                     <dependency>
@@ -75,10 +71,10 @@ under the License.
             <executions>
               <execution>
                 <id>test</id>
-                <phase>validate</phase>
                 <goals>
                   <goal>collect</goal>
                 </goals>
+                <phase>validate</phase>
                 <configuration>
                   <dependencies>
                     <dependency>

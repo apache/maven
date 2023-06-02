@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -31,10 +29,8 @@ under the License.
   <artifactId>child</artifactId>
 
   <name>Maven Integration Test :: MNG-3943</name>
-  <description>
-    Test that plugin executions are properly merged during inheritance, even if the child uses a different
-    plugin version than the parent.
-  </description>
+  <description>Test that plugin executions are properly merged during inheritance, even if the child uses a different
+    plugin version than the parent.</description>
 
   <build>
     <plugins>
@@ -46,21 +42,21 @@ under the License.
         <executions>
           <execution>
             <id>child-1</id>
-            <phase>validate</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <logFile>target/exec.log</logFile>
               <string>child-1</string>
             </configuration>
           </execution>
           <execution>
-            <!-- NOTE: <id> deliberately omitted to use default value -->
-            <phase>validate</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <!-- NOTE: <id> deliberately omitted to use default value -->
+            <phase>validate</phase>
             <configuration>
               <logFile>target/exec.log</logFile>
               <string>child-default</string>

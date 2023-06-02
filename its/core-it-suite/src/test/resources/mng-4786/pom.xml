@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,12 +25,10 @@ under the License.
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-4786</name>
-  <description>
-    Verify that plugins whose mojos are implemented as Ant scripts and use the Maven 2.1.x Ant support can be
+  <description>Verify that plugins whose mojos are implemented as Ant scripts and use the Maven 2.1.x Ant support can be
     invoked. The essential bits here are that Ant-based mojos are instantiated via a custom component factory, yet
     must undergo the same IoC as for regular Java components. And the 2.1.x Ant support actually requires injection
-    of a logger.
-  </description>
+    of a logger.</description>
 
   <build>
     <plugins>
@@ -43,15 +39,6 @@ under the License.
         <configuration>
           <outputFile>target/ant.txt</outputFile>
         </configuration>
-        <executions>
-          <execution>
-            <id>test</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>touch</goal>
-            </goals>
-          </execution>
-        </executions>
         <dependencies>
           <dependency>
             <groupId>org.apache.maven</groupId>
@@ -78,6 +65,15 @@ under the License.
             <version>1.0</version>
           </dependency>
         </dependencies>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>touch</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

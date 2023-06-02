@@ -59,7 +59,7 @@ public class MavenITmng1803PomValidationErrorIncludesLineNumberTest extends Abst
         List<String> lines = verifier.loadLines(verifier.getLogFileName(), null);
         for (String line : lines) {
             if (line.contains(":bad/id:")) {
-                assertTrue("Line number not found in: " + line, line.indexOf("38") > 0);
+                assertTrue("Line number not found in: " + line, line.indexOf("34") > 0);
                 assertTrue("Column number not found in: " + line, line.indexOf("19") > 0);
                 foundError = true;
                 break;

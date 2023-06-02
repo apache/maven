@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-3940</name>
-  <description>
-    Test that interpolation of environment variables respects the casing rules of the underlying OS (especially
-    Windows).
-  </description>
+  <description>Test that interpolation of environment variables respects the casing rules of the underlying OS (especially
+    Windows).</description>
 
   <properties>
     <envTest>${env.MAVEN_MNG_3940}</envTest>
@@ -45,10 +41,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <outputFile>target/${env.MAVEN_MNG_3940}.properties</outputFile>
               <expressions>

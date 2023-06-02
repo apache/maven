@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?><project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.its.mng3740</groupId>
   <artifactId>projects</artifactId>
-  <packaging>pom</packaging>
   <version>2</version>
+  <packaging>pom</packaging>
 
   <modules>
     <module>maven-mng3740-plugin</module>
@@ -18,10 +19,10 @@
         <executions>
           <execution>
             <id>test</id>
-            <phase>install</phase>
             <goals>
               <goal>touch</goal>
             </goals>
+            <phase>install</phase>
           </execution>
         </executions>
       </plugin>

@@ -17,10 +17,10 @@
         <executions>
           <execution>
             <id>check</id>
-            <phase>package</phase>
             <goals>
               <goal>check</goal>
             </goals>
+            <phase>package</phase>
           </execution>
         </executions>
       </plugin>

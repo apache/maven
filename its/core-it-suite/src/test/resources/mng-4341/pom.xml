@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4341</name>
-  <description>
-    Test that plugins bound to the same phase get executed in POM order even if one of the plugins participates
-    in the default lifecycle bindings for the project's packaging.
-  </description>
+  <description>Test that plugins bound to the same phase get executed in POM order even if one of the plugins participates
+    in the default lifecycle bindings for the project's packaging.</description>
 
   <build>
     <plugins>
@@ -46,10 +42,10 @@ under the License.
         <executions>
           <execution>
             <id>first</id>
-            <phase>validate</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>
@@ -65,10 +61,10 @@ under the License.
         <executions>
           <execution>
             <id>second</id>
-            <phase>validate</phase>
             <goals>
               <goal>resources</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

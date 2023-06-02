@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,11 +26,9 @@ under the License.
   <packaging>multi-goal-per-phase</packaging>
 
   <name>Maven Integration Test :: MNG-4350</name>
-  <description>
-    Test that multiple goals bound to the same phase by a lifecycle mapping execute in the order given by
+  <description>Test that multiple goals bound to the same phase by a lifecycle mapping execute in the order given by
     the lifecycle mapping. In particular, the order of plugin declarations in the POM should have no influence
-    on the lifecycle mappings specified by the packaging.
-  </description>
+    on the lifecycle mappings specified by the packaging.</description>
 
   <build>
     <plugins>

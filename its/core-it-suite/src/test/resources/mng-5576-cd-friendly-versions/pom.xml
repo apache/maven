@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -6,42 +7,20 @@
   <!-- interpolate here -->
   <version>1.0.0.${changelist}</version>
   <name>Maven Integration Test :: mng-5576</name>
-  <description>
-    Verifies that property references with dotted notation work within POM interpolation.
-  </description>
+  <description>Verifies that property references with dotted notation work within POM interpolation.</description>
 
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-expression</artifactId>
-        <version>2.1-SNAPSHOT</version>
-        <configuration>
-          <outputFile>target/pom.properties</outputFile>
-          <expressions>
-            <expression>project/version</expression>
-          </expressions>
-        </configuration>
-        <executions>
-          <execution>
-            <id>test</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>eval</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
     <pluginManagement>
       <plugins>
         <!-- set versions of default bindings plugins to avoid warning added in MNG-6562 -->
-        <plugin><!-- clean lifecycle -->
+        <plugin>
+          <!-- clean lifecycle -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
           <version>3.2.0</version>
         </plugin>
-        <plugin><!-- site lifecycle -->
+        <plugin>
+          <!-- site lifecycle -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
           <version>3.9.1</version>
@@ -79,5 +58,27 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-expression</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <outputFile>target/pom.properties</outputFile>
+          <expressions>
+            <expression>project/version</expression>
+          </expressions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>eval</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 </project>

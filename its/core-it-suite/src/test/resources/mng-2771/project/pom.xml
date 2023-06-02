@@ -1,18 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: it0124</name>
   <groupId>org.apache.maven.its.it0124</groupId>
   <artifactId>maven-it-it0124</artifactId>
-  <description>Test that ensures the POM extensions can override default component implementations.</description>
   <version>1.0</version>
+  <name>Maven Integration Test :: it0124</name>
+  <description>Test that ensures the POM extensions can override default component implementations.</description>
   <build>
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.its.it0124</groupId>
-        <artifactId>maven-it-it0124-extension</artifactId>
-        <version>1.0</version>
-      </extension>
-    </extensions>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.it0124</groupId>
@@ -20,28 +14,35 @@
         <version>1.0</version>
         <executions>
           <execution>
-            <phase>generate-resources</phase>
             <goals>
               <goal>lookup</goal>
             </goals>
+            <phase>generate-resources</phase>
           </execution>
         </executions>
       </plugin>
       <plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-verifier-plugin</artifactId>
-         <configuration>
-           <verificationFile>src/test/verifier/verifications-test.xml</verificationFile>
-         </configuration>
-         <executions>
-           <execution>
-             <phase>verify</phase>
-             <goals>
-               <goal>verify</goal>
-             </goals>
-           </execution>
-         </executions>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-verifier-plugin</artifactId>
+        <configuration>
+          <verificationFile>src/test/verifier/verifications-test.xml</verificationFile>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>verify</goal>
+            </goals>
+            <phase>verify</phase>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.its.it0124</groupId>
+        <artifactId>maven-it-it0124-extension</artifactId>
+        <version>1.0</version>
+      </extension>
+    </extensions>
   </build>
 </project>

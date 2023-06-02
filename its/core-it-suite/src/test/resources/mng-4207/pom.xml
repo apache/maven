@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,12 +26,31 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4207</name>
-  <description>
-    Test that a plugin that depends on log4j and employs the artifact resolver does not die when using
-    commons-http to resolve an artifact.
-  </description>
+  <description>Test that a plugin that depends on log4j and employs the artifact resolver does not die when using
+    commons-http to resolve an artifact.</description>
 
   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-log4j</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <groupId>org.apache.maven.its.mng4207</groupId>
+          <artifactId>it</artifactId>
+          <version>1.0</version>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>it</goal>
+            </goals>
+            <phase>initialize</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
@@ -49,26 +66,5 @@ under the License.
       </extension>
       -->
     </extensions>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-log4j</artifactId>
-        <version>2.1-SNAPSHOT</version>
-        <configuration>
-          <groupId>org.apache.maven.its.mng4207</groupId>
-          <artifactId>it</artifactId>
-          <version>1.0</version>
-        </configuration>
-        <executions>
-          <execution>
-            <id>test</id>
-            <phase>initialize</phase>
-            <goals>
-              <goal>it</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
   </build>
 </project>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,10 +25,8 @@ under the License.
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-4489</name>
-  <description>
-    Test that repositories contributed by extension POMs during transitive dependency resolution are subject to
-    mirror and authentication configuration.
-  </description>
+  <description>Test that repositories contributed by extension POMs during transitive dependency resolution are subject to
+    mirror and authentication configuration.</description>
 
   <build>
     <plugins>
@@ -42,10 +38,10 @@ under the License.
         <extensions>true</extensions>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>test</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -35,18 +33,11 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-4464 :: Sub</name>
-  <description>
-    Test that Maven recognizes both the forward and the backward slash as file separators, regardless of the
-    underlying filesystem (i.e. even on Unix).
-  </description>
+  <description>Test that Maven recognizes both the forward and the backward slash as file separators, regardless of the
+    underlying filesystem (i.e. even on Unix).</description>
 
   <build>
-    <!-- NOTE: The paths deliberately uses the backward slash -->
-    <sourceDirectory>src\main\j</sourceDirectory>
-    <testSourceDirectory>src\test\j</testSourceDirectory>
     <directory>target\it</directory>
-    <outputDirectory>target\it\classes</outputDirectory>
-    <testOutputDirectory>target\it\test-classes</testOutputDirectory>
     <resources>
       <resource>
         <directory>src\main\res</directory>
@@ -65,10 +56,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <!-- NOTE: This deliberately uses the backward slash -->
               <outputFile>target\path.properties</outputFile>
@@ -86,5 +77,10 @@ under the License.
         </executions>
       </plugin>
     </plugins>
+    <!-- NOTE: The paths deliberately uses the backward slash -->
+    <sourceDirectory>src\main\j</sourceDirectory>
+    <testSourceDirectory>src\test\j</testSourceDirectory>
+    <outputDirectory>target\it\classes</outputDirectory>
+    <testOutputDirectory>target\it\test-classes</testOutputDirectory>
   </build>
 </project>

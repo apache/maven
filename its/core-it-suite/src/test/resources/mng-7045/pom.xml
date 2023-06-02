@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -6,9 +7,7 @@
   <version>1.0</version>
 
   <name>Maven Integration Test :: MNG-7045</name>
-  <description>
-    Runs a Groovy script which refers some CDI 2.0 code. The script fails if Maven would leak CDI API 1.0.
-  </description>
+  <description>Runs a Groovy script which refers some CDI 2.0 code. The script fails if Maven would leak CDI API 1.0.</description>
 
   <dependencies>
     <dependency>
@@ -34,21 +33,10 @@
         <groupId>org.codehaus.gmavenplus</groupId>
         <artifactId>gmavenplus-plugin</artifactId>
         <version>1.11.0</version>
-        <executions>
-          <execution>
-            <id>run</id>
-            <phase>process-classes</phase>
-            <goals>
-              <goal>execute</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
           <scripts>
-            <script><![CDATA[
-println("InstanceSource=" + javax.enterprise.inject.Instance.class.getProtectionDomain().getCodeSource())
-javax.enterprise.inject.Instance.class.getDeclaredMethod("stream")
-          ]]></script>
+            <script><![CDATA[println("InstanceSource=" + javax.enterprise.inject.Instance.class.getProtectionDomain().getCodeSource())
+javax.enterprise.inject.Instance.class.getDeclaredMethod("stream")]]></script>
           </scripts>
         </configuration>
         <dependencies>
@@ -65,8 +53,16 @@ javax.enterprise.inject.Instance.class.getDeclaredMethod("stream")
             <scope>runtime</scope>
           </dependency>
         </dependencies>
+        <executions>
+          <execution>
+            <id>run</id>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <phase>process-classes</phase>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
 </project>
-

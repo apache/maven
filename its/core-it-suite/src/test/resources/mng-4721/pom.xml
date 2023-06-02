@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,9 +26,7 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4721</name>
-  <description>
-    Verify the handling of direct/transitive optional plugin dependencies.
-  </description>
+  <description>Verify the handling of direct/transitive optional plugin dependencies.</description>
 
   <build>
     <plugins>
@@ -38,19 +34,6 @@ under the License.
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-class-loader</artifactId>
         <version>2.1-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <id>load</id>
-            <phase>validate</phase>
-            <configuration>
-              <resourcePaths>org/apache/maven/plugin/coreit/c.properties,mng4721a.properties,mng4721b.properties</resourcePaths>
-              <pluginClassLoaderOutput>target/pcl.properties</pluginClassLoaderOutput>
-            </configuration>
-            <goals>
-              <goal>load</goal>
-            </goals>
-          </execution>
-        </executions>
         <dependencies>
           <dependency>
             <groupId>org.apache.maven.its.mng4721</groupId>
@@ -58,6 +41,19 @@ under the License.
             <version>0.1</version>
           </dependency>
         </dependencies>
+        <executions>
+          <execution>
+            <id>load</id>
+            <goals>
+              <goal>load</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <resourcePaths>org/apache/maven/plugin/coreit/c.properties,mng4721a.properties,mng4721b.properties</resourcePaths>
+              <pluginClassLoaderOutput>target/pcl.properties</pluginClassLoaderOutput>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

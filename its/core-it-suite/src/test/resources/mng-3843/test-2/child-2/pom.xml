@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -75,9 +73,9 @@ under the License.
   </prerequisites>
 
   <scm>
-    <url>http://child.url/trunk</url>
     <connection>http://child.url/scm</connection>
     <developerConnection>https://child.url/scm</developerConnection>
+    <url>http://child.url/trunk</url>
   </scm>
   <issueManagement>
     <url>http://child.url/issues</url>
@@ -87,21 +85,21 @@ under the License.
   </ciManagement>
   <distributionManagement>
     <repository>
-      <url>http://child.url/dist</url>
       <id>child.distros</id>
+      <url>http://child.url/dist</url>
     </repository>
     <snapshotRepository>
-      <url>http://child.url/snaps</url>
       <id>child.snaps</id>
+      <url>http://child.url/snaps</url>
     </snapshotRepository>
     <site>
-      <url>http://child.url/site</url>
       <id>child.site</id>
+      <url>http://child.url/site</url>
     </site>
-    <downloadUrl>http://child.url/download</downloadUrl>
     <relocation>
       <message>child-reloc-msg</message>
     </relocation>
+    <downloadUrl>http://child.url/download</downloadUrl>
   </distributionManagement>
 
   <properties>
@@ -156,11 +154,6 @@ under the License.
   <build>
     <defaultGoal>validate</defaultGoal>
     <directory>build</directory>
-    <sourceDirectory>sources/main</sourceDirectory>
-    <scriptSourceDirectory>sources/scripts</scriptSourceDirectory>
-    <testSourceDirectory>sources/test</testSourceDirectory>
-    <outputDirectory>build/main</outputDirectory>
-    <testOutputDirectory>build/test</testOutputDirectory>
     <finalName>coreit</finalName>
     <resources>
       <resource>
@@ -179,10 +172,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <outputFile>target/pom.properties</outputFile>
               <expressions>
@@ -193,10 +186,15 @@ under the License.
         </executions>
       </plugin>
     </plugins>
+    <sourceDirectory>sources/main</sourceDirectory>
+    <scriptSourceDirectory>sources/scripts</scriptSourceDirectory>
+    <testSourceDirectory>sources/test</testSourceDirectory>
+    <outputDirectory>build/main</outputDirectory>
+    <testOutputDirectory>build/test</testOutputDirectory>
   </build>
 
   <reporting>
-    <excludeDefaults>false</excludeDefaults>
     <outputDirectory>docs</outputDirectory>
+    <excludeDefaults>false</excludeDefaults>
   </reporting>
 </project>

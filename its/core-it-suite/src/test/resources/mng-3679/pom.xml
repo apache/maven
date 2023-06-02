@@ -4,11 +4,15 @@
 
   <groupId>org.apache.maven.its.mng3679</groupId>
   <artifactId>test</artifactId>
-  <packaging>pom</packaging>
   <version>1</version>
+  <packaging>pom</packaging>
 
-  <name/>
-  <description/>
+  <name />
+  <description />
+
+  <properties>
+    <myExecId>test-id</myExecId>
+  </properties>
 
   <build>
     <plugins>
@@ -19,10 +23,10 @@
         <executions>
           <execution>
             <id>${myExecId}</id>
-            <phase>validate</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <logFile>target/check.txt</logFile>
               <string>${myExecId}</string>
@@ -32,8 +36,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <properties>
-    <myExecId>test-id</myExecId>
-  </properties>
 </project>

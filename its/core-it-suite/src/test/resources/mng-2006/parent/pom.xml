@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,26 +26,24 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-2006</name>
-  <description>
-    Test that inheritance of those URLs which automatically append the child's artifact id take the child's
-    relative location to the parent into account.
-  </description>
+  <description>Test that inheritance of those URLs which automatically append the child's artifact id take the child's
+    relative location to the parent into account.</description>
+
+  <url>http://project.url/parent</url>
 
   <modules>
     <module>../child</module>
   </modules>
 
-  <url>http://project.url/parent</url>
-
   <scm>
-    <url>http://viewvc.project.url/parent</url>
     <connection>http://scm.project.url/parent</connection>
     <developerConnection>https://scm.project.url/parent</developerConnection>
+    <url>http://viewvc.project.url/parent</url>
   </scm>
   <distributionManagement>
     <site>
-      <url>http://site.project.url/parent</url>
       <id>parent.site</id>
+      <url>http://site.project.url/parent</url>
     </site>
   </distributionManagement>
 </project>

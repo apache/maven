@@ -1,11 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: mng0624</name>
-  <description>Test that child can get its parent without specifying a version</description>
   <groupId>org.apache.maven.its.mng0624</groupId>
   <artifactId>maven-it-mng0624-basic</artifactId>
-  <packaging>pom</packaging>
   <version>1.0</version>
+  <packaging>pom</packaging>
+  <name>Maven Integration Test :: mng0624</name>
+  <description>Test that child can get its parent without specifying a version</description>
   <modules>
     <module>parent</module>
     <module>main</module>

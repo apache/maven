@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,11 +26,9 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4842</name>
-  <description>
-    Verify that resolution of parent POMs for dependency POMs treats the remote repositories of the current
+  <description>Verify that resolution of parent POMs for dependency POMs treats the remote repositories of the current
     resolution request as dominant when merging with any repositories declared in the dependency POM. This
-    variant of the test checks manual dependency resolution by a plugin.
-  </description>
+    variant of the test checks manual dependency resolution by a plugin.</description>
 
   <build>
     <plugins>
@@ -53,10 +49,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>resolve-transitive</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

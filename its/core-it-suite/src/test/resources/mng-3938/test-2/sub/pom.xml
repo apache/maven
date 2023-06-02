@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -31,10 +29,8 @@ under the License.
   <artifactId>child</artifactId>
 
   <name>Maven Integration Test :: MNG-3938</name>
-  <description>
-    Test that plugin executions with the same id are merged during inheritance, especially executions using the
-    default id, regardless whether the id is given explicitly by the user or implicitly assumed from defaults.
-  </description>
+  <description>Test that plugin executions with the same id are merged during inheritance, especially executions using the
+    default id, regardless whether the id is given explicitly by the user or implicitly assumed from defaults.</description>
 
   <build>
     <plugins>
@@ -46,10 +42,10 @@ under the License.
           <execution>
             <!-- NOTE: Explicitly reference "default" id here -->
             <id>default</id>
-            <phase>validate</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <logFile>target/default.log</logFile>
               <string>child</string>
@@ -57,10 +53,10 @@ under the License.
           </execution>
           <execution>
             <id>non-default</id>
-            <phase>validate</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <logFile>target/non-default.log</logFile>
               <string>child</string>

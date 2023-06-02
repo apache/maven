@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,12 +26,10 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4052 :: Importing POM</name>
-  <description>
-    Test that the project builder properly detects and handles inter-model dependencies within a reactor
+  <description>Test that the project builder properly detects and handles inter-model dependencies within a reactor
     like a POM that imports another POM. To clarify, this is not about the kind of dependency where one
     project needs another project's output for compilation/testing but about the case where one project's
-    effective model requires another project's model for its construction.
-  </description>
+    effective model requires another project's model for its construction.</description>
 
   <dependencyManagement>
     <dependencies>

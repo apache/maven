@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,9 +25,11 @@ under the License.
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-6386 (Unicode Chars)</name>
-  <description>
-    Test project.baseUri property (RFC 3986 compliance).
-  </description>
+  <description>Test project.baseUri property (RFC 3986 compliance).</description>
+
+  <properties>
+    <pomProperty>${project.baseUri}</pomProperty>
+  </properties>
 
   <build>
     <plugins>
@@ -39,10 +39,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <outputFile>target/profile.properties</outputFile>
               <expressions>
@@ -54,8 +54,4 @@ under the License.
       </plugin>
     </plugins>
   </build>
-
-  <properties>
-    <pomProperty>${project.baseUri}</pomProperty>
-  </properties>
 </project>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,75 +17,70 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.mng7038</groupId>
+  <artifactId>parent</artifactId>
+  <version>1.0</version>
 
-    <groupId>org.apache.maven.its.mng7038</groupId>
-    <artifactId>parent</artifactId>
-    <version>1.0</version>
+  <packaging>pom</packaging>
 
-    <packaging>pom</packaging>
+  <name>Maven Integration Test :: MNG-7038</name>
+  <description>Test project.rootDirectory, session.topDirectory and session.rootDirectory properties.</description>
 
-    <name>Maven Integration Test :: MNG-7038</name>
-    <description>
-        Test project.rootDirectory, session.topDirectory and session.rootDirectory properties.
-    </description>
+  <modules>
+    <module>module-a</module>
+    <module>module-b</module>
+  </modules>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <rootdir>${project.rootDirectory}</rootdir>
-        <activated>false</activated>
-    </properties>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <rootdir>${project.rootDirectory}</rootdir>
+    <activated>false</activated>
+  </properties>
 
-    <modules>
-        <module>module-a</module>
-        <module>module-b</module>
-    </modules>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-expression</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>eval</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <outputFile>target/pom.properties</outputFile>
+              <expressions>
+                <expression>project/properties</expression>
+                <expression>project/rootDirectory</expression>
+                <expression>session/rootDirectory</expression>
+                <expression>session/topDirectory</expression>
+              </expressions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.its.plugins</groupId>
-                <artifactId>maven-it-plugin-expression</artifactId>
-                <version>2.1-SNAPSHOT</version>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>eval</goal>
-                        </goals>
-                        <configuration>
-                            <outputFile>target/pom.properties</outputFile>
-                            <expressions>
-                                <expression>project/properties</expression>
-                                <expression>project/rootDirectory</expression>
-                                <expression>session/rootDirectory</expression>
-                                <expression>session/topDirectory</expression>
-                            </expressions>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
-    <profiles>
-        <profile>
-            <id>rootdir-profile-activation</id>
-            <activation>
-                <file>
-                    <exists>${rootDirectory}/.mvn/.gitkeep</exists>
-                </file>
-            </activation>
-            <properties>
-                <activated>true</activated>
-            </properties>
-        </profile>
-    </profiles>
+  <profiles>
+    <profile>
+      <id>rootdir-profile-activation</id>
+      <activation>
+        <file>
+          <exists>${rootDirectory}/.mvn/.gitkeep</exists>
+        </file>
+      </activation>
+      <properties>
+        <activated>true</activated>
+      </properties>
+    </profile>
+  </profiles>
 
 </project>

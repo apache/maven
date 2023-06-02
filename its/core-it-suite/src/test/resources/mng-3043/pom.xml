@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,11 +26,9 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-3043</name>
-  <description>
-    Test that dependencies on attached artifacts like a test JAR or an EJB client JAR which have not been built
+  <description>Test that dependencies on attached artifacts like a test JAR or an EJB client JAR which have not been built
     yet, i.e. in build phases prior to "package" like "test", are satisfied from the output directories of the
-    projects in the reactor. This is meant as a best effort to provide a class path for compilation or testing.
-  </description>
+    projects in the reactor. This is meant as a best effort to provide a class path for compilation or testing.</description>
 
   <modules>
     <module>dependency</module>

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -7,12 +8,10 @@
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: it0085</name>
-  <description>
-    Verify that system-scoped dependencies get resolved with system scope
+  <description>Verify that system-scoped dependencies get resolved with system scope
     when they are resolved transitively via another (non-system)
     dependency. Inherited scope should not apply in the case of
-    system-scoped dependencies, no matter where they are.
-  </description>
+    system-scoped dependencies, no matter where they are.</description>
 
   <dependencies>
     <dependency>
@@ -36,10 +35,10 @@
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>test</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

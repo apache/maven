@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-4162</name>
-  <description>
-    Verify that the legacy reporting section is automatically converted into ordinary plugin configuration of the
-    Maven Site Plugin to ease migration.
-  </description>
+  <description>Verify that the legacy reporting section is automatically converted into ordinary plugin configuration of the
+    Maven Site Plugin to ease migration.</description>
 
   <build>
     <plugins>
@@ -42,10 +38,10 @@ under the License.
         <executions>
           <execution>
             <id>site</id>
-            <phase>site</phase>
             <goals>
               <goal>site</goal>
             </goals>
+            <phase>site</phase>
           </execution>
         </executions>
       </plugin>
@@ -62,10 +58,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>
@@ -91,12 +87,12 @@ under the License.
           </reportSet>
           <reportSet>
             <id>set-b</id>
-            <configuration>
-              <skipTests>false</skipTests>
-            </configuration>
             <reports>
               <report>report-only</report>
             </reports>
+            <configuration>
+              <skipTests>false</skipTests>
+            </configuration>
           </reportSet>
         </reportSets>
       </plugin>

@@ -8,10 +8,8 @@
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-3401</name>
-  <description>
-    Test that the configuration of an execution block with the id "default-cli" applies to direct CLI
-    invocations of a goal as well.
-  </description>
+  <description>Test that the configuration of an execution block with the id "default-cli" applies to direct CLI
+    invocations of a goal as well.</description>
 
   <build>
     <!-- NOTE: This variant of the test does not use plugin management -->

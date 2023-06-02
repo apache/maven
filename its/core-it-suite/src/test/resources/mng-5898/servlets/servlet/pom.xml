@@ -1,19 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
-   <modelVersion>4.0.0</modelVersion>
-   <groupId>root.project.servlets</groupId>
-   <artifactId>servlet</artifactId>
-   <packaging>war</packaging>
-   <name>servlet</name>
-   <parent>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>root.project</groupId>
+    <artifactId>servlets</artifactId>
+    <version>1.0</version>
+  </parent>
+  <groupId>root.project.servlets</groupId>
+  <artifactId>servlet</artifactId>
+  <packaging>war</packaging>
+  <name>servlet</name>
+  <dependencies>
+    <dependency>
       <groupId>root.project</groupId>
-      <artifactId>servlets</artifactId>
-      <version>1.0</version>
-   </parent>
-   <dependencies>
-      <dependency>
-         <groupId>root.project</groupId>
-         <artifactId>primary-source</artifactId>
-         <scope>provided</scope>
-      </dependency>
-   </dependencies>
+      <artifactId>primary-source</artifactId>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
 </project>

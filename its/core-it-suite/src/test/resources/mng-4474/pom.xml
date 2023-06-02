@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,18 +26,9 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4474</name>
-  <description>
-    Verify that the wagon manager does not erroneously cache/reuse wagon instances that use per-lookup instantiation.
-  </description>
+  <description>Verify that the wagon manager does not erroneously cache/reuse wagon instances that use per-lookup instantiation.</description>
 
   <build>
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.its</groupId>
-        <artifactId>core-it-wagon</artifactId>
-        <version>2.1-SNAPSHOT</version>
-      </extension>
-    </extensions>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
@@ -55,13 +44,20 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>lookup-wagon</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>
     </plugins>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.its</groupId>
+        <artifactId>core-it-wagon</artifactId>
+        <version>2.1-SNAPSHOT</version>
+      </extension>
+    </extensions>
   </build>
 </project>

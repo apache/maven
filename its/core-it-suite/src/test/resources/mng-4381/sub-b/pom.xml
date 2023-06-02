@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,10 +25,8 @@ under the License.
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-4381 :: B</name>
-  <description>
-    Test that extension plugins can contribute non-core components that can be accessed by other plugins in the same
-    project and in projects with the same extension.
-  </description>
+  <description>Test that extension plugins can contribute non-core components that can be accessed by other plugins in the same
+    project and in projects with the same extension.</description>
 
   <!--
   These repositories do not provide any artifacts and in particular do not affect the extension class path. They
@@ -64,10 +60,10 @@ under the License.
         </configuration>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>update-singleton</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,9 +26,7 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-3886</name>
-  <description>
-    Test that the goals from a plugin execution are executed in the order given by the POM.
-  </description>
+  <description>Test that the goals from a plugin execution are executed in the order given by the POM.</description>
 
   <build>
     <!-- This project does not use plugin management for the test plugin -->
@@ -42,13 +38,13 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>log-separator</goal>
               <goal>reset</goal>
               <goal>log-string</goal>
               <goal>log-separator</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <logFile>target/it.log</logFile>
               <string>test</string>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,12 +26,10 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-5214</name>
-  <description>
-    Test that a dependency with a type other than jar, test-jar, or ejb-client
+  <description>Test that a dependency with a type other than jar, test-jar, or ejb-client
     *not* get assigned a reactor path (target/classes, e.g.) just
     because the corresponding 'jar'
-    artifact is in the reactor.
-  </description>
+    artifact is in the reactor.</description>
 
   <modules>
     <module>dependency</module>

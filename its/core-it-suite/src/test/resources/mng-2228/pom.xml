@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,38 +25,15 @@ under the License.
   <version>1.0</version>
 
   <name>Maven Integration Test :: MNG-2228</name>
-  <description>
-    Verify that components injected into plugins are actually assignment-compatible with the corresponding mojo
-    fields in case the field type is both provided by a plugin dependency and by a build extension.
-  </description>
+  <description>Verify that components injected into plugins are actually assignment-compatible with the corresponding mojo
+    fields in case the field type is both provided by a plugin dependency and by a build extension.</description>
 
   <build>
-    <extensions>
-      <!-- load component api and implementation into core/extension realm -->
-      <extension>
-        <groupId>org.apache.maven.its.mng2228</groupId>
-        <artifactId>component</artifactId>
-        <version>0.1</version>
-      </extension>
-    </extensions>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-class-loader</artifactId>
         <version>2.1-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <id>api</id>
-            <phase>validate</phase>
-            <configuration>
-              <className>org.apache.maven.its.mng2228.Component</className>
-              <instanceofPropertiesFile>target/api.properties</instanceofPropertiesFile>
-            </configuration>
-            <goals>
-              <goal>instanceof</goal>
-            </goals>
-          </execution>
-        </executions>
         <dependencies>
           <!-- load component api and implementation into plugin realm -->
           <dependency>
@@ -72,7 +47,28 @@ under the License.
             <version>0.1</version>
           </dependency>
         </dependencies>
+        <executions>
+          <execution>
+            <id>api</id>
+            <goals>
+              <goal>instanceof</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <className>org.apache.maven.its.mng2228.Component</className>
+              <instanceofPropertiesFile>target/api.properties</instanceofPropertiesFile>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
+    <extensions>
+      <!-- load component api and implementation into core/extension realm -->
+      <extension>
+        <groupId>org.apache.maven.its.mng2228</groupId>
+        <artifactId>component</artifactId>
+        <version>0.1</version>
+      </extension>
+    </extensions>
   </build>
 </project>

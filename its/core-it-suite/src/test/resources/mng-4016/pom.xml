@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-4016</name>
-  <description>
-    Test that expressions with the special prefixes "project.", "pom." and "env." can be interpolated from
-    properties that include the prefix.
-  </description>
+  <description>Test that expressions with the special prefixes "project.", "pom." and "env." can be interpolated from
+    properties that include the prefix.</description>
 
   <properties>
     <!-- source properties for the expressions to evaluate -->
@@ -52,10 +48,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <outputFile>target/model.properties</outputFile>
               <expressions>

@@ -1,14 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>mng624 child1</name>
-  <groupId>org.apache.maven.its.mng624</groupId>
-  <artifactId>child1</artifactId>
-  <packaging>jar</packaging>
 
   <parent>
     <groupId>org.apache.maven.its.mng624</groupId>
     <artifactId>parent</artifactId>
     <version>${ver}</version>
   </parent>
+  <groupId>org.apache.maven.its.mng624</groupId>
+  <artifactId>child1</artifactId>
+  <packaging>jar</packaging>
+  <name>mng624 child1</name>
 
 </project>

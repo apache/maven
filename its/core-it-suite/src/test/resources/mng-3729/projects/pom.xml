@@ -17,26 +17,26 @@
         <version>1</version>
         <executions>
           <execution>
-            <inherited>false</inherited>
             <id>fork1</id>
-            <phase>initialize</phase>
             <goals>
               <goal>fork1</goal>
             </goals>
+            <phase>initialize</phase>
+            <inherited>false</inherited>
           </execution>
           <execution>
             <id>fork2</id>
-            <phase>initialize</phase>
             <goals>
               <goal>fork2</goal>
             </goals>
+            <phase>initialize</phase>
           </execution>
           <execution>
             <id>plain-goal</id>
-            <phase>compile</phase>
             <goals>
               <goal>plain1</goal>
             </goals>
+            <phase>compile</phase>
           </execution>
         </executions>
       </plugin>

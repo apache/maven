@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,10 +25,8 @@ under the License.
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-3092</name>
-  <description>
-    Verify that snapshots are not included in version ranges unless explicitly declared as the lower/upper bound
-    of the range.
-  </description>
+  <description>Verify that snapshots are not included in version ranges unless explicitly declared as the lower/upper bound
+    of the range.</description>
 
   <dependencies>
     <dependency>
@@ -63,10 +59,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

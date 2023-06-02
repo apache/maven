@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -31,8 +29,6 @@ under the License.
   <artifactId>sub-a</artifactId>
 
   <name>Maven Integration Test :: MNG-2363 :: Sub-A</name>
-  <description>
-    Test that the file-based profile activator resolves relative paths against the current project's base directory
-    and also interpolates ${basedir} if explicitly given, just like usual for other parts of the POM.
-  </description>
+  <description>Test that the file-based profile activator resolves relative paths against the current project's base directory
+    and also interpolates ${basedir} if explicitly given, just like usual for other parts of the POM.</description>
 </project>

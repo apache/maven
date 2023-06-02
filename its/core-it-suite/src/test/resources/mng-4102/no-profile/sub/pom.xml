@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -34,10 +32,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4102 :: Child</name>
-  <description>
-    Verify that the effective value of an inherited property reflects the values of any nested property
-    as defined by the child. This boils down to the order of inheritance and (parent) interpolation.
-  </description>
+  <description>Verify that the effective value of an inherited property reflects the values of any nested property
+    as defined by the child. This boils down to the order of inheritance and (parent) interpolation.</description>
 
   <properties>
     <overridden>CHILD</overridden>
@@ -51,10 +47,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <outputFile>target/pom.properties</outputFile>
               <expressions>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,9 +26,7 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: it0144</name>
-  <description>
-    Test that the lifecycle phases execute in proper order.
-  </description>
+  <description>Test that the lifecycle phases execute in proper order.</description>
 
   <build>
     <plugins>
@@ -42,10 +38,10 @@ under the License.
           <!-- default lifecycle -->
           <execution>
             <id>validate</id>
-            <phase>validate</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>validate</string>
@@ -53,10 +49,10 @@ under the License.
           </execution>
           <execution>
             <id>initialize</id>
-            <phase>initialize</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>initialize</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>initialize</string>
@@ -64,10 +60,10 @@ under the License.
           </execution>
           <execution>
             <id>generate-sources</id>
-            <phase>generate-sources</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>generate-sources</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>generate-sources</string>
@@ -75,10 +71,10 @@ under the License.
           </execution>
           <execution>
             <id>process-sources</id>
-            <phase>process-sources</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>process-sources</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>process-sources</string>
@@ -86,10 +82,10 @@ under the License.
           </execution>
           <execution>
             <id>generate-resources</id>
-            <phase>generate-resources</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>generate-resources</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>generate-resources</string>
@@ -97,10 +93,10 @@ under the License.
           </execution>
           <execution>
             <id>process-resources</id>
-            <phase>process-resources</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>process-resources</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>process-resources</string>
@@ -108,10 +104,10 @@ under the License.
           </execution>
           <execution>
             <id>compile</id>
-            <phase>compile</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>compile</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>compile</string>
@@ -119,10 +115,10 @@ under the License.
           </execution>
           <execution>
             <id>process-classes</id>
-            <phase>process-classes</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>process-classes</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>process-classes</string>
@@ -130,10 +126,10 @@ under the License.
           </execution>
           <execution>
             <id>generate-test-sources</id>
-            <phase>generate-test-sources</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>generate-test-sources</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>generate-test-sources</string>
@@ -141,10 +137,10 @@ under the License.
           </execution>
           <execution>
             <id>process-test-sources</id>
-            <phase>process-test-sources</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>process-test-sources</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>process-test-sources</string>
@@ -152,10 +148,10 @@ under the License.
           </execution>
           <execution>
             <id>generate-test-resources</id>
-            <phase>generate-test-resources</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>generate-test-resources</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>generate-test-resources</string>
@@ -163,10 +159,10 @@ under the License.
           </execution>
           <execution>
             <id>process-test-resources</id>
-            <phase>process-test-resources</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>process-test-resources</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>process-test-resources</string>
@@ -174,10 +170,10 @@ under the License.
           </execution>
           <execution>
             <id>test-compile</id>
-            <phase>test-compile</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>test-compile</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>test-compile</string>
@@ -185,10 +181,10 @@ under the License.
           </execution>
           <execution>
             <id>process-test-classes</id>
-            <phase>process-test-classes</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>process-test-classes</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>process-test-classes</string>
@@ -196,10 +192,10 @@ under the License.
           </execution>
           <execution>
             <id>test</id>
-            <phase>test</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>test</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>test</string>
@@ -207,10 +203,10 @@ under the License.
           </execution>
           <execution>
             <id>prepare-package</id>
-            <phase>prepare-package</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>prepare-package</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>prepare-package</string>
@@ -218,10 +214,10 @@ under the License.
           </execution>
           <execution>
             <id>package</id>
-            <phase>package</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>package</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>package</string>
@@ -229,10 +225,10 @@ under the License.
           </execution>
           <execution>
             <id>pre-integration-test</id>
-            <phase>pre-integration-test</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>pre-integration-test</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>pre-integration-test</string>
@@ -240,10 +236,10 @@ under the License.
           </execution>
           <execution>
             <id>integration-test</id>
-            <phase>integration-test</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>integration-test</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>integration-test</string>
@@ -251,10 +247,10 @@ under the License.
           </execution>
           <execution>
             <id>post-integration-test</id>
-            <phase>post-integration-test</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>post-integration-test</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>post-integration-test</string>
@@ -262,10 +258,10 @@ under the License.
           </execution>
           <execution>
             <id>verify</id>
-            <phase>verify</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>verify</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>verify</string>
@@ -273,10 +269,10 @@ under the License.
           </execution>
           <execution>
             <id>install</id>
-            <phase>install</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>install</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>install</string>
@@ -284,10 +280,10 @@ under the License.
           </execution>
           <execution>
             <id>deploy</id>
-            <phase>deploy</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>deploy</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>deploy</string>
@@ -296,10 +292,10 @@ under the License.
           <!-- clean lifecycle -->
           <execution>
             <id>pre-clean</id>
-            <phase>pre-clean</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>pre-clean</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>pre-clean</string>
@@ -307,10 +303,10 @@ under the License.
           </execution>
           <execution>
             <id>clean</id>
-            <phase>clean</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>clean</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>clean</string>
@@ -318,10 +314,10 @@ under the License.
           </execution>
           <execution>
             <id>post-clean</id>
-            <phase>post-clean</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>post-clean</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>post-clean</string>
@@ -330,10 +326,10 @@ under the License.
           <!-- site lifecycle -->
           <execution>
             <id>pre-site</id>
-            <phase>pre-site</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>pre-site</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>pre-site</string>
@@ -341,10 +337,10 @@ under the License.
           </execution>
           <execution>
             <id>site</id>
-            <phase>site</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>site</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>site</string>
@@ -352,10 +348,10 @@ under the License.
           </execution>
           <execution>
             <id>post-site</id>
-            <phase>post-site</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>post-site</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>post-site</string>
@@ -363,10 +359,10 @@ under the License.
           </execution>
           <execution>
             <id>site-deploy</id>
-            <phase>site-deploy</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>site-deploy</phase>
             <configuration>
               <logFile>target/phases.log</logFile>
               <string>site-deploy</string>

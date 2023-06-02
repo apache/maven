@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-3979</name>
-  <description>
-    Test that during inheritance the merging/joining of subtrees with equal identifier doesn't crash if the parent
-    POM has a non-empty element and the child POM has an empty element to join.
-  </description>
+  <description>Test that during inheritance the merging/joining of subtrees with equal identifier doesn't crash if the parent
+    POM has a non-empty element and the child POM has an empty element to join.</description>
 
   <properties>
     <prop0>test</prop0>
@@ -39,14 +35,14 @@ under the License.
 
   <repositories>
     <repository>
-      <id>equal-repo-id</id>
-      <url>http://maven.apache.org/null</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
       <releases>
         <checksumPolicy>ignore</checksumPolicy>
       </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>equal-repo-id</id>
+      <url>http://maven.apache.org/null</url>
     </repository>
   </repositories>
 
@@ -59,10 +55,10 @@ under the License.
         <executions>
           <execution>
             <id>equal-build-exec-id</id>
-            <phase>initialize</phase>
             <goals>
               <goal>reset</goal>
             </goals>
+            <phase>initialize</phase>
             <configuration>
               <logFile>target/exec.log</logFile>
               <string>test</string>

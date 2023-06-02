@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,11 +25,9 @@ under the License.
   <version>1.0-SNAPSHOT</version>
 
   <name>Maven Integration Test :: MNG-4328</name>
-  <description>
-    Verify that plugin parameters that are of primitive types like boolean (not java.lang.Boolean) can be populated
+  <description>Verify that plugin parameters that are of primitive types like boolean (not java.lang.Boolean) can be populated
     from expressions. In other words, the subtle difference between the runtime type of the expression value (which
-    will always be a primitive wrapper class due to reflection) and the actual parameter type should not matter.
-  </description>
+    will always be a primitive wrapper class due to reflection) and the actual parameter type should not matter.</description>
 
   <build>
     <plugins>
@@ -42,10 +38,10 @@ under the License.
         <executions>
           <execution>
             <id>test-1</id>
-            <phase>validate</phase>
             <goals>
               <goal>config</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <propertiesFile>target/config1.properties</propertiesFile>
               <primitiveBooleanParam>${settings.offline}</primitiveBooleanParam>
@@ -53,10 +49,10 @@ under the License.
           </execution>
           <execution>
             <id>test-2</id>
-            <phase>validate</phase>
             <goals>
               <goal>config</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <propertiesFile>target/config2.properties</propertiesFile>
               <primitiveBooleanParam>${project.executionRoot}</primitiveBooleanParam>

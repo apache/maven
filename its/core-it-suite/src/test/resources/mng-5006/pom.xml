@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,12 +26,10 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-5006</name>
-  <description>
-    Verify that resolution of parent POMs of dependencies that use a version range is not restricted to the
+  <description>Verify that resolution of parent POMs of dependencies that use a version range is not restricted to the
     repository from which the specific dependency version was picked. Or put differently, the fact that a:0.1
     was found in repo-1 does not mean parents/dependencies of a:0.1 are also located in that same repo, they
-    could be in any of the originally declared repos.
-  </description>
+    could be in any of the originally declared repos.</description>
 
   <dependencies>
     <dependency>
@@ -58,10 +54,10 @@ under the License.
         <executions>
           <execution>
             <id>resolve</id>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?><project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.its.mng3703</groupId>
   <artifactId>project</artifactId>
-  <name>project</name>
   <version>1</version>
+  <name>project</name>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>
@@ -31,10 +32,10 @@
         <executions>
           <execution>
             <id>test</id>
-            <phase>package</phase>
             <goals>
               <goal>check</goal>
             </goals>
+            <phase>package</phase>
           </execution>
         </executions>
       </plugin>

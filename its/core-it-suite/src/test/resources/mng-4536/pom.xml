@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,9 +26,7 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-4536</name>
-  <description>
-    Test that forking mojos that require no project only fork the current project and not the entire reactor.
-  </description>
+  <description>Test that forking mojos that require no project only fork the current project and not the entire reactor.</description>
 
   <modules>
     <module>mod-a</module>
@@ -46,10 +42,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>generate-sources</phase>
             <goals>
               <goal>fork-lifecycle-no-project</goal>
             </goals>
+            <phase>generate-sources</phase>
           </execution>
         </executions>
       </plugin>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,9 +26,7 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-3846</name>
-  <description>
-    Test that inheritance of certain URLs automatically appends the child's artifact id.
-  </description>
+  <description>Test that inheritance of certain URLs automatically appends the child's artifact id.</description>
 
   <url>http://parent.url</url>
   <organization>
@@ -46,9 +42,9 @@ under the License.
   </licenses>
 
   <scm>
-    <url>http://parent.url/viewvc</url>
     <connection>http://parent.url/scm</connection>
     <developerConnection>https://parent.url/scm</developerConnection>
+    <url>http://parent.url/viewvc</url>
   </scm>
   <issueManagement>
     <url>http://parent.url/issues</url>
@@ -58,16 +54,16 @@ under the License.
   </ciManagement>
   <distributionManagement>
     <repository>
-      <url>http://parent.url/dist</url>
       <id>parent.distros</id>
+      <url>http://parent.url/dist</url>
     </repository>
     <snapshotRepository>
-      <url>http://parent.url/snaps</url>
       <id>parent.snaps</id>
+      <url>http://parent.url/snaps</url>
     </snapshotRepository>
     <site>
-      <url>http://parent.url/site</url>
       <id>parent.site</id>
+      <url>http://parent.url/site</url>
     </site>
     <downloadUrl>http://parent.url/download</downloadUrl>
   </distributionManagement>

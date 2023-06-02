@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -29,16 +27,14 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-3892</name>
-  <description>
-    Test that a bunch of release artifacts can be deployed without the deployer erroneously complaining about
-    already deployed artifacts.
-  </description>
+  <description>Test that a bunch of release artifacts can be deployed without the deployer erroneously complaining about
+    already deployed artifacts.</description>
 
   <distributionManagement>
     <repository>
+      <uniqueVersion>true</uniqueVersion>
       <id>maven-core-it</id>
       <url>file:///${basedir}/repo</url>
-      <uniqueVersion>true</uniqueVersion>
     </repository>
   </distributionManagement>
 
@@ -51,13 +47,6 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
-            <configuration>
-              <mainFile>jars/main.jar</mainFile>
-              <attachedFile>jars/attached.jar</attachedFile>
-              <artifactType>jar</artifactType>
-              <artifactClassifier>it</artifactClassifier>
-            </configuration>
             <goals>
               <goal>set</goal>
               <goal>attach</goal>
@@ -66,6 +55,13 @@ under the License.
               <goal>install</goal>
               <goal>deploy</goal>
             </goals>
+            <phase>validate</phase>
+            <configuration>
+              <mainFile>jars/main.jar</mainFile>
+              <attachedFile>jars/attached.jar</attachedFile>
+              <artifactType>jar</artifactType>
+              <artifactClassifier>it</artifactClassifier>
+            </configuration>
           </execution>
         </executions>
       </plugin>

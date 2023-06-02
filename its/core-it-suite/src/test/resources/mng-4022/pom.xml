@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,10 +25,8 @@ under the License.
   <version>1</version>
 
   <name>Maven Integration Test :: MNG-4022</name>
-  <description>
-    Test that merging of equal plugin configuration is idempotent. This is especially interesting for lists with
-    empty elements.
-  </description>
+  <description>Test that merging of equal plugin configuration is idempotent. This is especially interesting for lists with
+    empty elements.</description>
 
   <build>
     <plugins>
@@ -43,10 +39,10 @@ under the License.
         </configuration>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>config</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>
@@ -66,11 +62,11 @@ under the License.
             <configuration>
               <!-- NOTE: It's crucial to have the first and last list item be empty -->
               <stringParams>
-                <stringParam/>
+                <stringParam />
                 <stringParam>one</stringParam>
-                <stringParam/>
+                <stringParam />
                 <stringParam>two</stringParam>
-                <stringParam/>
+                <stringParam />
               </stringParams>
             </configuration>
           </plugin>
@@ -88,11 +84,11 @@ under the License.
             <configuration>
               <!-- NOTE: It's crucial to have the first and last list item be empty -->
               <stringParams>
-                <stringParam/>
+                <stringParam />
                 <stringParam>one</stringParam>
-                <stringParam/>
+                <stringParam />
                 <stringParam>two</stringParam>
-                <stringParam/>
+                <stringParam />
               </stringParams>
             </configuration>
           </plugin>

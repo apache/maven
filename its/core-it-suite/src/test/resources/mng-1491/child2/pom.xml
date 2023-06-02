@@ -1,10 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?><project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>parent</artifactId>
     <groupId>org.apache.maven.its.mng1491</groupId>
+    <artifactId>parent</artifactId>
     <version>1</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
 
   <artifactId>child</artifactId>
 </project>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,8 +26,6 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-4317</name>
-  <description>
-    Verify that the g:a level metadata files from different repositories are properly merged when trying to resolve
-    a version for some plugin that was invoked with g:a:goal.
-  </description>
+  <description>Verify that the g:a level metadata files from different repositories are properly merged when trying to resolve
+    a version for some plugin that was invoked with g:a:goal.</description>
 </project>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,9 +25,7 @@ under the License.
   <version>1.0</version>
 
   <name>Maven Integration Test :: MNG-3586</name>
-  <description>
-    Test that plugin dependencies with scope system are part of the plugin class realm.
-  </description>
+  <description>Test that plugin dependencies with scope system are part of the plugin class realm.</description>
 
   <build>
     <plugins>
@@ -49,14 +45,14 @@ under the License.
         <executions>
           <execution>
             <id>load</id>
+            <goals>
+              <goal>load</goal>
+            </goals>
             <phase>validate</phase>
             <configuration>
               <resourcePaths>maven-core-it.properties</resourcePaths>
               <pluginClassLoaderOutput>target/pcl.properties</pluginClassLoaderOutput>
             </configuration>
-            <goals>
-              <goal>load</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

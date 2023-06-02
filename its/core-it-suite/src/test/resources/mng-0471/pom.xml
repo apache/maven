@@ -1,11 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: it0027</name>
   <groupId>org.apache.maven.its.it0027</groupId>
   <artifactId>maven-it-it0027</artifactId>
-  <description>Test @execute with a custom lifecycle, including configuration</description>
-  <packaging>jar</packaging>
   <version>1.0</version>
+  <packaging>jar</packaging>
+  <name>Maven Integration Test :: it0027</name>
+  <description>Test @execute with a custom lifecycle, including configuration</description>
 
   <build>
     <plugins>

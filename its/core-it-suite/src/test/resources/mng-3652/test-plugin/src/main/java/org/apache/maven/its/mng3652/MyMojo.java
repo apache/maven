@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.maven.its.mng3652;
 
 import java.io.File;
@@ -17,8 +35,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.wagon.ResourceDoesNotExistException;
-import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 
@@ -32,11 +48,9 @@ import org.codehaus.plexus.util.IOUtil;
  *
  * @phase validate
  */
-public class MyMojo
-    extends AbstractMojo
-{
+public class MyMojo extends AbstractMojo {
 
-    private static final String LS = System.getProperty( "line.separator" );
+    private static final String LS = System.getProperty("line.separator");
 
     /**
      * @parameter default-value="${project.build.directory}/touch.txt"
@@ -87,102 +101,83 @@ public class MyMojo
      */
     private File localRepoDir;
 
-    public void execute()
-        throws MojoExecutionException
-    {
+    public void execute() throws MojoExecutionException {
         ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy();
-        policy.setChecksumPolicy( ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
-        policy.setUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
-        policy.setEnabled( true );
+        policy.setChecksumPolicy(ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE);
+        policy.setUpdatePolicy(ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS);
+        policy.setEnabled(true);
 
-        ArtifactRepository remote =
-            repositoryFactory.createArtifactRepository( "test", testProtocol + "://localhost:" + testPort, layout,
-                                                        policy, policy );
+        ArtifactRepository remote = repositoryFactory.createArtifactRepository(
+                "test", testProtocol + "://localhost:" + testPort, layout, policy, policy);
 
-        Artifact artifact = artifactFactory.createArtifact( "bad.group", "missing-artifact", "1", null, "jar" );
+        Artifact artifact = artifactFactory.createArtifact("bad.group", "missing-artifact", "1", null, "jar");
 
-        try
-        {
-            FileUtils.deleteDirectory( localRepoDir );
+        try {
+            FileUtils.deleteDirectory(localRepoDir);
 
-            ArtifactRepository local =
-                repositoryFactory.createArtifactRepository( "local", localRepoDir.toURL().toExternalForm(), layout,
-                                                            null, null );
+            ArtifactRepository local = repositoryFactory.createArtifactRepository(
+                    "local", localRepoDir.toURL().toExternalForm(), layout, null, null);
 
-            getLog().info( "Retrieving " + artifact + " from " + remote + " to " + local );
+            getLog().info("Retrieving " + artifact + " from " + remote + " to " + local);
 
-            resolver.resolveAlways( artifact, Collections.singletonList( remote ), local );
-        }
-        catch ( Exception e )
-        {
-            throw new MojoExecutionException( e.getMessage(), e );
+            resolver.resolveAlways(artifact, Collections.singletonList(remote), local);
+        } catch (Exception e) {
+            throw new MojoExecutionException(e.getMessage(), e);
         }
 
         // consistency check to see that we actually spoke to the test server, helpful for debugging if
         // the test fails
-        try
-        {
-            String content = FileUtils.fileRead( artifact.getFile() ).trim();
-            if ( !content.equals( "some content" ) )
-            {
-                throw new MojoExecutionException( "Expected 'some content' but was '" + content + "'" );
+        try {
+            String content = FileUtils.fileRead(artifact.getFile()).trim();
+            if (!content.equals("some content")) {
+                throw new MojoExecutionException("Expected 'some content' but was '" + content + "'");
             }
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( e.getMessage(), e );
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
         }
 
         String artifactVersion;
         InputStream resourceAsStream = null;
-        try
-        {
+        try {
             Properties properties = new Properties();
-            resourceAsStream = Artifact.class.getClassLoader().getResourceAsStream( "META-INF/maven/org.apache.maven/maven-artifact/pom.properties" );
-            if ( resourceAsStream == null )
-            {
-                resourceAsStream = Artifact.class.getClassLoader().getResourceAsStream( "META-INF/maven/org.apache.maven.artifact/maven-artifact/pom.properties" );
+            resourceAsStream = Artifact.class
+                    .getClassLoader()
+                    .getResourceAsStream("META-INF/maven/org.apache.maven/maven-artifact/pom.properties");
+            if (resourceAsStream == null) {
+                resourceAsStream = Artifact.class
+                        .getClassLoader()
+                        .getResourceAsStream("META-INF/maven/org.apache.maven.artifact/maven-artifact/pom.properties");
             }
-            properties.load( resourceAsStream );
+            properties.load(resourceAsStream);
 
-            artifactVersion = properties.getProperty( "version" );
-            if ( artifactVersion == null )
-            {
-                throw new MojoExecutionException( "Artifact version not found" );
+            artifactVersion = properties.getProperty("version");
+            if (artifactVersion == null) {
+                throw new MojoExecutionException("Artifact version not found");
             }
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Unable to read properties file from maven-core", e );
-        }
-        finally
-        {
-            IOUtil.close( resourceAsStream );
+        } catch (IOException e) {
+            throw new MojoExecutionException("Unable to read properties file from maven-core", e);
+        } finally {
+            IOUtil.close(resourceAsStream);
         }
 
         FileWriter w = null;
-        try
-        {
+        try {
             touchFile.getParentFile().mkdirs();
-            w = new FileWriter( touchFile );
+            w = new FileWriter(touchFile);
 
-            w.write( runtimeInformation.getApplicationVersion().toString() );
-            w.write( LS );
-            w.write( System.getProperty( "java.version" ) );
-            w.write( LS );
-            w.write( System.getProperty( "os.name" ) );
-            w.write( LS );
-            w.write( System.getProperty( "os.version" ) );
-            w.write( LS );
-            w.write( artifactVersion );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Failed to write touch-file: " + touchFile, e );
-        }
-        finally
-        {
-            IOUtil.close( w );
+            w.write(runtimeInformation.getApplicationVersion().toString());
+            w.write(LS);
+            w.write(System.getProperty("java.version"));
+            w.write(LS);
+            w.write(System.getProperty("os.name"));
+            w.write(LS);
+            w.write(System.getProperty("os.version"));
+            w.write(LS);
+            w.write(artifactVersion);
+        } catch (IOException e) {
+            throw new MojoExecutionException("Failed to write touch-file: " + touchFile, e);
+        } finally {
+            IOUtil.close(w);
         }
     }
 }

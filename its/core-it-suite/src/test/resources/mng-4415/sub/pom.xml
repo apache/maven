@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -33,12 +31,10 @@ under the License.
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-4415</name>
-  <description>
-    Test that merging of plugins during inheritance follows these rules regarding ordering:
-     parent: X ->      A -> B ->      D -> E
-     child:       Y -> A ->      C -> D ->      F
-     result: X -> Y -> A -> B -> C -> D -> E -> F
-  </description>
+  <description>Test that merging of plugins during inheritance follows these rules regarding ordering:
+     parent: X -&gt;      A -&gt; B -&gt;      D -&gt; E
+     child:       Y -&gt; A -&gt;      C -&gt; D -&gt;      F
+     result: X -&gt; Y -&gt; A -&gt; B -&gt; C -&gt; D -&gt; E -&gt; F</description>
 
   <build>
     <plugins>
@@ -62,10 +58,10 @@ under the License.
         <executions>
           <execution>
             <id>first</id>
-            <phase>validate</phase>
             <goals>
               <goal>reset</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>
@@ -82,10 +78,10 @@ under the License.
         <executions>
           <execution>
             <id>second</id>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -30,9 +28,12 @@ under the License.
   <name>Maven Integration Test :: it0012</name>
   <description>Test simple POM interpolation</description>
 
+  <modules>
+    <module>child-project</module>
+  </modules>
+
   <properties>
-    <test>
-POM content (available with 2 prefixes):
+    <test>POM content (available with 2 prefixes):
   project.version: ${project.version}
   version: ${version}
 
@@ -62,20 +63,15 @@ environment properties (available with 2 prefixes):
 Not replaced:
   baseUri (not supported): ${baseUri}
   any.undefined.property: ${any.undefined.property}
-  settings.localRepository: ${settings.localRepository} (only replaced during parameter expression evaluation)
-    </test>
+  settings.localRepository: ${settings.localRepository} (only replaced during parameter expression evaluation)</test>
     <any.property>any value</any.property>
   </properties>
-
-  <modules>
-    <module>child-project</module>
-  </modules>
 
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-it-plugin-touch</artifactId>
         <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-touch</artifactId>
         <version>2.1-SNAPSHOT</version>
         <configuration>
           <pluginFile>touch-${project.version}.txt</pluginFile>

@@ -17,9 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng4270</groupId>
@@ -43,6 +41,9 @@ under the License.
         <artifactId>maven-it-plugin-extension1</artifactId>
         <version>2.1-SNAPSHOT</version>
 
+        <!-- SHOULD load the coreit-1 and coreit lifecycles/artifact-handlers -->
+        <extensions>true</extensions>
+
         <dependencies>
           <dependency>
             <groupId>org.apache.maven.its</groupId>
@@ -50,9 +51,6 @@ under the License.
             <version>2.1-SNAPSHOT</version>
           </dependency>
         </dependencies>
-
-        <!-- SHOULD load the coreit-1 and coreit lifecycles/artifact-handlers -->
-        <extensions>true</extensions>
       </plugin>
     </plugins>
   </build>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,12 +26,10 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-4233</name>
-  <description>
-    Verify that artifact instances created directly by plugins (i.e. via the artifact factory) can be resolved
+  <description>Verify that artifact instances created directly by plugins (i.e. via the artifact factory) can be resolved
     from the reactor. This case is a subtle variation of MNG-2877, namely not using @requiresDependencyResolution
     or artifact instances created by the Maven core. In short, reactor resolution should work for any artifact,
-    regardless whether created by the core or a plugin.
-  </description>
+    regardless whether created by the core or a plugin.</description>
 
   <modules>
     <module>producer</module>

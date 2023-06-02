@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng5868</groupId>
@@ -10,16 +10,24 @@
   <name>mng5338</name>
   <url>https://issues.apache.org/jira/browse/MNG-5868</url>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-
   <distributionManagement>
     <repository>
       <id>maven-core-it-mng-5868</id>
       <url>http://localhost:${deploymentPort}/repo</url>
     </repository>
   </distributionManagement>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
   <build>
     <pluginManagement>
@@ -47,10 +55,10 @@
         <executions>
           <execution>
             <id>attach-artifacts</id>
-            <phase>verify</phase>
             <goals>
               <goal>attach</goal>
             </goals>
+            <phase>verify</phase>
           </execution>
         </executions>
       </plugin>
@@ -67,10 +75,10 @@
             <executions>
               <execution>
                 <id>again-attach</id>
-                <phase>process-classes</phase>
                 <goals>
                   <goal>attach</goal>
                 </goals>
+                <phase>process-classes</phase>
               </execution>
             </executions>
           </plugin>
@@ -87,10 +95,10 @@
             <executions>
               <execution>
                 <id>and-again-attach</id>
-                <phase>process-sources</phase>
                 <goals>
                   <goal>attach</goal>
                 </goals>
+                <phase>process-sources</phase>
               </execution>
             </executions>
           </plugin>
@@ -98,13 +106,5 @@
       </build>
     </profile>
   </profiles>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.2</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
 
 </project>

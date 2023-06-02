@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,12 +25,10 @@ under the License.
   <version>1.0</version>
 
   <name>Maven Integration Test :: MNG-3890</name>
-  <description>
-    Test that transitive dependencies whose scope has been updated from "compile" to "provided" by a consumer
-    remain in "provided" scope when depending on this consumer with scope "compile".
-  </description>
+  <description>Test that transitive dependencies whose scope has been updated from "compile" to "provided" by a consumer
+    remain in "provided" scope when depending on this consumer with scope "compile".</description>
 
-<!-- Below are the dependency trees for the artifacts of this test with Maven 2.0.9:
+  <!-- Below are the dependency trees for the artifacts of this test with Maven 2.0.9:
 [INFO] ========================================================================
 [INFO] [dependency:tree]
 [INFO] org.apache.maven.its.mng3890:b:jar:0.1
@@ -69,13 +65,13 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
             <phase>validate</phase>
             <configuration>
               <testArtifacts>target/artifacts.txt</testArtifacts>
             </configuration>
-            <goals>
-              <goal>test</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

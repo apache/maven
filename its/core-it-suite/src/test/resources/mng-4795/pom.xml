@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-4795</name>
-  <description>
-    Test that reactor projects forked by an aggregator mojo bound to a lifecycle phase are subject to dependency
-    resolution as required by their respective build plugins.
-  </description>
+  <description>Test that reactor projects forked by an aggregator mojo bound to a lifecycle phase are subject to dependency
+    resolution as required by their respective build plugins.</description>
 
   <modules>
     <module>sub</module>
@@ -47,10 +43,10 @@ under the License.
         <executions>
           <execution>
             <id>fork-reactor</id>
-            <phase>process-sources</phase>
             <goals>
               <goal>fork-lifecycle-aggregator</goal>
             </goals>
+            <phase>process-sources</phase>
           </execution>
         </executions>
       </plugin>

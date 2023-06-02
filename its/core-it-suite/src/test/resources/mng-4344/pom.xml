@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,11 +26,9 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4344</name>
-  <description>
-    Test that custom executions from managed plugins which are part of the default lifecycle bindings get
+  <description>Test that custom executions from managed plugins which are part of the default lifecycle bindings get
     executed after executions from plugins that are defined in the regular build section and bound to the
-    same phase.
-  </description>
+    same phase.</description>
 
   <build>
     <pluginManagement>
@@ -45,10 +41,10 @@ under the License.
           <executions>
             <execution>
               <id>second</id>
-              <phase>validate</phase>
               <goals>
                 <goal>resources</goal>
               </goals>
+              <phase>validate</phase>
               <configuration>
                 <pathname>target/log.txt</pathname>
                 <message>second</message>
@@ -66,10 +62,10 @@ under the License.
         <executions>
           <execution>
             <id>first</id>
-            <phase>validate</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <logFile>target/log.txt</logFile>
               <string>first</string>

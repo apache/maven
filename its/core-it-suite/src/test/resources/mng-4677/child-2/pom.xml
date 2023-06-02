@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -34,9 +32,7 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4677 :: Child-2</name>
-  <description>
-    Verify that the plugin-level configuration is not inherited if inherited=false is set.
-  </description>
+  <description>Verify that the plugin-level configuration is not inherited if inherited=false is set.</description>
 
   <!-- NOTE: This module mentions the build plugin -->
   <build>

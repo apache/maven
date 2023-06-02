@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,12 +26,10 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4781</name>
-  <description>
-    Verify that deployment to a Nexus-like staging repository works. The subtle difference compared to an ordinary
+  <description>Verify that deployment to a Nexus-like staging repository works. The subtle difference compared to an ordinary
     HTTP/WebDAV server is that those staging repos yield a HTTP 400 (and not 404) for every GET request until a
     PUT request is made (which initializes the staging repo). The bottom line is that remote metadata must not be
-    requested before the first artifact is deployed.
-  </description>
+    requested before the first artifact is deployed.</description>
 
   <distributionManagement>
     <repository>
@@ -54,13 +50,13 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>set</goal>
               <goal>attach-pom</goal>
               <goal>install</goal>
               <goal>deploy</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

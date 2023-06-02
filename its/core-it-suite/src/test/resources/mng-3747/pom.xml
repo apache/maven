@@ -8,10 +8,8 @@
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-3747</name>
-  <description>
-    Test that expressions prefixed with "project.|pom." that reference build paths which are given as relative paths
-    in the POM are still interpolated with absolute paths when used in String-type plugin parameters.
-  </description>
+  <description>Test that expressions prefixed with "project.|pom." that reference build paths which are given as relative paths
+    in the POM are still interpolated with absolute paths when used in String-type plugin parameters.</description>
 
   <build>
     <!-- NOTE: Intentionally a relative path! -->
@@ -24,10 +22,10 @@
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>config</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <propertiesFile>target/config.properties</propertiesFile>
               <stringParam>path is: ${project.build.directory}/somepath</stringParam>

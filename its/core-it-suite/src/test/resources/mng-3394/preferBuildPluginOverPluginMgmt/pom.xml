@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng3394</groupId>
@@ -8,11 +8,9 @@
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-3394</name>
-  <description>
-    Test that the plugin version given in project/build/plugins overrides that in project/build/pluginManagement/plugins.
+  <description>Test that the plugin version given in project/build/plugins overrides that in project/build/pluginManagement/plugins.
     If this is correct, the clean plugin should find a valid version, and execute. Otherwise, the version 'invalid' is
-    used by Maven, and the clean plugin with that version cannot be resolved...so the build fails. Use `mvn clean` to test.
-  </description>
+    used by Maven, and the clean plugin with that version cannot be resolved...so the build fails. Use `mvn clean` to test.</description>
 
   <build>
     <pluginManagement>

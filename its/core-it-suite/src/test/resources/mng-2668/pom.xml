@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -8,9 +8,7 @@
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-2539</name>
-  <description>
-    Verify that dependencies of plugins are considered by the project sorter for a reactor build.
-  </description>
+  <description>Verify that dependencies of plugins are considered by the project sorter for a reactor build.</description>
 
   <modules>
     <!-- NOTE: project goes first but the project sorter should recognize that tools needs to be build first -->

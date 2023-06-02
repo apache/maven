@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,51 +25,9 @@ under the License.
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-4190</name>
-  <description>
-    Test that artifact repositories are merged if they are mirrored by the same repo. If n repos map to one
+  <description>Test that artifact repositories are merged if they are mirrored by the same repo. If n repos map to one
     mirror, there is no point in making n trips to the same mirror. However, the effective/merged repo needs
-    to account for possibly different policies of the original repos.
-  </description>
-
-  <repositories>
-    <repository>
-      <id>repo-4</id>
-      <url>file:///mng-4190/4</url>
-      <releases>
-        <enabled>true</enabled>
-        <checksumPolicy>fail</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-        <checksumPolicy>fail</checksumPolicy>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>repo-5</id>
-      <url>file:///mng-4190/5</url>
-      <releases>
-        <enabled>true</enabled>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-        <checksumPolicy>ignore</checksumPolicy>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>repo-6</id>
-      <url>file:///mng-4190/6</url>
-      <releases>
-        <enabled>false</enabled>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <checksumPolicy>ignore</checksumPolicy>
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
-    </repository>
-  </repositories>
+    to account for possibly different policies of the original repos.</description>
 
   <dependencies>
     <dependency>
@@ -86,6 +42,46 @@ under the License.
     </dependency>
   </dependencies>
 
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+        <checksumPolicy>fail</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+        <checksumPolicy>fail</checksumPolicy>
+      </snapshots>
+      <id>repo-4</id>
+      <url>file:///mng-4190/4</url>
+    </repository>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+        <checksumPolicy>ignore</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+        <checksumPolicy>ignore</checksumPolicy>
+      </snapshots>
+      <id>repo-5</id>
+      <url>file:///mng-4190/5</url>
+    </repository>
+    <repository>
+      <releases>
+        <enabled>false</enabled>
+        <checksumPolicy>ignore</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>ignore</checksumPolicy>
+      </snapshots>
+      <id>repo-6</id>
+      <url>file:///mng-4190/6</url>
+    </repository>
+  </repositories>
+
   <build>
     <plugins>
       <plugin>
@@ -95,13 +91,13 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
             <phase>validate</phase>
             <configuration>
               <projectArtifacts>target/artifacts.txt</projectArtifacts>
             </configuration>
-            <goals>
-              <goal>test</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>
@@ -112,6 +108,9 @@ under the License.
         <executions>
           <execution>
             <id>dump</id>
+            <goals>
+              <goal>eval</goal>
+            </goals>
             <phase>validate</phase>
             <configuration>
               <outputFile>target/repo.properties</outputFile>
@@ -119,9 +118,6 @@ under the License.
                 <expression>project/remoteArtifactRepositories</expression>
               </expressions>
             </configuration>
-            <goals>
-              <goal>eval</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

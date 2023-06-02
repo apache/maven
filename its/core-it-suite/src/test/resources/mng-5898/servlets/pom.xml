@@ -1,17 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
-   <modelVersion>4.0.0</modelVersion>
-   <groupId>root.project</groupId>
-   <artifactId>servlets</artifactId>
-   <packaging>pom</packaging>
-   <name>servlets</name>
-   <version>1.0</version>
-   <parent>
-      <groupId>root</groupId>
-      <artifactId>project</artifactId>
-      <version>1.0</version>
-   </parent>
-   <modules>
-      <module>servlet</module>
-   </modules>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>root</groupId>
+    <artifactId>project</artifactId>
+    <version>1.0</version>
+  </parent>
+  <groupId>root.project</groupId>
+  <artifactId>servlets</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+  <name>servlets</name>
+  <modules>
+    <module>servlet</module>
+  </modules>
 </project>
-

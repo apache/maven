@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,9 +25,7 @@ under the License.
   <version>1.0</version>
 
   <name>Maven Integration Test :: MNG-1995</name>
-  <description>
-    Verify that POM fields that are of type boolean can be interpolated with expressions.
-  </description>
+  <description>Verify that POM fields that are of type boolean can be interpolated with expressions.</description>
 
   <properties>
     <filter.resources>true</filter.resources>
@@ -38,21 +34,21 @@ under the License.
 
   <repositories>
     <repository>
-      <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
       <releases>
         <!-- That's the boolean POM field we would like to interpolate -->
         <enabled>${releasesEnabled}</enabled>
       </releases>
+      <id>maven-core-it</id>
+      <url>file:///${basedir}/repo</url>
     </repository>
   </repositories>
 
   <build>
     <resources>
       <resource>
-        <directory>src/main/resources</directory>
         <!-- That's the boolean POM field we would like to interpolate -->
         <filtering>${filter.resources}</filtering>
+        <directory>src/main/resources</directory>
       </resource>
     </resources>
     <plugins>
@@ -70,10 +66,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

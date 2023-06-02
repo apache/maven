@@ -1,12 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>mng624 simple child</name>
-  <artifactId>child</artifactId>
-  <packaging>jar</packaging>
   <parent>
     <groupId>org.apache.maven.its.mng624.simple</groupId>
     <artifactId>myproject</artifactId>
   </parent>
+  <artifactId>child</artifactId>
+  <packaging>jar</packaging>
+  <name>mng624 simple child</name>
 
   <profiles>
     <profile>
@@ -17,8 +18,10 @@
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
               <execution>
+                <goals>
+                  <goal>run</goal>
+                </goals>
                 <phase>install</phase>
-                <goals><goal>run</goal></goals>
                 <configuration>
                   <target>
                     <echo>hello world</echo>

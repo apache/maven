@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -34,11 +32,9 @@ under the License.
   <version>0.1-SNAPSHOT</version>
 
   <name>Maven Integration Test :: MNG-3133 :: Child</name>
-  <description>
-    Verify that URL normalization does not happen before interpolation which would result in invalid
+  <description>Verify that URL normalization does not happen before interpolation which would result in invalid
     inherited URLs for project layouts where the parent resides in a sibling directory of the child
-    and expressions are used for the parent URLs ("${expression}/../foo" -> "foo").
-  </description>
+    and expressions are used for the parent URLs ("${expression}/../foo" -&gt; "foo").</description>
 
   <properties>
     <!-- these check that the normalized URL is already available during interpolation -->
@@ -67,10 +63,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4955 :: Dependency</name>
-  <description>
-    Verify that dependency resolution prefers newer local snapshots over outdated remote snapshots that use the new
-    metadata format.
-  </description>
+  <description>Verify that dependency resolution prefers newer local snapshots over outdated remote snapshots that use the new
+    metadata format.</description>
 
   <build>
     <plugins>
@@ -42,12 +38,12 @@ under the License.
         <executions>
           <execution>
             <id>install</id>
-            <phase>validate</phase>
             <goals>
               <goal>set</goal>
               <goal>attach-pom</goal>
               <goal>install</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <mainFile>dep.jar</mainFile>
             </configuration>

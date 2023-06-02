@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,10 +25,8 @@ under the License.
   <version>0.1</version>
 
   <name>Maven Integration Test :: it-0146</name>
-  <description>
-    Verify that download remote snapshot are correctly installed locally via Installer with timestamped name.
-    see issue related in this thread: http://mail-archives.apache.org/mod_mbox/maven-dev/201112.mbox/%3cCAPCjjnHjsQED0tzUztwWtQcSpYVN_k0-0Xq2B7QxTN5arZ-xzA@mail.gmail.com%3e
-  </description>
+  <description>Verify that download remote snapshot are correctly installed locally via Installer with timestamped name.
+    see issue related in this thread: http://mail-archives.apache.org/mod_mbox/maven-dev/201112.mbox/%3cCAPCjjnHjsQED0tzUztwWtQcSpYVN_k0-0Xq2B7QxTN5arZ-xzA@mail.gmail.com%3e</description>
 
   <dependencies>
     <dependency>
@@ -49,10 +45,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>install-artifacts</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

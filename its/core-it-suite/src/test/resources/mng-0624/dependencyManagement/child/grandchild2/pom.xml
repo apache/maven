@@ -1,10 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>grandchild2</name>
-  <artifactId>grandchild2</artifactId>
-  <packaging>jar</packaging>
   <parent>
     <groupId>org.apache.maven.its.mng624.depmgmt</groupId>
     <artifactId>child</artifactId>
   </parent>
+  <artifactId>grandchild2</artifactId>
+  <packaging>jar</packaging>
+  <name>grandchild2</name>
 </project>

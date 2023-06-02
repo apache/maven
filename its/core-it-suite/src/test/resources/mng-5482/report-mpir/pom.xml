@@ -14,10 +14,10 @@
         <executions>
           <execution>
             <id>trigger-error</id>
-            <phase>validate</phase>
             <goals>
               <goal>site</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

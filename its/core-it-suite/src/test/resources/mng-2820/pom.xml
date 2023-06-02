@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,13 +17,10 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <!-- DOCUMENT-COMMENT-PRE-1 -->
-
 <!--
 DOCUMENT-COMMENT-PRE-2
 -->
-
 <project>
   <!-- MODEL-COMMENT -->
   <modelVersion>4.0.0</modelVersion>
@@ -57,25 +53,23 @@ DOCUMENT-COMMENT-PRE-2
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
-            <configuration>
-              <mainFile>main.jar</mainFile>
-            </configuration>
             <goals>
               <goal>set</goal>
               <goal>attach-pom</goal>
               <goal>install</goal>
               <goal>deploy</goal>
             </goals>
+            <phase>validate</phase>
+            <configuration>
+              <mainFile>main.jar</mainFile>
+            </configuration>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
 </project>
-
 <!-- DOCUMENT-COMMENT-POST-1 -->
-
 <!--
 DOCUMENT-COMMENT-POST-2
 -->

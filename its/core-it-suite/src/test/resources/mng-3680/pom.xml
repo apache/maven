@@ -1,16 +1,14 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng3680</groupId>
   <artifactId>test</artifactId>
-  <packaging>jar</packaging>
   <version>1</version>
+  <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-3680</name>
-  <description>
-    Verify that dependencies with invalid POMs can still be used without failing the build.
-  </description>
+  <description>Verify that dependencies with invalid POMs can still be used without failing the build.</description>
 
   <dependencies>
     <dependency>
@@ -30,13 +28,13 @@
         <executions>
           <execution>
             <id>test</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
             <phase>validate</phase>
             <configuration>
               <testArtifacts>target/artifacts.txt</testArtifacts>
             </configuration>
-            <goals>
-              <goal>test</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

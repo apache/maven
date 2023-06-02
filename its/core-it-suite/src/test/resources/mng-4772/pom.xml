@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,8 +25,6 @@ under the License.
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-4772</name>
-  <description>
-    Verify that repositories which have both releases and snapshots disabled aren't touched when looking for
-    the latest plugin version.
-  </description>
+  <description>Verify that repositories which have both releases and snapshots disabled aren't touched when looking for
+    the latest plugin version.</description>
 </project>

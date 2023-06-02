@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,8 +26,6 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-449</name>
-  <description>
-    Verify that versions for plugins are automatically resolved if not given in the POM by checking first LATEST and
-    then RELEASE in the repo metadata.
-  </description>
+  <description>Verify that versions for plugins are automatically resolved if not given in the POM by checking first LATEST and
+    then RELEASE in the repo metadata.</description>
 </project>

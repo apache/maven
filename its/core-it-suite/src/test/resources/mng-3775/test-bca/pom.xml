@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,11 +26,9 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-3775</name>
-  <description>
-    Verify that conflict resolution doesn't select nodes which are children of eventually disabled nodes.
+  <description>Verify that conflict resolution doesn't select nodes which are children of eventually disabled nodes.
     In other words, when a subtree gets disabled, all previously selected winners among the children need to
-    be revised.
-  </description>
+    be revised.</description>
 
   <dependencies>
     <!--
@@ -86,11 +82,11 @@ under the License.
         <executions>
           <execution>
             <id>resolve</id>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
               <goal>test</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

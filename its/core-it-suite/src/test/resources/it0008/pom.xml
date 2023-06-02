@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,12 +26,10 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: it0008</name>
-  <description>
-    Simple goal decoration where a plugin binds to a phase and the plugin must
+  <description>Simple goal decoration where a plugin binds to a phase and the plugin must
     be downloaded from a remote repository before it can be executed. This
     test also checks to make sure that mojo parameters are aligned to the
-    project basedir when their type is "java.io.File".
-  </description>
+    project basedir when their type is "java.io.File".</description>
 
   <build>
     <plugins>

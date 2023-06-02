@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,9 +26,7 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-2103 :: Parent</name>
-  <description>
-    Verify that the plugin-level inherited flag can be overridden by the execution-level flag.
-  </description>
+  <description>Verify that the plugin-level inherited flag can be overridden by the execution-level flag.</description>
 
   <modules>
     <module>child-1</module>
@@ -48,12 +44,12 @@ under the License.
         <executions>
           <execution>
             <id>inherited</id>
-            <!-- this should override the plugin-level setting -->
-            <inherited>true</inherited>
-            <phase>validate</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>validate</phase>
+            <!-- this should override the plugin-level setting -->
+            <inherited>true</inherited>
             <configuration>
               <logFile>target/log.txt</logFile>
               <string>inherited</string>
@@ -61,11 +57,11 @@ under the License.
           </execution>
           <execution>
             <id>not-inherited</id>
-            <!-- should use plugin-level setting, i.e. inherited=false -->
-            <phase>validate</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <!-- should use plugin-level setting, i.e. inherited=false -->
+            <phase>validate</phase>
             <configuration>
               <logFile>target/log.txt</logFile>
               <string>not-inherited</string>

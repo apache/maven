@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,10 +25,8 @@ under the License.
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-4379</name>
-  <description>
-    Test that the path of a system-scope dependency gets interpolated using environment variables during
-    transitive dependency resolution.
-  </description>
+  <description>Test that the path of a system-scope dependency gets interpolated using environment variables during
+    transitive dependency resolution.</description>
 
   <dependencies>
     <dependency>
@@ -54,10 +50,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

@@ -2,10 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-        <artifactId>projects</artifactId>
-        <groupId>org.apache.maven.its.mng3723</groupId>
-        <version>1</version>
-    </parent>
+    <groupId>org.apache.maven.its.mng3723</groupId>
+    <artifactId>projects</artifactId>
+    <version>1</version>
+  </parent>
   <groupId>org.apache.maven.its.mng3723</groupId>
   <artifactId>child</artifactId>
   <version>1</version>
@@ -20,10 +20,10 @@
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>run</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

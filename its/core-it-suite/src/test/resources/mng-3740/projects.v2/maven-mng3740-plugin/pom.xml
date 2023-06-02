@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.maven.its.mng3740</groupId>
@@ -7,8 +8,8 @@
   </parent>
   <groupId>org.apache.maven.its.mng3740</groupId>
   <artifactId>mavenit-mng3740-plugin</artifactId>
-  <packaging>maven-plugin</packaging>
   <version>2</version>
+  <packaging>maven-plugin</packaging>
 
   <dependencies>
     <dependency>

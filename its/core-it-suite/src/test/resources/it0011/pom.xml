@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -29,21 +27,6 @@ under the License.
 
   <name>Maven Integration Test :: it0011</name>
   <description>Test specification of dependency versions via &lt;dependencyManagement/&gt;.</description>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven.its.it0011</groupId>
-      <artifactId>a</artifactId>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.its.it0011</groupId>
-      <artifactId>b</artifactId>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
-  </dependencies>
 
   <dependencyManagement>
     <dependencies>
@@ -64,6 +47,21 @@ under the License.
     </dependencies>
   </dependencyManagement>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.it0011</groupId>
+      <artifactId>a</artifactId>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.it0011</groupId>
+      <artifactId>b</artifactId>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -76,10 +74,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

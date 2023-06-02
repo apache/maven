@@ -19,10 +19,10 @@
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>test</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <check>${java.version}</check>
             </configuration>

@@ -1,10 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test Dependency :: it0125</name>
   <groupId>org.apache.maven.its.it0125</groupId>
   <artifactId>maven-it-it0125-dependency</artifactId>
-  <description>Project that brings in a newer version of maven-core-it-support.</description>
   <version>1.0</version>
+  <name>Maven Integration Test Dependency :: it0125</name>
+  <description>Project that brings in a newer version of maven-core-it-support.</description>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its</groupId>

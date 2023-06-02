@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4615</name>
-  <description>
-    Verify that Maven validates required mojo parameters (and doesn't just have the plugins die with NPEs).
-    This scenario checks the case of a parameter missing its backing user property.
-  </description>
+  <description>Verify that Maven validates required mojo parameters (and doesn't just have the plugins die with NPEs).
+    This scenario checks the case of a parameter missing its backing user property.</description>
 
   <build>
     <plugins>
@@ -47,10 +43,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>required-config</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

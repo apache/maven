@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,13 +25,11 @@ under the License.
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-4528</name>
-  <description>
-    Test that wagon providers pulled in via transitive dependencies of Maven core artifacts get excluded from
+  <description>Test that wagon providers pulled in via transitive dependencies of Maven core artifacts get excluded from
     plugin realms (in favor of potentially newer wagons bundled with the core). This requirement is mostly a
     hack to compensate for the historic slip of Maven core artifacts depending on wagon providers. Those old
     wagon providers conflict with the usually newer wagons bundled with the core distro and cause grief under
-    a class loader hierarchy where wagons are loaded from the plugin realm (if available) like in Maven 3.
-  </description>
+    a class loader hierarchy where wagons are loaded from the plugin realm (if available) like in Maven 3.</description>
 
   <build>
     <plugins>
@@ -47,14 +43,6 @@ under the License.
           <providerGroupId>org.apache.maven.wagon</providerGroupId>
           <providerArtifactId>wagon-ssh-external</providerArtifactId>
         </configuration>
-        <executions>
-          <execution>
-            <phase>validate</phase>
-            <goals>
-              <goal>dump-version</goal>
-            </goals>
-          </execution>
-        </executions>
         <dependencies>
           <dependency>
             <!--
@@ -67,6 +55,14 @@ under the License.
             <version>2.0.2</version>
           </dependency>
         </dependencies>
+        <executions>
+          <execution>
+            <goals>
+              <goal>dump-version</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

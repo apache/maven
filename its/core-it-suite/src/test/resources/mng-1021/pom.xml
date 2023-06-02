@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,10 +25,8 @@ under the License.
   <version>1-SNAPSHOT</version>
 
   <name>Maven Integration Test :: MNG-1021</name>
-  <description>
-    Test that attached artifacts have the same build number as the main
-    artifact when deployed.
-  </description>
+  <description>Test that attached artifacts have the same build number as the main
+    artifact when deployed.</description>
 
   <distributionManagement>
     <snapshotRepository>
@@ -48,7 +44,6 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>initialize</phase>
             <goals>
               <goal>set</goal>
               <goal>attach-pom</goal>
@@ -56,6 +51,7 @@ under the License.
               <goal>install</goal>
               <goal>deploy</goal>
             </goals>
+            <phase>initialize</phase>
             <configuration>
               <mainFile>jars/main.jar</mainFile>
               <attachedFile>jars/attached.jar</attachedFile>

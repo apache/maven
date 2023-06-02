@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,10 +25,8 @@ under the License.
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-5064</name>
-  <description>
-    Verify that snapshot updates can be completely suppressed via the CLI arg -nsu. The initial retrieval of a
-    missing snapshot should not be suppressed though.
-  </description>
+  <description>Verify that snapshot updates can be completely suppressed via the CLI arg -nsu. The initial retrieval of a
+    missing snapshot should not be suppressed though.</description>
 
   <dependencies>
     <dependency>
@@ -53,10 +49,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>test</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

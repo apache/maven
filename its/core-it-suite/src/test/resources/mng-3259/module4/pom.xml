@@ -1,22 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
 
   <parent>
-      <groupId>org.codehaus.jira.mng.XXX</groupId>
-      <artifactId>parent</artifactId>
-      <version>1-SNAPSHOT</version>
-  </parent>  
-  
-    <modelVersion>4.0.0</modelVersion>
     <groupId>org.codehaus.jira.mng.XXX</groupId>
-    <artifactId>mng-module4-XXX</artifactId>
-    <packaging>ejb</packaging>
-    <version>1.0-SNAPSHOT</version>
-    <name>Module-4 XXX</name>
-    <description><![CDATA[Module 4 of issue XXX.]]></description>
+    <artifactId>parent</artifactId>
+    <version>1-SNAPSHOT</version>
+  </parent>
+  <groupId>org.codehaus.jira.mng.XXX</groupId>
+  <artifactId>mng-module4-XXX</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>ejb</packaging>
+  <name>Module-4 XXX</name>
+  <description><![CDATA[Module 4 of issue XXX.]]></description>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.jira.mng.XXX</groupId>
+      <artifactId>mng-module3-XXX</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>jboss</groupId>
+      <artifactId>jboss-j2ee</artifactId>
+    </dependency>
+    <!-- for test -->
+    <dependency>
+      <groupId>org.codehaus.jira.mng.XXX</groupId>
+      <artifactId>mng-module1-XXX</artifactId>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
@@ -39,21 +52,5 @@
       </plugin>
     </plugins>
   </build>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.codehaus.jira.mng.XXX</groupId>
-      <artifactId>mng-module3-XXX</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>jboss</groupId>
-      <artifactId>jboss-j2ee</artifactId>
-    </dependency>
-    <!-- for test -->
-    <dependency>
-      <groupId>org.codehaus.jira.mng.XXX</groupId>
-      <artifactId>mng-module1-XXX</artifactId>
-    </dependency>
-  </dependencies>
 
 </project>

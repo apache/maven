@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
   <parent>
@@ -6,8 +7,12 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
   <artifactId>child-hierarchy</artifactId>
-  <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>project1</module>
+    <module>project2</module>
+  </modules>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -15,8 +20,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <modules>
-    <module>project1</module>
-    <module>project2</module>
-  </modules>
 </project>

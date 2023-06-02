@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -29,18 +27,9 @@ under the License.
   <packaging>it-packaging</packaging>
 
   <name>Maven Integration Test :: MNG-2831</name>
-  <description>
-    Test the use of a custom lifecycle from a plugin that is defined as a build extension.
-  </description>
+  <description>Test the use of a custom lifecycle from a plugin that is defined as a build extension.</description>
 
   <build>
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-packaging</artifactId>
-        <version>2.1-SNAPSHOT</version>
-      </extension>
-    </extensions>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -51,5 +40,12 @@ under the License.
         </plugin>
       </plugins>
     </pluginManagement>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-packaging</artifactId>
+        <version>2.1-SNAPSHOT</version>
+      </extension>
+    </extensions>
   </build>
 </project>

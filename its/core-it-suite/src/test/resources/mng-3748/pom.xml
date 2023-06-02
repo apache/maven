@@ -1,14 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.its.mng3748</groupId>
   <artifactId>mng-3748</artifactId>
-  <packaging>pom</packaging>
   <version>1</version>
+  <packaging>pom</packaging>
 
   <name>Integration Test Project for MNG-3748</name>
-  <description>
-    This project verifies that MNG-3748 is fixed. It is controlled by a JUnit test called org.apache.maven.integrationtests.MNG3748Test
-  </description>
+  <description>This project verifies that MNG-3748 is fixed. It is controlled by a JUnit test called org.apache.maven.integrationtests.MNG3748Test</description>
 
   <url>https://issues.apache.org/jira/browse/MNG-3748</url>
 </project>

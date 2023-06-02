@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -32,10 +30,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4056 :: Dependency Producer</name>
-  <description>
-    Test that attached artifacts can be resolved from the reactor cache even if the dependency declaration
-    in the consumer module does not use the proper artifact type but merely specifies the classifier.
-  </description>
+  <description>Test that attached artifacts can be resolved from the reactor cache even if the dependency declaration
+    in the consumer module does not use the proper artifact type but merely specifies the classifier.</description>
 
   <build>
     <plugins>
@@ -46,10 +42,10 @@ under the License.
         <executions>
           <execution>
             <id>package</id>
-            <phase>validate</phase>
             <goals>
               <goal>set</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <mainFile>pom.xml</mainFile>
             </configuration>
@@ -57,10 +53,10 @@ under the License.
           <!-- NOTE: It is essential part of this test to attach the artifacts using the dedicated artifact type -->
           <execution>
             <id>package-tests</id>
-            <phase>validate</phase>
             <goals>
               <goal>attach</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <!-- mimic maven-jar-plugin:2.2:test-jar -->
               <attachedFile>test.jar</attachedFile>
@@ -70,10 +66,10 @@ under the License.
           </execution>
           <execution>
             <id>package-sources</id>
-            <phase>validate</phase>
             <goals>
               <goal>attach</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <!-- mimic maven-source-plugin:2.0.4:jar -->
               <attachedFile>source.jar</attachedFile>
@@ -83,10 +79,10 @@ under the License.
           </execution>
           <execution>
             <id>package-javadocs</id>
-            <phase>validate</phase>
             <goals>
               <goal>attach</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <!-- mimic maven-javadoc-plugin:2.5:jar -->
               <attachedFile>javadoc.jar</attachedFile>
@@ -96,10 +92,10 @@ under the License.
           </execution>
           <execution>
             <id>package-client</id>
-            <phase>validate</phase>
             <goals>
               <goal>attach</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <!-- mimic maven-ejb-plugin:2.1:ejb -->
               <attachedFile>client.jar</attachedFile>

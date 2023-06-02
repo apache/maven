@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -7,9 +8,7 @@
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-2068</name>
-  <description>
-    Test that the implied relative path for the parent POM works, even two levels deep.
-  </description>
+  <description>Test that the implied relative path for the parent POM works, even two levels deep.</description>
 
   <modules>
     <module>project/project-level2/project-level3</module>

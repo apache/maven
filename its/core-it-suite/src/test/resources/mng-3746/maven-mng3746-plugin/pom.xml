@@ -1,10 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?><project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.its.mng3746</groupId>
   <artifactId>mavenit-mng3746-plugin</artifactId>
+  <version>1</version>
   <packaging>maven-plugin</packaging>
   <name>mavenit-mng3746-plugin Maven Mojo</name>
-  <version>1</version>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>

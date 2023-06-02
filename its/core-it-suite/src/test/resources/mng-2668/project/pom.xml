@@ -1,19 +1,17 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.apache.maven.its.mng2668</groupId>
-    <version>1.0-SNAPSHOT</version>
     <artifactId>test-project</artifactId>
+    <version>1.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>project</artifactId>
 
   <name>Maven Integration Test :: MNG-2539 :: Plugin Dependency Consumer</name>
-  <description>
-    Verify that dependencies of plugins are considered by the project sorter for a reactor build.
-  </description>
+  <description>Verify that dependencies of plugins are considered by the project sorter for a reactor build.</description>
 
   <build>
     <plugins>
@@ -21,6 +19,9 @@
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-artifact</artifactId>
         <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <mainFile>pom.xml</mainFile>
+        </configuration>
         <dependencies>
           <dependency>
             <groupId>${project.groupId}</groupId>
@@ -28,20 +29,16 @@
             <version>${project.version}</version>
           </dependency>
         </dependencies>
-        <configuration>
-          <mainFile>pom.xml</mainFile>
-        </configuration>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>set</goal>
               <goal>install</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
 </project>
-

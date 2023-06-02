@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,9 +26,31 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-2309</name>
-  <description>
-    Test that profiles are injected in declaration order, with the last profile being the most dominant.
-  </description>
+  <description>Test that profiles are injected in declaration order, with the last profile being the most dominant.</description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-expression</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>eval</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <outputFile>target/pom.properties</outputFile>
+              <expressions>
+                <expression>project/properties</expression>
+              </expressions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
   <profiles>
     <!-- NOTE: Using intentionally more than two profiles to prevent random test success -->
@@ -65,28 +85,4 @@ under the License.
       </properties>
     </profile>
   </profiles>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-expression</artifactId>
-        <version>2.1-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <phase>validate</phase>
-            <goals>
-              <goal>eval</goal>
-            </goals>
-            <configuration>
-              <outputFile>target/pom.properties</outputFile>
-              <expressions>
-                <expression>project/properties</expression>
-              </expressions>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

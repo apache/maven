@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,9 +25,7 @@ under the License.
   <version>1.0</version>
 
   <name>Maven Integration Test :: MNG-2972</name>
-  <description>
-    Verify that a project-level plugin dependency replaces the original dependency from the plugin POM.
-  </description>
+  <description>Verify that a project-level plugin dependency replaces the original dependency from the plugin POM.</description>
 
   <build>
     <plugins>
@@ -37,6 +33,11 @@ under the License.
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-class-loader</artifactId>
         <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <classNames>org.apache.maven.its.mng2972.MNG2972,org.apache.maven.plugin.coreit.ClassA,org.apache.maven.plugin.coreit.ClassB</classNames>
+          <resourcePaths>org/apache/maven/its/mng2972/mng-2972.properties,org/apache/maven/plugin/coreit/a.properties,org/apache/maven/plugin/coreit/b.properties</resourcePaths>
+          <pluginClassLoaderOutput>target/pcl.properties</pluginClassLoaderOutput>
+        </configuration>
         <dependencies>
           <!--
           This dependency should replace the plugins's original dependency on
@@ -53,18 +54,13 @@ under the License.
             <version>0.2-mng-2972</version>
           </dependency>
         </dependencies>
-        <configuration>
-          <classNames>org.apache.maven.its.mng2972.MNG2972,org.apache.maven.plugin.coreit.ClassA,org.apache.maven.plugin.coreit.ClassB</classNames>
-          <resourcePaths>org/apache/maven/its/mng2972/mng-2972.properties,org/apache/maven/plugin/coreit/a.properties,org/apache/maven/plugin/coreit/b.properties</resourcePaths>
-          <pluginClassLoaderOutput>target/pcl.properties</pluginClassLoaderOutput>
-        </configuration>
         <executions>
           <execution>
             <id>load</id>
-            <phase>validate</phase>
             <goals>
               <goal>load</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

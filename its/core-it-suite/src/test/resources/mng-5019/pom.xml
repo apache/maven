@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,11 +26,9 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-5019</name>
-  <description>
-    Verify that plugins executed by other plugins (like reports executed by the maven-site-plugin) can successfully
+  <description>Verify that plugins executed by other plugins (like reports executed by the maven-site-plugin) can successfully
     look up components via string-based roles from their plugin realm as denoted by the thread context class loader,
-    even if those components are also contained in the parent plugin realm.
-  </description>
+    even if those components are also contained in the parent plugin realm.</description>
 
   <build>
     <plugins>
@@ -43,10 +39,10 @@ under the License.
         <version>0.1</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>it</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

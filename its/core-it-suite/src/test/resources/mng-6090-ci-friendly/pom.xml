@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,27 +17,26 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>mng-6090-ci-friendly</groupId>
   <artifactId>base-project</artifactId>
   <version>${revision}</version>
   <packaging>pom</packaging>
-
-  <properties>
-    <revision>1.3.0-SNAPSHOT</revision>
-  </properties>
   <modules>
     <module>module-3</module>
     <module>module-1</module>
     <module>module-2</module>
   </modules>
 
+  <properties>
+    <revision>1.3.0-SNAPSHOT</revision>
+  </properties>
+
   <build>
-    <pluginManagement><!-- see bootstrap for plugins versions -->
+    <pluginManagement>
+      <!-- see bootstrap for plugins versions -->
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -72,17 +70,17 @@ under the License.
         <executions>
           <execution>
             <id>flatten</id>
-            <phase>process-resources</phase>
             <goals>
               <goal>flatten</goal>
             </goals>
+            <phase>process-resources</phase>
           </execution>
           <execution>
             <id>flatten.clean</id>
-            <phase>clean</phase>
             <goals>
               <goal>clean</goal>
             </goals>
+            <phase>clean</phase>
           </execution>
         </executions>
       </plugin>

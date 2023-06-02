@@ -1,5 +1,4 @@
-<?xml version="1.0"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.its.mng3372</groupId>
@@ -12,7 +11,7 @@
       <artifactId>maven-core</artifactId>
       <version>3.8.6</version>
     </dependency>
-  
+
     <!-- These are directly from MNG-3372, but we need something that can actually resolve.
     <dependency>
       <groupId>commons-beanutils</groupId>

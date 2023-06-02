@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -31,8 +29,7 @@ under the License.
   <artifactId>dependency</artifactId>
 
   <name>Maven Integration Test :: MNG-5214 :: Dependency</name>
-  <description>A very dull project, which exists only so that its g:a:v is in the reactor.
-  </description>
+  <description>A very dull project, which exists only so that its g:a:v is in the reactor.</description>
 
   <build>
     <outputDirectory>classes-main</outputDirectory>
@@ -40,44 +37,44 @@ under the License.
   </build>
 
   <profiles>
-  <profile>
-    <id>createWsdl</id>
-    <build>
-      <plugins>
-  <plugin>
-    <groupId>org.apache.maven.its.plugins</groupId>
-    <artifactId>maven-it-plugin-artifact</artifactId>
-    <version>2.1-SNAPSHOT</version>
-    <executions>
-      <execution>
-        <id>attach-artifacts</id>
-        <phase>generate-resources</phase>
-        <goals>
-    <goal>attach</goal>
-        </goals>
-        <configuration>
-    <attachedFile>notmuch.wsdl</attachedFile>
-    <artifactType>wsdl</artifactType>
-        </configuration>
-      </execution>
-      <execution>
-        <id>install</id>
-        <phase>generate-resources</phase>
-        <configuration>
-    <pomFile>pom.xml</pomFile>
-    <!-- borrow the POM as the main artifact -->
-    <mainFile>pom.xml</mainFile>
-        </configuration>
-        <goals>
-    <goal>set</goal>
-    <goal>attach-pom</goal>
-    <goal>install</goal>
-        </goals>
-      </execution>
-    </executions>
-  </plugin>
-      </plugins>
-    </build>
-  </profile>
+    <profile>
+      <id>createWsdl</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.its.plugins</groupId>
+            <artifactId>maven-it-plugin-artifact</artifactId>
+            <version>2.1-SNAPSHOT</version>
+            <executions>
+              <execution>
+                <id>attach-artifacts</id>
+                <goals>
+                  <goal>attach</goal>
+                </goals>
+                <phase>generate-resources</phase>
+                <configuration>
+                  <attachedFile>notmuch.wsdl</attachedFile>
+                  <artifactType>wsdl</artifactType>
+                </configuration>
+              </execution>
+              <execution>
+                <id>install</id>
+                <goals>
+                  <goal>set</goal>
+                  <goal>attach-pom</goal>
+                  <goal>install</goal>
+                </goals>
+                <phase>generate-resources</phase>
+                <configuration>
+                  <pomFile>pom.xml</pomFile>
+                  <!-- borrow the POM as the main artifact -->
+                  <mainFile>pom.xml</mainFile>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 </project>

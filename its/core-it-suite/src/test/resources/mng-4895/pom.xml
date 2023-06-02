@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4895</name>
-  <description>
-    Verify that the classes constituting the Maven API are always loaded from the Maven core realm even if the plugin
-    realm contains a 3rd party dependency that contains (non-relocated) duplicates of API classes.
-  </description>
+  <description>Verify that the classes constituting the Maven API are always loaded from the Maven core realm even if the plugin
+    realm contains a 3rd party dependency that contains (non-relocated) duplicates of API classes.</description>
 
   <build>
     <plugins>
@@ -39,6 +35,10 @@ under the License.
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-dependency-resolution</artifactId>
         <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <compileClassPath>target/classpath.txt</compileClassPath>
+          <significantPathLevels>1</significantPathLevels>
+        </configuration>
         <dependencies>
           <dependency>
             <!-- This JAR contains stubs of essential classes of the Maven API, they must not get used -->
@@ -47,17 +47,13 @@ under the License.
             <version>0.1</version>
           </dependency>
         </dependencies>
-        <configuration>
-          <compileClassPath>target/classpath.txt</compileClassPath>
-          <significantPathLevels>1</significantPathLevels>
-        </configuration>
         <executions>
           <execution>
             <id>resolve</id>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

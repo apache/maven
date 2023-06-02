@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +29,10 @@
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>config</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

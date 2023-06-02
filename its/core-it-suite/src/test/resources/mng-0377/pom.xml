@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,9 +25,7 @@ under the License.
   <version>1.0-SNAPSHOT</version>
 
   <name>Maven Integration Test :: it0031</name>
-  <description>
-    Test usage of plugins.xml mapping file on the repository to resolve
+  <description>Test usage of plugins.xml mapping file on the repository to resolve
     plugin artifactId from its prefix using the pluginGroups in
-    the provided settings.xml.
-  </description>
+    the provided settings.xml.</description>
 </project>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4629</name>
-  <description>
-    Verify that mere POM validation does not fail upon a system-scope dependency that refers to a non-existing
-    file (the error is deferred to actual dependency resolution).
-  </description>
+  <description>Verify that mere POM validation does not fail upon a system-scope dependency that refers to a non-existing
+    file (the error is deferred to actual dependency resolution).</description>
 
   <dependencies>
     <dependency>

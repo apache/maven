@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -31,11 +29,30 @@ under the License.
   <artifactId>child</artifactId>
 
   <name>Maven Integration Test :: MNG-3899</name>
-  <description>
-    Test that build extensions are properly merged during inheritance.
-  </description>
+  <description>Test that build extensions are properly merged during inheritance.</description>
 
   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-expression</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>eval</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <outputFile>target/extension.properties</outputFile>
+              <expressions>
+                <expression>project/build/extensions</expression>
+              </expressions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
     <!-- project extensions should precede inherited extensions -->
     <extensions>
       <extension>
@@ -50,26 +67,5 @@ under the License.
         <version>0.2</version>
       </extension>
     </extensions>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-expression</artifactId>
-        <version>2.1-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <phase>validate</phase>
-            <goals>
-              <goal>eval</goal>
-            </goals>
-            <configuration>
-              <outputFile>target/extension.properties</outputFile>
-              <expressions>
-                <expression>project/build/extensions</expression>
-              </expressions>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
   </build>
 </project>

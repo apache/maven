@@ -3,9 +3,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.its.mng3703</groupId>
   <artifactId>mavenit-mng3703-plugin</artifactId>
+  <version>1</version>
   <packaging>maven-plugin</packaging>
   <name>maven-mng3703-plugin Maven Mojo</name>
-  <version>1</version>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>

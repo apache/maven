@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.maven.its.mng5581.lifecyclemappingdelegate;
 
 /*
@@ -10,13 +28,13 @@ package org.apache.maven.its.mng5581.lifecyclemappingdelegate;
  * governing permissions and limitations under the License.
  */
 
+import javax.inject.Named;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Named;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.Lifecycle;
@@ -34,9 +52,10 @@ import org.apache.maven.project.MavenProject;
 @Named("test-only")
 public class TestLifecycleMappingDelegate implements LifecycleMappingDelegate {
 
-    public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject project,
-            Lifecycle lifecycle, String lifecyclePhase) throws PluginNotFoundException, PluginResolutionException,
-            PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException {
+    public Map<String, List<MojoExecution>> calculateLifecycleMappings(
+            MavenSession session, MavenProject project, Lifecycle lifecycle, String lifecyclePhase)
+            throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+                    MojoNotFoundException, InvalidPluginDescriptorException {
 
         Map<String, List<MojoExecution>> pluginExecutions = new LinkedHashMap<String, List<MojoExecution>>();
 
@@ -56,8 +75,8 @@ public class TestLifecycleMappingDelegate implements LifecycleMappingDelegate {
 
         List<MojoExecution> result = new ArrayList<MojoExecution>();
 
-        List<MojoExecution> mojoExecutions = pluginExecutions
-                .get("org.apache.maven.plugins:maven-surefire-plugin:default-test");
+        List<MojoExecution> mojoExecutions =
+                pluginExecutions.get("org.apache.maven.plugins:maven-surefire-plugin:default-test");
         if (mojoExecutions != null) {
             result.addAll(mojoExecutions);
         }

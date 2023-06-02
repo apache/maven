@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4342</name>
-  <description>
-    Test that multiple goals within a single execution get their default configuration properly injected. In
-    particular, the default values for one goal should not influence the default values of the other goal.
-  </description>
+  <description>Test that multiple goals within a single execution get their default configuration properly injected. In
+    particular, the default values for one goal should not influence the default values of the other goal.</description>
 
   <build>
     <plugins>
@@ -46,12 +42,12 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <!-- both of these goals have a parameter named "defaultParam" but with different default values -->
               <goal>config</goal>
               <goal>append-config</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

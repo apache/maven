@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -33,11 +31,9 @@ under the License.
   <version>1.0-SNAPSHOT</version>
 
   <name>Maven Integration Test :: MNG-4023</name>
-  <description>
-    Verify that profiles in a parent are only injected once during a reactor build that include the parent
+  <description>Verify that profiles in a parent are only injected once during a reactor build that include the parent
     itself. The parent being part of the reactor makes it subject to project caching and proper use of the
-    cache is crucial here.
-  </description>
+    cache is crucial here.</description>
 
   <build>
     <plugins>
@@ -48,10 +44,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>config</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

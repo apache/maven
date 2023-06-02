@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,10 +25,8 @@ under the License.
   <version>1.0</version>
 
   <name>Maven Integration Test :: it0090</name>
-  <description>
-    Test that ensures that envars are interpolated correctly into plugin
-    configurations.
-  </description>
+  <description>Test that ensures that envars are interpolated correctly into plugin
+    configurations.</description>
 
   <build>
     <plugins>
@@ -40,14 +36,14 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
+            <goals>
+              <goal>config</goal>
+            </goals>
             <phase>validate</phase>
             <configuration>
               <propertiesFile>target/env.properties</propertiesFile>
               <stringParam>${env.MAVEN_TEST_ENVAR}</stringParam>
             </configuration>
-            <goals>
-              <goal>config</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,10 +25,8 @@ under the License.
   <version>1.0</version>
 
   <name>Maven Integration Test :: MNG-2052</name>
-  <description>
-    Test that properties defined in an active profile in the user's
-    settings are available for interpolation of systemPath in a dependency.
-  </description>
+  <description>Test that properties defined in an active profile in the user's
+    settings are available for interpolation of systemPath in a dependency.</description>
 
   <dependencies>
     <dependency>
@@ -50,10 +46,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

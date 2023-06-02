@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,11 +26,9 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4345</name>
-  <description>
-    Test that plugin executions contributed by default lifecycle mappings always execute first in the targeted
+  <description>Test that plugin executions contributed by default lifecycle mappings always execute first in the targeted
     lifecycle phase regardless of other plugin executions bound to the same phase and regardless of the POM
-    order of plugin declarations.
-  </description>
+    order of plugin declarations.</description>
 
   <build>
     <plugins>
@@ -48,11 +44,11 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <!-- NOTE: Bound to the same phase as maven-resources-plugin:resources -->
-            <phase>process-resources</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <!-- NOTE: Bound to the same phase as maven-resources-plugin:resources -->
+            <phase>process-resources</phase>
           </execution>
         </executions>
       </plugin>

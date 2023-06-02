@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,18 +25,9 @@ under the License.
   <version>1.0-SNAPSHOT</version>
 
   <name>Maven Integration Test :: MNG-3766</name>
-  <description>
-    Test toolchain discovery from build extensions.
-  </description>
+  <description>Test toolchain discovery from build extensions.</description>
 
   <build>
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.its</groupId>
-        <artifactId>core-it-toolchain</artifactId>
-        <version>2.1-SNAPSHOT</version>
-      </extension>
-    </extensions>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
@@ -47,10 +36,10 @@ under the License.
         <executions>
           <execution>
             <id>select-toolchain</id>
-            <phase>validate</phase>
             <goals>
               <goal>toolchain</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <outputFile>target/toolchains.properties</outputFile>
               <type>coreit</type>
@@ -59,10 +48,10 @@ under the License.
           </execution>
           <execution>
             <id>find-tool</id>
-            <phase>initialize</phase>
             <goals>
               <goal>find-tool</goal>
             </goals>
+            <phase>initialize</phase>
             <configuration>
               <outputFile>target/tool.properties</outputFile>
               <type>coreit</type>
@@ -72,5 +61,12 @@ under the License.
         </executions>
       </plugin>
     </plugins>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.its</groupId>
+        <artifactId>core-it-toolchain</artifactId>
+        <version>2.1-SNAPSHOT</version>
+      </extension>
+    </extensions>
   </build>
 </project>

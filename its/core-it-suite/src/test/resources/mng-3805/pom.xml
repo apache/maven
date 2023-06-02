@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,12 +25,33 @@ under the License.
   <version>1.0</version>
 
   <name>Maven Integration Test :: MNG-3805</name>
-  <description>
-    Verify that the extension manager respects the ordering of the extension's dependencies when setting up the
-    class realm.
-  </description>
+  <description>Verify that the extension manager respects the ordering of the extension's dependencies when setting up the
+    class realm.</description>
 
   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-uses-wagon</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>load-resource</id>
+            <goals>
+              <goal>load-resource</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <wagonProtocol>coreit</wagonProtocol>
+              <resourcePaths>
+                <resourcePath>org/apache/maven/its/mng3805/a.properties</resourcePath>
+              </resourcePaths>
+              <wagonClassLoaderOutput>target/wcl.properties</wagonClassLoaderOutput>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
     <extensions>
       <!--
       Both the extension artifact and each of its four dependencies contain the same resource. The IT plugin will
@@ -44,28 +63,5 @@ under the License.
         <version>0.1</version>
       </extension>
     </extensions>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-uses-wagon</artifactId>
-        <version>2.1-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <id>load-resource</id>
-            <phase>validate</phase>
-            <configuration>
-              <wagonProtocol>coreit</wagonProtocol>
-              <resourcePaths>
-                <resourcePath>org/apache/maven/its/mng3805/a.properties</resourcePath>
-              </resourcePaths>
-              <wagonClassLoaderOutput>target/wcl.properties</wagonClassLoaderOutput>
-            </configuration>
-            <goals>
-              <goal>load-resource</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
   </build>
 </project>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,10 +25,8 @@ under the License.
   <version>1.0-SNAPSHOT</version>
 
   <name>Maven Integration Test :: MNG-4053</name>
-  <description>
-    Verify that attributes in plugin configuration elements are not erroneously duplicated to other elements when
-    no plugin management is used.
-  </description>
+  <description>Verify that attributes in plugin configuration elements are not erroneously duplicated to other elements when
+    no plugin management is used.</description>
 
   <build>
     <!-- NOTE: This test does not use plugin management for the IT plugin -->
@@ -41,15 +37,15 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>config</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <propertiesFile>target/config.properties</propertiesFile>
               <domParam>
-                <copy todir="src" overwrite="true">
-                  <fileset dir="target"/>
+                <copy overwrite="true" todir="src">
+                  <fileset dir="target" />
                 </copy>
               </domParam>
             </configuration>

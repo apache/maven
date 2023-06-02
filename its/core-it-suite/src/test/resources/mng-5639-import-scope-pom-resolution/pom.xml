@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,55 +17,52 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.apache.maven.its.mng5639</groupId>
-    <artifactId>test</artifactId>
-    <version>0.1</version>
-    <packaging>jar</packaging>
+  <groupId>org.apache.maven.its.mng5639</groupId>
+  <artifactId>test</artifactId>
+  <version>0.1</version>
+  <packaging>jar</packaging>
 
-    <name>Maven Integration Test :: MNG-5639</name>
-    <description>
-        Checks that an import POM in the dependencyManagement section can be successfully
-        resolved from a repository defining a URL that contains a property.
-    </description>
+  <name>Maven Integration Test :: MNG-5639</name>
+  <description>Checks that an import POM in the dependencyManagement section can be successfully
+        resolved from a repository defining a URL that contains a property.</description>
 
-    <properties>
-        <!-- Value corresponds to the folder name in this directory -->
-        <repository.url.suffix.property>repo-set-by-property</repository.url.suffix.property>
-    </properties>
+  <properties>
+    <!-- Value corresponds to the folder name in this directory -->
+    <repository.url.suffix.property>repo-set-by-property</repository.url.suffix.property>
+  </properties>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M7</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.maven.its.mng5639</groupId>
-                <artifactId>a</artifactId>
-                <version>0.1</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
+  <dependencyManagement>
     <dependencies>
-        <dependency>
-            <groupId>org.apache.maven.its.mng5639</groupId>
-            <artifactId>b</artifactId>
-        </dependency>
+      <dependency>
+        <groupId>org.apache.maven.its.mng5639</groupId>
+        <artifactId>a</artifactId>
+        <version>0.1</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.mng5639</groupId>
+      <artifactId>b</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>3.0.0-M7</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
 </project>

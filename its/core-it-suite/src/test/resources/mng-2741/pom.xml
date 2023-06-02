@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,17 +17,14 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng2741</groupId>
   <artifactId>test</artifactId>
-  <packaging>jar</packaging>
   <version>1</version>
+  <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-2741</name>
-  <description>
-    Tests that plugin prefix/version metadata resolution errors tell the underlying transport issue.
-  </description>
+  <description>Tests that plugin prefix/version metadata resolution errors tell the underlying transport issue.</description>
 </project>

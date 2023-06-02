@@ -1,13 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: mng0624 :: Main</name>
-  <groupId>org.apache.maven.its.mng0624</groupId>
-  <artifactId>maven-it-mng0624-main</artifactId>
-  <version>1.0</version>
   <parent>
     <groupId>org.apache.maven.its.mng0624</groupId>
     <artifactId>maven-it-mng0624-basic-parent</artifactId>
     <version>${mng0624ParentPom}</version>
     <relativePath>../parent</relativePath>
   </parent>
+  <groupId>org.apache.maven.its.mng0624</groupId>
+  <artifactId>maven-it-mng0624-main</artifactId>
+  <version>1.0</version>
+  <name>Maven Integration Test :: mng0624 :: Main</name>
 </project>

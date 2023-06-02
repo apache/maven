@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,9 +26,7 @@ under the License.
   <packaging>war</packaging>
 
   <name>Maven Integration Test :: it0083</name>
-  <description>
-    Verify that overriding a transitive compile time dependency as provided in a WAR ensures it is not included.
-  </description>
+  <description>Verify that overriding a transitive compile time dependency as provided in a WAR ensures it is not included.</description>
 
   <dependencies>
     <dependency>
@@ -60,11 +56,11 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
               <goal>runtime</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

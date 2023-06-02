@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,27 +17,24 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-    <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.apache.maven.its.mng7112</groupId>
+    <artifactId>aggregator-b</artifactId>
+    <version>1.0</version>
+  </parent>
 
-    <artifactId>module-b</artifactId>
+  <artifactId>module-b</artifactId>
 
-    <parent>
-        <groupId>org.apache.maven.its.mng7112</groupId>
-        <artifactId>aggregator-b</artifactId>
-        <version>1.0</version>
-    </parent>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.its.plugins</groupId>
-                <artifactId>maven-it-plugin-log-file</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-log-file</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,11 +26,9 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-4768 :: BAD</name>
-  <description>
-    Verify that conflict resolution picks the nearest version that matches all hard constraints given by ranges.
+  <description>Verify that conflict resolution picks the nearest version that matches all hard constraints given by ranges.
     And for conflicting dependencies on distinct tree levels, "nearest" shouldn't be subject to the dependency
-    order.
-  </description>
+    order.</description>
 
   <dependencies>
     <dependency>
@@ -65,10 +61,10 @@ under the License.
         <executions>
           <execution>
             <id>resolve</id>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

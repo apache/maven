@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,7 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-5418</name>
-  <description>
-    Test that the file-based profile activator resolves file path with project properties.
-  </description>
-
+  <description>Test that the file-based profile activator resolves file path with project properties.</description>
 
   <properties>
     <site.base.path>${basedir}</site.base.path>
@@ -57,13 +52,13 @@ under the License.
             <executions>
               <execution>
                 <id>test-1</id>
+                <goals>
+                  <goal>reset</goal>
+                </goals>
                 <phase>validate</phase>
                 <configuration>
                   <logFile>target/path1.txt</logFile>
                 </configuration>
-                <goals>
-                  <goal>reset</goal>
-                </goals>
               </execution>
             </executions>
           </plugin>
@@ -86,13 +81,13 @@ under the License.
             <executions>
               <execution>
                 <id>test-2</id>
+                <goals>
+                  <goal>reset</goal>
+                </goals>
                 <phase>validate</phase>
                 <configuration>
                   <logFile>target/file1.txt</logFile>
                 </configuration>
-                <goals>
-                  <goal>reset</goal>
-                </goals>
               </execution>
             </executions>
           </plugin>
@@ -115,13 +110,13 @@ under the License.
             <executions>
               <execution>
                 <id>test-3</id>
+                <goals>
+                  <goal>reset</goal>
+                </goals>
                 <phase>validate</phase>
                 <configuration>
                   <logFile>target/missing1.txt</logFile>
                 </configuration>
-                <goals>
-                  <goal>reset</goal>
-                </goals>
               </execution>
             </executions>
           </plugin>
@@ -144,13 +139,13 @@ under the License.
             <executions>
               <execution>
                 <id>test-4</id>
+                <goals>
+                  <goal>reset</goal>
+                </goals>
                 <phase>validate</phase>
                 <configuration>
                   <logFile>target/missing2.txt</logFile>
                 </configuration>
-                <goals>
-                  <goal>reset</goal>
-                </goals>
               </execution>
             </executions>
           </plugin>

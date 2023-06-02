@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng3415</groupId>
@@ -7,13 +7,11 @@
   <version>1</version>
 
   <name>Maven Integration Test :: MNG-3415</name>
-  <description>
-    Test that failures to resolve the artifact metadata are properly handled. In particular, we need to distinguish
+  <description>Test that failures to resolve the artifact metadata are properly handled. In particular, we need to distinguish
     between a network failure and a missing metadata file in the remote repo. After a network failure, we immediately
     want to retry the remote repo during the next build, regardless of the repo's update policy. In case the metadata
     (and hence the corresponding artifact) is simply missing from the repo, we don't want to recheck this repo on each
-    build but wait until the update interval has elapsed (see also MNG-2712).
-  </description>
+    build but wait until the update interval has elapsed (see also MNG-2712).</description>
 
   <dependencies>
     <dependency>
@@ -34,10 +32,10 @@
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>test</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

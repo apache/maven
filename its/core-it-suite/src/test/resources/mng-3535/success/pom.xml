@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -16,42 +17,40 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>test</groupId>
-    <artifactId>mng3535-selfReferentialProperties</artifactId>
-    <packaging>pom</packaging>
-    <version>1.0</version>
-    <name>Apache Maven: mng3535-selfReferentialProperties</name>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>test</groupId>
+  <artifactId>mng3535-selfReferentialProperties</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+  <name>Apache Maven: mng3535-selfReferentialProperties</name>
+  <properties>
+    <java.specification.version>${java.specification.version}</java.specification.version>
+  </properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.its.plugins</groupId>
-                <version>2.1-SNAPSHOT</version>
-                <artifactId>maven-it-plugin-project-interpolation</artifactId>
-                <executions>
-                    <execution>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>verify-property</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <properties>
-                        <property>
-                            <name>java.specification.version</name>
-                            <value>${java.specification.version}</value>
-                        </property>
-                    </properties>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    <properties>
-        <java.specification.version>${java.specification.version}</java.specification.version>
-    </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-project-interpolation</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <properties>
+            <property>
+              <name>java.specification.version</name>
+              <value>${java.specification.version}</value>
+            </property>
+          </properties>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>verify-property</goal>
+            </goals>
+            <phase>install</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,13 +26,11 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-2921 :: Parent</name>
-  <description>
-    Verify that attached project artifacts can be resolved from the reactor as active project artifacts for
+  <description>Verify that attached project artifacts can be resolved from the reactor as active project artifacts for
     consumption on other module's class paths. Note the subtle difference of this test compared to the closely
     related issue MNG-2871: This test is about *attached* artifacts, i.e. dependencies that have already been
     packaged. MNG-2871 on the other hand is about dependencies that haven't been packaged yet but merely exist
-    as loose class files in a module's output directory.
-  </description>
+    as loose class files in a module's output directory.</description>
 
   <modules>
     <module>tests</module>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,11 +25,9 @@ under the License.
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-1992</name>
-  <description>
-    Test that system/execution properties take precedence over the POM's properties section when configuring a
+  <description>Test that system/execution properties take precedence over the POM's properties section when configuring a
     plugin parameter that is annotated with @parameter expression="prop". Note that this issue is not about POM
-    interpolation but rather plugin parameter expression evaluation.
-  </description>
+    interpolation but rather plugin parameter expression evaluation.</description>
 
   <properties>
     <config.stringParam>FAILED</config.stringParam>
@@ -45,10 +41,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>config</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <propertiesFile>target/config.properties</propertiesFile>
             </configuration>

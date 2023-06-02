@@ -1,14 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.its.mng3482</groupId>
   <artifactId>mng-3482</artifactId>
-  <packaging>jar</packaging>
   <version>2</version>
+  <packaging>jar</packaging>
 
   <name>Integration Test Project for MNG-3482</name>
-  <description>
-    This project verifies that MNG-3482 is fixed. It is controlled by a JUnit test called org.apache.maven.it.MNG3482Test
-  </description>
+  <description>This project verifies that MNG-3482 is fixed. It is controlled by a JUnit test called org.apache.maven.it.MNG3482Test</description>
 
   <url>https://issues.apache.org/jira/browse/MNG-3482</url>
 
@@ -34,10 +33,10 @@
         <executions>
           <execution>
             <id>resolve</id>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

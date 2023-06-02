@@ -1,10 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?><project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>mng-2739</artifactId>
     <groupId>org.apache.maven.its.mng2739</groupId>
+    <artifactId>mng-2739</artifactId>
     <version>1</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
   <artifactId>repo-url</artifactId>
   <name>repo-url</name>
   <description>Test missing repository url</description>

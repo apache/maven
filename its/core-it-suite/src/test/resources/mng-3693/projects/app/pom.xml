@@ -1,14 +1,15 @@
-<?xml version="1.0"?><project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>parent</artifactId>
     <groupId>org.apache.maven.its.mng3693</groupId>
+    <artifactId>parent</artifactId>
     <version>1</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.its.mng3693</groupId>
   <artifactId>app</artifactId>
-  <name>app</name>
   <version>1</version>
+  <name>app</name>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>

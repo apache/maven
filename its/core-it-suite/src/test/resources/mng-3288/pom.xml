@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,9 +26,7 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-3288</name>
-  <description>
-    Test the use of a system scoped dependency to a directory instead of a JAR which should fail early.
-  </description>
+  <description>Test the use of a system scoped dependency to a directory instead of a JAR which should fail early.</description>
 
   <dependencies>
     <dependency>
@@ -51,10 +47,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

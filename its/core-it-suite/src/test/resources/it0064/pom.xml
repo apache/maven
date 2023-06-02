@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -7,10 +8,8 @@
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: it0064</name>
-  <description>
-    Test the use of a mojo that uses setters instead of private fields
-    for the population of configuration values.
-  </description>
+  <description>Test the use of a mojo that uses setters instead of private fields
+    for the population of configuration values.</description>
 
   <build>
     <plugins>

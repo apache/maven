@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,18 +26,13 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-3877</name>
-  <description>
-    Verify that project directories are basedir aligned when inspected by plugins.
-  </description>
+  <description>Verify that project directories are basedir aligned when inspected by plugins.</description>
 
   <build>
-    <!--
-    NOTE: Deliberately re-specify default paths to decouple from super POM and interpolation. Proper handling of
-    *relative* paths is the whole point of this test.
-    -->
-    <sourceDirectory>src/main/java</sourceDirectory>
-    <testSourceDirectory>src/test/java</testSourceDirectory>
-    <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
+    <directory>target</directory>
+    <filters>
+      <filter>src/main/filters/it.properties</filter>
+    </filters>
     <resources>
       <resource>
         <directory>src/main/resources</directory>
@@ -50,12 +43,6 @@ under the License.
         <directory>src/test/resources</directory>
       </testResource>
     </testResources>
-    <directory>target</directory>
-    <outputDirectory>target/classes</outputDirectory>
-    <testOutputDirectory>target/test-classes</testOutputDirectory>
-    <filters>
-      <filter>src/main/filters/it.properties</filter>
-    </filters>
 
     <plugins>
       <plugin>
@@ -83,14 +70,23 @@ under the License.
         <executions>
           <execution>
             <id>effective-model</id>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>
     </plugins>
+    <!--
+    NOTE: Deliberately re-specify default paths to decouple from super POM and interpolation. Proper handling of
+    *relative* paths is the whole point of this test.
+    -->
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
+    <testSourceDirectory>src/test/java</testSourceDirectory>
+    <outputDirectory>target/classes</outputDirectory>
+    <testOutputDirectory>target/test-classes</testOutputDirectory>
   </build>
 
   <reporting>

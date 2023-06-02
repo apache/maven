@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -32,15 +30,11 @@ under the License.
   <version>0.1-SNAPSHOT</version>
 
   <name>Maven Integration Test :: MNG-3043 :: Dependency</name>
-  <description>
-    Test that dependencies on attached artifacts like a test JAR or an EJB client JAR which have not been built
+  <description>Test that dependencies on attached artifacts like a test JAR or an EJB client JAR which have not been built
     yet, i.e. in build phases prior to "package" like "test", are satisfied from the output directories of the
-    projects in the reactor. This is meant as a best effort to provide a class path for compilation or testing.
-  </description>
+    projects in the reactor. This is meant as a best effort to provide a class path for compilation or testing.</description>
 
   <build>
-    <outputDirectory>classes-main</outputDirectory>
-    <testOutputDirectory>classes-test</testOutputDirectory>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
@@ -50,10 +44,10 @@ under the License.
           <execution>
             <!-- mimic creation of test JAR -->
             <id>package-test-jar</id>
-            <phase>package</phase>
             <goals>
               <goal>attach</goal>
             </goals>
+            <phase>package</phase>
             <configuration>
               <attachedFile>classes-test/tests.jar</attachedFile>
               <artifactType>test-jar</artifactType>
@@ -63,10 +57,10 @@ under the License.
           <execution>
             <!-- mimic creation of EJB client JAR -->
             <id>package-ejb-client-jar</id>
-            <phase>package</phase>
             <goals>
               <goal>attach</goal>
             </goals>
+            <phase>package</phase>
             <configuration>
               <attachedFile>classes-main/client.jar</attachedFile>
               <artifactType>ejb-client</artifactType>
@@ -76,5 +70,7 @@ under the License.
         </executions>
       </plugin>
     </plugins>
+    <outputDirectory>classes-main</outputDirectory>
+    <testOutputDirectory>classes-test</testOutputDirectory>
   </build>
 </project>

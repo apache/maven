@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-3833</name>
-  <description>
-    Test that POM interpolation fully interpolates all properties in data flow chain, i.e. where property
-    A depends on property B, and property B depends on property C and so on.
-  </description>
+  <description>Test that POM interpolation fully interpolates all properties in data flow chain, i.e. where property
+    A depends on property B, and property B depends on property C and so on.</description>
 
   <properties>
     <!--
@@ -72,10 +68,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <outputFile>target/interpolated.properties</outputFile>
               <expressions>

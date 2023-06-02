@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -32,11 +30,9 @@ under the License.
   <packaging>maven-plugin</packaging>
 
   <name>Maven Integration Test :: MNG-4269</name>
-  <description>
-    Test that dependency resolution from the reactor is not too eager and does not resolve plugin artifacts from
+  <description>Test that dependency resolution from the reactor is not too eager and does not resolve plugin artifacts from
     the build directory of their plugin project when the plugin project hasn't been built yet. The technical
     problem is that the mere existence of a project output directory like target/classes is no sufficient indicator
     that we can use that for artifact resolution. The project's output directory might just be a left over from a
-    previous build and could be in any state, e.g. incomplete.
-  </description>
+    previous build and could be in any state, e.g. incomplete.</description>
 </project>

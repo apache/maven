@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: mng3396 :: plugin</name>
   <parent>
     <groupId>org.apache.maven.its.mng3396</groupId>
     <artifactId>plugin-parent</artifactId>
@@ -11,6 +9,16 @@
   <artifactId>plugin</artifactId>
   <version>1.0</version>
   <packaging>maven-plugin</packaging>
+  <name>Maven Integration Test :: mng3396 :: plugin</name>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>A</artifactId>
+        <version>3.0</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -24,13 +32,4 @@
       <version>1.0</version>
     </dependency>
   </dependencies>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>A</artifactId>
-        <version>3.0</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 </project>

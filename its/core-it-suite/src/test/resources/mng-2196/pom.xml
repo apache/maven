@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -7,11 +8,9 @@
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-2196</name>
-  <description>
-    Verify that multi-module builds where one project references another as
+  <description>Verify that multi-module builds where one project references another as
     a parent can build, even if that parent is not correctly referenced by
-    &lt;relativePath/&gt; and is not in the local repository.
-  </description>
+    &lt;relativePath/&gt; and is not in the local repository.</description>
 
   <modules>
     <module>level1</module>

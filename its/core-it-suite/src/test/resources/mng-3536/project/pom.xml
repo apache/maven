@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -16,37 +17,35 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.maven.its.mng3536</groupId>
-    <artifactId>mng3536-AppendedAbsolutePaths</artifactId>
-    <packaging>pom</packaging>
-    <version>1.0</version>
-    <name>Apache Maven: mng3536-AppendedAbsolutePaths</name>
-    <build>
-        <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.its.mng3536</groupId>
-                <artifactId>mng3536-AppendedAbsolutePaths-plugin</artifactId>
-                <version>1.0</version>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>validate</goal>
-                        </goals>
-                        <configuration>
-                          <foo>${project.build.outputDirectory}/foo.txt</foo>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-    <properties>
-        <test>file:${project.build.sourceDirectory}/plugin/Mojo3563.java</test>
-    </properties>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.mng3536</groupId>
+  <artifactId>mng3536-AppendedAbsolutePaths</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+  <name>Apache Maven: mng3536-AppendedAbsolutePaths</name>
+  <properties>
+    <test>file:${project.build.sourceDirectory}/plugin/Mojo3563.java</test>
+  </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.mng3536</groupId>
+        <artifactId>mng3536-AppendedAbsolutePaths-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>validate</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <foo>${project.build.outputDirectory}/foo.txt</foo>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+  </build>
 </project>

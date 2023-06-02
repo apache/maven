@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4410</name>
-  <description>
-    Verify that "mvn --help" outputs the usage help and stops the execution after that.
-  </description>
+  <description>Verify that "mvn --help" outputs the usage help and stops the execution after that.</description>
 
   <!-- NOTE: Maven should not try to build any project so we use this broken POM to check it didn't. -->
-  <invalid/>
+  <invalid />
 </project>

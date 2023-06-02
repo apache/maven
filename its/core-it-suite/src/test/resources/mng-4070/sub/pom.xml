@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,15 +17,14 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
   <!-- NOTE: The ugly formatting is essential part of this test! -->
   <parent>
-    <groupId>   org.apache.maven.its.mng4070   </groupId>
-    <artifactId>  parent  </artifactId>
-    <version>  1.0  </version>
+    <groupId>org.apache.maven.its.mng4070</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0</version>
   </parent>
 
   <artifactId>subproject</artifactId>
@@ -34,16 +32,14 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4070 :: Child</name>
-  <description>
-    Test that whitespace around artifact coordinates does not change artifact identity.
-  </description>
+  <description>Test that whitespace around artifact coordinates does not change artifact identity.</description>
 
   <dependencies>
     <dependency>
       <!-- NOTE: The ugly formatting is essential part of this test! -->
-      <groupId>   org.apache.maven.its.mng4070   </groupId>
-      <artifactId>  a  </artifactId>
-      <version>  0.1  </version>
+      <groupId>org.apache.maven.its.mng4070</groupId>
+      <artifactId>a</artifactId>
+      <version>0.1</version>
     </dependency>
   </dependencies>
 
@@ -59,10 +55,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

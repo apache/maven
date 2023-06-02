@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-3904</name>
-  <description>
-    Test that properties which refer to build directories which in turn refer to other build directories are
-    properly interpolated.
-  </description>
+  <description>Test that properties which refer to build directories which in turn refer to other build directories are
+    properly interpolated.</description>
 
   <properties>
     <!-- These are the properties of interest -->
@@ -43,10 +39,6 @@ under the License.
   <build>
     <!-- Test properties which finally refer to ${project.basedir} -->
     <directory>${project.basedir}/target</directory>
-    <outputDirectory>${project.build.directory}/classes</outputDirectory>
-    <!-- Test properties which finally refer to ${basedir} -->
-    <sourceDirectory>${basedir}/src</sourceDirectory>
-    <testSourceDirectory>${project.build.sourceDirectory}/test</testSourceDirectory>
 
     <plugins>
       <plugin>
@@ -55,10 +47,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <outputFile>target/pom.properties</outputFile>
               <expressions>
@@ -69,6 +61,10 @@ under the License.
         </executions>
       </plugin>
     </plugins>
+    <!-- Test properties which finally refer to ${basedir} -->
+    <sourceDirectory>${basedir}/src</sourceDirectory>
+    <testSourceDirectory>${project.build.sourceDirectory}/test</testSourceDirectory>
+    <outputDirectory>${project.build.directory}/classes</outputDirectory>
   </build>
 
   <reporting>

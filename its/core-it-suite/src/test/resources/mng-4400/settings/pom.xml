@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,9 +25,7 @@ under the License.
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-4400</name>
-  <description>
-    Verify that repositories declared in the settings.xml are accessed in their declaration order.
-  </description>
+  <description>Verify that repositories declared in the settings.xml are accessed in their declaration order.</description>
 
   <dependencies>
     <dependency>
@@ -47,10 +43,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <compileClassPathChecksums>target/checksum.properties</compileClassPathChecksums>
               <significantPathLevels>1</significantPathLevels>

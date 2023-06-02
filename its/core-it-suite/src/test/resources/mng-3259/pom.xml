@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.codehaus.jira.mng</groupId>
-    <artifactId>builder</artifactId>
-    <packaging>pom</packaging>
-    <name>Builder POM for issue XXX</name>
-    <version>1-SNAPSHOT</version>
-    <inceptionYear>2007</inceptionYear>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.codehaus.jira.mng</groupId>
+  <artifactId>builder</artifactId>
+  <version>1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>Builder POM for issue XXX</name>
+  <inceptionYear>2007</inceptionYear>
 
-    <modules>
-        <module>module1</module>
-        <module>module2</module>
-        <module>module3</module>
-        <module>module4</module>
-        <module>module5</module>
-    </modules>
+  <modules>
+    <module>module1</module>
+    <module>module2</module>
+    <module>module3</module>
+    <module>module4</module>
+    <module>module5</module>
+  </modules>
 </project>

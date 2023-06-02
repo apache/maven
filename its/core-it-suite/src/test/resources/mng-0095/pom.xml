@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -7,10 +8,14 @@
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-95</name>
-  <description>
-    Test reactor failure modes fail-fast, fail-at-end and fail-never by forcing an exception in the first module and
-    checking the build output of the other modules.
-  </description>
+  <description>Test reactor failure modes fail-fast, fail-at-end and fail-never by forcing an exception in the first module and
+    checking the build output of the other modules.</description>
+
+  <modules>
+    <module>subproject1</module>
+    <module>subproject2</module>
+    <module>subproject3</module>
+  </modules>
 
   <build>
     <pluginManagement>
@@ -23,10 +28,4 @@
       </plugins>
     </pluginManagement>
   </build>
-
-  <modules>
-    <module>subproject1</module>
-    <module>subproject2</module>
-    <module>subproject3</module>
-  </modules>
 </project>

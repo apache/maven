@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,9 +26,7 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-3845</name>
-  <description>
-    Test that inheritance is all-or-nothing for certain subtrees of the POM.
-  </description>
+  <description>Test that inheritance is all-or-nothing for certain subtrees of the POM.</description>
 
   <organization>
     <name>parent-org</name>
@@ -38,10 +34,10 @@ under the License.
   </organization>
 
   <scm>
-    <url>http://parent.url/viewvc</url>
     <connection>http://parent.url/scm</connection>
     <developerConnection>https://parent.url/scm</developerConnection>
     <tag>parent-tag</tag>
+    <url>http://parent.url/viewvc</url>
   </scm>
   <issueManagement>
     <system>parent-issues</system>
@@ -65,17 +61,17 @@ under the License.
   </ciManagement>
   <distributionManagement>
     <repository>
+      <uniqueVersion>false</uniqueVersion>
       <id>parent-distros</id>
       <name>parent-distros</name>
       <url>ssh://parent.url/distros</url>
-      <uniqueVersion>false</uniqueVersion>
       <layout>legacy</layout>
     </repository>
     <snapshotRepository>
+      <uniqueVersion>false</uniqueVersion>
       <id>parent-snaps</id>
       <name>parent-snaps</name>
       <url>ssh://parent.url/snaps</url>
-      <uniqueVersion>false</uniqueVersion>
       <layout>legacy</layout>
     </snapshotRepository>
     <site>

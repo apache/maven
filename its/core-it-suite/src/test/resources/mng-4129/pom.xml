@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,9 +26,7 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-4129</name>
-  <description>
-    Verify that plugin executions defined in the parent with inherited=false are not executed in child modules.
-  </description>
+  <description>Verify that plugin executions defined in the parent with inherited=false are not executed in child modules.</description>
 
   <modules>
     <module>child-1</module>
@@ -46,11 +42,11 @@ under the License.
         <executions>
           <execution>
             <id>inherited-execution</id>
-            <inherited>true</inherited>
-            <phase>validate</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>validate</phase>
+            <inherited>true</inherited>
             <configuration>
               <logFile>target/executions.txt</logFile>
               <string>inherited-execution</string>
@@ -58,11 +54,11 @@ under the License.
           </execution>
           <execution>
             <id>non-inherited-execution</id>
-            <inherited>false</inherited>
-            <phase>validate</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>validate</phase>
+            <inherited>false</inherited>
             <configuration>
               <logFile>target/executions.txt</logFile>
               <string>non-inherited-execution</string>

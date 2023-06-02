@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,12 +26,9 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4312</name>
-  <description>
-    Verify that plugins that use magic parameter expressions like ${plugin} for ordinary system properties
+  <description>Verify that plugins that use magic parameter expressions like ${plugin} for ordinary system properties
     get properly configured and don't crash due to Maven trying to inject a type-incompatible magic value
-    into the String-type mojo parameter.
-  </description>
-
+    into the String-type mojo parameter.</description>
 
   <build>
     <plugins>
@@ -55,10 +50,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>config</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

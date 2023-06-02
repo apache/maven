@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4891 :: Dependency Producer</name>
-  <description>
-    Verify that resolution of a local snapshot still succeeds even if the maven-metadata-local.xml has been
-    corrupted by a remote repository that misuses the same repo id, i.e. "local".
-  </description>
+  <description>Verify that resolution of a local snapshot still succeeds even if the maven-metadata-local.xml has been
+    corrupted by a remote repository that misuses the same repo id, i.e. "local".</description>
 
   <build>
     <plugins>
@@ -42,22 +38,22 @@ under the License.
         <executions>
           <execution>
             <id>install</id>
-            <phase>validate</phase>
             <goals>
               <goal>set</goal>
               <goal>attach-pom</goal>
               <goal>install</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <mainFile>pom.xml</mainFile>
             </configuration>
           </execution>
           <execution>
             <id>deploy</id>
-            <phase>validate</phase>
             <goals>
               <goal>deploy-file</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <!-- NOTE: Having the repo id clash with the id used internally for the local repo is the crucial piece here -->
               <repositoryId>local</repositoryId>

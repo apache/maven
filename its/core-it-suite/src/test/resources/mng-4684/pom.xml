@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,52 +26,29 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-4684</name>
-  <description>
-    Verify that active profiles can override distribution management settings.
-  </description>
+  <description>Verify that active profiles can override distribution management settings.</description>
 
   <distributionManagement>
     <repository>
-      <id>test</id>
-      <url>http://localhost/void</url>
-      <name>test</name>
-      <layout>legacy</layout>
       <uniqueVersion>false</uniqueVersion>
+      <id>test</id>
+      <name>test</name>
+      <url>http://localhost/void</url>
+      <layout>legacy</layout>
     </repository>
     <snapshotRepository>
-      <id>test</id>
-      <url>http://localhost/void</url>
-      <name>test</name>
-      <layout>legacy</layout>
       <uniqueVersion>false</uniqueVersion>
+      <id>test</id>
+      <name>test</name>
+      <url>http://localhost/void</url>
+      <layout>legacy</layout>
     </snapshotRepository>
     <site>
       <id>test</id>
-      <url>http://localhost/void</url>
       <name>test</name>
+      <url>http://localhost/void</url>
     </site>
   </distributionManagement>
-
-  <profiles>
-    <profile>
-      <id>mng4684</id>
-      <distributionManagement>
-        <repository>
-          <id>pr</id>
-          <url>http://localhost/r</url>
-        </repository>
-        <snapshotRepository>
-          <id>psr</id>
-          <url>http://localhost/sr</url>
-        </snapshotRepository>
-        <site>
-          <id>ps</id>
-          <url>http://localhost/s</url>
-          <name>passed</name>
-        </site>
-      </distributionManagement>
-    </profile>
-  </profiles>
 
   <build>
     <plugins>
@@ -90,13 +65,34 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>mng4684</id>
+      <distributionManagement>
+        <repository>
+          <id>pr</id>
+          <url>http://localhost/r</url>
+        </repository>
+        <snapshotRepository>
+          <id>psr</id>
+          <url>http://localhost/sr</url>
+        </snapshotRepository>
+        <site>
+          <id>ps</id>
+          <name>passed</name>
+          <url>http://localhost/s</url>
+        </site>
+      </distributionManagement>
+    </profile>
+  </profiles>
 </project>

@@ -487,6 +487,39 @@ under the License.
         <directory>src/test/resources-filtered</directory>
       </testResource>
     </testResources>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <configuration>
+            <java>
+              <includes>
+                <include>src/main/java/**/*.java</include>
+                <include>src/test/java/**/*.java</include>
+                <include>src/test/resources/**/src/main/java/**/*.java</include>
+                <include>src/test/resources/**/src/test/java/**/*.java</include>
+              </includes>
+              <excludes>
+                <exclude>src/test/resources/mng-5208/project/sub-2/src/main/java/Bad.java</exclude>
+              </excludes>
+            </java>
+            <pom>
+              <includes>
+                <include>pom.xml</include>
+                <include>src/test/resources/**/pom.xml</include>
+              </includes>
+              <excludes>
+                <exclude>src/test/resources/mng-2254/latin-1/pom.xml</exclude>
+                <exclude>src/test/resources/mng-2362/latin-1/pom.xml</exclude>
+                <exclude>src/test/resources/mng-3839/pom.xml</exclude>
+              </excludes>
+            </pom>
+          </configuration>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

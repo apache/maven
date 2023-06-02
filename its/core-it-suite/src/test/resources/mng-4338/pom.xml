@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>it-packaging</packaging>
 
   <name>Maven Integration Test :: MNG-4338</name>
-  <description>
-    Test that the optional-mojos element in custom lifecycle mappings is recognized and does not cause
-    a configuration failure when loading the lifecycle.
-  </description>
+  <description>Test that the optional-mojos element in custom lifecycle mappings is recognized and does not cause
+    a configuration failure when loading the lifecycle.</description>
 
   <build>
     <plugins>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,9 +26,7 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-5889</name>
-  <description>
-    Verify that path/to/.mvn directory is found when using -f/--file path/to/[module/]pom.xml.
-  </description>
+  <description>Verify that path/to/.mvn directory is found when using -f/--file path/to/[module/]pom.xml.</description>
 
   <properties>
     <jvm-config>${jvm.config}</jvm-config>
@@ -57,10 +53,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -43,7 +41,6 @@ under the License.
   </dependencies>
 
   <build>
-    <outputDirectory>classes</outputDirectory>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
@@ -56,16 +53,17 @@ under the License.
             project's artifact file.
             -->
             <id>compile</id>
+            <goals>
+              <goal>set</goal>
+            </goals>
             <phase>validate</phase>
             <configuration>
               <mainFile>classes</mainFile>
             </configuration>
-            <goals>
-              <goal>set</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>
     </plugins>
+    <outputDirectory>classes</outputDirectory>
   </build>
 </project>

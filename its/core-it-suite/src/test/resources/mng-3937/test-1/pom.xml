@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-3937</name>
-  <description>
-    Test that during inheritance/merging of a plugin execution the goals specified by child and parent are properly
-    ordered.
-  </description>
+  <description>Test that during inheritance/merging of a plugin execution the goals specified by child and parent are properly
+    ordered.</description>
 
   <build>
     <!-- This project does not use plugin management for the test plugin -->
@@ -43,11 +39,11 @@ under the License.
         <executions>
           <execution>
             <id>merge</id>
-            <phase>validate</phase>
             <goals>
               <goal>reset</goal>
               <goal>log-separator</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <logFile>target/parent.log</logFile>
               <length>4</length>

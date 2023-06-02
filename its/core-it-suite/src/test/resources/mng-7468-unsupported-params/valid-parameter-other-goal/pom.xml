@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,9 +25,7 @@ under the License.
   <version>1.0</version>
 
   <name>Maven Integration Test :: mng7468</name>
-  <description>
-    Test that ensures that warning about unsupported mojo parameters are generated.
-  </description>
+  <description>Test that ensures that warning about unsupported mojo parameters are generated.</description>
 
   <build>
     <plugins>
@@ -37,6 +33,9 @@ under the License.
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-configuration</artifactId>
         <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <booleanParam>true</booleanParam>
+        </configuration>
         <executions>
           <execution>
             <goals>
@@ -44,9 +43,6 @@ under the License.
             </goals>
           </execution>
         </executions>
-        <configuration>
-          <booleanParam>true</booleanParam>
-        </configuration>
       </plugin>
     </plugins>
   </build>

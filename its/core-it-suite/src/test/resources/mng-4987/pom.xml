@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4987</name>
-  <description>
-    Verify that snapshot version resolution from multiple (3+) repositories properly selects the repo with the
-    newest metadata according to its timestamps, regardless of the declaration order of the repos.
-  </description>
+  <description>Verify that snapshot version resolution from multiple (3+) repositories properly selects the repo with the
+    newest metadata according to its timestamps, regardless of the declaration order of the repos.</description>
 
   <dependencies>
     <dependency>
@@ -55,10 +51,10 @@ under the License.
         <executions>
           <execution>
             <id>resolve</id>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

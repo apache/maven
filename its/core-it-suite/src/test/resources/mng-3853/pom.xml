@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,13 +25,11 @@ under the License.
   <version>1.0-SNAPSHOT</version>
 
   <name>Maven Integration Test :: MNG-3853</name>
-  <description>
-    Verify that distribution management repos injected by profiles are recognized by the MavenProject instance and
+  <description>Verify that distribution management repos injected by profiles are recognized by the MavenProject instance and
     that the resulting artifact repositories are available to plugins via the corresponding expressions. Note that
     this issue is not primarily about the effective model (which was correct for the original issue, i.e. reflected
     the injected distributionManagement section) but whether the MavenProject wrapper around the model is in sync
-    with the model.
-  </description>
+    with the model.</description>
 
   <build>
     <plugins>
@@ -43,10 +39,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>config</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <propertiesFile>target/dist.properties</propertiesFile>
               <listParam>

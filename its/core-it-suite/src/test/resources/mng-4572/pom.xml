@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,12 +17,9 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <!-- NOTE: White space around the value is the essential part of this test -->
-  <modelVersion>
-    4.0.0
-  </modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng4572</groupId>
   <artifactId>test</artifactId>
@@ -31,7 +27,5 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-4572</name>
-  <description>
-    Test that the model parser doesn't choke when the modelVersion is surrounded by whitespace.
-  </description>
+  <description>Test that the model parser doesn't choke when the modelVersion is surrounded by whitespace.</description>
 </project>

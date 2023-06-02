@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-3927</name>
-  <description>
-    Test that the configuration for a plugin execution without an identifier does not pollute the configuration
-    of default plugin executions introduced by the packaging.
-  </description>
+  <description>Test that the configuration for a plugin execution without an identifier does not pollute the configuration
+    of default plugin executions introduced by the packaging.</description>
 
   <build>
     <plugins>
@@ -41,11 +37,11 @@ under the License.
         <version>0.1-stub-SNAPSHOT</version>
         <executions>
           <execution>
-            <!-- NOTE: <id> element deliberately omitted to trigger issue. -->
-            <phase>verify</phase>
             <goals>
               <goal>resources</goal>
             </goals>
+            <!-- NOTE: <id> element deliberately omitted to trigger issue. -->
+            <phase>verify</phase>
             <configuration>
               <!-- This should not apply to the execution of resources:resources in the process-resources phase -->
               <pathname>target/failed.txt</pathname>

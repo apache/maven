@@ -1,10 +1,11 @@
-<?xml version="1.0"?><project>
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>parent</artifactId>
     <groupId>org.apache.maven.its.mng3693</groupId>
+    <artifactId>parent</artifactId>
     <version>1</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.its.mng3693</groupId>
   <artifactId>dep</artifactId>
   <version>1</version>
@@ -19,10 +20,10 @@
         <executions>
           <execution>
             <id>move-pom</id>
-            <phase>package</phase>
             <goals>
               <goal>move-pom</goal>
             </goals>
+            <phase>package</phase>
           </execution>
         </executions>
       </plugin>

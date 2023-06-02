@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.its.mng3106</groupId>
@@ -34,10 +35,10 @@
             <executions>
               <execution>
                 <id>profile1-touch</id>
-                <phase>validate</phase>
                 <goals>
                   <goal>touch</goal>
                 </goals>
+                <phase>validate</phase>
                 <configuration>
                   <outputDirectory>${project.build.directory}/profile1</outputDirectory>
                 </configuration>
@@ -66,10 +67,10 @@
             <executions>
               <execution>
                 <id>profile2-touch</id>
-                <phase>validate</phase>
                 <goals>
                   <goal>touch</goal>
                 </goals>
+                <phase>validate</phase>
                 <configuration>
                   <outputDirectory>${project.build.directory}/profile2</outputDirectory>
                 </configuration>

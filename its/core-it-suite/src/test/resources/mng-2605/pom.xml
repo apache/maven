@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,10 +25,8 @@ under the License.
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-2605</name>
-  <description>
-    Test that profiles are not accidentally activated when they have no activation element at all and
-    the user did not request their activation via id.
-  </description>
+  <description>Test that profiles are not accidentally activated when they have no activation element at all and
+    the user did not request their activation via id.</description>
 
   <build>
     <plugins>
@@ -40,10 +36,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <outputFile>target/profile.properties</outputFile>
               <expressions>

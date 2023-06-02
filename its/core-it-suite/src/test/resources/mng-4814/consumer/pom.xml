@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,11 +26,9 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4814 :: Consumer</name>
-  <description>
-    Verify that dependency resolution by an aggregator before the build has actually produced any artifacts
+  <description>Verify that dependency resolution by an aggregator before the build has actually produced any artifacts
     doesn't prevent later resolution of project artifacts from the reactor if the aggregator originally resolved
-    them from the remote repo.
-  </description>
+    them from the remote repo.</description>
 
   <dependencies>
     <dependency>
@@ -55,10 +51,10 @@ under the License.
         <executions>
           <execution>
             <id>resolve</id>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

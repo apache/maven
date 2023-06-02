@@ -3,12 +3,10 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.its.mng2739</groupId>
   <artifactId>mng-2739</artifactId>
-  <packaging>pom</packaging>
   <version>1</version>
+  <packaging>pom</packaging>
   <name>mng-2739</name>
-  <description>
-    Verify that repositories lacking id or url fail to build/validate.
-  </description>
+  <description>Verify that repositories lacking id or url fail to build/validate.</description>
   <modules>
     <module>repo-id</module>
     <module>repo-url</module>

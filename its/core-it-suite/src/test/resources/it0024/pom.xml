@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: it0024</name>
-  <description>
-    Test usage of &lt;executions/&gt; inside a plugin rather than &lt;goals/&gt;
-    that are directly inside the plugin.
-   </description>
+  <description>Test usage of &lt;executions/&gt; inside a plugin rather than &lt;goals/&gt;
+    that are directly inside the plugin.</description>
 
   <build>
     <plugins>
@@ -42,13 +38,13 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
+            <goals>
+              <goal>reset</goal>
+            </goals>
             <phase>initialize</phase>
             <configuration>
               <logFile>target/plugin-exec-configuration.txt</logFile>
             </configuration>
-            <goals>
-              <goal>reset</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

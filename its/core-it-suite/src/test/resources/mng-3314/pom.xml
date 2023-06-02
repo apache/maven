@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,9 +25,7 @@ under the License.
   <version>1.0-SNAPSHOT</version>
 
   <name>Maven Integration Test :: MNG-3314</name>
-  <description>
-    Verify that snapshot dependencies which are scheduled for an update don't fail the build when in offline mode.
-  </description>
+  <description>Verify that snapshot dependencies which are scheduled for an update don't fail the build when in offline mode.</description>
 
   <dependencies>
     <!-- This has been deployed using uniqueVersion=false, it's the most prominent problem case -->
@@ -58,10 +54,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

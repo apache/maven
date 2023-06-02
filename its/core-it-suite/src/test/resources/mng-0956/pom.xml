@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,9 +26,7 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-956</name>
-  <description>
-    Test component injection from project-level plugin dependencies.
-  </description>
+  <description>Test component injection from project-level plugin dependencies.</description>
 
   <build>
     <plugins>
@@ -38,19 +34,6 @@ under the License.
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-class-loader</artifactId>
         <version>2.1-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <id>test</id>
-            <phase>validate</phase>
-            <configuration>
-              <className>java.lang.Object</className>
-              <instanceofPropertiesFile>target/component.properties</instanceofPropertiesFile>
-            </configuration>
-            <goals>
-              <goal>instanceof</goal>
-            </goals>
-          </execution>
-        </executions>
         <dependencies>
           <!-- load component into plugin realm -->
           <dependency>
@@ -59,6 +42,19 @@ under the License.
             <version>0.1</version>
           </dependency>
         </dependencies>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>instanceof</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <className>java.lang.Object</className>
+              <instanceofPropertiesFile>target/component.properties</instanceofPropertiesFile>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

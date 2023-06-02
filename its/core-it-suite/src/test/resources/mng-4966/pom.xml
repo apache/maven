@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,15 +25,13 @@ under the License.
   <version>1.0</version>
 
   <name>Maven Integration Test :: MNG-4966</name>
-  <description>
-    Verify that URLs in the effective model retain successive slashes which are significant in certain domains.
-  </description>
+  <description>Verify that URLs in the effective model retain successive slashes which are significant in certain domains.</description>
 
   <url>file:////UNC/server/dir/</url>
   <scm>
-    <url>ssh://localhost//home/user/</url>
     <connection>scm:hg:ssh://localhost//home/user/</connection>
     <developerConnection>[fetch=]http://server.org/[push=]ssh://server.org/</developerConnection>
+    <url>ssh://localhost//home/user/</url>
   </scm>
 
   <build>
@@ -54,10 +50,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

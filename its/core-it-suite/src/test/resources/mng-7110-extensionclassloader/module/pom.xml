@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,21 +17,18 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-      <!-- to reproduce the original issue, the parent must NOT be part of the reactor -->
-      <groupId>org.apache.maven.its.mng7110</groupId>
-      <artifactId>parent</artifactId>
-      <version>1.0</version>
-      <relativePath>../parent</relativePath>
+    <!-- to reproduce the original issue, the parent must NOT be part of the reactor -->
+    <groupId>org.apache.maven.its.mng7110</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0</version>
+    <relativePath>../parent</relativePath>
   </parent>
   <artifactId>module</artifactId>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its.mng7110</groupId>
@@ -40,7 +36,7 @@ under the License.
       <version>1.0</version>
     </dependency>
   </dependencies>
-  
+
   <build>
     <pluginManagement>
       <plugins>
@@ -50,10 +46,10 @@ under the License.
           <version>2.1-SNAPSHOT</version>
           <executions>
             <execution>
-              <phase>verify</phase>
               <goals>
                 <goal>load-dependencies</goal>
               </goals>
+              <phase>verify</phase>
               <configuration>
                 <projectClassLoaderOutput>out.txt</projectClassLoaderOutput>
                 <resourcePaths>lib.txt,extension.txt</resourcePaths>

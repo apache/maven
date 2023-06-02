@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -7,9 +8,7 @@
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: it0071</name>
-  <description>
-    Verifies that dotted property references work within plugin configurations.
-  </description>
+  <description>Verifies that dotted property references work within plugin configurations.</description>
 
   <properties>
     <m2.foo>foo2</m2.foo>

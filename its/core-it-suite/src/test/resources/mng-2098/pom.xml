@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,12 +25,10 @@ under the License.
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-2098</name>
-  <description>
-    Test that the selected version from a version range can be successfully resolved even if the repository
+  <description>Test that the selected version from a version range can be successfully resolved even if the repository
     with the newest metadata does not provide the selected version. In particular, the repository with the
     newest metadata must not be the only repository used during artifact resolution, all repositories must
-    be considered.
-  </description>
+    be considered.</description>
 
   <dependencies>
     <dependency>
@@ -51,10 +47,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,9 +26,7 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4116</name>
-  <description>
-    Test that the project builder does not decode URLs (which must be done by the transport layer instead).
-  </description>
+  <description>Test that the project builder does not decode URLs (which must be done by the transport layer instead).</description>
 
   <!-- some URLs using percent-encoded characters -->
   <url>http://maven.apache.org/spacy%20path</url>
@@ -70,10 +66,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <outputFile>target/pom.properties</outputFile>
               <expressions>

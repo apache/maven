@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,9 +25,7 @@ under the License.
   <version>1.0</version>
 
   <name>Maven Integration Test :: MNG-4553</name>
-  <description>
-    Verify that the core artifact filter considers both artifact id and group id.
-  </description>
+  <description>Verify that the core artifact filter considers both artifact id and group id.</description>
 
   <build>
     <plugins>
@@ -48,15 +44,15 @@ under the License.
         <executions>
           <execution>
             <id>load</id>
+            <goals>
+              <goal>load</goal>
+            </goals>
             <phase>validate</phase>
             <configuration>
               <resourcePaths>mng4553.properties</resourcePaths>
               <pluginClassLoaderOutput>target/pcl.properties</pluginClassLoaderOutput>
               <contextClassLoaderOutput>target/tccl.properties</contextClassLoaderOutput>
             </configuration>
-            <goals>
-              <goal>load</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

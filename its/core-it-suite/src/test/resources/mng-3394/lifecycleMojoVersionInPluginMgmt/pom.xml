@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng3394</groupId>
@@ -8,11 +8,9 @@
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-3394</name>
-  <description>
-    This test should verify that the Resources Plugin version used is 0.1-stub, not the latest one. It should
+  <description>This test should verify that the Resources Plugin version used is 0.1-stub, not the latest one. It should
     get this version from the POM's pluginManagement section, even though the plugin's mojo call is coming from
-    the default lifecycle bindings, and the plugin is not specified in the POM's build/plugins section.
-  </description>
+    the default lifecycle bindings, and the plugin is not specified in the POM's build/plugins section.</description>
 
   <build>
     <pluginManagement>

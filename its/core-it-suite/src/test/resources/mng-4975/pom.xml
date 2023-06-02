@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,9 +26,7 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-4975</name>
-  <description>
-    Test that plugin executions (in the same phase) are properly ordered after profile injection.
-  </description>
+  <description>Test that plugin executions (in the same phase) are properly ordered after profile injection.</description>
 
   <build>
     <plugins>
@@ -44,30 +40,30 @@ under the License.
         <executions>
           <execution>
             <id>one</id>
-            <phase>validate</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <string>1</string>
             </configuration>
           </execution>
           <execution>
             <id>two</id>
-            <phase>validate</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <string>2</string>
             </configuration>
           </execution>
           <execution>
             <id>three</id>
-            <phase>validate</phase>
             <goals>
               <goal>log-string</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <string>3</string>
             </configuration>
@@ -88,10 +84,10 @@ under the License.
             <executions>
               <execution>
                 <id>four</id>
-                <phase>validate</phase>
                 <goals>
                   <goal>log-string</goal>
                 </goals>
+                <phase>validate</phase>
                 <configuration>
                   <string>4</string>
                 </configuration>
@@ -111,10 +107,10 @@ under the License.
             <executions>
               <execution>
                 <id>five</id>
-                <phase>validate</phase>
                 <goals>
                   <goal>log-string</goal>
                 </goals>
+                <phase>validate</phase>
                 <configuration>
                   <string>5</string>
                 </configuration>

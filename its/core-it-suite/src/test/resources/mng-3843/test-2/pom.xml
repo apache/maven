@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -74,9 +72,9 @@ under the License.
   </modules>
 
   <scm>
-    <url>http://parent.url/trunk</url>
     <connection>http://parent.url/scm</connection>
     <developerConnection>https://parent.url/scm</developerConnection>
+    <url>http://parent.url/trunk</url>
   </scm>
   <issueManagement>
     <url>http://parent.url/issues</url>
@@ -86,21 +84,21 @@ under the License.
   </ciManagement>
   <distributionManagement>
     <repository>
-      <url>http://parent.url/dist</url>
       <id>parent.distros</id>
+      <url>http://parent.url/dist</url>
     </repository>
     <snapshotRepository>
-      <url>http://parent.url/snaps</url>
       <id>parent.snaps</id>
+      <url>http://parent.url/snaps</url>
     </snapshotRepository>
     <site>
-      <url>http://parent.url/site</url>
       <id>parent.site</id>
+      <url>http://parent.url/site</url>
     </site>
-    <downloadUrl>http://parent.url/download</downloadUrl>
     <relocation>
       <message>parent-reloc-msg</message>
     </relocation>
+    <downloadUrl>http://parent.url/download</downloadUrl>
   </distributionManagement>
 
   <properties>
@@ -137,11 +135,6 @@ under the License.
   <build>
     <defaultGoal>initialize</defaultGoal>
     <directory>out</directory>
-    <sourceDirectory>src/main</sourceDirectory>
-    <scriptSourceDirectory>src/scripts</scriptSourceDirectory>
-    <testSourceDirectory>src/test</testSourceDirectory>
-    <outputDirectory>out/main</outputDirectory>
-    <testOutputDirectory>out/test</testOutputDirectory>
     <resources>
       <resource>
         <directory>res/main</directory>
@@ -159,10 +152,10 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>eval</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <outputFile>target/pom.properties</outputFile>
               <expressions>
@@ -173,11 +166,16 @@ under the License.
         </executions>
       </plugin>
     </plugins>
+    <sourceDirectory>src/main</sourceDirectory>
+    <scriptSourceDirectory>src/scripts</scriptSourceDirectory>
+    <testSourceDirectory>src/test</testSourceDirectory>
+    <outputDirectory>out/main</outputDirectory>
+    <testOutputDirectory>out/test</testOutputDirectory>
   </build>
 
   <reporting>
-    <excludeDefaults>true</excludeDefaults>
     <outputDirectory>site</outputDirectory>
+    <excludeDefaults>true</excludeDefaults>
   </reporting>
 
   <profiles>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-4320</name>
-  <description>
-    Verify that for aggregator mojos invoked from the CLI that require dependency resolution the dependencies
-    of all projects in the reactor are resolved and not only the dependencies of the top-level project.
-  </description>
+  <description>Verify that for aggregator mojos invoked from the CLI that require dependency resolution the dependencies
+    of all projects in the reactor are resolved and not only the dependencies of the top-level project.</description>
 
   <modules>
     <module>sub-1</module>

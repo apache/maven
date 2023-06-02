@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,19 +17,16 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng4788</groupId>
-  <version>0.1-SNAPSHOT</version>
   <artifactId>test</artifactId>
+  <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4788</name>
-  <description>
-    Verify that plugins can install artifacts to a custom local repo (i.e. custom base dir and custom layout).
-  </description>
+  <description>Verify that plugins can install artifacts to a custom local repo (i.e. custom base dir and custom layout).</description>
 
   <build>
     <plugins>
@@ -41,11 +37,11 @@ under the License.
         <executions>
           <execution>
             <id>deploy</id>
-            <phase>validate</phase>
             <goals>
               <goal>set</goal>
               <goal>install-custom</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <mainFile>pom.xml</mainFile>
               <localRepoDir>target/local-repo</localRepoDir>

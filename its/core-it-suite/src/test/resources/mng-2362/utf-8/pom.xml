@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,13 +17,11 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <!--
 
 NOTE: This file being encoded in UTF-8 is essential part of this test!
 
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -33,9 +30,7 @@ NOTE: This file being encoded in UTF-8 is essential part of this test!
   <version>0.1</version>
 
   <name>Maven Integration Test :: MNG-2362</name>
-  <description>
-    TEST-CHARS: ßıΣЯא€
-  </description>
+  <description>TEST-CHARS: ßıΣЯא€</description>
 
   <distributionManagement>
     <repository>
@@ -53,16 +48,16 @@ NOTE: This file being encoded in UTF-8 is essential part of this test!
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
-            <configuration>
-              <mainFile>main.jar</mainFile>
-            </configuration>
             <goals>
               <goal>set</goal>
               <goal>attach-pom</goal>
               <goal>install</goal>
               <goal>deploy</goal>
             </goals>
+            <phase>validate</phase>
+            <configuration>
+              <mainFile>main.jar</mainFile>
+            </configuration>
           </execution>
         </executions>
       </plugin>

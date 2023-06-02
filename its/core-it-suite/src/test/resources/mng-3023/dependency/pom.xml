@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -34,7 +32,6 @@ under the License.
   <description>Test that reactor projects are included in dependency resolution.</description>
 
   <build>
-    <outputDirectory>dependency-classes</outputDirectory>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
@@ -43,22 +40,22 @@ under the License.
         <executions>
           <execution>
             <id>compile</id>
-            <phase>initialize</phase>
             <goals>
               <goal>set</goal>
             </goals>
+            <phase>initialize</phase>
             <configuration>
               <mainFile>dependency-classes</mainFile>
             </configuration>
           </execution>
           <execution>
             <id>install</id>
-            <phase>generate-sources</phase>
             <goals>
               <goal>set</goal>
               <goal>attach-pom</goal>
               <goal>install</goal>
             </goals>
+            <phase>generate-sources</phase>
             <configuration>
               <mainFile>dependency-1.jar</mainFile>
             </configuration>
@@ -66,5 +63,6 @@ under the License.
         </executions>
       </plugin>
     </plugins>
+    <outputDirectory>dependency-classes</outputDirectory>
   </build>
 </project>

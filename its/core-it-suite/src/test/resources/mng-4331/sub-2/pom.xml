@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4331 :: Sub-2</name>
-  <description>
-    Verify that the mojo annotation @requiresDependencyCollection allows to grab the transitive dependencies
-    without resolving their artifact files.
-  </description>
+  <description>Verify that the mojo annotation @requiresDependencyCollection allows to grab the transitive dependencies
+    without resolving their artifact files.</description>
 
   <dependencies>
     <!-- This dependency or more precisely its POM is part of the reactor but the actual artifact file is not (yet build) -->
@@ -51,10 +47,10 @@ under the License.
         <executions>
           <execution>
             <id>test</id>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <compileArtifacts>target/compile.txt</compileArtifacts>
             </configuration>

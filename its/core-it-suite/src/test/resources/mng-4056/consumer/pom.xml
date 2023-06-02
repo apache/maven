@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -32,10 +30,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-4056 :: Dependency Consumer</name>
-  <description>
-    Test that attached artifacts can be resolved from the reactor cache even if the dependency declaration
-    in the consumer module does not use the proper artifact type but merely specifies the classifier.
-  </description>
+  <description>Test that attached artifacts can be resolved from the reactor cache even if the dependency declaration
+    in the consumer module does not use the proper artifact type but merely specifies the classifier.</description>
 
   <dependencies>
     <!--
@@ -46,29 +42,29 @@ under the License.
       <groupId>org.apache.maven.its.mng4056</groupId>
       <artifactId>producer</artifactId>
       <version>0.1</version>
-      <type>jar</type>
       <classifier>tests</classifier>
+      <type>jar</type>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.mng4056</groupId>
       <artifactId>producer</artifactId>
       <version>0.1</version>
-      <type>jar</type>
       <classifier>sources</classifier>
+      <type>jar</type>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.mng4056</groupId>
       <artifactId>producer</artifactId>
       <version>0.1</version>
-      <type>jar</type>
       <classifier>javadoc</classifier>
+      <type>jar</type>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.mng4056</groupId>
       <artifactId>producer</artifactId>
       <version>0.1</version>
-      <type>jar</type>
       <classifier>client</classifier>
+      <type>jar</type>
     </dependency>
   </dependencies>
 
@@ -81,10 +77,10 @@ under the License.
         <executions>
           <execution>
             <id>package</id>
-            <phase>validate</phase>
             <goals>
               <goal>compile</goal>
             </goals>
+            <phase>validate</phase>
             <configuration>
               <projectArtifacts>target/artifacts.txt</projectArtifacts>
               <compileClassPath>target/compile.txt</compileClassPath>

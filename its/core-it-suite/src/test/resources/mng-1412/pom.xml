@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,9 +25,7 @@ under the License.
   <version>0.1-SNAPSHOT</version>
 
   <name>Maven Integration Test :: MNG-1412</name>
-  <description>
-    Check that dependencies are available in classpath in same order as declared in POM.
-  </description>
+  <description>Check that dependencies are available in classpath in same order as declared in POM.</description>
 
   <dependencies>
     <!-- model dependencies first, in the order given -->
@@ -49,6 +45,35 @@ under the License.
       <version>0.1</version>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-dependency-resolution</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <compileArtifacts>target/compile-artifacts.txt</compileArtifacts>
+          <compileClassPath>target/compile-classpath.txt</compileClassPath>
+          <runtimeArtifacts>target/runtime-artifacts.txt</runtimeArtifacts>
+          <runtimeClassPath>target/runtime-classpath.txt</runtimeClassPath>
+          <testArtifacts>target/test-artifacts.txt</testArtifacts>
+          <testClassPath>target/test-classpath.txt</testClassPath>
+          <significantPathLevels>1</significantPathLevels>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>runtime</goal>
+              <goal>test</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
   <profiles>
     <profile>
@@ -72,33 +97,4 @@ under the License.
       </dependencies>
     </profile>
   </profiles>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-dependency-resolution</artifactId>
-        <version>2.1-SNAPSHOT</version>
-        <configuration>
-          <compileArtifacts>target/compile-artifacts.txt</compileArtifacts>
-          <compileClassPath>target/compile-classpath.txt</compileClassPath>
-          <runtimeArtifacts>target/runtime-artifacts.txt</runtimeArtifacts>
-          <runtimeClassPath>target/runtime-classpath.txt</runtimeClassPath>
-          <testArtifacts>target/test-artifacts.txt</testArtifacts>
-          <testClassPath>target/test-classpath.txt</testClassPath>
-          <significantPathLevels>1</significantPathLevels>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>validate</phase>
-            <goals>
-              <goal>compile</goal>
-              <goal>runtime</goal>
-              <goal>test</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

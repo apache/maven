@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,10 +25,8 @@ under the License.
   <version>1.0</version>
 
   <name>Maven Integration Test :: MNG-3012</name>
-  <description>
-    Verify that classes shared with the Maven core realm are imported into the plugin realm such that instances of
-    these classes created by the core can be cast to classes loaded by the plugin.
-  </description>
+  <description>Verify that classes shared with the Maven core realm are imported into the plugin realm such that instances of
+    these classes created by the core can be cast to classes loaded by the plugin.</description>
 
   <build>
     <plugins>
@@ -38,22 +34,6 @@ under the License.
         <groupId>org.apache.maven.its.plugins</groupId>
         <artifactId>maven-it-plugin-class-loader</artifactId>
         <version>2.1-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <id>xpp3dom</id>
-            <phase>validate</phase>
-            <configuration>
-              <className>org.codehaus.plexus.util.xml.Xpp3Dom</className>
-              <objectExpressions>
-                <objectExpression>project/reporting/plugins/0/configuration</objectExpression>
-              </objectExpressions>
-              <instanceofPropertiesFile>target/xpp3dom.properties</instanceofPropertiesFile>
-            </configuration>
-            <goals>
-              <goal>instanceof</goal>
-            </goals>
-          </execution>
-        </executions>
         <dependencies>
           <!-- put Xpp3Dom into plugin class realm to offer Maven the bad choice -->
           <dependency>
@@ -62,6 +42,22 @@ under the License.
             <version>0.1-mng3012</version>
           </dependency>
         </dependencies>
+        <executions>
+          <execution>
+            <id>xpp3dom</id>
+            <goals>
+              <goal>instanceof</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <className>org.codehaus.plexus.util.xml.Xpp3Dom</className>
+              <objectExpressions>
+                <objectExpression>project/reporting/plugins/0/configuration</objectExpression>
+              </objectExpressions>
+              <instanceofPropertiesFile>target/xpp3dom.properties</instanceofPropertiesFile>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

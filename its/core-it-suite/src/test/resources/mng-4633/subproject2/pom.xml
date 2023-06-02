@@ -1,48 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project>
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.apache.maven.its.mng4633</groupId>
-        <artifactId>parent</artifactId>
-        <version>1.0</version>
-    </parent>
+  <parent>
+    <groupId>org.apache.maven.its.mng4633</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0</version>
+  </parent>
 
-    <artifactId>subproject2</artifactId>
-    <packaging>jar</packaging>
+  <artifactId>subproject2</artifactId>
+  <packaging>jar</packaging>
 
-    <name>Maven Integration Test :: MNG-4633 : Project 2</name>
+  <name>Maven Integration Test :: MNG-4633 : Project 2</name>
 
-
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.maven.its.mng4633</groupId>
-            <artifactId>subproject1</artifactId>
-            <version>1.0</version>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <executions>
-                    <execution>
-                       <id>default-compile</id>
-                       <configuration>
-                         <excludes>
-                           <exclude>**</exclude>
-                         </excludes>
-                       </configuration>
-                     </execution>
-                    <execution>
-                        <id>baz</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.mng4633</groupId>
+      <artifactId>subproject1</artifactId>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-compile</id>
+            <configuration>
+              <excludes>
+                <exclude>**</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>baz</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <phase>generate-resources</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

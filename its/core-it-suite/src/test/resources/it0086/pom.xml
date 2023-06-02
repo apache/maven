@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,10 +25,8 @@ under the License.
   <version>1.0</version>
 
   <name>Maven Integration Test :: it0086</name>
-  <description>
-    Verify that a plugin dependency class can be loaded from both the plugin classloader and the context classloader
-    available to the plugin.
-  </description>
+  <description>Verify that a plugin dependency class can be loaded from both the plugin classloader and the context classloader
+    available to the plugin.</description>
 
   <build>
     <plugins>
@@ -41,6 +37,9 @@ under the License.
         <executions>
           <execution>
             <id>load</id>
+            <goals>
+              <goal>load</goal>
+            </goals>
             <phase>validate</phase>
             <configuration>
               <classNames>org.apache.maven.plugin.coreit.ClassA,org.apache.maven.plugin.coreit.ClassB,org.apache.maven.plugin.coreit.SomeClass</classNames>
@@ -48,9 +47,6 @@ under the License.
               <pluginClassLoaderOutput>target/pcl.properties</pluginClassLoaderOutput>
               <contextClassLoaderOutput>target/tccl.properties</contextClassLoaderOutput>
             </configuration>
-            <goals>
-              <goal>load</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>
